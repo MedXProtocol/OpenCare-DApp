@@ -2,37 +2,41 @@ pragma solidity ^0.4.15;
 
 contract MedCredits {
     address public contractOwner;
-    uint256 caseCount;
+    uint256 public caseCount;
+    uint256 constant ALLOWED_DIAGNOSES = 2;
 
-    /*mapping(address => PatientCase) patientCases;*/
-
-    /* 0x2755f888047Db8E3d169C6A427470C44b19a7270 => [0][struct[]]*/
-    /* 0x2755f888047Db8E3d169C6A427470C44b19a7270 => [1][struct[]]*/
-    /* 0x203e9Aa0a8A8Dc03f8182bC74Db18cEe371dC237 => [2][struct[]]*/
-    //patientCases[msg.sender][caseCount];
-    mapping(address => mapping(uint256 => PatientCase)) patientCases;
-
+    mapping(uint256 => PatientCase) internal patientCases;
     mapping(address => Physician) public physicians;
 
-    enum CaseState { WaitingForDiagnosis, DiagnosisInProgress, DiagnosisAccepted, DiagnosisRejected }
-    enum PhysicianStatus { NotApproved, Approved }
-
     struct PatientCase {
+        address patient;
+        string symptoms;
+        bytes32 imagePath1;
+        bytes32 imagePath2;
         string diagnosis;
+        uint256 diagnosisCount;
         CaseState caseStatus;
         uint256 dateListed;
     }
 
     struct Physician {
-        address physician;
         PhysicianStatus status;
+        string name;
     }
 
-    event CaseListed(address patient);
-    event CaseDiagnosis(address patient, address doctor);
+    enum CaseState { WaitingForDiagnosis, DiagnosisInProgress, DiagnosisSubmitted, DiagnosisAccepted, DiagnosisRejected }
+    enum PhysicianStatus { NotApproved, Approved }
+
+    event CaseListed(address patient, uint256 dateListed);
+    event CaseDiagnosed(address patient, address doctor);
 
     modifier onlyOwner {
         require(msg.sender == contractOwner);
+        _;
+    }
+
+    modifier approvedPhysicianOnly {
+        require(physicians[msg.sender].status == PhysicianStatus.Approved);
         _;
     }
 
@@ -40,34 +44,57 @@ contract MedCredits {
         contractOwner = msg.sender;
     }
 
-    function addPhysician(address _physicianAddress) onlyOwner {
-        physicians[_physicianAddress] = Physician({physician: _physicianAddress, status: PhysicianStatus.NotApproved});
+    function createCase(string _symptoms) {
+        //TODO: Add params to create the actual case
+        patientCases[caseCount] = PatientCase(msg.sender, _symptoms, "", "", "", 0, CaseState.WaitingForDiagnosis, now);
+        caseCount++;
+        CaseListed(msg.sender, now);
     }
 
-    function createCase() {
-        patientCases[msg.sender][caseCount] = PatientCase("My Symptoms go here", CaseState.WaitingForDiagnosis, now);
+    function getCase(uint256 _caseId) constant returns (address, string, bytes32, bytes32, string, uint256, CaseState, uint256) {
+        PatientCase storage pCase = patientCases[_caseId];
+        //Only approved physicians and the patient can view their cases
+        require(physicians[msg.sender].status == PhysicianStatus.Approved || pCase.patient == msg.sender);
+
+        return (pCase.patient, pCase.symptoms, pCase.imagePath1, pCase.imagePath2, pCase.diagnosis, pCase.diagnosisCount, pCase.caseStatus, pCase.dateListed);
     }
 
-    function diagnoseCase(address _patient, uint256 _caseId, address _consultingPhysician) {
-        PatientCase patCase = patientCases[_patient][_caseId];
-        patCase.caseStatus = CaseState.DiagnosisInProgress;
+    function diagnoseCase(uint256 _caseId) approvedPhysicianOnly {
+        PatientCase storage pCase = patientCases[_caseId];
+        require(pCase.caseStatus == CaseState.WaitingForDiagnosis);
+        require(pCase.diagnosisCount <= ALLOWED_DIAGNOSES);
+        pCase.caseStatus = CaseState.DiagnosisInProgress;
     }
 
-    /* Reject or approved diagnosis */
-    function reviewDiagnosis() {
-        /*Patient only*/
+    function submitDiagnosis(uint256 _caseId, string _diagnosis) approvedPhysicianOnly {
+        PatientCase storage pCase = patientCases[_caseId];
+        require(pCase.caseStatus == CaseState.DiagnosisInProgress);
+        pCase.diagnosis = _diagnosis;
+        pCase.diagnosisCount++;
+        pCase.caseStatus = CaseState.DiagnosisSubmitted;
+    }
+
+    function reviewDiagnosis(uint256 _caseId, bool _accepted) {
+        PatientCase storage pCase = patientCases[_caseId];
+        require(pCase.caseStatus == CaseState.DiagnosisSubmitted);
+        require(pCase.patient == msg.sender);
+        if (_accepted)
+            pCase.caseStatus = CaseState.DiagnosisAccepted;
+        else {
+            if(pCase.diagnosisCount < ALLOWED_DIAGNOSES)
+                pCase.caseStatus = CaseState.WaitingForDiagnosis;
+            else
+                pCase.caseStatus = CaseState.DiagnosisRejected;
+        }
+    }
+
+    function addPhysician(address _physicianAddress, string _name) onlyOwner {
+        physicians[_physicianAddress] = Physician({status: PhysicianStatus.NotApproved, name: _name});
     }
 
     function approvePhysician(address _physicianAddress) onlyOwner {
-        Physician dr = physicians[_physicianAddress];
-        dr.status = PhysicianStatus.Approved;
+        Physician storage phys = physicians[_physicianAddress];
+        phys.status = PhysicianStatus.Approved;
     }
 
-    function listCase(address _patientAddress, uint256 _caseId) constant returns (string, CaseState, uint256) {
-        //Only approved physicians can view cases
-        require(physicians[msg.sender].physician != 0);
-
-        PatientCase patCase = patientCases[_patientAddress][_caseId];
-        return (patCase.diagnosis, patCase.caseStatus, patCase.dateListed);
-    }
 }
