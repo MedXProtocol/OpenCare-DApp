@@ -13,20 +13,29 @@ contract Case is Ownable {
     address public diagnosingDoctorA;
     address public diagnosingDoctorB;
 
-    string public caseDetailLocationHash;
-    string public encryptionKey;
-    string public diagnosisLocationHash;
+    bytes32 public caseDetailLocationHash;
+    bytes32 public originalEncryptionKey;
+    bytes32 public diagnosisLocationHash;
 
     DoctorManager public doctorManager;
     MedXToken public medXToken;
     CaseStatus public status;
 
+    mapping (address => Authorization) public authorizations;
+    struct Authorization {
+        AuthStatus status;
+        bytes32 doctorEncryptionKey;
+    }
+
     enum CaseStatus { Created, Open, Evaluated, Closed, Challenged, Canceled }
+    enum AuthStatus { None, Requested, Approved }
 
     event CaseCreated(address indexed _caseAddress, address indexed _casePatient);
     event CaseEvaluated(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor);
     event CaseClosed(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor);
     event CaseChallenged(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor);
+    event CaseAuthorizationRequested(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor);
+    event CaseAuthorizationApproved(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor);
 
     /**
      * @dev - throws if called by any account other than the patient.
@@ -44,32 +53,27 @@ contract Case is Ownable {
         _;
     }
 
+    modifier evaluateTiming() {
+        _;
+    }
+
     /**
      * @dev - Creates a new case with the given parameters
      * @param _patient - the patient who created the case
-     * @param _caseHash - location of the encrypted case files
-     * @param _encryptionKey - key used to encrypt the case files
      * @param _caseFee - fee for this particular case
      * @param _token - the MedX token
      * @param _doctorManager - the doctor manager contract
      */
     function Case(
         address _patient,
-        string _caseHash,
-        string _encryptionKey,
         uint256 _caseFee,
         MedXToken _token,
         DoctorManager _doctorManager
     ) {
-        /* check that this cases balance is 150% of the case fee */
-        require(_token.balanceOf(this) >= _caseFee + (_caseFee * 50) / 100);
-
+        status = CaseStatus.Created;
         patient = _patient;
-        caseDetailLocationHash = _caseHash;
-        encryptionKey = _encryptionKey;
         caseFee = _caseFee;
         medXToken = _token;
-        status = CaseStatus.Created;
         doctorManager = _doctorManager;
         CaseCreated(address(this), patient);
     }
@@ -91,12 +95,27 @@ contract Case is Ownable {
     }
 
     /**
-     * @dev - doctor submits diagnosis for case
+     * @dev - submit case details and make the case available for diagnosis
+     * @param _caseHash - location of the encrypted case files
+     * @param _encryptionKey - key used to encrypt the case files
+     */
+    function submitCase(bytes32 _caseHash, bytes32 _encryptionKey) onlyPatient {
+        require(status == CaseStatus.Created);
+        status = CaseStatus.Open;
+        caseDetailLocationHash = _caseHash;
+        originalEncryptionKey = _encryptionKey;
+    }
+
+    /**
+     * @dev - doctor submits diagnosis for case. Patient must have approved the doctor in order for them to decrypt the case files
      * @param _diagnosisHash - Swarm hash of where the diagnosis data is stored
      */
-    function diagnoseCase(string _diagnosisHash) public onlyDoctor {
-        require(status == CaseStatus.Created);
+    function diagnoseCase(bytes32 _diagnosisHash) public onlyDoctor {
+        require(status == CaseStatus.Open);
+        require(authorizations[msg.sender].status == AuthStatus.Approved);
         status = CaseStatus.Evaluated;
+
+        /* TODO: Start 24 hour timer */
         diagnosingDoctorA = msg.sender;
         diagnosisLocationHash = _diagnosisHash;
         CaseEvaluated(address(this), patient, diagnosingDoctorA);
@@ -110,7 +129,7 @@ contract Case is Ownable {
         require(status == CaseStatus.Evaluated);
         status = CaseStatus.Closed;
         medXToken.transfer(diagnosingDoctorA, caseFee);
-        medXToken.transfer(patient, medXToken.balanceOf(this) - caseFee); //Security in case the funds were bigger than required
+        medXToken.transfer(patient, medXToken.balanceOf(this).sub(caseFee)); //Security in case the funds were bigger than required
         CaseClosed(address(this), patient, diagnosingDoctorA);
     }
 
@@ -120,16 +139,18 @@ contract Case is Ownable {
     function challengeDiagnosis() public onlyPatient {
         require(status == CaseStatus.Evaluated);
         status = CaseStatus.Challenged;
+        /* TODO: Make sure case is within 24 hour period */
         CaseChallenged(address(this), patient, diagnosingDoctorA);
     }
 
     /**
-     * @dev - The second doctor confirms the diagnosis
+     * @dev - The second doctor confirms the diagnosis. Patient must have approved second doctor in order for them to have viewed the case files
      */
     function confirmChallengedDiagnosis() public onlyDoctor {
         /* TODO: add evaluation time logic */
         require(status == CaseStatus.Challenged);
         require(msg.sender != diagnosingDoctorA);
+        require(authorizations[msg.sender].status == AuthStatus.Requested);
 
         status = CaseStatus.Closed;
         diagnosingDoctorB = msg.sender;
@@ -148,6 +169,7 @@ contract Case is Ownable {
         /* TODO: add evaluation time logic */
         require(status == CaseStatus.Challenged);
         require(msg.sender != diagnosingDoctorA);
+        require(authorizations[msg.sender].status == AuthStatus.Requested);
 
         status = CaseStatus.Closed;
         diagnosingDoctorB = msg.sender;
@@ -156,5 +178,27 @@ contract Case is Ownable {
         medXToken.transfer(patient, medXToken.balanceOf(this) - ((caseFee * 50) / 100)); //Security in case the funds were bigger than required
 
         CaseClosed(address(this), patient, diagnosingDoctorA);
+    }
+
+    /**
+     * @dev - doctor requests access to patients encrypted case files. Patient needs to approved and created doctor specific decryption key
+     */
+    function requestAuthorization() public onlyDoctor {
+        authorizations[msg.sender].status = AuthStatus.Requested;
+        CaseAuthorizationRequested(address(this), patient, msg.sender);
+    }
+
+    /**
+     * @dev - Patient will encrypt the encryption key using the doctors public key so that the doctor can decrypt the case files
+     * @param _doctor - the doctors address to authorize
+     * @param _encryptionKey - the case file encryption key encrypted using the doctors public key
+     */
+    function authorizeDoctor(address _doctor, bytes32 _encryptionKey) public onlyPatient {
+        require(_doctor != 0x0);
+        require(doctorManager.isDoctor(_doctor));
+        require(authorizations[_doctor].status == AuthStatus.Requested);
+        authorizations[_doctor].status = AuthStatus.Approved;
+        authorizations[_doctor].doctorEncryptionKey = _encryptionKey;
+        CaseAuthorizationApproved(address(this), patient, _doctor);
     }
 }

@@ -1,5 +1,14 @@
 let MedCredits = artifacts.require("./MedCredits.sol");
+let MedXToken = artifacts.require("./MedXToken.sol");
+let DoctorManager = artifacts.require("./DoctorManager.sol");
+let CaseFactory = artifacts.require("./CaseFactory.sol");
 
 module.exports = function(deployer) {
-    deployer.deploy(MedCredits);
+    //deployer.deploy(MedCredits);
+
+    deployer.deploy(MedXToken).then(function () {
+        return deployer.deploy(DoctorManager);
+    }).then(function() {
+        return deployer.deploy(CaseFactory, 100, MedXToken.address, DoctorManager.address);
+    });
 };
