@@ -3,16 +3,23 @@ pragma solidity 0.4.15;
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract DoctorManager is Ownable {
-    mapping (address => bool) public doctors;
+    mapping (address => DoctorDetails) public doctors;
+    struct DoctorDetails {
+        bool isActive;
+        bool isCertified;
+        uint256 fee;
+    }
 
     function DoctorManager() {}
 
     function addDoctor(address _doctor) public onlyOwner {
-        require(doctors[_doctor] == false);
-        doctors[_doctor] = true;
+        require(doctors[_doctor].isActive == false);
+        doctors[_doctor].isActive = true;
+        doctors[_doctor].isCertified = false;
+        doctors[_doctor].fee = 0;
     }
 
-    function isDoctor(address _doctor) public returns (bool) {
-        return doctors[_doctor];
+    function isDoctor(address _doctor) constant public returns (bool) {
+        return doctors[_doctor].isActive;
     }
 }
