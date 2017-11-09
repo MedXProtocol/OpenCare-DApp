@@ -9,9 +9,8 @@ contract CaseFactory is Ownable, Pausable {
     using SafeMath for uint256;
 
     uint256 public caseFee;
-
-    mapping (address => Case) public cases;
     address[] public caseList;
+    mapping (address => address[]) public patientCases;
 
     MedXToken public medXToken;
     DoctorManager public doctorManager;
@@ -71,10 +70,17 @@ contract CaseFactory is Ownable, Pausable {
     }
 
     /**
-     * @dev - returns the length of the case list array
+     * @dev - returns the length of the "all" case list
      */
-    function getCaseListLength() public constant returns (uint256) {
+    function getAllCaseListCount() public constant returns (uint256 _caseCount) {
         return caseList.length;
+    }
+
+    /**
+     * @dev - returns the length of the patient specific case list
+     */
+    function getPatientCaseListCount(address _patient) constant public returns (uint256 _caseCount) {
+        return patientCases[_patient].length;
     }
 
     /**
@@ -84,8 +90,8 @@ contract CaseFactory is Ownable, Pausable {
      */
     function createCase(address _patient) internal returns (address _newCase) {
         Case newCase = new Case(_patient, caseFee, medXToken, doctorManager);
-        cases[address(newCase)] = newCase;
         caseList.push(address(newCase));
+        patientCases[_patient].push(address(newCase));
         return newCase;
     }
 }

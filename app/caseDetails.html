@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MedCredits :: Case Details</title>
+    <link rel="shortcut icon" type="image/png" href="images/favicon.ico"/>
+
+    <!-- Stylesheet includes: hosted -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css">
+
+    <!-- Stylesheet includes: local -->
+    <link rel="stylesheet" href="css/medcredits.css">
+
+    <!-- JS includes: hosted -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.18.12/URI.js"></script>
+
+    <!-- JS includes: local -->
+    <script src="scripts/libs/web3.min.js"></script>
+    <script src="scripts/libs/js.cookie.js"></script>
+    <script src="scripts/libs/moment.min.js"></script>
+    <script src="scripts/common.js"></script>
+    <script src="scripts/caseDetails.js"></script>
+</head>
+<body>
+<div class="page-container">
+    <!-- Content -->
+
+
+    <div class="main-content-panel">
+        <br />
+        <div class="row row-header">
+            <div class="col-md-2">&nbsp;</div>
+            <div class="col-md-8">
+                <br />
+                <button id="requestAuthorizationBtn" class='btn btn-primary form-button' type="button">Request Authorization</button>
+                <br />
+                <br />
+
+                <div class="row">
+                    Your Account: <span id="currentAccountLbl"></span><br />
+                    Doctor Account: <span id="isDoctorLbl"></span><br />
+                    Case Authorization Status: <span id="isAuthorizedDoctorLbl"></span><br />
+                    Your MedX Balance: <span id="medXBalanceLbl"></span><br />
+                    Case MedX Balance: <span id="caseBalanceLbl"></span>
+                </div>
+
+                <br />
+
+                <h3>Details for Case <span id="caseAddressLbl"></span></h3>
+
+                <div class="row row-header">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <strong>Case Fee:</strong> <span id="caseFeeLbl"></span> MedX
+                        </div>
+                        <div class="row">
+                            <strong>Patient:</strong> <span id="patientLbl"></span>
+                        </div>
+                        <div class="row">
+                            <strong>Diagnosing Dr A:</strong> <span id="doctorALbl"></span>
+                        </div>
+                        <div class="row">
+                            <strong>Diagnosing Dr B:</strong> <span id="doctorBLbl"></span>
+                        </div>
+                        <div class="row">
+                            <strong>Detail Location Hash:</strong> <span id="detailLocationHashLbl" class="long-address"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <strong>Original Encryption Key:</strong> <span id="originalEncryptionKeyLbl" class="long-address"></span>
+                        </div>
+                        <div class="row">
+                            <strong>Diagnosis Location Hash:</strong> <span id="diagnosisLocationHashLbl" class="long-address"></span>
+                        </div>
+                        <div class="row">
+                            <strong>Doctor Manager Address:</strong> <span id="doctorManagerAddressLbl"></span>
+                        </div>
+                        <div class="row">
+                            <strong>MedX Token Address:</strong> <span id="medXTokenAddressLbl"></span>
+                        </div>
+                        <div class="row">
+                            <strong>Status:</strong> <span id="statusLbl"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+
+                <h3>Patient Submit Case</h3>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label for="descriptionTxt" class="col-lg-3 control-label vert-align-control-label">Description</label>
+                            <div class="col-lg-7">
+                                <input id="descriptionTxt" type="text" class="form-control" placeholder="" value="DummyDescription" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label for="encryptionKeyTxt" class="col-lg-3 control-label vert-align-control-label">Encryption Key</label>
+                            <div class="col-lg-7">
+                                <input id="encryptionKeyTxt" type="text" class="form-control" placeholder="" value="EncryptionKey" />
+                            </div>
+                        </div>
+                        <br />
+                        <button id="submitCaseBtn" class='btn btn-primary form-button' type="button">Submit Case</button>
+                    </div>
+                </div>
+
+                <br />
+
+                <h3>Patient Authorize Doctor</h3>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label for="authDoctorAddressTxt" class="col-lg-3 control-label vert-align-control-label">Doctor Address</label>
+                            <div class="col-lg-7">
+                                <input id="authDoctorAddressTxt" type="text" class="form-control" placeholder="" value="0x8c936d8701bD5445acD97D5542699D46fa9da543" />
+                            </div>
+                        </div>
+                        <br />
+                        <button id="authDoctorBtn" class='btn btn-primary form-button' type="button">Authorized Doctor</button>
+                    </div>
+                </div>
+
+                <h3>Doctor Diagnose Case</h3>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label for="diagnosisTxt" class="col-lg-3 control-label vert-align-control-label">Diagnosis</label>
+                            <div class="col-lg-7">
+                                <input id="diagnosisTxt" type="text" class="form-control" placeholder="" value="DummyDiagnosis" />
+                            </div>
+                        </div>
+                        <br />
+                        <button id="diagnoseCaseBtn" class='btn btn-primary form-button' type="button">Diagnose Case</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-2">&nbsp;</div>
+        </div>
+        <br />
+        <br />
+    </div>
+</div>
+</body>
+</html>

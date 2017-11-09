@@ -129,7 +129,7 @@ contract Case is Ownable {
         require(status == CaseStatus.Evaluated);
         status = CaseStatus.Closed;
         medXToken.transfer(diagnosingDoctorA, caseFee);
-        medXToken.transfer(patient, medXToken.balanceOf(this).sub(caseFee)); //Security in case the funds were bigger than required
+        medXToken.transfer(patient, medXToken.balanceOf(address(this)));
         CaseClosed(address(this), patient, diagnosingDoctorA);
     }
 
@@ -150,14 +150,14 @@ contract Case is Ownable {
         /* TODO: add evaluation time logic */
         require(status == CaseStatus.Challenged);
         require(msg.sender != diagnosingDoctorA);
-        require(authorizations[msg.sender].status == AuthStatus.Requested);
+        require(authorizations[msg.sender].status == AuthStatus.Approved);
 
         status = CaseStatus.Closed;
         diagnosingDoctorB = msg.sender;
 
         medXToken.transfer(diagnosingDoctorA, caseFee);
         medXToken.transfer(diagnosingDoctorB, (caseFee * 50) / 100);
-        medXToken.transfer(patient, medXToken.balanceOf(this) - (caseFee + (caseFee * 50) / 100)); //Security in case the funds were bigger than required
+        medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
         CaseClosed(address(this), patient, diagnosingDoctorA);
     }
@@ -169,13 +169,13 @@ contract Case is Ownable {
         /* TODO: add evaluation time logic */
         require(status == CaseStatus.Challenged);
         require(msg.sender != diagnosingDoctorA);
-        require(authorizations[msg.sender].status == AuthStatus.Requested);
+        require(authorizations[msg.sender].status == AuthStatus.Approved);
 
         status = CaseStatus.Closed;
         diagnosingDoctorB = msg.sender;
 
         medXToken.transfer(diagnosingDoctorB, (caseFee * 50) / 100);
-        medXToken.transfer(patient, medXToken.balanceOf(this) - ((caseFee * 50) / 100)); //Security in case the funds were bigger than required
+        medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
         CaseClosed(address(this), patient, diagnosingDoctorA);
     }
