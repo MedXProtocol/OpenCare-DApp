@@ -1221,9 +1221,9 @@ var medXCaseAbi = [
     }
 ];
 
-var caseFactory, medXToken, doctorManager, medXCase, networkVersion, web3, currentUserAddress;
+var caseFactory, medXToken, doctorManager, medXCase, networkVersion, web3, currentUserAddress, bzz;
 
-var Web3 = require('web3');
+//var Web3 = require('web3');
 var currentBlockAtPageLoad = 0;
 var searchStartBlock = 0;
 var accountsInitialized = false;
@@ -1263,6 +1263,10 @@ $(function() {
             //window.location = "no_metamask.html";
             web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
         }
+
+        bzz = web3.bzz;
+        //bzz.setProvider("http://swarm-gateways.net");
+
 
         web3.eth.getBlock("latest", function (error, result) {
             log("Block Number: " + result.number);
@@ -1404,7 +1408,7 @@ function displayAlert(messageType, content) {
     }, ALERT_DISPLAY_TIME);
 }
 
-function updateAccountBalance() {
+function updateAccountBalance(_medXBalanceLbl) {
     medXToken.balanceOf(currentUserAddress, function(_error, _medXBalance) {
         $medXBalanceLbl.html(_medXBalance + " MEDX");
     });

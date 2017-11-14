@@ -1,9 +1,10 @@
+/* TODO: Hide/show controls based on viewing account. If account is patient, don't show doctor controls etc*/
+
 let $submitCaseBtn, $requestAuthorizationBtn, $authDoctorBtn, $diagnoseCaseBtn;
 let $currentAccountLbl, $isDoctorLbl, $medXBalanceLbl, $caseBalanceLbl, $caseAddressLbl, $caseFeeLbl, $patientLbl, $doctorALbl, $doctorBLbl, $detailLocationHashLbl, $statusLbl, $isAuthorizedDoctorLbl,
     $originalEncryptionKeyLbl, $diagnosisLocationHashLbl, $doctorManagerAddressLbl, $medXTokenAddressLbl;
 let $descriptionTxt, $encryptionKeyTxt, $authDoctorAddressTxt, $diagnosisTxt;
 let latestCase, queryStringCaseAddress;
-
 
 $(function() {
     $currentAccountLbl = $("#currentAccountLbl");
@@ -133,6 +134,20 @@ function diagnoseCase() {
     web3.eth.defaultAccount = currentUserAddress;
     latestCase.diagnoseCase($diagnosisTxt.val(), function(_error, _result) {
         log("Case Dianosis Submitted!");
+    });
+}
+
+function acceptDiagnosis() {
+    web3.eth.defaultAccount = currentUserAddress;
+    latestCase.acceptDiagnosis(function(_error, _result) {
+        log("Case accepted!");
+    });
+}
+
+function challengeDiagnosis() {
+    web3.eth.defaultAccount = currentUserAddress;
+    latestCase.challengeDiagnosis(function(_error, _result) {
+        log("Case challenged!");
     });
 }
 

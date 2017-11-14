@@ -1,7 +1,7 @@
+/* TODO: Change action button based on case status -> Evaluated, show review button*/
 let $createCaseBtn, $medXBalanceLbl;
 let $allListingsDataTable;
 let $allListingsTbl;
-
 
 $(function() {
     $createCaseBtn = $("#createCaseBtn");
@@ -16,13 +16,16 @@ function initializeIndexPage() {
         $createCaseBtn.on("click", createCase);
         $allListingsTbl.on("click", ".cancel-case", cancelCase);
         $allListingsDataTable = initDataTable($allListingsTbl, {
+            "columnDefs": [
+                {"targets": 4, "visible": false}
+            ],
             "language": {
                 "emptyTable": "There are currently no names for sale. Please check back later"
             }
         });
 
         populateAllListingsTable();
-        updateAccountBalance();
+        updateAccountBalance($medXBalanceLbl);
 
     } else {
         setTimeout(function() {
@@ -33,13 +36,14 @@ function initializeIndexPage() {
 
 function cancelCase() {
     web3.eth.defaultAccount = currentUserAddress;
-    let caseAddress = $allListingsDataTable.row($(this).parents("tr")).data()[0];
+    let caseAddress = $allListingsDataTable.row($(this).parents("tr")).data()[4];
+    log("Case Address [" + caseAddress + "]");
     let medXCase = web3.eth.contract(medXCaseAbi).at(caseAddress);
     medXCase.cancelCase(function(_error, _result) {
         log("Cancel case tx hash [" + _result + "]");
         waitForTxComplete(_result, "Cancel Case", function (_txDetails) {
             log("Case Canceled");
-            updateAccountBalance();
+            updateAccountBalance($medXBalanceLbl);
             populateAllListingsTable();
         });
     });
@@ -51,7 +55,7 @@ function createCase() {
         log("Create case tx hash [" + _result + "]");
         waitForTxComplete(_result, "Create Case", function (_txDetails) {
             log("Case Created");
-            window.location = "caseDetails.html";
+            populateAllListingsTable();
         });
     });
 }
@@ -73,7 +77,8 @@ function populateAllListingsTable() {
                             "<a href='caseDetails.html?caseId=" + encodeURIComponent(_contractAddress) + "'>" + _contractAddress + "</a>",
                             CaseStatus[_caseStatus],
                             _caseMedXBalance + " MEDX",
-                            "<button id='cancel" + _iterationCounter + "Btn' class='btn cancel-case btn-primary btn-block' " + disableButton + " type='button'>Cancel</button>"
+                            "<button id='cancel" + _iterationCounter + "Btn' class='btn cancel-case btn-primary btn-block' " + disableButton + " type='button'>Cancel</button>",
+                            _contractAddress
                         ]).draw();
                     });
                 })

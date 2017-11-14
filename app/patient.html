@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MedCredits</title>
+    <title>MedCredits :: Patient</title>
     <link rel="shortcut icon" type="image/png" href="images/favicon.ico"/>
 
     <!-- Stylesheet includes: hosted -->
@@ -20,60 +20,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.18.12/URI.js"></script>
 
     <!-- JS includes: local -->
-    <script src="scripts/libs/web3.min.js"></script>
     <script src="scripts/libs/js.cookie.js"></script>
     <script src="scripts/libs/moment.min.js"></script>
     <script src="scripts/common.js"></script>
-    <script src="scripts/index.js"></script>
-    <script src="scripts/utils.js"></script>
+    <script src="scripts/patient.js"></script>
 </head>
 <body>
 
 <div class="page-container">
-    <!-- Main Menu - Left -->
-    <!--<div class="left-nav">
-        <div class="col-md-12">
-            <ul class="nav nav-stacked">
-                <li><a id="allListingsMenu" href="#" class="active">All Listings</a></li>
-                <li><a id="myActivityMenu" href="my_activity.html">My Activity</a></li>
-                <li><a id="administrationMenu" href="administration.html" style="display:none">Administration</a></li>
-                <li><a id="statisticsMenu" href="statistics.html">Statistics</a></li>
-                <li><a id="aboutMenu" href="about.html">About</a></li>
-            </ul>
-        </div>
-    </div>-->
-
     <!-- Content -->
     <div class="main-content-panel">
-        <br />
-        <div class="row row-header">
-            <div class="col-md-2">&nbsp;</div>
-            <div class="col-md-8">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label for="tokenRecipientTxt" class="col-lg-3 control-label vert-align-control-label">Token Recipient</label>
-                            <div class="col-lg-7">
-                                <input id="tokenRecipientTxt" type="text" class="form-control" placeholder="" value="0xbE9082906a7a443b7AE0F80d3Cd2bCAA292EAd21" />
-                            </div>
-                            <button id="mintTokensBtn" class='btn btn-primary form-button' type="button">Mint Tokens</button>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <label for="doctorAddressTxt" class="col-lg-3 control-label vert-align-control-label">New Doctor</label>
-                            <div class="col-lg-7">
-                                <input id="doctorAddressTxt" type="text" class="form-control" placeholder="" value="0x8c936d8701bD5445acD97D5542699D46fa9da543" />
-                            </div>
-                            <button id="addDoctorBtn" class='btn btn-primary form-button' type="button">Add Doctor</button>
-                        </div>
-                        <br />
-                        <button id="createCaseBtn" class='btn btn-primary form-button' type="button">Create Case</button>
-
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2">&nbsp;</div>
-        </div>
         <br />
         <div class="row">
 
@@ -108,6 +64,38 @@
                 </div>
             </div>
             <div class="col-lg-2">&nbsp;</div>
+        </div>
+        <br />
+        <h3>Patient Submit Case</h3>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <label for="descriptionTxt" class="col-lg-3 control-label vert-align-control-label">Description</label>
+                    <div class="col-lg-7">
+                        <input id="descriptionTxt" type="text" class="form-control" placeholder="" value="DummyDescription" />
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="encryptionKeyTxt" class="col-lg-3 control-label vert-align-control-label">Encryption Key</label>
+                    <div class="col-lg-7">
+                        <input id="encryptionKeyTxt" type="text" class="form-control" placeholder="" value="EncryptionKey" />
+                    </div>
+                </div>
+                <br />
+                <button id="submitCaseBtn" class='btn btn-primary form-button' type="button">Create Case</button>
+            </div>
+        </div>
+
+        <div class="row row-header">
+            <div class="col-md-2">&nbsp;</div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button id="createCaseBtn" class='btn btn-primary form-button' type="button">Create Case</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">&nbsp;</div>
         </div>
     </div>
 </div>

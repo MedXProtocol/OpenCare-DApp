@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MedCredits :: Swarm POC</title>
+    <link rel="shortcut icon" type="image/png" href="images/favicon.ico"/>
+
+    <!-- Stylesheet includes: hosted -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css">
+
+    <!-- Stylesheet includes: local -->
+    <link rel="stylesheet" href="css/medcredits.css">
+
+    <!-- JS includes: hosted -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.18.12/URI.js"></script>
+
+    <!-- JS includes: local -->
+    <script src="scripts/libs/web3.min.js"></script>
+    <script src="scripts/libs/js.cookie.js"></script>
+    <script src="scripts/libs/moment.min.js"></script>
+    <!--<script src="scripts/common.js"></script>-->
+    <script src="scripts/swarm.js"></script>
+    <script type="application/javascript">
+        //var Web3 = require('web3');
+        var web3;
+        var accountsInitialized = false;
+
+        $(function() {
+            setTimeout(function () {
+                if (typeof web3 !== 'undefined') {
+                    web3 = new Web3(web3.currentProvider);
+                } else {
+                    console.log('No web3? You should consider trying MetaMask!');
+                    web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+                }
+
+                bzz = web3.bzz;
+                //bzz.setProvider("http://swarm-gateways.net");
+                web3.eth.getAccounts(initializeAccounts);
+            }, 500);
+        });
+
+        function initializeAccounts(_error, _result) {
+            web3.eth.getBlock("latest", function (error, result) {
+                if (!error) {
+                    accountsInitialized = true;
+                }
+                else {
+                    console.error(error);
+                }
+            });
+        }
+
+
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>

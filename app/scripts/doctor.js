@@ -1,7 +1,8 @@
+/* TODO: Check current account - if doctor then show list */
+
 let $createCaseBtn, $medXBalanceLbl;
 let $allListingsDataTable;
 let $allListingsTbl;
-
 
 $(function() {
     $createCaseBtn = $("#createCaseBtn");
