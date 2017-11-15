@@ -48,7 +48,7 @@ contract CaseFactory is Ownable, Pausable {
         require(_value == caseFee + (caseFee * 50) / 100);
         require(medXToken.balanceOf(_from) >= _value);
 
-        address createdCaseAddress = createCase(_from);
+        address createdCaseAddress = createCase(_from, _extraData);
         /* Transfer tokens from patient to the newly created case contract */
         medXToken.transferFrom(_from, createdCaseAddress, _value);
     }
@@ -88,8 +88,8 @@ contract CaseFactory is Ownable, Pausable {
      * @param _patient - the patient creating the case
      * @return - address of the case contract created
      */
-    function createCase(address _patient) internal returns (address _newCase) {
-        Case newCase = new Case(_patient, caseFee, medXToken, doctorManager);
+    function createCase(address _patient, bytes _caseDetailLocation) internal returns (address _newCase) {
+        Case newCase = new Case(_patient, _caseDetailLocation, caseFee, medXToken, doctorManager);
         caseList.push(address(newCase));
         patientCases[_patient].push(address(newCase));
         return newCase;

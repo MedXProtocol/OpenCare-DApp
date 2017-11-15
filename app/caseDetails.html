@@ -36,10 +36,6 @@
             <div class="col-md-2">&nbsp;</div>
             <div class="col-md-8">
                 <br />
-                <button id="requestAuthorizationBtn" class='btn btn-primary form-button' type="button">Request Authorization</button>
-                <br />
-                <br />
-
                 <div class="row">
                     Your Account: <span id="currentAccountLbl"></span><br />
                     Doctor Account: <span id="isDoctorLbl"></span><br />
@@ -61,6 +57,9 @@
                             <strong>Patient:</strong> <span id="patientLbl"></span>
                         </div>
                         <div class="row">
+                            <strong>Status:</strong> <span id="statusLbl"></span>
+                        </div>
+                        <div class="row">
                             <strong>Diagnosing Dr A:</strong> <span id="doctorALbl"></span>
                         </div>
                         <div class="row">
@@ -75,7 +74,10 @@
                             <strong>Original Encryption Key:</strong> <span id="originalEncryptionKeyLbl" class="long-address"></span>
                         </div>
                         <div class="row">
-                            <strong>Diagnosis Location Hash:</strong> <span id="diagnosisLocationHashLbl" class="long-address"></span>
+                            <strong>Diagnosis A Location Hash:</strong> <span id="diagnosisLocationHashLbl" class="long-address"></span>
+                        </div>
+                        <div class="row">
+                            <strong>Diagnosis B Location Hash:</strong> <span id="diagnosisBLocationHashLbl" class="long-address"></span>
                         </div>
                         <div class="row">
                             <strong>Doctor Manager Address:</strong> <span id="doctorManagerAddressLbl"></span>
@@ -83,64 +85,80 @@
                         <div class="row">
                             <strong>MedX Token Address:</strong> <span id="medXTokenAddressLbl"></span>
                         </div>
-                        <div class="row">
-                            <strong>Status:</strong> <span id="statusLbl"></span>
-                        </div>
                     </div>
                 </div>
 
                 <br />
-
-                <h3>Patient Submit Case</h3>
+                <h3>Patient Actions:</h3>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="row">
-                            <label for="descriptionTxt" class="col-lg-3 control-label vert-align-control-label">Description</label>
-                            <div class="col-lg-7">
-                                <input id="descriptionTxt" type="text" class="form-control" placeholder="" value="DummyDescription" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <label for="encryptionKeyTxt" class="col-lg-3 control-label vert-align-control-label">Encryption Key</label>
-                            <div class="col-lg-7">
-                                <input id="encryptionKeyTxt" type="text" class="form-control" placeholder="" value="EncryptionKey" />
-                            </div>
-                        </div>
-                        <br />
-                        <button id="submitCaseBtn" class='btn btn-primary form-button' type="button">Submit Case</button>
+                        <button id="acceptDiagnosisBtn" class='btn btn-primary form-button' type="button">Accept Diagnosis</button>
+                        <button id="challengeDiagnosisBtn" class='btn btn-primary form-button' type="button">Challenge Diagnosis</button>
                     </div>
                 </div>
+                <br />
+                <h4>Case Authorizations</h4>
+                <div class="row">
+                    <div class="col-lg-1">&nbsp;</div>
+                    <div class="col-lg-10">
+                        <div class="form-group">
+                            <fieldset>
+                                <form action="" class="form-group" method="post">
+                                    <div class="table-responsive">
+                                        <table id="allListingsTbl" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th>Case Doctor</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </form>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="col-lg-1">&nbsp;</div>
+                </div>
 
+                <h3>Doctor Actions:</h3>
+                <div class="row">
+                    <div class="col-md-12">
+                        <button id="requestAuthorizationBtn" class='btn btn-primary form-button' type="button">Request Authorization</button>
+                    </div>
+                </div>
                 <br />
 
-                <h3>Patient Authorize Doctor</h3>
+                <h4>Diagnose Case</h4>
 
                 <div class="row">
                     <div class="col-md-12">
                         <div class="row">
-                            <label for="authDoctorAddressTxt" class="col-lg-3 control-label vert-align-control-label">Doctor Address</label>
+                            <label for="diagnosisTxt" class="col-lg-3 control-label vert-align-control-label">Diagnosis location hash</label>
                             <div class="col-lg-7">
-                                <input id="authDoctorAddressTxt" type="text" class="form-control" placeholder="" value="0x8c936d8701bD5445acD97D5542699D46fa9da543" />
+                                <input id="diagnosisTxt" type="text" class="form-control" placeholder="" value="19be0ca2d257a9de8bfdaf406460309e1610d624bc15a91103f7a138a91d8fe2" />
                             </div>
+                            <button id="diagnoseCaseBtn" class='btn btn-primary form-button' type="button">Diagnose Case</button>
                         </div>
                         <br />
-                        <button id="authDoctorBtn" class='btn btn-primary form-button' type="button">Authorized Doctor</button>
+
                     </div>
                 </div>
-
-                <h3>Doctor Diagnose Case</h3>
-                <div class="row">
+                <!--<div class="row">
                     <div class="col-md-12">
                         <div class="row">
-                            <label for="diagnosisTxt" class="col-lg-3 control-label vert-align-control-label">Diagnosis</label>
-                            <div class="col-lg-7">
-                                <input id="diagnosisTxt" type="text" class="form-control" placeholder="" value="DummyDiagnosis" />
+                            <label for="diagnosisBTxt" class="col-lg-3 control-label vert-align-control-label">Diagnosis B location hash</label>
+                            <div class="col-lg-5">
+                                <input id="diagnosisBTxt" type="text" class="form-control" placeholder="" value="773e0ca2d257a9de8bfdaf406460309e1610d624bc15a91103f7a138a91d8lvc" />
                             </div>
+                            <button id="confirmChallengedDiagnosisBtn" class='btn btn-primary form-button col-lg-2' type="button">Confirm Diagnose</button>
+                            <button id="rejectChallengedDiagnosisBtn" class='btn btn-primary form-button col-lg-2' type="button">Reject Diagnose</button>
                         </div>
                         <br />
-                        <button id="diagnoseCaseBtn" class='btn btn-primary form-button' type="button">Diagnose Case</button>
+
                     </div>
-                </div>
+                </div>-->
 
             </div>
             <div class="col-md-2">&nbsp;</div>

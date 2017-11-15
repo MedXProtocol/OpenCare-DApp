@@ -777,10 +777,15 @@ var doctorManagerAbi = [
 ];
 var medXCaseAbi = [
     {
-        "constant": false,
+        "constant": true,
         "inputs": [],
-        "name": "rejectChallenegedDiagnosis",
-        "outputs": [],
+        "name": "getAllAuthorizationListCount",
+        "outputs": [
+            {
+                "name": "_authorizationCount",
+                "type": "uint256"
+            }
+        ],
         "payable": false,
         "type": "function"
     },
@@ -816,6 +821,24 @@ var medXCaseAbi = [
     },
     {
         "constant": true,
+        "inputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "authorizationList",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "type": "function"
+    },
+    {
+        "constant": true,
         "inputs": [],
         "name": "medXToken",
         "outputs": [
@@ -824,6 +847,36 @@ var medXCaseAbi = [
                 "type": "address"
             }
         ],
+        "payable": false,
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_secondaryDiagnosisHash",
+                "type": "bytes"
+            },
+            {
+                "name": "_accept",
+                "type": "bool"
+            }
+        ],
+        "name": "diagnoseChallengedCase",
+        "outputs": [],
+        "payable": false,
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_diagnosisHash",
+                "type": "bytes"
+            }
+        ],
+        "name": "diagnoseCase",
+        "outputs": [],
         "payable": false,
         "type": "function"
     },
@@ -863,23 +916,6 @@ var medXCaseAbi = [
         "type": "function"
     },
     {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_caseHash",
-                "type": "bytes32"
-            },
-            {
-                "name": "_encryptionKey",
-                "type": "bytes32"
-            }
-        ],
-        "name": "submitCase",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-    },
-    {
         "constant": true,
         "inputs": [],
         "name": "owner",
@@ -908,37 +944,24 @@ var medXCaseAbi = [
     {
         "constant": true,
         "inputs": [],
-        "name": "diagnosisLocationHash",
+        "name": "doctorManager",
         "outputs": [
             {
                 "name": "",
-                "type": "bytes32"
+                "type": "address"
             }
         ],
-        "payable": false,
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_diagnosisHash",
-                "type": "bytes32"
-            }
-        ],
-        "name": "diagnoseCase",
-        "outputs": [],
         "payable": false,
         "type": "function"
     },
     {
         "constant": true,
         "inputs": [],
-        "name": "doctorManager",
+        "name": "diagnosisBLocationHash",
         "outputs": [
             {
                 "name": "",
-                "type": "address"
+                "type": "bytes"
             }
         ],
         "payable": false,
@@ -958,21 +981,13 @@ var medXCaseAbi = [
         "type": "function"
     },
     {
-        "constant": false,
-        "inputs": [],
-        "name": "confirmChallengedDiagnosis",
-        "outputs": [],
-        "payable": false,
-        "type": "function"
-    },
-    {
         "constant": true,
         "inputs": [],
         "name": "originalEncryptionKey",
         "outputs": [
             {
                 "name": "",
-                "type": "bytes32"
+                "type": "bytes"
             }
         ],
         "payable": false,
@@ -994,6 +1009,19 @@ var medXCaseAbi = [
             {
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "diagnosisALocationHash",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes"
             }
         ],
         "payable": false,
@@ -1035,7 +1063,7 @@ var medXCaseAbi = [
         "outputs": [
             {
                 "name": "",
-                "type": "bytes32"
+                "type": "bytes"
             }
         ],
         "payable": false,
@@ -1054,6 +1082,10 @@ var medXCaseAbi = [
             {
                 "name": "_patient",
                 "type": "address"
+            },
+            {
+                "name": "_caseHash",
+                "type": "bytes"
             },
             {
                 "name": "_caseFee",
@@ -1155,6 +1187,50 @@ var medXCaseAbi = [
                 "type": "address"
             }
         ],
+        "name": "CaseClosedRejected",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "_caseAddress",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "_casePatient",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "_caseDoctor",
+                "type": "address"
+            }
+        ],
+        "name": "CaseClosedConfirmed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "_caseAddress",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "_casePatient",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "_caseDoctor",
+                "type": "address"
+            }
+        ],
         "name": "CaseChallenged",
         "type": "event"
     },
@@ -1221,9 +1297,8 @@ var medXCaseAbi = [
     }
 ];
 
-var caseFactory, medXToken, doctorManager, medXCase, networkVersion, web3, currentUserAddress, bzz;
+var caseFactory, medXToken, doctorManager, networkVersion, web3, currentUserAddress, bzz;
 
-//var Web3 = require('web3');
 var currentBlockAtPageLoad = 0;
 var searchStartBlock = 0;
 var accountsInitialized = false;
@@ -1242,6 +1317,8 @@ var CaseStatus = {
     "3": "Closed",
     "4": "Challenged",
     "5": "Canceled",
+    "6": "ClosedRejected",
+    "7": "ClosedConfirmed",
     "default": "None"
 };
 

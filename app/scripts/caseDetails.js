@@ -1,10 +1,13 @@
 /* TODO: Hide/show controls based on viewing account. If account is patient, don't show doctor controls etc*/
 
-let $submitCaseBtn, $requestAuthorizationBtn, $authDoctorBtn, $diagnoseCaseBtn;
+let $requestAuthorizationBtn, $authDoctorBtn, $diagnoseCaseBtn, $acceptDiagnosisBtn, $challengeDiagnosisBtn, $diagnoseBCaseBtn, $confirmChallengedDiagnosisBtn, $rejectChallengedDiagnosisBtn;
 let $currentAccountLbl, $isDoctorLbl, $medXBalanceLbl, $caseBalanceLbl, $caseAddressLbl, $caseFeeLbl, $patientLbl, $doctorALbl, $doctorBLbl, $detailLocationHashLbl, $statusLbl, $isAuthorizedDoctorLbl,
-    $originalEncryptionKeyLbl, $diagnosisLocationHashLbl, $doctorManagerAddressLbl, $medXTokenAddressLbl;
-let $descriptionTxt, $encryptionKeyTxt, $authDoctorAddressTxt, $diagnosisTxt;
+    $originalEncryptionKeyLbl, $diagnosisLocationHashLbl, $doctorManagerAddressLbl, $medXTokenAddressLbl, $diagnosisBLocationHashLbl;
+let $descriptionTxt, $encryptionKeyTxt, $authDoctorAddressTxt, $diagnosisTxt, $diagnosisBTxt;
 let latestCase, queryStringCaseAddress;
+let $allListingsDataTable;
+let $allListingsTbl;
+
 
 $(function() {
     $currentAccountLbl = $("#currentAccountLbl");
@@ -21,6 +24,7 @@ $(function() {
     $isAuthorizedDoctorLbl = $("#isAuthorizedDoctorLbl");
     $originalEncryptionKeyLbl = $("#originalEncryptionKeyLbl");
     $diagnosisLocationHashLbl = $("#diagnosisLocationHashLbl");
+    $diagnosisBLocationHashLbl = $("#diagnosisBLocationHashLbl");
     $doctorManagerAddressLbl = $("#doctorManagerAddressLbl");
     $medXTokenAddressLbl = $("#medXTokenAddressLbl");
 
@@ -28,36 +32,56 @@ $(function() {
     $encryptionKeyTxt = $("#encryptionKeyTxt");
     $authDoctorAddressTxt = $("#authDoctorAddressTxt");
     $diagnosisTxt = $("#diagnosisTxt");
+    $diagnosisBTxt = $("#diagnosisBTxt");
 
-    $submitCaseBtn = $("#submitCaseBtn");
     $requestAuthorizationBtn = $("#requestAuthorizationBtn");
     $authDoctorBtn = $("#authDoctorBtn");
     $diagnoseCaseBtn = $("#diagnoseCaseBtn");
+    $acceptDiagnosisBtn = $("#acceptDiagnosisBtn");
+    $challengeDiagnosisBtn = $("#challengeDiagnosisBtn");
+    $diagnoseBCaseBtn = $("#diagnoseBCaseBtn");
+    $confirmChallengedDiagnosisBtn = $("#confirmChallengedDiagnosisBtn");
+    $rejectChallengedDiagnosisBtn = $("#rejectChallengedDiagnosisBtn");
+
+    $allListingsTbl = $("#allListingsTbl");
 
     log("Query String Param [" + URI.parseQuery(URI.parse(window.location.href).query).caseId + "]");
     queryStringCaseAddress = URI.parseQuery(URI.parse(window.location.href).query).caseId;
 
-    initializeSubmitPage();
+    initializeCaseDetailsPage();
 });
 
-function initializeSubmitPage() {
+function initializeCaseDetailsPage() {
     if (accountsInitialized) {
         $currentAccountLbl.text(currentUserAddress);
         doctorManager.isDoctor(currentUserAddress, function(_error, _result) {
             $isDoctorLbl.text(_result);
         });
 
-        $submitCaseBtn.on("click", submitCase);
         $requestAuthorizationBtn.on("click", requestAuthorization);
-        $authDoctorBtn.on("click", authorizedDoctor);
         $diagnoseCaseBtn.on("click", diagnoseCase);
+        $acceptDiagnosisBtn.on("click", acceptDiagnosis);
+        $challengeDiagnosisBtn.on("click", challengeDiagnosis);
+
+        $allListingsTbl.on("click", ".auth-doctor", authorizeDoctor);
+
+        $allListingsDataTable = initDataTable($allListingsTbl, {
+            "info": false,
+            "paging": false,
+            "searching": false,
+            "language": {
+                "emptyTable": "There are currently no names for sale. Please check back later"
+            }
+        });
+
 
         updateAccountBalance();
         loadCase();
+        populateCaseAuthRequestsTable();
         getCaseDetails();
     } else {
         setTimeout(function() {
-            initializeSubmitPage();
+            initializeCaseDetailsPage();
         }, 500);
     }
 }
@@ -96,7 +120,7 @@ function getCaseDetails() {
             $doctorBLbl.text(_result);
         });
         latestCase.caseDetailLocationHash(function (_error, _result) {
-            $detailLocationHashLbl.text(_result);
+            $detailLocationHashLbl.text(web3.toAscii(_result));
         });
         latestCase.status(function (_error, _result) {
             $statusLbl.text(CaseStatus[_result]);
@@ -104,8 +128,11 @@ function getCaseDetails() {
         latestCase.originalEncryptionKey(function (_error, _result) {
             $originalEncryptionKeyLbl.text(_result);
         });
-        latestCase.diagnosisLocationHash(function (_error, _result) {
-            $diagnosisLocationHashLbl.text(_result);
+        latestCase.diagnosisALocationHash(function (_error, _result) {
+            $diagnosisLocationHashLbl.text(web3.toAscii(_result));
+        });
+        latestCase.diagnosisBLocationHash(function (_error, _result) {
+            $diagnosisBLocationHashLbl.text(web3.toAscii(_result));
         });
         latestCase.doctorManager(function (_error, _result) {
             $doctorManagerAddressLbl.text(_result);
@@ -123,17 +150,19 @@ function getCaseDetails() {
     }
 }
 
-function submitCase() {
-    web3.eth.defaultAccount = currentUserAddress;
-    latestCase.submitCase($descriptionTxt.val(), $encryptionKeyTxt.val(), function(_error, _result) {
-        log("Case Submitted!");
-    });
-}
-
 function diagnoseCase() {
     web3.eth.defaultAccount = currentUserAddress;
-    latestCase.diagnoseCase($diagnosisTxt.val(), function(_error, _result) {
-        log("Case Dianosis Submitted!");
+    let diagnosisMatch = true;
+    latestCase.status(function(_error, _status) {
+       if (_status == 4) {
+           latestCase.diagnoseChallengedCase($diagnosisTxt.val(), diagnosisMatch, function(_error, _result) {
+               log("Challenged Case Diagnosis Submitted with value [" + diagnosisMatch + "]!");
+           });
+       } else {
+           latestCase.diagnoseCase($diagnosisTxt.val(), function(_error, _result) {
+               log("Case Diagnosis Submitted!");
+           });
+       }
     });
 }
 
@@ -157,9 +186,12 @@ function updateCaseBalance(_caseAddress) {
     });
 }
 
-function authorizedDoctor() {
+function authorizeDoctor() {
     web3.eth.defaultAccount = currentUserAddress;
-    latestCase.authorizeDoctor($authDoctorAddressTxt.val(), "encryptionKey", function(_error, _result) {
+    let _doctorAddress = $allListingsDataTable.row($(this).parents("tr")).data()[0];
+    log("Case Address [" + _doctorAddress + "]");
+
+    latestCase.authorizeDoctor(_doctorAddress, "encryptionKey", function(_error, _result) {
        log("Doctor Authorized!");
     });
 }
@@ -168,5 +200,27 @@ function requestAuthorization() {
     web3.eth.defaultAccount = currentUserAddress;
     latestCase.requestAuthorization(function(_error, _result) {
         log("Auth requested for case!");
+    });
+}
+
+function populateCaseAuthRequestsTable() {
+    $allListingsDataTable.clear().draw();
+
+    latestCase.getAllAuthorizationListCount(function(_error, _authRequestCount) {
+        log("Auth request count [" + _authRequestCount + "]");
+        for (let _iterationCounter = 0; _iterationCounter < _authRequestCount; _iterationCounter++) {
+            latestCase.authorizationList(_iterationCounter, function(_error, _doctorAddress) {
+                latestCase.authorizations(_doctorAddress, function(_error, _authRequestDetails) {
+                    let disableButton = "";
+                    if (_authRequestDetails[0] == 2)
+                        disableButton = " disabled='disabled'";
+                    $allListingsDataTable.row.add([
+                        _doctorAddress,
+                        AuthStatus[_authRequestDetails[0]],
+                        "<button id='authdoctor" + _iterationCounter + "Btn' class='btn auth-doctor btn-primary btn-block' " + disableButton + " type='button'>Authorize</button>",
+                    ]).draw();
+                });
+            });
+        }
     });
 }

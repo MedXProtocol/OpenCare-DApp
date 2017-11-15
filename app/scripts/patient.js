@@ -1,12 +1,16 @@
 /* TODO: Change action button based on case status -> Evaluated, show review button*/
 let $createCaseBtn, $medXBalanceLbl;
+let $swarmHashCaseDataTxt;
 let $allListingsDataTable;
 let $allListingsTbl;
 
 $(function() {
     $createCaseBtn = $("#createCaseBtn");
+
     $allListingsTbl = $("#allListingsTbl");
     $medXBalanceLbl = $("#medXBalanceLbl");
+
+    $swarmHashCaseDataTxt = $("#swarmHashCaseDataTxt");
 
     initializeIndexPage();
 });
@@ -51,7 +55,7 @@ function cancelCase() {
 
 function createCase() {
     web3.eth.defaultAccount = currentUserAddress;
-    medXToken.approveAndCall(caseFactoryAddress, 150, "", function (_error, _result) {
+    medXToken.approveAndCall(caseFactoryAddress, 150, $swarmHashCaseDataTxt.val(), function (_error, _result) {
         log("Create case tx hash [" + _result + "]");
         waitForTxComplete(_result, "Create Case", function (_txDetails) {
             log("Case Created");
@@ -71,7 +75,7 @@ function populateAllListingsTable() {
                 medXCase.status(function(_error, _caseStatus) {
                     medXToken.balanceOf(_contractAddress, function(_error, _caseMedXBalance) {
                         let disableButton = "";
-                        if (_caseStatus != 0)
+                        if (_caseStatus != 1)
                             disableButton = " disabled='disabled'";
                         $allListingsDataTable.row.add([
                             "<a href='caseDetails.html?caseId=" + encodeURIComponent(_contractAddress) + "'>" + _contractAddress + "</a>",

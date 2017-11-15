@@ -46,11 +46,10 @@ function populateAllListingsTable() {
                 let medXCase = web3.eth.contract(medXCaseAbi).at(_contractAddress);
                 medXCase.status(function(_error, _caseStatus) {
                     if (_caseStatus == 1 || _caseStatus == 4) {
-                        medXCase.patient(function(_error, _pateitnAddress) {
+                        medXCase.patient(function(_error, _patientAddress) {
                             $allListingsDataTable.row.add([
                                 _contractAddress,
-                                CaseStatus[_caseStatus],
-                                _pateitnAddress,
+                                _patientAddress,
                                 "<button id='diagnose" + _iterationCounter + "Btn' class='btn diagnose-case btn-primary btn-block' type='button'>Diagnose</button>"
                             ]).draw();
                         })
