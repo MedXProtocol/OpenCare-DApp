@@ -106,7 +106,7 @@ contract Case is Ownable {
      */
     function diagnoseCase(bytes _diagnosisHash) public onlyDoctor {
         require(status == CaseStatus.Open);
-        require(authorizations[msg.sender].status == AuthStatus.Approved);
+        //require(authorizations[msg.sender].status == AuthStatus.Approved);
         status = CaseStatus.Evaluated;
 
         /* TODO: Start 24 hour timer */
@@ -145,7 +145,7 @@ contract Case is Ownable {
     function diagnoseChallengedCase(bytes _secondaryDiagnosisHash, bool _accept) public onlyDoctor {
         require(status == CaseStatus.Challenged);
         require(msg.sender != diagnosingDoctorA);
-        require(authorizations[msg.sender].status == AuthStatus.Approved);
+        //require(authorizations[msg.sender].status == AuthStatus.Approved);
 
         diagnosingDoctorB = msg.sender;
         diagnosisBLocationHash = _secondaryDiagnosisHash;
