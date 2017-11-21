@@ -1,0 +1,20 @@
+{
+  "name": "medcreditsapp",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^16.1.1",
+    "react-dom": "^16.1.1",
+    "react-router-dom": "^4.2.0",
+    "react-scripts": "1.0.17",
+    "bootstrap": "^3.3.7",
+    "web3": "^1.0.0-beta.26",
+    "react-web3": "^0.4.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
