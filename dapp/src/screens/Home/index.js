@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom';
 
 class Home extends Component {
   navigateToPatientScreen(){
@@ -24,10 +24,10 @@ class Home extends Component {
           </div>
           <div className="col">
             <button 
-              type="button" 
-              className="btn btn-default"
+              type="submit" 
+              className="btn btn-fill btn-info"
               onClick={() => this.navigateToPatientScreen()}>
-            I'm patient
+            Sign in
             </button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import {getCaseFactoryContract, getDefaultTxObj, waitForTxComplete} from '../../utils/web3-util'
+import {createCase, uploadToSwarm} from '../../utils/web3-util';
+import {uploadToIpfs} from '../../utils/ipfs-util';
 
 
 class NewCase extends Component {
@@ -8,7 +9,8 @@ class NewCase extends Component {
 
         this.state = {
             hash: null,
-            saving: false
+            error: null,
+            submitInProgress: false
         };
     }
 
@@ -16,23 +18,33 @@ class NewCase extends Component {
         this.setState({hash: event.target.value});
     }
 
-    handleSubmit = (event) => {
+    handleSubmit = async (event) => {
         event.preventDefault();
-        this.setState({saving: true});
+        this.setState({submitInProgress: true});
+        const hash = await uploadToIpfs(this.state.hash);
+        this.createNewCase(hash);
     }
 
-    saveCase = (hash) => {
-        const contract = getCaseFactoryContract();
-        // contract.submitNewFile(title, ipfsHash, this.props.getDefaultTxObj(), function(error, result) {
-        //     if(error) {
-        //         alert(error); // eslint-disable-line 
-        //         this.setState({saving: false});
-        //     } else {
-        //       this.props.waitForTxComplete(result, function() {
-        //         browserHistory.push('/');
-        //       });
-        //     }
-        // }.bind(this))
+    createNewCase = (hash) => {
+        createCase(hash, (error, result) => {
+            if(error !== null) {
+                this.onError(error);
+            } else {
+                this.onSuccess();
+            }
+        });
+    }
+
+    onError = (error) => {
+        this.setState({
+            error: error,
+            submitInProgress: false
+        });
+        
+    }
+
+    onSuccess = () => {
+        this.setState({submitInProgress: false});
     }
 
     render() {
@@ -51,8 +63,8 @@ class NewCase extends Component {
                     required
                 />
                 </div>
-                <button type="submit" className="btn btn-default" disabled={this.state.saving}>Submit</button>
-                <p hidden={!this.state.saving}>Submit in progress...</p>
+                <button type="submit" className="btn btn-default" disabled={this.state.submitInProgress}>Submit</button>
+                <p hidden={!this.state.submitInProgress}>Submit in progress...</p>
             </form>
             </div>
         );
