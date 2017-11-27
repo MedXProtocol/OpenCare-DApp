@@ -4,10 +4,19 @@ import caseContractConfig from '../config/contracts/case.json';
 import doctorManagerContractConfig from '../config/contracts/doctorManager.json';
 import {promisify} from './common-util';
 
-export function getSelectedAccount(){
+export function getSelectedAccount() {
     const { web3 } = window;
 
     return web3.eth.accounts[0];
+}
+
+export async function getSelectedAccountBalance() {
+    const selectedAccount = getSelectedAccount();
+    const contract = getMedXTokenContract();
+
+    const balance = promisify(cb => contract.balanceOf(selectedAccount, cb));
+
+    return balance;
 }
 
 export async function uploadToSwarm(rawJson) {

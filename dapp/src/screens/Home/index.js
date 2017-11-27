@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import Welcome from './components/Welcome';
 
 class Home extends Component {
   navigateToPatientScreen(){
@@ -12,26 +13,13 @@ class Home extends Component {
   
   render() {
     return (
-      <section className="container home">
+      <div className="container">
         <div className="row">
           <div className="col">
-            <button 
-              type="button" 
-              className="btn btn-default"
-              onClick={() => this.navigateToDoctorScreen()}>
-            I'm doctor
-            </button>
-          </div>
-          <div className="col">
-            <button 
-              type="submit" 
-              className="btn btn-fill btn-info"
-              onClick={() => this.navigateToPatientScreen()}>
-            Sign in
-            </button>
+            <Welcome />
           </div>
         </div>
-      </section>
+      </div>
     );
   }
 }

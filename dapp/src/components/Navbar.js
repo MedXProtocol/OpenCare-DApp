@@ -25,12 +25,10 @@ class Navbar extends Component {
                             <img src={logo} alt="MedCredits"></img> 
                         </a>
                     </div>
-                    <ul className="nav navbar-nav navbar-right">
-                        <li>
-                            <i className="ti-panel"></i>
-                            <p>{this.state.selectedAccount}</p>
-                        </li>
-                    </ul>
+
+                    <p className="navbar-text navbar-right">
+                        {this.state.selectedAccount}
+                    </p> 
                 </div>
             </nav>
         );

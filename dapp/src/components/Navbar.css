@@ -9,4 +9,8 @@
 
 .navbar-brand img {
     height: 100%;
-}  
+}
+
+.navbar .navbar-text {
+    margin-top: 25px;
+}

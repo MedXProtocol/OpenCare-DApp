@@ -1,0 +1,7 @@
+.card.card-account-address {
+    height: 152px;
+}
+
+.card.card-account-address .card-content p {
+    font-size: 1.5em;
+}
