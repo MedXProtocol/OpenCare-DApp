@@ -3,7 +3,6 @@ import caseFactoryContractConfig from '../config/contracts/caseFactory.json';
 import caseContractConfig from '../config/contracts/case.json';
 import doctorManagerContractConfig from '../config/contracts/doctorManager.json';
 import {promisify} from './common-util';
-import {downloadJson} from './storage-util';
 
 export function getSelectedAccount() {
     const { web3 } = window;
@@ -67,17 +66,38 @@ export async function getAllCasesForCurrentAccount() {
 
         const caseDetailLocationHash = await promisify(cb => caseContract.caseDetailLocationHash(cb));
         const status = await promisify(cb => caseContract.status(cb));
-        const text = await downloadJson(caseDetailLocationHash);
 
         cases.push({
+            number: i + 1,
             address: caseContractAddress,
             caseDetailLocationHash : caseDetailLocationHash,
-            text: text,
-            status: status
+            status: status.toNumber(),
+            statusName: getCaseStatusName(status.toNumber())
         });
     }
 
     return cases;
+}
+
+function getCaseStatusName(status) {
+    switch(status) {
+        case 1:
+            return "Open";
+        case 2:
+            return "Evaluated";
+        case 3:
+            return "Closed";
+        case 4:
+            return "Challenged";
+        case 5:
+            return "Canceled";
+        case 6:
+            return "Rejected";
+        case 7:
+            return "Confirmed";
+        default:
+            return "";
+    }
 }
 
 export function registerDoctor(address, callback) {

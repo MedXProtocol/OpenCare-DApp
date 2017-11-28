@@ -7,23 +7,6 @@ import { withRouter } from 'react-router-dom';
 
 
 class PatientProfile extends Component {
-  constructor() {
-    super()
-
-    this.state = {
-      cases: []
-    };
-  }
-
-  // async componentDidMount() {
-  //   const cases = await getAllCasesForCurrentAccount();
-  //   this.setState({cases: cases});
-  // }
-  
-  // navigateToNewCaseScree = () => {
-  //   this.props.history.push('/new-case');
-  // }
-  
   render() {
     return (
       <div className="container">
@@ -58,16 +41,6 @@ class PatientProfile extends Component {
           {this.renderCases(this.state.cases)}
         </div>
       </div>*/
-    );
-  }
-
-  renderCases (cases) {
-    return cases.map(c => 
-      <div key={c.address} className="list-group-item">
-        <span>{c.caseDetailLocationHash}</span>,
-        <span>{c.text}</span>,
-        <span>{c.status.toNumber()}</span>
-      </div>
     );
   }
 }
