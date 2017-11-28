@@ -7,7 +7,7 @@ class PatientCases extends Component {
         <div className="card">
             <div className="card-header">
                 <h4 className="card-title">Your Cases</h4>
-                <p class="category">All of the cases that you previously submitted</p>
+                <p className="category">All of the cases that you previously submitted</p>
             </div>
             <div className="card-content table-responsive">
                 <table className="table">

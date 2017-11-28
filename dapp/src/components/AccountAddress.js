@@ -27,7 +27,7 @@ class AccountAddress extends Component {
                         </div>
                         <div className="col-xs-10 text-right">
                             <h4 className="card-title">Address</h4>
-                            <p class="category">Address selected in your wallet or MetaMask</p>
+                            <p className="category">Address selected in your wallet or MetaMask</p>
                         </div>
                     </div>
                 </div>

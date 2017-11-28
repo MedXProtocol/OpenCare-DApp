@@ -3,6 +3,7 @@ import caseFactoryContractConfig from '../config/contracts/caseFactory.json';
 import caseContractConfig from '../config/contracts/case.json';
 import doctorManagerContractConfig from '../config/contracts/doctorManager.json';
 import {promisify} from './common-util';
+import {downloadJson} from './storage-util';
 
 export function getSelectedAccount() {
     const { web3 } = window;
@@ -17,18 +18,6 @@ export async function getSelectedAccountBalance() {
     const balance = promisify(cb => contract.balanceOf(selectedAccount, cb));
 
     return balance;
-}
-
-export async function uploadToSwarm(rawJson) {
-    const { web3 } = window;
-
-    return await promisify(cb => web3.bzz.upload(rawJson, cb));
-}
-
-export async function downloadFromSwarm(hash) {
-    const { web3 } = window;
-    
-    return await promisify(cb => web3.bzz.download(hash, cb));
 }
 
 export async function getMedXTokenBalance(account) {
@@ -78,7 +67,7 @@ export async function getAllCasesForCurrentAccount() {
 
         const caseDetailLocationHash = await promisify(cb => caseContract.caseDetailLocationHash(cb));
         const status = await promisify(cb => caseContract.status(cb));
-        const text = await downloadFromSwarm(caseDetailLocationHash);
+        const text = await downloadJson(caseDetailLocationHash);
 
         cases.push({
             address: caseContractAddress,

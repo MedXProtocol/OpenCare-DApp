@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import graphicLogo from '../../../assets/img/graphiclogo.png';
 import './Welcome.css';
 
 class Welcome extends Component {

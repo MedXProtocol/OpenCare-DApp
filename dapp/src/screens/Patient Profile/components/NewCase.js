@@ -11,7 +11,7 @@ class NewCase extends Component {
             <div className="card">
                 <div className="card-header">
                     <h4 className="card-title">New Case</h4>
-                    <p class="category">Click button to create new case</p>
+                    <p className="category">Click button to create new case</p>
                 </div>
                 <div className="card-content">
                     <div className="row">

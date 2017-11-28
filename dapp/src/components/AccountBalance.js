@@ -23,13 +23,13 @@ class AccountBalance extends Component {
                 <div className="card-header">
                     <div className="row">
                         <div className="col-xs-2">
-                            <div class="icon-big icon-warning text-center">
-                                <i class="ti-server"></i>
+                            <div className="icon-big icon-warning text-center">
+                                <i className="ti-server"></i>
                             </div>
                         </div>
                         <div className="col-xs-10 text-right">
                             <h4 className="card-title">Balance</h4>
-                            <p class="category">MEDX tokens balance</p>
+                            <p className="category">MEDX tokens balance</p>
                         </div>
                     </div>
                 </div>
