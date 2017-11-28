@@ -1,18 +1,25 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import './NewCase.css';
+import { getNextCaseFromQueue } from '../../../utils/web3-util';
+import './GetCase.css';
 
-class NewCase extends Component {
-    navigateToNewCaseScree = () => {
-        this.props.history.push('/new-case');
+class GetCase extends Component {
+    navigateToDiagnoseCaseScreen = async () => {
+        const nextCaseAddress = await getNextCaseFromQueue();
+        
+        if(nextCaseAddress == null) {
+
+        } else {
+            this.props.history.push('/diagnose-case/' + nextCaseAddress);
+        }
     }
   
     render() {
         return (
             <div className="card card-new-case">
                 <div className="card-header">
-                    <h4 className="card-title">New Case</h4>
-                    <p className="category">Click button to create new case</p>
+                    <h4 className="card-title">Next Case</h4>
+                    <p className="category">Click button to get the next case</p>
                 </div>
                 <div className="card-content">
                     <div className="row">
@@ -20,8 +27,8 @@ class NewCase extends Component {
                             <button 
                                 type="button" 
                                 className="btn btn-primary btn-fill"
-                                onClick={() => this.navigateToNewCaseScree()}>
-                                Start New Case
+                                onClick={() => this.navigateToDiagnoseCaseScreen()}>
+                                Diagnose Next Case
                             </button>
                         </div>
                     </div>
@@ -31,4 +38,4 @@ class NewCase extends Component {
   }
 }
 
-export default withRouter(NewCase);
+export default withRouter(GetCase);

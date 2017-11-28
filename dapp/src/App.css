@@ -1,5 +1,6 @@
 .main-panel {
     width: 100%;
+    overflow: auto;
 }
 
 body {

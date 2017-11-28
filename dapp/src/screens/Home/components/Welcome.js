@@ -8,7 +8,7 @@ class Welcome extends Component {
   }
 
   navigateToDoctorScreen = () => {
-    this.props.history.push('/doctor');
+    this.props.history.push('/physician-profile');
   }
   
   render() {

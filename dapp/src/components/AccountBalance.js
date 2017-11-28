@@ -19,7 +19,7 @@ class AccountBalance extends Component {
   
     render() {
         return (
-            <div className="card card-account-address">
+            <div className="card card-account-balance">
                 <div className="card-header">
                     <div className="row">
                         <div className="col-xs-2">

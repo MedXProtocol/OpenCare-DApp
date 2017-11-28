@@ -5,7 +5,8 @@ const ipfsApi = IpfsApi('localhost', '5001')
 
 export async function uploadJson(rawJson) {
     const buffer = Buffer.from(rawJson);
-    return await promisify(cb => ipfsApi.add(buffer, cb));
+    const uploadResult = await promisify(cb => ipfsApi.add(buffer, cb));
+    return uploadResult[0].hash;
 }
 
 export async function uploadFile(file) {
@@ -17,7 +18,11 @@ export async function uploadFile(file) {
 }
 
 export async function downloadJson(hash) {
-    return await promisify(cb => ipfsApi.get(hash, cb));
+    return await promisify(cb => ipfsApi.cat(hash, cb));
+}
+
+export function getFileUrl(hash) {
+    return 'http://localhost:8080/ipfs/' + hash;
 }
 
 function promisifyFileReader(fileReader, file){

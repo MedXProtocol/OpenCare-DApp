@@ -4,7 +4,9 @@ import Navbar from './components/Navbar';
 import Home from './screens/Home';
 import PatientProfile from './screens/Patient Profile';
 import NewCase from './screens/New Case';
-import Doctor from './screens/Doctor';
+import PatientCase from './screens/Patient Case';
+import PhysicianProfile from './screens/Physician Profile';
+import DiagnoseCase from './screens/Diagnose Case';
 import AddDoctor from './screens/Add Doctor';
 import Balance from './screens/Balance';
 import './App.css';
@@ -21,11 +23,13 @@ class App extends Component {
                         <BrowserRouter>
                             <div>
                                 <Route exact path='/' component={Home}/>
-                                <Route path='/patient-profile' component={PatientProfile}/>
-                                <Route path='/new-case' component={NewCase}/>
-                                <Route path='/doctor' component={Doctor}/>
-                                <Route path='/doctors' component={AddDoctor}/>
-                                <Route path='/balance' component={Balance}/>
+                                <Route exact path='/new-case' component={NewCase}/>
+                                <Route exact path='/patient-case/:caseAddress' component={PatientCase}/>
+                                <Route exact path='/patient-profile' component={PatientProfile}/>
+                                <Route exact path='/physician-profile' component={PhysicianProfile}/>
+                                <Route exact path='/diagnose-case/:caseAddress' component={DiagnoseCase}/>
+                                <Route exact path='/doctors' component={AddDoctor}/>
+                                <Route exact path='/balance' component={Balance}/>
                             </div>
                         </BrowserRouter>
                     </div>

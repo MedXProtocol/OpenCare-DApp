@@ -15,6 +15,10 @@ class PatientCases extends Component {
         const cases = await getAllCasesForCurrentAccount();
         this.setState({cases: cases});
     }
+
+    onCaseClick = (event) => {
+        this.props.history.push('/patient-case/' + event.target.id);              
+    }
   
     render() {
         return (
@@ -49,8 +53,7 @@ class PatientCases extends Component {
                 <td>{c.address}</td>
                 <td>{c.statusName}</td>
                 <td className="td-actions text-right">
-                    <a href="#" rel="tooltip" title="" className="btn btn-success btn-simple" data-original-title="Edit Profile">
-                        <i className="ti-pencil-alt"></i>
+                    <a id={c.address} onClick={this.onCaseClick} className="btn btn-success btn-simple ti-pencil-alt" >
                     </a>
                 </td>
             </tr>

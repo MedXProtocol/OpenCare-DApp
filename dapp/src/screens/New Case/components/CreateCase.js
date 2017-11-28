@@ -12,7 +12,9 @@ class CreateCase extends Component {
 
         this.state = {
             firstImageHash: null,
+            firstFileName: null,
             secondImageHash: null,
+            secondFileName: null,
             howLong: null,
             age: null,
             sex: null,
@@ -28,11 +30,13 @@ class CreateCase extends Component {
     }
 
     captureFirstImage = async (event) => {
+        this.setState({firstFileName: event.target.files[0].name});
         const imageHash = await this.captureFile(event);
         this.setState({firstImageHash: imageHash});
     }
 
     captureSecondImage = async (event) => {
+        this.setState({secondFileName: event.target.files[0].name});
         const imageHash = await this.captureFile(event);
         this.setState({secondImageHash: imageHash});
     }
@@ -152,19 +156,33 @@ class CreateCase extends Component {
             <div className="card">
                 <form method="#" action="#">
                     <div className="card-header">
-                        <h4 className="card-title">
+                        <h2 className="card-title">
                             New Case
-                        </h4>
+                        </h2>
                         <p className="category">Fill out all of the fields and submit the form</p>
                     </div>
                     <div className="card-content">
                         <div className="form-group">
                             <label>First Image</label>
-                            <input onChange={this.captureFirstImage} type="file" className="form-control" required/>
+                            <div>
+                                <label className="btn btn-primary">
+                                    Browse...<input onChange={this.captureFirstImage} type="file" className="form-control" style={{display: 'none'}} required/>
+                                </label>
+                                <span>
+                                    {this.state.firstFileName}
+                                </span>
+                            </div>
                         </div>
                         <div className="form-group">
                             <label>Second Image</label>
-                            <input onChange={this.captureSecondImage} type="file" className="form-control" required/>
+                            <div>
+                                <label className="btn btn-primary">
+                                    Browse...<input onChange={this.captureSecondImage} type="file" className="form-control" style={{display: 'none'}} required/>
+                                </label>
+                                <span>
+                                    {this.state.secondFileName}
+                                </span>
+                            </div>
                         </div>
                         <div className="form-group">
                             <label>How long have you had this?</label>
@@ -180,13 +198,13 @@ class CreateCase extends Component {
                                     <label className="control-label">Sex</label>
                                     <div>
                                         <div className="radio radio-inline">
-                                            <input onChange={this.updateSex} name="sex" id="male" type="radio" value="male" required />
+                                            <input onChange={this.updateSex} name="sex" id="male" type="radio" value="Male" required />
                                             <label htmlFor="radio">
                                                 Male
                                             </label>
                                         </div>
                                         <div className="radio radio-inline">
-                                            <input onChange={this.updateSex} name="sex" id="female" type="radio" value="female" required />
+                                            <input onChange={this.updateSex} name="sex" id="female" type="radio" value="Female" required />
                                             <label htmlFor="female">
                                                 Female
                                             </label>

@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
-import NewCase from './components/NewCase';
 import AccountAddress from '../../components/AccountAddress';
 import AccountBalance from '../../components/AccountBalance';
-import PatinetCases from './components/PatientCases';
+import GetCase from './components/GetCase';
 
-
-class PatientProfile extends Component {
+class PhysicianProfile extends Component {
   render() {
     return (
       <div className="container">
         <div className="row">
           <div className="col-lg-3 col-md-6">
-            <NewCase />
+            <GetCase />
           </div>
           <div className="col-lg-3 col-md-6">
             <AccountBalance />
@@ -22,7 +20,7 @@ class PatientProfile extends Component {
         </div>
         <div className="row">
           <div className="col-xs-12">
-            <PatinetCases />
+            {/* <PatinetCases /> */}
           </div>
         </div>
       </div>
@@ -30,4 +28,4 @@ class PatientProfile extends Component {
   }
 }
 
-export default PatientProfile;
+export default PhysicianProfile;

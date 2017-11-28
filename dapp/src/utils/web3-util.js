@@ -2,7 +2,7 @@ import medXTokenContractConfig from '../config/contracts/medXToken.json';
 import caseFactoryContractConfig from '../config/contracts/caseFactory.json';
 import caseContractConfig from '../config/contracts/case.json';
 import doctorManagerContractConfig from '../config/contracts/doctorManager.json';
-import {promisify} from './common-util';
+import { promisify } from './common-util';
 
 export function getSelectedAccount() {
     const { web3 } = window;
@@ -51,6 +51,35 @@ export function createCase(documentHash, callback) {
         });
 }
 
+export async function getCaseStatus(caseAddress) {
+    const contract = getCaseContract(caseAddress);
+
+    const status = (await promisify(cb => contract.status(cb))).toNumber();
+
+    return {
+        code: status,
+        name: getCaseStatusName(status)
+    }
+}
+
+export async function getCaseDetailsLocationHash(caseAddress) {
+    const contract = getCaseContract(caseAddress);
+
+    return getFileHashFromBytes(await promisify(cb => contract.caseDetailLocationHash(cb)));
+}
+
+export async function getCaseDoctorADiagnosisLocationHash(caseAddress) {
+    const contract = getCaseContract(caseAddress);
+    
+    return getFileHashFromBytes(await promisify(cb => contract.diagnosisALocationHash(cb)));
+}
+
+export async function getCaseDoctorBDiagnosisLocationHash(caseAddress) {
+    const contract = getCaseContract(caseAddress);
+    
+    return await promisify(cb => contract.diagnosisBLocationHash(cb));
+}
+
 export async function getAllCasesForCurrentAccount() {
     const contract = getCaseFactoryContract();
     const account = getSelectedAccount();
@@ -63,20 +92,111 @@ export async function getAllCasesForCurrentAccount() {
         const caseContractAddress = await promisify(cb => contract.patientCases(account, i, cb));
 
         const caseContract = getCaseContract(caseContractAddress);
-
-        const caseDetailLocationHash = await promisify(cb => caseContract.caseDetailLocationHash(cb));
         const status = await promisify(cb => caseContract.status(cb));
 
         cases.push({
             number: i + 1,
             address: caseContractAddress,
-            caseDetailLocationHash : caseDetailLocationHash,
             status: status.toNumber(),
             statusName: getCaseStatusName(status.toNumber())
         });
     }
 
     return cases;
+}
+
+export async function getNextCaseFromQueue() {
+    const contract = getCaseFactoryContract();
+    
+    const count = await promisify(cb => contract.getAllCaseListCount(cb));
+
+    for(let i = 0; i < count; i++) {
+        const caseContractAddress = await promisify(cb => contract.caseList(i, cb));
+
+        const caseContract = getCaseContract(caseContractAddress);
+        const status = (await promisify(cb => caseContract.status(cb))).toNumber();
+        
+        //Only Open or Challenged cases
+        if(status !== 1 && status !== 4) 
+            continue;
+
+        //Challenged case can not be review by the same doctor
+        if(status === 4 ) {
+            const account = getSelectedAccount(); 
+            const diagnosisADoctor = await promisify(cb => caseContract.diagnosingDoctorA(cb));
+
+            if(account === diagnosisADoctor)
+                continue;
+        }
+
+        return caseContractAddress;
+    }
+
+    return null;
+}
+
+export function registerDoctor(address, callback) {
+    const contract = getDoctorManagerContract();
+    contract
+        .addDoctor(address, getDefaultTxObj(), function(error, result) {
+            if(error !== null){
+                callback(error, result);
+            } else {
+                waitForTxComplete(result, callback);
+            }
+        });
+}
+
+export function acceptDiagnosis(caseAddress, callback) {
+    const contract = getCaseContract(caseAddress);
+    
+        contract
+            .acceptDiagnosis(getDefaultTxObj(), function(error, result) {
+                if(error !== null){
+                    callback(error, result);
+                } else {
+                    waitForTxComplete(result, callback);
+                }
+            });
+}
+
+export function challengeDiagnosis(caseAddress, callback) {
+    const contract = getCaseContract(caseAddress);
+    
+        contract
+            .challengeDiagnosis(getDefaultTxObj(), function(error, result) {
+                if(error !== null){
+                    callback(error, result);
+                } else {
+                    waitForTxComplete(result, callback);
+                }
+            });
+}
+
+export function diagnoseCase(caseAddress, diagnosisHash, callback) {
+    const contract = getCaseContract(caseAddress);
+
+    contract
+        .diagnoseCase(diagnosisHash, getDefaultTxObj(), function(error, result) {
+            if(error !== null){
+                callback(error, result);
+            } else {
+                waitForTxComplete(result, callback);
+            }
+        });
+}
+
+export function diagnoseChallengedCase(caseAddress, diagnosisHash, accept, callback) {
+    const contract = getCaseContract(caseAddress);
+    
+    contract
+        .diagnoseChallengedCase(diagnosisHash, accept, getDefaultTxObj(), function(error, result) {
+            if(error !== null){
+                callback(error, result);
+            } else {
+                waitForTxComplete(result, callback);
+            }
+        });
 }
 
 function getCaseStatusName(status) {
@@ -98,18 +218,6 @@ function getCaseStatusName(status) {
         default:
             return "";
     }
-}
-
-export function registerDoctor(address, callback) {
-    const contract = getDoctorManagerContract();
-    contract
-        .addDoctor(address, getDefaultTxObj(), function(error, result) {
-            if(error !== null){
-                callback(error, result);
-            } else {
-                waitForTxComplete(result, callback);
-            }
-        });
 }
 
 function getMedXTokenContract() {
@@ -138,6 +246,15 @@ function getDoctorManagerContract() {
 
     const contract = web3.eth.contract(doctorManagerContractConfig.abi);
     return contract.at(doctorManagerContractConfig.address);
+}
+
+function getFileHashFromBytes(bytes) {
+    if(bytes === "0x")
+        return null;
+
+    const { web3 } = window;
+    
+    return web3.toAscii(bytes);
 }
 
 function getDefaultTxObj() {
