@@ -1,7 +1,7 @@
 import IpfsApi from 'ipfs-api';
 import {promisify} from './common-util';
 
-const ipfsApi = IpfsApi('localhost', '5001')
+const ipfsApi = IpfsApi('ipfs.infura.io', '5001', {protocol: 'https'});
 
 export async function uploadJson(rawJson) {
     const buffer = Buffer.from(rawJson);
@@ -22,7 +22,7 @@ export async function downloadJson(hash) {
 }
 
 export function getFileUrl(hash) {
-    return 'http://localhost:8080/ipfs/' + hash;
+    return 'https://ipfs.infura.io/ipfs/' + hash;
 }
 
 function promisifyFileReader(fileReader, file){

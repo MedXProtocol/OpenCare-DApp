@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import {Modal} from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import Spinner from '../../../components/Spinner';
-import {getSelectedAccountBalance, createCase} from '../../../utils/web3-util';
-import {uploadJson, uploadFile} from '../../../utils/storage-util';
-
+import { getSelectedAccountBalance, createCase } from '../../../utils/web3-util';
+import { uploadJson, uploadFile } from '../../../utils/storage-util';
 
 class CreateCase extends Component {
     constructor(){
@@ -30,22 +29,32 @@ class CreateCase extends Component {
     }
 
     captureFirstImage = async (event) => {
-        this.setState({firstFileName: event.target.files[0].name});
+        const fileName = event.target.files[0].name;
         const imageHash = await this.captureFile(event);
-        this.setState({firstImageHash: imageHash});
+        this.setState({
+            firstImageHash: imageHash,
+            firstFileName: fileName
+        }); 
     }
 
     captureSecondImage = async (event) => {
-        this.setState({secondFileName: event.target.files[0].name});
+        const fileName = event.target.files[0].name;
         const imageHash = await this.captureFile(event);
-        this.setState({secondImageHash: imageHash});
+        this.setState({
+            secondImageHash: imageHash,
+            secondFileName: fileName
+        });
     }
 
     captureFile = async (event) => {
+        this.setState({submitInProgress: true});
+
         event.stopPropagation()
         event.preventDefault()
         const file = event.target.files[0]
         const imageHash = await uploadFile(file);
+
+        this.setState({submitInProgress: false});
         return imageHash;
     }
 

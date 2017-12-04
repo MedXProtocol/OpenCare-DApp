@@ -10,6 +10,13 @@ export function getSelectedAccount() {
     return web3.eth.accounts[0];
 }
 
+export function isDoctor() {
+    const contract = getDoctorManagerContract();
+    const selectedAccount = getSelectedAccount();
+
+    return promisify(cb => contract.isDoctor(selectedAccount, cb));
+}
+
 export async function getSelectedAccountBalance() {
     const selectedAccount = getSelectedAccount();
     const contract = getMedXTokenContract();
@@ -77,7 +84,7 @@ export async function getCaseDoctorADiagnosisLocationHash(caseAddress) {
 export async function getCaseDoctorBDiagnosisLocationHash(caseAddress) {
     const contract = getCaseContract(caseAddress);
     
-    return await promisify(cb => contract.diagnosisBLocationHash(cb));
+    return getFileHashFromBytes(await promisify(cb => contract.diagnosisBLocationHash(cb)));
 }
 
 export async function getAllCasesForCurrentAccount() {

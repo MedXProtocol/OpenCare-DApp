@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
 import Welcome from './components/Welcome';
+import './index.css';
 
 class Home extends Component {
   navigateToPatientScreen(){
@@ -13,10 +15,13 @@ class Home extends Component {
   
   render() {
     return (
-      <div className="container">
-        <div className="row">
-          <div className="col">
-            <Welcome />
+      <div>
+        <Navbar transparent={ true } />
+        <div className="wrapper wrapper-full-page wrapper-home-page">
+          <div className="fullpage lock-page" >
+            <div className="content">
+              <Welcome />
+            </div>
           </div>
         </div>
       </div>
@@ -25,3 +30,5 @@ class Home extends Component {
 }
 
 export default withRouter(Home);
+
+

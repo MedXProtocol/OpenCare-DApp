@@ -16,7 +16,7 @@ class ChallengedDiagnosis extends Component {
     async componentDidMount() {
         const diagnosisHash = await getCaseDoctorBDiagnosisLocationHash(this.props.caseAddress);
 
-        if(diagnosisHash !== "0x") {
+        if(diagnosisHash !== null && diagnosisHash !== "0x") {
             const diagnosisJson = await downloadJson(diagnosisHash);
             const diagnosis = JSON.parse(diagnosisJson);
             this.setState({ 
@@ -27,7 +27,8 @@ class ChallengedDiagnosis extends Component {
     }
 
     render() {
-        return this.state.hidden ? <div/> :
+        return this.state.hidden ? 
+            <div/> :
             <div className="card">
                 <div className="card-header">
                     <h2 className="card-title">Challenged Diagnosis</h2>

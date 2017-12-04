@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Spinner from '../../../components/Spinner';
-import { getCaseStatus, acceptDiagnosis, challengeDiagnosis } from '../../../utils/web3-util';
+import { getCaseStatus } from '../../../utils/web3-util';
 
 class CaseStatus extends Component {
     constructor(){
         super()
 
         this.state = {
-            status: {},
-            buttonsHidden: true,
-            submitInProgress: false
+            status: {}
         };
     }
 
@@ -18,67 +15,47 @@ class CaseStatus extends Component {
         const status = await getCaseStatus(this.props.caseAddress);
 
         this.setState({status: status});
-
-        if(status.code === 2) {
-            this.setState({buttonsHidden: false});
-        }
-    }
-
-    handleAcceptDiagnosis = async () => {
-        this.setState({submitInProgress: true});
-
-        acceptDiagnosis(this.props.caseAddress, (error, result) => {
-            if(error !== null) {
-                this.onError(error);
-            } else {
-                this.onSuccess();
-            }
-        });
-    }
-
-    handleChallengeDiagnosis = async () => {
-        this.setState({submitInProgress: true});
-
-        challengeDiagnosis(this.props.caseAddress, (error, result) => {
-            if(error !== null) {
-                this.onError(error);
-            } else {
-                this.onSuccess();
-            }
-        });
-    }
-
-    onError = (error) => {
-        this.setState({
-            error: error,
-            submitInProgress: false
-        });
-    }
-
-    onSuccess = () => {
-        this.setState({submitInProgress: false});
     }
 
     render() {
-        return ( this.state.hidden ?
-            <div /> :
+        return ( 
             <div className="card">
                 <div className="card-header">
-                    <h2 className="card-title">Resolution</h2>
-                    <p className="category">Review case make desicion</p>
+                    <h2 className="card-title">Status</h2>
                 </div>
                 <div className="card-content">
-                    <div className="row">
                     {
-                        this.state.buttonsHidden ? null :
-                        <div className="col-xs-12" >
-                            <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-defult">Accept</button>
-                            <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-defult">Challenge</button>
+                        this.state.status.code ===  1 ?
+                        <div className="alert alert-info">
+                            Your case is under review by a doctor
+                        </div> 
+                        : this.state.status.code === 2 ?
+                        <div className="alert alert-info">
+                            Case was diagnosed. Review diagnoses and accept or challenge it.
                         </div>
+                        : this.state.status.code === 3 ?
+                        <div className="alert alert-success">
+                            Your case was diagnosed and diagnosis accepted.
+                        </div>
+                        : this.state.status.code === 4 ?
+                        <div className="alert alert-warning">
+                            You challenged the case. The case is under review by another doctor.
+                        </div>
+                        : this.state.status.code === 5 ?
+                        <div className="alert alert-danger">
+                            You challenged the case. The case is under review by another doctor.
+                        </div>
+                        : this.state.status.code === 6 ?
+                        <div className="alert alert-danger">
+                            You challenged the case and lost.
+                        </div>
+                        : this.state.status.code === 7 ?
+                        <div className="alert alert-success">
+                            You challenged the case and won.
+                        </div>
+                        : null
                     }
-                    </div>
                 </div>
-                <Spinner loading={this.state.submitInProgress}/>
             </div>
         );
     }

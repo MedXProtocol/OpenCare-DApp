@@ -28,6 +28,11 @@ class PatientCases extends Component {
                     <p className="category">All of the cases that you previously submitted</p>
                 </div>
                 <div className="card-content table-responsive">
+                {
+                    this.state.cases.length === 0 ?
+                    <div className="alert alert-info">
+                        <span>You have not submitted any cases to MedCredits</span>
+                    </div> :
                     <table className="table">
                         <thead>
                             <tr>
@@ -41,6 +46,7 @@ class PatientCases extends Component {
                             {this.renderCases(this.state.cases)}
                         </tbody>
                     </table>
+                }
                 </div>
             </div>
         );

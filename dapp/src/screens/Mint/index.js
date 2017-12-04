@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
-import RegisterDoctor from './components/RegisterDoctor';
 import MainLayout from '../../layouts/MainLayout';
+import MintTokens from './components/MintTokens';
 
-class AddDoctor extends Component {
+class Mint extends Component {
+  
   render() {
     return (
         <MainLayout>
-            <RegisterDoctor />
+            <MintTokens />
         </MainLayout>
     );
   }
 }
 
-export default AddDoctor;
+export default Mint;

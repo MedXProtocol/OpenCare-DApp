@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import Spinner from '../../../components/Spinner';
-import {getSelectedAccount, registerDoctor} from '../../../utils/web3-util';
+import {getSelectedAccount, mintMedXTokens} from '../../../utils/web3-util';
 
 
-class RegisterDoctor extends Component {
+class MintTokens extends Component {
     constructor(){
         super()
 
         this.state = {
             address: getSelectedAccount(),
+            error: null,
             submitInProgress: false
         };
     }
@@ -19,12 +20,12 @@ class RegisterDoctor extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        this.registerDoctor();
+        this.mintTokens();
     }
 
-    registerDoctor = () => {
+    mintTokens = () => {
         this.setState({submitInProgress: true});
-        registerDoctor(this.state.address, (error, result) => {
+        mintMedXTokens(this.state.address, 1000, (error, result) => {
             if(error){
                 this.onError(error);
             } else {
@@ -49,8 +50,8 @@ class RegisterDoctor extends Component {
                     onSubmit={this.handleSubmit}
                     >
                     <div className="card-header">
-                        <h4 className="card-title">Register Doctor</h4>
-                        <p className="category">Register address as doctor</p>
+                        <h4 className="card-title">Mint Tokens</h4>
+                        <p className="category">Mint tokens to address below</p>
                     </div>
                     <div className="card-content">
                         <div className="form-group">
@@ -63,7 +64,7 @@ class RegisterDoctor extends Component {
                                 required
                             />
                         </div>
-                        <button type="submit" className="btn btn-default" disabled={this.state.submitInProgress}>Register</button>
+                        <button type="submit" className="btn btn-default" disabled={this.state.submitInProgress}>Mint Tokens</button>
                     </div>
                 </form>
                 <Spinner loading={this.state.submitInProgress}/>
@@ -72,4 +73,4 @@ class RegisterDoctor extends Component {
     }
 }
 
-export default RegisterDoctor;
+export default MintTokens;

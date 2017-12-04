@@ -18,23 +18,23 @@ class Welcome extends Component {
                 <div className="row">
                     <div className="col-md-12">
                         <h4>
-                            Select View
+                            Welcome!
                         </h4>
                     </div>
                     <div className="col-md-12">
                         <button 
                             type="button" 
-                            className="btn btn-default btn-info btn-lg btn-welcome"
+                            className="btn btn-default btn-primary btn-welcome"
                             onClick={() => this.navigateToPatientScreen()}>
-                            Patient View
+                            I am patient
                         </button>
                     </div>
                     <div className="col-md-12 top5">
                         <button 
                             type="submit" 
-                            className="btn btn-default btn-info btn-lg btn-welcome"
+                            className="btn btn-default btn-primary btn-welcome"
                             onClick={() => this.navigateToDoctorScreen()}>
-                        Physician View
+                        I am physician
                         </button>
                     </div>
                 </div>

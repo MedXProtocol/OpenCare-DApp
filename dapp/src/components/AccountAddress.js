@@ -21,7 +21,7 @@ class AccountAddress extends Component {
                 <div className="card-header">
                     <div className="row">
                         <div className="col-xs-2">
-                            <div className="icon-big icon-success text-center">
+                            <div className="icon-big icon-danger text-center">
                                 <i className="ti-wallet"></i>
                             </div>
                         </div>

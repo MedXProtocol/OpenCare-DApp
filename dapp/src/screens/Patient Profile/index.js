@@ -1,31 +1,25 @@
 import React, { Component } from 'react';
+import MainLayout from '../../layouts/MainLayout';
 import NewCase from './components/NewCase';
-import AccountAddress from '../../components/AccountAddress';
-import AccountBalance from '../../components/AccountBalance';
 import PatinetCases from './components/PatientCases';
-
 
 class PatientProfile extends Component {
   render() {
     return (
-      <div className="container">
-        <div className="row">
-          <div className="col-lg-3 col-md-6">
-            <NewCase />
+      <MainLayout>
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-6 col-md-12">
+              <NewCase />
+            </div>
           </div>
-          <div className="col-lg-3 col-md-6">
-            <AccountBalance />
-          </div>
-          <div className="col-lg-6 col-md-12">
-            <AccountAddress />
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-xs-12">
-            <PatinetCases />
+          <div className="row">
+            <div className="col-xs-12">
+              <PatinetCases />
+            </div>
           </div>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 }
