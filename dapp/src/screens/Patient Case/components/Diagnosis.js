@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Modal } from 'react-bootstrap';
+import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Spinner from '../../../components/Spinner';
 import { getCaseStatus, getCaseDoctorADiagnosisLocationHash, acceptDiagnosis, challengeDiagnosis } from '../../../utils/web3-util';
@@ -169,4 +170,4 @@ Diagnosis.defaultProps = {
     caseAddress: null
 };
 
-export default Diagnosis;
+export default withRouter(Diagnosis);
