@@ -1,0 +1,21 @@
+.navbar-default {
+    background-color: #051A38;
+    border-color: rgba(34, 34, 34, 0.05);
+}
+
+.navbar .navbar-brand {
+    padding: 0px;
+}
+
+#wallet-link-toggle,
+#wallet-link {
+    color: white !important;
+}
+
+.navbar-brand img {
+    height: 100%;
+}
+
+.navbar .navbar-text {
+    margin-top: 25px;
+}

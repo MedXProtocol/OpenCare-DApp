@@ -1,7 +1,10 @@
-var HDWalletProvider = require("truffle-hdwallet-provider");
 require('babel-register');
 require('babel-polyfill');
-require('dotenv').config();
+
+var HDWalletProvider = require("truffle-hdwallet-provider");
+
+var infura_apikey = "To0546l6M9AapR2JxoHN";
+var mnemonic = "remember type toddler wage nothing will food brick into siren sorry lawn";
 
 module.exports = {
     networks: {
@@ -11,12 +14,9 @@ module.exports = {
             network_id: "*" // Match any network id
         },
         ropsten: {
-            provider: function() {
-                return new HDWalletProvider(process.env.ROPSTEN_MNEMONIC, "https://ropsten.infura.io/GC0NQf10QgUudzUe5B54")
-            },
-            gas: 4600000,
-            gasPrice: 21000000000,
-            network_id: "3"
-        },
+          provider: new HDWalletProvider(mnemonic, "https://ropsten.infura.io/"+infura_apikey),
+          network_id: 3,
+          gas: 3000000
+        }
     }
 };
