@@ -52,7 +52,8 @@
     "whatwg-fetch": "2.0.3"
   },
   "devDependencies": {
-    "node-sass-chokidar": "^0.0.3"
+    "node-sass-chokidar": "^0.0.3",
+    "uglifyjs-webpack-plugin": "^1.1.2"
   },
   "scripts": {
     "build-css": "node-sass-chokidar src/ -o src/",
