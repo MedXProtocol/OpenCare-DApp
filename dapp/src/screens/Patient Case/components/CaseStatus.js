@@ -46,12 +46,12 @@ class CaseStatus extends Component {
                             You challenged the case. The case is under review by another doctor.
                         </div>
                         : this.state.status.code === 6 ?
-                        <div className="alert alert-danger">
-                            You challenged the case and lost.
-                        </div>
-                        : this.state.status.code === 7 ?
                         <div className="alert alert-success">
                             You challenged the case and won.
+                        </div>
+                        : this.state.status.code === 7 ?
+                        <div className="alert alert-danger">
+                            You challenged the case and lost.
                         </div>
                         : null
                     }
