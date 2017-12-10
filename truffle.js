@@ -1,10 +1,8 @@
 require('babel-register');
 require('babel-polyfill');
+require('dotenv').config();
 
 var HDWalletProvider = require("truffle-hdwallet-provider");
-
-var infura_apikey = "To0546l6M9AapR2JxoHN";
-var mnemonic = "remember type toddler wage nothing will food brick into siren sorry lawn";
 
 module.exports = {
     networks: {
@@ -14,9 +12,20 @@ module.exports = {
             network_id: "*" // Match any network id
         },
         ropsten: {
-          provider: new HDWalletProvider(mnemonic, "https://ropsten.infura.io/"+infura_apikey),
-          network_id: 3,
-          gas: 3000000
+            provider: function() {
+                return new HDWalletProvider(process.env.ROPSTEN_MNEMONIC, "https://ropsten.infura.io/" + process.env.INFURA_API_KEY);
+            },
+            network_id: 3,
+            gas: 3000000
+        },
+        mainnet: {
+            provider: function() {
+                return new HDWalletProvider(process.env.MAINNET_MNEMONIC, "https://mainnet.infura.io/" + process.env.INFURA_API_KEY);
+            },
+            gas: 3000000,
+            gasPrice: 21000000000,
+            network_id: "1"
         }
+
     }
 };
