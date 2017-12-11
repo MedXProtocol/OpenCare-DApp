@@ -16,17 +16,13 @@ class GetCase extends Component {
   
     render() {
         return (
-            <div className="card card-new-case">
-                <div className="card-header">
-                    <h4 className="card-title">Next Case</h4>
-                    <p className="category">Click button to get the next case</p>
-                </div>
+            <div className="card card-new-case padding10">
                 <div className="card-content">
                     <div className="row">
                         <div className="col text-center">
                             <button 
                                 type="button" 
-                                className="btn btn-primary btn-fill"
+                                className="btn btn-primary btn-fill btn-next-case"
                                 onClick={() => this.navigateToDiagnoseCaseScreen()}>
                                 Diagnose Next Case
                             </button>

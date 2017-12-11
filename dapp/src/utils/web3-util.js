@@ -219,9 +219,9 @@ function getCaseStatusName(status) {
         case 5:
             return "Canceled";
         case 6:
-            return "Rejected";
+            return "Closed";
         case 7:
-            return "Confirmed";
+            return "Closed";
         default:
             return "";
     }

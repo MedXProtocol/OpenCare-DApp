@@ -166,13 +166,12 @@ class CreateCase extends Component {
                 <form method="#" action="#">
                     <div className="card-header">
                         <h2 className="card-title">
-                            New Case
+                            Submit New Case
                         </h2>
-                        <p className="category">Fill out all of the fields and submit the form</p>
                     </div>
                     <div className="card-content">
                         <div className="form-group">
-                            <label>First Image</label>
+                            <label>Overview Photo:</label>
                             <div>
                                 <label className="btn btn-primary">
                                     Browse...<input onChange={this.captureFirstImage} type="file" className="form-control" style={{display: 'none'}} required/>
@@ -183,7 +182,7 @@ class CreateCase extends Component {
                             </div>
                         </div>
                         <div className="form-group">
-                            <label>Second Image</label>
+                            <label>Close-up Photo:</label>
                             <div>
                                 <label className="btn btn-primary">
                                     Browse...<input onChange={this.captureSecondImage} type="file" className="form-control" style={{display: 'none'}} required/>
@@ -235,7 +234,7 @@ class CreateCase extends Component {
                             </div>
                         </div>
                         <div className="form-group">
-                            <label>Description</label>
+                            <label>Please include any additional comments below:</label>
                             <textarea onChange={this.updateDescription} className="form-control" rows="5" required />
                         </div>
                         <button onClick={this.handleSubmit} type="submit" className="btn btn-fill btn-primary">Submit</button>
@@ -257,7 +256,7 @@ class CreateCase extends Component {
                     <Modal.Body>
                         <div className="row">
                             <div className="col text-center">
-                                <h4>Are you sure? This will cost 100-150 MEDX.</h4>
+                                <h4>Are you sure? This will cost 5-15 MEDX (depending on second opinion option)</h4>
                             </div>
                         </div>
                     </Modal.Body>

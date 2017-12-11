@@ -27,11 +27,11 @@ class CaseStatus extends Component {
                     {
                         this.state.status.code ===  1 ?
                         <div className="alert alert-info">
-                            Your case is under review by a doctor
+                            Your case is pending review by a doctor
                         </div> 
                         : this.state.status.code === 2 ?
                         <div className="alert alert-info">
-                            Case was diagnosed. Review diagnoses and accept or challenge it.
+                            Your case has been evaluated. Please review your diagnosis and medical recommendation.
                         </div>
                         : this.state.status.code === 3 ?
                         <div className="alert alert-success">
@@ -47,11 +47,11 @@ class CaseStatus extends Component {
                         </div>
                         : this.state.status.code === 6 ?
                         <div className="alert alert-success">
-                            You challenged the case and won.
+                            You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded 10 MEDX and may consider re-submitting your case to the network or visiting your local dermatologist.
                         </div>
                         : this.state.status.code === 7 ?
                         <div className="alert alert-danger">
-                            You challenged the case and lost.
+                            You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of 15 MEDX was charged for your first opinion and discounted second opinion.
                         </div>
                         : null
                     }

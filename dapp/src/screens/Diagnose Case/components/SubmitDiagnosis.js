@@ -124,7 +124,7 @@ class SubmitDiagnosis extends Component {
                 <form method="#" action="#">
                     <div className="card-header">
                         <h2 className="card-title">
-                            Your Diagnosis
+                            Submit Diagnosis
                         </h2>
                         <p className="category">Fill out all of the fields and submit the form</p>
                     </div>
@@ -133,17 +133,36 @@ class SubmitDiagnosis extends Component {
                             <label>Diagnosis</label>
                             <select onChange={this.updateDiagnosis} className="form-control">
                                 <option value=""></option>
-                                <option value="Abscess">Abscess</option>
                                 <option value="Acne">Acne</option>
-                                <option value="Alergic Contact Dermatitis">Alergic Contact Dermatitis</option>
+                                <option value="Dermatitis">Dermatitis</option>
                                 <option value="Alopecia">Alopecia</option>
-                                <option value="Bedsores">Bedsores</option>
-                                <option value="Birthmark">Birthmark</option>
-                                <option value="Bite">Bite</option>
-                                <option value="Bruises">Bruises</option>
-                                <option value="Burns">Burns</option>
-                                <option value="Callus">Callus</option>
+                                <option value="Actinic Keratosis">Actinic Keratosis</option>
+                                <option value="Insect bite/sting">Insect bite/sting</option>
+                                <option value="Poison Ivy/Poison Oak">Poison Ivy/Poison Oak</option>
+                                <option value="Blister">Blister</option>
+                                <option value="Bed Sores">Bed Sores</option>
                                 <option value="Cellulitis">Cellulitis</option>
+                                <option value="Cold Sores">Cold Sores</option>
+                                <option value="Abrasion">Abrasion</option>
+                                <option value="Drug Rash">Drug Rash</option>
+                                <option value="Dry Skin">Dry Skin</option>
+                                <option value="Skin Cancer">Skin Cancer</option>
+                                <option value="Benign Skin Growth">Benign Skin Growth</option>
+                                <option value="Psoriasis">Psoriasis</option>
+                                <option value="Shingles (Herpes Zoster)">Shingles (Herpes Zoster)</option>
+                                <option value="Warts">Warts</option>
+                                <option value="Sunburn">Sunburn</option>
+                                <option value="Seborrheic Keratosis">Seborrheic Keratosis</option>
+                                <option value="Herpes Simplex Virus (HSV)">Herpes Simplex Virus (HSV)</option>
+                                <option value="Rosacea">Rosacea</option>
+                                <option value="Scars">Scars</option>
+                                <option value="Nevus">Nevus</option>
+                                <option value="Calluses or corns">Calluses or corns</option>
+                                <option value="Erythema Multiforme">Erythema Multiforme</option>
+                                <option value="Ingrown Hair">Ingrown Hair</option>
+                                <option value="Lice">Lice</option>
+                                <option value="Seborrheic Dermatitis">Seborrheic Dermatitis</option>
+                                <option value="Birthmark">Birthmark</option>
                             </select>
                         </div>
                         <div className="form-group">

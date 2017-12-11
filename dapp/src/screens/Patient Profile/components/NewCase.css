@@ -1,3 +1,9 @@
 .card.card-new-case {
-    height: 152px;
+    /*height: 152px;*/
+    /*padding: 10px;*/
+}
+
+.btn-new-case {
+    font-size: 110%;
+    width: 200px;
 }

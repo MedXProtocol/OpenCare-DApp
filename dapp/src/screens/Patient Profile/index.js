@@ -9,7 +9,7 @@ class PatientProfile extends Component {
       <MainLayout>
         <div className="container">
           <div className="row">
-            <div className="col-lg-6 col-md-12">
+            <div className="col-md-12">
               <NewCase />
             </div>
           </div>

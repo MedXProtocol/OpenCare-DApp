@@ -29,19 +29,26 @@ class CaseDetails extends Component {
         return (
             <div className="card">
                 <div className="card-header">
-                    <h2 className="card-title">Case Details</h2>
-                    <p className="category">Information submitted with the case</p>
+                    <h2 className="card-title">Case Overview</h2>
                 </div>
                 <div className="card-content">
                     <div className="row">
-                        <div className="col-xs-12">
-                            <label>First image</label>
-                            <img src={this.state.firstImageUrl} alt="First" />
+                        <div className="col-xs-6">
+                            <label>Overview Photo:</label>
                         </div>
-                        <div className="col-xs-12 top10">
-                            <label>Second image</label>
-                            <img src={this.state.secondImageUrl} alt="Second" />
+                        <div className="col-xs-6">
+                            <label>Close-up Photo:</label>
                         </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-xs-6 text-center">
+                            <img src={this.state.firstImageUrl} alt="Overview" style={{maxHeight: 400}} />
+                        </div>
+                        <div className="col-xs-6 text-center">
+                            <img src={this.state.secondImageUrl} alt="CloseUp" style={{maxHeight: 400}} />
+                        </div>
+                    </div>
+                    <div className="row">
                         <div className="col-xs-12 top10">
                             <label>How long have you had this?</label>
                             <p>{this.state.details.howLong}</p>

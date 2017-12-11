@@ -1,0 +1,7 @@
+.alert-info > span {
+    font-size: 135%;
+}
+
+.alert-info {
+    padding: 25px;
+}

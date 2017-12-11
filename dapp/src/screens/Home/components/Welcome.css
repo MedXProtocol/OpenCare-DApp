@@ -1,3 +1,11 @@
 .btn-welcome {
-    width: 200px;
+    width: 225px;
+    font-size: 105%;
+}
+
+.card-lock {
+    width: 450px !important;
+    padding: 40px !important;
+    margin-left: -225px !important;
+    font-size: 120% !important;
 }

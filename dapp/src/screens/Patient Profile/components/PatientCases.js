@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import {getAllCasesForCurrentAccount} from '../../../utils/web3-util';
+import './PatientCases.css';
 
 class PatientCases extends Component {
     constructor() {
@@ -24,14 +25,13 @@ class PatientCases extends Component {
         return (
             <div className="card">
                 <div className="card-header">
-                    <h4 className="card-title">Cases</h4>
-                    <p className="category">All of the cases that you previously submitted</p>
+                    <h4 className="card-title">Case Log</h4>
                 </div>
                 <div className="card-content table-responsive">
                 {
                     this.state.cases.length === 0 ?
-                    <div className="alert alert-info">
-                        <span>You have not submitted any cases to MedCredits</span>
+                    <div className="alert alert-info text-center">
+                        <span>You do not have any historical or pending cases.</span>
                     </div> :
                     <table className="table">
                         <thead>

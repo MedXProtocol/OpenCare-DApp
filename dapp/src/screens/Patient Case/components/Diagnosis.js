@@ -101,8 +101,7 @@ class Diagnosis extends Component {
             <div /> :
             <div className="card">
                 <div className="card-header">
-                    <h2 className="card-title">Diagnosis</h2>
-                    <p className="category">Diagnosis provided by the doctor</p>
+                    <h2 className="card-title">Initial Diagnosis</h2>
                 </div>
                 <div className="card-content">
                     <div className="row">
@@ -126,7 +125,7 @@ class Diagnosis extends Component {
                             <div className="col-xs-12 text-center" >
                                 <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success btn-fill">Accept</button>
                                 &nbsp;
-                                <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-danger btn-fill">Challenge</button>
+                                <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-danger btn-fill">Get Second Opinion</button>
                             </div>
                         </div>
                     </div>
