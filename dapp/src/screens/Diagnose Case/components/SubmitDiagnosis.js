@@ -126,7 +126,6 @@ class SubmitDiagnosis extends Component {
                         <h2 className="card-title">
                             Submit Diagnosis
                         </h2>
-                        <p className="category">Fill out all of the fields and submit the form</p>
                     </div>
                     <div className="card-content">
                         <div className="form-group">

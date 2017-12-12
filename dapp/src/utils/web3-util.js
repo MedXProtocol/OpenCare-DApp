@@ -49,7 +49,7 @@ export function createCase(documentHash, callback) {
     const caseFactoryAddress = caseFactoryContractConfig.address;
 
     contract
-        .approveAndCall(caseFactoryAddress, 150, documentHash, getDefaultTxObj(), function(error, result){
+        .approveAndCall(caseFactoryAddress, 15, documentHash, getDefaultTxObj(), function(error, result){
             if(error !== null) {
                 callback(error, result);
             } else {
@@ -273,19 +273,23 @@ function getDefaultTxObj() {
 function waitForTxComplete(txHash, callback) {
     const { web3 } = window;
 
+    console.log("TX Hash [" + txHash + "]");
+
     web3.eth.getTransactionReceipt(txHash, function (error, result) {
         if(error !== null) {
             callback(error, result);
             return;
         }
-        
-        if (result !== null) {
+
+        callback(null, result);
+
+        /*if (result !== null) {
             callback(null, result);
             return;
         }
         console.log("Waiting for tx to be mined....");
         setTimeout(function () {
             waitForTxComplete(txHash, callback);
-        }, 5000);
+        }, 5000);*/
     });
 }

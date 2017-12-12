@@ -15,9 +15,10 @@ class CreateCase extends Component {
             secondImageHash: null,
             secondFileName: null,
             howLong: null,
+            size: null,
+            skinCancer: null,
+            sexuallyActive: null,
             age: null,
-            sex: null,
-            city: null,
             country: null,
             description: null,
 
@@ -62,16 +63,20 @@ class CreateCase extends Component {
         this.setState({howLong: event.target.value});
     }
 
+    updateSize= (event) => {
+        this.setState({size: event.target.value});
+    }
+
+    updateSkinCancer= (event) => {
+        this.setState({skinCancer: event.target.value});
+    }
+
+    updateSexuallyActive= (event) => {
+        this.setState({sexuallyActive: event.target.value});
+    }
+
     updateAge = (event) => {
         this.setState({age: event.target.value});
-    }
-
-    updateSex = (event) => {
-        this.setState({sex: event.target.value});
-    }
-
-    updateCity = (event) => {
-        this.setState({city: event.target.value});
     }
 
     updateCountry = (event) => {
@@ -87,7 +92,7 @@ class CreateCase extends Component {
         
         const accountBalance = await getSelectedAccountBalance();
 
-        if(accountBalance.toNumber() < 150) {
+        if(accountBalance.toNumber() < 15) {
             this.setState({showBalanceTooLowModal: true});
         } else {
             this.setState({showConfirmSubmissionModal: true});
@@ -127,9 +132,10 @@ class CreateCase extends Component {
             firstImageHash: this.state.firstImageHash,
             secondImageHash: this.state.secondImageHash,
             howLong: this.state.howLong,
+            size: this.state.size,
+            skinCancer: this.state.skinCancer,
+            sexuallyActive: this.state.sexuallyActive,
             age: this.state.age,
-            sex: this.state.sex,
-            city: this.state.city,
             country: this.state.country,
             description: this.state.description
         };
@@ -193,28 +199,95 @@ class CreateCase extends Component {
                             </div>
                         </div>
                         <div className="form-group">
-                            <label>How long have you had this?</label>
-                            <input onChange={this.updateHowLong} type="text" className="form-control" required />
-                        </div>
-                        <div className="form-group">
                             <div className="row">
-                                <div className="col-lg-6 col-md-12">
-                                    <label>Age</label>
-                                    <input onChange={this.updateAge} type="text" className="form-control" required />
-                                </div>
-                                <div className="col-lg-6 col-md-12">
-                                    <label className="control-label">Sex</label>
+                                <div className="col-lg-6 col-md-6 top15">
+                                    <label>How long have you had this problem?</label>
                                     <div>
                                         <div className="radio radio-inline">
-                                            <input onChange={this.updateSex} name="sex" id="male" type="radio" value="Male" required />
-                                            <label htmlFor="radio">
-                                                Male
+                                            <input onChange={this.updateHowLong} name="lengthOfTime" id="days" type="radio" value="Days" required />
+                                            <label htmlFor="days">
+                                                Days
                                             </label>
                                         </div>
                                         <div className="radio radio-inline">
-                                            <input onChange={this.updateSex} name="sex" id="female" type="radio" value="Female" required />
-                                            <label htmlFor="female">
-                                                Female
+                                            <input onChange={this.updateHowLong} name="lengthOfTime" id="weeks" type="radio" value="Weeks" required />
+                                            <label htmlFor="weeks">
+                                                Weeks
+                                            </label>
+                                        </div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateHowLong} name="lengthOfTime" id="months" type="radio" value="Months" required />
+                                            <label htmlFor="months">
+                                                Months
+                                            </label>
+                                        </div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateHowLong} name="lengthOfTime" id="years" type="radio" value="Years" required />
+                                            <label htmlFor="years">
+                                                Years
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-lg-6 col-md-6 top15">
+                                    <label>Is it growing, shrinking or staying the same size?</label>
+                                    <div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateSize} name="size" id="growing" type="radio" value="Growing" required />
+                                            <label htmlFor="growing">
+                                                Growing
+                                            </label>
+                                        </div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateSize} name="size" id="shrinking" type="radio" value="Shrinking" required />
+                                            <label htmlFor="shrinking">
+                                                Shrinking
+                                            </label>
+                                        </div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateSize} name="size" id="sameSize" type="radio" value="Same size" required />
+                                            <label htmlFor="sameSize">
+                                                Same size
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+
+                            <div className="row">
+                                <div className="col-lg-6 col-md-6 top15">
+                                    <label>Any history of skin cancer?</label>
+                                    <div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateSkinCancer} name="skinCancer" id="yes" type="radio" value="Yes" required />
+                                            <label htmlFor="yes">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateSkinCancer} name="skinCancer" id="no" type="radio" value="No" required />
+                                            <label htmlFor="no">
+                                                No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-lg-6 col-md-6 top15">
+                                    <label>Are you sexually active?</label>
+                                    <div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateSexuallyActive} name="sexuallyActive" id="sexYes" type="radio" value="Yes" required />
+                                            <label htmlFor="sexYes">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateSexuallyActive} name="sexuallyActive" id="sexNo" type="radio" value="No" required />
+                                            <label htmlFor="sexNo">
+                                                No
                                             </label>
                                         </div>
                                     </div>
@@ -223,15 +296,15 @@ class CreateCase extends Component {
                         </div>
                         <div className="form-group">
                             <div className="row">
-                                <div className="col-lg-6 col-md-12">
-                                    <label>City</label>
-                                    <input onChange={this.updateCity} type="text" className="form-control" required />
-                                </div>
-                                <div className="col-lg-6 col-md-12">
-                                    <label>Country</label>
-                                    <input onChange={this.updateCountry} type="text" className="form-control" required />
+                                <div className="col-lg-2 col-md-2 col-sm-3 col-xs-5">
+                                    <label>Age</label>
+                                    <input onChange={this.updateAge} type="text" className="form-control" required />
                                 </div>
                             </div>
+                        </div>
+                        <div className="form-group">
+                            <label>Country</label>
+                            <input onChange={this.updateCountry} type="text" className="form-control" required />
                         </div>
                         <div className="form-group">
                             <label>Please include any additional comments below:</label>
@@ -244,7 +317,7 @@ class CreateCase extends Component {
                     <Modal.Body>
                         <div className="row">
                             <div className="col text-center">
-                                <h4>You need 150 MEDX to submit case.</h4>
+                                <h4>You need 15 MEDX to submit a case.</h4>
                             </div>
                         </div>
                     </Modal.Body>
@@ -256,7 +329,8 @@ class CreateCase extends Component {
                     <Modal.Body>
                         <div className="row">
                             <div className="col text-center">
-                                <h4>Are you sure? This will cost 5-15 MEDX (depending on second opinion option)</h4>
+                                <h4>Are you sure?</h4>
+                                <h5>This will cost 5-15 MEDX (depending on second opinion option)</h5>
                             </div>
                         </div>
                     </Modal.Body>

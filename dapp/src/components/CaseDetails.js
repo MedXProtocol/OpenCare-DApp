@@ -33,10 +33,10 @@ class CaseDetails extends Component {
                 </div>
                 <div className="card-content">
                     <div className="row">
-                        <div className="col-xs-6">
+                        <div className="col-xs-6 text-center">
                             <label>Overview Photo:</label>
                         </div>
-                        <div className="col-xs-6">
+                        <div className="col-xs-6 text-center">
                             <label>Close-up Photo:</label>
                         </div>
                     </div>
@@ -47,30 +47,32 @@ class CaseDetails extends Component {
                         <div className="col-xs-6 text-center">
                             <img src={this.state.secondImageUrl} alt="CloseUp" style={{maxHeight: 400}} />
                         </div>
-                    </div>
-                    <div className="row">
                         <div className="col-xs-12 top10">
-                            <label>How long have you had this?</label>
+                            <label>How long have you had this problem:</label>
                             <p>{this.state.details.howLong}</p>
                         </div>
-                        <div className="col-lg-6 col-md-12 top10">
-                            <label>Age</label>
+                        <div className="col-md-6 top10">
+                            <label>Is it growing, shrinking or staying the same size:</label>
+                            <p>{this.state.details.size}</p>
+                        </div>
+                        <div className="col-md-6 top10">
+                            <label>Any history of skin cancer:</label>
+                            <p>{this.state.details.skinCancer}</p>
+                        </div>
+                        <div className="col-md-6 top10">
+                            <label>Are you sexually active:</label>
+                            <p>{this.state.details.sexuallyActive}</p>
+                        </div>
+                        <div className="col-md-6 top10">
+                            <label>Age:</label>
                             <p>{this.state.details.age}</p>
                         </div>
-                        <div className="col-lg-6 col-md-12 top10">
-                            <label>Sex</label>
-                            <p>{this.state.details.sex}</p>
-                        </div>
-                        <div className="col-lg-6 col-md-12 top10">
-                            <label>City</label>
-                            <p>{this.state.details.city}</p>
-                        </div>
-                        <div className="col-lg-6 col-md-12 top10">
-                            <label>Country</label>
+                        <div className="col-md-6 top10">
+                            <label>Country:</label>
                             <p>{this.state.details.country}</p>
                         </div>
                         <div className="col-xs-12 top10">
-                            <label>Description</label>
+                            <label>Additional comments:</label>
                             <p>{this.state.details.description}</p>
                         </div>
                     </div>

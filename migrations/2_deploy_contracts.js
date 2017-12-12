@@ -6,6 +6,6 @@ module.exports = function(deployer) {
     deployer.deploy(MedXToken).then(function () {
         return deployer.deploy(DoctorManager);
     }).then(function() {
-        return deployer.deploy(CaseFactory, 100, MedXToken.address, DoctorManager.address);
+        return deployer.deploy(CaseFactory, 10, MedXToken.address, DoctorManager.address);
     });
 };
