@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Spinner from '../../../components/Spinner';
-import {getSelectedAccount, mintMedXTokens} from '../../../utils/web3-util';
+import {getSelectedAccount, mintMedXTokens, fromTokenDecimal} from '../../../utils/web3-util';
 
 
 class MintTokens extends Component {
@@ -25,7 +25,7 @@ class MintTokens extends Component {
 
     mintTokens = () => {
         this.setState({submitInProgress: true});
-        mintMedXTokens(this.state.address, 1000, (error, result) => {
+        mintMedXTokens(this.state.address, fromTokenDecimal(1000), (error, result) => {
             if(error){
                 this.onError(error);
             } else {
