@@ -6,3 +6,7 @@ export const promisify = (inner) =>
         resolve(res);
     })
 );
+
+export const isNotEmptyString = (value) => {
+    return value && value !== "";
+}

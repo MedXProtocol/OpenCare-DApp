@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Modal } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import Spinner from '../../../components/Spinner';
+import { isNotEmptyString } from '../../../utils/common-util';
 import { getSelectedAccountBalance, createCase } from '../../../utils/web3-util';
 import { uploadJson, uploadFile } from '../../../utils/storage-util';
 
@@ -22,6 +23,7 @@ class CreateCase extends Component {
             country: null,
             description: null,
 
+            canSubmit: false,
             submitInProgress: false,
             showBalanceTooLowModal: false,
             showConfirmSubmissionModal: false,
@@ -35,7 +37,7 @@ class CreateCase extends Component {
         this.setState({
             firstImageHash: imageHash,
             firstFileName: fileName
-        }); 
+        }, this.validateInputs);
     }
 
     captureSecondImage = async (event) => {
@@ -44,7 +46,7 @@ class CreateCase extends Component {
         this.setState({
             secondImageHash: imageHash,
             secondFileName: fileName
-        });
+        }, this.validateInputs);
     }
 
     captureFile = async (event) => {
@@ -60,27 +62,27 @@ class CreateCase extends Component {
     }
 
     updateHowLong = (event) => {
-        this.setState({howLong: event.target.value});
+        this.setState({howLong: event.target.value}, this.validateInputs);
     }
 
     updateSize= (event) => {
-        this.setState({size: event.target.value});
+        this.setState({size: event.target.value}, this.validateInputs);
     }
 
     updateSkinCancer= (event) => {
-        this.setState({skinCancer: event.target.value});
+        this.setState({skinCancer: event.target.value}, this.validateInputs);
     }
 
     updateSexuallyActive= (event) => {
-        this.setState({sexuallyActive: event.target.value});
+        this.setState({sexuallyActive: event.target.value}, this.validateInputs);
     }
 
     updateAge = (event) => {
-        this.setState({age: event.target.value});
+        this.setState({age: event.target.value}, this.validateInputs);
     }
 
     updateCountry = (event) => {
-        this.setState({country: event.target.value});
+        this.setState({country: event.target.value}, this.validateInputs);
     }
 
     updateDescription = (event) => {
@@ -97,6 +99,20 @@ class CreateCase extends Component {
         } else {
             this.setState({showConfirmSubmissionModal: true});
         }
+    }
+
+    validateInputs = () => {
+        const valid = 
+            isNotEmptyString(this.state.firstImageHash) &&
+            isNotEmptyString(this.state.secondImageHash) &&
+            isNotEmptyString(this.state.howLong) &&
+            isNotEmptyString(this.state.size) &&
+            isNotEmptyString(this.state.skinCancer) &&
+            isNotEmptyString(this.state.sexuallyActive) &&
+            isNotEmptyString(this.state.age) &&
+            isNotEmptyString(this.state.country);
+
+            this.setState({ canSubmit: valid });
     }
 
     handleCloseBalanceTooLowModal = (event) => {
@@ -169,7 +185,7 @@ class CreateCase extends Component {
     render() {
         return (
             <div className="card">
-                <form method="#" action="#">
+                <form onSubmit={this.handleSubmit} >
                     <div className="card-header">
                         <h2 className="card-title">
                             Submit New Case
@@ -177,7 +193,7 @@ class CreateCase extends Component {
                     </div>
                     <div className="card-content">
                         <div className="form-group">
-                            <label>Overview Photo:</label>
+                            <label>Overview Photo<star>*</star></label>
                             <div>
                                 <label className="btn btn-primary">
                                     Browse...<input onChange={this.captureFirstImage} type="file" className="form-control" style={{display: 'none'}} required/>
@@ -188,7 +204,7 @@ class CreateCase extends Component {
                             </div>
                         </div>
                         <div className="form-group">
-                            <label>Close-up Photo:</label>
+                            <label>Close-up Photo<star>*</star></label>
                             <div>
                                 <label className="btn btn-primary">
                                     Browse...<input onChange={this.captureSecondImage} type="file" className="form-control" style={{display: 'none'}} required/>
@@ -201,7 +217,7 @@ class CreateCase extends Component {
                         <div className="form-group">
                             <div className="row">
                                 <div className="col-lg-6 col-md-6 top15">
-                                    <label>How long have you had this problem?</label>
+                                    <label>How long have you had this problem?<star>*</star></label>
                                     <div>
                                         <div className="radio radio-inline">
                                             <input onChange={this.updateHowLong} name="lengthOfTime" id="days" type="radio" value="Days" required />
@@ -230,7 +246,7 @@ class CreateCase extends Component {
                                     </div>
                                 </div>
                                 <div className="col-lg-6 col-md-6 top15">
-                                    <label>Is it growing, shrinking or staying the same size?</label>
+                                    <label>Is it growing, shrinking or staying the same size?<star>*</star></label>
                                     <div>
                                         <div className="radio radio-inline">
                                             <input onChange={this.updateSize} name="size" id="growing" type="radio" value="Growing" required />
@@ -259,7 +275,7 @@ class CreateCase extends Component {
 
                             <div className="row">
                                 <div className="col-lg-6 col-md-6 top15">
-                                    <label>Any history of skin cancer?</label>
+                                    <label>Any history of skin cancer?<star>*</star></label>
                                     <div>
                                         <div className="radio radio-inline">
                                             <input onChange={this.updateSkinCancer} name="skinCancer" id="yes" type="radio" value="Yes" required />
@@ -276,7 +292,7 @@ class CreateCase extends Component {
                                     </div>
                                 </div>
                                 <div className="col-lg-6 col-md-6 top15">
-                                    <label>Are you sexually active?</label>
+                                    <label>Are you sexually active?<star>*</star></label>
                                     <div>
                                         <div className="radio radio-inline">
                                             <input onChange={this.updateSexuallyActive} name="sexuallyActive" id="sexYes" type="radio" value="Yes" required />
@@ -297,20 +313,23 @@ class CreateCase extends Component {
                         <div className="form-group">
                             <div className="row">
                                 <div className="col-lg-2 col-md-2 col-sm-3 col-xs-5">
-                                    <label>Age</label>
+                                    <label>Age<star>*</star></label>
                                     <input onChange={this.updateAge} type="text" className="form-control" required />
                                 </div>
                             </div>
                         </div>
                         <div className="form-group">
-                            <label>Country</label>
+                            <label>Country<star>*</star></label>
                             <input onChange={this.updateCountry} type="text" className="form-control" required />
                         </div>
                         <div className="form-group">
-                            <label>Please include any additional comments below:</label>
-                            <textarea onChange={this.updateDescription} className="form-control" rows="5" required />
+                            <label>Please include any additional comments below</label>
+                            <textarea onChange={this.updateDescription} className="form-control" rows="5" />
                         </div>
-                        <button onClick={this.handleSubmit} type="submit" className="btn btn-fill btn-primary">Submit</button>
+                        <div class="category"><star>*</star> Required fields</div>
+                    </div>
+                    <div className="card-footer">
+                        <button disabled={!this.state.canSubmit} type="submit" className="btn btn-fill btn-primary">Submit</button>
                     </div>
                 </form>
                 <Modal show={this.state.showBalanceTooLowModal}>

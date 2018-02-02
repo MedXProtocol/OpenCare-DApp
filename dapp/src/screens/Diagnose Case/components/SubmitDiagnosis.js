@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Modal } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import Spinner from '../../../components/Spinner';
+import { isNotEmptyString } from '../../../utils/common-util';
 import { getCaseStatus, getCaseDoctorADiagnosisLocationHash, diagnoseCase, diagnoseChallengedCase } from '../../../utils/web3-util';
 import { uploadJson, downloadJson } from '../../../utils/storage-util';
 
@@ -18,6 +19,7 @@ class SubmitDiagnosis extends Component {
             diagnosis: null,
             recommendation: null,
             
+            canSubmit: false,
             submitInProgress: false,
             showConfirmationModal: false,
             showThankYouModal: false
@@ -42,11 +44,19 @@ class SubmitDiagnosis extends Component {
     }
 
     updateDiagnosis = (event) => {
-        this.setState({diagnosis: event.target.value});
+        this.setState({diagnosis: event.target.value}, this.validateInputs);
     }
 
     updateRecommendation = (event) => {
-        this.setState({recommendation: event.target.value});
+        this.setState({recommendation: event.target.value}, this.validateInputs);
+    }
+
+    validateInputs = () => {
+        const valid = 
+            isNotEmptyString(this.state.diagnosis) &&
+            isNotEmptyString(this.state.recommendation);
+
+            this.setState({ canSubmit: valid });
     }
 
     handleSubmit = async (event) => {
@@ -121,7 +131,7 @@ class SubmitDiagnosis extends Component {
     render() {
         return (
             <div className="card">
-                <form method="#" action="#">
+                <form onSubmit={this.handleSubmit} >
                     <div className="card-header">
                         <h2 className="card-title">
                             Submit Diagnosis
@@ -129,7 +139,7 @@ class SubmitDiagnosis extends Component {
                     </div>
                     <div className="card-content">
                         <div className="form-group">
-                            <label>Diagnosis</label>
+                            <label>Diagnosis<star>*</star></label>
                             <select onChange={this.updateDiagnosis} className="form-control">
                                 <option value=""></option>
                                 <option value="Acne">Acne</option>
@@ -165,10 +175,13 @@ class SubmitDiagnosis extends Component {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Recommendation</label>
+                            <label>Recommendation<star>*</star></label>
                             <textarea onChange={this.updateRecommendation} className="form-control" rows="5" required />
                         </div>
-                        <button onClick={this.handleSubmit} type="submit" className="btn btn-fill btn-primary">Submit</button>
+                        <div class="category"><star>*</star> Required fields</div>
+                    </div>
+                    <div className="card-footer">
+                        <button disabled={!this.state.canSubmit} type="submit" className="btn btn-fill btn-primary">Submit</button>
                     </div>
                 </form>
                 <Modal show={this.state.showConfirmationModal}>
