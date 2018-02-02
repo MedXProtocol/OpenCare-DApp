@@ -94,7 +94,7 @@ class CreateCase extends Component {
         
         const accountBalance = await getSelectedAccountBalance();
 
-        if(accountBalance.toNumber() < 15) {
+        if(accountBalance < 15) {
             this.setState({showBalanceTooLowModal: true});
         } else {
             this.setState({showConfirmSubmissionModal: true});

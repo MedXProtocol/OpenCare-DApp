@@ -14,7 +14,7 @@ class AccountBalance extends Component {
     async componentDidMount() {
         const accountBalance = await getSelectedAccountBalance();
         
-        this.setState({balance: accountBalance.toNumber()});
+        this.setState({balance: accountBalance});
     }
   
     render() {

@@ -25,9 +25,9 @@ export async function getSelectedAccountBalance() {
     const selectedAccount = getSelectedAccount();
     const contract = getMedXTokenContract();
 
-    const balance = promisify(cb => contract.balanceOf(selectedAccount, cb));
+    const balance = await promisify(cb => contract.balanceOf(selectedAccount, cb));
 
-    return balance / 10**18;
+    return balance.toNumber() / 10**18;
 }
 
 export async function getMedXTokenBalance(account) {
