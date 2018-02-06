@@ -23,7 +23,7 @@ export async function getSelectedAccountBalance() {
 
     const balance = await promisify(cb => contract.balanceOf(selectedAccount, cb));
 
-    return balance;
+    return balance.toNumber();
 }
 
 export async function getMedXTokenBalance(account) {
