@@ -10,10 +10,6 @@ export function getSelectedAccount() {
     return web3.eth.accounts[0];
 }
 
-export function fromTokenDecimal(tokenAmount) {
-    return tokenAmount * 10**18;
-}
-
 export function isDoctor() {
     const contract = getDoctorManagerContract();
     const selectedAccount = getSelectedAccount();
@@ -27,7 +23,7 @@ export async function getSelectedAccountBalance() {
 
     const balance = await promisify(cb => contract.balanceOf(selectedAccount, cb));
 
-    return balance.toNumber() / 10**18;
+    return balance;
 }
 
 export async function getMedXTokenBalance(account) {
@@ -53,7 +49,7 @@ export function createCase(documentHash, callback) {
     const caseFactoryAddress = caseFactoryContractConfig.address;
 
     contract
-        .approveAndCall(caseFactoryAddress, fromTokenDecimal(15), documentHash, getDefaultTxObj(), function(error, result){
+        .approveAndCall(caseFactoryAddress, 15, documentHash, getDefaultTxObj(), function(error, result){
             if(error !== null) {
                 callback(error, result);
             } else {
