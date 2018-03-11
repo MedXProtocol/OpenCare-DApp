@@ -16,10 +16,15 @@ class CreateCase extends Component {
             secondFileName: null,
             howLong: null,
             size: null,
+            painful:null,
+            bleeding:null,
+            itching:null,
             skinCancer: null,
             sexuallyActive: null,
             age: null,
             country: null,
+            color:null,
+            prevTreatment:null,
             description: null,
 
             submitInProgress: false,
@@ -67,6 +72,18 @@ class CreateCase extends Component {
         this.setState({size: event.target.value});
     }
 
+    updatePainful= (event) => {
+        this.setState({painful: event.target.value});
+    }
+
+    updateItching= (event) => {
+        this.setState({itching: event.target.value});
+    }
+
+    updateBleeding= (event) => {
+        this.setState({bleeding: event.target.value});
+    }
+
     updateSkinCancer= (event) => {
         this.setState({skinCancer: event.target.value});
     }
@@ -81,6 +98,14 @@ class CreateCase extends Component {
 
     updateCountry = (event) => {
         this.setState({country: event.target.value});
+    }
+
+    updateColor= (event) => {
+        this.setState({color: event.target.value});
+    }
+
+    updatePreviousTreatment= (event) => {
+        this.setState({prevTreatment: event.target.value});
     }
 
     updateDescription = (event) => {
@@ -133,10 +158,15 @@ class CreateCase extends Component {
             secondImageHash: this.state.secondImageHash,
             howLong: this.state.howLong,
             size: this.state.size,
+            painful:this.state.painful,
+            bleeding:this.state.bleeding,
+            itching:this.state.itching,
             skinCancer: this.state.skinCancer,
             sexuallyActive: this.state.sexuallyActive,
             age: this.state.age,
             country: this.state.country,
+            color:this.state.color,
+            prevTreatment:this.state.prevTreatment,
             description: this.state.description
         };
 
@@ -256,8 +286,63 @@ class CreateCase extends Component {
                         </div>
 
                         <div className="form-group">
-
                             <div className="row">
+                                <div className="col-lg-6 col-md-6 top15">
+                                    <label>Is it painful?</label>
+                                    <div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updatePainful} name="painful" id="painYes" type="radio" value="Yes" required />
+                                            <label htmlFor="painYes">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updatePainful} name="painful" id="painNo" type="radio" value="No" required />
+                                            <label htmlFor="painNo">
+                                                No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-lg-6 col-md-6 top15">
+                                    <label>Is it bleeding?</label>
+                                    <div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateBleeding} name="bleeding" id="bleedingYes" type="radio" value="Yes" required />
+                                            <label htmlFor="bleedingYes">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateBleeding} name="bleeding" id="bleedingNo" type="radio" value="No" required />
+                                            <label htmlFor="bleedingNo">
+                                                No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <div className="row">
+                                <div className="col-lg-6 col-md-6 top15">
+                                    <label>Is it itching?</label>
+                                    <div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateItching} name="itching" id="itchingYes" type="radio" value="Yes" required />
+                                            <label htmlFor="itchingYes">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        <div className="radio radio-inline">
+                                            <input onChange={this.updateItching} name="itching" id="itchingNo" type="radio" value="No" required />
+                                            <label htmlFor="itchingNo">
+                                                No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="col-lg-6 col-md-6 top15">
                                     <label>Any history of skin cancer?</label>
                                     <div>
@@ -275,6 +360,11 @@ class CreateCase extends Component {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <div className="row">
                                 <div className="col-lg-6 col-md-6 top15">
                                     <label>Are you sexually active?</label>
                                     <div>
@@ -305,6 +395,14 @@ class CreateCase extends Component {
                         <div className="form-group">
                             <label>Country</label>
                             <input onChange={this.updateCountry} type="text" className="form-control" required />
+                        </div>
+                        <div className="form-group">
+                            <label>Has it changed in color?</label>
+                            <input onChange={this.updateColor} type="text" className="form-control" required />
+                        </div>
+                        <div className="form-group">
+                            <label>Have you tried any treatments so far?</label>
+                            <input onChange={this.updatePreviousTreatment} type="text" className="form-control" required />
                         </div>
                         <div className="form-group">
                             <label>Please include any additional comments below:</label>

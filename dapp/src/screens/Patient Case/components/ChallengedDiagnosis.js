@@ -42,7 +42,9 @@ class ChallengedDiagnosis extends Component {
                         </div>
                         <div className="col-lg-6 col-md-12 top10">
                             <label>Recommendation</label>
-                            <p>{this.state.diagnosis.recommendation}</p>
+                            {this.state.diagnosis.recommendation.map(function(recommendationValue){
+                                return <li>{recommendationValue}</li>
+                            })}
                         </div>
                     </div>
                 </div>
