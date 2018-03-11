@@ -56,6 +56,18 @@ class CaseDetails extends Component {
                             <p>{this.state.details.size}</p>
                         </div>
                         <div className="col-md-6 top10">
+                            <label>Is it painful:</label>
+                            <p>{this.state.details.painful}</p>
+                        </div>
+                        <div className="col-md-6 top10">
+                            <label>Is it bleeding:</label>
+                            <p>{this.state.details.bleeding}</p>
+                        </div>
+                        <div className="col-md-6 top10">
+                            <label>Is it itching:</label>
+                            <p>{this.state.details.itching}</p>
+                        </div>
+                        <div className="col-md-6 top10">
                             <label>Any history of skin cancer:</label>
                             <p>{this.state.details.skinCancer}</p>
                         </div>
@@ -70,6 +82,14 @@ class CaseDetails extends Component {
                         <div className="col-md-6 top10">
                             <label>Country:</label>
                             <p>{this.state.details.country}</p>
+                        </div>
+                        <div className="col-xs-12 top10">
+                            <label>Has it changed in color:</label>
+                            <p>{this.state.details.color}</p>
+                        </div>
+                        <div className="col-xs-12 top10">
+                            <label>Have you tried any treatments so far:</label>
+                            <p>{this.state.details.prevTreatment}</p>
                         </div>
                         <div className="col-xs-12 top10">
                             <label>Additional comments:</label>
