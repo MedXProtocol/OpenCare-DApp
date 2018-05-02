@@ -4,26 +4,20 @@
 
 Smart contracts used by MedCredits
 
+Hippocrates Dapp readme is location [here](dapp/README.md)
+
 ### Install
+
     $ npm install
+
+### Running
+
+To run the Ganache server:
+
+  $ npm start
 
 ### Testing
 
+To run the truffle tests
 
-
-See [testrpc github](https://github.com/ethereumjs/testrpc) for instruction on how to install `testrpc`. 
-
-Start truffle private test network  
-
-    $ truffle develop
-    
-then, either 
-
-    $ truffle test
-
-or 
-
-    $ truffle(develop)> test
-    
-if you're in Truffle's development console
-    
+    $ npm test

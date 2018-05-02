@@ -17,7 +17,6 @@ let halfBaseFee = baseFee * 50 / 100;
 let initialPatientTokenBalance = 1000;
 
 contract('MedCredits', function (accounts) {
-
     describe.skip('Initial Setup:', function() {
         this.slow(1500);
 
