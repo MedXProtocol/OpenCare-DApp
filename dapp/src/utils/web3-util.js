@@ -1,7 +1,7 @@
-import medXTokenContractConfig from '../config/contracts/medXToken.json';
-import caseFactoryContractConfig from '../config/contracts/caseFactory.json';
-import caseContractConfig from '../config/contracts/case.json';
-import doctorManagerContractConfig from '../config/contracts/doctorManager.json';
+import medXTokenContractConfig from '#/MedXToken.json';
+import caseFactoryContractConfig from '#/CaseFactory.json';
+import caseContractConfig from '#/Case.json';
+import doctorManagerContractConfig from '#/DoctorManager.json';
 import { promisify } from './common-util';
 
 export function getSelectedAccount() {
@@ -77,13 +77,13 @@ export async function getCaseDetailsLocationHash(caseAddress) {
 
 export async function getCaseDoctorADiagnosisLocationHash(caseAddress) {
     const contract = getCaseContract(caseAddress);
-    
+
     return getFileHashFromBytes(await promisify(cb => contract.diagnosisALocationHash(cb)));
 }
 
 export async function getCaseDoctorBDiagnosisLocationHash(caseAddress) {
     const contract = getCaseContract(caseAddress);
-    
+
     return getFileHashFromBytes(await promisify(cb => contract.diagnosisBLocationHash(cb)));
 }
 
@@ -94,7 +94,7 @@ export async function getAllCasesForCurrentAccount() {
     const count = await promisify(cb => contract.getPatientCaseListCount(account, cb));
 
     let cases = [];
-    
+
     for(let i = 0; i < count; i++) {
         const caseContractAddress = await promisify(cb => contract.patientCases(account, i, cb));
 
@@ -114,7 +114,7 @@ export async function getAllCasesForCurrentAccount() {
 
 export async function getNextCaseFromQueue() {
     const contract = getCaseFactoryContract();
-    
+
     const count = await promisify(cb => contract.getAllCaseListCount(cb));
 
     for(let i = 0; i < count; i++) {
@@ -122,14 +122,14 @@ export async function getNextCaseFromQueue() {
 
         const caseContract = getCaseContract(caseContractAddress);
         const status = (await promisify(cb => caseContract.status(cb))).toNumber();
-        
+
         //Only Open or Challenged cases
-        if(status !== 1 && status !== 4) 
+        if(status !== 1 && status !== 4)
             continue;
 
         //Challenged case can not be review by the same doctor
         if(status === 4 ) {
-            const account = getSelectedAccount(); 
+            const account = getSelectedAccount();
             const diagnosisADoctor = await promisify(cb => caseContract.diagnosingDoctorA(cb));
 
             if(account === diagnosisADoctor)
@@ -156,7 +156,7 @@ export function registerDoctor(address, callback) {
 
 export function acceptDiagnosis(caseAddress, callback) {
     const contract = getCaseContract(caseAddress);
-    
+
         contract
             .acceptDiagnosis(getDefaultTxObj(), function(error, result) {
                 if(error !== null){
@@ -169,7 +169,7 @@ export function acceptDiagnosis(caseAddress, callback) {
 
 export function challengeDiagnosis(caseAddress, callback) {
     const contract = getCaseContract(caseAddress);
-    
+
         contract
             .challengeDiagnosis(getDefaultTxObj(), function(error, result) {
                 if(error !== null){
@@ -195,7 +195,7 @@ export function diagnoseCase(caseAddress, diagnosisHash, callback) {
 
 export function diagnoseChallengedCase(caseAddress, diagnosisHash, accept, callback) {
     const contract = getCaseContract(caseAddress);
-    
+
     contract
         .diagnoseChallengedCase(diagnosisHash, accept, getDefaultTxObj(), function(error, result) {
             if(error !== null){
@@ -260,7 +260,7 @@ function getFileHashFromBytes(bytes) {
         return null;
 
     const { web3 } = window;
-    
+
     return web3.toAscii(bytes);
 }
 

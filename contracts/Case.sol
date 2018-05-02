@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.23;
 
 import "./MedXToken.sol";
 import "./DoctorManager.sol";
@@ -68,7 +68,7 @@ contract Case is Ownable {
      * @param _token - the MedX token
      * @param _doctorManager - the doctor manager contract
      */
-    function Case(
+    constructor (
         address _patient,
         bytes _caseHash,
         uint256 _caseFee,
@@ -81,7 +81,7 @@ contract Case is Ownable {
         caseFee = _caseFee;
         medXToken = _token;
         doctorManager = _doctorManager;
-        CaseCreated(address(this), patient);
+        emit CaseCreated(address(this), patient);
     }
 
     /**
@@ -112,7 +112,7 @@ contract Case is Ownable {
         /* TODO: Start 24 hour timer */
         diagnosingDoctorA = msg.sender;
         diagnosisALocationHash = _diagnosisHash;
-        CaseEvaluated(address(this), patient, diagnosingDoctorA);
+        emit CaseEvaluated(address(this), patient, diagnosingDoctorA);
     }
 
     /**
@@ -124,7 +124,7 @@ contract Case is Ownable {
         status = CaseStatus.Closed;
         medXToken.transfer(diagnosingDoctorA, caseFee);
         medXToken.transfer(patient, medXToken.balanceOf(address(this)));
-        CaseClosed(address(this), patient, diagnosingDoctorA);
+        emit CaseClosed(address(this), patient, diagnosingDoctorA);
     }
 
     /**
@@ -134,7 +134,7 @@ contract Case is Ownable {
         require(status == CaseStatus.Evaluated);
         status = CaseStatus.Challenged;
         /* TODO: Make sure case is within 24 hour period */
-        CaseChallenged(address(this), patient, diagnosingDoctorA);
+        emit CaseChallenged(address(this), patient, diagnosingDoctorA);
     }
 
     /**
@@ -162,7 +162,7 @@ contract Case is Ownable {
     function requestAuthorization() public onlyDoctor {
         authorizations[msg.sender].status = AuthStatus.Requested;
         authorizationList.push(msg.sender);
-        CaseAuthorizationRequested(address(this), patient, msg.sender);
+        emit CaseAuthorizationRequested(address(this), patient, msg.sender);
     }
 
     /**
@@ -176,7 +176,7 @@ contract Case is Ownable {
         require(authorizations[_doctor].status == AuthStatus.Requested);
         authorizations[_doctor].status = AuthStatus.Approved;
         authorizations[_doctor].doctorEncryptionKey = _encryptionKey;
-        CaseAuthorizationApproved(address(this), patient, _doctor);
+        emit CaseAuthorizationApproved(address(this), patient, _doctor);
     }
 
     /**
@@ -196,7 +196,7 @@ contract Case is Ownable {
         medXToken.transfer(diagnosingDoctorB, (caseFee * 50) / 100);
         medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
-        CaseClosedConfirmed(address(this), patient, diagnosingDoctorA);
+        emit CaseClosedConfirmed(address(this), patient, diagnosingDoctorA);
     }
 
     /**
@@ -208,8 +208,6 @@ contract Case is Ownable {
         medXToken.transfer(diagnosingDoctorB, (caseFee * 50) / 100);
         medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
-        CaseClosedRejected(address(this), patient, diagnosingDoctorA);
+        emit CaseClosedRejected(address(this), patient, diagnosingDoctorA);
     }
-
-
 }
