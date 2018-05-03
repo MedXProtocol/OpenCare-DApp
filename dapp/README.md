@@ -12,4 +12,4 @@
 
 # Building app
 
-  $ npm build
+  $ npm run build

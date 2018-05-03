@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "start": "./scripts/ganache.sh",
-    "test": "truffle test"
+    "test": "truffle test",
+    "netlify-build": "./scripts/netlify-build.sh"
   },
   "devDependencies": {
     "babel-polyfill": "^6.26.0",
