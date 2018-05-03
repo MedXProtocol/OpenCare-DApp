@@ -11,13 +11,13 @@ module.exports = {
             port: 8545,
             network_id: 1234
         },
-        // ropsten: {
-        //     provider: function() {
-        //         return new HDWalletProvider(process.env.ROPSTEN_MNEMONIC, "https://ropsten.infura.io/" + process.env.INFURA_API_KEY);
-        //     },
-        //     network_id: 3,
-        //     gas: 3000000
-        // },
+        ropsten: {
+            provider: function() {
+                return new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.ROPSTEN_PROVIDER_URL);
+            },
+            network_id: 3,
+            gas: 3000000
+        },
         // mainnet: {
         //     provider: function() {
         //         return new HDWalletProvider(process.env.MAINNET_MNEMONIC, "https://mainnet.infura.io/" + process.env.INFURA_API_KEY);
@@ -26,6 +26,5 @@ module.exports = {
         //     gasPrice: 21000000000,
         //     network_id: "1"
         // }
-
     }
 };

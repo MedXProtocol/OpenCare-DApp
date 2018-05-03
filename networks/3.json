@@ -1,0 +1,17 @@
+{
+  "migrationVersion": 1525370518,
+  "contracts": [
+    {
+      "contractName": "Migrations",
+      "address": "0x0ecd6beaac121e0c05b96dc12338d6ece1641f74"
+    },
+    {
+      "contractName": "MedXToken",
+      "address": "0x6b9cc371daed07654fe1744bbd7fc3fe690ac7f7"
+    },
+    {
+      "contractName": "DoctorManager",
+      "address": "0x382bef160d1561b190898b62b9b2f2a194742a2b"
+    }
+  ]
+}

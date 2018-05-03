@@ -1,4 +1,5 @@
 export ROPSTEN_MNEMONIC="pony machine fee rent spawn doll erase dizzy remove logic unlock estate"
 export MAINNET_MNEMONIC=""
 export HDWALLET_MNEMONIC="pony machine fee rent spawn doll erase dizzy remove logic unlock estate"
+export ROPSTEN_PROVIDER_URL=https://ropsten.infura.io/To0546l6M9AapR2JxoHN
 export INFURA_API_KEY="To0546l6M9AapR2JxoHN"

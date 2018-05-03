@@ -7,6 +7,8 @@
 # testing
 *coverage
 
+networks/1234.json
+
 .ganache
 
 # production
