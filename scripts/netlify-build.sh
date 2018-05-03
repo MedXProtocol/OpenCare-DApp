@@ -1,6 +1,6 @@
 #! /bin/sh
 
-truffle compile && \
+truffle compile
 if [ "$BRANCH" == "develop" ]
 then
   truffle-migrate-off-chain --network ropsten
