@@ -89,20 +89,19 @@ class CreateCase extends Component {
         this.setState({description: event.target.value});
     }
 
-    handleSubmit = async (event) => {
-        event.preventDefault();
-        
-        const accountBalance = await getSelectedAccountBalance();
-
+    handleSubmit = (event) => {
+      event.preventDefault()
+      getSelectedAccountBalance().then((accountBalance) => {
         if(accountBalance < 15) {
             this.setState({showBalanceTooLowModal: true});
         } else {
             this.setState({showConfirmSubmissionModal: true});
         }
+      })
     }
 
     validateInputs = () => {
-        const valid = 
+        const valid =
             isNotEmptyString(this.state.firstImageHash) &&
             isNotEmptyString(this.state.secondImageHash) &&
             isNotEmptyString(this.state.howLong) &&
@@ -117,13 +116,13 @@ class CreateCase extends Component {
 
     handleCloseBalanceTooLowModal = (event) => {
         event.preventDefault();
-        
+
         this.setState({showBalanceTooLowModal: false});
     }
 
     handleCloseThankYouModal = (event) => {
         event.preventDefault();
-        
+
         this.setState({showThankYouModal: false});
 
         this.props.history.push('/patient-profile');
@@ -136,7 +135,7 @@ class CreateCase extends Component {
 
     handleAcceptConfirmSubmissionModal = async (event) => {
         event.preventDefault();
-        
+
         this.setState({showConfirmSubmissionModal: false});
         await this.createNewCase();
     }
@@ -174,7 +173,7 @@ class CreateCase extends Component {
             error: error,
             submitInProgress: false
         });
-        
+
     }
 
     onSuccess = () => {
@@ -193,7 +192,7 @@ class CreateCase extends Component {
                     </div>
                     <div className="card-content">
                         <div className="form-group">
-                            <label>Overview Photo<star>*</star></label>
+                            <label>Overview Photo<span className='star'>*</span></label>
                             <div>
                                 <label className="btn btn-primary">
                                     Browse...<input onChange={this.captureFirstImage} type="file" className="form-control" style={{display: 'none'}} required/>
@@ -204,7 +203,7 @@ class CreateCase extends Component {
                             </div>
                         </div>
                         <div className="form-group">
-                            <label>Close-up Photo<star>*</star></label>
+                            <label>Close-up Photo<span className='star'>*</span></label>
                             <div>
                                 <label className="btn btn-primary">
                                     Browse...<input onChange={this.captureSecondImage} type="file" className="form-control" style={{display: 'none'}} required/>
@@ -217,7 +216,7 @@ class CreateCase extends Component {
                         <div className="form-group">
                             <div className="row">
                                 <div className="col-lg-6 col-md-6 top15">
-                                    <label>How long have you had this problem?<star>*</star></label>
+                                    <label>How long have you had this problem?<span className='star'>*</span></label>
                                     <div>
                                         <div className="radio radio-inline">
                                             <input onChange={this.updateHowLong} name="lengthOfTime" id="days" type="radio" value="Days" required />
@@ -246,7 +245,7 @@ class CreateCase extends Component {
                                     </div>
                                 </div>
                                 <div className="col-lg-6 col-md-6 top15">
-                                    <label>Is it growing, shrinking or staying the same size?<star>*</star></label>
+                                    <label>Is it growing, shrinking or staying the same size?<span className='star'>*</span></label>
                                     <div>
                                         <div className="radio radio-inline">
                                             <input onChange={this.updateSize} name="size" id="growing" type="radio" value="Growing" required />
@@ -275,7 +274,7 @@ class CreateCase extends Component {
 
                             <div className="row">
                                 <div className="col-lg-6 col-md-6 top15">
-                                    <label>Any history of skin cancer?<star>*</star></label>
+                                    <label>Any history of skin cancer?<span className='star'>*</span></label>
                                     <div>
                                         <div className="radio radio-inline">
                                             <input onChange={this.updateSkinCancer} name="skinCancer" id="yes" type="radio" value="Yes" required />
@@ -292,7 +291,7 @@ class CreateCase extends Component {
                                     </div>
                                 </div>
                                 <div className="col-lg-6 col-md-6 top15">
-                                    <label>Are you sexually active?<star>*</star></label>
+                                    <label>Are you sexually active?<span className='star'>*</span></label>
                                     <div>
                                         <div className="radio radio-inline">
                                             <input onChange={this.updateSexuallyActive} name="sexuallyActive" id="sexYes" type="radio" value="Yes" required />
@@ -313,20 +312,20 @@ class CreateCase extends Component {
                         <div className="form-group">
                             <div className="row">
                                 <div className="col-lg-2 col-md-2 col-sm-3 col-xs-5">
-                                    <label>Age<star>*</star></label>
+                                    <label>Age<span className='star'>*</span></label>
                                     <input onChange={this.updateAge} type="text" className="form-control" required />
                                 </div>
                             </div>
                         </div>
                         <div className="form-group">
-                            <label>Country<star>*</star></label>
+                            <label>Country<span className='star'>*</span></label>
                             <input onChange={this.updateCountry} type="text" className="form-control" required />
                         </div>
                         <div className="form-group">
                             <label>Please include any additional comments below</label>
                             <textarea onChange={this.updateDescription} className="form-control" rows="5" />
                         </div>
-                        <div class="category"><star>*</star> Required fields</div>
+                        <div className="category"><span className='star'>*</span> Required fields</div>
                     </div>
                     <div className="card-footer">
                         <button disabled={!this.state.canSubmit} type="submit" className="btn btn-fill btn-primary">Submit</button>

@@ -4,49 +4,49 @@ import caseContractConfig from '#/Case.json';
 import doctorManagerContractConfig from '#/DoctorManager.json';
 import { promisify } from './common-util';
 
+import truffleContract from 'truffle-contract'
+
 export function getSelectedAccount() {
     const { web3 } = window;
 
     return web3.eth.accounts[0];
 }
 
-export function isDoctor() {
-    const contract = getDoctorManagerContract();
+export async function isDoctor() {
+    const contract = (await getDoctorManagerContract()).contract;
     const selectedAccount = getSelectedAccount();
 
     return promisify(cb => contract.isDoctor(selectedAccount, cb));
 }
 
 export async function getSelectedAccountBalance() {
-    const selectedAccount = getSelectedAccount();
-    const contract = getMedXTokenContract();
-
-    const balance = await promisify(cb => contract.balanceOf(selectedAccount, cb));
-
-    return balance.toNumber();
+  const selectedAccount = getSelectedAccount();
+  const contract = await getMedXTokenContract();
+  const balance = await contract.balanceOf(selectedAccount);
+  return balance.toNumber();
 }
 
 export async function getMedXTokenBalance(account) {
-    const contract = getMedXTokenContract();
+    const contract = await getMedXTokenContract();
 
-    return promisify(cb => contract.balanceOf(account, cb));
+    return contract.balanceOf(account);
 }
 
-export function mintMedXTokens(account, amount, callback) {
-    const contract = getMedXTokenContract();
-    contract
-        .mint(account, amount, getDefaultTxObj(), function(error, result) {
-            if(error !== null){
-                callback(error, result);
-            } else {
-                waitForTxComplete(result, callback);
-            }
-        });
+export async function mintMedXTokens(account, amount, callback) {
+    const contract = await getMedXTokenContract();
+    contract.mint(account, amount, getDefaultTxObj())
+      .then((result) => {
+        waitForTxComplete(result, callback);
+      })
+      .catch((error) => {
+        callback(error)
+      })
 }
 
-export function createCase(documentHash, callback) {
-    const contract = getMedXTokenContract();
-    const caseFactoryAddress = caseFactoryContractConfig.address;
+export async function createCase(documentHash, callback) {
+    const contract = (await getMedXTokenContract()).contract;
+    const caseFactory = (await getCaseFactoryContract()).contract;
+    const caseFactoryAddress = caseFactory.address;
 
     contract
         .approveAndCall(caseFactoryAddress, 15, documentHash, getDefaultTxObj(), function(error, result){
@@ -59,7 +59,7 @@ export function createCase(documentHash, callback) {
 }
 
 export async function getCaseStatus(caseAddress) {
-    const contract = getCaseContract(caseAddress);
+    const contract = (await getCaseContract(caseAddress)).contract;
 
     const status = (await promisify(cb => contract.status(cb))).toNumber();
 
@@ -70,25 +70,25 @@ export async function getCaseStatus(caseAddress) {
 }
 
 export async function getCaseDetailsLocationHash(caseAddress) {
-    const contract = getCaseContract(caseAddress);
+    const contract = (await getCaseContract(caseAddress)).contract;
 
     return getFileHashFromBytes(await promisify(cb => contract.caseDetailLocationHash(cb)));
 }
 
 export async function getCaseDoctorADiagnosisLocationHash(caseAddress) {
-    const contract = getCaseContract(caseAddress);
+    const contract = (await getCaseContract(caseAddress)).contract;
 
     return getFileHashFromBytes(await promisify(cb => contract.diagnosisALocationHash(cb)));
 }
 
 export async function getCaseDoctorBDiagnosisLocationHash(caseAddress) {
-    const contract = getCaseContract(caseAddress);
+    const contract = (await getCaseContract(caseAddress)).contract;
 
     return getFileHashFromBytes(await promisify(cb => contract.diagnosisBLocationHash(cb)));
 }
 
 export async function getAllCasesForCurrentAccount() {
-    const contract = getCaseFactoryContract();
+    const contract = (await getCaseFactoryContract()).contract;
     const account = getSelectedAccount();
 
     const count = await promisify(cb => contract.getPatientCaseListCount(account, cb));
@@ -98,7 +98,7 @@ export async function getAllCasesForCurrentAccount() {
     for(let i = 0; i < count; i++) {
         const caseContractAddress = await promisify(cb => contract.patientCases(account, i, cb));
 
-        const caseContract = getCaseContract(caseContractAddress);
+        const caseContract = (await getCaseContract(caseContractAddress)).contract;
         const status = await promisify(cb => caseContract.status(cb));
 
         cases.push({
@@ -113,14 +113,14 @@ export async function getAllCasesForCurrentAccount() {
 }
 
 export async function getNextCaseFromQueue() {
-    const contract = getCaseFactoryContract();
+    const contract = (await getCaseFactoryContract()).contract;
 
     const count = await promisify(cb => contract.getAllCaseListCount(cb));
 
     for(let i = 0; i < count; i++) {
         const caseContractAddress = await promisify(cb => contract.caseList(i, cb));
 
-        const caseContract = getCaseContract(caseContractAddress);
+        const caseContract = (await getCaseContract(caseContractAddress)).contract;
         const status = (await promisify(cb => caseContract.status(cb))).toNumber();
 
         //Only Open or Challenged cases
@@ -142,8 +142,8 @@ export async function getNextCaseFromQueue() {
     return null;
 }
 
-export function registerDoctor(address, callback) {
-    const contract = getDoctorManagerContract();
+export async function registerDoctor(address, callback) {
+    const contract = (await getDoctorManagerContract()).contract;
     contract
         .addDoctor(address, getDefaultTxObj(), function(error, result) {
             if(error !== null){
@@ -154,8 +154,8 @@ export function registerDoctor(address, callback) {
         });
 }
 
-export function acceptDiagnosis(caseAddress, callback) {
-    const contract = getCaseContract(caseAddress);
+export async function acceptDiagnosis(caseAddress, callback) {
+    const contract = (await getCaseContract(caseAddress)).contract;
 
         contract
             .acceptDiagnosis(getDefaultTxObj(), function(error, result) {
@@ -167,8 +167,8 @@ export function acceptDiagnosis(caseAddress, callback) {
             });
 }
 
-export function challengeDiagnosis(caseAddress, callback) {
-    const contract = getCaseContract(caseAddress);
+export async function challengeDiagnosis(caseAddress, callback) {
+    const contract = (await getCaseContract(caseAddress)).contract;
 
         contract
             .challengeDiagnosis(getDefaultTxObj(), function(error, result) {
@@ -180,8 +180,8 @@ export function challengeDiagnosis(caseAddress, callback) {
             });
 }
 
-export function diagnoseCase(caseAddress, diagnosisHash, callback) {
-    const contract = getCaseContract(caseAddress);
+export async function diagnoseCase(caseAddress, diagnosisHash, callback) {
+    const contract = (await getCaseContract(caseAddress)).contract;
 
     contract
         .diagnoseCase(diagnosisHash, getDefaultTxObj(), function(error, result) {
@@ -193,8 +193,8 @@ export function diagnoseCase(caseAddress, diagnosisHash, callback) {
         });
 }
 
-export function diagnoseChallengedCase(caseAddress, diagnosisHash, accept, callback) {
-    const contract = getCaseContract(caseAddress);
+export async function diagnoseChallengedCase(caseAddress, diagnosisHash, accept, callback) {
+    const contract = (await getCaseContract(caseAddress)).contract;
 
     contract
         .diagnoseChallengedCase(diagnosisHash, accept, getDefaultTxObj(), function(error, result) {
@@ -227,32 +227,27 @@ function getCaseStatusName(status) {
     }
 }
 
-function getMedXTokenContract() {
-    const { web3 } = window;
+function contractFromConfig (config) {
+  const contract = truffleContract(config)
+  contract.setProvider(window.web3.currentProvider)
+  contract.web3.eth.defaultAccount = window.web3.eth.accounts[0]
+  return contract
+}
 
-    const contract = web3.eth.contract(medXTokenContractConfig.abi);
-    return contract.at(medXTokenContractConfig.address);
+function getMedXTokenContract() {
+  return contractFromConfig(medXTokenContractConfig).deployed()
 }
 
 function getCaseFactoryContract() {
-    const { web3 } = window;
-
-    const contract = web3.eth.contract(caseFactoryContractConfig.abi);
-    return contract.at(caseFactoryContractConfig.address);
+    return contractFromConfig(caseFactoryContractConfig).deployed()
 }
 
 function getCaseContract(address) {
-    const { web3 } = window;
-
-    const contract = web3.eth.contract(caseContractConfig.abi);
-    return contract.at(address);
+    return contractFromConfig(caseContractConfig).at(address)
 }
 
 function getDoctorManagerContract() {
-    const { web3 } = window;
-
-    const contract = web3.eth.contract(doctorManagerContractConfig.abi);
-    return contract.at(doctorManagerContractConfig.address);
+    return contractFromConfig(doctorManagerContractConfig).deployed()
 }
 
 function getFileHashFromBytes(bytes) {

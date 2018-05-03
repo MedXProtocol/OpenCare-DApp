@@ -15,10 +15,10 @@ class SubmitDiagnosis extends Component {
         this.state = {
             isChallenge: false,
             originalDiagnosis: null,
-            
+
             diagnosis: null,
             recommendation: null,
-            
+
             canSubmit: false,
             submitInProgress: false,
             showConfirmationModal: false,
@@ -30,12 +30,12 @@ class SubmitDiagnosis extends Component {
         const status = await getCaseStatus(this.props.caseAddress);
 
         if(status.code === 4) {
-        
+
             const diagnosisHash = await getCaseDoctorADiagnosisLocationHash(this.props.caseAddress);
 
             const diagnosisJson = await downloadJson(diagnosisHash);
             const diagnosis = JSON.parse(diagnosisJson);
-            
+
             this.setState({
                 isChallenge: true,
                 originalDiagnosis: diagnosis.diagnosis
@@ -52,7 +52,7 @@ class SubmitDiagnosis extends Component {
     }
 
     validateInputs = () => {
-        const valid = 
+        const valid =
             isNotEmptyString(this.state.diagnosis) &&
             isNotEmptyString(this.state.recommendation);
 
@@ -61,13 +61,13 @@ class SubmitDiagnosis extends Component {
 
     handleSubmit = async (event) => {
         event.preventDefault();
-        
+
         this.setState({showConfirmationModal: true});
     }
 
     handleCloseThankYouModal = (event) => {
         event.preventDefault();
-        
+
         this.setState({showThankYouModal: false});
 
         this.props.history.push('/physician-profile');
@@ -120,7 +120,7 @@ class SubmitDiagnosis extends Component {
             error: error,
             submitInProgress: false
         });
-        
+
     }
 
     onSuccess = () => {
@@ -139,7 +139,7 @@ class SubmitDiagnosis extends Component {
                     </div>
                     <div className="card-content">
                         <div className="form-group">
-                            <label>Diagnosis<star>*</star></label>
+                            <label>Diagnosis<span className='star'>*</span></label>
                             <select onChange={this.updateDiagnosis} className="form-control">
                                 <option value=""></option>
                                 <option value="Acne">Acne</option>
@@ -175,10 +175,10 @@ class SubmitDiagnosis extends Component {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Recommendation<star>*</star></label>
+                            <label>Recommendation<span className='star'>*</span></label>
                             <textarea onChange={this.updateRecommendation} className="form-control" rows="5" required />
                         </div>
-                        <div class="category"><star>*</star> Required fields</div>
+                        <div className="category"><span className='star'>*</span> Required fields</div>
                     </div>
                     <div className="card-footer">
                         <button disabled={!this.state.canSubmit} type="submit" className="btn btn-fill btn-primary">Submit</button>
