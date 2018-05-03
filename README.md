@@ -20,4 +20,5 @@ To run the Ganache server:
 
 To run the truffle tests
 
-    $ npm test
+    $ npm run test
+
