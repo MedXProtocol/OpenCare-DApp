@@ -2,10 +2,13 @@ pragma solidity ^0.4.23;
 
 import "./Case.sol";
 import "./MedXToken.sol";
+import "./Registry.sol";
+import "./Delegate.sol";
+import "./Initializable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
-contract CaseFactory is Ownable, Pausable {
+contract CaseFactory is Ownable, Pausable, Initializable {
     using SafeMath for uint256;
 
     uint256 public caseFee;
@@ -13,27 +16,29 @@ contract CaseFactory is Ownable, Pausable {
     mapping (address => address[]) public patientCases;
 
     MedXToken public medXToken;
-    DoctorManager public doctorManager;
+    Registry registry;
 
     /**
      * @dev - Constructor
      * @param _baseCaseFee - initial case fee
      * @param _medXToken - the MedX token
      */
-    function CaseFactory(uint256 _baseCaseFee, MedXToken _medXToken, DoctorManager _doctorManager) {
+    function initialize(uint256 _baseCaseFee, MedXToken _medXToken, Registry _registry) external notInitialized {
         require(_baseCaseFee > 0);
         require(address(_medXToken) != 0x0);
-        require(address(_doctorManager) != 0x0);
+        require(address(_registry) != 0x0);
+        setInitialized();
 
+        owner = msg.sender;
         caseFee = _baseCaseFee;
         medXToken = _medXToken;
-        doctorManager = _doctorManager;
+        registry = _registry;
     }
 
     /**
      * @dev - Contract should not accept any ether
      */
-    function () {
+    function () payable public {
         revert();
     }
 
@@ -62,14 +67,6 @@ contract CaseFactory is Ownable, Pausable {
     }
 
     /**
-     * @dev - sets the doctor manager contract address
-     */
-    function setDoctorManager(DoctorManager _doctorManagerContract) public onlyOwner {
-        require(address(_doctorManagerContract) != 0x0);
-        doctorManager = _doctorManagerContract;
-    }
-
-    /**
      * @dev - returns the length of the "all" case list
      */
     function getAllCaseListCount() public constant returns (uint256 _caseCount) {
@@ -89,7 +86,9 @@ contract CaseFactory is Ownable, Pausable {
      * @return - address of the case contract created
      */
     function createCase(address _patient, bytes _caseDetailLocation) internal returns (address _newCase) {
-        Case newCase = new Case(_patient, _caseDetailLocation, caseFee, medXToken, doctorManager);
+        Delegate delegator = new Delegate(registry, "Case");
+        Case newCase = Case(delegator);
+        /* newCase.initialize(_patient, _caseDetailLocation, caseFee, medXToken, registry); */
         caseList.push(address(newCase));
         patientCases[_patient].push(address(newCase));
         return newCase;

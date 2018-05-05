@@ -239,14 +239,17 @@ function getMedXTokenContract() {
 }
 
 function getCaseFactoryContract() {
+    
     return contractFromConfig(caseFactoryContractConfig).deployed()
 }
 
 function getCaseContract(address) {
+
     return contractFromConfig(caseContractConfig).at(address)
 }
 
 function getDoctorManagerContract() {
+
     return contractFromConfig(doctorManagerContractConfig).deployed()
 }
 
