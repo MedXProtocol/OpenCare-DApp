@@ -16,7 +16,8 @@ module.exports = {
                 return new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.ROPSTEN_PROVIDER_URL);
             },
             network_id: 3,
-            gas: 3000000
+            gas: 4683623,
+            gasPrice: 10000000000
         },
         // mainnet: {
         //     provider: function() {

@@ -3,15 +3,35 @@
   "contracts": [
     {
       "contractName": "Migrations",
-      "address": "0x0ecd6beaac121e0c05b96dc12338d6ece1641f74"
+      "address": "0x43396f3a4d59242f212c5ca3dcf69225b83e53fa"
+    },
+    {
+      "contractName": "Registry",
+      "address": "0xaa25c12c8081ac192be10a764f69335e6cb132f6"
     },
     {
       "contractName": "MedXToken",
-      "address": "0x6b9cc371daed07654fe1744bbd7fc3fe690ac7f7"
+      "address": "0x83a69da0d411ffabefbe5c3f9bcc0a4ee1ce0615"
     },
     {
       "contractName": "DoctorManager",
-      "address": "0x382bef160d1561b190898b62b9b2f2a194742a2b"
+      "address": "0xe5f952b3c0d2cc7cc14ac6b759345fa6d2c49f92"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0xac0aeedeff3a10478c4101de138b7b91a2daf9a5"
+    },
+    {
+      "contractName": "Case",
+      "address": "0x20d25a1f7ac98b553d91199b8879b7a3fd233fbd"
+    },
+    {
+      "contractName": "CaseFactory",
+      "address": "0xb4f8e3bd319cc4c6f6f16651e1560a387cac0ae3"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0x6e586c0ae61096dca7dbb88f291822f2553925f2"
     }
   ]
 }
