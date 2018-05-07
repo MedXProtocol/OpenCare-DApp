@@ -10,7 +10,13 @@ export function isSignedIn () {
 
 export function signIn (account, masterPassword) {
   var preimage = deriveKey(masterPassword, account.salt)
+  var storedMasterPassword = deriveKey(preimage, account.preimageSalt).toString('hex')
+  if (account.storedMasterPassword !== storedMasterPassword) {
+    return false
+  }
+
   secretKey = aes.decrypt(account.encryptedSecretKey, preimage)
+  return true
 }
 
 export function signOut () {

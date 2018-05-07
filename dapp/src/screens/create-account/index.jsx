@@ -26,7 +26,7 @@ export class CreateAccount extends Component {
     this.setState({showConfirm: true})
   }
 
-  onSubmit = ({ secretKey, masterPassword }) => {
+  onConfirm = ({ secretKey, masterPassword }) => {
     signIn(getAccount(), masterPassword)
     this.setState({ redirect: true })
   }
@@ -36,7 +36,7 @@ export class CreateAccount extends Component {
     if (this.state.redirect) {
       content = <Redirect to='/' />
     } else if (this.state.showConfirm) {
-      content = <ConfirmCreate onSubmit={this.onSubmit} account={getAccount()}/>
+      content = <ConfirmCreate onConfirm={this.onConfirm} account={getAccount()}/>
     } else if (this.state.showMasterPassword) {
       content = <MasterPassword onMasterPassword={this.onMasterPassword} />
     } else {

@@ -8,8 +8,6 @@ import { ec as EC } from 'elliptic'
 
 export function setupAccount(secretKey, masterPassword) {
   var account = buildAccount(secretKey, masterPassword)
-
   setAccount(account)
-
   return account
 }

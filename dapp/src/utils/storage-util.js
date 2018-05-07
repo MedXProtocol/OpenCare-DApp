@@ -21,10 +21,30 @@ export async function uploadFile(file) {
 }
 
 export async function downloadJson(hash) {
-    return await promisify(cb => ipfsApi.cat(hash, (error, result) => {
-      result = decrypt(result)
-      cb(error, result)
-    }));
+    return await promisify(cb => {
+      ipfsApi.cat(hash, (error, result) => {
+        result = decrypt(result)
+        const buffer = Buffer.from(result)
+        cb(error, buffer.toString('utf8'))
+      })
+    });
+}
+
+export async function downloadImage(hash) {
+  return await promisify(cb => {
+    ipfsApi.cat(hash, (error, result) => {
+      if (error) {
+        cb(error, null)
+      } else {
+        result = decrypt(result)
+        var reader = new window.FileReader()
+        reader.onloadend = () => {
+          cb(error, reader.result)
+        };
+        reader.readAsDataURL(new Blob([result]));
+      }
+    })
+  });
 }
 
 export function getFileUrl(hash) {

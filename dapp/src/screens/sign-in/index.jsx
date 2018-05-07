@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
+import MainLayout from '../../layouts/MainLayout'
+import { withRouter, Link } from 'react-router-dom'
 import { getAccount } from '@/services/get-account'
+import { signIn } from '@/services/sign-in'
 import { SignInForm } from '@/components/sign-in-form'
 
-export class SignIn extends Component {
+class SignInComponent extends Component {
   componentDidMount () {
     this.setState({
       account: getAccount()
@@ -10,7 +13,9 @@ export class SignIn extends Component {
   }
 
   onSubmit = ({ secretKey, masterPassword }) => {
-    
+    if (signIn(getAccount(), masterPassword)) {
+      this.props.history.push('/')
+    }
   }
 
   render () {
@@ -19,7 +24,15 @@ export class SignIn extends Component {
         <div className='container'>
           <div className='row'>
             <div className='col-sm-8 col-sm-offset-2'>
-              <SignInForm onSubmit={this.onSubmit} />
+              <h1>Sign In</h1>
+              <SignInForm onSubmit={this.onSubmit} account={getAccount()}>
+                <div className='form-group'>
+                  <input type='submit' value='Sign In' className='btn btn-primary' />
+                </div>
+              </SignInForm>
+              <p>
+                Don't have an account? <Link to='/sign-up'>Sign up</Link>
+              </p>
             </div>
           </div>
         </div>
@@ -27,3 +40,5 @@ export class SignIn extends Component {
     )
   }
 }
+
+export const SignIn = withRouter(SignInComponent)
