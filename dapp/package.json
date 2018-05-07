@@ -55,6 +55,7 @@
     "babel-plugin-root-import": "^5.1.0",
     "babel-preset-env": "^1.6.1",
     "bulma": "^0.7.1",
+    "copy-webpack-plugin": "^4.5.1",
     "elliptic": "^6.4.0",
     "eslint-import-resolver-babel-root-import": "0.0.2",
     "js-cookie": "^2.2.0",

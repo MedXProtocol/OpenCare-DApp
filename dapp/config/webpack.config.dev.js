@@ -1,5 +1,6 @@
 'use strict';
 
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
@@ -211,6 +212,9 @@ module.exports = {
     ],
   },
   plugins: [
+    new CopyWebpackPlugin([
+      { from: './config/_redirects' }
+    ]),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
