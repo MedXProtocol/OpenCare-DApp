@@ -2,7 +2,7 @@
 
 import assert from "assert";
 
-export default async promise => {
+module.exports = async promise => {
     try {
         await promise;
     } catch (error) {
