@@ -5,7 +5,8 @@
     "start": "./scripts/ganache.sh",
     "test": "truffle test",
     "netlify-build": "./scripts/netlify-build.sh",
-    "migrate": "truffle-migrate-off-chain"
+    "migrate": "truffle-migrate-off-chain",
+    "migrate-reset": "truffle-migrate-off-chain --reset"
   },
   "devDependencies": {
     "babel-plugin-root-import": "^5.1.0",

@@ -2,6 +2,7 @@ import medXTokenContractConfig from '#/MedXToken.json';
 import caseFactoryContractConfig from '#/CaseFactory.json';
 import caseContractConfig from '#/Case.json';
 import doctorManagerContractConfig from '#/DoctorManager.json';
+import registryConfig from '#/Registry.json';
 import { promisify } from './common-util';
 
 import truffleContract from 'truffle-contract'
@@ -97,7 +98,6 @@ export async function getAllCasesForCurrentAccount() {
 
     for(let i = 0; i < count; i++) {
         const caseContractAddress = await promisify(cb => contract.patientCases(account, i, cb));
-
         const caseContract = (await getCaseContract(caseContractAddress)).contract;
         const status = await promisify(cb => caseContract.status(cb));
 
@@ -239,18 +239,31 @@ function getMedXTokenContract() {
 }
 
 function getCaseFactoryContract() {
-    
-    return contractFromConfig(caseFactoryContractConfig).deployed()
+  return lookupContractAt('CaseFactory', caseFactoryContractConfig)
 }
 
 function getCaseContract(address) {
-
-    return contractFromConfig(caseContractConfig).at(address)
+  return contractFromConfig(caseContractConfig).at(address)
 }
 
 function getDoctorManagerContract() {
+  return lookupContractAt('DoctorManager', doctorManagerContractConfig)
+}
 
-    return contractFromConfig(doctorManagerContractConfig).deployed()
+function lookupContractAt(name, contractConfig) {
+  return lookupContractAddress(name).then((address) => {
+    return contractFromConfig(contractConfig).at(address)
+  })
+}
+
+function lookupContractAddress(name) {
+  return getRegistryContract().then((registry) => {
+    return registry.lookup(toRegistryKey(name))
+  })
+}
+
+function getRegistryContract() {
+  return contractFromConfig(registryConfig).deployed()
 }
 
 function getFileHashFromBytes(bytes) {
@@ -267,6 +280,11 @@ function getDefaultTxObj() {
 
     return {'from': web3.eth.accounts[0]};
 }
+
+function toRegistryKey(string) {
+  return window.web3.sha3(string)
+}
+
 
 function waitForTxComplete(txHash, callback) {
     const { web3 } = window;

@@ -1,7 +1,7 @@
 pragma solidity 0.4.23;
 
 contract Initializable {
-    bool private initialized = false;
+    bool public initialized = false;
 
     modifier wasInitialized {
         require(initialized);

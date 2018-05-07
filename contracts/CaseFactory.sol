@@ -16,7 +16,7 @@ contract CaseFactory is Ownable, Pausable, Initializable {
     mapping (address => address[]) public patientCases;
 
     MedXToken public medXToken;
-    Registry registry;
+    Registry public registry;
 
     /**
      * @dev - Constructor
@@ -86,9 +86,9 @@ contract CaseFactory is Ownable, Pausable, Initializable {
      * @return - address of the case contract created
      */
     function createCase(address _patient, bytes _caseDetailLocation) internal returns (address _newCase) {
-        Delegate delegator = new Delegate(registry, "Case");
-        Case newCase = Case(delegator);
-        /* newCase.initialize(_patient, _caseDetailLocation, caseFee, medXToken, registry); */
+        Delegate delegate = new Delegate(registry, keccak256("Case"));
+        Case newCase = Case(delegate);
+        newCase.initialize(_patient, _caseDetailLocation, caseFee, medXToken, registry);
         caseList.push(address(newCase));
         patientCases[_patient].push(address(newCase));
         return newCase;
