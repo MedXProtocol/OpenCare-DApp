@@ -19,13 +19,11 @@ import { isSignedIn, signIn, signOut } from '@/services/sign-in'
 class App extends Component {
   componentDidMount () {
     window.addEventListener("beforeunload", this.unload)
-    window.addEventListener("blur", this.unload)
     window.addEventListener("focus", this.refocus)
   }
 
   componentWillUnmount () {
     window.removeEventListener("beforeunload", this.unload)
-    window.removeEventListener("blur", this.unload)
     window.removeEventListener("focus", this.refocus)
   }
 
