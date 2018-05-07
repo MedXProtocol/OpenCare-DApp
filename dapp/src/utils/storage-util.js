@@ -1,11 +1,13 @@
 import IpfsApi from 'ipfs-api';
 import {promisify} from './common-util';
+import { encrypt, decrypt } from '@/services/sign-in'
 
 const ipfsApi = IpfsApi('ipfs.infura.io', '5001', {protocol: 'https'});
 
 export async function uploadJson(rawJson) {
     const buffer = Buffer.from(rawJson);
-    const uploadResult = await promisify(cb => ipfsApi.add(buffer, cb));
+    const bufferEncrypted = Buffer.from(encrypt(buffer))
+    const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb));
     return uploadResult[0].hash;
 }
 
@@ -13,12 +15,36 @@ export async function uploadFile(file) {
     const reader = new window.FileReader()
     await promisifyFileReader(reader, file);
     const buffer = Buffer.from(reader.result);
-    const uploadResult = await promisify(cb => ipfsApi.add(buffer, cb));
+    const bufferEncrypted = Buffer.from(encrypt(buffer))
+    const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb));
     return uploadResult[0].hash;
 }
 
 export async function downloadJson(hash) {
-    return await promisify(cb => ipfsApi.cat(hash, cb));
+    return await promisify(cb => {
+      ipfsApi.cat(hash, (error, result) => {
+        result = decrypt(result)
+        const buffer = Buffer.from(result)
+        cb(error, buffer.toString('utf8'))
+      })
+    });
+}
+
+export async function downloadImage(hash) {
+  return await promisify(cb => {
+    ipfsApi.cat(hash, (error, result) => {
+      if (error) {
+        cb(error, null)
+      } else {
+        result = decrypt(result)
+        var reader = new window.FileReader()
+        reader.onloadend = () => {
+          cb(error, reader.result)
+        };
+        reader.readAsDataURL(new Blob([result]));
+      }
+    })
+  });
 }
 
 export function getFileUrl(hash) {
@@ -40,6 +66,6 @@ function promisifyFileReader(fileReader, file){
 
 // export async function downloadJson(hash) {
 //     const { web3 } = window;
-    
+
 //     return await promisify(cb => web3.bzz.download(hash, cb));
 // }

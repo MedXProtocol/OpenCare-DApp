@@ -1,11 +1,20 @@
-let MedXToken = artifacts.require("./MedXToken.sol");
-let DoctorManager = artifacts.require("./DoctorManager.sol");
-let CaseFactory = artifacts.require("./CaseFactory.sol");
+var deployAndRegister = require('./support/deploy-and-register')
+var deployAndRegisterDelegate = require('./support/deploy-and-register-delegate')
 
-module.exports = function(deployer) {
+let MedXToken = artifacts.require("./MedXToken.sol");
+let CaseFactory = artifacts.require("./CaseFactory.sol");
+let Registry = artifacts.require('./Registry.sol');
+let Delegate = artifacts.require('./Delegate.sol');
+
+module.exports = function(deployer, network, accounts) {
   deployer.then(async () => {
-    let medXToken = MedXToken.deployed()
-    let doctorManager = DoctorManager.deployed()
-    deployer.deploy(CaseFactory, 10, MedXToken.address, DoctorManager.address);
+    let registryInstance = await Registry.deployed()
+    let medXTokenInstance = await MedXToken.deployed()
+    let caseFactoryTargetKey = 'CaseFactoryTarget'
+    await deployAndRegister(deployer, CaseFactory, Registry, caseFactoryTargetKey)
+    await deployAndRegisterDelegate(deployer, Delegate, Registry, 'CaseFactory', caseFactoryTargetKey)
+    let caseFactoryDelegate = await CaseFactory.at(Delegate.address)
+    console.log('initalized with ', 10, medXTokenInstance.address, registryInstance.address)
+    await caseFactoryDelegate.initialize(10, medXTokenInstance.address, registryInstance.address)
   })
 };

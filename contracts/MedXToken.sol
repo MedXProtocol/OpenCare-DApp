@@ -9,11 +9,6 @@ contract MedXToken is MintableToken {
     uint8 public constant decimals = 18;
 
     /**
-     * @dev - Empty constructor
-     */
-    function MedXToken() {}
-
-    /**
      * @dev - Allow another contract to spend some tokens on your behalf
      * @param _spender - Contract that will spend the tokens
      * @param _value - Amount of tokens to spend

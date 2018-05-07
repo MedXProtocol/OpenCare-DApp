@@ -51,10 +51,16 @@
     "whatwg-fetch": "2.0.3"
   },
   "devDependencies": {
+    "aes-js": "^3.1.1",
     "babel-plugin-root-import": "^5.1.0",
     "babel-preset-env": "^1.6.1",
+    "bulma": "^0.7.1",
+    "elliptic": "^6.4.0",
     "eslint-import-resolver-babel-root-import": "0.0.2",
+    "js-cookie": "^2.2.0",
     "node-sass-chokidar": "^0.0.3",
+    "pbkdf2": "^3.0.16",
+    "randombytes": "^2.0.6",
     "truffle-contract": "^3.0.5",
     "uglifyjs-webpack-plugin": "^1.1.2",
     "webpack": "^3.8.1"

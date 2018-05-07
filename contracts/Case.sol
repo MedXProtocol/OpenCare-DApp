@@ -2,9 +2,11 @@ pragma solidity ^0.4.23;
 
 import "./MedXToken.sol";
 import "./DoctorManager.sol";
+import "./Registry.sol";
+import "./Initializable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract Case is Ownable {
+contract Case is Ownable, Initializable {
     using SafeMath for uint256;
 
     uint256 public caseFee;
@@ -18,7 +20,7 @@ contract Case is Ownable {
     bytes public diagnosisALocationHash;
     bytes public diagnosisBLocationHash;
 
-    DoctorManager public doctorManager;
+    Registry public registry;
     MedXToken public medXToken;
     CaseStatus public status;
 
@@ -53,7 +55,7 @@ contract Case is Ownable {
      * @dev - throws if called by any account other than a doctor.
      */
     modifier onlyDoctor() {
-        require(doctorManager.isDoctor(msg.sender));
+        require(doctorManager().isDoctor(msg.sender));
         _;
     }
 
@@ -66,21 +68,23 @@ contract Case is Ownable {
      * @param _patient - the patient who created the case
      * @param _caseFee - fee for this particular case
      * @param _token - the MedX token
-     * @param _doctorManager - the doctor manager contract
+     * @param _registry - the registry contract
      */
-    constructor (
+    function initialize (
         address _patient,
         bytes _caseHash,
         uint256 _caseFee,
         MedXToken _token,
-        DoctorManager _doctorManager
-    ) {
+        Registry _registry
+    ) external notInitialized {
+        setInitialized();
+        owner = msg.sender;
         status = CaseStatus.Open;
         patient = _patient;
         caseDetailLocationHash = _caseHash;
         caseFee = _caseFee;
         medXToken = _token;
-        doctorManager = _doctorManager;
+        registry = _registry;
         emit CaseCreated(address(this), patient);
     }
 
@@ -172,7 +176,7 @@ contract Case is Ownable {
      */
     function authorizeDoctor(address _doctor, bytes32 _encryptionKey) public onlyPatient {
         require(_doctor != 0x0);
-        require(doctorManager.isDoctor(_doctor));
+        require(doctorManager().isDoctor(_doctor));
         require(authorizations[_doctor].status == AuthStatus.Requested);
         authorizations[_doctor].status = AuthStatus.Approved;
         authorizations[_doctor].doctorEncryptionKey = _encryptionKey;
@@ -209,5 +213,9 @@ contract Case is Ownable {
         medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
         emit CaseClosedRejected(address(this), patient, diagnosingDoctorA);
+    }
+
+    function doctorManager() internal view returns (DoctorManager) {
+        return DoctorManager(registry.lookup(keccak256("DoctorManager")));
     }
 }

@@ -1,8 +1,5 @@
 #! /bin/sh
 
 truffle compile
-if [ "$BRANCH" == "develop" ]
-then
-  truffle-migrate-off-chain --network ropsten
-fi
+truffle-migrate-off-chain --network ropsten
 cd dapp && npm install && npm run build && cd ..

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getCaseDetailsLocationHash } from '../utils/web3-util';
-import { downloadJson, getFileUrl } from '../utils/storage-util';
+import { downloadJson, downloadImage, getFileUrl } from '../utils/storage-util';
 
 class CaseDetails extends Component {
     constructor(){
@@ -19,10 +19,14 @@ class CaseDetails extends Component {
         const detailsJson = await downloadJson(caseDetailsHash);
         const details = JSON.parse(detailsJson);
         this.setState({
-            details: details,
-            firstImageUrl: getFileUrl(details.firstImageHash),
-            secondImageUrl: getFileUrl(details.secondImageHash),
+            details: details
         });
+        downloadImage(details.firstImageHash).then((result) => {
+          this.setState({firstImageUrl: result})
+        })
+        downloadImage(details.secondImageHash).then((result) => {
+          this.setState({secondImageUrl: result})
+        })
     }
 
     render() {
