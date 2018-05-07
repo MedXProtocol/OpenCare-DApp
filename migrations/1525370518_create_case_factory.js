@@ -14,7 +14,6 @@ module.exports = function(deployer, network, accounts) {
     await deployAndRegister(deployer, CaseFactory, Registry, caseFactoryTargetKey)
     await deployAndRegisterDelegate(deployer, Delegate, Registry, 'CaseFactory', caseFactoryTargetKey)
     let caseFactoryDelegate = await CaseFactory.at(Delegate.address)
-    console.log('initalized with ', 10, medXTokenInstance.address, registryInstance.address)
     await caseFactoryDelegate.initialize(10, medXTokenInstance.address, registryInstance.address)
   })
 };

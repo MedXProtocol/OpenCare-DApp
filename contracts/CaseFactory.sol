@@ -53,7 +53,25 @@ contract CaseFactory is Ownable, Pausable, Initializable {
         require(_value == caseFee + (caseFee * 50) / 100);
         require(medXToken.balanceOf(_from) >= _value);
 
-        address createdCaseAddress = createCase(_from, _extraData);
+        /**
+         * assume that the 'extraData' contains
+         * 1. 64 bytes for encryptedCaseKey
+         * 2. remainder for ipfs hash
+         */
+
+        byte[64] memory encryptedCaseKey;
+        uint256 keyLength = 64;
+        uint256 i = 0;
+        for (; i < keyLength; i++) {
+          encryptedCaseKey[i] = _extraData[i];
+        }
+
+        bytes memory caseHash = new bytes(_extraData.length - keyLength);
+        for (i = keyLength; i < _extraData.length; i++) {
+          caseHash[i - keyLength] = _extraData[i];
+        }
+
+        address createdCaseAddress = createCase(_from, encryptedCaseKey, caseHash);
         /* Transfer tokens from patient to the newly created case contract */
         medXToken.transferFrom(_from, createdCaseAddress, _value);
     }
@@ -85,12 +103,25 @@ contract CaseFactory is Ownable, Pausable, Initializable {
      * @param _patient - the patient creating the case
      * @return - address of the case contract created
      */
-    function createCase(address _patient, bytes _caseDetailLocation) internal returns (address _newCase) {
+    function createCase(address _patient, byte[64] _encryptedCaseKey, bytes _ipfsHash) internal returns (address _newCase) {
         Delegate delegate = new Delegate(registry, keccak256("Case"));
         Case newCase = Case(delegate);
-        newCase.initialize(_patient, _caseDetailLocation, caseFee, medXToken, registry);
+        newCase.initialize(_patient, _encryptedCaseKey, _ipfsHash, caseFee, medXToken, registry);
         caseList.push(address(newCase));
         patientCases[_patient].push(address(newCase));
         return newCase;
     }
+
+
+    /**
+     * @dev Converts bytes to bytes32
+     * see https://ethereum.stackexchange.com/questions/7702/how-to-convert-byte-array-to-bytes32-in-solidity
+     */
+    /* function bytesToBytes32(bytes b, uint256 offset) internal pure returns (bytes32) {
+      bytes32 out;
+      for (uint256 i = 0; i < 32; i++) {
+        out |= bytes32(b[offset + i] & 0xFF) >> (i * 8);
+      }
+      return out;
+    } */
 }

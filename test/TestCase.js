@@ -13,13 +13,13 @@ contract('Case', function (accounts) {
     registry = await Registry.new()
     medXToken = await MedXToken.new()
 
-    await caseInstance.initialize(accounts[0], [1, 2], 10, medXToken.address, registry.address)
+    await caseInstance.initialize(accounts[0], 'alaksefj', [1, 2], 10, medXToken.address, registry.address)
   })
 
   describe('initialize()', () => {
     it('should not work twice', async () => {
       expectThrow(() => {
-        caseInstance.initialize(accounts[0], [1, 2], 10, medXToken.address, registry.address)
+        caseInstance.initialize(accounts[0], 'alaksefj', [1, 2], 10, medXToken.address, registry.address)
       })
     })
   })

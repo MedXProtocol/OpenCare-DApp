@@ -4,6 +4,9 @@ import caseContractConfig from '#/Case.json';
 import doctorManagerContractConfig from '#/DoctorManager.json';
 import registryConfig from '#/Registry.json';
 import { promisify } from './common-util';
+import { signedInSecretKey } from '@/services/sign-in'
+import aesjs from 'aes-js'
+import aes from '@/services/aes'
 
 import truffleContract from 'truffle-contract'
 
@@ -44,13 +47,17 @@ export async function mintMedXTokens(account, amount, callback) {
       })
 }
 
-export async function createCase(documentHash, callback) {
+export async function createCase(encryptedCaseKey, documentHash, callback) {
     const contract = (await getMedXTokenContract()).contract;
     const caseFactory = (await getCaseFactoryContract()).contract;
     const caseFactoryAddress = caseFactory.address;
 
+    var hashBytes = aesjs.utils.utf8.toBytes(documentHash)
+    var hashHex = aesjs.utils.hex.fromBytes(hashBytes)
+    const combined = '0x' + encryptedCaseKey + hashHex
+
     contract
-        .approveAndCall(caseFactoryAddress, 15, documentHash, getDefaultTxObj(), function(error, result){
+        .approveAndCall(caseFactoryAddress, 15, combined, getDefaultTxObj(), function(error, result){
             if(error !== null) {
                 callback(error, result);
             } else {
@@ -68,6 +75,14 @@ export async function getCaseStatus(caseAddress) {
         code: status,
         name: getCaseStatusName(status)
     }
+}
+
+export async function getCaseKey(caseAddress) {
+  const contract = await getCaseContract(caseAddress);
+  let encryptedCaseKeyBytes = await contract.getEncryptedCaseKey()
+  let encryptedCaseKey = encryptedCaseKeyBytes.map((hex) => hex.substring(2)).join('')
+  var caseKey = aes.decrypt(encryptedCaseKey, signedInSecretKey())
+  return caseKey
 }
 
 export async function getCaseDetailsLocationHash(caseAddress) {

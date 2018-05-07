@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getCaseDetailsLocationHash } from '../utils/web3-util';
+import { getCaseDetailsLocationHash, getCaseKey } from '../utils/web3-util';
 import { downloadJson, downloadImage, getFileUrl } from '../utils/storage-util';
 
 class CaseDetails extends Component {
@@ -15,16 +15,17 @@ class CaseDetails extends Component {
     }
 
     async componentDidMount() {
+        const caseKey = await getCaseKey(this.props.caseAddress)
         const caseDetailsHash = await getCaseDetailsLocationHash(this.props.caseAddress);
-        const detailsJson = await downloadJson(caseDetailsHash);
+        const detailsJson = await downloadJson(caseDetailsHash, caseKey);
         const details = JSON.parse(detailsJson);
         this.setState({
             details: details
         });
-        downloadImage(details.firstImageHash).then((result) => {
+        downloadImage(details.firstImageHash, caseKey).then((result) => {
           this.setState({firstImageUrl: result})
         })
-        downloadImage(details.secondImageHash).then((result) => {
+        downloadImage(details.secondImageHash, caseKey).then((result) => {
           this.setState({secondImageUrl: result})
         })
     }

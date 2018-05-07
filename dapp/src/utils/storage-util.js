@@ -1,42 +1,42 @@
 import IpfsApi from 'ipfs-api';
 import {promisify} from './common-util';
-import { encrypt, decrypt } from '@/services/sign-in'
+import aes from '@/services/aes'
 
 const ipfsApi = IpfsApi('ipfs.infura.io', '5001', {protocol: 'https'});
 
-export async function uploadJson(rawJson) {
+export async function uploadJson(rawJson, encryptionKey) {
     const buffer = Buffer.from(rawJson);
-    const bufferEncrypted = Buffer.from(encrypt(buffer))
+    const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
     const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb));
     return uploadResult[0].hash;
 }
 
-export async function uploadFile(file) {
+export async function uploadFile(file, encryptionKey) {
     const reader = new window.FileReader()
     await promisifyFileReader(reader, file);
     const buffer = Buffer.from(reader.result);
-    const bufferEncrypted = Buffer.from(encrypt(buffer))
+    const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
     const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb));
     return uploadResult[0].hash;
 }
 
-export async function downloadJson(hash) {
+export async function downloadJson(hash, encryptionKey) {
     return await promisify(cb => {
       ipfsApi.cat(hash, (error, result) => {
-        result = decrypt(result)
+        result = aes.decryptBytes(result, encryptionKey)
         const buffer = Buffer.from(result)
         cb(error, buffer.toString('utf8'))
       })
     });
 }
 
-export async function downloadImage(hash) {
+export async function downloadImage(hash, encryptionKey) {
   return await promisify(cb => {
     ipfsApi.cat(hash, (error, result) => {
       if (error) {
         cb(error, null)
       } else {
-        result = decrypt(result)
+        result = aes.decryptBytes(result, encryptionKey)
         var reader = new window.FileReader()
         reader.onloadend = () => {
           cb(error, reader.result)

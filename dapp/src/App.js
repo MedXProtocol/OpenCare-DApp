@@ -42,6 +42,10 @@ class App extends Component {
 
     const isAccessScreen = location.pathname == '/sign-up' || location.pathname == '/sign-in'
 
+    if (!isSignedIn()) {
+      console.log('you are not signed in')
+    }
+
     var redirect
     if (!isSignedIn() && !hasAccount() && !isAccessScreen) {
       redirect = <Redirect to='/sign-up' />
