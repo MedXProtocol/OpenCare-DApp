@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { Modal } from 'react-bootstrap';
+import { genKey } from '@/services/gen-key'
 import { withRouter } from 'react-router-dom';
 import Spinner from '../../../components/Spinner';
 import { isNotEmptyString } from '../../../utils/common-util';
 import { getSelectedAccountBalance, createCase } from '../../../utils/web3-util';
 import { uploadJson, uploadFile } from '../../../utils/storage-util';
+import { signedInSecretKey } from '@/services/sign-in'
+import aes from '@/services/aes'
 
 class CreateCase extends Component {
     constructor(){
@@ -22,6 +25,8 @@ class CreateCase extends Component {
             age: null,
             country: null,
             description: null,
+            caseEncryptionKey: genKey(32),
+
 
             canSubmit: false,
             submitInProgress: false,
@@ -55,7 +60,7 @@ class CreateCase extends Component {
         event.stopPropagation()
         event.preventDefault()
         const file = event.target.files[0]
-        const imageHash = await uploadFile(file);
+        const imageHash = await uploadFile(file, this.state.caseEncryptionKey);
 
         this.setState({submitInProgress: false});
         return imageHash;
@@ -157,9 +162,9 @@ class CreateCase extends Component {
 
         const caseJson = JSON.stringify(caseInformation);
 
-        const hash = await uploadJson(caseJson);
+        const hash = await uploadJson(caseJson, this.state.caseEncryptionKey);
 
-        createCase(hash, (error, result) => {
+        createCase(aes.encrypt(this.state.caseEncryptionKey, signedInSecretKey()), hash, (error, result) => {
             if(error !== null) {
                 this.onError(error);
             } else {

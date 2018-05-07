@@ -39,8 +39,20 @@ contract('CaseFactory', function (accounts) {
 
   describe('createCase', () => {
     it('should work', async () => {
-      await medXToken.approveAndCall(caseFactoryDelegate.address, 15, 'documentHash')
+      var encryptedCaseKey = Array.apply(null, {length: 64}).map(Number.call, Number)
+      var ipfsHash = Array.apply(null, {length: 50}).map(Number.call, Number)
+      var extraData = encryptedCaseKey.concat(ipfsHash)
+      var buffer = Buffer.from(extraData)
+      var hexData = '0x' + buffer.toString('hex')
+      await medXToken.approveAndCall(caseFactoryDelegate.address, 15, hexData)
       assert.equal((await caseFactoryDelegate.getAllCaseListCount()).toString(), 1)
+
+      let caseAddress = await caseFactoryDelegate.patientCases(web3.eth.accounts[0], 0)
+      var caseInstance = await Case.at(caseAddress)
+      var encryptedCaseKey = await caseInstance.getEncryptedCaseKey()
+
+      assert.equal(Buffer.from(encryptedCaseKey).toString('hex'), Buffer.from(encryptedCaseKey).toString('hex'))
+      assert.equal(await caseInstance.caseDetailLocationHash.call(), '0x' + Buffer.from(ipfsHash).toString('hex'))
     })
   })
 });

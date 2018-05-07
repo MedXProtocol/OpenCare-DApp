@@ -26,6 +26,9 @@ contract Case is Ownable, Initializable {
 
     address[] public authorizationList;
     mapping (address => Authorization) public authorizations;
+
+    byte[64] public encryptedCaseKey;
+
     struct Authorization {
         AuthStatus status;
         bytes32 doctorEncryptionKey;
@@ -72,6 +75,7 @@ contract Case is Ownable, Initializable {
      */
     function initialize (
         address _patient,
+        byte[64] _encryptedCaseKey,
         bytes _caseHash,
         uint256 _caseFee,
         MedXToken _token,
@@ -80,6 +84,7 @@ contract Case is Ownable, Initializable {
         setInitialized();
         owner = msg.sender;
         status = CaseStatus.Open;
+        encryptedCaseKey = _encryptedCaseKey;
         patient = _patient;
         caseDetailLocationHash = _caseHash;
         caseFee = _caseFee;
@@ -117,6 +122,10 @@ contract Case is Ownable, Initializable {
         diagnosingDoctorA = msg.sender;
         diagnosisALocationHash = _diagnosisHash;
         emit CaseEvaluated(address(this), patient, diagnosingDoctorA);
+    }
+
+    function getEncryptedCaseKey() public view returns (byte[64]) {
+      return encryptedCaseKey;
     }
 
     /**
