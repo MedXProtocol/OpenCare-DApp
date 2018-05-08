@@ -17,6 +17,15 @@ import './App.css'
 import { isSignedIn, signIn, signOut } from '@/services/sign-in'
 
 class App extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      requestedPathname: '',
+      redirectPathname: ''
+    }
+    this.checkSignInRedirect(props)
+  }
+
   componentDidMount () {
     window.addEventListener("beforeunload", this.unload)
     window.addEventListener("focus", this.refocus)
@@ -35,16 +44,42 @@ class App extends Component {
     this.forceUpdate()
   }
 
-  render () {
+  componentWillReceiveProps (nextProps) {
+    this.checkSignInRedirect(nextProps)
+  }
+
+  checkSignInRedirect (props) {
     const { location } = this.props
-
+    if (!location) { return }
     const isAccessScreen = location.pathname == '/sign-up' || location.pathname == '/sign-in'
+    if (!isSignedIn() && !isAccessScreen) {
+      let redirect
+      if (!hasAccount()) {
+        redirect = '/sign-up'
+      } else {
+        redirect = '/sign-in'
+      }
+      this.setState({
+        redirectPathname: redirect,
+        requestedPathname: location.pathname
+      })
+    } else if (isSignedIn()) {
+      if (this.state.requestedPathname) {
+        this.setState({
+          redirectPathname: this.state.requestedPathname,
+          requestedPathname: ''
+        })
+      } else {
+        this.setState({
+          redirectPathname: ''
+        })
+      }
+    }
+  }
 
-    var redirect
-    if (!isSignedIn() && !hasAccount() && !isAccessScreen) {
-      redirect = <Redirect to='/sign-up' />
-    } else if (!isSignedIn() && !isAccessScreen) {
-      redirect = <Redirect to='/sign-in' />
+  render () {
+    if (this.state.redirectPathname && this.props.location.pathname !== this.state.redirectPathname) {
+      var redirect = <Redirect to={this.state.redirectPathname} />
     }
 
     return (
