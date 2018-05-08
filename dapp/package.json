@@ -58,6 +58,7 @@
     "babel-preset-env": "^1.6.1",
     "bugsnag-sourcemaps": "^1.0.3",
     "bulma": "^0.7.1",
+    "classnames": "^2.2.5",
     "copy-webpack-plugin": "^4.5.1",
     "elliptic": "^6.4.0",
     "eslint-import-resolver-babel-root-import": "0.0.2",
