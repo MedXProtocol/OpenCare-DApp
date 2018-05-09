@@ -7,11 +7,16 @@ import "./Delegate.sol";
 import "./Initializable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import "./Queue.sol";
 
 contract CaseFactory is Ownable, Pausable, Initializable {
     using SafeMath for uint256;
+    using Queue for Queue.UInt256;
+
+    Queue.UInt256 openCaseQueue;
 
     uint256 public caseFee;
+
     address[] public caseList;
     mapping (address => address[]) public patientCases;
 
@@ -33,6 +38,7 @@ contract CaseFactory is Ownable, Pausable, Initializable {
         caseFee = _baseCaseFee;
         medXToken = _medXToken;
         registry = _registry;
+        openCaseQueue = Queue.create();
     }
 
     /**
@@ -50,7 +56,7 @@ contract CaseFactory is Ownable, Pausable, Initializable {
      * @param _extraData - unused
      */
     function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external whenNotPaused {
-        require(_value == caseFee + (caseFee * 50) / 100);
+        require(_value == caseFee.add(caseFee.mul(50).div(100)));
         require(medXToken.balanceOf(_from) >= _value);
 
         /**
@@ -107,11 +113,15 @@ contract CaseFactory is Ownable, Pausable, Initializable {
         Delegate delegate = new Delegate(registry, keccak256("Case"));
         Case newCase = Case(delegate);
         newCase.initialize(_patient, _encryptedCaseKey, _ipfsHash, caseFee, medXToken, registry);
-        caseList.push(address(newCase));
+        uint256 caseIndex = caseList.push(address(newCase));
+        openCaseQueue.enqueue(caseIndex);
         patientCases[_patient].push(address(newCase));
         return newCase;
     }
 
+    function requestNextCase() {
+      
+    }
 
     /**
      * @dev Converts bytes to bytes32

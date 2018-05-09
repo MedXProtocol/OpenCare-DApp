@@ -16,7 +16,6 @@ contract Case is Ownable, Initializable {
     address public diagnosingDoctorB;
 
     bytes public caseDetailLocationHash;
-    bytes public originalEncryptionKey;
     bytes public diagnosisALocationHash;
     bytes public diagnosisBLocationHash;
 
@@ -24,18 +23,13 @@ contract Case is Ownable, Initializable {
     MedXToken public medXToken;
     CaseStatus public status;
 
-    address[] public authorizationList;
-    mapping (address => Authorization) public authorizations;
-
     byte[64] public encryptedCaseKey;
 
-    struct Authorization {
-        AuthStatus status;
-        bytes32 doctorEncryptionKey;
+    enum CaseStatus {
+      None, Open, EvaluationRequest, Evaluating, Evaluated,
+      Closed, Challenged, ChallengeRequest, Challenging,
+      Canceled, ClosedRejected, ClosedConfirmed
     }
-
-    enum CaseStatus { None, Open, Evaluated, Closed, Challenged, Canceled, ClosedRejected, ClosedConfirmed }
-    enum AuthStatus { None, Requested, Approved }
 
     event CaseCreated(address indexed _caseAddress, address indexed _casePatient);
     event CaseEvaluated(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor);
@@ -44,13 +38,13 @@ contract Case is Ownable, Initializable {
     event CaseClosedConfirmed(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor);
     event CaseChallenged(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor);
     event CaseAuthorizationRequested(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor);
-    event CaseAuthorizationApproved(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor);
+    event CaseAuthorizationApproved(address indexed _caseAddress, address indexed _casePatient, address indexed _caseDoctor, bytes _doctorEncryptedKey);
 
     /**
      * @dev - throws if called by any account other than the patient.
      */
     modifier onlyPatient() {
-        require(msg.sender == patient);
+        require(msg.sender == patient, 'Sender must be patient');
         _;
     }
 
@@ -60,6 +54,16 @@ contract Case is Ownable, Initializable {
     modifier onlyDoctor() {
         require(doctorManager().isDoctor(msg.sender));
         _;
+    }
+
+    modifier onlyFirstDoctor() {
+      require(msg.sender == diagnosingDoctorA);
+      _;
+    }
+
+    modifier onlyChallengeDoctor() {
+      require(msg.sender == diagnosingDoctorB);
+      _;
     }
 
     modifier evaluateTiming() {
@@ -84,9 +88,9 @@ contract Case is Ownable, Initializable {
         setInitialized();
         owner = msg.sender;
         status = CaseStatus.Open;
-        encryptedCaseKey = _encryptedCaseKey;
+        encryptedCaseKey = _encryptedCaseKey; // don't need to store this
         patient = _patient;
-        caseDetailLocationHash = _caseHash;
+        caseDetailLocationHash = _caseHash; // don't need to store this
         caseFee = _caseFee;
         medXToken = _token;
         registry = _registry;
@@ -96,7 +100,7 @@ contract Case is Ownable, Initializable {
     /**
      * @dev - Contract should not accept any ether
      */
-    function() {
+    function () public payable {
         revert();
     }
 
@@ -113,13 +117,9 @@ contract Case is Ownable, Initializable {
      * @dev - doctor submits diagnosis for case. Patient must have approved the doctor in order for them to decrypt the case files
      * @param _diagnosisHash - Swarm hash of where the diagnosis data is stored
      */
-    function diagnoseCase(bytes _diagnosisHash) public onlyDoctor {
-        require(status == CaseStatus.Open);
-        //require(authorizations[msg.sender].status == AuthStatus.Approved);
+    function diagnoseCase(bytes _diagnosisHash) public onlyFirstDoctor {
+        require(status == CaseStatus.Evaluating);
         status = CaseStatus.Evaluated;
-
-        /* TODO: Start 24 hour timer */
-        diagnosingDoctorA = msg.sender;
         diagnosisALocationHash = _diagnosisHash;
         emit CaseEvaluated(address(this), patient, diagnosingDoctorA);
     }
@@ -155,48 +155,13 @@ contract Case is Ownable, Initializable {
      * @param _secondaryDiagnosisHash - Location of the diagnosis
      * @param _accept - diagnosis the same as the original
      */
-    function diagnoseChallengedCase(bytes _secondaryDiagnosisHash, bool _accept) public onlyDoctor {
-        require(status == CaseStatus.Challenged);
-        require(msg.sender != diagnosingDoctorA);
-        //require(authorizations[msg.sender].status == AuthStatus.Approved);
-
-        diagnosingDoctorB = msg.sender;
+    function diagnoseChallengedCase(bytes _secondaryDiagnosisHash, bool _accept) public onlyChallengeDoctor {
+        require(status == CaseStatus.Challenging);
         diagnosisBLocationHash = _secondaryDiagnosisHash;
-
         if (_accept)
             confirmChallengedDiagnosis();
         else
             rejectChallengedDiagnosis();
-    }
-
-    /**
-     * @dev - doctor requests access to patients encrypted case files. Patient needs to approved and created doctor specific decryption key
-     */
-    function requestAuthorization() public onlyDoctor {
-        authorizations[msg.sender].status = AuthStatus.Requested;
-        authorizationList.push(msg.sender);
-        emit CaseAuthorizationRequested(address(this), patient, msg.sender);
-    }
-
-    /**
-     * @dev - Patient will encrypt the encryption key using the doctors public key so that the doctor can decrypt the case files
-     * @param _doctor - the doctors address to authorize
-     * @param _encryptionKey - the case file encryption key encrypted using the doctors public key
-     */
-    function authorizeDoctor(address _doctor, bytes32 _encryptionKey) public onlyPatient {
-        require(_doctor != 0x0);
-        require(doctorManager().isDoctor(_doctor));
-        require(authorizations[_doctor].status == AuthStatus.Requested);
-        authorizations[_doctor].status = AuthStatus.Approved;
-        authorizations[_doctor].doctorEncryptionKey = _encryptionKey;
-        emit CaseAuthorizationApproved(address(this), patient, _doctor);
-    }
-
-    /**
-     * @dev - returns the length of the authorization list
-     */
-    function getAllAuthorizationListCount() public constant returns (uint256 _authorizationCount) {
-        return authorizationList.length;
     }
 
     /**
@@ -222,6 +187,32 @@ contract Case is Ownable, Initializable {
         medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
         emit CaseClosedRejected(address(this), patient, diagnosingDoctorA);
+    }
+
+    function requestDiagnosisAuthorization () external onlyDoctor {
+      require(status == CaseStatus.Open);
+      status = CaseStatus.EvaluationRequest;
+      emit CaseAuthorizationRequested(address(this), patient, msg.sender);
+    }
+
+    function requestChallengeAuthorization () external onlyDoctor {
+      require(status == CaseStatus.Challenged);
+      status = CaseStatus.ChallengeRequest;
+      emit CaseAuthorizationRequested(address(this), patient, msg.sender);
+    }
+
+    function authorizeDiagnosisDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
+      require(status == CaseStatus.EvaluationRequest);
+      diagnosingDoctorA = _doctor;
+      status = CaseStatus.Evaluating;
+      emit CaseAuthorizationApproved(address(this), patient, msg.sender, _doctorEncryptedKey);
+    }
+
+    function authorizeChallengeDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
+      require(status == CaseStatus.ChallengeRequest);
+      diagnosingDoctorB = _doctor;
+      status = CaseStatus.Challenging;
+      emit CaseAuthorizationApproved(address(this), patient, msg.sender, _doctorEncryptedKey);
     }
 
     function doctorManager() internal view returns (DoctorManager) {
