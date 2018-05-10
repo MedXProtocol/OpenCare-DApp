@@ -20,11 +20,8 @@ import { isSignedIn, signIn, signOut } from '@/services/sign-in'
 class App extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      requestedPathname: '',
-      redirectPathname: ''
-    }
-    this.checkSignInRedirect(props)
+    this.state = {}
+    this.state = this.getSignInRedirectState(props) || {}
   }
 
   componentDidMount () {
@@ -51,7 +48,8 @@ class App extends Component {
     this.checkSignInRedirect(nextProps)
   }
 
-  checkSignInRedirect (props) {
+  getSignInRedirectState (props) {
+    let state = null
     const { location } = this.props
     if (!location) { return }
     const isAccessScreen = location.pathname == '/sign-up' || location.pathname == '/sign-in'
@@ -62,22 +60,28 @@ class App extends Component {
       } else {
         redirect = '/sign-in'
       }
-      this.setState({
+      state = {
         redirectPathname: redirect,
         requestedPathname: location.pathname
-      })
+      }
     } else if (isSignedIn()) {
       if (this.state.requestedPathname) {
-        this.setState({
+        state = {
           redirectPathname: this.state.requestedPathname,
           requestedPathname: ''
-        })
+        }
       } else {
-        this.setState({
+        state = {
           redirectPathname: ''
-        })
+        }
       }
     }
+    return state
+  }
+
+  checkSignInRedirect (props) {
+    let state = this.getSignInRedirectState(props)
+    if (state) { this.setState(state) }
   }
 
   render () {
