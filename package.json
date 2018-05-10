@@ -19,10 +19,11 @@
     "babel-register": "^6.26.0",
     "dotenv": "^4.0.0",
     "swarm-js": "^0.1.37",
-    "web3": "^0.20.6",
-    "zeppelin-solidity": "^1.4.0",
     "truffle": "^4.1.7",
-    "truffle-hdwallet-provider": "0.0.3"
+    "truffle-hdwallet-provider": "0.0.3",
+    "truffle-migrate-off-chain": "^0.1.4",
+    "web3": "^0.20.6",
+    "zeppelin-solidity": "^1.4.0"
   },
   "dependencies": {}
 }
