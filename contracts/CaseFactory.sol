@@ -13,8 +13,6 @@ contract CaseFactory is Ownable, Pausable, Initializable {
     using SafeMath for uint256;
     using Queue for Queue.UInt256;
 
-    Queue.UInt256 openCaseQueue;
-
     uint256 public caseFee;
 
     address[] public caseList;
@@ -22,6 +20,8 @@ contract CaseFactory is Ownable, Pausable, Initializable {
 
     MedXToken public medXToken;
     Registry public registry;
+
+    Queue.UInt256 openCaseQueue;
 
     /**
      * @dev - Constructor

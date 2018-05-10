@@ -1,14 +1,9 @@
-var deployAndRegister = require('./support/deploy-and-register')
-var deployAndRegisterDelegate = require('./support/deploy-and-register-delegate')
+var deploy = require('./support/deploy')
 
 let DoctorManager = artifacts.require("./DoctorManager.sol");
-let Registry = artifacts.require('./Registry.sol');
-let Delegate = artifacts.require('./Delegate.sol');
 
 module.exports = function(deployer) {
-  deployAndRegister(deployer, DoctorManager, Registry, 'DoctorManagerTarget')
-  deployAndRegisterDelegate(deployer, Delegate, Registry, 'DoctorManager', 'DoctorManagerTarget').then(async () => {
-    let doctorManagerDelegate = await DoctorManager.at(Delegate.address)
-    await doctorManagerDelegate.initialize()
+  deploy(artifacts, deployer, DoctorManager).then((doctorManager) => {
+    return doctorManager.initialize()
   })
 };
