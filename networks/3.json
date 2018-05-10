@@ -1,37 +1,41 @@
 {
-  "migrationVersion": 1525370518,
+  "migrationVersion": 1525898540,
   "contracts": [
     {
       "contractName": "Migrations",
-      "address": "0x43396f3a4d59242f212c5ca3dcf69225b83e53fa"
+      "address": "0x755a546d1084ffba927bd3cf152d93d54164b7c9"
     },
     {
       "contractName": "Registry",
-      "address": "0xaa25c12c8081ac192be10a764f69335e6cb132f6"
+      "address": "0x7065f4c553c11c47bb5d3ed327de229475c8e80f"
     },
     {
       "contractName": "MedXToken",
-      "address": "0x83a69da0d411ffabefbe5c3f9bcc0a4ee1ce0615"
+      "address": "0xbedc4b0e686b3b0014789530cae0d34c41c054f1"
     },
     {
       "contractName": "DoctorManager",
-      "address": "0xe5f952b3c0d2cc7cc14ac6b759345fa6d2c49f92"
+      "address": "0xa2b06e2b2ed3a9fb1cf7c8ec7cd14818c0e27f9f"
     },
     {
       "contractName": "Delegate",
-      "address": "0xac0aeedeff3a10478c4101de138b7b91a2daf9a5"
+      "address": "0x5b40f72b53a118579be59319b487069a5e660656"
     },
     {
       "contractName": "Case",
-      "address": "0x20d25a1f7ac98b553d91199b8879b7a3fd233fbd"
+      "address": "0xaf1933263165f480a22b5ba8521d1f4397de49d9"
     },
     {
       "contractName": "CaseFactory",
       "address": "0xb4f8e3bd319cc4c6f6f16651e1560a387cac0ae3"
     },
     {
+      "contractName": "AccountManager",
+      "address": "0xe655bbcbef1b3c8e2ae2bf2ca2e242fc81bedb0e"
+    },
+    {
       "contractName": "Delegate",
-      "address": "0x6e586c0ae61096dca7dbb88f291822f2553925f2"
+      "address": "0x10ed9f5e5dfbeb9897bc98584e81a729442f10a5"
     }
   ]
 }
