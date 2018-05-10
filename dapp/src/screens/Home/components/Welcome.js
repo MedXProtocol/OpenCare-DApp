@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import './Welcome.css';
 
 class Welcome extends Component {
@@ -10,7 +10,7 @@ class Welcome extends Component {
   navigateToDoctorScreen = () => {
     this.props.history.push('/physician-profile');
   }
-  
+
   render() {
     return (
         <div className="card card-lock">
@@ -22,20 +22,18 @@ class Welcome extends Component {
                         </h4>
                     </div>
                     <div className="col-md-12 top15">
-                        <button 
-                            type="button" 
-                            className="btn btn-default btn-primary btn-welcome"
-                            onClick={() => this.navigateToPatientScreen()}>
+                        <Link
+                            to='/patient-profile'
+                            className="btn btn-default btn-primary btn-welcome">
                             I am a patient
-                        </button>
+                        </Link>
                     </div>
                     <div className="col-md-12 top15">
-                        <button 
-                            type="submit" 
-                            className="btn btn-default btn-primary btn-welcome"
-                            onClick={() => this.navigateToDoctorScreen()}>
+                      <Link
+                          to='/cases/open'
+                            className="btn btn-default btn-primary btn-welcome">
                         I am a physician
-                        </button>
+                      </Link>
                     </div>
                 </div>
             </div>

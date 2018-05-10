@@ -6,7 +6,8 @@ import { Redirect } from 'react-router-dom'
 import { ConfirmCreate } from './confirm-create'
 import { SecretKey } from './secret-key'
 import { MasterPassword } from './master-password'
-import { setupAccount } from '@/services/setup-account'
+import { buildAccount } from '@/services/build-account'
+import { createAccount } from '@/services/create-account'
 import { getAccount } from '@/services/get-account'
 import { signIn } from '@/services/sign-in'
 
@@ -22,13 +23,19 @@ export class CreateAccount extends Component {
   }
 
   onMasterPassword = (password) => {
-    setupAccount(this.state.secretKey, password)
-    this.setState({showConfirm: true})
+    var account = buildAccount(this.state.secretKey, password)
+    this.setState({
+      showConfirm: true,
+      account: account
+    })
   }
 
   onConfirm = ({ secretKey, masterPassword }) => {
-    signIn(getAccount(), masterPassword)
-    this.setState({ redirect: true })
+    createAccount(this.state.account, secretKey).then(() => {
+      signIn(getAccount(), masterPassword).then(() => {
+        this.setState({ redirect: true })
+      })
+    })
   }
 
   render () {
@@ -36,7 +43,7 @@ export class CreateAccount extends Component {
     if (this.state.redirect) {
       content = <Redirect to='/' />
     } else if (this.state.showConfirm) {
-      content = <ConfirmCreate onConfirm={this.onConfirm} account={getAccount()}/>
+      content = <ConfirmCreate onConfirm={this.onConfirm} account={this.state.account}/>
     } else if (this.state.showMasterPassword) {
       content = <MasterPassword onMasterPassword={this.onMasterPassword} />
     } else {

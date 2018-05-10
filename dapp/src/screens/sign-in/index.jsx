@@ -13,9 +13,9 @@ class SignInComponent extends Component {
   }
 
   onSubmit = ({ secretKey, masterPassword }) => {
-    if (signIn(getAccount(), masterPassword)) {
+    signIn(getAccount(), masterPassword).then(() => {
       this.props.history.push('/')
-    }
+    })
   }
 
   render () {

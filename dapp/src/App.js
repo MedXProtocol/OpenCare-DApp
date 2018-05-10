@@ -6,12 +6,13 @@ import { SignIn } from './screens/sign-in'
 import PatientProfile from './screens/Patient Profile'
 import NewCase from './screens/New Case'
 import PatientCase from './screens/Patient Case'
-import PhysicianProfile from './screens/Physician Profile'
+import PhysicianProfile from './screens/doctor-home'
 import DiagnoseCase from './screens/Diagnose Case'
 import AddDoctor from './screens/Add Doctor'
 import Mint from './screens/Mint'
 import Wallet from './screens/Wallet'
 import hasAccount from '@/services/has-account'
+import { OpenCases } from './screens/open-cases'
 import './App.css'
 
 import { isSignedIn, signIn, signOut } from '@/services/sign-in'
@@ -37,7 +38,9 @@ class App extends Component {
   }
 
   unload = () => {
-    signOut()
+    if (process.env.NODE_ENV !== 'development') {
+      signOut()
+    }
   }
 
   refocus = () => {
@@ -85,17 +88,18 @@ class App extends Component {
     return (
       <div>
         {redirect}
-        <Route exact path='/sign-in' component={ SignIn } />
-        <Route exact path='/sign-up' component={ CreateAccount } />
+        <Route path='/sign-in' component={ SignIn } />
+        <Route path='/sign-up' component={ CreateAccount } />
+        <Route path='/new-case' component={ NewCase }/>
+        <Route path='/patient-case/:caseAddress' component={ PatientCase }/>
+        <Route path='/patient-profile' component={ PatientProfile }/>
+        <Route path='/physician-profile' component={ PhysicianProfile }/>
+        <Route path='/diagnose-case/:caseAddress' component={ DiagnoseCase }/>
+        <Route path='/doctors' component={ AddDoctor }/>
+        <Route path='/mint' component={ Mint }/>
+        <Route path='/wallet' component={ Wallet }/>
+        <Route path='/cases/open' component={ OpenCases } />
         <Route exact path='/' component={ Home }/>
-        <Route exact path='/new-case' component={ NewCase }/>
-        <Route exact path='/patient-case/:caseAddress' component={ PatientCase }/>
-        <Route exact path='/patient-profile' component={ PatientProfile }/>
-        <Route exact path='/physician-profile' component={ PhysicianProfile }/>
-        <Route exact path='/diagnose-case/:caseAddress' component={ DiagnoseCase }/>
-        <Route exact path='/doctors' component={ AddDoctor }/>
-        <Route exact path='/mint' component={ Mint }/>
-        <Route exact path='/wallet' component={ Wallet }/>
       </div>
     )
   }

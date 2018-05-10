@@ -4,9 +4,18 @@ import { Modal } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import Spinner from '../../../components/Spinner';
 import { isNotEmptyString } from '../../../utils/common-util';
-import { getCaseStatus, getCaseDoctorADiagnosisLocationHash, diagnoseCase, diagnoseChallengedCase } from '../../../utils/web3-util';
+import {
+  getCaseStatus,
+  getCaseDoctorADiagnosisLocationHash,
+  diagnoseCase,
+  diagnoseChallengedCase,
+  getCaseKey
+} from '../../../utils/web3-util';
+import {
+  signedInSecretKey
+} from '@/services/sign-in'
 import { uploadJson, downloadJson } from '../../../utils/storage-util';
-
+import aes from '@/services/aes'
 
 class SubmitDiagnosis extends Component {
     constructor(){
@@ -28,6 +37,8 @@ class SubmitDiagnosis extends Component {
 
     async componentDidMount() {
         const status = await getCaseStatus(this.props.caseAddress);
+        const encryptedCaseKey = await getCaseKey(this.props.caseAddress)
+        const caseKey = aes.decrypt(encryptedCaseKey, signedInSecretKey())
 
         if(status.code === 4) {
 

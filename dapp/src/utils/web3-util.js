@@ -2,11 +2,13 @@ import medXTokenContractConfig from '#/MedXToken.json';
 import caseFactoryContractConfig from '#/CaseFactory.json';
 import caseContractConfig from '#/Case.json';
 import doctorManagerContractConfig from '#/DoctorManager.json';
+import accountManagerConfig from '#/AccountManager.json';
 import registryConfig from '#/Registry.json';
 import { promisify } from './common-util';
 import { signedInSecretKey } from '@/services/sign-in'
 import aesjs from 'aes-js'
 import aes from '@/services/aes'
+import caseStatus from './case-status'
 
 import truffleContract from 'truffle-contract'
 
@@ -47,6 +49,19 @@ export async function mintMedXTokens(account, amount, callback) {
       })
 }
 
+export function setPublicKey(publicKey) {
+  return getAccountManagerContract().then((accountManager) => {
+    return accountManager.setPublicKey(publicKey)
+  })
+}
+
+export function getPublicKey(address) {
+  if (!address) { address = getSelectedAccount() }
+  return getAccountManagerContract().then((accountManager) => {
+    return accountManager.publicKeys(address)
+  })
+}
+
 export async function createCase(encryptedCaseKey, documentHash, callback) {
     const contract = (await getMedXTokenContract()).contract;
     const caseFactory = (await getCaseFactoryContract()).contract;
@@ -81,8 +96,7 @@ export async function getCaseKey(caseAddress) {
   const contract = await getCaseContract(caseAddress);
   let encryptedCaseKeyBytes = await contract.getEncryptedCaseKey()
   let encryptedCaseKey = encryptedCaseKeyBytes.map((hex) => hex.substring(2)).join('')
-  var caseKey = aes.decrypt(encryptedCaseKey, signedInSecretKey())
-  return caseKey
+  return encryptedCaseKey
 }
 
 export async function getCaseDetailsLocationHash(caseAddress) {
@@ -127,34 +141,15 @@ export async function getAllCasesForCurrentAccount() {
     return cases;
 }
 
+export async function openCaseCount() {
+  return getCaseFactoryContract().then((contract) => {
+    return contract.openCaseCount()
+  })
+}
+
 export async function getNextCaseFromQueue() {
-    const contract = (await getCaseFactoryContract()).contract;
-
-    const count = await promisify(cb => contract.getAllCaseListCount(cb));
-
-    for(let i = 0; i < count; i++) {
-        const caseContractAddress = await promisify(cb => contract.caseList(i, cb));
-
-        const caseContract = (await getCaseContract(caseContractAddress)).contract;
-        const status = (await promisify(cb => caseContract.status(cb))).toNumber();
-
-        //Only Open or Challenged cases
-        if(status !== 1 && status !== 4)
-            continue;
-
-        //Challenged case can not be review by the same doctor
-        if(status === 4 ) {
-            const account = getSelectedAccount();
-            const diagnosisADoctor = await promisify(cb => caseContract.diagnosingDoctorA(cb));
-
-            if(account === diagnosisADoctor)
-                continue;
-        }
-
-        return caseContractAddress;
-    }
-
-    return null;
+  const contract = await getCaseFactoryContract()
+  await contract.requestNextCase()
 }
 
 export async function registerDoctor(address, callback) {
@@ -222,24 +217,23 @@ export async function diagnoseChallengedCase(caseAddress, diagnosisHash, accept,
 }
 
 function getCaseStatusName(status) {
-    switch(status) {
-        case 1:
-            return "Open";
-        case 2:
-            return "Evaluated";
-        case 3:
-            return "Closed";
-        case 4:
-            return "Challenged";
-        case 5:
-            return "Canceled";
-        case 6:
-            return "Closed";
-        case 7:
-            return "Closed";
-        default:
-            return "";
-    }
+  var statuses = {
+    0: 'None',
+    1: 'Open',
+    2: 'EvaluationRequest',
+    3: 'Evaluating',
+    4: 'Evaluated',
+    5: 'Closed',
+    6: 'Challenged',
+    7: 'ChallengeRequest',
+    8: 'Challenging',
+    9: 'Canceled',
+    10: 'ClosedRejected',
+    11: 'ClosedConfirmed'
+  }
+  var string = statuses[status]
+  if (!string) { throw new Error('Unknown status: ', status) }
+  return string
 }
 
 function contractFromConfig (config) {
@@ -263,6 +257,10 @@ function getCaseContract(address) {
 
 function getDoctorManagerContract() {
   return lookupContractAt('DoctorManager', doctorManagerContractConfig)
+}
+
+function getAccountManagerContract () {
+  return lookupContractAt('AccountManager', accountManagerConfig)
 }
 
 function lookupContractAt(name, contractConfig) {

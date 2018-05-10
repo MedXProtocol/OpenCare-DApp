@@ -3,13 +3,12 @@
     border-color: rgba(34, 34, 34, 0.05);
 }
 
-.navbar .navbar-brand {
-    padding: 0px;
+.navbar a {
+  color: white !important;
 }
 
-#wallet-link-toggle,
-#wallet-link {
-    color: white !important;
+.navbar .navbar-brand {
+    padding: 0px;
 }
 
 .navbar-brand img {

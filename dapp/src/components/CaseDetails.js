@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getCaseDetailsLocationHash, getCaseKey } from '../utils/web3-util';
 import { downloadJson, downloadImage, getFileUrl } from '../utils/storage-util';
+import aes from '@/services/aes'
+import { signedInSecretKey } from '@/services/sign-in'
 
 class CaseDetails extends Component {
     constructor(){
@@ -15,7 +17,8 @@ class CaseDetails extends Component {
     }
 
     async componentDidMount() {
-        const caseKey = await getCaseKey(this.props.caseAddress)
+        const encryptedCaseKey = await getCaseKey(this.props.caseAddress)
+        const caseKey = aes.decrypt(encryptedCaseKey, signedInSecretKey())
         const caseDetailsHash = await getCaseDetailsLocationHash(this.props.caseAddress);
         const detailsJson = await downloadJson(caseDetailsHash, caseKey);
         const details = JSON.parse(detailsJson);
