@@ -113,14 +113,22 @@ contract CaseFactory is Ownable, Pausable, Initializable {
         Delegate delegate = new Delegate(registry, keccak256("Case"));
         Case newCase = Case(delegate);
         newCase.initialize(_patient, _encryptedCaseKey, _ipfsHash, caseFee, medXToken, registry);
-        uint256 caseIndex = caseList.push(address(newCase));
+        uint256 caseIndex = caseList.push(address(newCase)) - 1;
         openCaseQueue.enqueue(caseIndex);
         patientCases[_patient].push(address(newCase));
         return newCase;
     }
 
-    function requestNextCase() {
-      
+    function requestNextCase() external returns (address) {
+      require(openCaseQueue.count() > 0);
+      uint256 caseIndex = openCaseQueue.dequeue();
+      Case caseContract = Case(caseList[caseIndex]);
+      caseContract.requestDiagnosisAuthorization(msg.sender);
+      return caseContract;
+    }
+
+    function openCaseCount() external view returns (uint256) {
+      return openCaseQueue.count();
     }
 
     /**

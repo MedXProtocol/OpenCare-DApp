@@ -51,8 +51,8 @@ contract Case is Ownable, Initializable {
     /**
      * @dev - throws if called by any account other than a doctor.
      */
-    modifier onlyDoctor() {
-        require(doctorManager().isDoctor(msg.sender));
+    modifier onlyDoctor(address _doctor) {
+        require(doctorManager().isDoctor(_doctor));
         _;
     }
 
@@ -189,16 +189,16 @@ contract Case is Ownable, Initializable {
         emit CaseClosedRejected(address(this), patient, diagnosingDoctorA);
     }
 
-    function requestDiagnosisAuthorization () external onlyDoctor {
+    function requestDiagnosisAuthorization (address _doctor) external onlyDoctor(_doctor) {
       require(status == CaseStatus.Open);
       status = CaseStatus.EvaluationRequest;
-      emit CaseAuthorizationRequested(address(this), patient, msg.sender);
+      emit CaseAuthorizationRequested(address(this), patient, _doctor);
     }
 
-    function requestChallengeAuthorization () external onlyDoctor {
+    function requestChallengeAuthorization (address _doctor) external onlyDoctor(_doctor) {
       require(status == CaseStatus.Challenged);
       status = CaseStatus.ChallengeRequest;
-      emit CaseAuthorizationRequested(address(this), patient, msg.sender);
+      emit CaseAuthorizationRequested(address(this), patient, _doctor);
     }
 
     function authorizeDiagnosisDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
