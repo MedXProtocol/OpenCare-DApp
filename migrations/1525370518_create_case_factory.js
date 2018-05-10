@@ -8,7 +8,7 @@ module.exports = function(deployer, network, accounts) {
   deployer.then(async () => {
     let registryInstance = await Registry.deployed()
     let medXTokenInstance = await MedXToken.deployed()
-    deploy(artifacts, deployer, CaseFactory).then((caseFactory) => {
+    return deploy(artifacts, deployer, CaseFactory).then((caseFactory) => {
       return caseFactory.initialize(10, medXTokenInstance.address, registryInstance.address)
     })
   })
