@@ -13,8 +13,10 @@ class Navbar extends Component {
   }
 
   componentDidMount () {
-    this.setState({
-      isDoctor: isDoctor()
+    isDoctor().then((isdoc) => {
+      this.setState({
+        isDoctor: isdoc
+      })
     })
   }
 
