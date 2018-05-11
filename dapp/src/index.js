@@ -10,14 +10,18 @@ import './assets/css/themify-icons.css';
 import './assets/sass/site.css';
 import './index.css';
 import App from './App';
+import { Provider } from 'react-redux'
+import { store } from './store'
 
 ReactDOM.render(
     <ErrorBoundary>
-      <Web3Provider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </Web3Provider>
+      <Provider store={store}>
+        <Web3Provider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </Web3Provider>
+      </Provider>
     </ErrorBoundary>,
     document.getElementById('root')
 );

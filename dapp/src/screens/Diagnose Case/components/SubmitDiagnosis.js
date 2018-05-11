@@ -38,7 +38,6 @@ class SubmitDiagnosis extends Component {
     async componentDidMount() {
         const status = await getCaseStatus(this.props.caseAddress);
         const encryptedCaseKey = await getCaseKey(this.props.caseAddress)
-        const caseKey = aes.decrypt(encryptedCaseKey, signedInSecretKey())
 
         if(status.code === 4) {
 

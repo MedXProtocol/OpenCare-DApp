@@ -1,8 +1,5 @@
 import { deriveKey } from '@/utils/derive-key'
-import hasAccount from './has-account'
 import { genKey } from './gen-key'
-import { setAccount } from './set-account'
-import { deriveKeyPair } from './derive-key-pair'
 import aes from './aes'
 
 export function buildAccount(secretKey, masterPassword) {

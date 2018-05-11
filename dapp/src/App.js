@@ -13,15 +13,17 @@ import Mint from './screens/Mint'
 import Wallet from './screens/Wallet'
 import hasAccount from '@/services/has-account'
 import { OpenCases } from './screens/open-cases'
+import auth from './watchers/case-authorization-requested'
 import './App.css'
 
-import { isSignedIn, signIn, signOut } from '@/services/sign-in'
+import { isSignedIn, signOut } from '@/services/sign-in'
 
 class App extends Component {
   constructor (props) {
     super(props)
     this.state = {}
     this.state = this.getSignInRedirectState(props) || {}
+    auth()
   }
 
   componentDidMount () {
@@ -52,7 +54,7 @@ class App extends Component {
     let state = null
     const { location } = this.props
     if (!location) { return }
-    const isAccessScreen = location.pathname == '/sign-up' || location.pathname == '/sign-in'
+    const isAccessScreen = location.pathname === '/sign-up' || location.pathname === '/sign-in'
     if (!isSignedIn() && !isAccessScreen) {
       let redirect
       if (!hasAccount()) {

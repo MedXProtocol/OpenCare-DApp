@@ -83,7 +83,7 @@ contract('CaseFactory', function (accounts) {
         })
       }).then((result) => {
         assert.equal(result.event, 'CaseAuthorizationRequested')
-        assert.equal(result.args._caseDoctor, doctor)
+        assert.equal(result.args.doctor, doctor)
       })
       assert.equal(await env.caseFactory.openCaseCount(), 0)
     })

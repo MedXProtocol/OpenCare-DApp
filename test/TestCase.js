@@ -45,7 +45,7 @@ contract('Case', function (accounts) {
     it('should allow a doctor to request', async () => {
       await caseInstance.requestDiagnosisAuthorization(doctorAddress).then(async (result) => {
         assert.equal(result.logs[0].event, 'CaseAuthorizationRequested')
-        assert.equal(result.logs[0].args._caseDoctor, doctorAddress)
+        assert.equal(result.logs[0].args.doctor, doctorAddress)
         assert.equal(await caseInstance.status.call(), caseStatus('EvaluationRequest'))
       }).catch((error) => {
         console.error(error)

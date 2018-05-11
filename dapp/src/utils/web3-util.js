@@ -236,7 +236,7 @@ function getCaseStatusName(status) {
   return string
 }
 
-function contractFromConfig (config) {
+export function contractFromConfig (config) {
   const contract = truffleContract(config)
   contract.setProvider(window.web3.currentProvider)
   contract.web3.eth.defaultAccount = window.web3.eth.accounts[0]
@@ -247,11 +247,11 @@ function getMedXTokenContract() {
   return contractFromConfig(medXTokenContractConfig).deployed()
 }
 
-function getCaseFactoryContract() {
+export function getCaseFactoryContract() {
   return lookupContractAt('CaseFactory', caseFactoryContractConfig)
 }
 
-function getCaseContract(address) {
+export function getCaseContract(address) {
   return contractFromConfig(caseContractConfig).at(address)
 }
 
