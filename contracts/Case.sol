@@ -4,7 +4,7 @@ import "./MedXToken.sol";
 import "./DoctorManager.sol";
 import "./Registry.sol";
 import "./Initializable.sol";
-import "./CaseFactory.sol";
+import "./CaseManager.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract Case is Ownable, Initializable {
@@ -34,14 +34,14 @@ contract Case is Ownable, Initializable {
       Canceled, ClosedRejected, ClosedConfirmed
     }
 
-    event CaseCreated(address indexed caseFactory, address indexed patient);
-    event CaseEvaluated(address indexed caseFactory, address indexed patient, address indexed doctor);
-    event CaseClosed(address indexed caseFactory, address indexed patient, address indexed doctor);
-    event CaseClosedRejected(address indexed caseFactory, address indexed patient, address indexed doctor);
-    event CaseClosedConfirmed(address indexed caseFactory, address indexed patient, address indexed doctor);
-    event CaseChallenged(address indexed caseFactory, address indexed patient, address indexed doctor);
-    event CaseAuthorizationRequested(address indexed caseFactory, address indexed patient, address indexed doctor);
-    event CaseAuthorizationApproved(address indexed caseFactory, address indexed patient, address indexed doctor, bytes doctorEncryptedKey);
+    event CaseCreated(address indexed caseManager, address indexed patient);
+    event CaseEvaluated(address indexed caseManager, address indexed patient, address indexed doctor);
+    event CaseClosed(address indexed caseManager, address indexed patient, address indexed doctor);
+    event CaseClosedRejected(address indexed caseManager, address indexed patient, address indexed doctor);
+    event CaseClosedConfirmed(address indexed caseManager, address indexed patient, address indexed doctor);
+    event CaseChallenged(address indexed caseManager, address indexed patient, address indexed doctor);
+    event CaseAuthorizationRequested(address indexed caseManager, address indexed patient, address indexed doctor);
+    event CaseAuthorizationApproved(address indexed caseManager, address indexed patient, address indexed doctor, bytes doctorEncryptedKey);
 
     /**
      * @dev - throws if called by any account other than the patient.
@@ -97,7 +97,7 @@ contract Case is Ownable, Initializable {
         caseFee = _caseFee;
         medXToken = _token;
         registry = _registry;
-        emit CaseCreated(caseFactory(), patient);
+        emit CaseCreated(caseManager(), patient);
     }
 
     /**
@@ -124,7 +124,7 @@ contract Case is Ownable, Initializable {
         require(status == CaseStatus.Evaluating);
         status = CaseStatus.Evaluated;
         diagnosisALocationHash = _diagnosisHash;
-        emit CaseEvaluated(caseFactory(), patient, diagnosingDoctorA);
+        emit CaseEvaluated(caseManager(), patient, diagnosingDoctorA);
     }
 
     function getEncryptedCaseKey() public view returns (byte[64]) {
@@ -140,7 +140,7 @@ contract Case is Ownable, Initializable {
         status = CaseStatus.Closed;
         medXToken.transfer(diagnosingDoctorA, caseFee);
         medXToken.transfer(patient, medXToken.balanceOf(address(this)));
-        emit CaseClosed(caseFactory(), patient, diagnosingDoctorA);
+        emit CaseClosed(caseManager(), patient, diagnosingDoctorA);
     }
 
     /**
@@ -150,7 +150,7 @@ contract Case is Ownable, Initializable {
         require(status == CaseStatus.Evaluated);
         status = CaseStatus.Challenged;
         /* TODO: Make sure case is within 24 hour period */
-        emit CaseChallenged(caseFactory(), patient, diagnosingDoctorA);
+        emit CaseChallenged(caseManager(), patient, diagnosingDoctorA);
     }
 
     /**
@@ -177,7 +177,7 @@ contract Case is Ownable, Initializable {
         medXToken.transfer(diagnosingDoctorB, (caseFee * 50) / 100);
         medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
-        emit CaseClosedConfirmed(caseFactory(), patient, diagnosingDoctorA);
+        emit CaseClosedConfirmed(caseManager(), patient, diagnosingDoctorA);
     }
 
     /**
@@ -189,19 +189,19 @@ contract Case is Ownable, Initializable {
         medXToken.transfer(diagnosingDoctorB, (caseFee * 50) / 100);
         medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
-        emit CaseClosedRejected(caseFactory(), patient, diagnosingDoctorA);
+        emit CaseClosedRejected(caseManager(), patient, diagnosingDoctorA);
     }
 
     function requestDiagnosisAuthorization (address _doctor) external onlyDoctor(_doctor) {
       require(status == CaseStatus.Open);
       status = CaseStatus.EvaluationRequest;
-      emit CaseAuthorizationRequested(caseFactory(), patient, _doctor);
+      emit CaseAuthorizationRequested(caseManager(), patient, _doctor);
     }
 
     function requestChallengeAuthorization (address _doctor) external onlyDoctor(_doctor) {
       require(status == CaseStatus.Challenged);
       status = CaseStatus.ChallengeRequest;
-      emit CaseAuthorizationRequested(caseFactory(), patient, _doctor);
+      emit CaseAuthorizationRequested(caseManager(), patient, _doctor);
     }
 
     function authorizeDiagnosisDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
@@ -209,7 +209,7 @@ contract Case is Ownable, Initializable {
       diagnosingDoctorA = _doctor;
       status = CaseStatus.Evaluating;
       approvedDoctorKeys[_doctor] = _doctorEncryptedKey;
-      emit CaseAuthorizationApproved(caseFactory(), patient, msg.sender, _doctorEncryptedKey);
+      emit CaseAuthorizationApproved(caseManager(), patient, msg.sender, _doctorEncryptedKey);
     }
 
     function authorizeChallengeDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
@@ -217,14 +217,14 @@ contract Case is Ownable, Initializable {
       diagnosingDoctorB = _doctor;
       status = CaseStatus.Challenging;
       approvedDoctorKeys[_doctor] = _doctorEncryptedKey;
-      emit CaseAuthorizationApproved(caseFactory(), patient, msg.sender, _doctorEncryptedKey);
+      emit CaseAuthorizationApproved(caseManager(), patient, msg.sender, _doctorEncryptedKey);
     }
 
     function doctorManager() internal view returns (DoctorManager) {
       return DoctorManager(registry.lookup(keccak256("DoctorManager")));
     }
 
-    function caseFactory() internal view returns (CaseFactory) {
-      return CaseFactory(registry.lookup(keccak256("CaseFactory")));
+    function caseManager() internal view returns (CaseManager) {
+      return CaseManager(registry.lookup(keccak256("CaseManager")));
     }
 }

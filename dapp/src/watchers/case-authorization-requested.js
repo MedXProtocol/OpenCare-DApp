@@ -1,24 +1,25 @@
-import { contractFromConfig, getCaseFactoryContract } from '@/utils/web3-util'
+import { contractFromConfig, getCaseManagerContract } from '@/utils/web3-util'
 import padLeft from '@/utils/pad-left'
 import { store } from '@/store'
+import getWeb3 from '@/get-web3'
 
 function bytes32ToAddress(string) {
   return '0x' + string.substring(26)
 }
 
 export default async function() {
-  const { web3 } = window
+  const web3 = getWeb3()
 
-  let caseFactory = await getCaseFactoryContract()
-  let topicAddress = "0x" + padLeft(caseFactory.address.substring(2), 64)
+  let caseManager = await getCaseManagerContract()
+  let topicAddress = "0x" + padLeft(caseManager.address.substring(2), 64)
   var authRequest = web3.sha3('CaseAuthorizationRequested(address,address,address)')
-  var authRequestFilter = web3.eth.filter({
+  var authRequestSubscription = web3.eth.filter({
     fromBlock: 0,
     toBlock: 'latest',
     topics: [authRequest, topicAddress]
   })
 
-  authRequestFilter.watch((error, result) => {
+  authRequestSubscription.watch((error, result) => {
     store.dispatch({
       type: 'CaseAuthorizationRequested',
       address: result.address,

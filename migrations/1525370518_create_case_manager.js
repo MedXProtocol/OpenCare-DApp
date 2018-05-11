@@ -1,15 +1,15 @@
 var deploy = require('./support/deploy')
 
 let MedXToken = artifacts.require("./MedXToken.sol");
-let CaseFactory = artifacts.require("./CaseFactory.sol");
+let CaseManager = artifacts.require("./CaseManager.sol");
 let Registry = artifacts.require('./Registry.sol');
 
 module.exports = function(deployer, network, accounts) {
   deployer.then(async () => {
     let registryInstance = await Registry.deployed()
     let medXTokenInstance = await MedXToken.deployed()
-    deploy(artifacts, deployer, CaseFactory).then((caseFactory) => {
-      return caseFactory.initialize(10, medXTokenInstance.address, registryInstance.address)
+    return deploy(artifacts, deployer, CaseManager).then((caseManager) => {
+      return caseManager.initialize(10, medXTokenInstance.address, registryInstance.address)
     })
   })
 };

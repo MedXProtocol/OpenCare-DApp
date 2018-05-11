@@ -22,8 +22,10 @@ class App extends Component {
   constructor (props) {
     super(props)
     this.state = {}
-    this.state = this.getSignInRedirectState(props) || {}
-    auth()
+    this.getSignInRedirectState(props).then((state) => {
+      if (state) { this.setState(state) }
+      auth()
+    })
   }
 
   componentDidMount () {
@@ -50,12 +52,13 @@ class App extends Component {
     this.checkSignInRedirect(nextProps)
   }
 
-  getSignInRedirectState (props) {
+  getSignInRedirectState = async (props) => {
     let state = null
     const { location } = this.props
     if (!location) { return }
+    let signedIn = await isSignedIn()
     const isAccessScreen = location.pathname === '/sign-up' || location.pathname === '/sign-in'
-    if (!isSignedIn() && !isAccessScreen) {
+    if (!signedIn && !isAccessScreen) {
       let redirect
       if (!hasAccount()) {
         redirect = '/sign-up'
@@ -66,7 +69,7 @@ class App extends Component {
         redirectPathname: redirect,
         requestedPathname: location.pathname
       }
-    } else if (isSignedIn()) {
+    } else if (signedIn) {
       if (this.state.requestedPathname) {
         state = {
           redirectPathname: this.state.requestedPathname,
@@ -82,8 +85,9 @@ class App extends Component {
   }
 
   checkSignInRedirect (props) {
-    let state = this.getSignInRedirectState(props)
-    if (state) { this.setState(state) }
+    this.getSignInRedirectState(props).then((state) => {
+      if (state) { this.setState(state) }
+    })
   }
 
   render () {

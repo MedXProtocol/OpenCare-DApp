@@ -17,7 +17,7 @@ contract MedXToken is MintableToken {
      */
     function approveAndCall(ITokenRecipient _spender, uint256 _value, bytes _extraData) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
+        emit Approval(msg.sender, _spender, _value);
         _spender.receiveApproval(msg.sender, _value, this, _extraData);
         return true;
     }

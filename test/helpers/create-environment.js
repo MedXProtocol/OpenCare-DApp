@@ -5,7 +5,7 @@ module.exports = async function createEnvironment(artifacts) {
   const MedXToken = artifacts.require("./MedXToken.sol")
   const DoctorManager = artifacts.require('./DoctorManager.sol')
   const Delegate = artifacts.require('./Delegate.sol')
-  const CaseFactory = artifacts.require('./CaseFactory.sol')
+  const CaseManager = artifacts.require('./CaseManager.sol')
   const Registry = artifacts.require("./Registry.sol")
 
   let registry = await Registry.new()
@@ -14,12 +14,12 @@ module.exports = async function createEnvironment(artifacts) {
   let caseInstance = await Case.new()
   await registry.register(toRegistryKey('Case'), caseInstance.address)
 
-  let caseFactoryInstance = await CaseFactory.new()
-  await registry.register(toRegistryKey('CaseFactoryTarget'), caseFactoryInstance.address)
-  let caseFactoryDelegate = await Delegate.new(registry.address, toRegistryKey('CaseFactoryTarget'))
-  await registry.register(toRegistryKey('CaseFactory'), caseFactoryDelegate.address)
-  let caseFactory = await CaseFactory.at(caseFactoryDelegate.address)
-  await caseFactory.initialize(10, medXToken.address, registry.address)
+  let caseManagerInstance = await CaseManager.new()
+  await registry.register(toRegistryKey('CaseManagerTarget'), caseManagerInstance.address)
+  let caseManagerDelegate = await Delegate.new(registry.address, toRegistryKey('CaseManagerTarget'))
+  await registry.register(toRegistryKey('CaseManager'), caseManagerDelegate.address)
+  let caseManager = await CaseManager.at(caseManagerDelegate.address)
+  await caseManager.initialize(10, medXToken.address, registry.address)
 
   let doctorManagerInstance = await DoctorManager.new()
   await registry.register(toRegistryKey('DoctorManagerTarget'), doctorManagerInstance.address)
@@ -31,7 +31,7 @@ module.exports = async function createEnvironment(artifacts) {
   return {
     registry,
     medXToken,
-    caseFactory,
+    caseManager,
     doctorManager
   }
 }

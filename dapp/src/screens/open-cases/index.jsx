@@ -7,28 +7,29 @@ import {
   Table
 } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import { getNextCaseFromQueue, openCaseCount } from '@/utils/web3-util'
+import {
+  getNextCaseFromQueue
+} from '@/utils/web3-util'
 import { connect } from 'react-redux'
 import { CaseRow } from './case-row'
 import values from 'lodash.values'
+import keys from 'lodash.keys'
 import get from 'lodash.get'
+import dispatch from '@/dispatch'
 
 const OpenCases = connect(
   (state, ownProps) => {
-    let cases = get(state, `doctorCases[${window.web3.eth.accounts[0]}].cases`) || {}
+    let cases = get(state, `doctorCases.cases`) || {}
+    let caseCount = get(state, `caseCount.count`, '0').toString()
     return {
-      cases: values(cases)
+      cases,
+      caseCount: caseCount
     }
   }
 )(class extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      openCaseCount: 0
-    }
-    openCaseCount().then((response) => {
-      this.setState({openCaseCount: response.toString()})
-    })
+  componentDidMount() {
+    dispatch({type: 'OPEN_CASE_COUNT_FETCH_REQUESTED'})
+    dispatch({type: 'DOCTOR_CASES_FETCH_REQUESTED'})
   }
 
   onClickRequestCase = async (e) => {
@@ -36,15 +37,18 @@ const OpenCases = connect(
   }
 
   render () {
+    let caseKeys = keys(this.props.cases)
+    let cases = caseKeys.reverse().map((key) => this.props.cases[key])
+
     return (
       <MainLayout>
         <div className="container">
           <div className="row">
             <div className='col-xs-12'>
-              <h2>Open Cases: {this.state.openCaseCount}</h2>
+              <h2>Open Cases: {this.props.caseCount}</h2>
             </div>
             <div className="col-xs-12">
-              <Button disabled={this.state.openCaseCount === '0'} onClick={this.onClickRequestCase} bsStyle="primary">Request Case</Button>
+              <Button disabled={this.props.caseCount === '0'} onClick={this.onClickRequestCase} bsStyle="primary">Request Case</Button>
             </div>
             <div className="col-xs-12">
               <h2>Cases</h2>
@@ -58,7 +62,7 @@ const OpenCases = connect(
                 </thead>
                 <tbody>
                   {
-                    this.props.cases.map(caze => <CaseRow case={caze} key={caze.address} />)
+                    cases.map(address => <CaseRow address={address} key={address} />)
                   }
                 </tbody>
               </Table>

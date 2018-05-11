@@ -2,16 +2,16 @@ const expectThrow = require('./helpers/expectThrow')
 const toRegistryKey = require('../migrations/support/to-registry-key')
 const Registry = artifacts.require("./Registry.sol")
 const Delegate = artifacts.require("./Delegate.sol")
-const CaseFactory = artifacts.require("./CaseFactory.sol")
+const CaseManager = artifacts.require("./CaseManager.sol")
 const MedXToken = artifacts.require("./MedXToken.sol")
 const Case = artifacts.require("./Case.sol")
 const buildCaseParameters = require('./helpers/build-case-parameters')
 const generateBytes = require('./helpers/generate-bytes')
 const createEnvironment = require('./helpers/create-environment')
 const createCase = require('./helpers/create-case')
-const resetCaseFactory = require('./helpers/reset-case-factory')
+const resetCaseManager = require('./helpers/reset-case-factory')
 
-contract('CaseFactory', function (accounts) {
+contract('CaseManager', function (accounts) {
   let patient = accounts[0]
   let doctor = accounts[1]
 
@@ -24,13 +24,13 @@ contract('CaseFactory', function (accounts) {
   })
 
   beforeEach(async () => {
-    env.caseFactory = await resetCaseFactory(artifacts, env)
+    env.caseManager = await resetCaseManager(artifacts, env)
   })
 
   describe('initialize()', () => {
     it('should not be called again', () => {
       expectThrow(async () => {
-        await env.caseFactory.initialize(10, env.medXToken.address, env.registry.address)
+        await env.caseManager.initialize(10, env.medXToken.address, env.registry.address)
       })
     })
   })
@@ -41,11 +41,11 @@ contract('CaseFactory', function (accounts) {
       let encryptedCaseKey = generateBytes(64)
       let hexData = buildCaseParameters(ipfsHash, encryptedCaseKey)
 
-      assert.equal((await env.caseFactory.getAllCaseListCount()).toString(), 0)
-      await env.medXToken.approveAndCall(env.caseFactory.address, 15, hexData)
-      assert.equal((await env.caseFactory.getAllCaseListCount()).toString(), 1)
+      assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
+      await env.medXToken.approveAndCall(env.caseManager.address, 15, hexData)
+      assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
 
-      let caseAddress = await env.caseFactory.patientCases(patient, 0)
+      let caseAddress = await env.caseManager.patientCases(patient, 0)
       var caseInstance = await Case.at(caseAddress)
       var caseEncryptedCaseKey = await caseInstance.getEncryptedCaseKey()
 
@@ -56,12 +56,12 @@ contract('CaseFactory', function (accounts) {
 
   describe('openCaseCount()', () => {
     it('should return zero when empty', async () => {
-      assert.equal(await env.caseFactory.openCaseCount(), 0)
+      assert.equal(await env.caseManager.openCaseCount(), 0)
     })
 
     it('should return the count when one exists', async () => {
       await createCase(env, patient)
-      assert.equal(await env.caseFactory.openCaseCount(), 1)
+      assert.equal(await env.caseManager.openCaseCount(), 1)
     })
   })
 
@@ -75,7 +75,7 @@ contract('CaseFactory', function (accounts) {
     })
 
     it('should pull a case off the queue and auth the doctor', async () => {
-      await env.caseFactory.requestNextCase({ from: doctor })
+      await env.caseManager.requestNextCase({ from: doctor })
       await new Promise((resolve, reject) => {
         caseAuthorizationRequested.watch((error, result) => {
           if (error) { reject(error) }
@@ -85,7 +85,9 @@ contract('CaseFactory', function (accounts) {
         assert.equal(result.event, 'CaseAuthorizationRequested')
         assert.equal(result.args.doctor, doctor)
       })
-      assert.equal(await env.caseFactory.openCaseCount(), 0)
+      assert.equal(await env.caseManager.openCaseCount(), 0)
+      assert.equal(await env.caseManager.doctorAuthorizationRequestCount(doctor), 1)
+      assert.equal(await env.caseManager.doctorAuthorizationRequestCaseAtIndex(doctor, 0), caseContract.address)
     })
   })
 });

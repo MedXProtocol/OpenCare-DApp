@@ -7,20 +7,17 @@ import get from 'lodash.get'
 
 const CaseRow = connect(
   (state, ownProps) => {
-    let status = get(state, `cases[${ownProps.case.address}]`)
+    let status = get(state, `cases[${ownProps.address}]`)
     let props = {}
     if (status) { props.status = status }
     return props
   }
 )(class extends Component {
   componentDidMount() {
-    dispatch({ type: 'CASE_FETCH_REQUESTED', address: this.props.case.address })
+    dispatch({ type: 'CASE_FETCH_REQUESTED', address: this.props.address })
   }
 
   render () {
-    if (this.props.case.requested) {
-      'Pending'
-    }
     return (
       <tr>
         <td>Test</td>

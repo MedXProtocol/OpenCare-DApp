@@ -15,7 +15,5 @@ export default function (state, action) {
       break;
   }
 
-  console.log(action)
-
   return state
 }

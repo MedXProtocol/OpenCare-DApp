@@ -9,7 +9,7 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "./Queue.sol";
 
-contract CaseFactory is Ownable, Pausable, Initializable {
+contract CaseManager is Ownable, Pausable, Initializable {
     using SafeMath for uint256;
     using Queue for Queue.UInt256;
 
@@ -22,6 +22,8 @@ contract CaseFactory is Ownable, Pausable, Initializable {
     Registry public registry;
 
     Queue.UInt256 openCaseQueue;
+
+    mapping (address => uint256[]) public doctorAuthorizationRequests;
 
     /**
      * @dev - Constructor
@@ -110,13 +112,13 @@ contract CaseFactory is Ownable, Pausable, Initializable {
      * @return - address of the case contract created
      */
     function createCase(address _patient, byte[64] _encryptedCaseKey, bytes _ipfsHash) internal returns (address _newCase) {
-        Delegate delegate = new Delegate(registry, keccak256("Case"));
-        Case newCase = Case(delegate);
-        newCase.initialize(_patient, _encryptedCaseKey, _ipfsHash, caseFee, medXToken, registry);
-        uint256 caseIndex = caseList.push(address(newCase)) - 1;
-        openCaseQueue.enqueue(caseIndex);
-        patientCases[_patient].push(address(newCase));
-        return newCase;
+      Delegate delegate = new Delegate(registry, keccak256("Case"));
+      Case newCase = Case(delegate);
+      newCase.initialize(_patient, _encryptedCaseKey, _ipfsHash, caseFee, medXToken, registry);
+      uint256 caseIndex = caseList.push(address(newCase)) - 1;
+      openCaseQueue.enqueue(caseIndex);
+      patientCases[_patient].push(address(newCase));
+      return newCase;
     }
 
     function requestNextCase() external returns (address) {
@@ -124,11 +126,23 @@ contract CaseFactory is Ownable, Pausable, Initializable {
       uint256 caseIndex = openCaseQueue.dequeue();
       Case caseContract = Case(caseList[caseIndex]);
       caseContract.requestDiagnosisAuthorization(msg.sender);
+      doctorAuthorizationRequests[msg.sender].push(caseIndex);
       return caseContract;
     }
 
     function openCaseCount() external view returns (uint256) {
       return openCaseQueue.count();
+    }
+
+    function doctorAuthorizationRequestCount(address _doctor) external view returns (uint256) {
+      return doctorAuthorizationRequests[_doctor].length;
+    }
+
+    function doctorAuthorizationRequestCaseAtIndex(address _doctor, uint256 _doctorAuthIndex) external view returns (address) {
+      require(_doctorAuthIndex < doctorAuthorizationRequests[_doctor].length);
+      uint256 index = doctorAuthorizationRequests[_doctor][_doctorAuthIndex];
+      require(index < caseList.length);
+      return caseList[index];
     }
 
     /**

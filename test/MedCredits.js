@@ -3,12 +3,12 @@ import stringTo32Bytes from '../migrations/support/to-registry-key'
 
 const Registry = artifacts.require("./Registry.sol")
 const MedXToken = artifacts.require("./MedXToken.sol");
-const CaseFactory = artifacts.require("./CaseFactory.sol");
+const CaseManager = artifacts.require("./CaseManager.sol");
 const DoctorManager = artifacts.require("./DoctorManager.sol");
 const Case = artifacts.require("./Case.sol");
 
 let medXToken;
-let caseFactory;
+let caseManager;
 let doctorManager;
 let theCase;
 let registry;
@@ -27,22 +27,22 @@ contract.skip('MedCredits', function (accounts) {
         before(async () => {
             medXToken = await MedXToken.new();
             doctorManager = await DoctorManager.new();
-            caseFactory = await CaseFactory.new(100, medXToken.address, doctorManager.address);
+            caseManager = await CaseManager.new(100, medXToken.address, doctorManager.address);
         });
 
         it("Configuration test...", async () => {
             smartLog("MedXToken Address [" + medXToken.address + "]");
             smartLog("DrManager Address [" + doctorManager.address + "]");
-            smartLog("CaseFactory Address [" + caseFactory.address + "]");
+            smartLog("CaseManager Address [" + caseManager.address + "]");
             await medXToken.mint(accounts[1], 1000);
             await medXToken.mint(accounts[2], 1000);
             await medXToken.mint(accounts[3], 1000);
             smartLog("Token total supply [" + await medXToken.totalSupply() + "]");
             smartLog("Token balance for [" + accounts[1] + "] is [" + await medXToken.balanceOf(accounts[1]) + "]");
 
-            await medXToken.approveAndCall(caseFactory.address, 150, "", { from: accounts[1] });
-            let caseAddress = await caseFactory.caseList(0);
-            smartLog("Case list length [" + await caseFactory.getAllCaseListCount() + "]");
+            await medXToken.approveAndCall(caseManager.address, 150, "", { from: accounts[1] });
+            let caseAddress = await caseManager.caseList(0);
+            smartLog("Case list length [" + await caseManager.getAllCaseListCount() + "]");
             smartLog("Case address [" + caseAddress + "]");
             smartLog("Case token balance [" + await medXToken.balanceOf(caseAddress) + "]");
 
@@ -51,26 +51,26 @@ contract.skip('MedCredits', function (accounts) {
             smartLog("Case patient [" + await theCase.patient() + "], should be [" + accounts[1] + "]");
             assert.equal(await theCase.patient(), accounts[1], "Incorrect patient");
 
-            await medXToken.approveAndCall(caseFactory.address, 150, "", { from: accounts[1] });
-            await medXToken.approveAndCall(caseFactory.address, 150, "", { from: accounts[1] });
-            await medXToken.approveAndCall(caseFactory.address, 150, "", { from: accounts[2] });
-            await medXToken.approveAndCall(caseFactory.address, 150, "", { from: accounts[3] });
+            await medXToken.approveAndCall(caseManager.address, 150, "", { from: accounts[1] });
+            await medXToken.approveAndCall(caseManager.address, 150, "", { from: accounts[1] });
+            await medXToken.approveAndCall(caseManager.address, 150, "", { from: accounts[2] });
+            await medXToken.approveAndCall(caseManager.address, 150, "", { from: accounts[3] });
 
-            smartLog("Patient 1 case count [" + await caseFactory.getPatientCaseListCount({ from: accounts[1] }) + "]");
-            smartLog("Patient 2 case count [" + await caseFactory.getPatientCaseListCount({ from: accounts[2] }) + "]");
-            smartLog("Patient 3 case count [" + await caseFactory.getPatientCaseListCount({ from: accounts[3] }) + "]");
-            smartLog("All case count [" + await caseFactory.getAllCaseListCount() + "]");
+            smartLog("Patient 1 case count [" + await caseManager.getPatientCaseListCount({ from: accounts[1] }) + "]");
+            smartLog("Patient 2 case count [" + await caseManager.getPatientCaseListCount({ from: accounts[2] }) + "]");
+            smartLog("Patient 3 case count [" + await caseManager.getPatientCaseListCount({ from: accounts[3] }) + "]");
+            smartLog("All case count [" + await caseManager.getAllCaseListCount() + "]");
 
-            assert.equal(await caseFactory.getPatientCaseListCount({ from: accounts[1] }), 3);
-            assert.equal(await caseFactory.getPatientCaseListCount({ from: accounts[2] }), 1);
-            assert.equal(await caseFactory.getPatientCaseListCount({ from: accounts[3] }), 1);
-            assert.equal(await caseFactory.getAllCaseListCount(), 5);
+            assert.equal(await caseManager.getPatientCaseListCount({ from: accounts[1] }), 3);
+            assert.equal(await caseManager.getPatientCaseListCount({ from: accounts[2] }), 1);
+            assert.equal(await caseManager.getPatientCaseListCount({ from: accounts[3] }), 1);
+            assert.equal(await caseManager.getAllCaseListCount(), 5);
 
-            let mostRecentCaseIndex = await caseFactory.getPatientCaseListCount({ from: accounts[1] }) - 1;
-            smartLog("Patient 1 case 1 [" + await caseFactory.patientCases(accounts[1], 0) + "]");
-            smartLog("Patient 1 case 2 [" + await caseFactory.patientCases(accounts[1], 1) + "]");
-            smartLog("Patient 1 case 3 [" + await caseFactory.patientCases(accounts[1], 2) + "]");
-            smartLog("Patient 1 most recent case [" + await caseFactory.patientCases(accounts[1], mostRecentCaseIndex) + "]");
+            let mostRecentCaseIndex = await caseManager.getPatientCaseListCount({ from: accounts[1] }) - 1;
+            smartLog("Patient 1 case 1 [" + await caseManager.patientCases(accounts[1], 0) + "]");
+            smartLog("Patient 1 case 2 [" + await caseManager.patientCases(accounts[1], 1) + "]");
+            smartLog("Patient 1 case 3 [" + await caseManager.patientCases(accounts[1], 2) + "]");
+            smartLog("Patient 1 most recent case [" + await caseManager.patientCases(accounts[1], mostRecentCaseIndex) + "]");
         });
     });
 
@@ -86,10 +86,10 @@ contract.skip('MedCredits', function (accounts) {
             doctorManager = await Delegate.new(registry.address, 'DoctorManagerTarget')
             await registry.register(stringTo32Bytes('DoctorManager'), doctorManagerDelegate.address)
 
-            let caseFactoryInstance = await CaseFactory.new();
-            await registry.register(stringTo32Bytes('CaseFactoryTarget'), caseFactory.address)
-            caseFactory = await Delegate.new(registry.address, 'CaseFactoryTarget')
-            await registry.register(stringTo32Bytes('CaseFactory'), caseFactoryDelegate.address)
+            let caseManagerInstance = await CaseManager.new();
+            await registry.register(stringTo32Bytes('CaseManagerTarget'), caseManager.address)
+            caseManager = await Delegate.new(registry.address, 'CaseManagerTarget')
+            await registry.register(stringTo32Bytes('CaseManager'), caseManagerDelegate.address)
 
             /* Pre-fund with tokens */
             await medXToken.mint(accounts[1], initialPatientTokenBalance);
@@ -118,13 +118,13 @@ contract.skip('MedCredits', function (accounts) {
             let accountTokenBalance = await medXToken.balanceOf(testPatientAccount);
             assert.equal(accountTokenBalance, initialPatientTokenBalance);
 
-            await medXToken.approveAndCall(caseFactory.address, (baseFee + halfBaseFee), swarmHash, { from: testPatientAccount });
-            assert.equal(await caseFactory.getAllCaseListCount(), 1);
-            assert.equal(await caseFactory.getPatientCaseListCount(testPatientAccount), 1);
+            await medXToken.approveAndCall(caseManager.address, (baseFee + halfBaseFee), swarmHash, { from: testPatientAccount });
+            assert.equal(await caseManager.getAllCaseListCount(), 1);
+            assert.equal(await caseManager.getPatientCaseListCount(testPatientAccount), 1);
             assert.equal(accountTokenBalance - 150, 850);
 
-            let latestPatientCaseIndex = (await caseFactory.getPatientCaseListCount(testPatientAccount)) - 1;
-            let patientCase = Case.at(await caseFactory.patientCases(testPatientAccount, latestPatientCaseIndex));
+            let latestPatientCaseIndex = (await caseManager.getPatientCaseListCount(testPatientAccount)) - 1;
+            let patientCase = Case.at(await caseManager.patientCases(testPatientAccount, latestPatientCaseIndex));
             assert.equal(await patientCase.status(), CaseStatus.Open);
             assert.equal(web3.toAscii(await patientCase.caseDetailLocationHash()), swarmHash);
         });
@@ -136,18 +136,18 @@ contract.skip('MedCredits', function (accounts) {
             smartLog("Patient token balance [" + await medXToken.balanceOf(testPatientAccount) + "]");
             assert.equal(await medXToken.balanceOf(testPatientAccount), initialPatientTokenBalance);
 
-            await medXToken.approveAndCall(caseFactory.address, (baseFee + halfBaseFee), swarmHash, { from: testPatientAccount });
-            assert.equal(await caseFactory.getAllCaseListCount(), 1);
-            assert.equal(await caseFactory.getPatientCaseListCount(testPatientAccount), 1);
+            await medXToken.approveAndCall(caseManager.address, (baseFee + halfBaseFee), swarmHash, { from: testPatientAccount });
+            assert.equal(await caseManager.getAllCaseListCount(), 1);
+            assert.equal(await caseManager.getPatientCaseListCount(testPatientAccount), 1);
             assert.equal(await medXToken.balanceOf(testPatientAccount), (initialPatientTokenBalance - (baseFee + halfBaseFee)));
 
-            await medXToken.approveAndCall(caseFactory.address, (baseFee + halfBaseFee), swarmHash2, { from: testPatientAccount });
-            assert.equal(await caseFactory.getAllCaseListCount(), 2);
-            assert.equal(await caseFactory.getPatientCaseListCount(testPatientAccount), 2);
+            await medXToken.approveAndCall(caseManager.address, (baseFee + halfBaseFee), swarmHash2, { from: testPatientAccount });
+            assert.equal(await caseManager.getAllCaseListCount(), 2);
+            assert.equal(await caseManager.getPatientCaseListCount(testPatientAccount), 2);
             assert.equal(await medXToken.balanceOf(testPatientAccount), (initialPatientTokenBalance - (2 * (baseFee + halfBaseFee))));
 
-            let latestPatientCaseIndex = (await caseFactory.getPatientCaseListCount(testPatientAccount)) - 1;
-            let latestPatientCaseAddress = await caseFactory.patientCases(testPatientAccount, latestPatientCaseIndex);
+            let latestPatientCaseIndex = (await caseManager.getPatientCaseListCount(testPatientAccount)) - 1;
+            let latestPatientCaseAddress = await caseManager.patientCases(testPatientAccount, latestPatientCaseIndex);
             smartLog("Latest patient case address [" + latestPatientCaseAddress + "]");
 
             let latestCase = Case.at(latestPatientCaseAddress);
@@ -170,9 +170,9 @@ contract.skip('MedCredits', function (accounts) {
             let drAccountA = accounts[9];
 
             /* Open a new case */
-            await medXToken.approveAndCall(caseFactory.address, (baseFee + halfBaseFee), swarmHash, { from: testPatientAccount });
-            let latestPatientCaseIndex = (await caseFactory.getPatientCaseListCount(testPatientAccount)) - 1;
-            let patientCase = Case.at(await caseFactory.patientCases(testPatientAccount, latestPatientCaseIndex));
+            await medXToken.approveAndCall(caseManager.address, (baseFee + halfBaseFee), swarmHash, { from: testPatientAccount });
+            let latestPatientCaseIndex = (await caseManager.getPatientCaseListCount(testPatientAccount)) - 1;
+            let patientCase = Case.at(await caseManager.patientCases(testPatientAccount, latestPatientCaseIndex));
             smartLog("Patient case address [" + patientCase.address + "]");
             assert.equal(await patientCase.status(), CaseStatus.Open);
 
@@ -206,9 +206,9 @@ contract.skip('MedCredits', function (accounts) {
             let drAccountB = accounts[8];
 
             /* Open a new case */
-            await medXToken.approveAndCall(caseFactory.address, (baseFee + halfBaseFee), swarmHash, { from: testPatientAccount });
-            let latestPatientCaseIndex = (await caseFactory.getPatientCaseListCount(testPatientAccount)) - 1;
-            let patientCase = Case.at(await caseFactory.patientCases(testPatientAccount, latestPatientCaseIndex));
+            await medXToken.approveAndCall(caseManager.address, (baseFee + halfBaseFee), swarmHash, { from: testPatientAccount });
+            let latestPatientCaseIndex = (await caseManager.getPatientCaseListCount(testPatientAccount)) - 1;
+            let patientCase = Case.at(await caseManager.patientCases(testPatientAccount, latestPatientCaseIndex));
             assert.equal(await patientCase.status(), CaseStatus.Open);
 
             /* Authorize doctor A to view case details */
@@ -256,9 +256,9 @@ contract.skip('MedCredits', function (accounts) {
             let drAccountB = accounts[8];
 
             /* Open a new case */
-            await medXToken.approveAndCall(caseFactory.address, (baseFee + halfBaseFee), swarmHash, { from: testPatientAccount });
-            let latestPatientCaseIndex = (await caseFactory.getPatientCaseListCount(testPatientAccount)) - 1;
-            let patientCase = Case.at(await caseFactory.patientCases(testPatientAccount, latestPatientCaseIndex));
+            await medXToken.approveAndCall(caseManager.address, (baseFee + halfBaseFee), swarmHash, { from: testPatientAccount });
+            let latestPatientCaseIndex = (await caseManager.getPatientCaseListCount(testPatientAccount)) - 1;
+            let patientCase = Case.at(await caseManager.patientCases(testPatientAccount, latestPatientCaseIndex));
             assert.equal(await patientCase.status(), CaseStatus.Open);
 
             /* Authorize doctor A to view case details */
@@ -304,7 +304,7 @@ contract.skip('MedCredits', function (accounts) {
         before(async () => {
             medXToken = await MedXToken.deployed();
             doctorManager = await DoctorManager.deployed();
-            caseFactory = await CaseFactory.deployed();
+            caseManager = await CaseManager.deployed();
         });
 
         it("doctor should request authorization", async () => {

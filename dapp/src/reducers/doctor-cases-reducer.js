@@ -2,24 +2,36 @@ import update from 'immutability-helper';
 
 export default function (state, action) {
   if (typeof state === 'undefined') {
-    state = {}
+    state = {
+      loading: false,
+      cases: {}
+    }
   }
 
   switch(action.type) {
-    case 'CaseAuthorizationRequested':
+    case 'DOCTOR_CASES_FETCH_STARTED':
       state = update(state, {
-        [action.doctor]: {
-          $set: {
-            cases: {
-              [action.address]: {
-                address: action.address,
-                requested: true
-              }
-            }
+        loading: {
+          $set: true
+        }
+      })
+      break
+    case 'DOCTOR_CASES_FETCH_SINGLE_SUCCEEDED':
+      state = update(state, {
+        cases: {
+          [action.index]: {
+            $set: action.address
           }
         }
       })
-      break;
+      break
+    case 'DOCTOR_CASES_FETCH_SUCCEEDED':
+      state = update(state, {
+        loading: {
+          $set: false
+        }
+      })
+      break
   }
 
   return state

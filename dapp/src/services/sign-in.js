@@ -4,11 +4,14 @@ import Cookie from 'js-cookie'
 import { deriveKey } from '@/utils/derive-key'
 import { getPublicKey, setPublicKey } from '@/utils/web3-util'
 import { deriveKeyPair } from '@/services/derive-key-pair'
+import hexToAscii from '@/utils/hex-to-ascii'
 
 let secretKey = ''
 
-export function isSignedIn () {
-  return !!signedInSecretKey()
+export async function isSignedIn () {
+  let publicKey = await getPublicKey()
+  publicKey = hexToAscii(publicKey)
+  return (publicKey && !!signedInSecretKey())
 }
 
 export async function signIn (account, masterPassword) {
@@ -19,7 +22,7 @@ export async function signIn (account, masterPassword) {
   // NOTE: the code below can be removed and above uncommented after the public keys have been setup in staging
 
   return getPublicKey().then((publicKey) => {
-    if (!window.web3.toAscii(publicKey)) {
+    if (!hexToAscii(publicKey)) {
       let publicKey = deriveKeyPair(secretKey).getPublic(true, 'hex')
       return setPublicKey(publicKey)
     }
