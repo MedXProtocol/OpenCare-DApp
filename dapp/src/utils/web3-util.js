@@ -40,6 +40,20 @@ export async function mintMedXTokens(account, amount, callback) {
     })
 }
 
+export async function getCaseDate(address) {
+  const contract = await getCaseContract(address)
+  let watcher = contract.CaseCreated({}, {fromBlock: 0, toBlock: 'latest'})
+  let event = await promisify(cb => {
+    watcher.watch((error, result) => {
+      watcher.stopWatching()
+      cb(error, result)
+    })
+  })
+  const web3 = getWeb3()
+  let block = await promisify(cb => web3.eth.getBlock(event.blockNumber, cb))
+  return block.timestamp
+}
+
 export function setPublicKey(publicKey) {
   return getAccountManagerContract().then((accountManager) => {
     return promisify(cb => accountManager.setPublicKey(publicKey, cb))
@@ -199,16 +213,16 @@ function getCaseStatusName(status) {
   var statuses = {
     0: 'None',
     1: 'Open',
-    2: 'EvaluationRequest',
+    2: 'Pending Approval',
     3: 'Evaluating',
     4: 'Evaluated',
     5: 'Closed',
     6: 'Challenged',
-    7: 'ChallengeRequest',
+    7: 'Pending Approval',
     8: 'Challenging',
     9: 'Canceled',
-    10: 'ClosedRejected',
-    11: 'ClosedConfirmed'
+    10: 'Diagnosis Rejected',
+    11: 'Diagnosis Confirmed'
   }
   var string = statuses[status]
   if (!string) { throw new Error('Unknown status: ', status) }
