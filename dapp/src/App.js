@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { withRouter, Route, Redirect } from 'react-router-dom'
 import Home from './screens/Home'
 import { CreateAccount } from './screens/create-account'
@@ -13,91 +14,26 @@ import Mint from './screens/Mint'
 import Wallet from './screens/Wallet'
 import hasAccount from '@/services/has-account'
 import { OpenCases } from './screens/open-cases'
-import auth from './watchers/case-authorization-requested'
 import './App.css'
-
-import { isSignedIn, signOut } from '@/services/sign-in'
+import { withAccountManager } from './drizzle-helpers/with-account-manager'
+import get from 'lodash.get'
+import { SignInRedirect } from './sign-in-redirect'
 
 class App extends Component {
-  constructor (props) {
+  constructor (props, context) {
     super(props)
     this.state = {}
-    this.getSignInRedirectState(props).then((state) => {
-      if (state) { this.setState(state) }
-      auth()
-    })
-  }
-
-  componentDidMount () {
-    window.addEventListener("beforeunload", this.unload)
-    window.addEventListener("focus", this.refocus)
-  }
-
-  componentWillUnmount () {
-    window.removeEventListener("beforeunload", this.unload)
-    window.removeEventListener("focus", this.refocus)
-  }
-
-  unload = () => {
-    if (process.env.NODE_ENV !== 'development') {
-      signOut()
-    }
-  }
-
-  refocus = () => {
-    this.forceUpdate()
-  }
-
-  componentWillReceiveProps (nextProps) {
-    this.checkSignInRedirect(nextProps)
-  }
-
-  getSignInRedirectState = async (props) => {
-    let state = null
-    const { location } = this.props
-    if (!location) { return }
-    let signedIn = await isSignedIn()
-    const isAccessScreen = location.pathname === '/sign-up' || location.pathname === '/sign-in'
-    if (!signedIn && !isAccessScreen) {
-      let redirect
-      if (!hasAccount()) {
-        redirect = '/sign-up'
-      } else {
-        redirect = '/sign-in'
-      }
-      state = {
-        redirectPathname: redirect,
-        requestedPathname: location.pathname
-      }
-    } else if (signedIn) {
-      if (this.state.requestedPathname) {
-        state = {
-          redirectPathname: this.state.requestedPathname,
-          requestedPathname: ''
-        }
-      } else {
-        state = {
-          redirectPathname: ''
-        }
-      }
-    }
-    return state
-  }
-
-  checkSignInRedirect (props) {
-    this.getSignInRedirectState(props).then((state) => {
-      if (state) { this.setState(state) }
-    })
   }
 
   render () {
-    if (this.state.redirectPathname && this.props.location.pathname !== this.state.redirectPathname) {
-      var redirect = <Redirect to={this.state.redirectPathname} />
+    let publicKey
+    if (this.props.drizzleInitialized) {
+      this.publicKeyDataKey = this.props.AccountManager.publicKeys.cacheCall(this.props.accounts[0])
+      publicKey = this.props.AccountManager.publicKeys.value(this.isDoctorDataKey)
     }
 
     return (
       <div>
-        {redirect}
         <Route path='/sign-in' component={ SignIn } />
         <Route path='/sign-up' component={ CreateAccount } />
         <Route path='/new-case' component={ NewCase }/>
@@ -115,4 +51,4 @@ class App extends Component {
   }
 }
 
-export default withRouter(App)
+export default withRouter(withAccountManager(App))

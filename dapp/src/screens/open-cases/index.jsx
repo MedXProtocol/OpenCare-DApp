@@ -10,23 +10,23 @@ import PropTypes from 'prop-types'
 import {
   getNextCaseFromQueue
 } from '@/utils/web3-util'
-import { connect } from 'react-redux'
+import { drizzleConnect } from 'drizzle-react'
 import { CaseRow } from './case-row'
 import values from 'lodash.values'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
 import dispatch from '@/dispatch'
 
-const OpenCases = connect(
-  (state, ownProps) => {
-    let cases = get(state, `doctorCases.cases`) || {}
-    let caseCount = get(state, `caseCount.count`, '0').toString()
-    return {
-      cases,
-      caseCount: caseCount
-    }
+function mapStateToProps(state, ownProps) {
+  let cases = get(state, `doctorCases.cases`) || {}
+  let caseCount = get(state, `caseCount.count`, '0').toString()
+  return {
+    cases,
+    caseCount: caseCount
   }
-)(class extends Component {
+}
+
+const OpenCases = drizzleConnect(class extends Component {
   componentDidMount() {
     dispatch({type: 'OPEN_CASE_COUNT_FETCH_REQUESTED'})
     dispatch({type: 'DOCTOR_CASES_FETCH_REQUESTED'})
@@ -72,7 +72,7 @@ const OpenCases = connect(
       </MainLayout>
     )
   }
-})
+}, mapStateToProps)
 
 OpenCases.propTypes = {
   cases: PropTypes.array.isRequired

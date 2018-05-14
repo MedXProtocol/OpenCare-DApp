@@ -4,8 +4,8 @@ import { getCaseDoctorBDiagnosisLocationHash } from '../../../utils/web3-util';
 import { downloadJson } from '../../../utils/storage-util';
 
 class ChallengedDiagnosis extends Component {
-    constructor(){
-        super()
+    constructor(props){
+        super(props)
 
         this.state = {
             diagnosis: {},
@@ -19,7 +19,7 @@ class ChallengedDiagnosis extends Component {
         if(diagnosisHash !== null && diagnosisHash !== "0x") {
             const diagnosisJson = await downloadJson(diagnosisHash);
             const diagnosis = JSON.parse(diagnosisJson);
-            this.setState({ 
+            this.setState({
                 diagnosis: diagnosis,
                 hidden: false
             });
@@ -27,7 +27,7 @@ class ChallengedDiagnosis extends Component {
     }
 
     render() {
-        return this.state.hidden ? 
+        return this.state.hidden ?
             <div/> :
             <div className="card">
                 <div className="card-header">
@@ -35,7 +35,7 @@ class ChallengedDiagnosis extends Component {
                 </div>
                 <div className="card-content">
                     <div className="row">
-                        
+
                         <div className="col-xs-12">
                             <label>Diagnosis</label>
                             <p>{this.state.diagnosis.diagnosis}</p>

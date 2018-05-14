@@ -3,8 +3,9 @@ import React, { Component } from 'react'
 import { formatKey } from '@/services/format-key'
 import { getAccount } from '@/services/get-account'
 import { isAccountMasterPassword } from '@/services/is-account-master-password'
+import { withAccountManager } from '@/drizzle-helpers/with-account-manager'
 
-export class SignInForm extends Component {
+export const SignInForm = withAccountManager(class extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -57,7 +58,7 @@ export class SignInForm extends Component {
       </form>
     )
   }
-}
+})
 
 SignInForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,

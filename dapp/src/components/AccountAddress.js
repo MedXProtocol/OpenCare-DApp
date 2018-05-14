@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import {getSelectedAccount} from '../utils/web3-util';
+import { withContextManager } from '@/drizzle-helpers/with-context-manager'
 import './AccountAddress.css';
+import get from 'lodash.get'
 
 class AccountAddress extends Component {
     constructor(){
@@ -12,7 +14,7 @@ class AccountAddress extends Component {
     }
 
     componentDidMount(){
-        this.setState({selectedAccount: getSelectedAccount()});
+        this.setState({selectedAccount: get(this.props, 'accounts[0]')});
     }
   
     render() {
@@ -45,4 +47,4 @@ class AccountAddress extends Component {
     }
 }
 
-export default AccountAddress;
+export default withContextManager(AccountAddress);

@@ -1,27 +1,30 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Web3Provider } from 'react-web3';
-import { BrowserRouter } from 'react-router-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { BrowserRouter } from 'react-router-dom'
 import { ErrorBoundary } from './error-boundary'
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'font-awesome/css/font-awesome.min.css';
-import './assets/sass/paper-dashboard/paper-dashboard.css';
-import './assets/css/themify-icons.css';
-import './assets/sass/site.css';
-import './index.css';
-import App from './App';
-import { Provider } from 'react-redux'
+import { DrizzleProvider } from 'drizzle-react'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'font-awesome/css/font-awesome.min.css'
+import './assets/sass/paper-dashboard/paper-dashboard.css'
+import './assets/css/themify-icons.css'
+import './assets/sass/site.css'
+import './index.css'
+import App from './App'
 import { store } from './store'
+import drizzleOptions from './drizzleOptions'
 
-ReactDOM.render(
+let coreApp =
+  <DrizzleProvider options={drizzleOptions} store={store}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </DrizzleProvider>
+
+if (process.env.NODE_ENV === 'production') {
+  coreApp =
     <ErrorBoundary>
-      <Provider store={store}>
-        <Web3Provider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </Web3Provider>
-      </Provider>
-    </ErrorBoundary>,
-    document.getElementById('root')
-);
+      {coreApp}
+    </ErrorBoundary>
+}
+
+ReactDOM.render(coreApp, document.getElementById('root'))

@@ -11,27 +11,28 @@ import aes from '@/services/aes'
 import caseStatus from './case-status'
 import getWeb3 from '@/get-web3'
 
-export function getSelectedAccount() {
+export async function getSelectedAccount() {
   const web3 = getWeb3()
-  return web3.eth.accounts[0]
+  let accounts = await web3.eth.getAccounts()
+  return accounts[0]
 }
 
 export async function isDoctor() {
   const contract = await getDoctorManagerContract()
-  const selectedAccount = getSelectedAccount()
-  return promisify(cb => contract.isDoctor(selectedAccount, cb))
+  const selectedAccount = await getSelectedAccount()
+  return contract.methods.isDoctor(selectedAccount).call()
 }
 
 export async function getSelectedAccountBalance() {
-  const selectedAccount = getSelectedAccount()
+  const selectedAccount = await getSelectedAccount()
   const contract = await getMedXTokenContract()
-  const balance = await promisify(cb => contract.balanceOf(selectedAccount, cb))
-  return balance.toNumber()
+  const balance = await contract.methods.balanceOf(selectedAccount).call()
+  return balance.toString()
 }
 
 export async function mintMedXTokens(account, amount, callback) {
   const contract = await getMedXTokenContract()
-  return promisify(cb => contract.mint(account, amount, getDefaultTxObj(), cb))
+  return contract.methods.mint(account, amount).send()
     .then((result) => {
       waitForTxComplete(result, callback)
     })
@@ -41,56 +42,50 @@ export async function mintMedXTokens(account, amount, callback) {
 }
 
 export async function getCaseDate(address) {
-  const contract = await getCaseContract(address)
-  let watcher = contract.CaseCreated({}, {fromBlock: 0, toBlock: 'latest'})
-  let event = await promisify(cb => {
-    watcher.watch((error, result) => {
-      watcher.stopWatching()
-      cb(error, result)
-    })
-  })
-  const web3 = getWeb3()
-  let block = await promisify(cb => web3.eth.getBlock(event.blockNumber, cb))
-  return block.timestamp
+  // const contract = await getCaseContract(address)
+  // let watcher = contract.CaseCreated({}, {fromBlock: 0, toBlock: 'latest'})
+  // let event = await promisify(cb => {
+  //   watcher.watch((error, result) => {
+  //     watcher.stopWatching()
+  //     cb(error, result)
+  //   })
+  // })
+  // const web3 = getWeb3()
+  // let block = await promisify(cb => web3.eth.getBlock(event.blockNumber, cb))
+  // return block.timestamp
+  return 0
 }
 
 export function setPublicKey(publicKey) {
   return getAccountManagerContract().then((accountManager) => {
-    return promisify(cb => accountManager.setPublicKey(publicKey, cb))
+    return accountManager.methods.setPublicKey('0x' + publicKey).send()
   })
 }
 
-export function getPublicKey(address) {
-  if (!address) { address = getSelectedAccount() }
+export async function getPublicKey(address) {
+  if (!address) { address = await getSelectedAccount() }
   return getAccountManagerContract().then((accountManager) => {
-    return promisify(cb => accountManager.publicKeys(address, cb))
+    return accountManager.methods.publicKeys(address).call()
   })
 }
 
 export async function createCase(encryptedCaseKey, documentHash, callback) {
   const contract = await getMedXTokenContract()
   const caseManager = await getCaseManagerContract()
-  const caseManagerAddress = caseManager.address
+  const caseManagerAddress = caseManager.options.address
 
   var hashBytes = aesjs.utils.utf8.toBytes(documentHash)
   var hashHex = aesjs.utils.hex.fromBytes(hashBytes)
   const combined = '0x' + encryptedCaseKey + hashHex
 
-  contract.approveAndCall(
-    caseManagerAddress, 15, combined, getDefaultTxObj(), function(error, result) {
-        if(error !== null) {
-            callback(error, result)
-        } else {
-            waitForTxComplete(result, callback)
-        }
-    }
-  )
+  debugger
+  return contract.methods.approveAndCall(caseManagerAddress, 15, combined).send()
 }
 
 export async function getCaseStatus(caseAddress) {
   const contract = await getCaseContract(caseAddress)
-  let status = await promisify(cb => contract.status.call(cb))
-  status = status.toNumber()
+  let status = await contract.methods.status().call()
+  status = status.toString()
   return {
       code: status,
       name: getCaseStatusName(status)
@@ -99,44 +94,44 @@ export async function getCaseStatus(caseAddress) {
 
 export async function getCaseKey(caseAddress) {
   const contract = await getCaseContract(caseAddress)
-  let encryptedCaseKeyBytes = await promisify(cb => contract.getEncryptedCaseKey(cb))
+  let encryptedCaseKeyBytes = await contract.methods.getEncryptedCaseKey().call()
   let encryptedCaseKey = encryptedCaseKeyBytes.map((hex) => hex.substring(2)).join('')
   return encryptedCaseKey
 }
 
 export async function getCaseDetailsLocationHash(caseAddress) {
   const contract = await getCaseContract(caseAddress)
-  return getFileHashFromBytes(await promisify(cb => contract.caseDetailLocationHash.call(cb)))
+  return getFileHashFromBytes(await contract.methods.caseDetailLocationHash().call())
 }
 
 export async function getCaseDoctorADiagnosisLocationHash(caseAddress) {
   const contract = await getCaseContract(caseAddress)
-  return getFileHashFromBytes(await promisify(cb => contract.diagnosisALocationHash.call(cb)))
+  return getFileHashFromBytes(await contract.methods.diagnosisALocationHash().call())
 }
 
 export async function getCaseDoctorBDiagnosisLocationHash(caseAddress) {
   const contract = await getCaseContract(caseAddress)
-  return getFileHashFromBytes(await promisify(cb => contract.diagnosisBLocationHash.call(cb)))
+  return getFileHashFromBytes(await contract.methods.diagnosisBLocationHash().call())
 }
 
 export async function getAllCasesForCurrentAccount() {
   const contract = await getCaseManagerContract()
-  const account = getSelectedAccount()
+  const account = await getSelectedAccount()
 
-  const count = await promisify(cb => contract.getPatientCaseListCount(account, cb))
+  const count = await contract.methods.getPatientCaseListCount(account).call()
 
   let cases = []
 
   for(let i = 0; i < count; i++) {
-    const caseContractAddress = await promisify(cb => contract.patientCases.call(account, i, cb))
+    const caseContractAddress = await contract.methods.patientCases(account, i).call()
     const caseContract = await getCaseContract(caseContractAddress)
-    const status = await promisify(cb => caseContract.status.call(cb))
+    const status = await caseContract.methods.status().call()
 
     cases.push({
       number: i + 1,
       address: caseContractAddress,
-      status: status.toNumber(),
-      statusName: getCaseStatusName(status.toNumber())
+      status: status.toString(),
+      statusName: getCaseStatusName(status.toString())
     })
   }
 
@@ -145,18 +140,18 @@ export async function getAllCasesForCurrentAccount() {
 
 export async function openCaseCount() {
   return getCaseManagerContract().then((contract) => {
-    return promisify(cb => contract.openCaseCount(cb))
+    return contract.methods.openCaseCount().call()
   })
 }
 
 export async function getNextCaseFromQueue() {
   const contract = await getCaseManagerContract()
-  await promisify(cb => contract.requestNextCase(cb))
+  await contract.methods.requestNextCase().send()
 }
 
 export async function registerDoctor(address, callback) {
   const contract = await getDoctorManagerContract()
-  return contract.addDoctor(address, getDefaultTxObj(), function(error, result) {
+  return contract.methods.addDoctor(address).send(function(error, result) {
     if(error !== null){
         callback(error, result)
     } else {
@@ -167,7 +162,7 @@ export async function registerDoctor(address, callback) {
 
 export async function acceptDiagnosis(caseAddress, callback) {
   const contract = await getCaseContract(caseAddress)
-  contract.acceptDiagnosis(getDefaultTxObj(), function(error, result) {
+  contract.methods.acceptDiagnosis().send(function(error, result) {
     if(error !== null){
         callback(error, result)
     } else {
@@ -178,7 +173,7 @@ export async function acceptDiagnosis(caseAddress, callback) {
 
 export async function challengeDiagnosis(caseAddress, callback) {
   const contract = await getCaseContract(caseAddress)
-  contract.challengeDiagnosis(getDefaultTxObj(), function(error, result) {
+  contract.methods.challengeDiagnosis().send(function(error, result) {
     if(error !== null){
       callback(error, result)
     } else {
@@ -189,7 +184,7 @@ export async function challengeDiagnosis(caseAddress, callback) {
 
 export async function diagnoseCase(caseAddress, diagnosisHash, callback) {
   const contract = await getCaseContract(caseAddress)
-  contract.diagnoseCase(diagnosisHash, getDefaultTxObj(), function(error, result) {
+  contract.methods.diagnoseCase(diagnosisHash).send(function(error, result) {
     if(error !== null){
       callback(error, result)
     } else {
@@ -200,7 +195,7 @@ export async function diagnoseCase(caseAddress, diagnosisHash, callback) {
 
 export async function diagnoseChallengedCase(caseAddress, diagnosisHash, accept, callback) {
   const contract = await getCaseContract(caseAddress)
-  contract.diagnoseChallengedCase(diagnosisHash, accept, getDefaultTxObj(), function(error, result) {
+  contract.methods.diagnoseChallengedCase(diagnosisHash, accept).send(function(error, result) {
     if(error !== null){
       callback(error, result)
     } else {
@@ -232,23 +227,23 @@ function getCaseStatusName(status) {
 export async function contractFromConfig (config, address) {
   const web3 = getWeb3()
   if (!address) {
-    let networkId = await promisify(cb => web3.version.getNetwork(cb))
+    let networkId = await web3.eth.net.getId()
     address = config.networks[networkId].address
   }
-  const Contract = web3.eth.contract(config.abi)
-  return Contract.at(address)
+  let account = await getSelectedAccount()
+  return new web3.eth.Contract(config.abi, address, { from: account })
 }
 
 export async function getDoctorAuthorizationRequestCount() {
-  let doctor = getSelectedAccount()
+  let doctor = await getSelectedAccount()
   let caseManager = await getCaseManagerContract()
-  return promisify(cb => caseManager.doctorAuthorizationRequestCount(doctor, cb))
+  return caseManager.methods.doctorAuthorizationRequestCount(doctor).call()
 }
 
 export async function getDoctorAuthorizationRequestCaseAtIndex(index) {
-  let doctor = getSelectedAccount()
+  let doctor = await getSelectedAccount()
   let caseManager = await getCaseManagerContract()
-  return promisify(cb => caseManager.doctorAuthorizationRequestCaseAtIndex(doctor, index, cb))
+  return caseManager.methods.doctorAuthorizationRequestCaseAtIndex(doctor, index).call()
 }
 
 function getMedXTokenContract() {
@@ -279,7 +274,7 @@ function lookupContractAt(name, contractConfig) {
 
 function lookupContractAddress(name) {
   return getRegistryContract().then((registry) => {
-    return promisify(cb => registry.lookup(toRegistryKey(name), cb))
+    return registry.methods.lookup(toRegistryKey(name)).call()
   })
 }
 
@@ -288,18 +283,14 @@ function getRegistryContract() {
 }
 
 function getFileHashFromBytes(bytes) {
-  if(bytes === "0x")
+  if(!bytes || bytes === "0x")
       return null
   const web3 = getWeb3()
-  return web3.toAscii(bytes)
-}
-
-function getDefaultTxObj() {
-  return {'from': getSelectedAccount()}
+  return web3.utils.hexToAscii(bytes)
 }
 
 function toRegistryKey(string) {
-  return getWeb3().sha3(string)
+  return getWeb3().utils.sha3(string)
 }
 
 function waitForTxComplete(txHash, callback) {

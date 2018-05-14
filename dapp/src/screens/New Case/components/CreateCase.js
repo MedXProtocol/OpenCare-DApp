@@ -164,21 +164,17 @@ class CreateCase extends Component {
 
         const hash = await uploadJson(caseJson, this.state.caseEncryptionKey);
 
-        createCase(aes.encrypt(this.state.caseEncryptionKey, signedInSecretKey()), hash, (error, result) => {
-            if(error !== null) {
-                this.onError(error);
-            } else {
-                this.onSuccess();
-            }
-        });
+        createCase(aes.encrypt(this.state.caseEncryptionKey, signedInSecretKey()), hash)
+          .then(() => this.onSuccess())
+          .catch((error) => this.onError(error))
     }
 
     onError = (error) => {
-        this.setState({
-            error: error,
-            submitInProgress: false
-        });
-
+      console.error(error)
+      this.setState({
+          error: error,
+          submitInProgress: false
+      });
     }
 
     onSuccess = () => {

@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import Spinner from '../../../components/Spinner';
 import {getSelectedAccount, mintMedXTokens} from '../../../utils/web3-util';
-
+import { withContextManager } from '@/drizzle-helpers/with-context-manager'
+import get from 'lodash.get'
 
 class MintTokens extends Component {
-    constructor(){
-        super()
+    constructor(props){
+        super(props)
 
         this.state = {
-            address: getSelectedAccount(),
+            address: get(this.props, 'accounts[0]'),
             error: null,
             submitInProgress: false
         };
@@ -33,7 +34,7 @@ class MintTokens extends Component {
             }
         });
     }
-    
+
     onSuccess = () => {
         this.setState({submitInProgress: false});
     }
@@ -46,7 +47,7 @@ class MintTokens extends Component {
     render() {
         return (
             <div className="card">
-                <form 
+                <form
                     onSubmit={this.handleSubmit}
                     >
                     <div className="card-header">
@@ -56,8 +57,8 @@ class MintTokens extends Component {
                     <div className="card-content">
                         <div className="form-group">
                             <label htmlFor="hash">Account Address:</label>
-                            <input 
-                                className="form-control" 
+                            <input
+                                className="form-control"
                                 id="hash"
                                 value={this.state.address}
                                 onChange={this.updateAddress}
@@ -73,4 +74,4 @@ class MintTokens extends Component {
     }
 }
 
-export default MintTokens;
+export default withContextManager(MintTokens);

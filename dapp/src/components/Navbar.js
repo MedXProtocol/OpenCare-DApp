@@ -13,11 +13,11 @@ class Navbar extends Component {
   }
 
   componentDidMount () {
-    isDoctor().then((isdoc) => {
-      this.setState({
-        isDoctor: isdoc
-      })
-    })
+    // isDoctor().then((isdoc) => {
+    //   this.setState({
+    //     isDoctor: isdoc
+    //   })
+    // })
   }
 
   render() {

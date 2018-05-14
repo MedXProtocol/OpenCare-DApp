@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import Spinner from '../../../components/Spinner';
 import {getSelectedAccount, registerDoctor} from '../../../utils/web3-util';
-
+import { withContextManager } from '@/drizzle-helpers/with-context-manager'
+import get from 'lodash.get'
 
 class RegisterDoctor extends Component {
-    constructor(){
-        super()
-
+    constructor(props){
+        super(props)
         this.state = {
-            address: getSelectedAccount(),
+            address: get(this.props, 'accounts[0]', ''),
             submitInProgress: false
         };
     }
@@ -32,7 +32,15 @@ class RegisterDoctor extends Component {
             }
         });
     }
-    
+
+    componentWillReceiveProps (props) {
+      let address = get(props, 'accounts[0]')
+      let existingAddress = get(this.props, 'accounts[0]')
+      if (!existingAddress && address) {
+        this.setState({address})
+      }
+    }
+
     onSuccess = () => {
         this.setState({submitInProgress: false});
     }
@@ -45,7 +53,7 @@ class RegisterDoctor extends Component {
     render() {
         return (
             <div className="card">
-                <form 
+                <form
                     onSubmit={this.handleSubmit}
                     >
                     <div className="card-header">
@@ -55,8 +63,8 @@ class RegisterDoctor extends Component {
                     <div className="card-content">
                         <div className="form-group">
                             <label htmlFor="hash">Account Address:</label>
-                            <input 
-                                className="form-control" 
+                            <input
+                                className="form-control"
                                 id="hash"
                                 value={this.state.address}
                                 onChange={this.updateAddress}
@@ -72,4 +80,4 @@ class RegisterDoctor extends Component {
     }
 }
 
-export default RegisterDoctor;
+export default withContextManager(RegisterDoctor);
