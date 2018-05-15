@@ -10,21 +10,25 @@ import './assets/css/themify-icons.css'
 import './assets/sass/site.css'
 import './index.css'
 import App from './App'
-import { store } from './store'
-import drizzleOptions from './drizzleOptions'
+import storePromise from '@/store'
 
-let coreApp =
-  <DrizzleProvider options={drizzleOptions} store={store}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </DrizzleProvider>
+window.addEventListener('load', () => {
+  storePromise.then(({store, options}) => {
 
-if (process.env.NODE_ENV === 'production') {
-  coreApp =
-    <ErrorBoundary>
-      {coreApp}
-    </ErrorBoundary>
-}
+    let coreApp =
+      <DrizzleProvider options={options} store={store}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </DrizzleProvider>
 
-ReactDOM.render(coreApp, document.getElementById('root'))
+    if (process.env.NODE_ENV === 'production') {
+      coreApp =
+        <ErrorBoundary>
+          {coreApp}
+        </ErrorBoundary>
+    }
+
+    ReactDOM.render(coreApp, document.getElementById('root'))
+  })
+})

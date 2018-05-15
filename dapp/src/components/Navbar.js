@@ -5,24 +5,31 @@ import PropTypes from 'prop-types'
 import logo from '../assets/img/logo.png'
 import './Navbar.css'
 import { isDoctor } from '@/utils/web3-util'
+import { withDoctorManager } from '@/drizzle-helpers/with-doctor-manager'
 
 class Navbar extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {}
+    this.init()
   }
 
-  componentDidMount () {
-    // isDoctor().then((isdoc) => {
-    //   this.setState({
-    //     isDoctor: isdoc
-    //   })
-    // })
+  componentWillReceiveProps (props) {
+    this.init()
+  }
+
+  init () {
+    if (this.props.drizzleInitialized && this.props.accounts[0] && this.props.DoctorManager) {
+      this.isDoctorDataKey = this.props.DoctorManager.isDoctor.cacheCall(this.props.accounts[0])
+    }
   }
 
   render() {
+    if (this.props.drizzleInitialized && this.props.DoctorManager) {
+      var isDoctor = this.props.DoctorManager.isDoctor.value(this.isDoctorDataKey)
+    }
 
-    if (this.state.isDoctor) {
+    if (isDoctor) {
       var casesItem =
         <Link to='/cases/open' className="navbar-text navbar-right btn-magnify">
           Open Cases
@@ -61,8 +68,8 @@ Navbar.propTypes = {
 };
 
 Navbar.defaultProps = {
-    transparent: false
+    transparent: false,
+    accounts: []
 };
 
-
-export default withRouter(Navbar);
+export default withRouter(withDoctorManager(Navbar))

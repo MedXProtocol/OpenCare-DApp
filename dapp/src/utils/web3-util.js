@@ -14,6 +14,7 @@ import getWeb3 from '@/get-web3'
 export async function getSelectedAccount() {
   const web3 = getWeb3()
   let accounts = await web3.eth.getAccounts()
+  if (!accounts) { throw 'No accounts available' }
   return accounts[0]
 }
 
@@ -78,7 +79,6 @@ export async function createCase(encryptedCaseKey, documentHash, callback) {
   var hashHex = aesjs.utils.hex.fromBytes(hashBytes)
   const combined = '0x' + encryptedCaseKey + hashHex
 
-  debugger
   return contract.methods.approveAndCall(caseManagerAddress, 15, combined).send()
 }
 
@@ -228,6 +228,7 @@ export async function contractFromConfig (config, address) {
   const web3 = getWeb3()
   if (!address) {
     let networkId = await web3.eth.net.getId()
+    if (!networkId) throw 'No network'
     address = config.networks[networkId].address
   }
   let account = await getSelectedAccount()
@@ -258,24 +259,26 @@ export function getCaseContract(address) {
   return contractFromConfig(caseContractConfig, address)
 }
 
-function getDoctorManagerContract() {
+export function getDoctorManagerContract() {
   return lookupContractAt('DoctorManager', doctorManagerContractConfig)
 }
 
-function getAccountManagerContract () {
+export function getAccountManagerContract () {
   return lookupContractAt('AccountManager', accountManagerConfig)
 }
 
-function lookupContractAt(name, contractConfig) {
-  return lookupContractAddress(name).then((address) => {
-    return contractFromConfig(contractConfig, address)
-  })
+export function lookupContractAt(name, contractConfig) {
+  return lookupContractAddress(name)
+    .then((address) => {
+      return contractFromConfig(contractConfig, address)
+    })
+    .catch((error) => console.error(error))
 }
 
 function lookupContractAddress(name) {
   return getRegistryContract().then((registry) => {
     return registry.methods.lookup(toRegistryKey(name)).call()
-  })
+  }).catch((error) => console.error(error))
 }
 
 function getRegistryContract() {

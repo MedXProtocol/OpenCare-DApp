@@ -1,18 +1,27 @@
 import React, { Component } from 'react';
 import Spinner from '../../../components/Spinner';
 import {getSelectedAccount, mintMedXTokens} from '../../../utils/web3-util';
-import { withContextManager } from '@/drizzle-helpers/with-context-manager'
+import { withMedXToken } from '@/drizzle-helpers/with-medx-token'
 import get from 'lodash.get'
+import defined from '@/utils/defined'
+import dispatch from '@/dispatch'
 
 class MintTokens extends Component {
     constructor(props){
         super(props)
-
         this.state = {
-            address: get(this.props, 'accounts[0]'),
+            address: get(this.props, 'accounts[0]', ''),
             error: null,
             submitInProgress: false
         };
+        dispatch({ type: 'PUSH_TO_TXSTACK' })
+    }
+
+    componentWillReceiveProps (props) {
+      if (!this.props.accounts[0] && props.accounts[0])
+      this.setState({
+        address: props.accounts[0]
+      })
     }
 
     updateAddress = (event) => {
@@ -25,14 +34,8 @@ class MintTokens extends Component {
     }
 
     mintTokens = () => {
-        this.setState({submitInProgress: true});
-        mintMedXTokens(this.state.address, 1000, (error, result) => {
-            if(error){
-                this.onError(error);
-            } else {
-                this.onSuccess();
-            }
-        });
+      const stackId = this.props.MedXToken.mint.cacheSend(this.state.address, 1000)
+      this.setState({stackId})
     }
 
     onSuccess = () => {
@@ -45,6 +48,18 @@ class MintTokens extends Component {
     }
 
     render() {
+      var minting = false
+      if (defined(this.state.stackId)) {
+        const txHash = this.props.transactionStack[this.state.stackId]
+        minting = true
+        if (defined(txHash)) {
+          var transactionStatus = this.props.transactions[txHash].status
+          if (transactionStatus === 'success') {
+            minting = false
+          }
+        }
+      }
+
         return (
             <div className="card">
                 <form
@@ -65,13 +80,16 @@ class MintTokens extends Component {
                                 required
                             />
                         </div>
-                        <button type="submit" className="btn btn-default" disabled={this.state.submitInProgress}>Mint Tokens</button>
+                        <button
+                          type="submit"
+                          className="btn btn-default"
+                          disabled={minting}>Mint Tokens</button>
                     </div>
                 </form>
-                <Spinner loading={this.state.submitInProgress}/>
+                <Spinner loading={minting}/>
             </div>
         );
     }
 }
 
-export default withContextManager(MintTokens);
+export default withMedXToken(MintTokens);

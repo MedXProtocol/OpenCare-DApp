@@ -12,6 +12,11 @@ export const withMedXToken = function (WrappedComponent) {
           value: function (key) {
             return get(contextManager.props, `contracts.MedXToken.balanceOf[${key}].value`)
           }
+        },
+        mint: {
+          cacheSend: function (account, amount) {
+            return contextManager.context.drizzle.contracts.MedXToken.methods.mint.cacheSend(account, amount)
+          }
         }
       }
     }

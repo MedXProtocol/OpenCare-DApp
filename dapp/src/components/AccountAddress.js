@@ -5,19 +5,8 @@ import './AccountAddress.css';
 import get from 'lodash.get'
 
 class AccountAddress extends Component {
-    constructor(){
-        super()
-
-        this.state = {
-            selectedAccount: ''
-        };
-    }
-
-    componentDidMount(){
-        this.setState({selectedAccount: get(this.props, 'accounts[0]')});
-    }
-  
     render() {
+      var account = get(this.props, 'accounts[0]')
         return (
             <div className="card card-account-address">
                 <div className="card-header">
@@ -37,7 +26,7 @@ class AccountAddress extends Component {
                     <div className="row">
                         <div className="col-xs-12">
                             <p className="text-right">
-                                {this.state.selectedAccount}
+                                {account}
                             </p>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 import { contractFromConfig, getCaseManagerContract } from '@/utils/web3-util'
 import padLeft from '@/utils/pad-left'
-import { store } from '@/store'
+import dispatch from '@/dispatch'
 import getWeb3 from '@/get-web3'
 
 function bytes32ToAddress(string) {
@@ -20,7 +20,7 @@ export default async function() {
   })
 
   authRequestSubscription.watch((error, result) => {
-    store.dispatch({
+    dispatch({
       type: 'CaseAuthorizationRequested',
       address: result.address,
       patient: bytes32ToAddress(result.topics[2]),

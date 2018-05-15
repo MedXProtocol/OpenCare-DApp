@@ -27,7 +27,7 @@ class App extends Component {
 
   render () {
     let publicKey
-    if (this.props.drizzleInitialized) {
+    if (this.props.drizzleInitialized && this.props.accounts[0]) {
       this.publicKeyDataKey = this.props.AccountManager.publicKeys.cacheCall(this.props.accounts[0])
       publicKey = this.props.AccountManager.publicKeys.value(this.isDoctorDataKey)
     }
@@ -49,6 +49,10 @@ class App extends Component {
       </div>
     )
   }
+}
+
+App.defaultProps = {
+  accounts: []
 }
 
 export default withRouter(withAccountManager(App))

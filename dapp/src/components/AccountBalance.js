@@ -1,23 +1,29 @@
 import React, { Component } from 'react';
 import {getSelectedAccountBalance} from '../utils/web3-util';
 import './AccountBalance.css';
+import { withMedXToken } from '@/drizzle-helpers/with-medx-token'
 
 class AccountBalance extends Component {
-    constructor(){
-        super()
-
-        this.state = {
-            balance: ''
-        };
+    constructor(props) {
+      super(props)
+      this.init(props)
     }
 
-    async componentDidMount() {
-        const accountBalance = await getSelectedAccountBalance();
-        
-        this.setState({balance: accountBalance});
+    componentWillReceiveProps (props) {
+      this.init(props)
     }
-  
+
+    init (props) {
+      if (props.drizzleInitialized && props.accounts[0]) {
+        this.dataKey = props.MedXToken.balanceOf.cacheCall(props.accounts[0])
+      }
+    }
+
     render() {
+      if (this.dataKey) {
+        var balance = this.props.MedXToken.balanceOf.value(this.dataKey)
+      }
+
         return (
             <div className="card card-account-balance">
                 <div className="card-header">
@@ -37,7 +43,7 @@ class AccountBalance extends Component {
                     <div className="row">
                         <div className="col-xs-12">
                             <div className="numbers">
-                                {this.state.balance} MEDX
+                                {balance} MEDX
                             </div>
                         </div>
                     </div>
@@ -47,4 +53,4 @@ class AccountBalance extends Component {
     }
 }
 
-export default AccountBalance;
+export default withMedXToken(AccountBalance)

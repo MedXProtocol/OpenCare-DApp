@@ -8,14 +8,18 @@ import get from 'lodash.get'
 export function withContextManager(WrappedComponent, propFactory) {
   const mapStateToProps = (state, props) => {
     return {
-      contracts: state.contracts,
       accounts: get(state, 'accounts', []),
+      contracts: state.contracts,
+      transactions: state.transactions,
+      transactionStack: state.transactionStack,
       drizzleInitialized: get(state, 'drizzleStatus.initialized', false),
+      web3Status: get(state, 'web3.status')
     }
   }
 
   const ContextManager = class extends Component {
-    componentDidMount() {
+    constructor (props) {
+      super(props)
       if (propFactory) {
         this.extraProps = propFactory(this)
       }
@@ -27,6 +31,11 @@ export function withContextManager(WrappedComponent, propFactory) {
 
   ContextManager.contextTypes = {
     drizzle: PropTypes.object
+  }
+
+  ContextManager.defaultProps = {
+    accounts: [],
+    drizzleInitialized: false
   }
 
   return drizzleConnect(ContextManager, mapStateToProps)
