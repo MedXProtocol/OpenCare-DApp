@@ -8,14 +8,9 @@ import {
   getCaseStatus,
   getCaseDoctorADiagnosisLocationHash,
   diagnoseCase,
-  diagnoseChallengedCase,
-  getCaseKey
+  diagnoseChallengedCase
 } from '../../../utils/web3-util';
-import {
-  signedInSecretKey
-} from '@/services/sign-in'
 import { uploadJson, downloadJson } from '../../../utils/storage-util';
-import aes from '@/services/aes'
 
 class SubmitDiagnosis extends Component {
     constructor(){
@@ -37,7 +32,6 @@ class SubmitDiagnosis extends Component {
 
     async componentDidMount() {
         const status = await getCaseStatus(this.props.caseAddress);
-        const encryptedCaseKey = await getCaseKey(this.props.caseAddress)
 
         if(status.code === 4) {
 

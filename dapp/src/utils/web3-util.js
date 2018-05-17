@@ -8,8 +8,9 @@ import { promisify } from './common-util'
 import { signedInSecretKey } from '@/services/sign-in'
 import aesjs from 'aes-js'
 import aes from '@/services/aes'
-import caseStatus from './case-status'
 import getWeb3 from '@/get-web3'
+import { caseStatusToName } from './case-status-to-name'
+import bytesToHex from './bytes-to-hex'
 
 export async function getSelectedAccount() {
   const web3 = getWeb3()
@@ -59,6 +60,7 @@ export async function getCaseDate(address) {
 
 export function setPublicKey(publicKey) {
   return getAccountManagerContract().then((accountManager) => {
+    console.log('setPublicKey ', publicKey)
     return accountManager.methods.setPublicKey('0x' + publicKey).send()
   })
 }
@@ -88,14 +90,14 @@ export async function getCaseStatus(caseAddress) {
   status = status.toString()
   return {
       code: status,
-      name: getCaseStatusName(status)
+      name: caseStatusToName(status)
   }
 }
 
 export async function getCaseKey(caseAddress) {
   const contract = await getCaseContract(caseAddress)
   let encryptedCaseKeyBytes = await contract.methods.getEncryptedCaseKey().call()
-  let encryptedCaseKey = encryptedCaseKeyBytes.map((hex) => hex.substring(2)).join('')
+  let encryptedCaseKey = bytesToHex(encryptedCaseKeyBytes)
   return encryptedCaseKey
 }
 
@@ -131,7 +133,7 @@ export async function getAllCasesForCurrentAccount() {
       number: i + 1,
       address: caseContractAddress,
       status: status.toString(),
-      statusName: getCaseStatusName(status.toString())
+      statusName: caseStatusToName(status.toString())
     })
   }
 
@@ -202,26 +204,6 @@ export async function diagnoseChallengedCase(caseAddress, diagnosisHash, accept,
       waitForTxComplete(result, callback)
     }
   })
-}
-
-function getCaseStatusName(status) {
-  var statuses = {
-    0: 'None',
-    1: 'Open',
-    2: 'Pending Approval',
-    3: 'Evaluating',
-    4: 'Evaluated',
-    5: 'Closed',
-    6: 'Challenged',
-    7: 'Pending Approval',
-    8: 'Challenging',
-    9: 'Canceled',
-    10: 'Diagnosis Rejected',
-    11: 'Diagnosis Confirmed'
-  }
-  var string = statuses[status]
-  if (!string) { throw new Error('Unknown status: ', status) }
-  return string
 }
 
 export async function contractFromConfig (config, address) {

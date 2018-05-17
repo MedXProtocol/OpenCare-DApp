@@ -195,12 +195,14 @@ contract Case is Ownable, Initializable {
     function requestDiagnosisAuthorization (address _doctor) external onlyDoctor(_doctor) {
       require(status == CaseStatus.Open);
       status = CaseStatus.EvaluationRequest;
+      diagnosingDoctorA = _doctor;
       emit CaseAuthorizationRequested(caseManager(), patient, _doctor);
     }
 
     function requestChallengeAuthorization (address _doctor) external onlyDoctor(_doctor) {
       require(status == CaseStatus.Challenged);
       status = CaseStatus.ChallengeRequest;
+      diagnosingDoctorB = _doctor;
       emit CaseAuthorizationRequested(caseManager(), patient, _doctor);
     }
 

@@ -1,7 +1,5 @@
-import { ec as EC } from 'elliptic'
-
-const curve = new EC('p521')
+import { ec } from '@/utils/ec'
 
 export function deriveKeyPair(secretKey) {
-  return curve.genKeyPair({ entropy: secretKey })
+  return ec.genKeyPair({ entropy: secretKey })
 }

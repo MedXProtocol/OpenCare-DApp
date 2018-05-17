@@ -12,7 +12,6 @@ import {
 } from '@/utils/web3-util'
 import { drizzleConnect } from 'drizzle-react'
 import { CaseRow } from './case-row'
-import values from 'lodash.values'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
 import dispatch from '@/dispatch'

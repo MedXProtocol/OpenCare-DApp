@@ -95,14 +95,14 @@ contract CaseManager is Ownable, Pausable, Initializable {
     /**
      * @dev - returns the length of the "all" case list
      */
-    function getAllCaseListCount() public constant returns (uint256 _caseCount) {
+    function getAllCaseListCount() public constant returns (uint256) {
         return caseList.length;
     }
 
     /**
      * @dev - returns the length of the patient specific case list
      */
-    function getPatientCaseListCount(address _patient) constant public returns (uint256 _caseCount) {
+    function getPatientCaseListCount(address _patient) constant public returns (uint256) {
         return patientCases[_patient].length;
     }
 
@@ -111,7 +111,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
      * @param _patient - the patient creating the case
      * @return - address of the case contract created
      */
-    function createCase(address _patient, byte[64] _encryptedCaseKey, bytes _ipfsHash) internal returns (address _newCase) {
+    function createCase(address _patient, byte[64] _encryptedCaseKey, bytes _ipfsHash) internal returns (address) {
       Delegate delegate = new Delegate(registry, keccak256("Case"));
       Case newCase = Case(delegate);
       newCase.initialize(_patient, _encryptedCaseKey, _ipfsHash, caseFee, medXToken, registry);

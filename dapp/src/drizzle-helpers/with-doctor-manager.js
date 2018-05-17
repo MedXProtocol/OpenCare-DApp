@@ -1,6 +1,5 @@
 import { withContextManager } from './with-context-manager'
 import get from 'lodash.get'
-import getWeb3 from '@/get-web3'
 
 export const withDoctorManager = function (WrappedComponent) {
   return withContextManager(WrappedComponent, function (contextManager) {

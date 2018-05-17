@@ -31,7 +31,7 @@ export class CreateAccount extends Component {
   }
 
   onConfirm = ({ secretKey, masterPassword }) => {
-    createAccount(this.state.account, secretKey).then(() => {
+    createAccount(this.state.account, this.state.secretKey).then(() => {
       signIn(getAccount(), masterPassword).then(() => {
         this.setState({ redirect: true })
       })

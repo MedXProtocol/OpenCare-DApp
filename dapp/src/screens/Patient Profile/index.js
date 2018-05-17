@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import NewCase from './components/NewCase';
-import PatinetCases from './components/PatientCases';
+import PatientCases from './components/patient-cases';
 
 class PatientProfile extends Component {
   render() {
@@ -15,7 +15,7 @@ class PatientProfile extends Component {
           </div>
           <div className="row">
             <div className="col-xs-12">
-              <PatinetCases />
+              <PatientCases />
             </div>
           </div>
         </div>

@@ -18,7 +18,6 @@
     "css-loader": "0.28.7",
     "date-fns": "^1.29.0",
     "dotenv": "4.0.0",
-    "drizzle": "github:asselstine/drizzle#feature/web3-contracts",
     "drizzle-react": "^1.1.1",
     "eslint": "4.10.0",
     "eslint-config-react-app": "^2.0.1",

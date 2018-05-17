@@ -15,39 +15,45 @@ import Wallet from './screens/Wallet'
 import hasAccount from '@/services/has-account'
 import { OpenCases } from './screens/open-cases'
 import './App.css'
-import { withAccountManager } from './drizzle-helpers/with-account-manager'
+import { withContextManager } from './drizzle-helpers/with-context-manager'
 import get from 'lodash.get'
 import { SignInRedirect } from './sign-in-redirect'
+import { DrizzleComponent } from '@/components/drizzle-component'
 
-class App extends Component {
-  constructor (props, context) {
-    super(props)
-    this.state = {}
+class App extends DrizzleComponent {
+  drizzleInit (props) {
+    if (!this.state.publicKeyDataKey) {
+      this.setState({
+        publicKeyDataKey: this.context.drizzle.contracts.AccountManager.methods.publicKeys.cacheCall(this.props.accounts[0])
+      })
+    }
   }
 
   render () {
-    let publicKey
-    if (this.props.drizzleInitialized && this.props.accounts[0]) {
-      this.publicKeyDataKey = this.props.AccountManager.publicKeys.cacheCall(this.props.accounts[0])
-      publicKey = this.props.AccountManager.publicKeys.value(this.isDoctorDataKey)
+    var result = <div></div>
+    if (this.state.publicKeyDataKey) {
+      var publicKey = get(this.props, `contracts.AccountManager.publicKeys[${this.state.publicKeyDataKey}]`)
+      if (publicKey) {
+        var result =
+          <div>
+            <SignInRedirect publicKey={publicKey.value} />
+            <Route path='/sign-in' component={ SignIn } />
+            <Route path='/sign-up' component={ CreateAccount } />
+            <Route path='/new-case' component={ NewCase }/>
+            <Route path='/patient-case/:caseAddress' component={ PatientCase }/>
+            <Route path='/patient-profile' component={ PatientProfile }/>
+            <Route path='/physician-profile' component={ PhysicianProfile }/>
+            <Route path='/diagnose-case/:caseAddress' component={ DiagnoseCase }/>
+            <Route path='/doctors' component={ AddDoctor }/>
+            <Route path='/mint' component={ Mint }/>
+            <Route path='/wallet' component={ Wallet }/>
+            <Route path='/cases/open' component={ OpenCases } />
+            <Route exact path='/' component={ Home }/>
+          </div>
+      }
     }
 
-    return (
-      <div>
-        <Route path='/sign-in' component={ SignIn } />
-        <Route path='/sign-up' component={ CreateAccount } />
-        <Route path='/new-case' component={ NewCase }/>
-        <Route path='/patient-case/:caseAddress' component={ PatientCase }/>
-        <Route path='/patient-profile' component={ PatientProfile }/>
-        <Route path='/physician-profile' component={ PhysicianProfile }/>
-        <Route path='/diagnose-case/:caseAddress' component={ DiagnoseCase }/>
-        <Route path='/doctors' component={ AddDoctor }/>
-        <Route path='/mint' component={ Mint }/>
-        <Route path='/wallet' component={ Wallet }/>
-        <Route path='/cases/open' component={ OpenCases } />
-        <Route exact path='/' component={ Home }/>
-      </div>
-    )
+    return result
   }
 }
 
@@ -55,4 +61,4 @@ App.defaultProps = {
   accounts: []
 }
 
-export default withRouter(withAccountManager(App))
+export default withRouter(withContextManager(App))
