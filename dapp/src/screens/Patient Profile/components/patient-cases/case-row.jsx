@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { DrizzleComponent } from '@/components/drizzle-component'
 import PropTypes from 'prop-types'
 import { drizzleConnect } from 'drizzle-react'
@@ -115,7 +116,7 @@ export const CaseRow = drizzleConnect(withCaseManager(withAccountManager(class _
     return (
       <tr>
         <td className="text-center">{this.props.caseIndex}</td>
-        <td>{this.props.caseAddress}</td>
+        <td><Link to={`/patient-case/${this.props.caseAddress}`}>{this.props.caseAddress}</Link></td>
         <td>{caseStatusToName(status)}</td>
         <td className="td-actions text-right">
           {approvalButton}
