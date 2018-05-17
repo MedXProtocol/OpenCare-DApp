@@ -23,13 +23,9 @@ const CaseRow = drizzleConnect(class extends Component {
   }
 
   render () {
-    var date = '-'
-    if (this.props.date) {
-      var date = distanceInWordsToNow(new Date(this.props.date * 1000), {addSuffix: true})
-    }
     return (
       <tr>
-        <td>{date}</td>
+        <td>{this.props.address}</td>
         <td>{this.props.status.name}</td>
         <td></td>
       </tr>
