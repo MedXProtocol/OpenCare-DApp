@@ -20,38 +20,24 @@ import get from 'lodash.get'
 import { SignInRedirect } from './sign-in-redirect'
 import { DrizzleComponent } from '@/components/drizzle-component'
 
-class App extends DrizzleComponent {
-  drizzleInit (props) {
-    if (!this.state.publicKeyDataKey) {
-      this.setState({
-        publicKeyDataKey: this.context.drizzle.contracts.AccountManager.methods.publicKeys.cacheCall(this.props.accounts[0])
-      })
-    }
-  }
-
+class App extends Component {
   render () {
-    var result = <div></div>
-    if (this.state.publicKeyDataKey) {
-      var publicKey = get(this.props, `contracts.AccountManager.publicKeys[${this.state.publicKeyDataKey}]`)
-      if (publicKey) {
-        var result =
-          <div>
-            <SignInRedirect publicKey={publicKey.value} />
-            <Route path='/sign-in' component={ SignIn } />
-            <Route path='/sign-up' component={ CreateAccount } />
-            <Route path='/new-case' component={ NewCase }/>
-            <Route path='/patient-case/:caseAddress' component={ PatientCase }/>
-            <Route path='/patient-profile' component={ PatientProfile }/>
-            <Route path='/physician-profile' component={ PhysicianProfile }/>
-            <Route path='/diagnose-case/:caseAddress' component={ DiagnoseCase }/>
-            <Route path='/doctors' component={ AddDoctor }/>
-            <Route path='/mint' component={ Mint }/>
-            <Route path='/wallet' component={ Wallet }/>
-            <Route path='/cases/open' component={ OpenCases } />
-            <Route exact path='/' component={ Home }/>
-          </div>
-      }
-    }
+    var result =
+      <div>
+        <SignInRedirect />
+        <Route path='/sign-in' component={ SignIn } />
+        <Route path='/sign-up' component={ CreateAccount } />
+        <Route path='/new-case' component={ NewCase }/>
+        <Route path='/patient-case/:caseAddress' component={ PatientCase }/>
+        <Route path='/patient-profile' component={ PatientProfile }/>
+        <Route path='/physician-profile' component={ PhysicianProfile }/>
+        <Route path='/diagnose-case/:caseAddress' component={ DiagnoseCase }/>
+        <Route path='/doctors' component={ AddDoctor }/>
+        <Route path='/mint' component={ Mint }/>
+        <Route path='/wallet' component={ Wallet }/>
+        <Route path='/cases/open' component={ OpenCases } />
+        <Route exact path='/' component={ Home }/>
+      </div>
 
     return result
   }

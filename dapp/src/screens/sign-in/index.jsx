@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import MainLayout from '../../layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { getAccount } from '@/services/get-account'
-import { signIn } from '@/services/sign-in'
+import { signInWithPublicKeyCheck } from '@/services/sign-in'
 import { SignInForm } from '@/components/sign-in-form'
 
 class SignInComponent extends Component {
@@ -13,7 +13,7 @@ class SignInComponent extends Component {
   }
 
   onSubmit = ({ secretKey, masterPassword }) => {
-    signIn(getAccount(), masterPassword).then(() => {
+    signInWithPublicKeyCheck(getAccount(), masterPassword).then(() => {
       this.props.history.push('/')
     })
   }

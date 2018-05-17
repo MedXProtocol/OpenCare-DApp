@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { withRouter, Redirect } from 'react-router-dom'
 
 import hasAccount from '@/services/has-account'
-import { isSignedIn, isValidPublicKey, signOut } from '@/services/sign-in'
+import { isSignedIn, signOut } from '@/services/sign-in'
 import redirect from '@/services/redirect'
 
 export const SignInRedirect = withRouter(class extends Component {
@@ -43,7 +43,7 @@ export const SignInRedirect = withRouter(class extends Component {
   getSignInRedirectState = (props) => {
     const { location } = props
     if (!location) { return }
-    let signedIn = isSignedIn() && isValidPublicKey(props.publicKey)
+    let signedIn = isSignedIn()
     return redirect({isSignedIn: signedIn, hasAccount: hasAccount(), pathname: location.pathname, state: this.state})
   }
 
@@ -55,7 +55,3 @@ export const SignInRedirect = withRouter(class extends Component {
     }
   }
 })
-
-SignInRedirect.propTypes = {
-  publicKey: PropTypes.string
-}

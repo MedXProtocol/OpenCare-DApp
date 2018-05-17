@@ -16,12 +16,9 @@ export function isValidPublicKey (publicKey) {
   return !!publicKey && !!hexToAscii(publicKey)
 }
 
-export async function signIn (account, masterPassword) {
+export async function signInWithPublicKeyCheck (account, masterPassword) {
   var preimage = deriveKey(masterPassword, account.salt)
   var secretKey = aes.decrypt(account.encryptedSecretKey, preimage)
-
-  // setSecretKey(secretKey)
-  // NOTE: the code below can be removed and above uncommented after the public keys have been setup in staging
 
   return getPublicKey().then((publicKey) => {
     if (!publicKey || !hexToAscii(publicKey)) {
@@ -31,6 +28,12 @@ export async function signIn (account, masterPassword) {
   }).then(() => {
     setSecretKey(secretKey)
   })
+}
+
+export async function signIn (account, masterPassword) {
+  var preimage = deriveKey(masterPassword, account.salt)
+  var secretKey = aes.decrypt(account.encryptedSecretKey, preimage)
+  setSecretKey(secretKey)
 }
 
 export function signOut () {
