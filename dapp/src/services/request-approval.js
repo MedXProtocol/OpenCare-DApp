@@ -16,8 +16,6 @@ export function* cacheCall(drizzleContract, field, ...args) {
 
 export function* approveDiagnosisRequest({drizzle, contract}) {
   let diagnosingDoctorA = yield cacheCall(cacheCall, contract, 'diagnosingDoctorA')
-  console.log(diagnosingDoctorA)
-  debugger
   // get doctor address
 
   // yield call(getContractVar, contract, 'Blarg')

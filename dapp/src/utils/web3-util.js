@@ -60,7 +60,6 @@ export async function getCaseDate(address) {
 
 export function setPublicKey(publicKey) {
   return getAccountManagerContract().then((accountManager) => {
-    console.log('setPublicKey ', publicKey)
     return accountManager.methods.setPublicKey('0x' + publicKey).send()
   })
 }
@@ -281,7 +280,7 @@ function toRegistryKey(string) {
 function waitForTxComplete(txHash, callback) {
   const web3 = getWeb3()
 
-  console.log("TX Hash [" + txHash + "]")
+  // console.log("TX Hash [" + txHash + "]")
 
   web3.eth.getTransactionReceipt(txHash, function (error, result) {
     if(error !== null) {

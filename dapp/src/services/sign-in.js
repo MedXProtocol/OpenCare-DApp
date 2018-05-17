@@ -8,8 +8,12 @@ import hexToAscii from '@/utils/hex-to-ascii'
 
 let secretKey = ''
 
-export function isSignedIn (publicKey) {
-  return (publicKey && hexToAscii(publicKey) && !!signedInSecretKey())
+export function isSignedIn () {
+  return !!signedInSecretKey()
+}
+
+export function isValidPublicKey (publicKey) {
+  return !!publicKey && !!hexToAscii(publicKey)
 }
 
 export async function signIn (account, masterPassword) {

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import logo from '../assets/img/logo.png'
 import './Navbar.css'
 import { isDoctor } from '@/utils/web3-util'
+import { isSignedIn, signOut } from '@/services/sign-in'
 import { withDoctorManager } from '@/drizzle-helpers/with-doctor-manager'
 
 class Navbar extends Component {
@@ -20,13 +21,25 @@ class Navbar extends Component {
 
   init () {
     if (this.props.drizzleInitialized && this.props.accounts[0] && this.props.DoctorManager) {
-      this.isDoctorDataKey = this.props.DoctorManager.isDoctor.cacheCall(this.props.accounts[0])
+      // this.isDoctorDataKey = this.props.DoctorManager.isDoctor.cacheCall(this.props.accounts[0])
     }
+  }
+
+  signOut = () => {
+    signOut()
+    this.props.history.push('/')
   }
 
   render() {
     if (this.props.drizzleInitialized && this.props.DoctorManager) {
       var isDoctor = this.props.DoctorManager.isDoctor.value(this.isDoctorDataKey)
+    }
+
+    if (isSignedIn()) {
+      var signOut =
+        <a className="navbar-text navbar-right btn-magnify" href='javascript:;' onClick={this.signOut}>
+          Sign Out
+        </a>
     }
 
     if (isDoctor) {
@@ -47,6 +60,7 @@ class Navbar extends Component {
                         </Link>
                     </div>
                     <div className="collapse navbar-collapse">
+                        {signOut}
                         <Link to='/wallet' className="navbar-text navbar-right btn-magnify">
                             <i className="ti-wallet"></i>
                             &nbsp; My Wallet
