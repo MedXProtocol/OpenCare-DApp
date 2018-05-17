@@ -1,5 +1,5 @@
 #! /bin/sh
 
 truffle compile && \
-truffle-migrate-off-chain --network ropsten && \
+npm run migrate -- --network ropsten && \
 cd dapp && npm install && npm run build && cd ..
