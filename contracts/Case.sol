@@ -26,7 +26,7 @@ contract Case is Ownable, Initializable {
 
     byte[64] public encryptedCaseKey;
 
-    mapping(address => bytes) approvedDoctorKeys;
+    mapping(address => bytes) public approvedDoctorKeys;
 
     enum CaseStatus {
       None, Open, EvaluationRequest, Evaluating, Evaluated,

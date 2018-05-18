@@ -13,9 +13,7 @@ import { approveDiagnosisRequest } from '@/services/request-approval'
 import bytesToHex from '@/utils/bytes-to-hex'
 import aes from '@/services/aes'
 import { signedInSecretKey } from '@/services/sign-in'
-import { ec } from '@/utils/ec'
-import { ec as EC } from 'elliptic'
-import { deriveKeyPair } from '@/services/derive-key-pair'
+import { deriveSharedKey } from '@/services/derive-shared-key'
 
 function mapStateToProps(state, ownProps) {
   let accessor = `contracts[${ownProps.caseAddress}]`
@@ -54,8 +52,6 @@ export const CaseRow = drizzleConnect(withCaseManager(withAccountManager(class _
     const drizzle = this.context.drizzle
     const contract = drizzle.contracts[this.props.caseAddress]
     const status = this.status()
-    const _EC = EC
-    const _ec = ec
     this.setState({ test: 'foo' })
     if (status === '2') {
       const diagnosingDoctorA = this.diagnosingDoctorA()
@@ -63,10 +59,7 @@ export const CaseRow = drizzleConnect(withCaseManager(withAccountManager(class _
       const encryptedCaseKey = bytesToHex(this.encryptedCaseKey())
       const secretKey = signedInSecretKey()
       const caseKey = aes.decrypt(encryptedCaseKey, secretKey)
-      const patientKeyPair = deriveKeyPair(secretKey)
-      const doctorKeyPair = ec.keyFromPublic(diagnosingDoctorAPublicKey, 'hex')
-      const combinedKeyPair = patientKeyPair.derive(doctorKeyPair.getPublic())
-      const sharedKey = combinedKeyPair.toString(16).substring(0, 64)
+      const sharedKey = deriveSharedKey(secretKey, diagnosingDoctorAPublicKey)
       const doctorEncryptedCaseKey = aes.encrypt(caseKey, sharedKey)
 
       contract.methods.authorizeDiagnosisDoctor.cacheSend(diagnosingDoctorA, '0x' + doctorEncryptedCaseKey)

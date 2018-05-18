@@ -1,43 +1,52 @@
 import React, {
   Component
 } from 'react'
+import { Link } from 'react-router-dom'
 import { drizzleConnect } from 'drizzle-react'
 import dispatch from '@/dispatch'
 import get from 'lodash.get'
-import { getCaseDate } from '@/utils/web3-util'
+import { getCaseDate, getCaseContract } from '@/utils/web3-util'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
+import { withPropSaga } from '@/components/with-prop-saga'
 
 function mapStateToProps(state, ownProps) {
-  let status = get(state, `cases[${ownProps.address}]`)
-  let date = get(state, `caseDates.cases[${ownProps.address}]`)
+  return {
+    account: get(state, 'accounts[0]')
+  }
+}
+
+function* asyncProps(ownProps) {
   let props = {}
-  if (status) { props.status = status }
-  if (date) { props.date = date }
+  let contract = yield getCaseContract(ownProps.address)
+  props.status = yield contract.methods.status().call()
+  props.caseFee = yield contract.methods.caseFee().call()
+  if (props.status === '3') {
+    props.diagnosingDoctorA = yield contract.methods.diagnosingDoctorA().call()
+    props.doctorKey = yield contract.methods.approvedDoctorKeys(props.diagnosingDoctorA).call()
+  }
+
   return props
 }
 
-const CaseRow = drizzleConnect(class extends Component {
-  componentDidMount() {
-    dispatch({ type: 'CASE_FETCH_REQUESTED', address: this.props.address })
-    dispatch({ type: 'CASE_DATE_FETCH_REQUESTED', address: this.props.address })
-  }
-
+const CaseRow = drizzleConnect(withPropSaga(asyncProps, class extends Component {
   render () {
+    if (this.props.diagnosingDoctorA === this.props.account) {
+      var address = <Link to={`/diagnose-case/${this.props.address}`}>{this.props.address}</Link>
+    } else {
+      address = this.props.address
+    }
     return (
       <tr>
-        <td>{this.props.address}</td>
-        <td>{this.props.status.name}</td>
+        <td>{address}</td>
+        <td>{this.props.status}</td>
         <td></td>
       </tr>
     )
   }
-}, mapStateToProps)
+}), mapStateToProps)
 
 CaseRow.defaultProps = {
-  status: {
-    code: 0,
-    name: 'Unknown'
-  },
+  status: 0,
   date: null
 }
 

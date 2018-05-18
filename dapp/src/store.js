@@ -1,13 +1,12 @@
 import { createStore, applyMiddleware, compose } from 'redux'
-import createSagaMiddleware from 'redux-saga'
 import { generateContractsInitialState } from 'drizzle'
 import drizzleOptions from './drizzleOptions'
 import sagas from './sagas'
 import reducers from './reducers'
+import { sagaMiddleware } from './saga-middleware'
 
 const storeFactory = function () {
   return drizzleOptions().then((options) => {
-    const sagaMiddleware = createSagaMiddleware()
     const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
     const initialState = {
       contracts: generateContractsInitialState(options)
