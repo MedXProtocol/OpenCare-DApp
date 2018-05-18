@@ -12,15 +12,12 @@ import DiagnoseCase from './screens/Diagnose Case'
 import AddDoctor from './screens/Add Doctor'
 import Mint from './screens/Mint'
 import Wallet from './screens/Wallet'
-import hasAccount from '@/services/has-account'
 import { OpenCases } from './screens/open-cases'
 import './App.css'
 import { withContextManager } from './drizzle-helpers/with-context-manager'
-import get from 'lodash.get'
 import { SignInRedirect } from './sign-in-redirect'
-import { DrizzleComponent } from '@/components/drizzle-component'
 
-class App extends Component {
+const App = class extends Component {
   render () {
     var result =
       <div>

@@ -35,6 +35,9 @@ export default async function () {
       MedXToken: [
         'Mint'
       ]
+    },
+    polls: {
+      accounts: 1000
     }
   }
 }

@@ -4,16 +4,20 @@ import { withRouter, Link } from 'react-router-dom'
 import { getAccount } from '@/services/get-account'
 import { signInWithPublicKeyCheck } from '@/services/sign-in'
 import { SignInForm } from '@/components/sign-in-form'
+import { getSelectedAccount } from '@/utils/web3-util'
+import { withPropSaga } from '@/components/with-prop-saga'
 
-class SignInComponent extends Component {
-  componentDidMount () {
-    this.setState({
-      account: getAccount()
-    })
+function* propSaga(ownProps) {
+  let address = yield getSelectedAccount()
+  return {
+    address,
+    account: getAccount(address)
   }
+}
 
+export const SignIn = withRouter(withPropSaga(propSaga, class extends Component {
   onSubmit = ({ secretKey, masterPassword }) => {
-    signInWithPublicKeyCheck(getAccount(), masterPassword).then(() => {
+    signInWithPublicKeyCheck(this.props.account, masterPassword).then(() => {
       this.props.history.push('/')
     })
   }
@@ -25,7 +29,7 @@ class SignInComponent extends Component {
           <div className='row'>
             <div className='col-sm-8 col-sm-offset-2'>
               <h1>Sign In</h1>
-              <SignInForm onSubmit={this.onSubmit} account={getAccount()}>
+              <SignInForm onSubmit={this.onSubmit} account={this.props.account}>
                 <div className='form-group'>
                   <input type='submit' value='Sign In' className='btn btn-primary' />
                 </div>
@@ -39,6 +43,4 @@ class SignInComponent extends Component {
       </MainLayout>
     )
   }
-}
-
-export const SignIn = withRouter(SignInComponent)
+}))

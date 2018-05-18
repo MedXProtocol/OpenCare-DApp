@@ -10,8 +10,17 @@ import { buildAccount } from '@/services/build-account'
 import { createAccount } from '@/services/create-account'
 import { getAccount } from '@/services/get-account'
 import { signIn } from '@/services/sign-in'
+import { getSelectedAccount } from '@/utils/web3-util'
+import { withPropSaga } from '@/components/with-prop-saga'
 
-export class CreateAccount extends Component {
+function* propSaga(ownProps) {
+  let address = yield getSelectedAccount()
+  return {
+    address
+  }
+}
+
+export const CreateAccount = withPropSaga(propSaga, class extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -31,8 +40,8 @@ export class CreateAccount extends Component {
   }
 
   onConfirm = ({ secretKey, masterPassword }) => {
-    createAccount(this.state.account, this.state.secretKey).then(() => {
-      signIn(getAccount(), masterPassword).then(() => {
+    createAccount(this.props.address, this.state.account, this.state.secretKey).then(() => {
+      signIn(getAccount(this.props.address), masterPassword).then(() => {
         this.setState({ redirect: true })
       })
     })
@@ -55,4 +64,4 @@ export class CreateAccount extends Component {
       </MainLayout>
     )
   }
-}
+})

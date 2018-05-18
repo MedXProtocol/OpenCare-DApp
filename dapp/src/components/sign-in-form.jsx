@@ -3,9 +3,8 @@ import React, { Component } from 'react'
 import { formatKey } from '@/services/format-key'
 import { getAccount } from '@/services/get-account'
 import { isAccountMasterPassword } from '@/services/is-account-master-password'
-import { withAccountManager } from '@/drizzle-helpers/with-account-manager'
 
-export const SignInForm = withAccountManager(class extends Component {
+export const SignInForm = class extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -43,6 +42,7 @@ export const SignInForm = withAccountManager(class extends Component {
           <input
             disabled={secretKeyDisabled}
             value={secretKeyValue}
+            autoComplete="off"
             onChange={(e) => this.setState({secretKey: e.target.value})}
             type="text" className="form-control" id="secretKey" />
         </div>
@@ -58,7 +58,7 @@ export const SignInForm = withAccountManager(class extends Component {
       </form>
     )
   }
-})
+}
 
 SignInForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,

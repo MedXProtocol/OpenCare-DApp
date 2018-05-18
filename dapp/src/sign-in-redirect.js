@@ -3,12 +3,28 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import { withRouter, Redirect } from 'react-router-dom'
-
-import hasAccount from '@/services/has-account'
+import get from 'lodash.get'
+import { getAccount } from '@/services/get-account'
 import { isSignedIn, signOut } from '@/services/sign-in'
 import redirect from '@/services/redirect'
+import { withPropSaga } from '@/components/with-prop-saga'
+import { getSelectedAccount } from '@/utils/web3-util'
+import { drizzleConnect } from 'drizzle-react'
 
-export const SignInRedirect = withRouter(class extends Component {
+function mapStateToProps (state, ownProps) {
+  return {
+    address: get(state, 'accounts[0]')
+  }
+}
+
+function* propSaga(ownProps) {
+  let account = getAccount(ownProps.address)
+  return {
+    account
+  }
+}
+
+export const SignInRedirect = withRouter(drizzleConnect(withPropSaga(propSaga, class extends Component {
   constructor (props) {
     super(props)
     this.state = {}
@@ -26,7 +42,11 @@ export const SignInRedirect = withRouter(class extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.checkSignInRedirect(nextProps)
+    if (this.props.address && this.props.address !== nextProps.address) {
+      signOut()
+    } else {
+      this.checkSignInRedirect(nextProps)
+    }
   }
 
   unload = () => {
@@ -44,7 +64,7 @@ export const SignInRedirect = withRouter(class extends Component {
     const { location } = props
     if (!location) { return }
     let signedIn = isSignedIn()
-    return redirect({isSignedIn: signedIn, hasAccount: hasAccount(), pathname: location.pathname, state: this.state})
+    return redirect({isSignedIn: signedIn, hasAccount: !!props.account, pathname: location.pathname, state: this.state})
   }
 
   render () {
@@ -54,4 +74,4 @@ export const SignInRedirect = withRouter(class extends Component {
       return <span></span>
     }
   }
-})
+}), mapStateToProps))

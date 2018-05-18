@@ -9,7 +9,11 @@ export default function({isSignedIn, hasAccount, pathname, state}) {
       }
       state.requestedPathname = pathname
     } else {
-      state.redirect = ''
+      if (hasAccount) {
+        state.redirect = '/sign-in'
+      } else {
+        state.redirect = ''
+      }
       if (!state.requestedPathname) {
         state.requestedPathname = '/'
       }
