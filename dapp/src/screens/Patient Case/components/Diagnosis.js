@@ -26,7 +26,7 @@ class Diagnosis extends Component {
 
         this.setState({status: status});
 
-        if(status.code === 2) {
+        if(status.code === '4') {
             this.setState({buttonsHidden: false});
         }
 

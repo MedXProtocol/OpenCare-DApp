@@ -30,7 +30,7 @@ const PatientCase = withPropSaga(propSaga, class extends Component {
               <Diagnosis caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
             </div>
             <div className="col">
-              <ChallengedDiagnosis caseAddress={this.props.match.params.caseAddress}/>
+              <ChallengedDiagnosis caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
             </div>
             <div className="col">
               <CaseDetails caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />

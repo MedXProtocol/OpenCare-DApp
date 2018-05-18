@@ -17,7 +17,7 @@ class ChallengedDiagnosis extends Component {
         const diagnosisHash = await getCaseDoctorBDiagnosisLocationHash(this.props.caseAddress);
 
         if(diagnosisHash !== null && diagnosisHash !== "0x") {
-            const diagnosisJson = await downloadJson(diagnosisHash);
+            const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey);
             const diagnosis = JSON.parse(diagnosisJson);
             this.setState({
                 diagnosis: diagnosis,
@@ -51,7 +51,8 @@ class ChallengedDiagnosis extends Component {
 }
 
 ChallengedDiagnosis.propTypes = {
-    caseAddress: PropTypes.string
+    caseAddress: PropTypes.string,
+    caseKey: PropTypes.string
 };
 
 ChallengedDiagnosis.defaultProps = {
