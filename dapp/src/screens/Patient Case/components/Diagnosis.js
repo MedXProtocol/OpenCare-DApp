@@ -23,19 +23,19 @@ class Diagnosis extends Component {
 
     async componentDidMount() {
         const status = await getCaseStatus(this.props.caseAddress);
-        
+
         this.setState({status: status});
 
         if(status.code === 2) {
             this.setState({buttonsHidden: false});
         }
-        
+
         const diagnosisHash = await getCaseDoctorADiagnosisLocationHash(this.props.caseAddress);
 
         if(diagnosisHash !== null && diagnosisHash !== "0x") {
-            const diagnosisJson = await downloadJson(diagnosisHash);
+            const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey);
             const diagnosis = JSON.parse(diagnosisJson);
-            this.setState({ 
+            this.setState({
                 diagnosis: diagnosis,
                 hidden: false
             });
@@ -68,7 +68,7 @@ class Diagnosis extends Component {
 
     handleCloseThankYouModal = (event) => {
         event.preventDefault();
-        
+
         this.setState({showThankYouModal: false});
 
         this.props.history.push('/patient-profile');
@@ -76,7 +76,7 @@ class Diagnosis extends Component {
 
     handleCloseChallengeModal = (event) => {
         event.preventDefault();
-        
+
         this.setState({showChallengeModal: false});
 
         this.props.history.push('/patient-profile');
@@ -105,7 +105,7 @@ class Diagnosis extends Component {
                 </div>
                 <div className="card-content">
                     <div className="row">
-                        
+
                         <div className="col-xs-12">
                             <label>Diagnosis</label>
                             <p>{this.state.diagnosis.diagnosis}</p>
@@ -162,7 +162,8 @@ class Diagnosis extends Component {
 }
 
 Diagnosis.propTypes = {
-    caseAddress: PropTypes.string
+    caseAddress: PropTypes.string,
+    caseKey: PropTypes.string
 };
 
 Diagnosis.defaultProps = {
