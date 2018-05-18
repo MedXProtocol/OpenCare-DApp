@@ -6,7 +6,7 @@ import accountManagerConfig from '#/AccountManager.json'
 import registryConfig from '#/Registry.json'
 import { promisify } from './common-util'
 import { signedInSecretKey } from '@/services/sign-in'
-import aesjs from 'aes-js'
+import hashToHex from '@/utils/hash-to-hex'
 import aes from '@/services/aes'
 import getWeb3 from '@/get-web3'
 import { caseStatusToName } from './case-status-to-name'
@@ -75,9 +75,7 @@ export async function createCase(encryptedCaseKey, documentHash, callback) {
   const contract = await getMedXTokenContract()
   const caseManager = await getCaseManagerContract()
   const caseManagerAddress = caseManager.options.address
-
-  var hashBytes = aesjs.utils.utf8.toBytes(documentHash)
-  var hashHex = aesjs.utils.hex.fromBytes(hashBytes)
+  var hashHex = hashToHex(documentHash)
   const combined = '0x' + encryptedCaseKey + hashHex
 
   return contract.methods.approveAndCall(caseManagerAddress, 15, combined).send()

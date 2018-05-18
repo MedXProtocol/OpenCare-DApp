@@ -20,7 +20,7 @@ function* asyncProps(ownProps) {
   let contract = yield getCaseContract(ownProps.address)
   props.status = yield contract.methods.status().call()
   props.caseFee = yield contract.methods.caseFee().call()
-  if (props.status === '3') {
+  if (parseInt(props.status) >= 3) {
     props.diagnosingDoctorA = yield contract.methods.diagnosingDoctorA().call()
     props.doctorKey = yield contract.methods.approvedDoctorKeys(props.diagnosingDoctorA).call()
   }

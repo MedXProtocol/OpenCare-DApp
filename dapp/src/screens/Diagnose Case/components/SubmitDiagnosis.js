@@ -4,15 +4,35 @@ import { Modal } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import Spinner from '../../../components/Spinner';
 import { isNotEmptyString } from '../../../utils/common-util';
+import hashToHex from '@/utils/hash-to-hex'
 import {
   getCaseStatus,
   getCaseDoctorADiagnosisLocationHash,
   diagnoseCase,
+  getCaseContract,
   diagnoseChallengedCase
-} from '../../../utils/web3-util';
+} from '@/utils/web3-util';
 import { uploadJson, downloadJson } from '../../../utils/storage-util';
+import { withPropSaga } from '@/components/with-prop-saga'
 
-class SubmitDiagnosis extends Component {
+function* propSaga(ownProps) {
+  if (!ownProps.caseKey) { return }
+  const caseContract = yield getCaseContract(ownProps.caseAddress)
+  const status = yield caseContract.methods.status().call()
+  const originalDiagnosisHash = yield getCaseDoctorADiagnosisLocationHash(ownProps.caseAddress)
+  let originalDiagnosis
+  if (originalDiagnosisHash) {
+    const originalDiagnosisJson = yield downloadJson(originalDiagnosisHash, ownProps.caseKey)
+    originalDiagnosis = JSON.parse(originalDiagnosisJson);
+  }
+
+  return {
+    status,
+    originalDiagnosis
+  }
+}
+
+const SubmitDiagnosis = withPropSaga(propSaga, class extends Component {
     constructor(){
         super()
 
@@ -28,23 +48,6 @@ class SubmitDiagnosis extends Component {
             showConfirmationModal: false,
             showThankYouModal: false
         };
-    }
-
-    async componentDidMount() {
-        const status = await getCaseStatus(this.props.caseAddress);
-
-        if(status.code === 4) {
-
-            const diagnosisHash = await getCaseDoctorADiagnosisLocationHash(this.props.caseAddress);
-
-            const diagnosisJson = await downloadJson(diagnosisHash);
-            const diagnosis = JSON.parse(diagnosisJson);
-
-            this.setState({
-                isChallenge: true,
-                originalDiagnosis: diagnosis.diagnosis
-            });
-        }
     }
 
     updateDiagnosis = (event) => {
@@ -96,12 +99,13 @@ class SubmitDiagnosis extends Component {
 
         const diagnosisJson = JSON.stringify(diagnosisInformation);
 
-        const hash = await uploadJson(diagnosisJson);
+        const ipfsHash = await uploadJson(diagnosisJson, this.props.caseKey);
+        const hashHex = '0x' + hashToHex(ipfsHash)
 
         if(this.state.isChallenge) {
             const accept = this.state.originalDiagnosis === this.state.diagnosis;
 
-            diagnoseChallengedCase(this.props.caseAddress, hash, accept, (error, result) => {
+            diagnoseChallengedCase(this.props.caseAddress, hashHex, accept, (error, result) => {
                 if(error !== null) {
                     this.onError(error);
                 } else {
@@ -109,7 +113,7 @@ class SubmitDiagnosis extends Component {
                 }
             });
         } else {
-            diagnoseCase(this.props.caseAddress, hash, (error, result) => {
+            diagnoseCase(this.props.caseAddress, hashHex, (error, result) => {
                 if(error !== null) {
                     this.onError(error);
                 } else {
@@ -217,7 +221,7 @@ class SubmitDiagnosis extends Component {
             </div>
         );
     }
-}
+})
 
 SubmitDiagnosis.propTypes = {
     caseAddress: PropTypes.string

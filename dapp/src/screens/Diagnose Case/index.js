@@ -46,10 +46,10 @@ const DiagnoseCase = drizzleConnect(withPropSaga(propSaga, class extends Compone
         <div className="container">
           <div className="row">
             <div className="col">
-              <CaseDetails caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey}/>
+              <CaseDetails caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
             </div>
             <div className="col">
-              <SubmitDiagnosis caseAddress={this.props.match.params.caseAddress}/>
+              <SubmitDiagnosis caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
             </div>
           </div>
         </div>
