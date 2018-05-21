@@ -151,6 +151,7 @@ contract Case is Ownable, Initializable {
         require(status == CaseStatus.Evaluated);
         status = CaseStatus.Challenged;
         /* TODO: Make sure case is within 24 hour period */
+        caseManager().addCaseToQueue(address(this));
         emit CaseChallenged(caseManager(), patient, diagnosingDoctorA);
     }
 

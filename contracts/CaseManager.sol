@@ -16,6 +16,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
     uint256 public caseFee;
 
     address[] public caseList;
+    mapping (address => uint256) public caseIndices;
     mapping (address => address[]) public patientCases;
 
     MedXToken public medXToken;
@@ -24,6 +25,12 @@ contract CaseManager is Ownable, Pausable, Initializable {
     Queue.UInt256 openCaseQueue;
 
     mapping (address => uint256[]) public doctorAuthorizationRequests;
+
+    modifier onlyCase(address _case) {
+      require(_case != address(0));
+      require(caseIndices[_case] != uint256(0));
+      _;
+    }
 
     /**
      * @dev - Constructor
@@ -41,6 +48,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
         medXToken = _medXToken;
         registry = _registry;
         openCaseQueue = Queue.create();
+        caseList.push(address(0));
     }
 
     /**
@@ -96,7 +104,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
      * @dev - returns the length of the "all" case list
      */
     function getAllCaseListCount() public constant returns (uint256) {
-        return caseList.length;
+        return caseList.length - 1;
     }
 
     /**
@@ -116,6 +124,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       Case newCase = Case(delegate);
       newCase.initialize(_patient, _encryptedCaseKey, _ipfsHash, caseFee, medXToken, registry);
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
+      caseIndices[address(newCase)] = caseIndex;
       openCaseQueue.enqueue(caseIndex);
       patientCases[_patient].push(address(newCase));
       return newCase;
@@ -125,9 +134,19 @@ contract CaseManager is Ownable, Pausable, Initializable {
       require(openCaseQueue.count() > 0);
       uint256 caseIndex = openCaseQueue.dequeue();
       Case caseContract = Case(caseList[caseIndex]);
-      caseContract.requestDiagnosisAuthorization(msg.sender);
+      if (caseContract.status() == Case.CaseStatus.Open) {
+        caseContract.requestDiagnosisAuthorization(msg.sender);
+      } else {
+        caseContract.requestChallengeAuthorization(msg.sender);
+      }
       doctorAuthorizationRequests[msg.sender].push(caseIndex);
       return caseContract;
+    }
+
+    function addCaseToQueue(address _case) external onlyCase(_case) {
+      Case caseContract = Case(_case);
+      require(caseContract.status() == Case.CaseStatus.Challenged);
+      openCaseQueue.enqueue(caseIndices[_case]);
     }
 
     function openCaseCount() external view returns (uint256) {

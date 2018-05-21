@@ -3,17 +3,19 @@ import { Link } from 'react-router-dom'
 import { DrizzleComponent } from '@/components/drizzle-component'
 import PropTypes from 'prop-types'
 import { drizzleConnect } from 'drizzle-react'
-import { withCaseManager } from '@/drizzle-helpers/with-case-manager'
-import { withAccountManager } from '@/drizzle-helpers/with-account-manager'
-import { getCaseContract } from '@/utils/web3-util'
+import {
+  getCaseContract,
+  getCaseStatus,
+  getAccountManagerContract
+} from '@/utils/web3-util'
 import { caseStatusToName } from '@/utils/case-status-to-name'
 import get from 'lodash.get'
 import dispatch from '@/dispatch'
 import { approveDiagnosisRequest } from '@/services/request-approval'
 import bytesToHex from '@/utils/bytes-to-hex'
-import aes from '@/services/aes'
 import { signedInSecretKey } from '@/services/sign-in'
-import { deriveSharedKey } from '@/services/derive-shared-key'
+import { withPropSaga } from '@/components/with-prop-saga'
+import reencryptCaseKey from '@/services/reencrypt-case-key'
 
 function mapStateToProps(state, ownProps) {
   let accessor = `contracts[${ownProps.caseAddress}]`
@@ -23,85 +25,49 @@ function mapStateToProps(state, ownProps) {
   }
 }
 
-export const CaseRow = drizzleConnect(withCaseManager(withAccountManager(class _CaseRow extends DrizzleComponent {
-  drizzleInit (props) {
-    const { drizzle } = this.context
-    const contract = drizzle.contracts[props.caseAddress]
-    const AccountManager = drizzle.contracts.AccountManager
-    if (!props.contractState) {
-      getCaseContract(props.caseAddress).then((contract) => {
-        drizzle.addContract({
-          contractName: props.caseAddress,
-          web3Contract: contract
-        })
-      })
-    } else if (contract) {
-      var newState = {}
-      newState.statusKey = contract.methods.status.cacheCall()
-      newState.diagnosingDoctorAKey = contract.methods.diagnosingDoctorA.cacheCall()
-      newState.encryptedKeyKey = contract.methods.getEncryptedCaseKey.cacheCall()
-      this.setState(newState)
-    }
+function* propSaga(ownProps) {
+  if (!ownProps.caseAddress) { return {} }
+
+  const props = {}
+  props.caseContract = yield getCaseContract(ownProps.caseAddress)
+
+  props.status = yield getCaseStatus(ownProps.caseAddress)
+  props.encryptedCaseKey = bytesToHex(yield props.caseContract.methods.getEncryptedCaseKey().call())
+
+  const accountManager = yield getAccountManagerContract()
+  if (props.status.code === 3) {
+    props.diagnosingDoctorA = yield props.caseContract.methods.diagnosingDoctorA().call()
+    props.diagnosingDoctorAPublicKey = (yield accountManager.methods.publicKeys(props.diagnosingDoctorA).call()).substring(2)
+  } else if (props.status.code === 8) {
+    props.diagnosingDoctorB = yield props.caseContract.methods.diagnosingDoctorB().call()
+    props.diagnosingDoctorBPublicKey = (yield accountManager.methods.publicKeys(props.diagnosingDoctorB).call()).substring(2)
   }
 
-  contract (key) {
-    return get(this.props.contractState, key)
-  }
+  return props
+}
 
+export const CaseRow = drizzleConnect(withPropSaga(propSaga, class _CaseRow extends DrizzleComponent {
   onApprove = () => {
-    const drizzle = this.context.drizzle
-    const contract = drizzle.contracts[this.props.caseAddress]
-    const status = this.status()
-    this.setState({ test: 'foo' })
-    if (status === '3') {
-      const diagnosingDoctorA = this.diagnosingDoctorA()
-      const diagnosingDoctorAPublicKey = this.diagnosingDoctorAPublicKey().substring(2)
-      const encryptedCaseKey = bytesToHex(this.encryptedCaseKey())
-      const secretKey = signedInSecretKey()
-      const caseKey = aes.decrypt(encryptedCaseKey, secretKey)
-      const sharedKey = deriveSharedKey(secretKey, diagnosingDoctorAPublicKey)
-      const doctorEncryptedCaseKey = aes.encrypt(caseKey, sharedKey)
+    const status = this.props.status
 
-      contract.methods.authorizeDiagnosisDoctor.cacheSend(diagnosingDoctorA, '0x' + doctorEncryptedCaseKey)
+    if (status.code === 3) {
+      let doctor = this.props.diagnosingDoctorA
+      let doctorPublicKey = this.props.diagnosingDoctorAPublicKey
+      const doctorEncryptedCaseKey = reencryptCaseKey({secretKey: signedInSecretKey(), encryptedCaseKey: this.props.encryptedCaseKey, doctorPublicKey})
+      this.props.caseContract.methods.authorizeDiagnosisDoctor(doctor, '0x' + doctorEncryptedCaseKey).send()
+    } else if (status.code === 8) {
+      let doctor = this.props.diagnosingDoctorB
+      let doctorPublicKey = this.props.diagnosingDoctorBPublicKey
+      const doctorEncryptedCaseKey = reencryptCaseKey({secretKey: signedInSecretKey(), encryptedCaseKey: this.props.encryptedCaseKey, doctorPublicKey})
+      this.props.caseContract.methods.authorizeChallengeDoctor(doctor, '0x' + doctorEncryptedCaseKey).send()
     }
-  }
-
-  checkStateKey (fieldName, key, rootState = 'contractState') {
-    var value = null
-    if (this.state[key]) {
-      value = get(this.props, `${rootState}.${fieldName}[${this.state[key]}].value`)
-    }
-    return value
-  }
-
-  status () {
-    return this.checkStateKey('status', 'statusKey')
-  }
-
-  encryptedCaseKey () {
-    return this.checkStateKey('getEncryptedCaseKey', 'encryptedKeyKey')
-  }
-
-  diagnosingDoctorA () {
-    return this.checkStateKey('diagnosingDoctorA', 'diagnosingDoctorAKey')
-  }
-
-  diagnosingDoctorAPublicKey () {
-    return this.checkStateKey('publicKeys', 'diagnosingDoctorAPublicKeyKey', 'contracts.AccountManager')
   }
 
   render () {
-    let diagnosingDoctorA = this.diagnosingDoctorA()
-    if (diagnosingDoctorA) {
-      if (!this.state.diagnosingDoctorAPublicKeyKey) {
-        const AccountManager = this.context.drizzle.contracts.AccountManager
-        this.setState({diagnosingDoctorAPublicKeyKey: AccountManager.methods.publicKeys.cacheCall(diagnosingDoctorA)})
-      }
-    }
+    if (!this.props.status) { return <tr></tr> }
 
-    var status = this.status()
-
-    if (status === '3' || status === '8') {
+    const status = this.props.status
+    if (status.code === 3 || status.code === 8) {
       var approvalButton = <button className='btn btn-primary' onClick={this.onApprove}>Approve</button>
     }
 
@@ -109,14 +75,14 @@ export const CaseRow = drizzleConnect(withCaseManager(withAccountManager(class _
       <tr>
         <td className="text-center">{this.props.caseIndex}</td>
         <td><Link to={`/patient-case/${this.props.caseAddress}`}>{this.props.caseAddress}</Link></td>
-        <td>{caseStatusToName(status)}</td>
+        <td>{caseStatusToName(status.code)}</td>
         <td className="td-actions text-right">
           {approvalButton}
         </td>
       </tr>
     )
   }
-})), mapStateToProps)
+}), mapStateToProps)
 
 CaseRow.propTypes = {
   caseAddress: PropTypes.string,

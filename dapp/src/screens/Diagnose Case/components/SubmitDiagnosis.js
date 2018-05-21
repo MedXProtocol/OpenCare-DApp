@@ -1,125 +1,118 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { Modal } from 'react-bootstrap';
-import { withRouter } from 'react-router-dom';
-import Spinner from '../../../components/Spinner';
-import { isNotEmptyString } from '../../../utils/common-util';
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
+import { Modal } from 'react-bootstrap'
+import { withRouter } from 'react-router-dom'
+import Spinner from '@/components/Spinner'
+import { isNotEmptyString } from '@/utils/common-util'
 import hashToHex from '@/utils/hash-to-hex'
 import {
-  getCaseStatus,
   getCaseDoctorADiagnosisLocationHash,
   diagnoseCase,
   getCaseContract,
   diagnoseChallengedCase
-} from '@/utils/web3-util';
-import { uploadJson, downloadJson } from '../../../utils/storage-util';
+} from '@/utils/web3-util'
+import { uploadJson, downloadJson } from '@/utils/storage-util'
 import { withPropSaga } from '@/components/with-prop-saga'
+import isBlank from '@/utils/is-blank'
 
 function* propSaga(ownProps) {
-  if (!ownProps.caseKey) { return }
-  const caseContract = yield getCaseContract(ownProps.caseAddress)
-  const status = yield caseContract.methods.status().call()
-  const originalDiagnosisHash = yield getCaseDoctorADiagnosisLocationHash(ownProps.caseAddress)
-  let originalDiagnosis
-  if (originalDiagnosisHash) {
-    const originalDiagnosisJson = yield downloadJson(originalDiagnosisHash, ownProps.caseKey)
-    originalDiagnosis = JSON.parse(originalDiagnosisJson);
+  if (!ownProps.caseKey) { return {} }
+  const props = {}
+  if (ownProps.diagnosisHash) {
+    const originalDiagnosis = yield downloadJson(ownProps.diagnosisHash, ownProps.caseKey)
+    props.diagnosis = JSON.parse(originalDiagnosis);
   }
-
-  return {
-    status,
-    originalDiagnosis
-  }
+  return props
 }
 
 const SubmitDiagnosis = withPropSaga(propSaga, class extends Component {
     constructor(){
-        super()
+      super()
 
-        this.state = {
-            isChallenge: false,
-            originalDiagnosis: null,
+      this.state = {
+        isChallenge: false,
+        originalDiagnosis: null,
 
-            diagnosis: null,
-            recommendation: null,
+        diagnosis: null,
+        recommendation: null,
 
-            canSubmit: false,
-            submitInProgress: false,
-            showConfirmationModal: false,
-            showThankYouModal: false
-        };
+        canSubmit: false,
+        submitInProgress: false,
+        showConfirmationModal: false,
+        showThankYouModal: false
+      }
     }
 
     updateDiagnosis = (event) => {
-        this.setState({diagnosis: event.target.value}, this.validateInputs);
+        this.setState({diagnosis: event.target.value}, this.validateInputs)
     }
 
     updateRecommendation = (event) => {
-        this.setState({recommendation: event.target.value}, this.validateInputs);
+        this.setState({recommendation: event.target.value}, this.validateInputs)
     }
 
     validateInputs = () => {
         const valid =
             isNotEmptyString(this.state.diagnosis) &&
-            isNotEmptyString(this.state.recommendation);
+            isNotEmptyString(this.state.recommendation)
 
-            this.setState({ canSubmit: valid });
+            this.setState({ canSubmit: valid })
     }
 
     handleSubmit = async (event) => {
-        event.preventDefault();
+        event.preventDefault()
 
-        this.setState({showConfirmationModal: true});
+        this.setState({showConfirmationModal: true})
     }
 
     handleCloseThankYouModal = (event) => {
-        event.preventDefault();
+        event.preventDefault()
 
-        this.setState({showThankYouModal: false});
+        this.setState({showThankYouModal: false})
 
-        this.props.history.push('/physician-profile');
+        this.props.history.push('/physician-profile')
     }
 
     handleCancelConfirmSubmissionModal = (event) => {
-        this.setState({showConfirmationModal: false});
+        this.setState({showConfirmationModal: false})
     }
 
     handleAcceptConfirmSubmissionModal = async (event) => {
-        this.setState({showConfirmationModal: false});
-        await this.submitDiagnosis();
+        this.setState({showConfirmationModal: false})
+        await this.submitDiagnosis()
     }
 
     submitDiagnosis = async () => {
-        this.setState({submitInProgress: true});
+        this.setState({submitInProgress: true})
 
         const diagnosisInformation = {
             diagnosis: this.state.diagnosis,
             recommendation: this.state.recommendation
-        };
+        }
 
-        const diagnosisJson = JSON.stringify(diagnosisInformation);
+        const diagnosisJson = JSON.stringify(diagnosisInformation)
 
-        const ipfsHash = await uploadJson(diagnosisJson, this.props.caseKey);
+        const ipfsHash = await uploadJson(diagnosisJson, this.props.caseKey)
         const hashHex = '0x' + hashToHex(ipfsHash)
 
-        if(this.state.isChallenge) {
-            const accept = this.state.originalDiagnosis === this.state.diagnosis;
+        if(!isBlank(this.props.diagnosisHash)) {
+            const accept = this.props.diagnosis.diagnosis === this.state.diagnosis
 
             diagnoseChallengedCase(this.props.caseAddress, hashHex, accept, (error, result) => {
                 if(error !== null) {
-                    this.onError(error);
+                    this.onError(error)
                 } else {
-                    this.onSuccess();
+                    this.onSuccess()
                 }
-            });
+            })
         } else {
             diagnoseCase(this.props.caseAddress, hashHex, (error, result) => {
                 if(error !== null) {
-                    this.onError(error);
+                    this.onError(error)
                 } else {
-                    this.onSuccess();
+                    this.onSuccess()
                 }
-            });
+            })
         }
     }
 
@@ -127,13 +120,13 @@ const SubmitDiagnosis = withPropSaga(propSaga, class extends Component {
         this.setState({
             error: error,
             submitInProgress: false
-        });
+        })
 
     }
 
     onSuccess = () => {
-        this.setState({submitInProgress: false});
-        this.setState({showThankYouModal: true});
+        this.setState({submitInProgress: false})
+        this.setState({showThankYouModal: true})
     }
 
     render() {
@@ -219,16 +212,14 @@ const SubmitDiagnosis = withPropSaga(propSaga, class extends Component {
                 </Modal>
                 <Spinner loading={this.state.submitInProgress}/>
             </div>
-        );
+        )
     }
 })
 
 SubmitDiagnosis.propTypes = {
-    caseAddress: PropTypes.string
-};
+  caseAddress: PropTypes.string.isRequired,
+  caseKey: PropTypes.any.isRequired,
+  diagnosisHash: PropTypes.string
+}
 
-SubmitDiagnosis.defaultProps = {
-    caseAddress: null
-};
-
-export default withRouter(SubmitDiagnosis);
+export default withRouter(SubmitDiagnosis)

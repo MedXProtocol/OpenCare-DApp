@@ -13,6 +13,9 @@ export default function (state, action) {
       state = update(state, {
         loading: {
           $set: true
+        },
+        cases: {
+          $set: {}
         }
       })
       break

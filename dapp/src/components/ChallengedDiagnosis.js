@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getCaseDoctorBDiagnosisLocationHash } from '../../../utils/web3-util';
-import { downloadJson } from '../../../utils/storage-util';
+import { getCaseDoctorBDiagnosisLocationHash } from '@/utils/web3-util';
+import { downloadJson } from '@/utils/storage-util';
 
 class ChallengedDiagnosis extends Component {
     constructor(props){

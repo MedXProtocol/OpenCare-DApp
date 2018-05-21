@@ -19,11 +19,13 @@ function mapStateToProps(state, ownProps) {
 function* asyncProps(ownProps) {
   let props = {}
   let contract = yield getCaseContract(ownProps.address)
-  props.status = yield contract.methods.status().call()
+  props.status = parseInt(yield contract.methods.status().call())
   props.caseFee = yield contract.methods.caseFee().call()
-  if (parseInt(props.status) >= 3) {
+  if (props.status >= 3) {
     props.diagnosingDoctorA = yield contract.methods.diagnosingDoctorA().call()
-    props.doctorKey = yield contract.methods.approvedDoctorKeys(props.diagnosingDoctorA).call()
+  }
+  if (props.status >= 7) {
+    props.diagnosingDoctorB = yield contract.methods.diagnosingDoctorB().call()
   }
 
   return props
@@ -31,7 +33,7 @@ function* asyncProps(ownProps) {
 
 const CaseRow = drizzleConnect(withPropSaga(asyncProps, class extends Component {
   render () {
-    if (this.props.diagnosingDoctorA === this.props.account) {
+    if (this.props.diagnosingDoctorA === this.props.account || this.props.diagnosingDoctorB === this.props.account) {
       var address = <Link to={`/diagnose-case/${this.props.address}`}>{this.props.address}</Link>
     } else {
       address = this.props.address

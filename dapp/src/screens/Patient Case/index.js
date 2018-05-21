@@ -3,7 +3,7 @@ import MainLayout from '../../layouts/MainLayout';
 import CaseStatus from './components/CaseStatus';
 import CaseDetails from '../../components/CaseDetails';
 import Diagnosis from '@/components/Diagnosis';
-import ChallengedDiagnosis from './components/ChallengedDiagnosis';
+import ChallengedDiagnosis from '@/components/ChallengedDiagnosis';
 import { getCaseKey, getCaseDoctorADiagnosisLocationHash } from '@/utils/web3-util'
 import { signedInSecretKey } from '@/services/sign-in'
 import aes from '@/services/aes'
