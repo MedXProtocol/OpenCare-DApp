@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import CaseDetails from '../../components/CaseDetails';
 import SubmitDiagnosis from './components/SubmitDiagnosis';
-import { withPropSaga } from '@/components/with-prop-saga'
+import { withPropSaga } from '@/saga-genesis/with-prop-saga'
 import { signedInSecretKey } from '@/services/sign-in'
 import { deriveSharedKey } from '@/services/derive-shared-key'
 import aes from '@/services/aes'

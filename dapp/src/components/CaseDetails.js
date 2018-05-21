@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getCaseDetailsLocationHash, getCaseKey } from '../utils/web3-util';
 import { downloadJson, downloadImage, getFileUrl } from '../utils/storage-util';
-import { withPropSaga } from '@/components/with-prop-saga'
+import { withPropSaga } from '@/saga-genesis/with-prop-saga'
 import { all } from 'redux-saga/effects'
 
 function* propSaga(ownProps) {

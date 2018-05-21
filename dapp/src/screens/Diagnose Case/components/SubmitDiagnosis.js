@@ -13,7 +13,7 @@ import {
   diagnoseChallengedCase
 } from '@/utils/web3-util';
 import { uploadJson, downloadJson } from '../../../utils/storage-util';
-import { withPropSaga } from '@/components/with-prop-saga'
+import { withPropSaga } from '@/saga-genesis/with-prop-saga'
 
 function* propSaga(ownProps) {
   if (!ownProps.caseKey) { return }

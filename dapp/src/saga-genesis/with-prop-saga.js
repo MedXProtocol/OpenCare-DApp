@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { sagaMiddleware } from '@/saga-middleware'
+import { SagaContext } from './saga-context'
 
 export function withPropSaga(saga, WrappedComponent) {
   const PropSagaWrapper = class extends Component {

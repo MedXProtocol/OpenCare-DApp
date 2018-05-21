@@ -7,7 +7,7 @@ import ChallengedDiagnosis from './components/ChallengedDiagnosis';
 import { getCaseKey } from '@/utils/web3-util'
 import { signedInSecretKey } from '@/services/sign-in'
 import aes from '@/services/aes'
-import { withPropSaga } from '@/components/with-prop-saga'
+import { withPropSaga } from '@/saga-genesis/with-prop-saga'
 
 function* propSaga(ownProps) {
   const encryptedCaseKey = yield getCaseKey(ownProps.match.params.caseAddress)

@@ -7,7 +7,7 @@ import dispatch from '@/dispatch'
 import get from 'lodash.get'
 import { getCaseDate, getCaseContract } from '@/utils/web3-util'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
-import { withPropSaga } from '@/components/with-prop-saga'
+import { withPropSaga } from '@/saga-genesis/with-prop-saga'
 
 function mapStateToProps(state, ownProps) {
   return {

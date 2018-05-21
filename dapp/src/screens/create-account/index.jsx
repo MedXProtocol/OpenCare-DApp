@@ -11,7 +11,7 @@ import { createAccount } from '@/services/create-account'
 import { getAccount } from '@/services/get-account'
 import { signIn } from '@/services/sign-in'
 import { getSelectedAccount } from '@/utils/web3-util'
-import { withPropSaga } from '@/components/with-prop-saga'
+import { withPropSaga } from '@/saga-genesis/with-prop-saga'
 
 function* propSaga(ownProps) {
   let address = yield getSelectedAccount()

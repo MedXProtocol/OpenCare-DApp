@@ -7,7 +7,7 @@ import get from 'lodash.get'
 import { getAccount } from '@/services/get-account'
 import { isSignedIn, signOut } from '@/services/sign-in'
 import redirect from '@/services/redirect'
-import { withPropSaga } from '@/components/with-prop-saga'
+import { withPropSaga } from '@/saga-genesis/with-prop-saga'
 import { getSelectedAccount } from '@/utils/web3-util'
 import { drizzleConnect } from 'drizzle-react'
 
