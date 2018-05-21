@@ -203,6 +203,7 @@ contract Case is Ownable, Initializable {
 
     function requestChallengeAuthorization (address _doctor) external onlyDoctor(_doctor) {
       require(status == CaseStatus.Challenged);
+      require(_doctor != diagnosingDoctorA);
       status = CaseStatus.ChallengeRequest;
       diagnosingDoctorB = _doctor;
       emit CaseAuthorizationRequested(caseManager(), patient, _doctor);
@@ -218,6 +219,7 @@ contract Case is Ownable, Initializable {
 
     function authorizeChallengeDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
       require(status == CaseStatus.ChallengeRequest);
+      require(_doctor != diagnosingDoctorA);
       diagnosingDoctorB = _doctor;
       status = CaseStatus.Challenging;
       approvedDoctorKeys[_doctor] = _doctorEncryptedKey;

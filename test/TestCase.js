@@ -113,6 +113,10 @@ contract('Case', function (accounts) {
           await caseInstance.requestChallengeAuthorization(doctorAddress2)
           assert.equal(await caseInstance.status.call(), caseStatus('ChallengeRequest'))
         })
+
+        it('should not allow the same doctor to challenge diagnosis', async () => {
+          await expectThrow(caseInstance.requestChallengeAuthorization(doctorAddress))
+        })
       })
 
       context('and request auth', () => {
