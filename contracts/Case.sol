@@ -29,9 +29,10 @@ contract Case is Ownable, Initializable {
     mapping(address => bytes) public approvedDoctorKeys;
 
     enum CaseStatus {
-      None, Open, EvaluationRequest, Evaluating, Evaluated,
-      Closed, Challenged, ChallengeRequest, Challenging,
-      Canceled, ClosedRejected, ClosedConfirmed
+      None, Open, Canceled, EvaluationRequest, Evaluating,
+      Evaluated, Closed,
+      Challenged, ChallengeRequest, Challenging,
+      ClosedRejected, ClosedConfirmed
     }
 
     event CaseCreated(address indexed caseManager, address indexed patient);

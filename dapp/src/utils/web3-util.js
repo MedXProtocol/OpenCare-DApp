@@ -11,6 +11,7 @@ import aes from '@/services/aes'
 import getWeb3 from '@/get-web3'
 import { caseStatusToName } from './case-status-to-name'
 import bytesToHex from './bytes-to-hex'
+import { Status } from './status'
 
 export async function getSelectedAccount() {
   const web3 = getWeb3()
@@ -85,9 +86,11 @@ export async function getCaseStatus(caseAddress) {
   const contract = await getCaseContract(caseAddress)
   let status = await contract.methods.status().call()
   status = status.toString()
+  const code = parseInt(status)
   return {
-      code: status,
-      name: caseStatusToName(status)
+      code,
+      name: caseStatusToName(status),
+      object: new Status(code)
   }
 }
 

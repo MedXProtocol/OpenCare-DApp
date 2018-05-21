@@ -8,6 +8,7 @@ import get from 'lodash.get'
 import { getCaseDate, getCaseContract } from '@/utils/web3-util'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
 import { withPropSaga } from '@/components/with-prop-saga'
+import { caseStatusToName } from '@/utils/case-status-to-name'
 
 function mapStateToProps(state, ownProps) {
   return {
@@ -35,10 +36,13 @@ const CaseRow = drizzleConnect(withPropSaga(asyncProps, class extends Component 
     } else {
       address = this.props.address
     }
+    if (this.props.status) {
+      var status = caseStatusToName(parseInt(this.props.status))
+    }
     return (
       <tr>
         <td>{address}</td>
-        <td>{this.props.status}</td>
+        <td>{status}</td>
         <td></td>
       </tr>
     )

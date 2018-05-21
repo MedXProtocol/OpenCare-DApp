@@ -53,7 +53,7 @@ export const CaseRow = drizzleConnect(withCaseManager(withAccountManager(class _
     const contract = drizzle.contracts[this.props.caseAddress]
     const status = this.status()
     this.setState({ test: 'foo' })
-    if (status === '2') {
+    if (status === '3') {
       const diagnosingDoctorA = this.diagnosingDoctorA()
       const diagnosingDoctorAPublicKey = this.diagnosingDoctorAPublicKey().substring(2)
       const encryptedCaseKey = bytesToHex(this.encryptedCaseKey())
@@ -63,7 +63,6 @@ export const CaseRow = drizzleConnect(withCaseManager(withAccountManager(class _
       const doctorEncryptedCaseKey = aes.encrypt(caseKey, sharedKey)
 
       contract.methods.authorizeDiagnosisDoctor.cacheSend(diagnosingDoctorA, '0x' + doctorEncryptedCaseKey)
-    } else if (status === '7') {
     }
   }
 
@@ -102,7 +101,7 @@ export const CaseRow = drizzleConnect(withCaseManager(withAccountManager(class _
 
     var status = this.status()
 
-    if (status === '2' || status === '7') {
+    if (status === '3' || status === '8') {
       var approvalButton = <button className='btn btn-primary' onClick={this.onApprove}>Approve</button>
     }
 
