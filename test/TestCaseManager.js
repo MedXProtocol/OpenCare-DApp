@@ -14,6 +14,7 @@ const resetCaseManager = require('./helpers/reset-case-factory')
 contract('CaseManager', function (accounts) {
   let patient = accounts[0]
   let doctor = accounts[1]
+  let doctor2 = accounts[2]
 
   let env
 
@@ -21,6 +22,7 @@ contract('CaseManager', function (accounts) {
     env = await createEnvironment(artifacts)
     await env.medXToken.mint(patient, 1000000000000)
     await env.doctorManager.addDoctor(doctor)
+    await env.doctorManager.addDoctor(doctor2)
   })
 
   beforeEach(async () => {
@@ -88,6 +90,23 @@ contract('CaseManager', function (accounts) {
       assert.equal(await env.caseManager.openCaseCount(), 0)
       assert.equal(await env.caseManager.doctorAuthorizationRequestCount(doctor), 1)
       assert.equal(await env.caseManager.doctorAuthorizationRequestCaseAtIndex(doctor, 0), caseContract.address)
+    })
+
+    describe('for case that has been diagnosed and challenged', () => {
+      beforeEach(async () => {
+        await env.caseManager.requestNextCase({ from: doctor })
+        await caseContract.authorizeDiagnosisDoctor(doctor, 'encryptedCaseKey', { from: patient })
+        await caseContract.diagnoseCase('diagnosisHash', { from: doctor })
+        await caseContract.challengeDiagnosis({ from: patient })
+      })
+
+      it('should not allow the diagnosing doctor to challenge', async () => {
+        expectThrow(env.caseManager.requestNextCase({ from: doctor }))
+      })
+
+      it('should allow a new doctor to challenge', async () => {
+        await env.caseManager.requestNextCase({ from: doctor2 })
+      })
     })
   })
 });

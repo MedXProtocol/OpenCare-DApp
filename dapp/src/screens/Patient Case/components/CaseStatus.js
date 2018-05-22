@@ -35,32 +35,32 @@ class CaseStatus extends Component {
                             A doctor has requested to diagnose your case.  Please authorize the diagnosis.
                         </div>
                         : status === 3 ?
-                        <div className="alert alert-success">
-                            A doctor is currently diagnosing your case.
+                        <div className="alert alert-danger">
+                            You have cancelled this case.
                         </div>
                         : status === 4 ?
                         <div className="alert alert-success">
-                            Your case has been evaluated.  Please review it.
+                            A doctor is currently diagnosing your case.
                         </div>
                         : status === 5 ?
+                        <div className="alert alert-success">
+                            Your case has been evaluated.  Please review it.
+                        </div>
+                        : status === 6 ?
                         <div className="alert alert-warning">
                             Your case has been successfully diagnosed and closed.
                         </div>
-                        : status === 6 ?
+                        : status === 7 ?
                         <div className="alert alert-danger">
                             You challenged the case. The case has been submitted for review by another doctor.
                         </div>
-                        : status === 7 ?
+                        : status === 8 ?
                         <div className="alert alert-success">
                             A doctor has requested to challenge the existing diagnoses.  Please authorize the challenge diagnosis.
                         </div>
-                        : status === 8 ?
-                        <div className="alert alert-danger">
-                            Your case is under review by a second doctor.
-                        </div>
                         : status === 9 ?
                         <div className="alert alert-danger">
-                            You have cancelled this case.
+                            Your case is under review by a second doctor.
                         </div>
                         : status === 10 ?
                         <div className="alert alert-danger">

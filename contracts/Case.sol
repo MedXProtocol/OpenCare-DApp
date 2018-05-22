@@ -29,9 +29,10 @@ contract Case is Ownable, Initializable {
     mapping(address => bytes) public approvedDoctorKeys;
 
     enum CaseStatus {
-      None, Open, EvaluationRequest, Evaluating, Evaluated,
-      Closed, Challenged, ChallengeRequest, Challenging,
-      Canceled, ClosedRejected, ClosedConfirmed
+      None, Open, Canceled, EvaluationRequest, Evaluating,
+      Evaluated, Closed,
+      Challenged, ChallengeRequest, Challenging,
+      ClosedRejected, ClosedConfirmed
     }
 
     event CaseCreated(address indexed caseManager, address indexed patient);
@@ -150,6 +151,7 @@ contract Case is Ownable, Initializable {
         require(status == CaseStatus.Evaluated);
         status = CaseStatus.Challenged;
         /* TODO: Make sure case is within 24 hour period */
+        caseManager().addCaseToQueue(address(this));
         emit CaseChallenged(caseManager(), patient, diagnosingDoctorA);
     }
 
@@ -201,6 +203,7 @@ contract Case is Ownable, Initializable {
 
     function requestChallengeAuthorization (address _doctor) external onlyDoctor(_doctor) {
       require(status == CaseStatus.Challenged);
+      require(_doctor != diagnosingDoctorA);
       status = CaseStatus.ChallengeRequest;
       diagnosingDoctorB = _doctor;
       emit CaseAuthorizationRequested(caseManager(), patient, _doctor);
@@ -216,6 +219,7 @@ contract Case is Ownable, Initializable {
 
     function authorizeChallengeDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
       require(status == CaseStatus.ChallengeRequest);
+      require(_doctor != diagnosingDoctorA);
       diagnosingDoctorB = _doctor;
       status = CaseStatus.Challenging;
       approvedDoctorKeys[_doctor] = _doctorEncryptedKey;
