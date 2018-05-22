@@ -7,11 +7,11 @@ import "./Delegate.sol";
 import "./Initializable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
-import "./Queue.sol";
+import "./SkipList.sol";
 
 contract CaseManager is Ownable, Pausable, Initializable {
     using SafeMath for uint256;
-    using Queue for Queue.UInt256;
+    using SkipList for SkipList.UInt256;
 
     uint256 public caseFee;
 
@@ -22,7 +22,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
     MedXToken public medXToken;
     Registry public registry;
 
-    Queue.UInt256 openCaseQueue;
+    SkipList.UInt256 openCaseQueue;
 
     mapping (address => uint256[]) public doctorAuthorizationRequests;
 
@@ -47,7 +47,6 @@ contract CaseManager is Ownable, Pausable, Initializable {
         caseFee = _baseCaseFee;
         medXToken = _medXToken;
         registry = _registry;
-        openCaseQueue = Queue.create();
         caseList.push(address(0));
     }
 
@@ -125,14 +124,15 @@ contract CaseManager is Ownable, Pausable, Initializable {
       newCase.initialize(_patient, _encryptedCaseKey, _ipfsHash, caseFee, medXToken, registry);
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
-      openCaseQueue.enqueue(caseIndex);
+      openCaseQueue.enqueue(address(0), caseIndex);
       patientCases[_patient].push(address(newCase));
       return newCase;
     }
 
     function requestNextCase() external returns (address) {
-      require(openCaseQueue.count() > 0);
-      uint256 caseIndex = openCaseQueue.dequeue();
+      require(openCaseQueue.length() > 0);
+      uint256 caseIndex = openCaseQueue.dequeue(msg.sender);
+      require(caseIndex > 0);
       Case caseContract = Case(caseList[caseIndex]);
       if (caseContract.status() == Case.CaseStatus.Open) {
         caseContract.requestDiagnosisAuthorization(msg.sender);
@@ -146,11 +146,11 @@ contract CaseManager is Ownable, Pausable, Initializable {
     function addCaseToQueue(address _case) external onlyCase(_case) {
       Case caseContract = Case(_case);
       require(caseContract.status() == Case.CaseStatus.Challenged);
-      openCaseQueue.enqueue(caseIndices[_case]);
+      openCaseQueue.enqueue(caseContract.diagnosingDoctorA(), caseIndices[_case]);
     }
 
     function openCaseCount() external view returns (uint256) {
-      return openCaseQueue.count();
+      return openCaseQueue.length();
     }
 
     function doctorAuthorizationRequestCount(address _doctor) external view returns (uint256) {
