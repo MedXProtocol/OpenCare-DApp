@@ -1,5 +1,5 @@
 {
-  "migrationVersion": 1526941041,
+  "migrationVersion": 1527018349,
   "contracts": [
     {
       "contractName": "Migrations",
@@ -68,6 +68,18 @@
     {
       "contractName": "Case",
       "address": "0xbbc58c7dd15174e6239da469e50598e5fc0b4a8f"
+    },
+    {
+      "contractName": "SkipList",
+      "address": "0x0e3d77cff10b928d09999ecb704c9b6b23bb9b6c"
+    },
+    {
+      "contractName": "CaseManager",
+      "address": "0x38f9fb2d9c69c0b29b6dcc4107e3e4503012fc08"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0x4ee05f5840cbfb0d704b747afd557fff7fcd6416"
     }
   ]
 }
