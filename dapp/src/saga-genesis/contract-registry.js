@@ -16,6 +16,10 @@ export class ContractRegistry {
     return !!this.contracts[address]
   }
 
+  hasName(name) {
+    return !!this.nameAlias[name]
+  }
+
   addNameAlias(name, address) {
     this.nameAlias[name] = address
   }

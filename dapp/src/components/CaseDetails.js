@@ -1,13 +1,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getCaseDetailsLocationHash, getCaseKey } from '../utils/web3-util';
+import { getCaseContract, getCaseDetailsLocationHash, getCaseKey } from '../utils/web3-util';
 import { downloadJson, downloadImage, getFileUrl } from '../utils/storage-util';
-import { withPropSaga } from '@/saga-genesis/with-prop-saga'
+import { withPropSagaContext } from '@/saga-genesis/with-prop-saga-context'
 import { all } from 'redux-saga/effects'
+import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 
-function* propSaga(ownProps) {
+function* propSaga(ownProps, { cacheCall, contractRegistry }) {
   if (!ownProps.caseKey) { return }
-  const caseDetailsHash = yield getCaseDetailsLocationHash(ownProps.caseAddress);
+
+  const caseAddress = ownProps.caseAddress
+
+  if (!contractRegistry.hasAddress(caseAddress)) {
+    contractRegistry.add(yield getCaseContract(caseAddress))
+  }
+
+  const caseDetailsHash = getFileHashFromBytes(yield cacheCall(caseAddress, 'caseDetailLocationHash'))
   const detailsJson = yield downloadJson(caseDetailsHash, ownProps.caseKey);
   const details = JSON.parse(detailsJson);
 
@@ -23,7 +31,7 @@ function* propSaga(ownProps) {
   }
 }
 
-const CaseDetails = withPropSaga(propSaga, class extends Component {
+const CaseDetails = withPropSagaContext(propSaga, class extends Component {
     render() {
         return (
             <div className="card">

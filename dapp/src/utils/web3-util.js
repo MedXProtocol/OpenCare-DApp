@@ -12,6 +12,7 @@ import getWeb3 from '@/get-web3'
 import { caseStatusToName } from './case-status-to-name'
 import bytesToHex from './bytes-to-hex'
 import { Status } from './status'
+import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 
 export async function getSelectedAccount() {
   const web3 = getWeb3()
@@ -265,13 +266,6 @@ function lookupContractAddress(name) {
 
 function getRegistryContract() {
   return contractFromConfig(registryConfig)
-}
-
-function getFileHashFromBytes(bytes) {
-  if(!bytes || bytes === "0x")
-      return null
-  const web3 = getWeb3()
-  return web3.utils.hexToAscii(bytes)
 }
 
 function toRegistryKey(string) {

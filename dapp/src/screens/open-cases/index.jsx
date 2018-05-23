@@ -54,12 +54,6 @@ const OpenCases = drizzleConnect(withPropSaga(sagaCacheContext({saga: propSaga, 
     await getNextCaseFromQueue()
   }
 
-  reset = () => {
-    this.props.cases.forEach((address) => {
-      dispatch({type: 'CACHE_INVALIDATE_ADDRESS', address})
-    })
-  }
-
   render () {
     let caseKeys = keys(this.props.cases)
     let cases = caseKeys.reverse().map((key) => this.props.cases[key])
@@ -72,7 +66,7 @@ const OpenCases = drizzleConnect(withPropSaga(sagaCacheContext({saga: propSaga, 
               <h2>Open Cases: {this.props.caseCount}</h2>
             </div>
             <div className="col-xs-12">
-              <Button disabled={this.props.caseCount === '0'} onClick={this.reset} bsStyle="primary">Request Case</Button>
+              <Button disabled={this.props.caseCount === '0'} onClick={this.onClickRequestCase} bsStyle="primary">Request Case</Button>
             </div>
             <div className="col-xs-12">
               <h2>Cases</h2>

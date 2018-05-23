@@ -4,23 +4,31 @@ import CaseStatus from './components/CaseStatus';
 import CaseDetails from '../../components/CaseDetails';
 import Diagnosis from '@/components/Diagnosis';
 import ChallengedDiagnosis from '@/components/ChallengedDiagnosis';
-import { getCaseKey, getCaseDoctorADiagnosisLocationHash } from '@/utils/web3-util'
+import { getCaseKey, getCaseDoctorADiagnosisLocationHash, getCaseContract } from '@/utils/web3-util'
 import { signedInSecretKey } from '@/services/sign-in'
 import aes from '@/services/aes'
-import { withPropSaga } from '@/saga-genesis/with-prop-saga'
+import { withPropSagaContext } from '@/saga-genesis/with-prop-saga-context'
+import bytesToHex from '@/utils/bytes-to-hex'
+import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 
-function* propSaga(ownProps) {
+function* propSaga(ownProps, { cacheCall, contractRegistry }) {
   const caseAddress = ownProps.match.params.caseAddress
-  const encryptedCaseKey = yield getCaseKey(caseAddress)
+
+  if (!contractRegistry.hasAddress(caseAddress)) {
+    contractRegistry.add(yield getCaseContract(caseAddress))
+  }
+
+  const encryptedCaseKey = bytesToHex(yield cacheCall(caseAddress, 'getEncryptedCaseKey'))
   const caseKey = aes.decrypt(encryptedCaseKey, signedInSecretKey())
-  const diagnosisHash = yield getCaseDoctorADiagnosisLocationHash(caseAddress)
+
+  const diagnosisHash = getFileHashFromBytes(yield cacheCall(caseAddress, 'diagnosisALocationHash'))
   return {
     caseKey,
     diagnosisHash
   }
 }
 
-const PatientCase = withPropSaga(propSaga, class extends Component {
+const PatientCase = withPropSagaContext(propSaga, class extends Component {
   render() {
     if (this.props.diagnosisHash) {
       var diagnosis =

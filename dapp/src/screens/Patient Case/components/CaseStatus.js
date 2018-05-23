@@ -1,24 +1,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getCaseStatus } from '../../../utils/web3-util';
+import { getCaseContract } from '../../../utils/web3-util';
+import { withPropSagaContext } from '@/saga-genesis/with-prop-saga-context'
 
-class CaseStatus extends Component {
-    constructor(){
-        super()
+function* propSaga(ownProps, { cacheCall, contractRegistry }) {
+  if (!contractRegistry.hasAddress(ownProps.caseAddress)) {
+    contractRegistry.add(yield getCaseContract(ownProps.caseAddress))
+  }
+  const status = yield cacheCall(ownProps.caseAddress, 'status')
+  return {
+    status
+  }
+}
 
-        this.state = {
-            status: {}
-        };
-    }
-
-    async componentDidMount() {
-        const status = await getCaseStatus(this.props.caseAddress);
-
-        this.setState({status: status});
-    }
-
+const CaseStatus = withPropSagaContext(propSaga, class _CaseStatus extends Component {
     render() {
-      var status = this.state.status.code
+      var status = this.props.status
         return (
             <div className="card">
                 <div className="card-header">
@@ -76,14 +73,10 @@ class CaseStatus extends Component {
             </div>
         );
     }
-}
+})
 
 CaseStatus.propTypes = {
-    caseAddress: PropTypes.string
-};
-
-CaseStatus.defaultProps = {
-    caseAddress: null
+    caseAddress: PropTypes.string.isRequired
 };
 
 export default CaseStatus;
