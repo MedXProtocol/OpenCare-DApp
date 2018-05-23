@@ -1,17 +1,15 @@
-import React from 'react'
-import { DrizzleComponent } from '@/components/drizzle-component'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withCaseManager } from '@/drizzle-helpers/with-case-manager'
-import { drizzleConnect } from 'drizzle-react'
 import get from 'lodash.get'
 import { CaseRow } from './case-row'
+import { connect } from 'react-redux'
 
-export const PatientCaseRow = withCaseManager(class _PatientCaseRow extends DrizzleComponent {
-  drizzleInit (props) {
-    this.setState({
-      caseAddressKey: this.props.CaseManager.patientCases.cacheCall(props.address, props.caseIndex)
-    })
-  }
+export const PatientCaseRow = class _PatientCaseRow extends Component {
+  // drizzleInit (props) {
+  //   this.setState({
+  //     caseAddressKey: this.props.CaseManager.patientCases.cacheCall(props.address, props.caseIndex)
+  //   })
+  // }
 
   render () {
     var caseRow = <tr></tr>
@@ -24,7 +22,7 @@ export const PatientCaseRow = withCaseManager(class _PatientCaseRow extends Driz
 
     return caseRow
   }
-})
+}
 
 PatientCaseRow.propTypes = {
   caseIndex: PropTypes.number.isRequired,

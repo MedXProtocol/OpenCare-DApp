@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getCaseContract } from '../../../utils/web3-util';
-import { withPropSagaContext } from '@/saga-genesis/with-prop-saga-context'
+import { withSaga } from '@/saga-genesis/with-saga'
 
 function* propSaga(ownProps, { cacheCall, contractRegistry }) {
   if (!contractRegistry.hasAddress(ownProps.caseAddress)) {
@@ -13,7 +13,7 @@ function* propSaga(ownProps, { cacheCall, contractRegistry }) {
   }
 }
 
-const CaseStatus = withPropSagaContext(propSaga, class _CaseStatus extends Component {
+const CaseStatus = withSaga(propSaga, class _CaseStatus extends Component {
     render() {
       var status = this.props.status
         return (

@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
-import Spinner from '../../../components/Spinner';
-import {getSelectedAccount, registerDoctor} from '../../../utils/web3-util';
-import { withContextManager } from '@/drizzle-helpers/with-context-manager'
+import React, { Component } from 'react'
+import Spinner from '../../../components/Spinner'
+import { registerDoctor } from '../../../utils/web3-util'
 import get from 'lodash.get'
 
 class RegisterDoctor extends Component {
@@ -10,27 +9,27 @@ class RegisterDoctor extends Component {
         this.state = {
             address: get(this.props, 'accounts[0]', ''),
             submitInProgress: false
-        };
+        }
     }
 
     updateAddress = (event) => {
-        this.setState({address: event.target.value});
+        this.setState({address: event.target.value})
     }
 
     handleSubmit = (event) => {
-        event.preventDefault();
-        this.registerDoctor();
+        event.preventDefault()
+        this.registerDoctor()
     }
 
     registerDoctor = () => {
-        this.setState({submitInProgress: true});
+        this.setState({submitInProgress: true})
         registerDoctor(this.state.address, (error, result) => {
             if(error){
-                this.onError(error);
+                this.onError(error)
             } else {
-                this.onSuccess();
+                this.onSuccess()
             }
-        });
+        })
     }
 
     componentWillReceiveProps (props) {
@@ -42,12 +41,12 @@ class RegisterDoctor extends Component {
     }
 
     onSuccess = () => {
-        this.setState({submitInProgress: false});
+        this.setState({submitInProgress: false})
     }
 
     onError = (error) => {
-        this.setState({error: error});
-        this.setState({submitInProgress: false});
+        this.setState({error: error})
+        this.setState({submitInProgress: false})
     }
 
     render() {
@@ -76,8 +75,8 @@ class RegisterDoctor extends Component {
                 </form>
                 <Spinner loading={this.state.submitInProgress}/>
             </div>
-        );
+        )
     }
 }
 
-export default withContextManager(RegisterDoctor);
+export default RegisterDoctor

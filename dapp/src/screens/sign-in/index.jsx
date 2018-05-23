@@ -5,17 +5,18 @@ import { getAccount } from '@/services/get-account'
 import { signInWithPublicKeyCheck } from '@/services/sign-in'
 import { SignInForm } from '@/components/sign-in-form'
 import { getSelectedAccount } from '@/utils/web3-util'
-import { withPropSaga } from '@/saga-genesis/with-prop-saga'
+import { connect } from 'react-redux'
+import get from 'lodash.get'
 
-function* propSaga(ownProps) {
-  let address = yield getSelectedAccount()
+function mapStateToProps(state, ownProps) {
+  let address = get(state, 'accounts[0]')
   return {
     address,
     account: getAccount(address)
   }
 }
 
-export const SignIn = withRouter(withPropSaga(propSaga, class extends Component {
+export const SignIn = withRouter(connect(mapStateToProps)(class extends Component {
   onSubmit = ({ secretKey, masterPassword }) => {
     signInWithPublicKeyCheck(this.props.account, masterPassword).then(() => {
       this.props.history.push('/')

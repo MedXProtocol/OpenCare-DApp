@@ -1,25 +1,31 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import {getAllCasesForCurrentAccount} from '@/utils/web3-util'
+import {
+  getAllCasesForCurrentAccount,
+  getCaseManagerContract
+} from '@/utils/web3-util'
 import './PatientCases.css'
-import { withCaseManager } from '@/drizzle-helpers/with-case-manager'
+import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
 import { PatientCaseRow } from './patient-case-row'
-import { DrizzleComponent } from '@/components/drizzle-component'
+import { connect } from 'react-redux'
+import get from 'lodash.get'
 
-class PatientCases extends DrizzleComponent {
-  drizzleInit (props) {
-    // console.log(props.accounts[0])
-    this.setState({
-      caseListCountKey: props.CaseManager.getPatientCaseListCount.cacheCall(props.accounts[0])
-    })
+function mapStateToProps(state, { contractRegistry, accounts }) {
+  let account = get(state, 'accounts[0]')
+  let caseManager = contractRegistry.requireAddressByName('CaseManager')
+  return {
+    account,
+    caseListCount: cacheCallValue(state, caseManager, 'getPatientCaseListCount', account)
   }
+}
 
+function* saga(ownProps, { cacheCall, contractRegistry }) {
+  let caseManager = contractRegistry.addressByName('CaseManager')
+  yield cacheCall(caseManager, 'getPatientCaseListCount', ownProps.account)
+}
+
+const PatientCases = connect(mapStateToProps)(withSaga(saga, class _PatientCases extends Component {
   render() {
-    var caseListCount = 0
-    if (this.state.caseListCountKey) {
-      caseListCount = +(this.props.CaseManager.getPatientCaseListCount.value(this.state.caseListCountKey))
-    }
-
     return (
         <div className="card">
             <div className="card-header">
@@ -27,7 +33,7 @@ class PatientCases extends DrizzleComponent {
             </div>
             <div className="card-content table-responsive">
             {
-                !caseListCount ?
+                !this.props.caseListCount ?
                 <div className="alert alert-info text-center">
                     <span>You do not have any historical or pending cases.</span>
                 </div> :
@@ -41,7 +47,7 @@ class PatientCases extends DrizzleComponent {
                         </tr>
                     </thead>
                     <tbody>
-                      {[...Array(parseInt(caseListCount)).keys()].map((i) => <PatientCaseRow address={this.props.accounts[0]} caseIndex={i} key={i} />)}
+                      {[...Array(parseInt(this.props.caseListCount)).keys()].map((i) => <PatientCaseRow address={this.props.account} caseIndex={i} key={i} />)}
                     </tbody>
                 </table>
             }
@@ -49,6 +55,6 @@ class PatientCases extends DrizzleComponent {
         </div>
     )
   }
-}
+}))
 
-export default withRouter(withCaseManager(PatientCases))
+export default withRouter(PatientCases)

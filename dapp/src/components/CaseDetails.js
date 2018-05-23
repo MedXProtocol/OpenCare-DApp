@@ -2,36 +2,61 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getCaseContract, getCaseDetailsLocationHash, getCaseKey } from '../utils/web3-util';
 import { downloadJson, downloadImage, getFileUrl } from '../utils/storage-util';
-import { withPropSagaContext } from '@/saga-genesis/with-prop-saga-context'
+import { withSaga, cacheCallValue } from '@/saga-genesis'
 import { all } from 'redux-saga/effects'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
+import { connect } from 'react-redux'
 
-function* propSaga(ownProps, { cacheCall, contractRegistry }) {
-  if (!ownProps.caseKey) { return }
 
-  const caseAddress = ownProps.caseAddress
-
-  if (!contractRegistry.hasAddress(caseAddress)) {
-    contractRegistry.add(yield getCaseContract(caseAddress))
-  }
-
-  const caseDetailsHash = getFileHashFromBytes(yield cacheCall(caseAddress, 'caseDetailLocationHash'))
-  const detailsJson = yield downloadJson(caseDetailsHash, ownProps.caseKey);
-  const details = JSON.parse(detailsJson);
-
-  const [firstImageUrl, secondImageUrl] = yield all([
-    downloadImage(details.firstImageHash, ownProps.caseKey),
-    downloadImage(details.secondImageHash, ownProps.caseKey)
-  ])
-
+function mapStateToProps(state, { caseAddress, contractRegistry }) {
+  let caseDetailLocationHash = cacheCallValue(state, caseAddress, 'caseDetailLocationHash')
   return {
-    details,
-    firstImageUrl,
-    secondImageUrl
+    caseDetailsHash: getFileHashFromBytes(caseDetailLocationHash)
   }
 }
 
-const CaseDetails = withPropSagaContext(propSaga, class extends Component {
+function* saga({ caseAddress }, { cacheCall, contractRegistry }) {
+  if (!contractRegistry.hasAddress(caseAddress)) {
+    contractRegistry.add(yield getCaseContract(caseAddress))
+  }
+  yield cacheCall(caseAddress, 'caseDetailLocationHash')
+}
+
+const CaseDetails = withSaga(saga, connect(mapStateToProps)(class extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      details: {}
+    }
+  }
+  
+  componentDidMount () {
+    this.init(this.props)
+  }
+
+  componentWillReceiveProps (props) {
+    this.init(props)
+  }
+
+  async init (props) {
+    if (!props.caseDetailsHash || !props.caseKey) {
+      return
+    }
+    const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
+    const details = JSON.parse(detailsJson);
+
+    const [firstImageUrl, secondImageUrl] = await Promise.all([
+      downloadImage(details.firstImageHash, props.caseKey),
+      downloadImage(details.secondImageHash, props.caseKey)
+    ])
+
+    this.setState({
+      details,
+      firstImageUrl,
+      secondImageUrl
+    })
+  }
+
     render() {
         return (
             <div className="card">
@@ -49,45 +74,45 @@ const CaseDetails = withPropSagaContext(propSaga, class extends Component {
                     </div>
                     <div className="row">
                         <div className="col-xs-6 text-center">
-                            <img src={this.props.firstImageUrl} alt="Overview" style={{maxHeight: 400}} />
+                            <img src={this.state.firstImageUrl} alt="Overview" style={{maxHeight: 400}} />
                         </div>
                         <div className="col-xs-6 text-center">
-                            <img src={this.props.secondImageUrl} alt="CloseUp" style={{maxHeight: 400}} />
+                            <img src={this.state.secondImageUrl} alt="CloseUp" style={{maxHeight: 400}} />
                         </div>
                         <div className="col-xs-12 top10">
                             <label>How long have you had this problem:</label>
-                            <p>{this.props.details.howLong}</p>
+                            <p>{this.state.details.howLong}</p>
                         </div>
                         <div className="col-md-6 top10">
                             <label>Is it growing, shrinking or staying the same size:</label>
-                            <p>{this.props.details.size}</p>
+                            <p>{this.state.details.size}</p>
                         </div>
                         <div className="col-md-6 top10">
                             <label>Any history of skin cancer:</label>
-                            <p>{this.props.details.skinCancer}</p>
+                            <p>{this.state.details.skinCancer}</p>
                         </div>
                         <div className="col-md-6 top10">
                             <label>Are you sexually active:</label>
-                            <p>{this.props.details.sexuallyActive}</p>
+                            <p>{this.state.details.sexuallyActive}</p>
                         </div>
                         <div className="col-md-6 top10">
                             <label>Age:</label>
-                            <p>{this.props.details.age}</p>
+                            <p>{this.state.details.age}</p>
                         </div>
                         <div className="col-md-6 top10">
                             <label>Country:</label>
-                            <p>{this.props.details.country}</p>
+                            <p>{this.state.details.country}</p>
                         </div>
                         <div className="col-xs-12 top10">
                             <label>Additional comments:</label>
-                            <p>{this.props.details.description}</p>
+                            <p>{this.state.details.description}</p>
                         </div>
                     </div>
                 </div>
             </div>
         );
     }
-})
+}))
 
 CaseDetails.propTypes = {
   caseAddress: PropTypes.string,

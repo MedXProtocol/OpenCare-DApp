@@ -2,45 +2,42 @@ import React, {
   Component
 } from 'react'
 import { Link } from 'react-router-dom'
-import { drizzleConnect } from 'drizzle-react'
+import { connect } from 'react-redux'
 import dispatch from '@/dispatch'
 import get from 'lodash.get'
 import { getCaseDate, getCaseContract } from '@/utils/web3-util'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
-import { withPropSaga } from '@/saga-genesis/with-prop-saga'
-import { sagaCacheContext } from '@/saga-genesis/saga-cache-context'
+import { withSaga, cacheCallValue } from '@/saga-genesis'
 import { caseStatusToName } from '@/utils/case-status-to-name'
 import getWeb3 from '@/get-web3'
-import callState from '@/saga-genesis/call-state'
-import contractRegistry from '@/contract-registry'
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state, { address, contractRegistry }) {
+  let account = get(state, 'accounts[0]')
   return {
-    statusInFlight: callState(state, ownProps.address, 'status').inFlight,
-    caseFeeInFlight: callState(state, ownProps.address, 'caseFee').inFlight,
-    account: get(state, 'accounts[0]')
+    status: cacheCallValue(state, address, 'status'),
+    caseFee: cacheCallValue(state, address, 'caseFee'),
+    diagnosingDoctorA: cacheCallValue(state, address, 'diagnosingDoctorA'),
+    diagnosingDoctorB: cacheCallValue(state, address, 'diagnosingDoctorB'),
+    account
   }
 }
 
-function* propSaga(ownProps, {cacheCall, contractRegistry}) {
+function* propSaga({address}, {cacheCall, contractRegistry}) {
   let props = {}
-  if (!contractRegistry.hasAddress(ownProps.address)) {
-    contractRegistry.add(yield getCaseContract(ownProps.address))
+  if (!contractRegistry.hasAddress(address)) {
+    contractRegistry.add(yield getCaseContract(address))
   }
-  let status = yield cacheCall(ownProps.address, 'status')
-  props.status = parseInt(status)
-  props.caseFee = yield cacheCall(ownProps.address, 'caseFee')
-  if (props.status >= 3) {
-    props.diagnosingDoctorA = yield cacheCall(ownProps.address, 'diagnosingDoctorA')
+  let status = parseInt(yield cacheCall(address, 'status'))
+  yield cacheCall(address, 'caseFee')
+  if (status >= 3) {
+    yield cacheCall(address, 'diagnosingDoctorA')
   }
-  if (props.status >= 7) {
-    props.diagnosingDoctorB = yield cacheCall(ownProps.address, 'diagnosingDoctorB')
+  if (status >= 7) {
+    yield cacheCall(address, 'diagnosingDoctorB')
   }
-
-  return props
 }
 
-const CaseRow = drizzleConnect(withPropSaga(sagaCacheContext({saga: propSaga, web3: getWeb3(), contractRegistry}), class extends Component {
+const CaseRow = connect(mapStateToProps)(withSaga(propSaga, class extends Component {
   render () {
     if (this.props.diagnosingDoctorA === this.props.account || this.props.diagnosingDoctorB === this.props.account) {
       var address = <Link to={`/diagnose-case/${this.props.address}`}>{this.props.address}</Link>
@@ -58,7 +55,7 @@ const CaseRow = drizzleConnect(withPropSaga(sagaCacheContext({saga: propSaga, we
       </tr>
     )
   }
-}), mapStateToProps)
+}))
 
 CaseRow.defaultProps = {
   status: 0,

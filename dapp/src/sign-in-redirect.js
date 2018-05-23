@@ -7,24 +7,25 @@ import get from 'lodash.get'
 import { getAccount } from '@/services/get-account'
 import { isSignedIn, signOut } from '@/services/sign-in'
 import redirect from '@/services/redirect'
-import { withPropSaga } from '@/saga-genesis/with-prop-saga'
-import { getSelectedAccount } from '@/utils/web3-util'
-import { drizzleConnect } from 'drizzle-react'
+import { connect } from 'react-redux'
 
 function mapStateToProps (state, ownProps) {
+  let address = get(state, 'accounts[0]')
   return {
-    address: get(state, 'accounts[0]')
+    address,
+    account: getAccount(address)
   }
 }
 
-function* propSaga(ownProps) {
-  let account = getAccount(ownProps.address)
+function mapDispatchToProps (dispatch) {
   return {
-    account
+    refreshAccounts: () => {
+      dispatch({type: 'WEB3_ACCOUNTS_REFRESH'})
+    }
   }
 }
 
-export const SignInRedirect = withRouter(drizzleConnect(withPropSaga(propSaga, class extends Component {
+export const SignInRedirect = withRouter(connect(mapStateToProps, mapDispatchToProps)(class extends Component {
   constructor (props) {
     super(props)
     this.state = {}
@@ -34,6 +35,7 @@ export const SignInRedirect = withRouter(drizzleConnect(withPropSaga(propSaga, c
     window.addEventListener("beforeunload", this.unload)
     window.addEventListener("focus", this.refocus)
     this.checkSignInRedirect(this.props)
+    this.props.refreshAccounts()
   }
 
   componentWillUnmount () {
@@ -74,4 +76,4 @@ export const SignInRedirect = withRouter(drizzleConnect(withPropSaga(propSaga, c
       return <span></span>
     }
   }
-}), mapStateToProps))
+}))

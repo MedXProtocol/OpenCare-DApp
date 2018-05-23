@@ -15,64 +15,56 @@ import {
   getAccountManagerContract,
   getCaseDoctorADiagnosisLocationHash
 } from '@/utils/web3-util'
-import {
-  drizzleConnect
-} from 'drizzle-react'
-import { withPropSagaContext } from '@/saga-genesis/with-prop-saga-context'
+import { withSaga, cacheCallValue } from '@/saga-genesis'
 import bytesToHex from '@/utils/bytes-to-hex'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
+import { connect } from 'react-redux'
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state, { match, contractRegistry }) {
+  const caseAddress = match.params.caseAddress
+  let account = get(state, 'accounts[0]')
+  let accountManager = contractRegistry.requireAddressByName('AccountManager')
+
+  const patientAddress = cacheCallValue(caseAddress, 'patient')
+  const patientPublicKey = cacheCallValue(state, accountManager, 'publicKeys', patientAddress)
+  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'approvedDoctorKeys', account)
+  if (patientPublicKey && encryptedCaseKey) {
+    const sharedKey = deriveSharedKey(signedInSecretKey(), patientPublicKey.substring(2))
+    var caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
+  }
   return {
-    account: get(state, 'accounts[0]')
+    account,
+    showDiagnosis: !!account,
+    caseKey,
+    status: cacheCallValue(state, caseAddress, 'status'),
+    doctorA: cacheCallValue(state, caseAddress, 'diagnosingDoctorA'),
+    diagnosisHash: getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash')),
+    doctorB: cacheCallValue(state, caseAddress, 'diagnosingDoctorB'),
+    challengeHash: getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
   }
 }
 
-function* propSaga(ownProps, { cacheCall, contractRegistry }) {
-  if (!ownProps.account) {
-    return {
-      showDiagnosis: false
-    }
-  }
+function* saga(ownProps, { cacheCall, contractRegistry }) {
+  const caseAddress = ownProps.match.params.caseAddress
 
-  const props = {}
-
-  props.caseAddress = ownProps.match.params.caseAddress
-
-  if (!contractRegistry.hasAddress(props.caseAddress)) {
-    contractRegistry.add(yield getCaseContract(props.caseAddress))
-  }
-  if (!contractRegistry.hasName('AccountManager')) {
-    contractRegistry.add(yield getAccountManagerContract(), 'AccountManager')
+  if (!contractRegistry.hasAddress(caseAddress)) {
+    contractRegistry.add(yield getCaseContract(caseAddress))
   }
   let accountManager = contractRegistry.addressByName('AccountManager')
 
-  const patientAddress = yield cacheCall(props.caseAddress, 'patient')
-
+  const patientAddress = yield cacheCall(caseAddress, 'patient')
   const patientPublicKey = yield cacheCall(accountManager, 'publicKeys', patientAddress)
-  const sharedKey = deriveSharedKey(signedInSecretKey(), patientPublicKey.substring(2))
-  const encryptedCaseKey = yield cacheCall(props.caseAddress, 'approvedDoctorKeys', ownProps.account)
-  props.caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
+  const encryptedCaseKey = yield cacheCall(caseAddress, 'approvedDoctorKeys', ownProps.account)
 
-  props.status = yield cacheCall(props.caseAddress, 'status')
+  let status = parseInt(yield cacheCall(caseAddress, 'status'))
 
-  if (props.status.code >= 3) {
-    props.doctorA = yield cacheCall(props.caseAddress, 'diagnosingDoctorA')
-  }
-  if (props.status.code >= 5) {
-    props.diagnosisHash = getFileHashFromBytes(yield cacheCall(props.caseAddress, 'diagnosisALocationHash'))
-  }
-  if (props.status.code >= 9) {
-    props.doctorB = yield cacheCall(props.caseAddress, 'diagnosingDoctorB')
-  }
-  if (props.status.code >= 10) {
-    props.challengeHash = getFileHashFromBytes(yield cacheCall(props.caseAddress, 'diagnosisBLocationHash'))
-  }
-
-  return props
+  if (status >= 3) { yield cacheCall(caseAddress, 'diagnosingDoctorA') }
+  if (status >= 5) { yield cacheCall(caseAddress, 'diagnosisALocationHash') }
+  if (status >= 9) { yield cacheCall(caseAddress, 'diagnosingDoctorB') }
+  if (status >= 10) { yield cacheCall(caseAddress, 'diagnosisBLocationHash') }
 }
 
-const DiagnoseCase = drizzleConnect(withPropSagaContext(propSaga, class extends Component {
+const DiagnoseCase = connect(mapStateToProps)(withSaga(saga, class extends Component {
   render () {
     if (!this.props.status) { return <div></div> }
 
@@ -114,6 +106,6 @@ const DiagnoseCase = drizzleConnect(withPropSagaContext(propSaga, class extends 
       </MainLayout>
     );
   }
-}), mapStateToProps)
+}))
 
 export default DiagnoseCase;

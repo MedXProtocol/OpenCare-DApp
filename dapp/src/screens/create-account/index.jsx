@@ -11,16 +11,8 @@ import { createAccount } from '@/services/create-account'
 import { getAccount } from '@/services/get-account'
 import { signIn } from '@/services/sign-in'
 import { getSelectedAccount } from '@/utils/web3-util'
-import { withPropSaga } from '@/saga-genesis/with-prop-saga'
 
-function* propSaga(ownProps) {
-  let address = yield getSelectedAccount()
-  return {
-    address
-  }
-}
-
-export const CreateAccount = withPropSaga(propSaga, class extends Component {
+export const CreateAccount = class extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -64,4 +56,4 @@ export const CreateAccount = withPropSaga(propSaga, class extends Component {
       </MainLayout>
     )
   }
-})
+}

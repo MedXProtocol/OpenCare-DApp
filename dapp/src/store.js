@@ -1,23 +1,27 @@
 import { createStore, applyMiddleware, compose } from 'redux'
-import { generateContractsInitialState } from 'drizzle'
-import drizzleOptions from './drizzleOptions'
+import createSagaMiddleware from 'redux-saga'
 import sagas from './sagas'
 import reducers from './reducers'
-import { sagaMiddleware } from './saga-middleware'
+import createContractRegistry from './create-contract-registry'
+import getWeb3 from '@/get-web3'
 
 const storeFactory = function () {
-  return drizzleOptions().then((options) => {
+  return createContractRegistry().then((contractRegistry) => {
     const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-    const initialState = {
-      contracts: generateContractsInitialState(options)
-    }
-    let store = createStore(reducers, initialState, composeEnhancers(applyMiddleware(sagaMiddleware)))
+    const sagaMiddleware = createSagaMiddleware({
+      context: {
+        contractRegistry,
+        web3: getWeb3(),
+        cacheContexts: {}
+      }
+    })
+    let store = createStore(reducers, undefined, composeEnhancers(applyMiddleware(sagaMiddleware)))
     sagaMiddleware.run(sagas)
     return {
       store,
-      options
+      contractRegistry
     }
-  }).catch((error) => console.error(error))
+  }).catch(console.error)
 }
 
 const store = storeFactory()

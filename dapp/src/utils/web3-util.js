@@ -230,7 +230,7 @@ export async function getDoctorAuthorizationRequestCaseAtIndex(index) {
   return caseManager.methods.doctorAuthorizationRequestCaseAtIndex(doctor, index).call()
 }
 
-function getMedXTokenContract() {
+export function getMedXTokenContract() {
   return contractFromConfig(medXTokenContractConfig)
 }
 

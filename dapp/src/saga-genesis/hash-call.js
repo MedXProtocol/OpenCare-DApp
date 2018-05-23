@@ -1,7 +1,10 @@
-import getWeb3 from '@/get-web3'
-
-const web3 = getWeb3()
+import web3 from 'web3'
 
 export default function (address, method, args) {
-  return web3.utils.sha3(address + method + args.join(','))
+  let digest = address + method + args.join(',')
+  if (web3.utils) {
+    return web3.utils.sha3(digest)
+  } else {
+    return web3.sha3(digest)
+  }
 }

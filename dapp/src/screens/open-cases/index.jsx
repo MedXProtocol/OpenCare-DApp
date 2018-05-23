@@ -14,44 +14,47 @@ import {
   getDoctorAuthorizationRequestCount,
   getDoctorAuthorizationRequestCaseAtIndex
 } from '@/utils/web3-util'
-import { drizzleConnect } from 'drizzle-react'
-import { withPropSaga } from '@/saga-genesis/with-prop-saga'
-import { sagaCacheContext } from '@/saga-genesis/saga-cache-context'
+import { connect } from 'react-redux'
+import { withSaga, cacheCallValue, withContractRegistry } from '@/saga-genesis'
 import { CaseRow } from './case-row'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
 import dispatch from '@/dispatch'
 import { call } from 'redux-saga/effects'
-import contractRegistry from '@/contract-registry'
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state, { contractRegistry }) {
   const account = get(state, 'accounts[0]')
+  let caseManager = contractRegistry.requireAddressByName('CaseManager')
+  let caseCount = cacheCallValue(state, caseManager, 'doctorAuthorizationRequestCount', account)
+  let cases = []
+  for (let i = 0; i < caseCount; i++) {
+    cases.push(cacheCallValue(state, caseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i))
+  }
   return {
-    account
+    account,
+    caseCount,
+    cases
   }
 }
 
-function* propSaga(ownProps, { cacheCall, contractRegistry }) {
-  const props = {}
-  if (!ownProps.account) { return props }
-
-  let caseManagerAddress = contractRegistry.addressByName('CaseManager')
-  if (!caseManagerAddress) {
-    caseManagerAddress = contractRegistry.add(yield call(getCaseManagerContract), 'CaseManager')
+function* saga({ account }, { cacheCall, contractRegistry }) {
+  if (!account) { return }
+  let caseManager = contractRegistry.requireAddressByName('CaseManager')
+  let caseCount = yield cacheCall(caseManager, 'doctorAuthorizationRequestCount', account)
+  for (let i = 0; i < caseCount; i++) {
+    yield cacheCall(caseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
   }
-
-  props.caseCount = yield call(cacheCall, caseManagerAddress, 'doctorAuthorizationRequestCount', ownProps.account)
-  props.cases = []
-  for (let i = 0; i < props.caseCount; i++) {
-    props.cases.push(yield call(cacheCall, caseManagerAddress, 'doctorAuthorizationRequestCaseAtIndex', ownProps.account, i))
-  }
-
-  return props
 }
 
-const OpenCases = drizzleConnect(withPropSaga(sagaCacheContext({saga: propSaga, web3: getWeb3(), contractRegistry}), class extends Component {
+const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, class extends Component {
   onClickRequestCase = async (e) => {
     await getNextCaseFromQueue()
+  }
+
+  componentWillReceiveProps (props) {
+    if (this.props.account != props.account) {
+      this.props.runSaga(props)
+    }
   }
 
   render () {
@@ -90,7 +93,7 @@ const OpenCases = drizzleConnect(withPropSaga(sagaCacheContext({saga: propSaga, 
       </MainLayout>
     )
   }
-}), mapStateToProps)
+})))
 
 OpenCases.propTypes = {
   cases: PropTypes.array.isRequired

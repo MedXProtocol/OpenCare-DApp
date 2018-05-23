@@ -33,6 +33,12 @@ export class ContractRegistry {
     return result
   }
 
+  requireAddressByName(name) {
+    const address = this.addressByName(name)
+    if (!address) throw `Unable to find contract with name ${name}`
+    return address
+  }
+
   findByName(name) {
     return this.contracts[this.nameAlias[name]]
   }

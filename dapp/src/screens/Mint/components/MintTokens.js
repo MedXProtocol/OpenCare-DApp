@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Spinner from '../../../components/Spinner';
-import {getSelectedAccount, mintMedXTokens} from '../../../utils/web3-util';
-import { withMedXToken } from '@/drizzle-helpers/with-medx-token'
+import { mintMedXTokens } from '../../../utils/web3-util';
 import get from 'lodash.get'
 import defined from '@/utils/defined'
 import dispatch from '@/dispatch'
@@ -92,4 +91,4 @@ class MintTokens extends Component {
     }
 }
 
-export default withMedXToken(MintTokens);
+export default MintTokens

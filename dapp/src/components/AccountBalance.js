@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import {getSelectedAccountBalance} from '../utils/web3-util';
 import './AccountBalance.css';
-import { withMedXToken } from '@/drizzle-helpers/with-medx-token'
 
 class AccountBalance extends Component {
     constructor(props) {
@@ -53,4 +51,4 @@ class AccountBalance extends Component {
     }
 }
 
-export default withMedXToken(AccountBalance)
+export default AccountBalance

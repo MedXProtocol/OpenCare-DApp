@@ -6,7 +6,6 @@ import logo from '../assets/img/logo.png'
 import './Navbar.css'
 import { isDoctor } from '@/utils/web3-util'
 import { isSignedIn, signOut } from '@/services/sign-in'
-import { withDoctorManager } from '@/drizzle-helpers/with-doctor-manager'
 
 class Navbar extends Component {
   constructor(props) {
@@ -86,4 +85,4 @@ Navbar.defaultProps = {
     accounts: []
 };
 
-export default withRouter(withDoctorManager(Navbar))
+export default withRouter(Navbar)

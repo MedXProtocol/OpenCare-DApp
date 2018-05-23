@@ -7,28 +7,36 @@ import ChallengedDiagnosis from '@/components/ChallengedDiagnosis';
 import { getCaseKey, getCaseDoctorADiagnosisLocationHash, getCaseContract } from '@/utils/web3-util'
 import { signedInSecretKey } from '@/services/sign-in'
 import aes from '@/services/aes'
-import { withPropSagaContext } from '@/saga-genesis/with-prop-saga-context'
+import { withSaga, cacheCallValue } from '@/saga-genesis'
 import bytesToHex from '@/utils/bytes-to-hex'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
+import { connect } from 'react-redux'
 
-function* propSaga(ownProps, { cacheCall, contractRegistry }) {
-  const caseAddress = ownProps.match.params.caseAddress
-
-  if (!contractRegistry.hasAddress(caseAddress)) {
-    contractRegistry.add(yield getCaseContract(caseAddress))
+function mapStateToProps(state, { match, contractRegistry }) {
+  const caseAddress = match.params.caseAddress
+  const encryptedCaseKey = bytesToHex(cacheCallValue(state, caseAddress, 'getEncryptedCaseKey'))
+  if (encryptedCaseKey) {
+    var caseKey = aes.decrypt(encryptedCaseKey, signedInSecretKey())
   }
-
-  const encryptedCaseKey = bytesToHex(yield cacheCall(caseAddress, 'getEncryptedCaseKey'))
-  const caseKey = aes.decrypt(encryptedCaseKey, signedInSecretKey())
-
-  const diagnosisHash = getFileHashFromBytes(yield cacheCall(caseAddress, 'diagnosisALocationHash'))
+  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
   return {
     caseKey,
     diagnosisHash
   }
 }
 
-const PatientCase = withPropSagaContext(propSaga, class extends Component {
+function* saga(ownProps, { cacheCall, contractRegistry }) {
+  const caseAddress = ownProps.match.params.caseAddress
+
+  if (!contractRegistry.hasAddress(caseAddress)) {
+    contractRegistry.add(yield getCaseContract(caseAddress))
+  }
+
+  yield cacheCall(caseAddress, 'getEncryptedCaseKey')
+  yield cacheCall(caseAddress, 'diagnosisALocationHash')
+}
+
+const PatientCase = connect(mapStateToProps)(withSaga(saga, class extends Component {
   render() {
     if (this.props.diagnosisHash) {
       var diagnosis =
@@ -55,6 +63,6 @@ const PatientCase = withPropSagaContext(propSaga, class extends Component {
       </MainLayout>
     );
   }
-})
+}))
 
 export default PatientCase;

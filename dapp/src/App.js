@@ -14,7 +14,6 @@ import Mint from './screens/Mint'
 import Wallet from './screens/Wallet'
 import { OpenCases } from './screens/open-cases'
 import './App.css'
-import { withContextManager } from './drizzle-helpers/with-context-manager'
 import { SignInRedirect } from './sign-in-redirect'
 
 const App = class extends Component {
@@ -44,4 +43,4 @@ App.defaultProps = {
   accounts: []
 }
 
-export default withRouter(withContextManager(App))
+export default withRouter(App)

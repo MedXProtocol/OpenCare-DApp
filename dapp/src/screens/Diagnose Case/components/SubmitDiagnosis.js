@@ -11,23 +11,12 @@ import {
   getCaseContract,
   diagnoseChallengedCase
 } from '@/utils/web3-util';
-import { withPropSaga } from '@/saga-genesis/with-prop-saga'
 import { uploadJson, downloadJson } from '@/utils/storage-util'
 import isBlank from '@/utils/is-blank'
 
-function* propSaga(ownProps) {
-  if (!ownProps.caseKey) { return {} }
-  const props = {}
-  if (ownProps.diagnosisHash) {
-    const originalDiagnosis = yield downloadJson(ownProps.diagnosisHash, ownProps.caseKey)
-    props.diagnosis = JSON.parse(originalDiagnosis);
-  }
-  return props
-}
-
-const SubmitDiagnosis = withPropSaga(propSaga, class extends Component {
-    constructor(){
-      super()
+const SubmitDiagnosis = class extends Component {
+    constructor(props, context){
+      super(props, context)
 
       this.state = {
         isChallenge: false,
@@ -40,6 +29,24 @@ const SubmitDiagnosis = withPropSaga(propSaga, class extends Component {
         submitInProgress: false,
         showConfirmationModal: false,
         showThankYouModal: false
+      }
+    }
+
+    componentDidMount () {
+      this.init(this.props)
+    }
+
+    componentWillReceiveProps(props) {
+      this.init(props)
+    }
+
+    init (props) {
+      if (props.diagnosisHash) {
+        downloadJson(props.diagnosisHash, props.caseKey).then((originalDiagnosis) => {
+          this.setState({
+            originalDiagnosis: JSON.parse(originalDiagnosis)
+          })
+        })
       }
     }
 
@@ -96,7 +103,7 @@ const SubmitDiagnosis = withPropSaga(propSaga, class extends Component {
         const hashHex = '0x' + hashToHex(ipfsHash)
 
         if(!isBlank(this.props.diagnosisHash)) {
-            const accept = this.props.diagnosis.diagnosis === this.state.diagnosis
+            const accept = this.state.originalDiagnosis.diagnosis === this.state.diagnosis
 
             diagnoseChallengedCase(this.props.caseAddress, hashHex, accept, (error, result) => {
                 if(error !== null) {
@@ -214,7 +221,7 @@ const SubmitDiagnosis = withPropSaga(propSaga, class extends Component {
             </div>
         )
     }
-})
+}
 
 SubmitDiagnosis.propTypes = {
   caseAddress: PropTypes.string.isRequired,
