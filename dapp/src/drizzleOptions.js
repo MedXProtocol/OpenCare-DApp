@@ -37,7 +37,6 @@ export default async function () {
       ]
     },
     polls: {
-      accounts: 1000
     }
   }
 }

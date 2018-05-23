@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { sagaMiddleware } from '@/saga-middleware'
-import { SagaContext } from './saga-context'
+import { connect } from 'react-redux'
 
 export function withPropSaga(saga, WrappedComponent) {
   const PropSagaWrapper = class extends Component {

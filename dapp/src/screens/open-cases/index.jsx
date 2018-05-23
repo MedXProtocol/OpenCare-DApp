@@ -7,32 +7,57 @@ import {
   Table
 } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import getWeb3 from '@/get-web3'
 import {
-  getNextCaseFromQueue
+  getNextCaseFromQueue,
+  getCaseManagerContract,
+  getDoctorAuthorizationRequestCount,
+  getDoctorAuthorizationRequestCaseAtIndex
 } from '@/utils/web3-util'
 import { drizzleConnect } from 'drizzle-react'
+import { withPropSaga } from '@/saga-genesis/with-prop-saga'
+import { sagaCacheContext } from '@/saga-genesis/saga-cache-context'
 import { CaseRow } from './case-row'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
 import dispatch from '@/dispatch'
+import { call } from 'redux-saga/effects'
+import contractRegistry from '@/contract-registry'
 
 function mapStateToProps(state, ownProps) {
-  let cases = get(state, `doctorCases.cases`) || {}
-  let caseCount = get(state, `caseCount.count`, '0').toString()
+  const account = get(state, 'accounts[0]')
   return {
-    cases,
-    caseCount: caseCount
+    account
   }
 }
 
-const OpenCases = drizzleConnect(class extends Component {
-  componentDidMount() {
-    dispatch({type: 'OPEN_CASE_COUNT_FETCH_REQUESTED'})
-    dispatch({type: 'DOCTOR_CASES_FETCH_REQUESTED'})
+function* propSaga(ownProps, { cacheCall, contractRegistry }) {
+  const props = {}
+  if (!ownProps.account) { return props }
+
+  let caseManagerAddress = contractRegistry.addressByName('CaseManager')
+  if (!caseManagerAddress) {
+    caseManagerAddress = contractRegistry.add(yield call(getCaseManagerContract), 'CaseManager')
   }
 
+  props.caseCount = yield call(cacheCall, caseManagerAddress, 'doctorAuthorizationRequestCount', ownProps.account)
+  props.cases = []
+  for (let i = 0; i < props.caseCount; i++) {
+    props.cases.push(yield call(cacheCall, caseManagerAddress, 'doctorAuthorizationRequestCaseAtIndex', ownProps.account, i))
+  }
+
+  return props
+}
+
+const OpenCases = drizzleConnect(withPropSaga(sagaCacheContext({saga: propSaga, web3: getWeb3(), contractRegistry}), class extends Component {
   onClickRequestCase = async (e) => {
     await getNextCaseFromQueue()
+  }
+
+  reset = () => {
+    this.props.cases.forEach((address) => {
+      dispatch({type: 'CACHE_INVALIDATE_ADDRESS', address})
+    })
   }
 
   render () {
@@ -47,7 +72,7 @@ const OpenCases = drizzleConnect(class extends Component {
               <h2>Open Cases: {this.props.caseCount}</h2>
             </div>
             <div className="col-xs-12">
-              <Button disabled={this.props.caseCount === '0'} onClick={this.onClickRequestCase} bsStyle="primary">Request Case</Button>
+              <Button disabled={this.props.caseCount === '0'} onClick={this.reset} bsStyle="primary">Request Case</Button>
             </div>
             <div className="col-xs-12">
               <h2>Cases</h2>
@@ -71,7 +96,7 @@ const OpenCases = drizzleConnect(class extends Component {
       </MainLayout>
     )
   }
-}, mapStateToProps)
+}), mapStateToProps)
 
 OpenCases.propTypes = {
   cases: PropTypes.array.isRequired

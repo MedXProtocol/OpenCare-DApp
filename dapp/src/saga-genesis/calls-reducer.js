@@ -1,4 +1,4 @@
-export default function (state, {type, call}) {
+export default function (state, {type, call, response, error}) {
   if (typeof state === 'undefined') {
     state = {}
   }
@@ -13,14 +13,14 @@ export default function (state, {type, call}) {
         }
       }
       break
-      
+
     case 'WEB3_CALL_RETURN':
       state = {
         ...state,
         [call.hash]: {
           ...state[call.hash],
           inFlight: false,
-          response: action.response
+          response: response
         }
       }
       break
@@ -31,7 +31,7 @@ export default function (state, {type, call}) {
         [call.hash]: {
           ...state[call.hash],
           inFlight: false,
-          error: action.error
+          error: error
         }
       }
       break

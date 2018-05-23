@@ -14,7 +14,7 @@ import dispatch from '@/dispatch'
 import { approveDiagnosisRequest } from '@/services/request-approval'
 import bytesToHex from '@/utils/bytes-to-hex'
 import { signedInSecretKey } from '@/services/sign-in'
-import { withPropSaga } from '@/components/with-prop-saga'
+import { withPropSaga } from '@/saga-genesis/with-prop-saga'
 import reencryptCaseKey from '@/services/reencrypt-case-key'
 
 function mapStateToProps(state, ownProps) {

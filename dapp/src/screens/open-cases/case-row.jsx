@@ -8,30 +8,39 @@ import get from 'lodash.get'
 import { getCaseDate, getCaseContract } from '@/utils/web3-util'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
 import { withPropSaga } from '@/saga-genesis/with-prop-saga'
+import { sagaCacheContext } from '@/saga-genesis/saga-cache-context'
 import { caseStatusToName } from '@/utils/case-status-to-name'
+import getWeb3 from '@/get-web3'
+import callState from '@/saga-genesis/call-state'
+import contractRegistry from '@/contract-registry'
 
 function mapStateToProps(state, ownProps) {
   return {
+    statusInFlight: callState(state, ownProps.address, 'status').inFlight,
+    caseFeeInFlight: callState(state, ownProps.address, 'caseFee').inFlight,
     account: get(state, 'accounts[0]')
   }
 }
 
-function* asyncProps(ownProps) {
+function* propSaga(ownProps, {cacheCall, contractRegistry}) {
   let props = {}
-  let contract = yield getCaseContract(ownProps.address)
-  props.status = parseInt(yield contract.methods.status().call())
-  props.caseFee = yield contract.methods.caseFee().call()
+  if (!contractRegistry.hasAddress(ownProps.address)) {
+    contractRegistry.add(yield getCaseContract(ownProps.address))
+  }
+  let status = yield cacheCall(ownProps.address, 'status')
+  props.status = parseInt(status)
+  props.caseFee = yield cacheCall(ownProps.address, 'caseFee')
   if (props.status >= 3) {
-    props.diagnosingDoctorA = yield contract.methods.diagnosingDoctorA().call()
+    props.diagnosingDoctorA = yield cacheCall(ownProps.address, 'diagnosingDoctorA')
   }
   if (props.status >= 7) {
-    props.diagnosingDoctorB = yield contract.methods.diagnosingDoctorB().call()
+    props.diagnosingDoctorB = yield cacheCall(ownProps.address, 'diagnosingDoctorB')
   }
 
   return props
 }
 
-const CaseRow = drizzleConnect(withPropSaga(asyncProps, class extends Component {
+const CaseRow = drizzleConnect(withPropSaga(sagaCacheContext({saga: propSaga, web3: getWeb3(), contractRegistry}), class extends Component {
   render () {
     if (this.props.diagnosingDoctorA === this.props.account || this.props.diagnosingDoctorB === this.props.account) {
       var address = <Link to={`/diagnose-case/${this.props.address}`}>{this.props.address}</Link>
@@ -44,7 +53,7 @@ const CaseRow = drizzleConnect(withPropSaga(asyncProps, class extends Component 
     return (
       <tr>
         <td>{address}</td>
-        <td>{status}</td>
+        <td>{status} {this.props.statusInFlight}</td>
         <td></td>
       </tr>
     )
