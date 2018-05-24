@@ -13,7 +13,7 @@ function* propSaga(ownProps, { cacheCall, contractRegistry }) {
   }
 }
 
-const CaseStatus = withSaga(propSaga, class _CaseStatus extends Component {
+const CaseStatus = withSaga(propSaga)(class _CaseStatus extends Component {
     render() {
       var status = this.props.status
         return (

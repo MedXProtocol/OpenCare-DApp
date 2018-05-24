@@ -19,12 +19,12 @@ function mapStateToProps(state, { contractRegistry, accounts }) {
   }
 }
 
-function* saga(ownProps, { cacheCall, contractRegistry }) {
+function* saga({ account }, { cacheCall, contractRegistry }) {
   let caseManager = contractRegistry.addressByName('CaseManager')
-  yield cacheCall(caseManager, 'getPatientCaseListCount', ownProps.account)
+  yield cacheCall(caseManager, 'getPatientCaseListCount', account)
 }
 
-const PatientCases = connect(mapStateToProps)(withSaga(saga, class _PatientCases extends Component {
+const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account']})(class _PatientCases extends Component {
   render() {
     return (
         <div className="card">
@@ -55,6 +55,6 @@ const PatientCases = connect(mapStateToProps)(withSaga(saga, class _PatientCases
         </div>
     )
   }
-}))
+})))
 
 export default withRouter(PatientCases)

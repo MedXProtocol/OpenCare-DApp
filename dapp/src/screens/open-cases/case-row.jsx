@@ -7,7 +7,7 @@ import dispatch from '@/dispatch'
 import get from 'lodash.get'
 import { getCaseDate, getCaseContract } from '@/utils/web3-util'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
-import { withSaga, cacheCallValue } from '@/saga-genesis'
+import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
 import { caseStatusToName } from '@/utils/case-status-to-name'
 import getWeb3 from '@/get-web3'
 
@@ -37,7 +37,7 @@ function* propSaga({address}, {cacheCall, contractRegistry}) {
   }
 }
 
-const CaseRow = connect(mapStateToProps)(withSaga(propSaga, class extends Component {
+const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga, { propTriggers: ['address'] })(class extends Component {
   render () {
     if (this.props.diagnosingDoctorA === this.props.account || this.props.diagnosingDoctorB === this.props.account) {
       var address = <Link to={`/diagnose-case/${this.props.address}`}>{this.props.address}</Link>
@@ -55,7 +55,7 @@ const CaseRow = connect(mapStateToProps)(withSaga(propSaga, class extends Compon
       </tr>
     )
   }
-}))
+})))
 
 CaseRow.defaultProps = {
   status: 0,

@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getCaseContract, getCaseDetailsLocationHash, getCaseKey } from '../utils/web3-util';
 import { downloadJson, downloadImage, getFileUrl } from '../utils/storage-util';
-import { withSaga, cacheCallValue } from '@/saga-genesis'
+import { withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
 import { all } from 'redux-saga/effects'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
-
 
 function mapStateToProps(state, { caseAddress, contractRegistry }) {
   let caseDetailLocationHash = cacheCallValue(state, caseAddress, 'caseDetailLocationHash')
@@ -22,14 +21,15 @@ function* saga({ caseAddress }, { cacheCall, contractRegistry }) {
   yield cacheCall(caseAddress, 'caseDetailLocationHash')
 }
 
-const CaseDetails = withSaga(saga, connect(mapStateToProps)(class extends Component {
+const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(
+  class extends Component {
   constructor (props) {
     super(props)
     this.state = {
       details: {}
     }
   }
-  
+
   componentDidMount () {
     this.init(this.props)
   }
@@ -112,7 +112,7 @@ const CaseDetails = withSaga(saga, connect(mapStateToProps)(class extends Compon
             </div>
         );
     }
-}))
+})))
 
 CaseDetails.propTypes = {
   caseAddress: PropTypes.string,

@@ -28,7 +28,8 @@ function mapStateToProps(state, { contractRegistry }) {
   let caseCount = cacheCallValue(state, caseManager, 'doctorAuthorizationRequestCount', account)
   let cases = []
   for (let i = 0; i < caseCount; i++) {
-    cases.push(cacheCallValue(state, caseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i))
+    let c = cacheCallValue(state, caseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
+    if (c) { cases.push(c) }
   }
   return {
     account,
@@ -46,15 +47,9 @@ function* saga({ account }, { cacheCall, contractRegistry }) {
   }
 }
 
-const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, class extends Component {
+const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account'] })(class extends Component {
   onClickRequestCase = async (e) => {
     await getNextCaseFromQueue()
-  }
-
-  componentWillReceiveProps (props) {
-    if (this.props.account != props.account) {
-      this.props.runSaga(props)
-    }
   }
 
   render () {

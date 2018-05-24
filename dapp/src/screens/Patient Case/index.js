@@ -7,7 +7,7 @@ import ChallengedDiagnosis from '@/components/ChallengedDiagnosis';
 import { getCaseKey, getCaseDoctorADiagnosisLocationHash, getCaseContract } from '@/utils/web3-util'
 import { signedInSecretKey } from '@/services/sign-in'
 import aes from '@/services/aes'
-import { withSaga, cacheCallValue } from '@/saga-genesis'
+import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
 import bytesToHex from '@/utils/bytes-to-hex'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
@@ -25,8 +25,8 @@ function mapStateToProps(state, { match, contractRegistry }) {
   }
 }
 
-function* saga(ownProps, { cacheCall, contractRegistry }) {
-  const caseAddress = ownProps.match.params.caseAddress
+function* saga({ match }, { cacheCall, contractRegistry }) {
+  const caseAddress = match.params.caseAddress
 
   if (!contractRegistry.hasAddress(caseAddress)) {
     contractRegistry.add(yield getCaseContract(caseAddress))
@@ -36,7 +36,7 @@ function* saga(ownProps, { cacheCall, contractRegistry }) {
   yield cacheCall(caseAddress, 'diagnosisALocationHash')
 }
 
-const PatientCase = connect(mapStateToProps)(withSaga(saga, class extends Component {
+const PatientCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match']})(class extends Component {
   render() {
     if (this.props.diagnosisHash) {
       var diagnosis =
@@ -63,6 +63,6 @@ const PatientCase = connect(mapStateToProps)(withSaga(saga, class extends Compon
       </MainLayout>
     );
   }
-}))
+})))
 
 export default PatientCase;

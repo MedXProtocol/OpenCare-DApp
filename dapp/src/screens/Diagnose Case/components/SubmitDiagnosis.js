@@ -224,8 +224,8 @@ const SubmitDiagnosis = class extends Component {
 }
 
 SubmitDiagnosis.propTypes = {
-  caseAddress: PropTypes.string.isRequired,
-  caseKey: PropTypes.any.isRequired,
+  caseAddress: PropTypes.string,
+  caseKey: PropTypes.any,
   diagnosisHash: PropTypes.string
 }
 

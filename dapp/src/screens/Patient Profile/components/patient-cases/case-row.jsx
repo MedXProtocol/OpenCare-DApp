@@ -31,28 +31,28 @@ function mapStateToProps(state, { caseAddress, contractRegistry }) {
   }
 }
 
-function* saga(ownProps, { cacheCall, contractRegistry }) {
-  if (!ownProps.caseAddress) { return {} }
+function* saga({ caseAddress }, { cacheCall, contractRegistry }) {
+  if (!caseAddress) { return {} }
 
-  if (!contractRegistry.hasAddress(ownProps.caseAddress)) {
-    contractRegistry.add(yield getCaseContract(ownProps.caseAddress))
+  if (!contractRegistry.hasAddress(caseAddress)) {
+    contractRegistry.add(yield getCaseContract(caseAddress))
   }
 
   let accountManager = contractRegistry.requireAddressByName('AccountManager')
 
-  yield cacheCall(ownProps.caseAddress, 'getEncryptedCaseKey')
-  let status = yield cacheCall(ownProps.caseAddress, 'status')
+  yield cacheCall(caseAddress, 'getEncryptedCaseKey')
+  let status = yield cacheCall(caseAddress, 'status')
 
   if (status === '3') {
-    let diagnosingDoctorA = yield cacheCall(ownProps.caseAddress, 'diagnosingDoctorA')
+    let diagnosingDoctorA = yield cacheCall(caseAddress, 'diagnosingDoctorA')
     yield cacheCall(accountManager, 'publicKeys', diagnosingDoctorA)
   } else if (status === '8') {
-    let diagnosingDoctorB = yield cacheCall(ownProps.caseAddress, 'diagnosingDoctorB')
+    let diagnosingDoctorB = yield cacheCall(caseAddress, 'diagnosingDoctorB')
     yield cacheCall(accountManager, 'publicKeys', diagnosingDoctorB)
   }
 }
 
-export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(saga, class _CaseRow extends DrizzleComponent {
+export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress']})(class _CaseRow extends DrizzleComponent {
   onApprove = () => {
     const status = this.props.status
     const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
