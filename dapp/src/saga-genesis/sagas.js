@@ -1,5 +1,7 @@
-import { select, put, take, takeEvery, getContext, setContext } from 'redux-saga/effects'
-import hashCall from '@/saga-genesis/hash-call'
+import { select, put, take, takeEvery, getContext, setContext, fork, call } from 'redux-saga/effects'
+import { createCall } from './create-call'
+
+const delay = (ms) => new Promise(res => setTimeout(res, ms))
 
 /*
 Triggers the web3 call.
@@ -18,12 +20,25 @@ function* web3Call({call}) {
   }
 }
 
+function* web3Send({transactionId, call, options = {}}) {
+  const { address, method, args } = call
+  try {
+    const contractRegistry = yield getContext('contractRegistry')
+    const contract = contractRegistry.requireByAddress(address)
+    let receipt = yield contract.methods[method](...args).send(options)
+    yield put({type: 'WEB3_SEND_RETURN', transactionId, call, receipt})
+    return receipt
+  } catch (error) {
+    yield put({type: 'WEB3_SEND_ERROR', transactionId, call, error})
+    throw error
+  }
+}
+
 function getContractCalls(state, address) {
   return state.cache.contractCalls[address]
 }
 
-function* invalidateAddress(action) {
-  const { address } = action
+function* invalidateAddress({ address }) {
   let callsMap = yield select(getContractCalls, address)
   if (!callsMap) { return }
   yield* Object.values(callsMap).map(function* (callState) {
@@ -44,8 +59,7 @@ function* registerCall(call) {
 }
 
 export function* cacheCall(address, method, ...args) {
-  let call = {address, method, args}
-  call.hash = hashCall(address, method, args)
+  let call = createCall(address, method, args)
   yield registerCall(call)
   let callState = yield select(state => state.calls[call.hash])
   if (callState && callState.response) {
@@ -83,9 +97,28 @@ function* web3Accounts() {
   yield put({type: 'WEB3_ACCOUNTS', accounts})
 }
 
+function* startAccountsPolling() {
+  while (true) {
+    yield put({type: 'WEB3_ACCOUNTS_REFRESH'})
+    yield call(delay, 2000)
+  }
+}
+
+function* invalidateTransaction({transactionId, call, receipt}) {
+  var contractAddresses = Object.values(receipt.events).reduce((addressSet, event) => {
+    return addressSet.add(event.address)
+  }, new Set())
+  yield* Array.from(contractAddresses).map(function* (address) {
+    yield put({type: 'CACHE_INVALIDATE_ADDRESS', address})
+  })
+}
+
 export default function* () {
+  yield takeEvery('WEB3_SEND_RETURN', invalidateTransaction)
   yield takeEvery('WEB3_ACCOUNTS_REFRESH', web3Accounts)
   yield takeEvery('CACHE_INVALIDATE_ADDRESS', invalidateAddress)
   yield takeEvery('WEB3_CALL', web3Call)
+  yield takeEvery('WEB3_SEND', web3Send)
   yield takeEvery('RUN_SAGA', runSaga)
+  yield fork(startAccountsPolling)
 }

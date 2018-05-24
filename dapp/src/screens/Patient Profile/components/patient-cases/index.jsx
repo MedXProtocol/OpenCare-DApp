@@ -34,7 +34,7 @@ const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga
             </div>
             <div className="card-content table-responsive">
             {
-                !this.props.caseListCount ?
+                !this.props.caseListCount || this.props.caseListCount === '0' ?
                 <div className="alert alert-info text-center">
                     <span>You do not have any historical or pending cases.</span>
                 </div> :

@@ -12,7 +12,7 @@ import get from 'lodash.get'
 import dispatch from '@/dispatch'
 import bytesToHex from '@/utils/bytes-to-hex'
 import { signedInSecretKey } from '@/services/sign-in'
-import { withSaga, cacheCallValue, withContractRegistry } from '@/saga-genesis'
+import { withSaga, cacheCallValue, withContractRegistry, withSend } from '@/saga-genesis'
 import reencryptCaseKey from '@/services/reencrypt-case-key'
 
 function mapStateToProps(state, { caseAddress, contractRegistry }) {
@@ -50,20 +50,21 @@ function* saga({ caseAddress }, { cacheCall, contractRegistry }) {
   }
 }
 
-export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress']})(class _CaseRow extends Component {
+export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress']})(withSend(class _CaseRow extends Component {
   onApprove = () => {
     const status = this.props.status
     const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
-    if (status.code === 3) {
+    const { send, caseAddress } = this.props
+    if (status === '3') {
       let doctor = this.props.diagnosingDoctorA
       let doctorPublicKey = this.props.diagnosingDoctorAPublicKey.substring(2)
       const doctorEncryptedCaseKey = reencryptCaseKey({secretKey: signedInSecretKey(), encryptedCaseKey, doctorPublicKey})
-      this.props.caseContract.methods.authorizeDiagnosisDoctor(doctor, '0x' + doctorEncryptedCaseKey).send()
-    } else if (status.code === 8) {
+      send(caseAddress, 'authorizeDiagnosisDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
+    } else if (status === '8') {
       let doctor = this.props.diagnosingDoctorB
       let doctorPublicKey = this.props.diagnosingDoctorBPublicKey.substring(2)
       const doctorEncryptedCaseKey = reencryptCaseKey({secretKey: signedInSecretKey(), encryptedCaseKey, doctorPublicKey})
-      this.props.caseContract.methods.authorizeChallengeDoctor(doctor, '0x' + doctorEncryptedCaseKey).send()
+      send(caseAddress, 'authorizeChallengeDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
     }
   }
 
@@ -86,7 +87,7 @@ export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(sa
       </tr>
     )
   }
-})))
+}))))
 
 CaseRow.propTypes = {
   caseAddress: PropTypes.string,

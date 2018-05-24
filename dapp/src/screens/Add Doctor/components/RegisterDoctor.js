@@ -3,15 +3,18 @@ import Spinner from '../../../components/Spinner'
 import { registerDoctor } from '../../../utils/web3-util'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
+import { withContractRegistry, withSend } from '@/saga-genesis'
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state, { contractRegistry }) {
   const account = get(state, 'accounts[0]')
+  const DoctorManager = contractRegistry.requireAddressByName('DoctorManager')
   return {
-    account
+    account,
+    DoctorManager
   }
 }
 
-const RegisterDoctor = connect(mapStateToProps)(class _RegisterDoctor extends Component {
+const RegisterDoctor = withContractRegistry(connect(mapStateToProps)(withSend(class _RegisterDoctor extends Component {
     constructor(props){
         super(props)
         this.state = {
@@ -30,14 +33,8 @@ const RegisterDoctor = connect(mapStateToProps)(class _RegisterDoctor extends Co
     }
 
     registerDoctor = () => {
-        this.setState({submitInProgress: true})
-        registerDoctor(this.state.address, (error, result) => {
-            if(error){
-                this.onError(error)
-            } else {
-                this.onSuccess()
-            }
-        })
+      const { DoctorManager, send } = this.props
+      send(DoctorManager, 'addDoctor', this.state.address)()
     }
 
     componentWillReceiveProps (props) {
@@ -83,6 +80,6 @@ const RegisterDoctor = connect(mapStateToProps)(class _RegisterDoctor extends Co
             </div>
         )
     }
-})
+})))
 
 export default RegisterDoctor

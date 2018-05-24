@@ -4,6 +4,7 @@ import getDoctorCases from './get-doctor-cases'
 import openCaseCount from './open-case-count'
 import getCaseDate from './get-case-date'
 import { rootSagaGenesis  } from '@/saga-genesis'
+import web3CallReturn from './web3-call-return'
 
 export default function* () {
   yield all(
@@ -12,7 +13,8 @@ export default function* () {
       getDoctorCases(),
       openCaseCount(),
       getCaseDate(),
-      rootSagaGenesis()
+      rootSagaGenesis(),
+      web3CallReturn()
     ]
   )
 }

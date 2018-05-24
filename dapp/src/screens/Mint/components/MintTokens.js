@@ -3,23 +3,33 @@ import Spinner from '../../../components/Spinner';
 import { mintMedXTokens } from '../../../utils/web3-util';
 import get from 'lodash.get'
 import defined from '@/utils/defined'
-import dispatch from '@/dispatch'
+import { connect } from 'react-redux'
+import { withContractRegistry, withSend } from '@/saga-genesis'
 
-class MintTokens extends Component {
+function mapStateToProps (state, { contractRegistry }) {
+  let account = get(state, 'accounts[0]')
+  let MedXToken = contractRegistry.requireAddressByName('MedXToken')
+  return {
+    account,
+    transactions: state.sends.transactions,
+    MedXToken
+  }
+}
+
+const MintTokens = withContractRegistry(connect(mapStateToProps)(withSend(class _MintTokens extends Component {
     constructor(props){
         super(props)
         this.state = {
-            address: get(this.props, 'accounts[0]', ''),
+            address: props.account || '',
             error: null,
             submitInProgress: false
         };
-        dispatch({ type: 'PUSH_TO_TXSTACK' })
     }
 
     componentWillReceiveProps (props) {
-      if (!this.props.accounts[0] && props.accounts[0])
+      if (!this.props.account && props.account)
       this.setState({
-        address: props.accounts[0]
+        address: props.account
       })
     }
 
@@ -33,8 +43,9 @@ class MintTokens extends Component {
     }
 
     mintTokens = () => {
-      const stackId = this.props.MedXToken.mint.cacheSend(this.state.address, 1000)
-      this.setState({stackId})
+      const { send, MedXToken } = this.props
+      const transactionId = send(MedXToken, 'mint', this.state.address, 1000)()
+      this.setState({transactionId})
     }
 
     onSuccess = () => {
@@ -59,36 +70,36 @@ class MintTokens extends Component {
         }
       }
 
-        return (
-            <div className="card">
-                <form
-                    onSubmit={this.handleSubmit}
-                    >
-                    <div className="card-header">
-                        <h4 className="card-title">Mint Tokens</h4>
-                        <p className="category">Mint tokens to address below</p>
-                    </div>
-                    <div className="card-content">
-                        <div className="form-group">
-                            <label htmlFor="hash">Account Address:</label>
-                            <input
-                                className="form-control"
-                                id="hash"
-                                value={this.state.address}
-                                onChange={this.updateAddress}
-                                required
-                            />
-                        </div>
-                        <button
-                          type="submit"
-                          className="btn btn-default"
-                          disabled={minting}>Mint Tokens</button>
-                    </div>
-                </form>
-                <Spinner loading={minting}/>
-            </div>
-        );
+      return (
+          <div className="card">
+              <form
+                  onSubmit={this.handleSubmit}
+                  >
+                  <div className="card-header">
+                      <h4 className="card-title">Mint Tokens</h4>
+                      <p className="category">Mint tokens to address below</p>
+                  </div>
+                  <div className="card-content">
+                      <div className="form-group">
+                          <label htmlFor="hash">Account Address:</label>
+                          <input
+                              className="form-control"
+                              id="hash"
+                              value={this.state.address}
+                              onChange={this.updateAddress}
+                              required
+                          />
+                      </div>
+                      <button
+                        type="submit"
+                        className="btn btn-default"
+                        disabled={minting}>Mint Tokens</button>
+                  </div>
+              </form>
+              <Spinner loading={minting}/>
+          </div>
+      );
     }
-}
+})))
 
 export default MintTokens

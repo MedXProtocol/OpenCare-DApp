@@ -7,9 +7,30 @@ import { isNotEmptyString } from '../../../utils/common-util';
 import { getSelectedAccountBalance, createCase } from '../../../utils/web3-util';
 import { uploadJson, uploadFile } from '../../../utils/storage-util';
 import { signedInSecretKey } from '@/services/sign-in'
+import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '@/saga-genesis'
+import hashToHex from '@/utils/hash-to-hex'
+import { connect } from 'react-redux'
 import aes from '@/services/aes'
+import get from 'lodash.get'
 
-class CreateCase extends Component {
+function mapStateToProps (state, { contractRegistry }) {
+  const account = get(state, 'accounts[0]')
+  const MedXToken = contractRegistry.requireAddressByName('MedXToken')
+  const CaseManager = contractRegistry.requireAddressByName('CaseManager')
+  const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
+  return {
+    account,
+    MedXToken,
+    CaseManager,
+    balance
+  }
+}
+
+function* saga({ account, MedXToken }) {
+  yield cacheCall(MedXToken, 'balanceOf', account)
+}
+
+const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: 'account' })(withSend(class _CreateCase extends Component {
     constructor(){
         super()
 
@@ -96,13 +117,11 @@ class CreateCase extends Component {
 
     handleSubmit = (event) => {
       event.preventDefault()
-      getSelectedAccountBalance().then((accountBalance) => {
-        if(accountBalance < 15) {
-            this.setState({showBalanceTooLowModal: true});
-        } else {
-            this.setState({showConfirmSubmissionModal: true});
-        }
-      })
+      if(this.props.balance < 15) {
+          this.setState({showBalanceTooLowModal: true});
+      } else {
+          this.setState({showConfirmSubmissionModal: true});
+      }
     }
 
     validateInputs = () => {
@@ -161,12 +180,13 @@ class CreateCase extends Component {
         };
 
         const caseJson = JSON.stringify(caseInformation);
-
         const hash = await uploadJson(caseJson, this.state.caseEncryptionKey);
+        const encryptedCaseKey = aes.encrypt(this.state.caseEncryptionKey, signedInSecretKey())
 
-        createCase(aes.encrypt(this.state.caseEncryptionKey, signedInSecretKey()), hash)
-          .then(() => this.onSuccess())
-          .catch((error) => this.onError(error))
+        const { send, MedXToken, CaseManager } = this.props
+        var hashHex = hashToHex(hash)
+        const combined = '0x' + encryptedCaseKey + hashHex
+        send(MedXToken, 'approveAndCall', CaseManager, 15, combined)()
     }
 
     onError = (error) => {
@@ -374,6 +394,6 @@ class CreateCase extends Component {
             </div>
         );
     }
-}
+}))))
 
 export default withRouter(CreateCase);

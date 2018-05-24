@@ -15,7 +15,7 @@ import {
   getDoctorAuthorizationRequestCaseAtIndex
 } from '@/utils/web3-util'
 import { connect } from 'react-redux'
-import { withSaga, cacheCallValue, withContractRegistry } from '@/saga-genesis'
+import { withSaga, cacheCallValue, withContractRegistry, withSend } from '@/saga-genesis'
 import { CaseRow } from './case-row'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
@@ -24,45 +24,37 @@ import { call } from 'redux-saga/effects'
 
 function mapStateToProps(state, { contractRegistry }) {
   const account = get(state, 'accounts[0]')
-  let caseManager = contractRegistry.requireAddressByName('CaseManager')
-  let caseCount = cacheCallValue(state, caseManager, 'doctorAuthorizationRequestCount', account)
+  let CaseManager = contractRegistry.requireAddressByName('CaseManager')
+  const openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount')
+  let caseCount = cacheCallValue(state, CaseManager, 'doctorAuthorizationRequestCount', account)
   let cases = []
   for (let i = 0; i < caseCount; i++) {
-    let c = cacheCallValue(state, caseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
+    let c = cacheCallValue(state, CaseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
     if (c) { cases.push(c) }
   }
   return {
     account,
+    openCaseCount,
     caseCount,
     cases,
-    caseManager
+    CaseManager
   }
 }
 
 function* saga({ account }, { cacheCall, contractRegistry }) {
   if (!account) { return }
-  let caseManager = contractRegistry.requireAddressByName('CaseManager')
-  let caseCount = yield cacheCall(caseManager, 'doctorAuthorizationRequestCount', account)
+  let CaseManager = contractRegistry.requireAddressByName('CaseManager')
+  yield cacheCall(CaseManager, 'openCaseCount')
+  let caseCount = yield cacheCall(CaseManager, 'doctorAuthorizationRequestCount', account)
   for (let i = 0; i < caseCount; i++) {
-    yield cacheCall(caseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
+    yield cacheCall(CaseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
   }
 }
 
-function mapDispatchToProps(dispatch, props) {
-  return {
-    reset: (address) => {
-      dispatch({type: 'CACHE_INVALIDATE_ADDRESS', address})
-    }
-  }
-}
-
-const OpenCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account'] })(class extends Component {
-  onClickRequestCase = async (e) => {
-    await getNextCaseFromQueue()
-  }
-
-  reset = () => {
-    this.props.reset(this.props.caseManager)
+const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account'] })(withSend(class extends Component {
+  onClickRequestCase = (e) => {
+    const { send, CaseManager } = this.props
+    send(CaseManager, 'requestNextCase')()
   }
 
   render () {
@@ -74,10 +66,10 @@ const OpenCases = withContractRegistry(connect(mapStateToProps, mapDispatchToPro
         <div className="container">
           <div className="row">
             <div className='col-xs-12'>
-              <h2>Open Cases: {this.props.caseCount}</h2>
+              <h2>Open Cases: {this.props.openCaseCount}</h2>
             </div>
             <div className="col-xs-12">
-              <Button disabled={this.props.caseCount === '0'} onClick={this.reset} bsStyle="primary">Request Case</Button>
+              <Button disabled={this.props.openCaseCount === '0'} onClick={this.onClickRequestCase} bsStyle="primary">Request Case</Button>
             </div>
             <div className="col-xs-12">
               <h2>Cases</h2>
@@ -101,7 +93,7 @@ const OpenCases = withContractRegistry(connect(mapStateToProps, mapDispatchToPro
       </MainLayout>
     )
   }
-})))
+}))))
 
 OpenCases.propTypes = {
   cases: PropTypes.array.isRequired

@@ -44,8 +44,8 @@ function mapStateToProps(state, { match, contractRegistry }) {
   }
 }
 
-function* saga(ownProps, { cacheCall, contractRegistry }) {
-  const caseAddress = ownProps.match.params.caseAddress
+function* saga({ match, account}, { cacheCall, contractRegistry }) {
+  const caseAddress = match.params.caseAddress
 
   if (!contractRegistry.hasAddress(caseAddress)) {
     contractRegistry.add(yield getCaseContract(caseAddress))
@@ -54,7 +54,7 @@ function* saga(ownProps, { cacheCall, contractRegistry }) {
 
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   const patientPublicKey = yield cacheCall(accountManager, 'publicKeys', patientAddress)
-  const encryptedCaseKey = yield cacheCall(caseAddress, 'approvedDoctorKeys', ownProps.account)
+  const encryptedCaseKey = yield cacheCall(caseAddress, 'approvedDoctorKeys', account)
 
   let status = parseInt(yield cacheCall(caseAddress, 'status'))
 
@@ -64,7 +64,7 @@ function* saga(ownProps, { cacheCall, contractRegistry }) {
   if (status >= 10) { yield cacheCall(caseAddress, 'diagnosisBLocationHash') }
 }
 
-const DiagnoseCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class extends Component {
+const DiagnoseCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'account']})(class extends Component {
   render () {
     if (!this.props.status) { return <div></div> }
 

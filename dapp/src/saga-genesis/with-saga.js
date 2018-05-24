@@ -1,19 +1,11 @@
 import React, { Component } from 'react'
-import getWeb3 from '@/get-web3'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import isEqualWith from 'lodash.isequalwith'
 
 let lastSagaKey = 0
 
 export function withSaga(saga, { propTriggers: propTriggers, storeKey: storeKey } = { storeKey: 'store' }) {
   return function (WrappedComponent) {
-    function mapStateToProps(state) {
-      return {
-        // running: state.sagas[key]
-      }
-    }
-
     function mapDispatchToProps(dispatch, props) {
       return {
         run: (newProps, key) => {
@@ -22,7 +14,7 @@ export function withSaga(saga, { propTriggers: propTriggers, storeKey: storeKey 
       }
     }
 
-    const SagaWrapper = connect(mapStateToProps, mapDispatchToProps)(class extends Component {
+    const SagaWrapper = connect(() => { return {} }, mapDispatchToProps)(class extends Component {
       constructor(props, context) {
         super(props, context)
         this.sagaKey = lastSagaKey++
@@ -47,13 +39,11 @@ export function withSaga(saga, { propTriggers: propTriggers, storeKey: storeKey 
       }
 
       runSaga = (props) => {
-        if (!props.running) {
-          props.run(props, this.sagaKey)
-        }
+        props.run(props, this.sagaKey)
       }
 
       render () {
-        return <WrappedComponent {...this.props} runSaga={this.runSaga} />
+        return <WrappedComponent {...this.props} />
       }
     })
 

@@ -17,15 +17,7 @@ function mapStateToProps (state, ownProps) {
   }
 }
 
-function mapDispatchToProps (dispatch) {
-  return {
-    refreshAccounts: () => {
-      dispatch({type: 'WEB3_ACCOUNTS_REFRESH'})
-    }
-  }
-}
-
-export const SignInRedirect = withRouter(connect(mapStateToProps, mapDispatchToProps)(class extends Component {
+export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends Component {
   constructor (props) {
     super(props)
     this.state = {}
@@ -35,7 +27,6 @@ export const SignInRedirect = withRouter(connect(mapStateToProps, mapDispatchToP
     window.addEventListener("beforeunload", this.unload)
     window.addEventListener("focus", this.refocus)
     this.checkSignInRedirect(this.props)
-    this.props.refreshAccounts()
   }
 
   componentWillUnmount () {

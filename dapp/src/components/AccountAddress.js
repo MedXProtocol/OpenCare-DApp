@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
 import './AccountAddress.css';
 import get from 'lodash.get'
+import { connect } from 'react-redux'
 
-class AccountAddress extends Component {
+function mapStateToProps(state, ownProps) {
+  const account = get(state, 'accounts[0]')
+  return {
+    account
+  }
+}
+
+const AccountAddress = connect(mapStateToProps)(class _AccountAddress extends Component {
     render() {
-      var account = get(this.props, 'accounts[0]')
         return (
             <div className="card card-account-address">
                 <div className="card-header">
@@ -24,7 +31,7 @@ class AccountAddress extends Component {
                     <div className="row">
                         <div className="col-xs-12">
                             <p className="text-right">
-                                {account}
+                                {this.props.account}
                             </p>
                         </div>
                     </div>
@@ -32,6 +39,6 @@ class AccountAddress extends Component {
             </div>
         );
     }
-}
+})
 
 export default AccountAddress
