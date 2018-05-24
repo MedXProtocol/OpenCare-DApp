@@ -6,33 +6,33 @@ import logo from '../assets/img/logo.png'
 import './Navbar.css'
 import { isDoctor } from '@/utils/web3-util'
 import { isSignedIn, signOut } from '@/services/sign-in'
+import get from 'lodash.get'
+import { connect } from 'react-redux'
+import { withContractRegistry, cacheCallValue, withSaga } from '@/saga-genesis'
 
-class Navbar extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {}
-    this.init()
+function mapStateToProps (state, { contractRegistry }) {
+  const account = get(state, 'accounts[0]')
+  const doctorManager = contractRegistry.requireAddressByName('DoctorManager')
+  const isDoctor = cacheCallValue(state, doctorManager, 'isDoctor', account)
+  return {
+    account,
+    isDoctor
   }
+}
 
-  componentWillReceiveProps (props) {
-    this.init()
-  }
+function* saga({ account }, { cacheCall, contractRegistry }) {
+  const doctorManager = contractRegistry.requireAddressByName('DoctorManager')
+  yield cacheCall(doctorManager, 'isDoctor', account)
+}
 
-  init () {
-    if (this.props.drizzleInitialized && this.props.accounts[0] && this.props.DoctorManager) {
-      // this.isDoctorDataKey = this.props.DoctorManager.isDoctor.cacheCall(this.props.accounts[0])
-    }
-  }
-
+const Navbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: 'account' })(class _Navbar extends Component {
   signOut = () => {
     signOut()
     this.props.history.push('/')
   }
 
   render() {
-    if (this.props.drizzleInitialized && this.props.DoctorManager) {
-      var isDoctor = this.props.DoctorManager.isDoctor.value(this.isDoctorDataKey)
-    }
+    var isDoctor = this.props.isDoctor
 
     if (isSignedIn()) {
       var signOut =
@@ -74,7 +74,7 @@ class Navbar extends Component {
             </nav>
         );
     }
-}
+})))
 
 Navbar.propTypes = {
     transparent: PropTypes.bool

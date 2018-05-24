@@ -5,7 +5,7 @@ import { sagaCacheContext } from '@/saga-genesis/saga-cache-context'
 import { connect } from 'react-redux'
 import isEqualWith from 'lodash.isequalwith'
 
-export function withSaga(saga, { propTriggers: propTriggers, storeKey: storeKey } = { propTriggers: [], storeKey: 'store' }) {
+export function withSaga(saga, { propTriggers: propTriggers, storeKey: storeKey } = { storeKey: 'store' }) {
   return function (WrappedComponent) {
     let wrappedSaga = sagaCacheContext(saga)
 
@@ -29,13 +29,16 @@ export function withSaga(saga, { propTriggers: propTriggers, storeKey: storeKey 
       }
 
       componentWillReceiveProps (props) {
-        if (propTriggers.length) {
-          var triggerPropsMatch = propTriggers.reduce((matched, prop) => {
-            return matched && this.props[prop] === props[prop]
-          }, true)
-          if (!triggerPropsMatch) {
-            this.runSaga(props)
-          }
+        let propsChanged = false
+        if (typeof propTriggers === 'string') {
+          propsChanged = this.props[propTriggers] !== props[propTriggers]
+        } else if (Array.isArray(propTriggers)) {
+          propsChanged = propTriggers.reduce((matched, prop) => {
+            return matched && this.props[prop] !== props[prop]
+          }, false)
+        }
+        if (propsChanged) {
+          this.runSaga(props)
         }
       }
 

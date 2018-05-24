@@ -2,12 +2,20 @@ import React, { Component } from 'react'
 import Spinner from '../../../components/Spinner'
 import { registerDoctor } from '../../../utils/web3-util'
 import get from 'lodash.get'
+import { connect } from 'react-redux'
 
-class RegisterDoctor extends Component {
+function mapStateToProps(state, ownProps) {
+  const account = get(state, 'accounts[0]')
+  return {
+    account
+  }
+}
+
+const RegisterDoctor = connect(mapStateToProps)(class _RegisterDoctor extends Component {
     constructor(props){
         super(props)
         this.state = {
-            address: get(this.props, 'accounts[0]', ''),
+            address: this.props.account || '',
             submitInProgress: false
         }
     }
@@ -33,10 +41,8 @@ class RegisterDoctor extends Component {
     }
 
     componentWillReceiveProps (props) {
-      let address = get(props, 'accounts[0]')
-      let existingAddress = get(this.props, 'accounts[0]')
-      if (!existingAddress && address) {
-        this.setState({address})
+      if (!this.props.account && props.account) {
+        this.setState({address: props.account})
       }
     }
 
@@ -77,6 +83,6 @@ class RegisterDoctor extends Component {
             </div>
         )
     }
-}
+})
 
 export default RegisterDoctor

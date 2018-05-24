@@ -1,27 +1,27 @@
-import React, { Component } from 'react';
-import './AccountBalance.css';
+import React, { Component } from 'react'
+import './AccountBalance.css'
+import { connect } from 'react-redux'
+import get from 'lodash.get'
+import { withContractRegistry, cacheCallValue, withSaga } from '@/saga-genesis'
 
-class AccountBalance extends Component {
-    constructor(props) {
-      super(props)
-      this.init(props)
-    }
+function mapStateToProps(state, { contractRegistry }) {
+  const account = get(state, 'accounts[0]')
+  const medXToken = contractRegistry.requireAddressByName('MedXToken')
+  const balance = cacheCallValue(state, medXToken, 'balanceOf', account)
+  return {
+    account,
+    balance
+  }
+}
 
-    componentWillReceiveProps (props) {
-      this.init(props)
-    }
+function* saga({ account }, { cacheCall, contractRegistry }) {
+  if (!account) { return }
+  let medXToken = contractRegistry.requireAddressByName('MedXToken')
+  yield cacheCall(medXToken, 'balanceOf', account)
+}
 
-    init (props) {
-      if (props.drizzleInitialized && props.accounts[0]) {
-        this.dataKey = props.MedXToken.balanceOf.cacheCall(props.accounts[0])
-      }
-    }
-
+const AccountBalance = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: 'account' })(class _AccountBalance extends Component {
     render() {
-      if (this.dataKey) {
-        var balance = this.props.MedXToken.balanceOf.value(this.dataKey)
-      }
-
         return (
             <div className="card card-account-balance">
                 <div className="card-header">
@@ -41,14 +41,14 @@ class AccountBalance extends Component {
                     <div className="row">
                         <div className="col-xs-12">
                             <div className="numbers">
-                                {balance} MEDX
+                                {this.props.balance} MEDX
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        );
+        )
     }
-}
+})))
 
 export default AccountBalance

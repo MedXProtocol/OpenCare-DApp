@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { DrizzleComponent } from '@/components/drizzle-component'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
@@ -11,7 +10,6 @@ import {
 import { caseStatusToName } from '@/utils/case-status-to-name'
 import get from 'lodash.get'
 import dispatch from '@/dispatch'
-import { approveDiagnosisRequest } from '@/services/request-approval'
 import bytesToHex from '@/utils/bytes-to-hex'
 import { signedInSecretKey } from '@/services/sign-in'
 import { withSaga, cacheCallValue, withContractRegistry } from '@/saga-genesis'
@@ -52,7 +50,7 @@ function* saga({ caseAddress }, { cacheCall, contractRegistry }) {
   }
 }
 
-export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress']})(class _CaseRow extends DrizzleComponent {
+export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress']})(class _CaseRow extends Component {
   onApprove = () => {
     const status = this.props.status
     const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
