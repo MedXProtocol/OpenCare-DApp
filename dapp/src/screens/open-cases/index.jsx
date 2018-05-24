@@ -34,7 +34,8 @@ function mapStateToProps(state, { contractRegistry }) {
   return {
     account,
     caseCount,
-    cases
+    cases,
+    caseManager
   }
 }
 
@@ -47,9 +48,21 @@ function* saga({ account }, { cacheCall, contractRegistry }) {
   }
 }
 
-const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account'] })(class extends Component {
+function mapDispatchToProps(dispatch, props) {
+  return {
+    reset: (address) => {
+      dispatch({type: 'CACHE_INVALIDATE_ADDRESS', address})
+    }
+  }
+}
+
+const OpenCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account'] })(class extends Component {
   onClickRequestCase = async (e) => {
     await getNextCaseFromQueue()
+  }
+
+  reset = () => {
+    this.props.reset(this.props.caseManager)
   }
 
   render () {
@@ -64,7 +77,7 @@ const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, {
               <h2>Open Cases: {this.props.caseCount}</h2>
             </div>
             <div className="col-xs-12">
-              <Button disabled={this.props.caseCount === '0'} onClick={this.onClickRequestCase} bsStyle="primary">Request Case</Button>
+              <Button disabled={this.props.caseCount === '0'} onClick={this.reset} bsStyle="primary">Request Case</Button>
             </div>
             <div className="col-xs-12">
               <h2>Cases</h2>

@@ -13,15 +13,16 @@ import get from 'lodash.get'
 function mapStateToProps(state, { contractRegistry, accounts }) {
   let account = get(state, 'accounts[0]')
   let caseManager = contractRegistry.requireAddressByName('CaseManager')
+  const caseListCount = cacheCallValue(state, caseManager, 'getPatientCaseListCount', account)
   return {
     account,
-    caseListCount: cacheCallValue(state, caseManager, 'getPatientCaseListCount', account)
+    caseListCount
   }
 }
 
 function* saga({ account }, { cacheCall, contractRegistry }) {
   let caseManager = contractRegistry.addressByName('CaseManager')
-  yield cacheCall(caseManager, 'getPatientCaseListCount', account)
+  let patientCaseListCount = yield cacheCall(caseManager, 'getPatientCaseListCount', account)
 }
 
 const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account']})(class _PatientCases extends Component {

@@ -1,4 +1,5 @@
-import { select, put, takeEvery, getContext, setContext } from 'redux-saga/effects'
+import { select, put, take, takeEvery, getContext, setContext } from 'redux-saga/effects'
+import hashCall from '@/saga-genesis/hash-call'
 
 /*
 Triggers the web3 call.
@@ -23,15 +24,56 @@ function getContractCalls(state, address) {
 
 function* invalidateAddress(action) {
   const { address } = action
-  let callHash = yield select(getContractCalls, address)
-  if (!callHash) { return }
-  yield* Object.values(callHash).map(function* (cacheCall) {
-    yield put({type: 'WEB3_CALL', call: cacheCall.call})
+  let callsMap = yield select(getContractCalls, address)
+  if (!callsMap) { return }
+  yield* Object.values(callsMap).map(function* (callState) {
+    if (callState.count > 0) {
+      yield put({type: 'WEB3_CALL', call: callState.call})
+    }
   })
 }
 
+function* clearCalls() {
+  let key = yield getContext('key')
+  yield put({type: 'CACHE_DEREGISTER_KEY', key})
+}
+
+function* registerCall(call) {
+  let key = yield getContext('key')
+  yield put({type: 'CACHE_REGISTER', call, key})
+}
+
+export function* cacheCall(address, method, ...args) {
+  let call = {address, method, args}
+  call.hash = hashCall(address, method, args)
+  yield registerCall(call)
+  let callState = yield select(state => state.calls[call.hash])
+  if (callState && callState.response) {
+    return callState.response
+  } else {
+    if (!callState || !callState.inFlight) {
+      yield put({type: 'WEB3_CALL', call})
+    }
+    // wait for call to return
+    while (true) {
+      let action = yield take(['WEB3_CALL_RETURN', 'WEB3_CALL_ERROR'])
+      if (action.call.hash === call.hash) {
+        switch (action.type) {
+          case 'WEB3_CALL_RETURN':
+            return action.response
+          case 'WEB3_CALL_ERROR':
+            throw action.error
+        }
+      }
+    }
+  }
+}
+
 function* runSaga({saga, props, key}) {
-  yield saga(props)
+  yield setContext({ key })
+  yield clearCalls()
+  let contractRegistry = yield getContext('contractRegistry')
+  yield saga(props, { cacheCall, contractRegistry })
   yield put({type: 'END_SAGA', key})
 }
 
