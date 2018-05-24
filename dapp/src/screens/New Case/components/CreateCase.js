@@ -20,6 +20,7 @@ function mapStateToProps (state, { contractRegistry }) {
   const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
   return {
     account,
+    transactions: state.sends.transactions,
     MedXToken,
     CaseManager,
     balance
@@ -55,6 +56,19 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
             showConfirmSubmissionModal: false,
             showThankYouModal: false
         };
+    }
+
+    componentWillReceiveProps (props) {
+      if (this.state.transactionId) {
+        if (get(props, `transactions[${this.state.transactionId}].complete`)) {
+          let error = props.transactions[this.state.transactionId].error
+          if (error) {
+            this.onError(error)
+          } else {
+            this.onSuccess()
+          }
+        }
+      }
     }
 
     captureFirstImage = async (event) => {
@@ -186,7 +200,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
         const { send, MedXToken, CaseManager } = this.props
         var hashHex = hashToHex(hash)
         const combined = '0x' + encryptedCaseKey + hashHex
-        send(MedXToken, 'approveAndCall', CaseManager, 15, combined)()
+        this.setState({transactionId: send(MedXToken, 'approveAndCall', CaseManager, 15, combined)()})
     }
 
     onError = (error) => {

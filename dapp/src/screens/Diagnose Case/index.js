@@ -34,6 +34,7 @@ function mapStateToProps(state, { match, contractRegistry }) {
   }
   return {
     account,
+    caseAddress,
     showDiagnosis: !!account,
     caseKey,
     status: cacheCallValue(state, caseAddress, 'status'),

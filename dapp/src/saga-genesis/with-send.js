@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createCall } from './create-call'
 
-let transactionIds = 0
+let transactionIds = 1
 
 export function withSend(WrappedComponent) {
   function mapDispatchToProps(dispatch, props) {
@@ -16,7 +16,7 @@ export function withSend(WrappedComponent) {
   const SendWrapper = connect(() => { return {} }, mapDispatchToProps)(class extends Component {
     send = (address, method, ...args) => {
       return (options) => {
-        let call = createCall(address, method, args)
+        let call = createCall(address, method, ...args)
         let transactionId = transactionIds++
         this.props.dispatchSend(transactionId, call, options)
         return transactionId

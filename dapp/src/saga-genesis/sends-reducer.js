@@ -23,6 +23,7 @@ export default function (state, {type, transactionId, call, error, receipt}) {
           ...state.transactions,
           [transactionId]: {
             inFlight: false,
+            complete: true,
             receipt
           }
         }
@@ -35,6 +36,7 @@ export default function (state, {type, transactionId, call, error, receipt}) {
           ...state.transactions,
           [transactionId]: {
             inFlight: false,
+            complete: true,
             error
           }
         }

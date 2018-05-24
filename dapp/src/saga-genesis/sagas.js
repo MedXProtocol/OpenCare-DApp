@@ -59,7 +59,7 @@ function* registerCall(call) {
 }
 
 export function* cacheCall(address, method, ...args) {
-  let call = createCall(address, method, args)
+  let call = createCall(address, method, ...args)
   yield registerCall(call)
   let callState = yield select(state => state.calls[call.hash])
   if (callState && callState.response) {

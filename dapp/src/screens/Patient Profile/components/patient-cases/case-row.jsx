@@ -16,12 +16,13 @@ import { withSaga, cacheCallValue, withContractRegistry, withSend } from '@/saga
 import reencryptCaseKey from '@/services/reencrypt-case-key'
 
 function mapStateToProps(state, { caseAddress, contractRegistry }) {
-  let accountManager = contractRegistry.requireAddressByName('AccountManager')
-  let diagnosingDoctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
-  let diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
+  const accountManager = contractRegistry.requireAddressByName('AccountManager')
+  const diagnosingDoctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
+  const diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
+  const encryptedCaseKey = bytesToHex(cacheCallValue(state, caseAddress, 'getEncryptedCaseKey'))
   return {
     status: cacheCallValue(state, caseAddress, 'status'),
-    encryptedCaseKey: bytesToHex(cacheCallValue(state, caseAddress, 'getEncryptedCaseKey')),
+    encryptedCaseKey,
     diagnosingDoctorA,
     diagnosingDoctorB,
     diagnosingDoctorAPublicKey: cacheCallValue(state, accountManager, 'publicKeys', diagnosingDoctorA),
@@ -53,7 +54,7 @@ function* saga({ caseAddress }, { cacheCall, contractRegistry }) {
 export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress']})(withSend(class _CaseRow extends Component {
   onApprove = () => {
     const status = this.props.status
-    const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
+    const encryptedCaseKey = this.props.encryptedCaseKey
     const { send, caseAddress } = this.props
     if (status === '3') {
       let doctor = this.props.diagnosingDoctorA

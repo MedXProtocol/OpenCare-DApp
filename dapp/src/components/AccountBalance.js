@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import './AccountBalance.css'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
-import { withContractRegistry, cacheCallValue, withSaga } from '@/saga-genesis'
+import { withContractRegistry, cacheCall, cacheCallValue, withSaga } from '@/saga-genesis'
 
 function mapStateToProps(state, { contractRegistry }) {
   const account = get(state, 'accounts[0]')
@@ -14,7 +14,7 @@ function mapStateToProps(state, { contractRegistry }) {
   }
 }
 
-function* saga({ account }, { cacheCall, contractRegistry }) {
+function* saga({ account }, { contractRegistry }) {
   if (!account) { return }
   let medXToken = contractRegistry.requireAddressByName('MedXToken')
   yield cacheCall(medXToken, 'balanceOf', account)

@@ -1,6 +1,8 @@
 import { withSaga } from './with-saga'
 import { withContractRegistry } from './with-contract-registry'
-import rootSagaGenesis from './sagas'
+import { createCall } from './create-call'
+import rootSagaGenesis, { cacheCall } from './sagas'
+import hashCall from './hash-call'
 import cacheCallState from './cache-call-state'
 import cacheCallValue from './cache-call-value'
 import { ContractRegistry } from './contract-registry'
@@ -8,6 +10,9 @@ import { ContractRegistryProvider } from './contract-registry-provider'
 import { withSend } from './with-send'
 
 export {
+  cacheCall,
+  createCall,
+  hashCall,
   withSaga,
   withSend,
   withContractRegistry,
