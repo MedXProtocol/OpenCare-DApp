@@ -7,7 +7,7 @@ import {
 import './PatientCases.css'
 import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
 import { PatientCaseRow } from './patient-case-row'
-import { CaseRow, caseRowSaga } from './case-row'
+import { CaseRow, caseRowSaga, mapStateToCaseRowProps } from './case-row'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { fork } from 'redux-saga/effects'
@@ -17,9 +17,20 @@ function mapStateToProps(state, { contractRegistry, accounts }) {
   let CaseManager = contractRegistry.requireAddressByName('CaseManager')
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
   const cases = []
+  let showingApprovalModal = false
   for (let caseIndex = 0; caseIndex < caseListCount; caseIndex++) {
-    let c = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
-    if (c) { cases.push(c) }
+    let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
+    let caseRowProps = mapStateToCaseRowProps(state, { caseAddress, contractRegistry })
+    if (caseAddress) {
+      if (/3|8/.test(caseRowProps.status) && !showingApprovalModal) {
+        showingApprovalModal = true
+        caseRowProps.showModal = true
+      }
+      cases.push({
+        caseAddress,
+        caseRowProps
+      })
+    }
   }
   return {
     account,
@@ -61,7 +72,7 @@ const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga
                         </tr>
                     </thead>
                     <tbody>
-                      {this.props.cases.map((caseAddress, caseIndex) => <CaseRow caseAddress={caseAddress} caseIndex={caseIndex} key={caseIndex} />
+                      {this.props.cases.map(({caseAddress, caseRowProps}, caseIndex) => <CaseRow caseAddress={caseAddress} caseIndex={caseIndex} key={caseIndex} {...caseRowProps} />
                       )}
                     </tbody>
                 </table>

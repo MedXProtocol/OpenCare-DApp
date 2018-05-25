@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { Modal } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import {
   getCaseContract,
@@ -15,7 +16,7 @@ import { signedInSecretKey } from '@/services/sign-in'
 import { withSaga, cacheCall, cacheCallValue, withContractRegistry, withSend } from '@/saga-genesis'
 import reencryptCaseKey from '@/services/reencrypt-case-key'
 
-function mapStateToProps(state, { caseAddress, contractRegistry }) {
+export function mapStateToCaseRowProps(state, { caseAddress, contractRegistry }) {
   const accountManager = contractRegistry.requireAddressByName('AccountManager')
   const diagnosingDoctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
   const diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
@@ -52,8 +53,28 @@ export function* caseRowSaga({ caseAddress }, { contractRegistry }) {
   }
 }
 //withSaga(caseRowSaga, { propTriggers: ['caseAddress']})(
-export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSend(class _CaseRow extends Component {
+export const CaseRow = withContractRegistry(withSend(class _CaseRow extends Component {
+  constructor (props, context) {
+    super(props, context)
+    this.state = {}
+  }
+
+  componentDidMount () {
+    this.init(this.props)
+  }
+
+  componentWillReceiveProps (props) {
+    this.init(props)
+  }
+
+  init (props) {
+    if (props.showModal) {
+      this.setState({showModal: true})
+    }
+  }
+
   onApprove = () => {
+    this.setState({showModal: false})
     const status = this.props.status
     const encryptedCaseKey = this.props.encryptedCaseKey
     const { send, caseAddress } = this.props
@@ -78,8 +99,24 @@ export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSend(cl
       var approvalButton = <button className='btn btn-primary' onClick={this.onApprove}>Approve</button>
     }
 
+    var modal =
+      <Modal show={this.state.showModal}>
+          <Modal.Body>
+              <div className="row">
+                  <div className="col text-center">
+                      <h4>A doctor has requested to diagnose your case.  Do you approve?</h4>
+                  </div>
+              </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <button onClick={this.onApprove} type="button" className="btn btn-defult">Yes</button>
+            <button onClick={() => this.setState({showModal: false})} type="button" className="btn btn-defult">No</button>
+          </Modal.Footer>
+      </Modal>
+
     return (
       <tr>
+        {modal}
         <td className="text-center">{this.props.caseIndex}</td>
         <td><Link to={`/patient-case/${this.props.caseAddress}`}>{this.props.caseAddress}</Link></td>
         <td>{caseStatusToName(status)}</td>
@@ -89,9 +126,10 @@ export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSend(cl
       </tr>
     )
   }
-})))
+}))
 
 CaseRow.propTypes = {
   caseAddress: PropTypes.string,
-  caseIndex: PropTypes.any
+  caseIndex: PropTypes.any,
+  showModal: PropTypes.bool
 }

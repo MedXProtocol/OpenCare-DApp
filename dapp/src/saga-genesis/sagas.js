@@ -148,7 +148,7 @@ function* startBlockTracker () {
 }
 
 function* latestBlock({block}) {
-  console.log(block)
+  // console.log(block)
   const addresses = block.transactions.reduce((addressSet, transaction) => {
     addressSet.add(transaction.to)
     return addressSet.add(transaction.from)
