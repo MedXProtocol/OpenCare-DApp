@@ -2,6 +2,7 @@ export class ContractRegistry {
   constructor () {
     this.contracts = {}
     this.nameAlias = {}
+    this.addressName = {}
   }
 
   add(web3Contract, optionalName) {
@@ -22,6 +23,11 @@ export class ContractRegistry {
 
   addNameAlias(name, address) {
     this.nameAlias[name] = address
+    this.addressName[address] = name
+  }
+
+  nameByAddress(address) {
+    return this.addressName[address]
   }
 
   addressByName(name) {

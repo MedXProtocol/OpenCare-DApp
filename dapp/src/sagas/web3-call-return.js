@@ -1,9 +1,12 @@
-import { getContext, takeEvery } from 'redux-saga/effects'
+import { put, getContext, takeEvery } from 'redux-saga/effects'
 
 function* invalidateCache ({call, receipt}) {
-  const contractRegistry = getContext('contractRegistry')
-  // const MedXToken = contractRegistry.requireAddressByName('MedXToken')
-  // if (call.address === MedXToken && call.)
+  const contractRegistry = yield getContext('contractRegistry')
+  const MedXToken = contractRegistry.requireAddressByName('MedXToken')
+  const CaseManager = contractRegistry.requireAddressByName('CaseManager')
+  if (call.address === MedXToken) {
+    yield put({type: 'CACHE_INVALIDATE_ADDRESS', address: CaseManager})
+  }
 }
 
 export default function* () {

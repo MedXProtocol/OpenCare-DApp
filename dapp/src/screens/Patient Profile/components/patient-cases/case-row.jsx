@@ -12,7 +12,7 @@ import get from 'lodash.get'
 import dispatch from '@/dispatch'
 import bytesToHex from '@/utils/bytes-to-hex'
 import { signedInSecretKey } from '@/services/sign-in'
-import { withSaga, cacheCallValue, withContractRegistry, withSend } from '@/saga-genesis'
+import { withSaga, cacheCall, cacheCallValue, withContractRegistry, withSend } from '@/saga-genesis'
 import reencryptCaseKey from '@/services/reencrypt-case-key'
 
 function mapStateToProps(state, { caseAddress, contractRegistry }) {
@@ -20,8 +20,9 @@ function mapStateToProps(state, { caseAddress, contractRegistry }) {
   const diagnosingDoctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
   const diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
   const encryptedCaseKey = bytesToHex(cacheCallValue(state, caseAddress, 'getEncryptedCaseKey'))
+  const status = cacheCallValue(state, caseAddress, 'status')
   return {
-    status: cacheCallValue(state, caseAddress, 'status'),
+    status,
     encryptedCaseKey,
     diagnosingDoctorA,
     diagnosingDoctorB,
@@ -30,7 +31,7 @@ function mapStateToProps(state, { caseAddress, contractRegistry }) {
   }
 }
 
-function* saga({ caseAddress }, { cacheCall, contractRegistry }) {
+export function* caseRowSaga({ caseAddress }, { contractRegistry }) {
   if (!caseAddress) { return {} }
 
   if (!contractRegistry.hasAddress(caseAddress)) {
@@ -50,8 +51,8 @@ function* saga({ caseAddress }, { cacheCall, contractRegistry }) {
     yield cacheCall(accountManager, 'publicKeys', diagnosingDoctorB)
   }
 }
-
-export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress']})(withSend(class _CaseRow extends Component {
+//withSaga(caseRowSaga, { propTriggers: ['caseAddress']})(
+export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSend(class _CaseRow extends Component {
   onApprove = () => {
     const status = this.props.status
     const encryptedCaseKey = this.props.encryptedCaseKey
@@ -88,7 +89,7 @@ export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(sa
       </tr>
     )
   }
-}))))
+})))
 
 CaseRow.propTypes = {
   caseAddress: PropTypes.string,

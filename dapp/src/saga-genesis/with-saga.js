@@ -10,6 +10,9 @@ export function withSaga(saga, { propTriggers: propTriggers, storeKey: storeKey 
       return {
         run: (newProps, key) => {
           dispatch({type: 'RUN_SAGA', saga, props: newProps, key})
+        },
+        clearCalls: (key) => {
+          dispatch({type: 'CACHE_DEREGISTER_KEY', key})
         }
       }
     }
@@ -22,6 +25,10 @@ export function withSaga(saga, { propTriggers: propTriggers, storeKey: storeKey 
 
       componentDidMount() {
         this.runSaga(this.props)
+      }
+
+      componentWillUnmount() {
+        this.props.clearCalls(this.sagaKey)
       }
 
       componentWillReceiveProps (props) {

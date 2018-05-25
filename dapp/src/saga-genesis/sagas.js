@@ -1,5 +1,19 @@
-import { select, put, take, takeEvery, getContext, setContext, fork, call } from 'redux-saga/effects'
+import {
+  select,
+  put,
+  take,
+  takeEvery,
+  getContext,
+  setContext,
+  fork,
+  call
+} from 'redux-saga/effects'
+import {
+  eventChannel,
+  END
+} from 'redux-saga'
 import { createCall } from './create-call'
+import PollingBlockTracker from 'eth-block-tracker'
 
 const delay = (ms) => new Promise(res => setTimeout(res, ms))
 
@@ -39,6 +53,8 @@ function getContractCalls(state, address) {
 }
 
 function* invalidateAddress({ address }) {
+  let contractRegistry = yield getContext('contractRegistry')
+  // console.log(`Invalidating ${address} ${contractRegistry.nameByAddress(address)}`)
   let callsMap = yield select(getContractCalls, address)
   if (!callsMap) { return }
   yield* Object.values(callsMap).map(function* (callState) {
@@ -104,6 +120,44 @@ function* startAccountsPolling() {
   }
 }
 
+function createBlockTrackerEmitter (web3) {
+  return eventChannel(emit => {
+    const blockTracker = new PollingBlockTracker({provider: web3.currentProvider})
+
+    blockTracker.on('latest', (block) => {
+      emit({type: 'BLOCK_LATEST', block})
+    })
+
+    blockTracker.start().catch((error) => {
+      emit({type: 'BLOCK_TRACKER_FAILED', error})
+      emit(END)
+    })
+
+    return () => {
+      blockTracker.stop()
+    }
+  })
+}
+
+function* startBlockTracker () {
+  const web3 = yield getContext('web3')
+  const channel = createBlockTrackerEmitter(web3)
+  while (true) {
+    yield put(yield take(channel))
+  }
+}
+
+function* latestBlock({block}) {
+  console.log(block)
+  const addresses = block.transactions.reduce((addressSet, transaction) => {
+    addressSet.add(transaction.to)
+    return addressSet.add(transaction.from)
+  }, new Set())
+  yield* Array.from(addresses).map(function* (address) {
+    yield put({type: 'CACHE_INVALIDATE_ADDRESS', address})
+  })
+}
+
 function* invalidateTransaction({transactionId, call, receipt}) {
   var contractAddresses = Object.values(receipt.events).reduce((addressSet, event) => {
     return addressSet.add(event.address)
@@ -117,8 +171,10 @@ export default function* () {
   yield takeEvery('WEB3_SEND_RETURN', invalidateTransaction)
   yield takeEvery('WEB3_ACCOUNTS_REFRESH', web3Accounts)
   yield takeEvery('CACHE_INVALIDATE_ADDRESS', invalidateAddress)
+  yield takeEvery('BLOCK_LATEST', latestBlock)
   yield takeEvery('WEB3_CALL', web3Call)
   yield takeEvery('WEB3_SEND', web3Send)
   yield takeEvery('RUN_SAGA', runSaga)
   yield fork(startAccountsPolling)
+  yield fork(startBlockTracker)
 }

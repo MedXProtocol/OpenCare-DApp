@@ -7,25 +7,38 @@ import {
 import './PatientCases.css'
 import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
 import { PatientCaseRow } from './patient-case-row'
+import { CaseRow, caseRowSaga } from './case-row'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
+import { fork } from 'redux-saga/effects'
 
 function mapStateToProps(state, { contractRegistry, accounts }) {
   let account = get(state, 'accounts[0]')
-  let caseManager = contractRegistry.requireAddressByName('CaseManager')
-  const caseListCount = cacheCallValue(state, caseManager, 'getPatientCaseListCount', account)
+  let CaseManager = contractRegistry.requireAddressByName('CaseManager')
+  const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
+  const cases = []
+  for (let caseIndex = 0; caseIndex < caseListCount; caseIndex++) {
+    let c = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
+    if (c) { cases.push(c) }
+  }
   return {
     account,
-    caseListCount
+    caseListCount,
+    cases,
+    CaseManager
   }
 }
 
 function* saga({ account }, { cacheCall, contractRegistry }) {
-  let caseManager = contractRegistry.addressByName('CaseManager')
-  let patientCaseListCount = yield cacheCall(caseManager, 'getPatientCaseListCount', account)
+  let CaseManager = contractRegistry.addressByName('CaseManager')
+  let patientCaseListCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', account)
+  for (let i = 0; i < patientCaseListCount; i++) {
+    let caseAddress = yield cacheCall(CaseManager, 'patientCases', account, i)
+    yield fork(caseRowSaga, {caseAddress}, {contractRegistry})
+  }
 }
 
-const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account']})(class _PatientCases extends Component {
+const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseListCount']})(class _PatientCases extends Component {
   render() {
     return (
         <div className="card">
@@ -48,7 +61,8 @@ const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga
                         </tr>
                     </thead>
                     <tbody>
-                      {[...Array(parseInt(this.props.caseListCount)).keys()].map((i) => <PatientCaseRow address={this.props.account} caseIndex={i} key={i} />)}
+                      {this.props.cases.map((caseAddress, caseIndex) => <CaseRow caseAddress={caseAddress} caseIndex={caseIndex} key={caseIndex} />
+                      )}
                     </tbody>
                 </table>
             }
