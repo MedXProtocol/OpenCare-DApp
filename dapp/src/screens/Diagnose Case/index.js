@@ -15,7 +15,7 @@ import {
   getAccountManagerContract,
   getCaseDoctorADiagnosisLocationHash
 } from '@/utils/web3-util'
-import { withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
+import { hashCall, withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
 import bytesToHex from '@/utils/bytes-to-hex'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
@@ -25,9 +25,18 @@ function mapStateToProps(state, { match, contractRegistry }) {
   let account = get(state, 'accounts[0]')
   let accountManager = contractRegistry.requireAddressByName('AccountManager')
 
+  const hasher = hashCall
+
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, accountManager, 'publicKeys', patientAddress)
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'approvedDoctorKeys', account)
+  const status = cacheCallValue(state, caseAddress, 'status')
+  const doctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
+  const doctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
+  const da = hasher(caseAddress, 'diagnosisALocationHash')
+  const db = hasher(caseAddress, 'diagnosisBLocationHash')
+  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
+  const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
   if (patientPublicKey && encryptedCaseKey) {
     const sharedKey = deriveSharedKey(signedInSecretKey(), patientPublicKey.substring(2))
     var caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
@@ -37,11 +46,11 @@ function mapStateToProps(state, { match, contractRegistry }) {
     caseAddress,
     showDiagnosis: !!account,
     caseKey,
-    status: cacheCallValue(state, caseAddress, 'status'),
-    doctorA: cacheCallValue(state, caseAddress, 'diagnosingDoctorA'),
-    diagnosisHash: getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash')),
-    doctorB: cacheCallValue(state, caseAddress, 'diagnosingDoctorB'),
-    challengeHash: getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
+    status,
+    doctorA,
+    diagnosisHash,
+    doctorB,
+    challengeHash
   }
 }
 
@@ -67,26 +76,30 @@ function* saga({ match, account}, { cacheCall, contractRegistry }) {
 
 const DiagnoseCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'account']})(class extends Component {
   render () {
+
     if (!this.props.status) { return <div></div> }
+
+    var challenging = this.props.doctorB === this.props.account
+    var status = parseInt(this.props.status)
 
     if (!isBlank(this.props.challengeHash)) {
       var challenge =
         <div className='col'>
           <ChallengedDiagnosis caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
         </div>
-    } else if (this.props.doctorB === this.props.account) {
+    } else if (this.props.doctorB === this.props.account && status === 9) {
       challenge =
         <div className='col'>
           <SubmitDiagnosis caseAddress={this.props.caseAddress} caseKey={this.props.caseKey} diagnosisHash={this.props.diagnosisHash} />
         </div>
     }
 
-    if (!isBlank(this.props.diagnosisHash)) {
+    if (!isBlank(this.props.diagnosisHash) && !challenging) {
       var diagnosis =
         <div className='col'>
           <Diagnosis caseAddress={this.props.caseAddress} caseKey={this.props.caseKey} />
         </div>
-    } else if (this.props.doctorA === this.props.account) {
+    } else if (this.props.doctorA === this.props.account && status === 4) {
       diagnosis =
         <div className='col'>
           <SubmitDiagnosis caseAddress={this.props.caseAddress} caseKey={this.props.caseKey} />

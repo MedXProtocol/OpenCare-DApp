@@ -101,7 +101,7 @@ class Diagnosis extends Component {
             <div /> :
             <div className="card">
                 <div className="card-header">
-                    <h2 className="card-title">Initial Diagnosis</h2>
+                    <h2 className="card-title">Diagnosis</h2>
                 </div>
                 <div className="card-content">
                     <div className="row">
@@ -135,7 +135,7 @@ class Diagnosis extends Component {
                     <Modal.Body>
                         <div className="row">
                             <div className="col text-center">
-                                <h4>Thank you using MedCredits!</h4>
+                                <h4>Thank you for using MedCredits!</h4>
                             </div>
                         </div>
                     </Modal.Body>

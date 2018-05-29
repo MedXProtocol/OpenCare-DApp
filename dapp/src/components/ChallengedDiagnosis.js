@@ -31,7 +31,7 @@ class ChallengedDiagnosis extends Component {
             <div/> :
             <div className="card">
                 <div className="card-header">
-                    <h2 className="card-title">Second Opinion</h2>
+                    <h2 className="card-title">Diagnosis</h2>
                 </div>
                 <div className="card-content">
                     <div className="row">

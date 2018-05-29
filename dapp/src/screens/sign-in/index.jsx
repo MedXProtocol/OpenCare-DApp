@@ -4,7 +4,6 @@ import { withRouter, Link } from 'react-router-dom'
 import { getAccount } from '@/services/get-account'
 import { signInWithPublicKeyCheck } from '@/services/sign-in'
 import { SignInForm } from '@/components/sign-in-form'
-import { getSelectedAccount } from '@/utils/web3-util'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 

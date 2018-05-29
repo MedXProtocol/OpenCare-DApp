@@ -36,7 +36,7 @@ export async function getSelectedAccountBalance() {
 
 export async function mintMedXTokens(account, amount, callback) {
   const contract = await getMedXTokenContract()
-  return contract.methods.mint(account, amount).send()
+  return contract.methods.mint(account, amount).send(await getDefaultTxOptions())
     .then((result) => {
       waitForTxComplete(result, callback)
     })
@@ -61,8 +61,8 @@ export async function getCaseDate(address) {
 }
 
 export function setPublicKey(publicKey) {
-  return getAccountManagerContract().then((accountManager) => {
-    return accountManager.methods.setPublicKey('0x' + publicKey).send()
+  return getAccountManagerContract().then(async (accountManager) => {
+    return accountManager.methods.setPublicKey('0x' + publicKey).send(await getDefaultTxOptions())
   })
 }
 
@@ -80,7 +80,7 @@ export async function createCase(encryptedCaseKey, documentHash, callback) {
   var hashHex = hashToHex(documentHash)
   const combined = '0x' + encryptedCaseKey + hashHex
 
-  return contract.methods.approveAndCall(caseManagerAddress, 15, combined).send()
+  return contract.methods.approveAndCall(caseManagerAddress, 15, combined).send(await getDefaultTxOptions())
 }
 
 export async function getCaseStatus(caseAddress) {
@@ -149,12 +149,12 @@ export async function openCaseCount() {
 
 export async function getNextCaseFromQueue() {
   const contract = await getCaseManagerContract()
-  await contract.methods.requestNextCase().send()
+  await contract.methods.requestNextCase().send(await getDefaultTxOptions())
 }
 
 export async function registerDoctor(address, callback) {
   const contract = await getDoctorManagerContract()
-  return contract.methods.addDoctor(address).send(function(error, result) {
+  return contract.methods.addDoctor(address).send(await getDefaultTxOptions(), function(error, result) {
     if(error !== null){
         callback(error, result)
     } else {
@@ -165,7 +165,7 @@ export async function registerDoctor(address, callback) {
 
 export async function acceptDiagnosis(caseAddress, callback) {
   const contract = await getCaseContract(caseAddress)
-  contract.methods.acceptDiagnosis().send(function(error, result) {
+  contract.methods.acceptDiagnosis().send(await getDefaultTxOptions(), function(error, result) {
     if(error !== null){
         callback(error, result)
     } else {
@@ -176,7 +176,7 @@ export async function acceptDiagnosis(caseAddress, callback) {
 
 export async function challengeDiagnosis(caseAddress, callback) {
   const contract = await getCaseContract(caseAddress)
-  contract.methods.challengeDiagnosis().send(function(error, result) {
+  contract.methods.challengeDiagnosis().send(await getDefaultTxOptions(), function(error, result) {
     if(error !== null){
       callback(error, result)
     } else {
@@ -187,7 +187,7 @@ export async function challengeDiagnosis(caseAddress, callback) {
 
 export async function diagnoseCase(caseAddress, diagnosisHash, callback) {
   const contract = await getCaseContract(caseAddress)
-  contract.methods.diagnoseCase(diagnosisHash).send(function(error, result) {
+  contract.methods.diagnoseCase(diagnosisHash).send(await getDefaultTxOptions(), function(error, result) {
     if(error !== null){
       callback(error, result)
     } else {
@@ -198,7 +198,7 @@ export async function diagnoseCase(caseAddress, diagnosisHash, callback) {
 
 export async function diagnoseChallengedCase(caseAddress, diagnosisHash, accept, callback) {
   const contract = await getCaseContract(caseAddress)
-  contract.methods.diagnoseChallengedCase(diagnosisHash, accept).send(function(error, result) {
+  contract.methods.diagnoseChallengedCase(diagnosisHash, accept).send(await getDefaultTxOptions(), function(error, result) {
     if(error !== null){
       callback(error, result)
     } else {
@@ -215,7 +215,7 @@ export async function contractFromConfig (config, address) {
     address = config.networks[networkId].address
   }
   let account = await getSelectedAccount()
-  return new web3.eth.Contract(config.abi, address, { from: account })
+  return new web3.eth.Contract(config.abi, address)
 }
 
 export async function getDoctorAuthorizationRequestCount() {
@@ -285,4 +285,11 @@ function waitForTxComplete(txHash, callback) {
 
     callback(null, result)
   })
+}
+
+async function getDefaultTxOptions() {
+  const account = await getSelectedAccount()
+  return {
+    from: account
+  }
 }

@@ -6,7 +6,7 @@ import {
   getContext,
   setContext,
   fork,
-  call
+  call as sagaCall
 } from 'redux-saga/effects'
 import {
   eventChannel,
@@ -23,28 +23,38 @@ Triggers the web3 call.
 function* web3Call({call}) {
   const { address, method, args } = call
   try {
+    const account = yield select(state => state.accounts[0])
+    const options = { from: account }
     const contractRegistry = yield getContext('contractRegistry')
     const contract = contractRegistry.requireByAddress(address)
-    let response = yield contract.methods[method](...args).call()
+    const callMethod = contract.methods[method](...args).call
+    console.log('web3Call: ', address, method, ...args, options)
+    let response = yield sagaCall(callMethod, options)
     yield put({type: 'WEB3_CALL_RETURN', call, response})
     return response
   } catch (error) {
+    console.error(error)
     yield put({type: 'WEB3_CALL_ERROR', call, error})
-    throw error
   }
 }
 
-function* web3Send({transactionId, call, options = {}}) {
+function* web3Send({ transactionId, call, options }) {
   const { address, method, args } = call
   try {
+    const account = yield select(state => state.accounts[0])
+    options = options || {
+      from: account
+    }
     const contractRegistry = yield getContext('contractRegistry')
     const contract = contractRegistry.requireByAddress(address)
-    let receipt = yield contract.methods[method](...args).send(options)
+    console.log('web3Send: ', address, method, ...args, options)
+    const send = contract.methods[method](...args).send
+    let receipt = yield sagaCall(send, options)
     yield put({type: 'WEB3_SEND_RETURN', transactionId, call, receipt})
     return receipt
   } catch (error) {
+    console.error(error)
     yield put({type: 'WEB3_SEND_ERROR', transactionId, call, error})
-    throw error
   }
 }
 
@@ -54,7 +64,7 @@ function getContractCalls(state, address) {
 
 function* invalidateAddress({ address }) {
   let contractRegistry = yield getContext('contractRegistry')
-  // console.log(`Invalidating ${address} ${contractRegistry.nameByAddress(address)}`)
+  console.log(`Invalidating ${address} ${contractRegistry.nameByAddress(address)}`)
   let callsMap = yield select(getContractCalls, address)
   if (!callsMap) { return }
   yield* Object.values(callsMap).map(function* (callState) {
@@ -116,7 +126,7 @@ function* web3Accounts() {
 function* startAccountsPolling() {
   while (true) {
     yield put({type: 'WEB3_ACCOUNTS_REFRESH'})
-    yield call(delay, 2000)
+    yield sagaCall(delay, 2000)
   }
 }
 
@@ -159,7 +169,7 @@ function* latestBlock({block}) {
 }
 
 function* invalidateTransaction({transactionId, call, receipt}) {
-  var contractAddresses = Object.values(receipt.events).reduce((addressSet, event) => {
+  var contractAddresses = Object.values(receipt.events || {}).reduce((addressSet, event) => {
     return addressSet.add(event.address)
   }, new Set())
   yield* Array.from(contractAddresses).map(function* (address) {

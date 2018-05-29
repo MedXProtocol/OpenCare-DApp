@@ -40,6 +40,12 @@ function mapStateToProps(state, { contractRegistry, accounts }) {
   }
 }
 
+function mapDispatchToProps (dispatch) {
+  return {
+    invalidate: (address) => dispatch({type: 'CACHE_INVALIDATE_ADDRESS', address})
+  }
+}
+
 function* saga({ account }, { cacheCall, contractRegistry }) {
   let CaseManager = contractRegistry.addressByName('CaseManager')
   let patientCaseListCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', account)
@@ -49,7 +55,10 @@ function* saga({ account }, { cacheCall, contractRegistry }) {
   }
 }
 
-const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseListCount']})(class _PatientCases extends Component {
+const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'caseListCount']})(class _PatientCases extends Component {
+  componentDidMount () {
+    this.props.invalidate(this.props.contractRegistry.requireAddressByName('CaseManager'))
+  }
   render() {
     return (
         <div className="card">

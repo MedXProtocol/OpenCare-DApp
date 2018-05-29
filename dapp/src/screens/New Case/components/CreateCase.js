@@ -4,7 +4,6 @@ import { genKey } from '@/services/gen-key'
 import { withRouter } from 'react-router-dom';
 import Spinner from '../../../components/Spinner';
 import { isNotEmptyString } from '../../../utils/common-util';
-import { getSelectedAccountBalance, createCase } from '../../../utils/web3-util';
 import { uploadJson, uploadFile } from '../../../utils/storage-util';
 import { signedInSecretKey } from '@/services/sign-in'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '@/saga-genesis'

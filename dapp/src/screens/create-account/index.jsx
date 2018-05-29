@@ -10,7 +10,6 @@ import { buildAccount } from '@/services/build-account'
 import { createAccount } from '@/services/create-account'
 import { getAccount } from '@/services/get-account'
 import { signIn } from '@/services/sign-in'
-import { getSelectedAccount } from '@/utils/web3-util'
 
 export const CreateAccount = class extends Component {
   constructor (props) {
