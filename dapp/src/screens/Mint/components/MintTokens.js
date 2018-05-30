@@ -7,11 +7,11 @@ import { connect } from 'react-redux'
 import { withContractRegistry, withSend } from '@/saga-genesis'
 
 function mapStateToProps (state, { contractRegistry }) {
-  let account = get(state, 'accounts[0]')
+  let account = get(state, 'sagaGenesis.accounts[0]')
   let MedXToken = contractRegistry.requireAddressByName('MedXToken')
   return {
     account,
-    transactions: state.sends.transactions,
+    transactions: state.sagaGenesis.transactions,
     MedXToken
   }
 }

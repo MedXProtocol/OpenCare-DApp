@@ -18,7 +18,7 @@ export function* registerCall(call) {
 }
 
 function getContractCalls(state, address) {
-  return state.sagaGenesis.cache.contractCalls[address]
+  return state.sagaGenesis.cacheScope.contractCalls[address]
 }
 
 export function* invalidateAddress({ address }) {
@@ -46,7 +46,7 @@ export function* runSaga({saga, props, key}) {
   yield setContext({ key })
   yield clearCalls()
   let contractRegistry = yield getContext('contractRegistry')
-  yield saga(props, { cacheCall, contractRegistry })
+  yield saga(props, { contractRegistry })
   yield put({type: 'END_SAGA', key})
 }
 

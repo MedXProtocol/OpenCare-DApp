@@ -2,6 +2,7 @@ import {
   put,
   takeEvery,
   getContext,
+  take,
   fork
 } from 'redux-saga/effects'
 import {

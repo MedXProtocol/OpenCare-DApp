@@ -18,7 +18,7 @@ import { withSend } from '@/saga-genesis'
 
 function mapStateToProps (state, ownProps) {
   return {
-    transactions: state.sends.transactions
+    transactions: state.sagaGenesis.transactions
   }
 }
 

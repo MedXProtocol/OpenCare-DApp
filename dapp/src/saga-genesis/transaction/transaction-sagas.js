@@ -2,7 +2,8 @@ import {
   select,
   put,
   getContext,
-  call as sagaCall
+  call as sagaCall,
+  takeEvery
 } from 'redux-saga/effects'
 
 export function* web3Send({ transactionId, call, options }) {

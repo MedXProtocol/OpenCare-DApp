@@ -8,11 +8,12 @@ import get from 'lodash.get'
 import { getCaseDate, getCaseContract } from '@/utils/web3-util'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
 import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
+import { cacheCall } from '@/saga-genesis/sagas'
 import { doctorCaseStatusToName } from '@/utils/doctor-case-status-to-name'
 import getWeb3 from '@/get-web3'
 
 function mapStateToProps(state, { address, contractRegistry }) {
-  let account = get(state, 'accounts[0]')
+  let account = get(state, 'sagaGenesis.accounts[0]')
   const status = cacheCallValue(state, address, 'status')
   const caseFee = cacheCallValue(state, address, 'caseFee')
   const diagnosingDoctorA = cacheCallValue(state, address, 'diagnosingDoctorA')
@@ -26,7 +27,7 @@ function mapStateToProps(state, { address, contractRegistry }) {
   }
 }
 
-function* propSaga({address}, {cacheCall, contractRegistry}) {
+function* propSaga({address}, {contractRegistry}) {
   let props = {}
   if (!contractRegistry.hasAddress(address)) {
     contractRegistry.add(yield getCaseContract(address))

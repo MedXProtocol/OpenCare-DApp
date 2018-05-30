@@ -16,6 +16,7 @@ import {
 } from '@/utils/web3-util'
 import { connect } from 'react-redux'
 import { withSaga, cacheCallValue, withContractRegistry, withSend } from '@/saga-genesis'
+import { cacheCall } from '@/saga-genesis/sagas'
 import { CaseRow } from './case-row'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
@@ -23,7 +24,7 @@ import dispatch from '@/dispatch'
 import { call } from 'redux-saga/effects'
 
 function mapStateToProps(state, { contractRegistry }) {
-  const account = get(state, 'accounts[0]')
+  const account = get(state, 'sagaGenesis.accounts[0]')
   let CaseManager = contractRegistry.requireAddressByName('CaseManager')
   const openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount')
   let caseCount = cacheCallValue(state, CaseManager, 'doctorAuthorizationRequestCount', account)
@@ -41,7 +42,7 @@ function mapStateToProps(state, { contractRegistry }) {
   }
 }
 
-function* saga({ account }, { cacheCall, contractRegistry }) {
+function* saga({ account }, { contractRegistry }) {
   if (!account) { return }
   let CaseManager = contractRegistry.requireAddressByName('CaseManager')
   yield cacheCall(CaseManager, 'openCaseCount')

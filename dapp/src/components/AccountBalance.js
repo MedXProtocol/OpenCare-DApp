@@ -5,7 +5,7 @@ import get from 'lodash.get'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga } from '@/saga-genesis'
 
 function mapStateToProps(state, { contractRegistry }) {
-  const account = get(state, 'accounts[0]')
+  const account = get(state, 'sagaGenesis.accounts[0]')
   const medXToken = contractRegistry.requireAddressByName('MedXToken')
   const balance = cacheCallValue(state, medXToken, 'balanceOf', account)
   return {

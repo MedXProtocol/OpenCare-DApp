@@ -10,7 +10,7 @@ import redirect from '@/services/redirect'
 import { connect } from 'react-redux'
 
 function mapStateToProps (state, ownProps) {
-  let address = get(state, 'accounts[0]')
+  let address = get(state, 'sagaGenesis.accounts[0]')
   return {
     address,
     account: getAccount(address)

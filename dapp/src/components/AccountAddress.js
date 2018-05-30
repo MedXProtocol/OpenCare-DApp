@@ -4,7 +4,7 @@ import get from 'lodash.get'
 import { connect } from 'react-redux'
 
 function mapStateToProps(state, ownProps) {
-  const account = get(state, 'accounts[0]')
+  const account = get(state, 'sagaGenesis.accounts[0]')
   return {
     account
   }

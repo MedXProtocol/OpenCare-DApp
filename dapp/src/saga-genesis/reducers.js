@@ -1,14 +1,14 @@
 import { combineReducers } from 'redux'
-import cache from './cache/cache-reducer'
-import calls from './calls/calls-reducer'
-import sagas from './saga-reducer'
-import accounts from './accounts/accounts-reducer'
-import sends from './sends/sends-reducer'
+import accounts from './account/account-reducer'
+import cacheScope from './cache-scope/cache-scope-reducer'
+import callCache from './call-cache/call-cache-reducer'
+import transactions from './transaction/transaction-reducer'
+import network from './network/network-reducer'
 
 export const sagaGenesis = combineReducers({
-  cache,
-  calls,
-  sagas,
+  cacheScope,
+  callCache,
   accounts,
-  sends
+  transactions,
+  network
 })

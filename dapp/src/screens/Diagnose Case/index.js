@@ -16,13 +16,14 @@ import {
   getCaseDoctorADiagnosisLocationHash
 } from '@/utils/web3-util'
 import { hashCall, withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
+import { cacheCall } from '@/saga-genesis/sagas'
 import bytesToHex from '@/utils/bytes-to-hex'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
 
 function mapStateToProps(state, { match, contractRegistry }) {
   const caseAddress = match.params.caseAddress
-  let account = get(state, 'accounts[0]')
+  let account = get(state, 'sagaGenesis.accounts[0]')
   let accountManager = contractRegistry.requireAddressByName('AccountManager')
 
   const hasher = hashCall
@@ -54,7 +55,7 @@ function mapStateToProps(state, { match, contractRegistry }) {
   }
 }
 
-function* saga({ match, account}, { cacheCall, contractRegistry }) {
+function* saga({ match, account}, { contractRegistry }) {
   const caseAddress = match.params.caseAddress
 
   if (!contractRegistry.hasAddress(caseAddress)) {

@@ -1,3 +1,14 @@
+import {
+  all,
+  put,
+  select,
+  take,
+  takeEvery,
+  getContext,
+  call as sagaCall
+} from 'redux-saga/effects'
+import { registerCall } from '../cache-scope/cache-scope-sagas'
+import { createCall } from '../utils/create-call'
 
 /*
 Triggers the web3 call.
@@ -23,7 +34,7 @@ function* web3Call({call}) {
 export function* cacheCall(address, method, ...args) {
   let call = createCall(address, method, ...args)
   yield registerCall(call)
-  let callState = yield select(state => state.sagaGenesis.calls[call.hash])
+  let callState = yield select(state => state.sagaGenesis.callCache[call.hash])
   if (callState && callState.response) {
     return callState.response
   } else {

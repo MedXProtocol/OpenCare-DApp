@@ -1,19 +1,25 @@
-import accountsSagas from './accounts/accounts-sagas'
-import blocksSagas from './blocks/blocks-sagas'
-import cacheSagas from './cache/cache-sagas'
-import callsSagas from './calls/calls-sagas'
+import { all } from 'redux-saga/effects'
+
+import accountSagas from './account/account-sagas'
+import blockSagas from './block/block-sagas'
+import cacheScopeSagas from './cache-scope/cache-scope-sagas'
+import callCacheSagas, { cacheCall } from './call-cache/call-cache-sagas'
 import networkSagas from './network/network-sagas'
-import sendsSagas from './sends/sends-sagas'
+import transactionSagas from './transaction/transaction-sagas'
+
+export {
+  cacheCall
+}
 
 export default function* () {
   yield all(
     [
-      accountsSagas(),
-      blocksSagas(),
-      cacheSagas(),
-      callsSagas(),
+      accountSagas(),
+      blockSagas(),
+      cacheScopeSagas(),
+      callCacheSagas(),
       networkSagas(),
-      sendsSagas()
+      transactionSagas()
     ]
   )
 }

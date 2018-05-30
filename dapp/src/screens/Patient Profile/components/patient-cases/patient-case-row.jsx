@@ -5,6 +5,7 @@ import { CaseRow } from './case-row'
 import { connect } from 'react-redux'
 import { getCaseManagerContract } from '@/utils/web3-util'
 import { withContractRegistry, cacheCallValue, withSaga, createCall, hashCall } from '@/saga-genesis'
+import { cacheCall } from '@/saga-genesis/sagas'
 
 function mapStateToProps(state, { address, caseIndex, contractRegistry }) {
   let CaseManager = contractRegistry.requireAddressByName('CaseManager')
@@ -14,7 +15,7 @@ function mapStateToProps(state, { address, caseIndex, contractRegistry }) {
   }
 }
 
-function* saga({ address, caseIndex }, { cacheCall, contractRegistry }) {
+function* saga({ address, caseIndex }, { contractRegistry }) {
   let CaseManager = contractRegistry.requireAddressByName('CaseManager')
   yield cacheCall(CaseManager, 'patientCases', address, caseIndex)
 }

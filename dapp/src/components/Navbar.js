@@ -9,9 +9,10 @@ import { isSignedIn, signOut } from '@/services/sign-in'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { withContractRegistry, cacheCallValue, withSaga } from '@/saga-genesis'
+import { cacheCall } from '@/saga-genesis/sagas'
 
 function mapStateToProps (state, { contractRegistry }) {
-  const account = get(state, 'accounts[0]')
+  const account = get(state, 'sagaGenesis.accounts[0]')
   const doctorManager = contractRegistry.requireAddressByName('DoctorManager')
   const isDoctor = cacheCallValue(state, doctorManager, 'isDoctor', account)
   return {
@@ -20,7 +21,7 @@ function mapStateToProps (state, { contractRegistry }) {
   }
 }
 
-function* saga({ account }, { cacheCall, contractRegistry }) {
+function* saga({ account }, { contractRegistry }) {
   const doctorManager = contractRegistry.requireAddressByName('DoctorManager')
   yield cacheCall(doctorManager, 'isDoctor', account)
 }

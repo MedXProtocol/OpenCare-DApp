@@ -14,14 +14,14 @@ import get from 'lodash.get'
 import getWeb3 from '@/get-web3'
 
 function mapStateToProps (state, { contractRegistry }) {
-  const account = get(state, 'accounts[0]')
+  const account = get(state, 'sagaGenesis.accounts[0]')
   const MedXToken = contractRegistry.requireAddressByName('MedXToken')
   const CaseManager = contractRegistry.requireAddressByName('CaseManager')
   const CaseManagerContract = contractRegistry.findByAddress(CaseManager)
   const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
   return {
     account,
-    transactions: state.sends.transactions,
+    transactions: state.sagaGenesis.transactions,
     MedXToken,
     CaseManager,
     CaseManagerContract,

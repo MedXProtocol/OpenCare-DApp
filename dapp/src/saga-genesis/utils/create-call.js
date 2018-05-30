@@ -1,4 +1,4 @@
-import hashCall from '@/saga-genesis/hash-call'
+import hashCall from './hash-call'
 
 export function createCall(address, method, ...args) {
   let call = {address, method, args}

@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getCaseContract } from '../../../utils/web3-util';
 import { withSaga } from '@/saga-genesis/with-saga'
+import { cacheCall } from '@/saga-genesis/sagas'
 
-function* propSaga(ownProps, { cacheCall, contractRegistry }) {
+function* propSaga(ownProps, { contractRegistry }) {
   if (!contractRegistry.hasAddress(ownProps.caseAddress)) {
     contractRegistry.add(yield getCaseContract(ownProps.caseAddress))
   }
