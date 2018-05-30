@@ -15,9 +15,11 @@ import bytesToHex from '@/utils/bytes-to-hex'
 import { signedInSecretKey } from '@/services/sign-in'
 import { withSaga, cacheCall, cacheCallValue, withContractRegistry, withSend } from '@/saga-genesis'
 import reencryptCaseKey from '@/services/reencrypt-case-key'
+import { contractByName } from '@/saga-genesis/state-finders'
+import { addContract } from '@/saga-genesis/sagas'
 
-export function mapStateToCaseRowProps(state, { caseAddress, contractRegistry }) {
-  const accountManager = contractRegistry.requireAddressByName('AccountManager')
+export function mapStateToCaseRowProps(state, { caseAddress }) {
+  const AccountManager = contractByName(state, 'AccountManager')
   const diagnosingDoctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
   const diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
@@ -27,29 +29,23 @@ export function mapStateToCaseRowProps(state, { caseAddress, contractRegistry })
     encryptedCaseKey,
     diagnosingDoctorA,
     diagnosingDoctorB,
-    diagnosingDoctorAPublicKey: cacheCallValue(state, accountManager, 'publicKeys', diagnosingDoctorA),
-    diagnosingDoctorBPublicKey: cacheCallValue(state, accountManager, 'publicKeys', diagnosingDoctorB)
+    diagnosingDoctorAPublicKey: cacheCallValue(state, AccountManager, 'publicKeys', diagnosingDoctorA),
+    diagnosingDoctorBPublicKey: cacheCallValue(state, AccountManager, 'publicKeys', diagnosingDoctorB),
+    AccountManager
   }
 }
 
-export function* caseRowSaga({ caseAddress }, { contractRegistry }) {
-  if (!caseAddress) { return {} }
-
-  if (!contractRegistry.hasAddress(caseAddress)) {
-    contractRegistry.add(yield getCaseContract(caseAddress))
-  }
-
-  let accountManager = contractRegistry.requireAddressByName('AccountManager')
-
+export function* caseRowSaga({ caseAddress, AccountManager }) {
+  if (!caseAddress || !AccountManager) { return {} }
+  yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'encryptedCaseKey')
   let status = yield cacheCall(caseAddress, 'status')
-
   if (status === '3') {
     let diagnosingDoctorA = yield cacheCall(caseAddress, 'diagnosingDoctorA')
-    yield cacheCall(accountManager, 'publicKeys', diagnosingDoctorA)
+    yield cacheCall(AccountManager, 'publicKeys', diagnosingDoctorA)
   } else if (status === '8') {
     let diagnosingDoctorB = yield cacheCall(caseAddress, 'diagnosingDoctorB')
-    yield cacheCall(accountManager, 'publicKeys', diagnosingDoctorB)
+    yield cacheCall(AccountManager, 'publicKeys', diagnosingDoctorB)
   }
 }
 //withSaga(caseRowSaga, { propTriggers: ['caseAddress']})(

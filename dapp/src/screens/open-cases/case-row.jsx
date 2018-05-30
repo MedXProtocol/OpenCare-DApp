@@ -3,7 +3,6 @@ import React, {
 } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import dispatch from '@/dispatch'
 import get from 'lodash.get'
 import { getCaseDate, getCaseContract } from '@/utils/web3-util'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
@@ -11,8 +10,9 @@ import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
 import { cacheCall } from '@/saga-genesis/sagas'
 import { doctorCaseStatusToName } from '@/utils/doctor-case-status-to-name'
 import getWeb3 from '@/get-web3'
+import { addContract } from '@/saga-genesis/sagas'
 
-function mapStateToProps(state, { address, contractRegistry }) {
+function mapStateToProps(state, { address }) {
   let account = get(state, 'sagaGenesis.accounts[0]')
   const status = cacheCallValue(state, address, 'status')
   const caseFee = cacheCallValue(state, address, 'caseFee')
@@ -27,11 +27,9 @@ function mapStateToProps(state, { address, contractRegistry }) {
   }
 }
 
-function* propSaga({address}, {contractRegistry}) {
+function* propSaga({address}) {
   let props = {}
-  if (!contractRegistry.hasAddress(address)) {
-    contractRegistry.add(yield getCaseContract(address))
-  }
+  yield addContract({address, contractKey: 'Case'})
   let status = parseInt(yield cacheCall(address, 'status'))
   yield cacheCall(address, 'caseFee')
   if (status >= 3) {

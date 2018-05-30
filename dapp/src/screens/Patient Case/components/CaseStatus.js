@@ -2,13 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getCaseContract } from '../../../utils/web3-util';
 import { withSaga } from '@/saga-genesis/with-saga'
-import { cacheCall } from '@/saga-genesis/sagas'
+import { cacheCall, addContract } from '@/saga-genesis/sagas'
+import { select } from 'redux-saga/effects'
 
-function* propSaga(ownProps, { contractRegistry }) {
-  if (!contractRegistry.hasAddress(ownProps.caseAddress)) {
-    contractRegistry.add(yield getCaseContract(ownProps.caseAddress))
-  }
-  const status = yield cacheCall(ownProps.caseAddress, 'status')
+function* propSaga({ caseAddress }) {
+  yield addContract({address: caseAddress, contractKey: 'Case'})
+  const status = yield cacheCall(caseAddress, 'status')
   return {
     status
   }

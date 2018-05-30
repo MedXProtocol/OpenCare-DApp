@@ -9,33 +9,25 @@ import { deriveSharedKey } from '@/services/derive-shared-key'
 import aes from '@/services/aes'
 import isBlank from '@/utils/is-blank'
 import get from 'lodash.get'
-import {
-  getCaseStatus,
-  getCaseContract,
-  getAccountManagerContract,
-  getCaseDoctorADiagnosisLocationHash
-} from '@/utils/web3-util'
 import { hashCall, withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
-import { cacheCall } from '@/saga-genesis/sagas'
-import bytesToHex from '@/utils/bytes-to-hex'
+import { cacheCall, addContract } from '@/saga-genesis/sagas'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
+import { contractByName } from '@/saga-genesis/state-finders'
 
-function mapStateToProps(state, { match, contractRegistry }) {
+function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
   let account = get(state, 'sagaGenesis.accounts[0]')
-  let accountManager = contractRegistry.requireAddressByName('AccountManager')
+  const AccountManager = contractByName(state, 'AccountManager')
 
   const hasher = hashCall
 
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
-  const patientPublicKey = cacheCallValue(state, accountManager, 'publicKeys', patientAddress)
+  const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'approvedDoctorKeys', account)
   const status = cacheCallValue(state, caseAddress, 'status')
   const doctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
   const doctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
-  const da = hasher(caseAddress, 'diagnosisALocationHash')
-  const db = hasher(caseAddress, 'diagnosisBLocationHash')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
   if (patientPublicKey && encryptedCaseKey) {
@@ -51,21 +43,18 @@ function mapStateToProps(state, { match, contractRegistry }) {
     doctorA,
     diagnosisHash,
     doctorB,
-    challengeHash
+    challengeHash,
+    AccountManager
   }
 }
 
-function* saga({ match, account}, { contractRegistry }) {
+function* saga({ match, account, AccountManager }) {
+  if (!AccountManager) { return }
   const caseAddress = match.params.caseAddress
-
-  if (!contractRegistry.hasAddress(caseAddress)) {
-    contractRegistry.add(yield getCaseContract(caseAddress))
-  }
-  let accountManager = contractRegistry.addressByName('AccountManager')
-
+  yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
-  const patientPublicKey = yield cacheCall(accountManager, 'publicKeys', patientAddress)
-  const encryptedCaseKey = yield cacheCall(caseAddress, 'approvedDoctorKeys', account)
+  yield cacheCall(AccountManager, 'publicKeys', patientAddress)
+  yield cacheCall(caseAddress, 'approvedDoctorKeys', account)
 
   let status = parseInt(yield cacheCall(caseAddress, 'status'))
 
@@ -75,7 +64,7 @@ function* saga({ match, account}, { contractRegistry }) {
   if (status >= 10) { yield cacheCall(caseAddress, 'diagnosisBLocationHash') }
 }
 
-const DiagnoseCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'account']})(class extends Component {
+const DiagnoseCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'account', 'AccountManager']})(class extends Component {
   render () {
 
     if (!this.props.status) { return <div></div> }

@@ -8,12 +8,12 @@ import { getCaseKey, getCaseDoctorADiagnosisLocationHash, getCaseContract } from
 import { signedInSecretKey } from '@/services/sign-in'
 import aes from '@/services/aes'
 import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
-import { cacheCall } from '@/saga-genesis/sagas'
+import { cacheCall, addContract } from '@/saga-genesis/sagas'
 import bytesToHex from '@/utils/bytes-to-hex'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
 
-function mapStateToProps(state, { match, contractRegistry }) {
+function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   if (encryptedCaseKey) {
@@ -26,13 +26,9 @@ function mapStateToProps(state, { match, contractRegistry }) {
   }
 }
 
-function* saga({ match }, { contractRegistry }) {
+function* saga({ match }) {
   const caseAddress = match.params.caseAddress
-
-  if (!contractRegistry.hasAddress(caseAddress)) {
-    contractRegistry.add(yield getCaseContract(caseAddress))
-  }
-
+  addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'encryptedCaseKey')
   yield cacheCall(caseAddress, 'diagnosisALocationHash')
 }

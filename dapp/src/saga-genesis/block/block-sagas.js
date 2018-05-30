@@ -7,7 +7,6 @@ import {
 } from 'redux-saga/effects'
 import {
   eventChannel,
-  delay,
   END
 } from 'redux-saga'
 import PollingBlockTracker from 'eth-block-tracker'

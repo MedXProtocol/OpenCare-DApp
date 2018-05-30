@@ -11,7 +11,7 @@ import {
 export function* refreshNetwork() {
   const web3 = yield getContext('web3')
   let networkId = yield web3.eth.net.getId()
-  yield put({type: 'WEB3_NETWORK_ID', networkId})
+  yield put({type: 'WEB3_NETWORK_ID', web3, networkId})
 }
 
 export function* startNetworkPolling() {

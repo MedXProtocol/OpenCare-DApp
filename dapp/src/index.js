@@ -11,21 +11,19 @@ import './assets/css/themify-icons.css'
 import './assets/sass/site.css'
 import './index.css'
 import App from './App'
-import storePromise from '@/store'
+import store, { contractRegistry } from '@/store'
 
 window.addEventListener('load', () => {
-  storePromise.then(({store, options, contractRegistry}) => {
-    let coreApp =
-      <ErrorBoundary>
-        <ContractRegistryProvider contractRegistry={contractRegistry}>
-          <Provider store={store}>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </Provider>
-        </ContractRegistryProvider>
-      </ErrorBoundary>
+  let coreApp =
+    <ErrorBoundary>
+      <ContractRegistryProvider contractRegistry={contractRegistry}>
+        <Provider store={store}>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </Provider>
+      </ContractRegistryProvider>
+    </ErrorBoundary>
 
-    ReactDOM.render(coreApp, document.getElementById('root'))
-  })
+  ReactDOM.render(coreApp, document.getElementById('root'))
 })

@@ -23,7 +23,6 @@ function getContractCalls(state, address) {
 
 export function* invalidateAddress({ address }) {
   let contractRegistry = yield getContext('contractRegistry')
-  // console.log(`Invalidating ${address} ${contractRegistry.nameByAddress(address)}`)
   let callsMap = yield select(getContractCalls, address)
   if (!callsMap) { return }
   yield* Object.values(callsMap).map(function* (callState) {
@@ -45,8 +44,7 @@ export function* invalidateTransaction({transactionId, call, receipt}) {
 export function* runSaga({saga, props, key}) {
   yield setContext({ key })
   yield clearCalls()
-  let contractRegistry = yield getContext('contractRegistry')
-  yield saga(props, { contractRegistry })
+  yield saga(props)
   yield put({type: 'END_SAGA', key})
 }
 

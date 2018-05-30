@@ -5,10 +5,11 @@ import get from 'lodash.get'
 import defined from '@/utils/defined'
 import { connect } from 'react-redux'
 import { withContractRegistry, withSend } from '@/saga-genesis'
+import { contractByName } from '@/saga-genesis/state-finders'
 
-function mapStateToProps (state, { contractRegistry }) {
+function mapStateToProps (state) {
   let account = get(state, 'sagaGenesis.accounts[0]')
-  let MedXToken = contractRegistry.requireAddressByName('MedXToken')
+  let MedXToken = contractByName(state, 'MedXToken')
   return {
     account,
     transactions: state.sagaGenesis.transactions,

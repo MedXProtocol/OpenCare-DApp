@@ -12,28 +12,28 @@ import { connect } from 'react-redux'
 import aes from '@/services/aes'
 import get from 'lodash.get'
 import getWeb3 from '@/get-web3'
+import { contractByName } from '@/saga-genesis/state-finders'
 
-function mapStateToProps (state, { contractRegistry }) {
+function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
-  const MedXToken = contractRegistry.requireAddressByName('MedXToken')
-  const CaseManager = contractRegistry.requireAddressByName('CaseManager')
-  const CaseManagerContract = contractRegistry.findByAddress(CaseManager)
+  const MedXToken = contractByName(state, 'MedXToken')
+  const CaseManager = contractByName(state, 'CaseManager')
   const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
   return {
     account,
     transactions: state.sagaGenesis.transactions,
     MedXToken,
     CaseManager,
-    CaseManagerContract,
     balance
   }
 }
 
 function* saga({ account, MedXToken }) {
+  if (!MedXToken) { return }
   yield cacheCall(MedXToken, 'balanceOf', account)
 }
 
-const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: 'account' })(withSend(class _CreateCase extends Component {
+const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(withSend(class _CreateCase extends Component {
     constructor(){
         super()
 
@@ -195,9 +195,6 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
             description: this.state.description
         };
 
-        const web3 = getWeb3()
-
-
         const caseJson = JSON.stringify(caseInformation);
         const hash = await uploadJson(caseJson, this.state.caseEncryptionKey);
         const encryptedCaseKey = aes.encrypt(this.state.caseEncryptionKey, signedInSecretKey())
@@ -205,7 +202,9 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
         const { send, MedXToken, CaseManager } = this.props
         var hashHex = hashToHex(hash)
 
-        var data = this.props.CaseManagerContract.methods.createCase(this.props.account, '0x' + encryptedCaseKey, '0x' + hashHex).encodeABI()
+        var CaseManagerContract = this.props.contractRegistry.get(this.props.CaseManager, 'CaseManager', getWeb3())
+        var data = CaseManagerContract.methods.createCase(this.props.account, '0x' + encryptedCaseKey, '0x' + hashHex).encodeABI()
+
         this.setState({transactionId: send(MedXToken, 'approveAndCall', CaseManager, 15, data)()})
     }
 

@@ -1,5 +1,5 @@
-import storePromise from '@/store'
+import store from '@/store'
 
 export default function(action) {
-  storePromise.then(({ store }) => { store.dispatch(action) })
+  store.dispatch(action)
 }

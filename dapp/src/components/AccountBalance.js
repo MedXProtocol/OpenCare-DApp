@@ -3,24 +3,25 @@ import './AccountBalance.css'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga } from '@/saga-genesis'
+import { contractByName } from '@/saga-genesis/state-finders'
 
-function mapStateToProps(state, { contractRegistry }) {
+function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
-  const medXToken = contractRegistry.requireAddressByName('MedXToken')
-  const balance = cacheCallValue(state, medXToken, 'balanceOf', account)
+  const MedXToken = contractByName(state, 'MedXToken')
+  const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
   return {
     account,
-    balance
+    balance,
+    MedXToken
   }
 }
 
-function* saga({ account }, { contractRegistry }) {
-  if (!account) { return }
-  let medXToken = contractRegistry.requireAddressByName('MedXToken')
-  yield cacheCall(medXToken, 'balanceOf', account)
+function* saga({ account, MedXToken }) {
+  if (!account || !MedXToken) { return }
+  yield cacheCall(MedXToken, 'balanceOf', account)
 }
 
-const AccountBalance = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: 'account' })(class _AccountBalance extends Component {
+const AccountBalance = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(class _AccountBalance extends Component {
     render() {
         return (
             <div className="card card-account-balance">

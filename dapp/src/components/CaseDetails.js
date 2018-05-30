@@ -6,19 +6,18 @@ import { withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
 import { all } from 'redux-saga/effects'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
-import { cacheCall } from '@/saga-genesis/sagas'
+import { cacheCall, addContract } from '@/saga-genesis/sagas'
+import { contractByName } from '@/saga-genesis/state-finders'
 
-function mapStateToProps(state, { caseAddress, contractRegistry }) {
+function mapStateToProps(state, { caseAddress }) {
   let caseDetailLocationHash = cacheCallValue(state, caseAddress, 'caseDetailLocationHash')
   return {
     caseDetailsHash: getFileHashFromBytes(caseDetailLocationHash)
   }
 }
 
-function* saga({ caseAddress }, { contractRegistry }) {
-  if (!contractRegistry.hasAddress(caseAddress)) {
-    contractRegistry.add(yield getCaseContract(caseAddress))
-  }
+function* saga({ caseAddress, networkId }) {
+  yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'caseDetailLocationHash')
 }
 

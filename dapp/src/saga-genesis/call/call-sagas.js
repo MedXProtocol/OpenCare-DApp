@@ -1,34 +1,35 @@
 import {
-  select,
   put,
+  select,
+  takeEvery,
   getContext,
-  call as sagaCall,
-  takeEvery
+  call as sagaCall
 } from 'redux-saga/effects'
 import { contractKeyByAddress } from '../state-finders'
 
-export function* web3Send({ transactionId, call, options }) {
+/*
+Triggers the web3 call.
+*/
+export function* web3Call({call}) {
   const { address, method, args } = call
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
-    options = options || {
-      from: account
-    }
+    const options = { from: account }
     const contractRegistry = yield getContext('contractRegistry')
     const web3 = yield getContext('web3')
     const contractKey = yield select(contractKeyByAddress, address)
     const contract = contractRegistry.get(address, contractKey, web3)
-    // console.log('web3Send: ', address, method, ...args, options)
-    const send = contract.methods[method](...args).send
-    let receipt = yield sagaCall(send, options)
-    yield put({type: 'WEB3_SEND_RETURN', transactionId, call, receipt})
-    return receipt
+    const callMethod = contract.methods[method](...args).call
+    // console.log('web3Call: ', address, method, ...args, options)
+    let response = yield sagaCall(callMethod, options)
+    yield put({type: 'WEB3_CALL_RETURN', call, response})
+    return response
   } catch (error) {
     console.error(error)
-    yield put({type: 'WEB3_SEND_ERROR', transactionId, call, error})
+    yield put({type: 'WEB3_CALL_ERROR', call, error})
   }
 }
 
 export default function* () {
-  yield takeEvery('WEB3_SEND', web3Send)
+  yield takeEvery('WEB3_CALL', web3Call)
 }

@@ -4,10 +4,12 @@ import { registerDoctor } from '../../../utils/web3-util'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { withContractRegistry, withSend } from '@/saga-genesis'
+import { contractByName } from '@/saga-genesis/state-finders'
 
-function mapStateToProps(state, { contractRegistry }) {
+
+function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
-  const DoctorManager = contractRegistry.requireAddressByName('DoctorManager')
+  const DoctorManager = contractByName(state, 'DoctorManager')
   return {
     account,
     DoctorManager

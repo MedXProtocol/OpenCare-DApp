@@ -7,25 +7,17 @@ import {
   Table
 } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import getWeb3 from '@/get-web3'
-import {
-  getNextCaseFromQueue,
-  getCaseManagerContract,
-  getDoctorAuthorizationRequestCount,
-  getDoctorAuthorizationRequestCaseAtIndex
-} from '@/utils/web3-util'
 import { connect } from 'react-redux'
 import { withSaga, cacheCallValue, withContractRegistry, withSend } from '@/saga-genesis'
 import { cacheCall } from '@/saga-genesis/sagas'
 import { CaseRow } from './case-row'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
-import dispatch from '@/dispatch'
-import { call } from 'redux-saga/effects'
+import { contractByName } from '@/saga-genesis/state-finders'
 
-function mapStateToProps(state, { contractRegistry }) {
+function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
-  let CaseManager = contractRegistry.requireAddressByName('CaseManager')
+  let CaseManager = contractByName(state, 'CaseManager')
   const openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount')
   let caseCount = cacheCallValue(state, CaseManager, 'doctorAuthorizationRequestCount', account)
   let cases = []
@@ -42,9 +34,8 @@ function mapStateToProps(state, { contractRegistry }) {
   }
 }
 
-function* saga({ account }, { contractRegistry }) {
-  if (!account) { return }
-  let CaseManager = contractRegistry.requireAddressByName('CaseManager')
+function* saga({ account, CaseManager }) {
+  if (!account || !CaseManager) { return }
   yield cacheCall(CaseManager, 'openCaseCount')
   let caseCount = yield cacheCall(CaseManager, 'doctorAuthorizationRequestCount', account)
   for (let i = 0; i < caseCount; i++) {
@@ -52,7 +43,7 @@ function* saga({ account }, { contractRegistry }) {
   }
 }
 
-const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account'] })(withSend(class extends Component {
+const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager'] })(withSend(class extends Component {
   onClickRequestCase = (e) => {
     const { send, CaseManager } = this.props
     send(CaseManager, 'requestNextCase')()

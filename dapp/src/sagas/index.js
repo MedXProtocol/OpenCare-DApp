@@ -1,22 +1,22 @@
-import { all, fork } from 'redux-saga/effects'
-import getCaseInfo from './get-case-info'
-import getDoctorCases from './get-doctor-cases'
-import openCaseCount from './open-case-count'
-import getCaseDate from './get-case-date'
-import { rootSagaGenesis  } from '@/saga-genesis'
+import { all, fork, takeEvery } from 'redux-saga/effects'
+import rootSagaGenesis, { takeWeb3Initialized } from '@/saga-genesis/sagas'
 import web3CallReturn from './web3-call-return'
 import cacheInvalidatePoll from './cache-invalidate-poll'
+import addTopLevelContracts from './add-top-level-contracts'
+import addRegistryContracts from './add-registry-contracts'
 
-export default function* () {
+function* start() {
+  yield addTopLevelContracts()
   yield all(
     [
-      getCaseInfo(),
-      getDoctorCases(),
-      openCaseCount(),
-      getCaseDate(),
-      rootSagaGenesis(),
       web3CallReturn(),
       cacheInvalidatePoll()
     ]
   )
+}
+
+export default function* () {
+  yield fork(takeWeb3Initialized, start)
+  yield takeEvery('WEB3_NETWORK_ID', addRegistryContracts)
+  yield rootSagaGenesis()
 }

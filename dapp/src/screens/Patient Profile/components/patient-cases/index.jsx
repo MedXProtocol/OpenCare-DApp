@@ -12,16 +12,18 @@ import { CaseRow, caseRowSaga, mapStateToCaseRowProps } from './case-row'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { fork } from 'redux-saga/effects'
+import { contractByName } from '@/saga-genesis/state-finders'
 
-function mapStateToProps(state, { contractRegistry, accounts }) {
-  let account = get(state, 'sagaGenesis.accounts[0]')
-  let CaseManager = contractRegistry.requireAddressByName('CaseManager')
+function mapStateToProps(state, { accounts }) {
+  const account = get(state, 'sagaGenesis.accounts[0]')
+  const CaseManager = contractByName(state, 'CaseManager')
+  const AccountManager = contractByName(state, 'AccountManager')
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
   const cases = []
   let showingApprovalModal = false
   for (let caseIndex = 0; caseIndex < caseListCount; caseIndex++) {
     let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
-    let caseRowProps = mapStateToCaseRowProps(state, { caseAddress, contractRegistry })
+    let caseRowProps = mapStateToCaseRowProps(state, { caseAddress })
     if (caseAddress) {
       if (/3|8/.test(caseRowProps.status) && !showingApprovalModal) {
         showingApprovalModal = true
@@ -37,7 +39,8 @@ function mapStateToProps(state, { contractRegistry, accounts }) {
     account,
     caseListCount,
     cases,
-    CaseManager
+    CaseManager,
+    AccountManager
   }
 }
 
@@ -47,18 +50,18 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
-function* saga({ account }, { contractRegistry }) {
-  let CaseManager = contractRegistry.addressByName('CaseManager')
+function* saga({ account, CaseManager, AccountManager }) {
+  if (!account || !CaseManager) { return }
   let patientCaseListCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', account)
   for (let i = 0; i < patientCaseListCount; i++) {
     let caseAddress = yield cacheCall(CaseManager, 'patientCases', account, i)
-    yield fork(caseRowSaga, {caseAddress}, {contractRegistry})
+    yield fork(caseRowSaga, {caseAddress, AccountManager})
   }
 }
 
-const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'caseListCount']})(class _PatientCases extends Component {
+const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager']})(class _PatientCases extends Component {
   componentDidMount () {
-    this.props.invalidate(this.props.contractRegistry.requireAddressByName('CaseManager'))
+    this.props.invalidate(this.props.CaseManager)
   }
   render() {
     return (
