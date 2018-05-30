@@ -13,7 +13,8 @@ function mapStateToProps (state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
   return {
     address,
-    account: getAccount(address)
+    account: getAccount(address),
+    web3Failed: state.sagaGenesis.web3.error
   }
 }
 
@@ -49,7 +50,14 @@ export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends 
   }
 
   checkSignInRedirect (props) {
-    var state = this.getSignInRedirectState(props)
+    if (props.web3Failed) {
+      var state = {
+        redirect: '/try-metamask',
+        requestedPathname: props.location.pathname
+      }
+    } else {
+      state = this.getSignInRedirectState(props)
+    }
     if (state) { this.setState(state) }
   }
 

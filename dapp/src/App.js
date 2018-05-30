@@ -15,12 +15,15 @@ import Wallet from './screens/Wallet'
 import { OpenCases } from './screens/open-cases'
 import './App.css'
 import { SignInRedirect } from './sign-in-redirect'
+import { TryMetamask } from './screens/try-metamask'
+import { connect } from 'react-redux'
 
 const App = class extends Component {
   render () {
     var result =
       <div>
         <SignInRedirect />
+        <Route path='/try-metamask' component={TryMetamask} />
         <Route path='/sign-in' component={ SignIn } />
         <Route path='/sign-up' component={ CreateAccount } />
         <Route path='/new-case' component={ NewCase }/>
