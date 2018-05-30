@@ -1,7 +1,6 @@
 const expectThrow = require('./helpers/expectThrow')
 const createEnvironment = require('./helpers/create-environment')
 const Case = artifacts.require('Case.sol')
-const buildCaseParameters = require('./helpers/build-case-parameters')
 const createCase = require('./helpers/create-case')
 const generateBytes = require('./helpers/generate-bytes')
 const caseStatus = require('./helpers/case-status')

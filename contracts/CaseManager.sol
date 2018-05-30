@@ -32,6 +32,11 @@ contract CaseManager is Ownable, Pausable, Initializable {
       _;
     }
 
+    modifier onlyThis() {
+      require(this == msg.sender);
+      _;
+    }
+
     /**
      * @dev - Constructor
      * @param _baseCaseFee - initial case fee
@@ -69,26 +74,49 @@ contract CaseManager is Ownable, Pausable, Initializable {
         require(medXToken.balanceOf(_from) >= _value);
 
         /**
-         * assume that the 'extraData' contains
-         * 1. 64 bytes for encryptedCaseKey
-         * 2. remainder for ipfs hash
+
+        Call data will be structured:
+
+        4 bytes: sig
+        32 bytes: _from
+        32 bytes: _value
+        32 bytes: _token
+        32 bytes: _extraData offset
+        32 bytes: _extraData length
+        X bytes: _extraData
+        Y bytes: 32 - (_extraData.length % 32)
+
          */
 
-        byte[64] memory encryptedCaseKey;
-        uint256 keyLength = 64;
-        uint256 i = 0;
-        for (; i < keyLength; i++) {
-          encryptedCaseKey[i] = _extraData[i];
+        bytes4 sig;
+
+        uint256 i;
+        for (i = 0; i < 4; i++) {
+          sig |= bytes4(_extraData[i]) >> 8*i;
         }
 
-        bytes memory caseHash = new bytes(_extraData.length - keyLength);
-        for (i = keyLength; i < _extraData.length; i++) {
-          caseHash[i - keyLength] = _extraData[i];
+        require(sig == bytes4(keccak256('createCase(address,bytes,bytes)')));
+
+        address _this = address(this);
+        address newCase;
+
+        uint256 inputSize = _extraData.length;
+
+        assembly {
+          let ptr := mload(0x40)
+          calldatacopy(ptr, 164, inputSize)
+          let result := call(gas, _this, 0, ptr, inputSize, 0, 0)
+          let size := returndatasize
+          returndatacopy(ptr, 0, size)
+
+          switch result
+          case 0 { revert(ptr, size) }
+          default {
+            newCase := mload(ptr)
+          }
         }
 
-        address createdCaseAddress = createCase(_from, encryptedCaseKey, caseHash);
-        /* Transfer tokens from patient to the newly created case contract */
-        medXToken.transferFrom(_from, createdCaseAddress, _value);
+        medXToken.transferFrom(_from, newCase, _value);
     }
 
     /**
@@ -118,7 +146,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
      * @param _patient - the patient creating the case
      * @return - address of the case contract created
      */
-    function createCase(address _patient, byte[64] _encryptedCaseKey, bytes _ipfsHash) internal returns (address) {
+    function createCase(address _patient, bytes _encryptedCaseKey, bytes _ipfsHash) public onlyThis returns (address) {
       Delegate delegate = new Delegate(registry, keccak256("Case"));
       Case newCase = Case(delegate);
       newCase.initialize(_patient, _encryptedCaseKey, _ipfsHash, caseFee, medXToken, registry);

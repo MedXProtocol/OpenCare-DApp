@@ -97,9 +97,8 @@ export async function getCaseStatus(caseAddress) {
 
 export async function getCaseKey(caseAddress) {
   const contract = await getCaseContract(caseAddress)
-  let encryptedCaseKeyBytes = await contract.methods.getEncryptedCaseKey().call()
-  let encryptedCaseKey = bytesToHex(encryptedCaseKeyBytes)
-  return encryptedCaseKey
+  let encryptedCaseKeyBytes = await contract.methods.encryptedCaseKey().call()
+  return encryptedCaseKey.substring(2)
 }
 
 export async function getCaseDetailsLocationHash(caseAddress) {

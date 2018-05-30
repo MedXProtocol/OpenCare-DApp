@@ -14,9 +14,9 @@ import { connect } from 'react-redux'
 
 function mapStateToProps(state, { match, contractRegistry }) {
   const caseAddress = match.params.caseAddress
-  const encryptedCaseKey = bytesToHex(cacheCallValue(state, caseAddress, 'getEncryptedCaseKey'))
+  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   if (encryptedCaseKey) {
-    var caseKey = aes.decrypt(encryptedCaseKey, signedInSecretKey())
+    var caseKey = aes.decrypt(encryptedCaseKey.substring(2), signedInSecretKey())
   }
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
   return {
@@ -32,7 +32,7 @@ function* saga({ match }, { cacheCall, contractRegistry }) {
     contractRegistry.add(yield getCaseContract(caseAddress))
   }
 
-  yield cacheCall(caseAddress, 'getEncryptedCaseKey')
+  yield cacheCall(caseAddress, 'encryptedCaseKey')
   yield cacheCall(caseAddress, 'diagnosisALocationHash')
 }
 

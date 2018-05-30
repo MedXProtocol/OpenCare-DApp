@@ -5,7 +5,6 @@ const Delegate = artifacts.require("./Delegate.sol")
 const CaseManager = artifacts.require("./CaseManager.sol")
 const MedXToken = artifacts.require("./MedXToken.sol")
 const Case = artifacts.require("./Case.sol")
-const buildCaseParameters = require('./helpers/build-case-parameters')
 const generateBytes = require('./helpers/generate-bytes')
 const createEnvironment = require('./helpers/create-environment')
 const createCase = require('./helpers/create-case')
@@ -39,20 +38,22 @@ contract('CaseManager', function (accounts) {
 
   describe('createCase()', () => {
     it('should work', async () => {
-      let ipfsHash = generateBytes(50)
-      let encryptedCaseKey = generateBytes(64)
-      let hexData = buildCaseParameters(ipfsHash, encryptedCaseKey)
+      let ipfsHash = '0x516d61485a4a774243486a54726d3848793244356d50706a64636d5a4d396e5971554e475a6855435368526e5a4a' // generateBytes(50)
+      let encryptedCaseKey = '0x265995a0a13dad6fbc6769d0c9a99f07dcb1acb7bc8c5f8c5a85ab6739512b9bcad881a302630a17dcbdbe908683d13d3f2363a2e006af9df53068c0860f2f73'
+      var hexData = env.caseManager.contract.createCase.getData(patient, encryptedCaseKey, ipfsHash)
 
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
+
       await env.medXToken.approveAndCall(env.caseManager.address, 15, hexData)
+
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
 
       let caseAddress = await env.caseManager.patientCases(patient, 0)
       var caseInstance = await Case.at(caseAddress)
-      var caseEncryptedCaseKey = await caseInstance.getEncryptedCaseKey()
+      var caseEncryptedCaseKey = await caseInstance.encryptedCaseKey()
 
-      assert.equal(Buffer.from(caseEncryptedCaseKey).toString('hex'), Buffer.from(encryptedCaseKey).toString('hex'))
-      assert.equal(await caseInstance.caseDetailLocationHash.call(), '0x' + Buffer.from(ipfsHash).toString('hex'))
+      assert.equal(caseEncryptedCaseKey, encryptedCaseKey)
+      assert.equal(await caseInstance.caseDetailLocationHash.call(), ipfsHash)
     })
   })
 

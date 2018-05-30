@@ -24,7 +24,7 @@ contract Case is Ownable, Initializable {
     MedXToken public medXToken;
     CaseStatus public status;
 
-    byte[64] public encryptedCaseKey;
+    bytes public encryptedCaseKey;
 
     mapping(address => bytes) public approvedDoctorKeys;
 
@@ -83,7 +83,7 @@ contract Case is Ownable, Initializable {
      */
     function initialize (
         address _patient,
-        byte[64] _encryptedCaseKey,
+        bytes _encryptedCaseKey,
         bytes _caseHash,
         uint256 _caseFee,
         MedXToken _token,
@@ -126,10 +126,6 @@ contract Case is Ownable, Initializable {
         status = CaseStatus.Evaluated;
         diagnosisALocationHash = _diagnosisHash;
         emit CaseEvaluated(caseManager(), patient, diagnosingDoctorA);
-    }
-
-    function getEncryptedCaseKey() public view returns (byte[64]) {
-      return encryptedCaseKey;
     }
 
     /**

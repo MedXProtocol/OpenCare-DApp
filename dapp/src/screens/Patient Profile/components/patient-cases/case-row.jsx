@@ -20,7 +20,7 @@ export function mapStateToCaseRowProps(state, { caseAddress, contractRegistry })
   const accountManager = contractRegistry.requireAddressByName('AccountManager')
   const diagnosingDoctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
   const diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
-  const encryptedCaseKey = bytesToHex(cacheCallValue(state, caseAddress, 'getEncryptedCaseKey'))
+  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const status = cacheCallValue(state, caseAddress, 'status')
   return {
     status,
@@ -41,7 +41,7 @@ export function* caseRowSaga({ caseAddress }, { contractRegistry }) {
 
   let accountManager = contractRegistry.requireAddressByName('AccountManager')
 
-  yield cacheCall(caseAddress, 'getEncryptedCaseKey')
+  yield cacheCall(caseAddress, 'encryptedCaseKey')
   let status = yield cacheCall(caseAddress, 'status')
 
   if (status === '3') {
@@ -76,7 +76,7 @@ export const CaseRow = withContractRegistry(withSend(class _CaseRow extends Comp
   onApprove = () => {
     this.setState({showModal: false})
     const status = this.props.status
-    const encryptedCaseKey = this.props.encryptedCaseKey
+    const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
     const { send, caseAddress } = this.props
     if (status === '3') {
       let doctor = this.props.diagnosingDoctorA
