@@ -31,7 +31,7 @@ class ChallengedDiagnosis extends Component {
             <div/> :
             <div className="card">
                 <div className="card-header">
-                    <h2 className="card-title">Diagnosis</h2>
+                    <h2 className="card-title">{this.props.title}</h2>
                 </div>
                 <div className="card-content">
                     <div className="row">
@@ -51,12 +51,14 @@ class ChallengedDiagnosis extends Component {
 }
 
 ChallengedDiagnosis.propTypes = {
-    caseAddress: PropTypes.string,
-    caseKey: PropTypes.string
+  caseAddress: PropTypes.string,
+  caseKey: PropTypes.string,
+  title: PropTypes.string
 };
 
 ChallengedDiagnosis.defaultProps = {
-    caseAddress: null
+  caseAddress: null,
+  title: 'Diagnosis'
 };
 
 export default ChallengedDiagnosis;

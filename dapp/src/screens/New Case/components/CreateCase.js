@@ -11,17 +11,20 @@ import hashToHex from '@/utils/hash-to-hex'
 import { connect } from 'react-redux'
 import aes from '@/services/aes'
 import get from 'lodash.get'
+import getWeb3 from '@/get-web3'
 
 function mapStateToProps (state, { contractRegistry }) {
   const account = get(state, 'accounts[0]')
   const MedXToken = contractRegistry.requireAddressByName('MedXToken')
   const CaseManager = contractRegistry.requireAddressByName('CaseManager')
+  const CaseManagerContract = contractRegistry.findByAddress(CaseManager)
   const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
   return {
     account,
     transactions: state.sends.transactions,
     MedXToken,
     CaseManager,
+    CaseManagerContract,
     balance
   }
 }
@@ -192,14 +195,18 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
             description: this.state.description
         };
 
+        const web3 = getWeb3()
+
+
         const caseJson = JSON.stringify(caseInformation);
         const hash = await uploadJson(caseJson, this.state.caseEncryptionKey);
         const encryptedCaseKey = aes.encrypt(this.state.caseEncryptionKey, signedInSecretKey())
 
         const { send, MedXToken, CaseManager } = this.props
         var hashHex = hashToHex(hash)
-        const combined = '0x' + encryptedCaseKey + hashHex
-        this.setState({transactionId: send(MedXToken, 'approveAndCall', CaseManager, 15, combined)()})
+
+        var data = this.props.CaseManagerContract.methods.createCase(this.props.account, '0x' + encryptedCaseKey, '0x' + hashHex).encodeABI()
+        this.setState({transactionId: send(MedXToken, 'approveAndCall', CaseManager, 15, data)()})
     }
 
     onError = (error) => {

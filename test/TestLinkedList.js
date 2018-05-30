@@ -45,6 +45,18 @@ contract('TestLinkedList', function (accounts) {
       await linkedList.dequeue()
       assert.equal(await linkedList.length(), 0)
     })
+
+    it('should work after enqueuing', async () => {
+      await linkedList.enqueue(14)
+      assert.equal((await linkedList.tailId()).toString(), 1, 'latest id is 1')
+      await linkedList.enqueue(2)
+      assert.equal(await linkedList.length(), 2, 'length is 2')
+      assert.equal((await linkedList.tailId()).toString(), 2, 'latest id is 2')
+      await linkedList.dequeue()
+      assert.equal(await linkedList.length(), 1, 'length is one after dequeue')
+      await linkedList.enqueue(7)
+      assert.equal(await linkedList.tailId(), 3, 'new node id is three')
+    })
   })
 
   describe('remove()', () => {

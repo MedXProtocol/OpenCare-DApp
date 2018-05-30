@@ -28,6 +28,7 @@ library SkipList {
     */
     uint256 tailId = self.list.tailId();
     uint256 newId = self.list.enqueue(_value);
+    // Get the last segment id
     uint256 segmentId = self.nodeToSegment[_address][tailId];
     if (segmentId == 0) {
       // start a new segment

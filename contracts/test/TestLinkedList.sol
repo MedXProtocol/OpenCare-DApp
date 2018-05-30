@@ -39,6 +39,10 @@ contract TestLinkedList {
     return list.peekId();
   }
 
+  function tailId() external view returns (uint256) {
+    return list.tailId();
+  }
+
   function length() external view returns (uint256) {
     return list.length();
   }

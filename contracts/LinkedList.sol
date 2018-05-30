@@ -23,7 +23,7 @@ library LinkedList {
   function enqueue(UInt256 storage self, uint256 _value) internal returns (uint256) {
     self.idIndex = self.idIndex.add(1);
     self.count = self.count.add(1);
-    uint256 id = self.count;
+    uint256 id = self.idIndex;
     self.element[id] = _value;
 
     if (self.tail > 0) {

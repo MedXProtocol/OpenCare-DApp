@@ -28,7 +28,7 @@ function* web3Call({call}) {
     const contractRegistry = yield getContext('contractRegistry')
     const contract = contractRegistry.requireByAddress(address)
     const callMethod = contract.methods[method](...args).call
-    console.log('web3Call: ', address, method, ...args, options)
+    // console.log('web3Call: ', address, method, ...args, options)
     let response = yield sagaCall(callMethod, options)
     yield put({type: 'WEB3_CALL_RETURN', call, response})
     return response
@@ -47,7 +47,7 @@ function* web3Send({ transactionId, call, options }) {
     }
     const contractRegistry = yield getContext('contractRegistry')
     const contract = contractRegistry.requireByAddress(address)
-    console.log('web3Send: ', address, method, ...args, options)
+    // console.log('web3Send: ', address, method, ...args, options)
     const send = contract.methods[method](...args).send
     let receipt = yield sagaCall(send, options)
     yield put({type: 'WEB3_SEND_RETURN', transactionId, call, receipt})
@@ -64,7 +64,7 @@ function getContractCalls(state, address) {
 
 function* invalidateAddress({ address }) {
   let contractRegistry = yield getContext('contractRegistry')
-  console.log(`Invalidating ${address} ${contractRegistry.nameByAddress(address)}`)
+  // console.log(`Invalidating ${address} ${contractRegistry.nameByAddress(address)}`)
   let callsMap = yield select(getContractCalls, address)
   if (!callsMap) { return }
   yield* Object.values(callsMap).map(function* (callState) {
