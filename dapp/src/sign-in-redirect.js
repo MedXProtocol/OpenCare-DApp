@@ -38,9 +38,8 @@ export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends 
   componentWillReceiveProps (nextProps) {
     if (this.props.address && this.props.address !== nextProps.address) {
       signOut()
-    } else {
-      this.checkSignInRedirect(nextProps)
     }
+    this.checkSignInRedirect(nextProps)
   }
 
   unload = () => {
@@ -54,6 +53,16 @@ export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends 
       var state = {
         redirect: '/try-metamask',
         requestedPathname: props.location.pathname
+      }
+    } else if (!props.address) {
+      state = {
+        redirect: '/login-metamask',
+        requestedPathname: props.location.pathname
+      }
+    } else if (props.address && props.location.pathname == '/login-metamask') {
+      state = {
+        redirect: '/',
+        requestedPathname: ''
       }
     } else {
       state = this.getSignInRedirectState(props)

@@ -16,6 +16,7 @@ import { OpenCases } from './screens/open-cases'
 import './App.css'
 import { SignInRedirect } from './sign-in-redirect'
 import { TryMetamask } from './screens/try-metamask'
+import { LoginToMetaMask } from './screens/login-to-metamask'
 import { connect } from 'react-redux'
 
 const App = class extends Component {
@@ -23,6 +24,7 @@ const App = class extends Component {
     var result =
       <div>
         <SignInRedirect />
+        <Route path='/login-metamask' component={LoginToMetaMask} />
         <Route path='/try-metamask' component={TryMetamask} />
         <Route path='/sign-in' component={ SignIn } />
         <Route path='/sign-up' component={ CreateAccount } />
