@@ -5,6 +5,7 @@ import {
   takeEvery,
   getContext,
   setContext,
+  spawn
 } from 'redux-saga/effects'
 
 export function* clearCalls() {
@@ -44,8 +45,7 @@ export function* invalidateTransaction({transactionId, call, receipt}) {
 export function* runSaga({saga, props, key}) {
   yield setContext({ key })
   yield clearCalls()
-  yield saga(props)
-  yield put({type: 'END_SAGA', key})
+  yield spawn(saga, props)
 }
 
 export default function* () {
