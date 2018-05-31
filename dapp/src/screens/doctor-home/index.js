@@ -4,7 +4,6 @@ import { withRouter } from 'react-router-dom';
 import MainLayout from '../../layouts/MainLayout';
 import GetCase from './components/GetCase';
 import Challenges from './components/Challenges';
-import { isDoctor } from '../../utils/web3-util';
 
 class PhysicianProfile extends Component {
   constructor(){
@@ -13,12 +12,6 @@ class PhysicianProfile extends Component {
     this.state = {
         isDoctor: true
     };
-  }
-  
-  async componentDidMount() {
-    const result = await isDoctor();
-
-    this.setState({ isDoctor: result });
   }
 
   handleCloseModal = (event) => {

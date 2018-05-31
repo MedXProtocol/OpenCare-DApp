@@ -12,19 +12,18 @@ import {
 } from 'redux-saga'
 import { contractKeyByAddress } from '../state-finders'
 
-function createTransactionEventChannel (web3, {transactionId, call, options, send}) {
+function createTransactionEventChannel (web3, transactionId, send, options) {
   return eventChannel(emit => {
-
     let promiEvent = send(options)
       .on('confirmation', (confirmationNumber, receipt) => {
         emit({type: 'TRANSACTION_CONFIRMATION', transactionId, confirmationNumber, receipt})
-        if (confirmationNumber > 3) {
+        if (confirmationNumber > 2) {
           emit({type: 'TRANSACTION_CONFIRMED', transactionId, confirmationNumber, receipt})
           emit(END)
         }
       })
       .on('receipt', (receipt) => {
-        emit({type: 'TRANSACTION_RECEIPT', transactionId, call, receipt})
+        emit({type: 'TRANSACTION_RECEIPT', transactionId, receipt})
       })
       .on('error', (error) => {
         emit({type: 'TRANSACTION_ERROR', transactionId, error})
@@ -47,14 +46,22 @@ export function* web3Send({ transactionId, call, options }) {
     const contractRegistry = yield getContext('contractRegistry')
     const web3 = yield getContext('web3')
     const contractKey = yield select(contractKeyByAddress, address)
+
     const contract = contractRegistry.get(address, contractKey, web3)
-    // console.log('web3Send: ', address, method, ...args, options)
+    const func = contract.methods[call.method](...call.args)
+    if (!options.gas) {
+      const gasEstimate = yield func.estimateGas(options)
+      options.gas = gasEstimate * 2
+    }
+    const send = func.send
 
-    const send = contract.methods[method](...args).send
-
-    const transactionChannel = createTransactionEventChannel(web3, {transactionId, call, options, send})
-    while (true) {
-      yield put(yield take(transactionChannel))
+    const transactionChannel = createTransactionEventChannel(web3, transactionId, send, options)
+    try {
+      while (true) {
+        yield put(yield take(transactionChannel))
+      }
+    } finally {
+      transactionChannel.close()
     }
   } catch (error) {
     console.error(error)

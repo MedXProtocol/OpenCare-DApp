@@ -4,7 +4,6 @@ import React, {
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
-import { getCaseDate, getCaseContract } from '@/utils/web3-util'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
 import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
 import { cacheCall } from '@/saga-genesis/sagas'

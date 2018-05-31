@@ -24,7 +24,6 @@ export function* registerCall(call) {
 }
 
 export function* invalidateAddress({ address }) {
-  let contractRegistry = yield getContext('contractRegistry')
   let callCountRegistry = yield getContext('callCountRegistry')
   let contractCalls = Object.values(callCountRegistry.getContractCalls(address))
   if (!contractCalls) { return }

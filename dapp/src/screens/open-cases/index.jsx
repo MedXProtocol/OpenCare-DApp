@@ -43,9 +43,9 @@ function* saga({ account, CaseManager }) {
   }
 }
 
-const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager'] })(withSend(class _OpenCases extends Component {
+const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager'] })(withSend(class _OpenCases extends Component {
   onClickRequestCase = (e) => {
-    const { send, CaseManager } = this.props
+    const { send, CaseManager, contractRegistry } = this.props
     send(CaseManager, 'requestNextCase')()
   }
 

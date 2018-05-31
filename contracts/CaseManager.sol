@@ -163,9 +163,9 @@ contract CaseManager is Ownable, Pausable, Initializable {
     }
 
     function requestNextCase() external returns (address) {
-      require(openCaseQueue.length() > 0);
+      require(openCaseQueue.length() > 0, 'No more cases');
       uint256 caseIndex = openCaseQueue.dequeue(msg.sender);
-      require(caseIndex > 0);
+      require(caseIndex > 0, 'Invalid case index');
       Case caseContract = Case(caseList[caseIndex]);
       if (caseContract.status() == Case.CaseStatus.Open) {
         caseContract.requestDiagnosisAuthorization(msg.sender);
@@ -175,6 +175,16 @@ contract CaseManager is Ownable, Pausable, Initializable {
       doctorAuthorizationRequests[msg.sender].push(caseIndex);
       emit CaseDequeued(caseContract);
       return caseContract;
+    }
+
+    function peekNextCase() external view returns (address) {
+      require(openCaseQueue.length() > 0);
+      uint256 caseIndex = openCaseQueue.peek(msg.sender);
+      if (caseIndex > 0) {
+        return caseList[caseIndex];
+      } else {
+        return address(0);
+      }
     }
 
     function addCaseToQueue(address _case) external onlyCase(_case) {

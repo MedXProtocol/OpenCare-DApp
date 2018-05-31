@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Spinner from '../../../components/Spinner';
-import { mintMedXTokens } from '../../../utils/web3-util';
 import get from 'lodash.get'
 import defined from '@/utils/defined'
 import { connect } from 'react-redux'

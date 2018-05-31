@@ -30,6 +30,8 @@ export class CallCountRegistry {
   }
 
   getContractCalls (address) {
+    if (!address) { return {} }
+    address = address.toLowerCase()
     let contractCalls = this.contractCalls[address]
     if (!contractCalls) {
       contractCalls = {}
