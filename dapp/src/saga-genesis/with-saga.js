@@ -17,17 +17,19 @@ export function withSaga(saga, { propTriggers: propTriggers, storeKey: storeKey 
       }
     }
 
-    const SagaWrapper = connect(() => { return {} }, mapDispatchToProps)(class extends Component {
+    const SagaWrapper = connect(() => { return {} }, mapDispatchToProps)(class _SagaWrapper extends Component {
       constructor(props, context) {
         super(props, context)
         this.sagaKey = lastSagaKey++
       }
 
       componentDidMount() {
+        // console.log('+++Mounting ', WrappedComponent.name)
         this.runSaga(this.props)
       }
 
       componentWillUnmount() {
+        // console.log('---Unmounting ', WrappedComponent.name)
         this.props.clearCalls(this.sagaKey)
       }
 

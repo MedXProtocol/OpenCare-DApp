@@ -40,7 +40,7 @@ function* propSaga({address}) {
   }
 }
 
-const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga, { propTriggers: ['address'] })(class extends Component {
+const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga, { propTriggers: ['address'] })(class _CaseRow extends Component {
   render () {
     var status = parseInt(this.props.status || 0)
     let isApprovedDiagnosingADoctor = this.props.diagnosingDoctorA == this.props.account && status > 3

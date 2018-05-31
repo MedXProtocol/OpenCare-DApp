@@ -33,7 +33,7 @@ function* saga({ match }) {
   yield cacheCall(caseAddress, 'diagnosisALocationHash')
 }
 
-const PatientCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match']})(class extends Component {
+const PatientCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match']})(class _PatientCase extends Component {
   render() {
     if (this.props.diagnosisHash) {
       var diagnosis =

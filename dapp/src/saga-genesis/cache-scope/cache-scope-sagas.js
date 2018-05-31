@@ -3,40 +3,29 @@ import {
   put,
   select,
   takeEvery,
+  fork,
   getContext,
   setContext,
   spawn
 } from 'redux-saga/effects'
 
 export function* deregisterKey({key}) {
-  let cacheScope = yield getContext('cacheScope')
-  yield* cacheScope.deregister(key).map(function* (call) {
-    // yield put({type: 'WEB3_CALL_CLEAR', call})
-    // console.log('cleared: ', call.method)
-  })
-}
-
-export function* clearCalls() {
-  let key = yield getContext('key')
-  yield deregisterKey({key})
+  let callCountRegistry = yield getContext('callCountRegistry')
+  yield* callCountRegistry.deregister(key)
 }
 
 export function* registerCall(call) {
   let key = yield getContext('key')
-  let cacheScope = yield getContext('cacheScope')
-  cacheScope.register(call, key)
-}
-
-function getContractCalls(state, address) {
-  return state.sagaGenesis.cacheScope.contractCalls[address]
+  let callCountRegistry = yield getContext('callCountRegistry')
+  callCountRegistry.register(call, key)
 }
 
 export function* invalidateAddress({ address }) {
   let contractRegistry = yield getContext('contractRegistry')
-  let cacheScope = yield getContext('cacheScope')
-  let callStates = Object.values(cacheScope.getContractCalls(address))
-  if (!callStates) { return }
-  yield* callStates.map(function* (callState) {
+  let callCountRegistry = yield getContext('callCountRegistry')
+  let contractCalls = Object.values(callCountRegistry.getContractCalls(address))
+  if (!contractCalls) { return }
+  yield* contractCalls.map(function* (callState) {
     if (callState.count > 0) {
       yield put({type: 'WEB3_CALL', call: callState.call})
     }
@@ -56,7 +45,7 @@ export function* invalidateTransaction({transactionId, call, receipt}) {
 
 export function* runSaga({saga, props, key}) {
   yield setContext({ key })
-  yield clearCalls()
+  yield deregisterKey({ key })
   yield spawn(saga, props)
 }
 

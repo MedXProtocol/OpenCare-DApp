@@ -1,4 +1,4 @@
-export class CacheScope {
+export class CallCountRegistry {
   constructor() {
     this.contractCalls = {}
     this.keyCalls = {}

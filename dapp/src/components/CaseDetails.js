@@ -22,7 +22,7 @@ function* saga({ caseAddress, networkId }) {
 }
 
 const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(
-  class extends Component {
+  class _CaseDetails extends Component {
   constructor (props) {
     super(props)
     this.state = {

@@ -1,7 +1,7 @@
 import { withSaga } from './with-saga'
 import { withContractRegistry } from './with-contract-registry'
 import { createCall } from './utils/create-call'
-import { CacheScope } from './cache-scope'
+import { CallCountRegistry } from './call-count-registry'
 import rootSagaGenesis, { cacheCall } from './sagas'
 import hashCall from './utils/hash-call'
 import cacheCallState from './cache-call-state'
@@ -11,7 +11,7 @@ import { ContractRegistryProvider } from './contract-registry-provider'
 import { withSend } from './with-send'
 
 export {
-  CacheScope,
+  CallCountRegistry,
   cacheCall,
   createCall,
   hashCall,

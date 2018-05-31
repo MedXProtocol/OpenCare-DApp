@@ -3,25 +3,27 @@ import {
   select,
   getContext,
   spawn,
-  take
+  fork,
+  take,
+  takeEvery,
+  call as sagaCall
 } from 'redux-saga/effects'
 import { registerCall } from '../cache-scope/cache-scope-sagas'
 import { createCall } from '../utils/create-call'
-
-function* triggerCall(call) {
-  yield put({type: 'WEB3_CALL', call})
-}
+import { contractKeyByAddress } from '../state-finders'
 
 export function* cacheCall(address, method, ...args) {
   let call = createCall(address, method, ...args)
+  const callCountRegistry = yield getContext('callCountRegistry')
+  const isFresh = callCountRegistry.count(call) > 0
   yield registerCall(call)
   let callState = yield select(state => state.sagaGenesis.callCache[call.hash])
-
-  if (callState && callState.response) {
+  const hasResponse = callState && callState.response
+  if (isFresh && hasResponse) {
     return callState.response
   } else {
     if (!callState || !callState.inFlight) {
-      yield spawn(triggerCall, call)
+      yield spawn(put, {type: 'WEB3_CALL', call})
     }
     // wait for call to return
     while (true) {
@@ -36,4 +38,36 @@ export function* cacheCall(address, method, ...args) {
       }
     }
   }
+}
+
+/*
+Triggers the web3 call.
+*/
+export function* web3Call({call}) {
+  const { address, method, args } = call
+  try {
+    const account = yield select(state => state.sagaGenesis.accounts[0])
+    const options = { from: account }
+    const contractRegistry = yield getContext('contractRegistry')
+    const web3 = yield getContext('web3')
+    const contractKey = yield select(contractKeyByAddress, address)
+    const contract = contractRegistry.get(address, contractKey, web3)
+    const callMethod = contract.methods[method](...args).call
+    // console.log('web3Call: ', address, method, ...args, options)
+    yield spawn(function* () {
+      try {
+        let response = yield sagaCall(callMethod, options)
+        yield fork(put, {type: 'WEB3_CALL_RETURN', call, response})
+      } catch (error) {
+        yield fork(put, {type: 'WEB3_CALL_ERROR', call, error})
+      }
+    })
+  } catch (error) {
+    console.error(error)
+    yield put({type: 'WEB3_CALL_ERROR', call, error})
+  }
+}
+
+export default function* () {
+  yield takeEvery('WEB3_CALL', web3Call)
 }

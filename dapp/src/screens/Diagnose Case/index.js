@@ -64,13 +64,14 @@ function* saga({ match, account, AccountManager }) {
   if (status >= 10) { yield cacheCall(caseAddress, 'diagnosisBLocationHash') }
 }
 
-const DiagnoseCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'account', 'AccountManager']})(class extends Component {
+const DiagnoseCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'account', 'AccountManager']})(class _DiagnoseCase extends Component {
   render () {
-
-    if (!this.props.status) { return <div></div> }
-
     var challenging = this.props.doctorB === this.props.account
-    var status = parseInt(this.props.status)
+    if (this.props.status) {
+      var status = parseInt(this.props.status)
+    } else {
+      status = 0
+    }
 
     if (!isBlank(this.props.challengeHash)) {
       var challenge =

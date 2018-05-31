@@ -4,11 +4,6 @@ export default function (state, {type, call, response, error}) {
   }
 
   switch (type) {
-    case 'WEB3_CALL_CLEAR':
-      state = {...state}
-      delete state[call.hash]
-      break
-      
     case 'WEB3_CALL':
       state = {
         ...state,
