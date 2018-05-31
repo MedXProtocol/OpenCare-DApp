@@ -15,8 +15,9 @@ function createBlockTrackerEmitter (web3) {
   return eventChannel(emit => {
     const blockTracker = new PollingBlockTracker({provider: web3.currentProvider})
 
-    blockTracker.on('latest', (block) => {
-      emit({type: 'BLOCK_LATEST', block})
+    blockTracker.on('sync', ({ newBlock, oldBlock }) => {
+      if (oldBlock) { emit({type: 'BLOCK_LATEST', block: oldBlock}) }
+      if (newBlock) { emit({type: 'BLOCK_LATEST', block: newBlock}) }
     })
 
     blockTracker.start().catch((error) => {
