@@ -3,6 +3,7 @@ import {
   select,
   takeEvery,
   getContext,
+  spawn,
   call as sagaCall
 } from 'redux-saga/effects'
 import { contractKeyByAddress } from '../state-finders'
@@ -21,9 +22,14 @@ export function* web3Call({call}) {
     const contract = contractRegistry.get(address, contractKey, web3)
     const callMethod = contract.methods[method](...args).call
     // console.log('web3Call: ', address, method, ...args, options)
-    let response = yield sagaCall(callMethod, options)
-    yield put({type: 'WEB3_CALL_RETURN', call, response})
-    return response
+    yield spawn(function* () {
+      try {
+        let response = yield sagaCall(callMethod, options)
+        yield put({type: 'WEB3_CALL_RETURN', call, response})
+      } catch (error) {
+        yield put({type: 'WEB3_CALL_ERROR', call, error})
+      }
+    })
   } catch (error) {
     console.error(error)
     yield put({type: 'WEB3_CALL_ERROR', call, error})

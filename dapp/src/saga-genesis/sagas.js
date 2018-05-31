@@ -14,6 +14,7 @@ import networkSagas from './network/network-sagas'
 import transactionSagas from './transaction/transaction-sagas'
 import web3Initialize, { takeWeb3Initialized } from './web3/web3-sagas'
 import callSagas, { web3Call } from './call/call-sagas'
+import { CacheScope } from './cache-scope'
 
 export {
   web3Call,
