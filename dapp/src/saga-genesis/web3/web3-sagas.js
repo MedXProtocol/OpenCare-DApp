@@ -17,11 +17,6 @@ function* web3Initialize() {
   }
 }
 
-export function* takeWeb3Initialized(saga) {
-  const action = yield take('WEB3_INITIALIZED')
-  yield saga(action)
-}
-
 export default function* () {
   yield web3Initialize()
 }

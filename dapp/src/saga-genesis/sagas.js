@@ -12,12 +12,11 @@ import cacheScopeSagas from './cache-scope/cache-scope-sagas'
 import cacheCallSagas, { cacheCall } from './call-cache/call-cache-sagas'
 import networkSagas from './network/network-sagas'
 import transactionSagas from './transaction/transaction-sagas'
-import web3Initialize, { takeWeb3Initialized } from './web3/web3-sagas'
+import web3Initialize from './web3/web3-sagas'
 
-export {
-  cacheCall,
-  addContract,
-  takeWeb3Initialized
+function* takeOnceAndRun(pattern, saga) {
+  const action = yield take(pattern)
+  yield saga(action)
 }
 
 function* start({ web3 }) {
@@ -34,7 +33,13 @@ function* start({ web3 }) {
   )
 }
 
+export {
+  cacheCall,
+  addContract,
+  takeOnceAndRun
+}
+
 export default function* () {
-  yield fork(takeWeb3Initialized, start)
+  yield fork(takeOnceAndRun, 'WEB3_INITIALIZED', start)
   yield web3Initialize()
 }
