@@ -1,4 +1,5 @@
 export default function (state, address) {
+  if (!address) { return }
   address = address.toLowerCase()
   var networkId = state.sagaGenesis.network.networkId
   if (state.sagaGenesis &&
