@@ -1,8 +1,6 @@
 export default function (state, {type, transactionId, call, error, receipt}) {
   if (typeof state === 'undefined') {
-    state = {
-      transactions: {}
-    }
+    state = {}
   }
 
   switch (type) {
