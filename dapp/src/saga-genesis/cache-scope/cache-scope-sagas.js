@@ -8,6 +8,9 @@ import {
   setContext,
   spawn
 } from 'redux-saga/effects'
+import {
+  contractKeyByAddress
+} from '../state-finders'
 
 export function* deregisterKey({key}) {
   let callCountRegistry = yield getContext('callCountRegistry')
@@ -37,9 +40,10 @@ export function* invalidateTransaction({transactionId, call, receipt}) {
     return addressSet.add(event.address)
   }, new Set())
   yield* Array.from(contractAddresses).map(function* (address) {
-    yield spawn(function* () {
-      yield put({type: 'CACHE_INVALIDATE_ADDRESS', address})
-    })
+    const contractKey = yield select(contractKeyByAddress, address)
+    if (contractKey) {
+      yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
+    }
   })
 }
 

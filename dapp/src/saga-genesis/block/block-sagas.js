@@ -2,6 +2,7 @@ import {
   put,
   takeEvery,
   getContext,
+  select,
   take,
   fork
 } from 'redux-saga/effects'
@@ -9,15 +10,17 @@ import {
   eventChannel,
   END
 } from 'redux-saga'
+import {
+  contractKeyByAddress
+} from '../state-finders'
 import PollingBlockTracker from 'eth-block-tracker'
 
 function createBlockTrackerEmitter (web3) {
   return eventChannel(emit => {
     const blockTracker = new PollingBlockTracker({provider: web3.currentProvider})
 
-    blockTracker.on('sync', ({ newBlock, oldBlock }) => {
-      if (oldBlock) { emit({type: 'BLOCK_LATEST', block: oldBlock}) }
-      if (newBlock) { emit({type: 'BLOCK_LATEST', block: newBlock}) }
+    blockTracker.on('latest', (block) => {
+      emit({type: 'BLOCK_LATEST', block})
     })
 
     blockTracker.start().catch((error) => {
@@ -42,11 +45,15 @@ function* startBlockTracker () {
 export function* latestBlock({block}) {
   // console.log(block)
   const addresses = block.transactions.reduce((addressSet, transaction) => {
+    console.log(transaction)
     addressSet.add(transaction.to)
     return addressSet.add(transaction.from)
   }, new Set())
   yield* Array.from(addresses).map(function* (address) {
-    yield put({type: 'CACHE_INVALIDATE_ADDRESS', address})
+    const contractKey = yield select(contractKeyByAddress, address)
+    if (contractKey) {
+      yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
+    }
   })
 }
 
