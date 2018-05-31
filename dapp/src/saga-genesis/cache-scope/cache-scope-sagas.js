@@ -36,7 +36,7 @@ export function* invalidateAddress({ address }) {
 }
 
 export function* invalidateTransaction({transactionId, call, receipt}) {
-  var contractAddresses = Object.values(receipt.events || {}).reduce((addressSet, event) => {
+  const contractAddresses = Object.values(receipt.events || {}).reduce((addressSet, event) => {
     return addressSet.add(event.address)
   }, new Set())
   yield* Array.from(contractAddresses).map(function* (address) {
@@ -54,7 +54,7 @@ export function* runSaga({saga, props, key}) {
 }
 
 export default function* () {
-  yield takeEvery('WEB3_SEND_RETURN', invalidateTransaction)
+  yield takeEvery('TRANSACTION_CONFIRMED', invalidateTransaction)
   yield takeEvery('CACHE_INVALIDATE_ADDRESS', invalidateAddress)
   yield takeEvery('CACHE_DEREGISTER_KEY', deregisterKey)
   yield takeEvery('RUN_SAGA', runSaga)

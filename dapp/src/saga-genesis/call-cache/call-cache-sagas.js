@@ -56,7 +56,7 @@ export function* web3Call({call}) {
     // console.log('web3Call: ', address, method, ...args, options)
     yield spawn(function* () {
       try {
-        let response = yield sagaCall(callMethod, options)
+        let response = yield sagaCall(callMethod, options, 'pending')
         yield fork(put, {type: 'WEB3_CALL_RETURN', call, response})
       } catch (error) {
         yield fork(put, {type: 'WEB3_CALL_ERROR', call, error})

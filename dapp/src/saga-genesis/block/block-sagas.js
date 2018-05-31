@@ -43,17 +43,30 @@ function* startBlockTracker () {
 }
 
 export function* latestBlock({block}) {
-  // console.log(block)
-  const addresses = block.transactions.reduce((addressSet, transaction) => {
-    console.log(transaction)
-    addressSet.add(transaction.to)
-    return addressSet.add(transaction.from)
-  }, new Set())
-  yield* Array.from(addresses).map(function* (address) {
+  const web3 = yield getContext('web3')
+  const addressSet = new Set()
+  const addAddress = function* (address) {
+    if (!address) { return false }
     const contractKey = yield select(contractKeyByAddress, address)
     if (contractKey) {
-      yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
+      addressSet.add(address)
+      return true
     }
+    return false
+  }
+  yield* block.transactions.map(function* (addressSet, transaction) {
+    const to = yield addAddress(transaction.to)
+    const from = yield addAddress(transaction.from)
+    if (to || from) {
+      const receipt = yield web3.eth.getTransactionReceipt(transaction.hash)
+      yield* receipt.logs.map(function* (log) {
+        yield addAddress(log.address)
+      })
+    }
+  })
+
+  yield* Array.from(addressSet).map(function* (address) {
+    yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   })
 }
 

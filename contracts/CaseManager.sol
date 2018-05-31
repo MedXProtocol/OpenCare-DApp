@@ -26,6 +26,10 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
     mapping (address => uint256[]) public doctorAuthorizationRequests;
 
+    event NewCase(address indexed caseAddress, uint256 indexed index);
+    event CaseDequeued(address indexed caseAddress);
+    event CaseQueued(address indexed caseAddress);
+
     modifier onlyCase(address _case) {
       require(_case != address(0));
       require(caseIndices[_case] != uint256(0));
@@ -154,6 +158,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       caseIndices[address(newCase)] = caseIndex;
       openCaseQueue.enqueue(address(0), caseIndex);
       patientCases[_patient].push(address(newCase));
+      emit NewCase(newCase, caseIndex);
       return newCase;
     }
 
@@ -168,6 +173,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
         caseContract.requestChallengeAuthorization(msg.sender);
       }
       doctorAuthorizationRequests[msg.sender].push(caseIndex);
+      emit CaseDequeued(caseContract);
       return caseContract;
     }
 
@@ -175,6 +181,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       Case caseContract = Case(_case);
       require(caseContract.status() == Case.CaseStatus.Challenged);
       openCaseQueue.enqueue(caseContract.diagnosingDoctorA(), caseIndices[_case]);
+      emit CaseQueued(_case);
     }
 
     function openCaseCount() external view returns (uint256) {

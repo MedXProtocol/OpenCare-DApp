@@ -11,5 +11,5 @@ function* invalidateCache ({call, receipt}) {
 }
 
 export default function* () {
-  yield takeEvery('WEB3_SEND_RETURN', invalidateCache)
+  yield takeEvery('TRANSACTION_RETURN', invalidateCache)
 }

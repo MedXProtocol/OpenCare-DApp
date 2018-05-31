@@ -32,7 +32,7 @@ function* saga({ account, DoctorManager }) {
   yield cacheCall(DoctorManager, 'isDoctor', account)
 }
 
-const Navbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: 'account' })(class _Navbar extends Component {
+const Navbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager'] })(class _Navbar extends Component {
   signOut = () => {
     signOut()
     this.props.history.push('/')

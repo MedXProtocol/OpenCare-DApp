@@ -11,5 +11,5 @@ function* cacheInvalidatePoll() {
 }
 
 export default function* () {
-  yield fork(cacheInvalidatePoll)
+  // yield fork(cacheInvalidatePoll)
 }

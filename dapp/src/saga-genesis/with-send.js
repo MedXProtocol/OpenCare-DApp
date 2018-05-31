@@ -8,7 +8,7 @@ export function withSend(WrappedComponent) {
   function mapDispatchToProps(dispatch, props) {
     return {
       dispatchSend: (transactionId, call, options) => {
-        dispatch({type: 'WEB3_SEND', transactionId, call, options})
+        dispatch({type: 'SEND_TRANSACTION', transactionId, call, options})
       }
     }
   }

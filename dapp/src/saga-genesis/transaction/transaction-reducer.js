@@ -6,16 +6,16 @@ export default function (state, {type, transactionId, call, error, receipt}) {
   }
 
   switch (type) {
-    case 'WEB3_SEND':
+    case 'SEND_TRANSACTION':
       state = {
         ...state,
         [transactionId]: {
-          inFlight: true
+          inFlight: true,
         }
       }
       break
 
-    case 'WEB3_SEND_RETURN':
+    case 'TRANSACTION_RETURN':
       state = {
         ...state,
         [transactionId]: {
@@ -26,7 +26,15 @@ export default function (state, {type, transactionId, call, error, receipt}) {
       }
       break
 
-    case 'WEB_SEND_ERROR':
+    case 'TRANSACTION_CONFIRMED':
+      state = {
+        ...state,
+        [transactionId]: {
+          confirmed: true
+        }
+      }
+
+    case 'TRANSACTION_ERROR':
       state = {
         ...state,
         [transactionId]: {

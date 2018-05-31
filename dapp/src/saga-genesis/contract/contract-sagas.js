@@ -7,6 +7,7 @@ import {
 } from '../state-finders'
 
 export function* addContract({address, name, contractKey, networkId}) {
+  address = address.toLowerCase()
   if (!networkId) {
     networkId = yield select((state) => state.sagaGenesis.network.networkId)
   }
