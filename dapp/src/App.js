@@ -7,7 +7,6 @@ import { SignIn } from './screens/sign-in'
 import PatientProfile from './screens/Patient Profile'
 import NewCase from './screens/New Case'
 import PatientCase from './screens/Patient Case'
-import PhysicianProfile from './screens/doctor-home'
 import DiagnoseCase from './screens/Diagnose Case'
 import AddDoctor from './screens/Add Doctor'
 import Mint from './screens/Mint'
@@ -31,7 +30,6 @@ const App = class extends Component {
         <Route path='/new-case' component={ NewCase }/>
         <Route path='/patient-case/:caseAddress' component={ PatientCase }/>
         <Route path='/patient-profile' component={ PatientProfile }/>
-        <Route path='/physician-profile' component={ PhysicianProfile }/>
         <Route path='/diagnose-case/:caseAddress' component={ DiagnoseCase }/>
         <Route path='/doctors' component={ AddDoctor }/>
         <Route path='/mint' component={ Mint }/>

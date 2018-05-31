@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Spinner from '../../../components/Spinner'
-import { registerDoctor } from '../../../utils/web3-util'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { withContractRegistry, withSend } from '@/saga-genesis'

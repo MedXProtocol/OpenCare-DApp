@@ -21,45 +21,6 @@ export async function getSelectedAccount() {
   return accounts[0]
 }
 
-export async function isDoctor() {
-  const contract = await getDoctorManagerContract()
-  const selectedAccount = await getSelectedAccount()
-  return contract.methods.isDoctor(selectedAccount).call()
-}
-
-export async function getSelectedAccountBalance() {
-  const selectedAccount = await getSelectedAccount()
-  const contract = await getMedXTokenContract()
-  const balance = await contract.methods.balanceOf(selectedAccount).call()
-  return balance.toString()
-}
-
-export async function mintMedXTokens(account, amount, callback) {
-  const contract = await getMedXTokenContract()
-  return contract.methods.mint(account, amount).send(await getDefaultTxOptions())
-    .then((result) => {
-      waitForTxComplete(result, callback)
-    })
-    .catch((error) => {
-      callback(error)
-    })
-}
-
-export async function getCaseDate(address) {
-  // const contract = await getCaseContract(address)
-  // let watcher = contract.CaseCreated({}, {fromBlock: 0, toBlock: 'latest'})
-  // let event = await promisify(cb => {
-  //   watcher.watch((error, result) => {
-  //     watcher.stopWatching()
-  //     cb(error, result)
-  //   })
-  // })
-  // const web3 = getWeb3()
-  // let block = await promisify(cb => web3.eth.getBlock(event.blockNumber, cb))
-  // return block.timestamp
-  return 0
-}
-
 export function setPublicKey(publicKey) {
   return getAccountManagerContract().then(async (accountManager) => {
     return accountManager.methods.setPublicKey('0x' + publicKey).send(await getDefaultTxOptions())
@@ -73,139 +34,6 @@ export async function getPublicKey(address) {
   })
 }
 
-export async function createCase(encryptedCaseKey, documentHash, callback) {
-  const contract = await getMedXTokenContract()
-  const caseManager = await getCaseManagerContract()
-  const caseManagerAddress = caseManager.options.address
-  var hashHex = hashToHex(documentHash)
-  const combined = '0x' + encryptedCaseKey + hashHex
-
-  return contract.methods.approveAndCall(caseManagerAddress, 15, combined).send(await getDefaultTxOptions())
-}
-
-export async function getCaseStatus(caseAddress) {
-  const contract = await getCaseContract(caseAddress)
-  let status = await contract.methods.status().call()
-  status = status.toString()
-  const code = parseInt(status)
-  return {
-      code,
-      name: caseStatusToName(status),
-      object: new Status(code)
-  }
-}
-
-export async function getCaseKey(caseAddress) {
-  const contract = await getCaseContract(caseAddress)
-  let encryptedCaseKeyBytes = await contract.methods.encryptedCaseKey().call()
-  return encryptedCaseKeyBytes.substring(2)
-}
-
-export async function getCaseDetailsLocationHash(caseAddress) {
-  const contract = await getCaseContract(caseAddress)
-  return getFileHashFromBytes(await contract.methods.caseDetailLocationHash().call())
-}
-
-export async function getCaseDoctorADiagnosisLocationHash(caseAddress) {
-  const contract = await getCaseContract(caseAddress)
-  return getFileHashFromBytes(await contract.methods.diagnosisALocationHash().call())
-}
-
-export async function getCaseDoctorBDiagnosisLocationHash(caseAddress) {
-  const contract = await getCaseContract(caseAddress)
-  return getFileHashFromBytes(await contract.methods.diagnosisBLocationHash().call())
-}
-
-export async function getAllCasesForCurrentAccount() {
-  const contract = await getCaseManagerContract()
-  const account = await getSelectedAccount()
-
-  const count = await contract.methods.getPatientCaseListCount(account).call()
-
-  let cases = []
-
-  for(let i = 0; i < count; i++) {
-    const caseContractAddress = await contract.methods.patientCases(account, i).call()
-    const caseContract = await getCaseContract(caseContractAddress)
-    const status = await caseContract.methods.status().call()
-
-    cases.push({
-      number: i + 1,
-      address: caseContractAddress,
-      status: status.toString(),
-      statusName: caseStatusToName(status.toString())
-    })
-  }
-
-  return cases
-}
-
-export async function openCaseCount() {
-  return getCaseManagerContract().then((contract) => {
-    return contract.methods.openCaseCount().call()
-  })
-}
-
-export async function getNextCaseFromQueue() {
-  const contract = await getCaseManagerContract()
-  await contract.methods.requestNextCase().send(await getDefaultTxOptions())
-}
-
-export async function registerDoctor(address, callback) {
-  const contract = await getDoctorManagerContract()
-  return contract.methods.addDoctor(address).send(await getDefaultTxOptions(), function(error, result) {
-    if(error !== null){
-        callback(error, result)
-    } else {
-        waitForTxComplete(result, callback)
-    }
-  })
-}
-
-export async function acceptDiagnosis(caseAddress, callback) {
-  const contract = await getCaseContract(caseAddress)
-  contract.methods.acceptDiagnosis().send(await getDefaultTxOptions(), function(error, result) {
-    if(error !== null){
-        callback(error, result)
-    } else {
-        waitForTxComplete(result, callback)
-    }
-  })
-}
-
-export async function challengeDiagnosis(caseAddress, callback) {
-  const contract = await getCaseContract(caseAddress)
-  contract.methods.challengeDiagnosis().send(await getDefaultTxOptions(), function(error, result) {
-    if(error !== null){
-      callback(error, result)
-    } else {
-      waitForTxComplete(result, callback)
-    }
-  })
-}
-
-export async function diagnoseCase(caseAddress, diagnosisHash, callback) {
-  const contract = await getCaseContract(caseAddress)
-  contract.methods.diagnoseCase(diagnosisHash).send(await getDefaultTxOptions(), function(error, result) {
-    if(error !== null){
-      callback(error, result)
-    } else {
-      waitForTxComplete(result, callback)
-    }
-  })
-}
-
-export async function diagnoseChallengedCase(caseAddress, diagnosisHash, accept, callback) {
-  const contract = await getCaseContract(caseAddress)
-  contract.methods.diagnoseChallengedCase(diagnosisHash, accept).send(await getDefaultTxOptions(), function(error, result) {
-    if(error !== null){
-      callback(error, result)
-    } else {
-      waitForTxComplete(result, callback)
-    }
-  })
-}
-
 export async function contractFromConfig (config, address) {
   const web3 = getWeb3()
   if (!address) {
@@ -215,34 +43,6 @@ export async function contractFromConfig (config, address) {
   }
   let account = await getSelectedAccount()
   return new web3.eth.Contract(config.abi, address)
-}
-
-export async function getDoctorAuthorizationRequestCount() {
-  let doctor = await getSelectedAccount()
-  let caseManager = await getCaseManagerContract()
-  return caseManager.methods.doctorAuthorizationRequestCount(doctor).call()
-}
-
-export async function getDoctorAuthorizationRequestCaseAtIndex(index) {
-  let doctor = await getSelectedAccount()
-  let caseManager = await getCaseManagerContract()
-  return caseManager.methods.doctorAuthorizationRequestCaseAtIndex(doctor, index).call()
-}
-
-export function getMedXTokenContract() {
-  return contractFromConfig(medXTokenContractConfig)
-}
-
-export function getCaseManagerContract() {
-  return lookupContractAt('CaseManager', caseManagerContractConfig)
-}
-
-export function getCaseContract(address) {
-  return contractFromConfig(caseContractConfig, address)
-}
-
-export function getDoctorManagerContract() {
-  return lookupContractAt('DoctorManager', doctorManagerContractConfig)
 }
 
 export function getAccountManagerContract () {
@@ -269,21 +69,6 @@ function getRegistryContract() {
 
 function toRegistryKey(string) {
   return getWeb3().utils.sha3(string)
-}
-
-function waitForTxComplete(txHash, callback) {
-  const web3 = getWeb3()
-
-  // console.log("TX Hash [" + txHash + "]")
-
-  web3.eth.getTransactionReceipt(txHash, function (error, result) {
-    if(error !== null) {
-        callback(error, result)
-        return
-    }
-
-    callback(null, result)
-  })
 }
 
 async function getDefaultTxOptions() {

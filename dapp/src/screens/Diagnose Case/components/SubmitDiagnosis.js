@@ -5,12 +5,6 @@ import { Link } from 'react-router-dom'
 import Spinner from '@/components/Spinner'
 import { isNotEmptyString } from '@/utils/common-util'
 import hashToHex from '@/utils/hash-to-hex'
-import {
-  getCaseDoctorADiagnosisLocationHash,
-  diagnoseCase,
-  getCaseContract,
-  diagnoseChallengedCase
-} from '@/utils/web3-util';
 import { uploadJson, downloadJson } from '@/utils/storage-util'
 import isBlank from '@/utils/is-blank'
 import { connect } from 'react-redux'
@@ -198,7 +192,7 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
                       </div>
                   </Modal.Body>
                   <Modal.Footer>
-                    <Link to='/physician-profile' className="btn btn-defult">OK</Link>
+                    <Link to='/cases/open' className="btn btn-defult">OK</Link>
                   </Modal.Footer>
               </Modal>
               <Spinner loading={loading} />

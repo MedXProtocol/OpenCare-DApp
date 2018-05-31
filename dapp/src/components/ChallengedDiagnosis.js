@@ -1,28 +1,41 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { getCaseDoctorBDiagnosisLocationHash } from '@/utils/web3-util';
-import { downloadJson } from '@/utils/storage-util';
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
+import { downloadJson } from '@/utils/storage-util'
+import { cacheCallValue, withSaga, cacheCall } from '@/saga-genesis'
+import { connect } from 'react-redux'
+import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 
-class ChallengedDiagnosis extends Component {
+function mapStateToProps(state, { caseAddress }) {
+  const diagnosisBLocationHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
+  return {
+    diagnosisBLocationHash
+  }
+}
+
+function* saga({ caseAddress }) {
+  yield cacheCall(caseAddress, 'diagnosisBLocationHash')
+}
+
+const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: 'caseAddress' })(class _ChallengedDiagnosis extends Component {
     constructor(props){
         super(props)
 
         this.state = {
             diagnosis: {},
             hidden: true
-        };
+        }
     }
 
     async componentDidMount() {
-        const diagnosisHash = await getCaseDoctorBDiagnosisLocationHash(this.props.caseAddress);
+        const diagnosisHash = this.props.diagnosisBLocationHash
 
         if(diagnosisHash !== null && diagnosisHash !== "0x") {
-            const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey);
-            const diagnosis = JSON.parse(diagnosisJson);
+            const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey)
+            const diagnosis = JSON.parse(diagnosisJson)
             this.setState({
                 diagnosis: diagnosis,
                 hidden: false
-            });
+            })
         }
     }
 
@@ -46,19 +59,19 @@ class ChallengedDiagnosis extends Component {
                         </div>
                     </div>
                 </div>
-            </div>;
+            </div>
     }
-}
+}))
 
 ChallengedDiagnosis.propTypes = {
   caseAddress: PropTypes.string,
   caseKey: PropTypes.string,
   title: PropTypes.string
-};
+}
 
 ChallengedDiagnosis.defaultProps = {
   caseAddress: null,
   title: 'Diagnosis'
-};
+}
 
-export default ChallengedDiagnosis;
+export default ChallengedDiagnosis

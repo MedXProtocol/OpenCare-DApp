@@ -4,7 +4,6 @@ import CaseStatus from './components/CaseStatus';
 import CaseDetails from '../../components/CaseDetails';
 import Diagnosis from '@/components/Diagnosis';
 import ChallengedDiagnosis from '@/components/ChallengedDiagnosis';
-import { getCaseKey, getCaseDoctorADiagnosisLocationHash, getCaseContract } from '@/utils/web3-util'
 import { signedInSecretKey } from '@/services/sign-in'
 import aes from '@/services/aes'
 import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'

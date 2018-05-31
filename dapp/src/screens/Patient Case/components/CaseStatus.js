@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getCaseContract } from '../../../utils/web3-util';
 import { withSaga } from '@/saga-genesis/with-saga'
 import { cacheCall, addContract } from '@/saga-genesis/sagas'
 import { select } from 'redux-saga/effects'

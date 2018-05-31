@@ -3,11 +3,6 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import { connect } from 'react-redux'
-import {
-  getCaseContract,
-  getCaseStatus,
-  getAccountManagerContract
-} from '@/utils/web3-util'
 import { caseStatusToName } from '@/utils/case-status-to-name'
 import get from 'lodash.get'
 import dispatch from '@/dispatch'

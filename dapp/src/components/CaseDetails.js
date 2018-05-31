@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getCaseContract, getCaseDetailsLocationHash, getCaseKey } from '../utils/web3-util';
 import { downloadJson, downloadImage, getFileUrl } from '../utils/storage-util';
 import { withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
 import { all } from 'redux-saga/effects'

@@ -1,9 +1,5 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import {
-  getAllCasesForCurrentAccount,
-  getCaseManagerContract
-} from '@/utils/web3-util'
 import './PatientCases.css'
 import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
 import { cacheCall } from '@/saga-genesis/sagas'
