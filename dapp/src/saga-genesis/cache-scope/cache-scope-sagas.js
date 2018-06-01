@@ -13,8 +13,11 @@ import {
 } from '../state-finders'
 
 export function* deregisterKey({key}) {
-  let callCountRegistry = yield getContext('callCountRegistry')
-  yield* callCountRegistry.deregister(key)
+  const callCountRegistry = yield getContext('callCountRegistry')
+  const calls = callCountRegistry.deregister(key)
+  if (calls.length) {
+    yield put({type: 'WEB3_STALE_CALLS', calls})
+  }
 }
 
 export function* registerCall(call) {

@@ -14,14 +14,14 @@ import { contractKeyByAddress } from '../state-finders'
 
 export function* cacheCall(address, method, ...args) {
   let call = createCall(address, method, ...args)
-  const callCountRegistry = yield getContext('callCountRegistry')
-  const isFresh = callCountRegistry.count(call) > 0
-  yield registerCall(call)
   let callState = yield select(state => state.sagaGenesis.callCache[call.hash])
-  const hasResponse = callState && callState.response
-  if (isFresh && hasResponse) {
+  const isHot = callState && !callState.stale && callState.response
+  // the registerCall could be pulled up into a different function that wraps this one
+  yield registerCall(call)
+  // If the callState has a response and it's hot and fresh then return it
+  if (isHot) {
     return callState.response
-  } else {
+  } else { // Retrieve or wait for the new state
     if (!callState || !callState.inFlight) {
       yield spawn(put, {type: 'WEB3_CALL', call})
     }
