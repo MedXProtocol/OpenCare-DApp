@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import { ContractRegistryProvider } from '@/saga-genesis'
 import 'font-awesome/css/font-awesome.min.css'
 import './assets/css/themify-icons.css'
-import './assets/sass/index.scss'
+import './index.css'
 import App from './App'
 import store, { contractRegistry } from '@/store'
 
