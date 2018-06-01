@@ -9,7 +9,7 @@ import { deriveSharedKey } from '@/services/derive-shared-key'
 import aes from '@/services/aes'
 import isBlank from '@/utils/is-blank'
 import get from 'lodash.get'
-import { hashCall, withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
+import { withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
 import { cacheCall, addContract } from '@/saga-genesis/sagas'
 import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
@@ -19,9 +19,6 @@ function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
   let account = get(state, 'sagaGenesis.accounts[0]')
   const AccountManager = contractByName(state, 'AccountManager')
-
-  const hasher = hashCall
-
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'approvedDoctorKeys', account)

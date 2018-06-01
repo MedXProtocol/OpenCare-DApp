@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { createCall } from './utils/create-call'
+import { createCall } from '../utils/create-call'
 
 let transactionIds = 1
 

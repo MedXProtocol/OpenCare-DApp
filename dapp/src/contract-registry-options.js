@@ -5,11 +5,7 @@ import doctorManagerContractConfig from '#/DoctorManager.json'
 import accountManagerConfig from '#/AccountManager.json'
 import registryConfig from '#/Registry.json'
 
-function abiFactory(abi) {
-  return function (web3, address) {
-    return new web3.eth.Contract(abi, address)
-  }
-}
+import { abiFactory } from '@/saga-genesis/utils'
 
 export default {
   contractFactories: {
