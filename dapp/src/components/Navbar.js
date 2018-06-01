@@ -35,11 +35,11 @@ function mapStateToProps (state) {
 }
 
 function* saga({ account, DoctorManager }) {
-  if (!DoctorManager) { return }
+  if (!account || !DoctorManager) { return }
   yield cacheCall(DoctorManager, 'isDoctor', account)
 }
 
-const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager'] })(class _HippoNavbar extends Component {
+const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager', 'MedXToken'] })(class _HippoNavbar extends Component {
   signOut = () => {
     signOut()
     this.props.history.push('/')
@@ -53,8 +53,7 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
         <NavDropdown title='My Account' id='my-account'>
           <LinkContainer to='/wallet'>
             <MenuItem href='/wallet'>
-              <i className="ti-wallet"></i>
-              &nbsp; My Wallet
+              My Balance
             </MenuItem>
           </LinkContainer>
           <LinkContainer to='/emergency-kit'>
@@ -68,11 +67,18 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
           </MenuItem>
         </NavDropdown>
 
+      var myCasesItem =
+        <LinkContainer to='/'>
+          <NavItem href='/'>
+            My Cases
+          </NavItem>
+        </LinkContainer>
+
       if (isDoctor) {
-        var casesItem =
+        var openCasesItem =
           <LinkContainer to='/cases/open'>
             <NavItem href='/cases/open'>
-              Open Cases
+              Diagnose Cases
             </NavItem>
           </LinkContainer>
       }
@@ -96,6 +102,7 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
 
     return (
       <Navbar
+        inverse
         collapseOnSelect
         id="mainNav"
         className={navbarClassName}>
@@ -109,7 +116,8 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
         </Navbar.Header>
         <Navbar.Collapse>
           <Nav pullRight>
-            {casesItem}
+            {myCasesItem}
+            {openCasesItem}
             {doctorsItem}
             {profileMenu}
           </Nav>

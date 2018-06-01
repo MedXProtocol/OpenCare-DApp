@@ -1,0 +1,16 @@
+@import "~bootstrap-sass/assets/stylesheets/bootstrap/variables";
+
+$body-bg: #f4f3ef;
+
+$brand-dark-blue: #051A38;
+
+$font-family-base: 'Muli', #{$font-family-base};
+
+$navbar-height: 60px;
+$navbar-padding-vertical: 20px;
+$navbar-border-radius: 0;
+
+$navbar-inverse-bg: $brand-dark-blue;
+$navbar-inverse-link-color: #ddd;
+$navbar-inverse-link-active-bg: $brand-dark-blue;
+$navbar-inverse-border: none;

@@ -36,7 +36,7 @@ const PatientCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
   render() {
     if (this.props.diagnosisHash) {
       var diagnosis =
-        <div className="col">
+        <div className='col-xs-12'>
           <Diagnosis caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
         </div>
     }
@@ -44,14 +44,14 @@ const PatientCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
       <MainLayout>
         <div className="container">
           <div className="row">
-            <div className="col">
+            <div className='col-xs-12'>
               <CaseStatus caseAddress={this.props.match.params.caseAddress}/>
             </div>
             {diagnosis}
-            <div className="col">
+            <div className='col-xs-12'>
               <ChallengedDiagnosis caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} title='Second Diagnosis' />
             </div>
-            <div className="col">
+            <div className='col-xs-12'>
               <CaseDetails caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
             </div>
           </div>

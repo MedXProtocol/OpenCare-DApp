@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { Modal } from 'react-bootstrap';
+import {
+  Modal,
+  FormGroup,
+  ControlLabel,
+  Radio
+} from 'react-bootstrap';
 import { genKey } from '@/services/gen-key'
 import { withRouter } from 'react-router-dom';
 import Spinner from '../../../components/Spinner';
@@ -165,7 +170,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
 
         this.setState({showThankYouModal: false});
 
-        this.props.history.push('/patient-profile');
+        this.props.history.push('/');
     }
 
     handleCancelConfirmSubmissionModal = (event) => {
@@ -253,102 +258,76 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                                 </span>
                             </div>
                         </div>
-                        <div className="form-group">
-                            <div className="row">
-                                <div className="col-lg-6 col-md-6 top15">
-                                    <label>How long have you had this problem?<span className='star'>*</span></label>
-                                    <div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateHowLong} name="lengthOfTime" id="days" type="radio" value="Days" required />
-                                            <label htmlFor="days">
-                                                Days
-                                            </label>
-                                        </div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateHowLong} name="lengthOfTime" id="weeks" type="radio" value="Weeks" required />
-                                            <label htmlFor="weeks">
-                                                Weeks
-                                            </label>
-                                        </div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateHowLong} name="lengthOfTime" id="months" type="radio" value="Months" required />
-                                            <label htmlFor="months">
-                                                Months
-                                            </label>
-                                        </div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateHowLong} name="lengthOfTime" id="years" type="radio" value="Years" required />
-                                            <label htmlFor="years">
-                                                Years
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-lg-6 col-md-6 top15">
-                                    <label>Is it growing, shrinking or staying the same size?<span className='star'>*</span></label>
-                                    <div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateSize} name="size" id="growing" type="radio" value="Growing" required />
-                                            <label htmlFor="growing">
-                                                Growing
-                                            </label>
-                                        </div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateSize} name="size" id="shrinking" type="radio" value="Shrinking" required />
-                                            <label htmlFor="shrinking">
-                                                Shrinking
-                                            </label>
-                                        </div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateSize} name="size" id="sameSize" type="radio" value="Same size" required />
-                                            <label htmlFor="sameSize">
-                                                Same size
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="form-group">
 
                             <div className="row">
                                 <div className="col-lg-6 col-md-6 top15">
-                                    <label>Any history of skin cancer?<span className='star'>*</span></label>
-                                    <div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateSkinCancer} name="skinCancer" id="yes" type="radio" value="Yes" required />
-                                            <label htmlFor="yes">
-                                                Yes
-                                            </label>
-                                        </div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateSkinCancer} name="skinCancer" id="no" type="radio" value="No" required />
-                                            <label htmlFor="no">
-                                                No
-                                            </label>
-                                        </div>
-                                    </div>
+
+                                                          <FormGroup>
+                                                          <p>
+                                                            <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
+                                                           </p>
+                                                           <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Days" required>
+                                                             Days
+                                                           </Radio>{' '}
+                                                           <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Weeks" required>
+                                                             Weeks
+                                                           </Radio>{' '}
+                                                           <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Months" required>
+                                                             Months
+                                                           </Radio>{' '}
+                                                           <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Years" required>
+                                                             Years
+                                                           </Radio>
+                                                         </FormGroup>
+
                                 </div>
                                 <div className="col-lg-6 col-md-6 top15">
-                                    <label>Are you sexually active?<span className='star'>*</span></label>
-                                    <div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateSexuallyActive} name="sexuallyActive" id="sexYes" type="radio" value="Yes" required />
-                                            <label htmlFor="sexYes">
-                                                Yes
-                                            </label>
-                                        </div>
-                                        <div className="radio radio-inline">
-                                            <input onChange={this.updateSexuallyActive} name="sexuallyActive" id="sexNo" type="radio" value="No" required />
-                                            <label htmlFor="sexNo">
-                                                No
-                                            </label>
-                                        </div>
-                                    </div>
+                                  <FormGroup>
+                                  <p>
+                                    <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
+                                   </p>
+                                   <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Growing" required>
+                                     Growing
+                                   </Radio>{' '}
+                                   <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Shrinking" required>
+                                     Shrinking
+                                   </Radio>{' '}
+                                   <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Same size" required>
+                                     Same size
+                                   </Radio>
+                                 </FormGroup>
                                 </div>
                             </div>
-                        </div>
+
+                          <div className="row">
+                              <div className="col-lg-6 col-md-6 top15">
+                                <FormGroup>
+                                <p>
+                                  <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
+                                 </p>
+                                 <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="Yes" required>
+                                   Yes
+                                 </Radio>{' '}
+                                 <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="No" required>
+                                   No
+                                 </Radio>
+                               </FormGroup>
+                              </div>
+                              <div className="col-lg-6 col-md-6 top15">
+                                <FormGroup>
+                                <p>
+                                  <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
+                                 </p>
+                                 <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="Yes" required>
+                                   Yes
+                                 </Radio>{' '}
+                                 <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="No" required>
+                                   No
+                                 </Radio>
+                               </FormGroup>
+                              </div>
+                          </div>
+                        
                         <div className="form-group">
                             <div className="row">
                                 <div className="col-lg-2 col-md-2 col-sm-3 col-xs-5">

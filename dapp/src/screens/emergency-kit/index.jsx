@@ -41,15 +41,13 @@ const DiagnoseCase = connect(mapStateToProps)(class _DiagnoseCase extends Compon
               <h4 className='text-center'>
                 To sign in on a new browser:
               </h4>
-              <h5>
-                <ol>
-                  <li>Ensure you are using a Web3-enabled browser and that the current account is <b>{this.props.account}</b></li>
-                  <li>Go to the Hippocrates sign up page: <a href='/sign-up' target='_blank'>/sign-up</a></li>
-                  <li>Enter the above secret key</li>
-                  <li>Enter a new master password to encrypt your data locally</li>
-                  <li>Confirm the master password, then create your account</li>
-                </ol>
-              </h5>
+              <ol>
+                <li>Ensure you are using a Web3-enabled browser and that the current account is <b>{this.props.account}</b></li>
+                <li>Go to the Hippocrates sign up page: <a href='/sign-up' target='_blank'>/sign-up</a></li>
+                <li>Enter the above secret key</li>
+                <li>Enter a new master password to encrypt your data locally</li>
+                <li>Confirm the master password, then create your account</li>
+              </ol>
               <h4 className='text-center'>
                 <a href='javascript:;' onClick={this.print}><b>Print</b></a> or save this page for your records.
               </h4>

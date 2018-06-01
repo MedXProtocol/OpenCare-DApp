@@ -5,6 +5,11 @@ import defined from '@/utils/defined'
 import { connect } from 'react-redux'
 import { withContractRegistry, withSend } from '@/saga-genesis'
 import { contractByName } from '@/saga-genesis/state-finders'
+import {
+  FormGroup,
+  ControlLabel,
+  FormControl
+} from 'react-bootstrap'
 
 function mapStateToProps (state) {
   let account = get(state, 'sagaGenesis.accounts[0]')
@@ -71,33 +76,29 @@ const MintTokens = withContractRegistry(connect(mapStateToProps)(withSend(class 
       }
 
       return (
-          <div className="card">
-              <form
-                  onSubmit={this.handleSubmit}
-                  >
-                  <div className="card-header">
-                      <h4 className="card-title">Mint Tokens</h4>
-                      <p className="category">Mint tokens to address below</p>
-                  </div>
-                  <div className="card-content">
-                      <div className="form-group">
-                          <label htmlFor="hash">Account Address:</label>
-                          <input
-                              className="form-control"
-                              id="hash"
-                              value={this.state.address}
-                              onChange={this.updateAddress}
-                              required
-                          />
-                      </div>
-                      <button
-                        type="submit"
-                        className="btn btn-default"
-                        disabled={minting}>Mint Tokens</button>
-                  </div>
+        <div className='container'>
+          <div className='row'>
+            <div className='col-sm-12'>
+              <h1>Mint Tokens</h1>
+              <form onSubmit={this.handleSubmit}>
+                <FormGroup>
+                  <ControlLabel>Account Address</ControlLabel>
+                  <FormControl
+                    className="form-control"
+                    id="hash"
+                    value={this.state.address}
+                    onChange={this.updateAddress}
+                    required />
+                </FormGroup>
+                <button
+                  type="submit"
+                  className="btn btn-default"
+                  disabled={minting}>Mint Tokens</button>
               </form>
               <Spinner loading={minting}/>
+            </div>
           </div>
+        </div>
       );
     }
 })))

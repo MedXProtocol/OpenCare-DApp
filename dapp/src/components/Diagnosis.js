@@ -88,13 +88,13 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   handleCloseThankYouModal = (event) => {
       event.preventDefault();
       this.setState({showThankYouModal: false});
-      this.props.history.push('/patient-profile');
+      this.props.history.push('/');
   }
 
   handleCloseChallengeModal = (event) => {
       event.preventDefault();
       this.setState({showChallengeModal: false});
-      this.props.history.push('/patient-profile');
+      this.props.history.push('/');
   }
 
   onAcceptSuccess = () => {

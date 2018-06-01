@@ -55,30 +55,29 @@ const RegisterDoctor = withContractRegistry(connect(mapStateToProps)(withSend(cl
 
     render() {
         return (
-            <div className="card">
-                <form
-                    onSubmit={this.handleSubmit}
-                    >
-                    <div className="card-header">
-                        <h4 className="card-title">Register Doctor</h4>
-                        <p className="category">Register address as doctor</p>
-                    </div>
-                    <div className="card-content">
-                        <div className="form-group">
-                            <label htmlFor="hash">Account Address:</label>
-                            <input
-                                className="form-control"
-                                id="hash"
-                                value={this.state.address}
-                                onChange={this.updateAddress}
-                                required
-                            />
-                        </div>
-                        <button type="submit" className="btn btn-default" disabled={this.state.submitInProgress}>Register</button>
-                    </div>
+          <div className='container'>
+            <div className='row'>
+              <div className='col-sm-12'>
+                <form onSubmit={this.handleSubmit}>
+                  <div>
+                    <h1>Register Doctor</h1>
+                  </div>
+                  <div className="form-group">
+                      <label htmlFor="hash">Account Address</label>
+                      <input
+                          className="form-control"
+                          id="hash"
+                          value={this.state.address}
+                          onChange={this.updateAddress}
+                          required
+                      />
+                  </div>
+                  <button type="submit" className="btn btn-default" disabled={this.state.submitInProgress}>Register</button>
                 </form>
                 <Spinner loading={this.state.submitInProgress}/>
+              </div>
             </div>
+          </div>
         )
     }
 })))

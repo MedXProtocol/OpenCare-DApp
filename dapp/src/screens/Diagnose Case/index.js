@@ -72,24 +72,24 @@ const DiagnoseCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga
 
     if (!isBlank(this.props.challengeHash)) {
       var challenge =
-        <div className='col'>
+        <div className='col-xs-12'>
           <ChallengedDiagnosis caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
         </div>
     } else if (this.props.doctorB === this.props.account && status === 9) {
       challenge =
-        <div className='col'>
+        <div className='col-xs-12'>
           <SubmitDiagnosis caseAddress={this.props.caseAddress} caseKey={this.props.caseKey} diagnosisHash={this.props.diagnosisHash} />
         </div>
     }
 
     if (!isBlank(this.props.diagnosisHash) && !challenging) {
       var diagnosis =
-        <div className='col'>
+        <div className='col-xs-12'>
           <Diagnosis caseAddress={this.props.caseAddress} caseKey={this.props.caseKey} />
         </div>
     } else if (this.props.doctorA === this.props.account && status === 4) {
       diagnosis =
-        <div className='col'>
+        <div className='col-xs-12'>
           <SubmitDiagnosis caseAddress={this.props.caseAddress} caseKey={this.props.caseKey} />
         </div>
     }
@@ -100,7 +100,7 @@ const DiagnoseCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga
           <div className='row'>
             {diagnosis}
             {challenge}
-            <div className='col'>
+            <div className='col-sm-12'>
               <CaseDetails caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
             </div>
           </div>
