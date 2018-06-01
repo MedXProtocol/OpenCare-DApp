@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import MainLayout from '../../layouts/MainLayout'
-import Buy from './components/Buy'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
