@@ -11,17 +11,13 @@ function abiFactory(abi) {
   }
 }
 
-function truffleArtifactContractFactory(config) {
-  return abiFactory(config.abi)
-}
-
 export default {
   contractFactories: {
-    AccountManager: truffleArtifactContractFactory(accountManagerConfig),
-    CaseManager: truffleArtifactContractFactory(caseManagerContractConfig),
-    MedXToken: truffleArtifactContractFactory(medXTokenContractConfig),
-    DoctorManager: truffleArtifactContractFactory(doctorManagerContractConfig),
-    Case: truffleArtifactContractFactory(caseContractConfig),
-    Registry: truffleArtifactContractFactory(registryConfig)
+    AccountManager: abiFactory(accountManagerConfig.abi),
+    CaseManager: abiFactory(caseManagerContractConfig.abi),
+    MedXToken: abiFactory(medXTokenContractConfig.abi),
+    DoctorManager: abiFactory(doctorManagerContractConfig.abi),
+    Case: abiFactory(caseContractConfig.abi),
+    Registry: abiFactory(registryConfig.abi)
   }
 }
