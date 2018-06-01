@@ -1,78 +1,99 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withSaga } from '@/saga-genesis/with-saga'
+import { withSaga, cacheCallValue } from '@/saga-genesis'
 import { cacheCall, addContract } from '@/saga-genesis/sagas'
 import { select } from 'redux-saga/effects'
+import { connect } from 'react-redux'
 
-function* propSaga({ caseAddress }) {
-  yield addContract({address: caseAddress, contractKey: 'Case'})
-  const status = yield cacheCall(caseAddress, 'status')
+function mapStateToProps(state, { caseAddress }) {
+  const status = (cacheCallValue(state, caseAddress, 'status') || '0')
   return {
     status
   }
 }
 
-const CaseStatus = withSaga(propSaga)(class _CaseStatus extends Component {
+function* saga({ caseAddress }) {
+  yield addContract({address: caseAddress, contractKey: 'Case'})
+  yield cacheCall(caseAddress, 'status')
+}
+
+const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(class _CaseStatus extends Component {
     render() {
-      var status = this.props.status
-        return (
-            <div className="card">
-                <div className="card-header">
-                    <h2 className="card-title">Status</h2>
-                </div>
-                <div className="card-content">
-                    {
-                        status ===  1 ?
-                        <div className="alert alert-info">
-                            Your case is waiting to be assigned to a doctor.
-                        </div>
-                        : status === 2 ?
-                        <div className="alert alert-info">
-                            A doctor has requested to diagnose your case.  Please authorize the diagnosis.
-                        </div>
-                        : status === 3 ?
-                        <div className="alert alert-danger">
-                            You have cancelled this case.
-                        </div>
-                        : status === 4 ?
-                        <div className="alert alert-success">
-                            A doctor is currently diagnosing your case.
-                        </div>
-                        : status === 5 ?
-                        <div className="alert alert-success">
-                            Your case has been evaluated.  Please review it.
-                        </div>
-                        : status === 6 ?
-                        <div className="alert alert-warning">
-                            Your case has been successfully diagnosed and closed.
-                        </div>
-                        : status === 7 ?
-                        <div className="alert alert-danger">
-                            You challenged the case. The case has been submitted for review by another doctor.
-                        </div>
-                        : status === 8 ?
-                        <div className="alert alert-success">
-                            A doctor has requested to challenge the existing diagnoses.  Please authorize the challenge diagnosis.
-                        </div>
-                        : status === 9 ?
-                        <div className="alert alert-danger">
-                            Your case is under review by a second doctor.
-                        </div>
-                        : status === 10 ?
-                        <div className="alert alert-danger">
-                            You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded 10 MEDX and may consider re-submitting your case to the network or visiting your local dermatologist.
-                        </div>
-                        : status === 11 ?
-                        <div className="alert alert-danger">
-                            You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of 15 MEDX was charged for your first opinion and discounted second opinion.
-                        </div>
-                        : null
-                    }
-                </div>
+      var status = parseInt(this.props.status)
+      let alert
+      switch (status) {
+        case 1:
+          alert =
+            <div className="alert alert-info">
+                Your case is waiting to be assigned to a doctor.
             </div>
-        );
+          break
+        case 2:
+          alert =
+            <div className="alert alert-info">
+                A doctor has requested to diagnose your case.  Please authorize the diagnosis.
+            </div>
+          break
+        case 3:
+          alert =
+            <div className="alert alert-danger">
+                You have cancelled this case.
+            </div>
+          break
+        case 4:
+          alert =
+            <div className="alert alert-success">
+                A doctor is currently diagnosing your case.
+            </div>
+          break
+        case 5:
+          alert =
+            <div className="alert alert-success">
+                Your case has been evaluated.  Please review it.
+            </div>
+          break
+        case 6:
+          alert =
+            <div className="alert alert-warning">
+                Your case has been successfully diagnosed and closed.
+            </div>
+          break
+        case 7:
+          alert =
+            <div className="alert alert-danger">
+                You challenged the case. The case has been submitted for review by another doctor.
+            </div>
+          break
+        case 8:
+          alert =
+            <div className="alert alert-success">
+                A doctor has requested to challenge the existing diagnoses.  Please authorize the challenge diagnosis.
+            </div>
+          break
+        case 9:
+          alert =
+            <div className="alert alert-danger">
+                Your case is under review by a second doctor.
+            </div>
+          break
+        case 10:
+          alert =
+            <div className="alert alert-danger">
+                You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded 10 MEDX and may consider re-submitting your case to the network or visiting your local dermatologist.
+            </div>
+          break
+        case 11:
+          alert =
+            <div className="alert alert-danger">
+                You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of 15 MEDX was charged for your first opinion and discounted second opinion.
+            </div>
+          break
+        default:
+          alert = <div className="alert alert-info">Open</div>
+      }
+      return alert
     }
-})
+}))
 
 CaseStatus.propTypes = {
     caseAddress: PropTypes.string.isRequired
