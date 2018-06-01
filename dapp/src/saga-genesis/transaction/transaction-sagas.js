@@ -46,13 +46,8 @@ export function* web3Send({ transactionId, call, options }) {
     const contractRegistry = yield getContext('contractRegistry')
     const web3 = yield getContext('web3')
     const contractKey = yield select(contractKeyByAddress, address)
-
     const contract = contractRegistry.get(address, contractKey, web3)
     const func = contract.methods[call.method](...call.args)
-    if (!options.gas) {
-      const gasEstimate = yield func.estimateGas(options)
-      options.gas = gasEstimate * 2
-    }
     const send = func.send
 
     const transactionChannel = createTransactionEventChannel(web3, transactionId, send, options)

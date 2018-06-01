@@ -9,9 +9,9 @@ import { isSignedIn, signOut } from '@/services/sign-in'
 import get from 'lodash.get'
 import networkIdToName from '@/utils/network-id-to-name'
 import { connect } from 'react-redux'
-import { withContractRegistry, cacheCallValue, withSaga } from '@/saga-genesis'
 import { cacheCall } from '@/saga-genesis/sagas'
-import { contractByName } from '@/saga-genesis/state-finders'
+import { withContractRegistry, withSaga } from '@/saga-genesis/components'
+import { cacheCallValue, contractByName } from '@/saga-genesis/state-finders'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
