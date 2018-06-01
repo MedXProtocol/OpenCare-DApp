@@ -11,6 +11,7 @@ import DiagnoseCase from './screens/Diagnose Case'
 import AddDoctor from './screens/Add Doctor'
 import Mint from './screens/Mint'
 import Wallet from './screens/Wallet'
+import EmergencyKit from './screens/emergency-kit'
 import { OpenCases } from './screens/open-cases'
 import './App.css'
 import { SignInRedirect } from './sign-in-redirect'
@@ -23,6 +24,7 @@ const App = class extends Component {
     var result =
       <div>
         <SignInRedirect />
+        <Route path='/emergency-kit' component={EmergencyKit} />
         <Route path='/login-metamask' component={LoginToMetaMask} />
         <Route path='/try-metamask' component={TryMetamask} />
         <Route path='/sign-in' component={ SignIn } />

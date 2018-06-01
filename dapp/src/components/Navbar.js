@@ -1,7 +1,15 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
-import { Modal } from 'react-bootstrap'
+import {
+  Modal,
+  Nav,
+  Navbar,
+  NavItem,
+  NavDropdown,
+  MenuItem
+} from 'react-bootstrap'
 import { withRouter, Link } from 'react-router-dom'
+import { LinkContainer } from 'react-router-bootstrap'
 import PropTypes from 'prop-types'
 import logo from '../assets/img/logo.png'
 import './Navbar.css'
@@ -31,7 +39,7 @@ function* saga({ account, DoctorManager }) {
   yield cacheCall(DoctorManager, 'isDoctor', account)
 }
 
-const Navbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager'] })(class _Navbar extends Component {
+const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager'] })(class _HippoNavbar extends Component {
   signOut = () => {
     signOut()
     this.props.history.push('/')
@@ -41,10 +49,40 @@ const Navbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { pr
     var isDoctor = this.props.isDoctor
 
     if (isSignedIn()) {
-      var signOut =
-        <a className="navbar-text navbar-right btn-magnify" href='javascript:;' onClick={this.signOut}>
-          Sign Out
-        </a>
+      var profileMenu =
+        <NavDropdown title='My Account' id='my-account'>
+          <LinkContainer to='/wallet'>
+            <MenuItem href='/wallet'>
+              <i className="ti-wallet"></i>
+              &nbsp; My Wallet
+            </MenuItem>
+          </LinkContainer>
+          <LinkContainer to='/emergency-kit'>
+            <MenuItem href='/emergency-kit'>
+              My Emergency Kit
+            </MenuItem>
+          </LinkContainer>
+          <MenuItem divider />
+          <MenuItem href='javascript:;' onClick={this.signOut}>
+            Sign Out
+          </MenuItem>
+        </NavDropdown>
+
+      if (isDoctor) {
+        var casesItem =
+          <LinkContainer to='/cases/open'>
+            <NavItem href='/cases/open'>
+              Open Cases
+            </NavItem>
+          </LinkContainer>
+      }
+
+      var doctorsItem =
+        <LinkContainer to='/doctors'>
+          <NavItem href='/doctors'>
+            Doctors
+          </NavItem>
+        </LinkContainer>
     }
 
     if (this.props.networkId) {
@@ -54,57 +92,49 @@ const Navbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { pr
       }
     }
 
-    if (isDoctor) {
-      var casesItem =
-        <Link to='/cases/open' className="navbar-text navbar-right btn-magnify">
-          Open Cases
-        </Link>
-    }
-        return (
-            <nav id="mainNav" className={classnames('navbar', { 'navbar-transparent': this.props.transparent, 'navbar-absolute': this.props.transparent, 'navbar-default': !this.props.transparent})}>
-                <div className="container">
-                    <div className="navbar-header">
-                        <Link to='/' className="navbar-brand" id="collNav" href="">
-                            <img src={logo} alt="MedCredits"></img>
-                        </Link>
-                        <p className='navbar-text'>{networkName}</p>
-                        <Link to='/wallet' id="wallet-link-toggle" className="navbar-toggle collapsed ti-wallet">
-                            <span className="sr-only">Toggle</span>
-                        </Link>
-                    </div>
-                    <div className="collapse navbar-collapse">
-                        {signOut}
-                        <Link to='/wallet' className="navbar-text navbar-right btn-magnify">
-                            <i className="ti-wallet"></i>
-                            &nbsp; My Wallet
-                        </Link>
-                        <Link to='/doctors' className="navbar-text navbar-right btn-magnify">
-                            &nbsp; Doctors
-                        </Link>
-                        {casesItem}
+    let navbarClassName = classnames('navbar', { 'navbar-transparent': this.props.transparent, 'navbar-absolute': this.props.transparent, 'navbar-default': !this.props.transparent})
+
+    return (
+      <Navbar
+        collapseOnSelect
+        id="mainNav"
+        className={navbarClassName}>
+        <Navbar.Header>
+          <Navbar.Brand>
+            <Link to='/' className="navbar-brand" id="collNav" href="">
+                <img src={logo} alt="MedCredits"></img>
+            </Link>
+          </Navbar.Brand>
+          <Navbar.Toggle />
+        </Navbar.Header>
+        <Navbar.Collapse>
+          <Nav pullRight>
+            {casesItem}
+            {doctorsItem}
+            {profileMenu}
+          </Nav>
+        </Navbar.Collapse>
+        <Modal show={showNetworkModal}>
+            <Modal.Body>
+                <div className="row">
+                    <div className="col text-center">
+                        <h4>You must switch to the Ropsten network</h4>
                     </div>
                 </div>
-                <Modal show={showNetworkModal}>
-                    <Modal.Body>
-                        <div className="row">
-                            <div className="col text-center">
-                                <h4>You must switch to the Ropsten network</h4>
-                            </div>
-                        </div>
-                    </Modal.Body>
-                </Modal>
-            </nav>
-        );
+            </Modal.Body>
+          </Modal>
+        </Navbar>
+      );
     }
 })))
 
-Navbar.propTypes = {
+HippoNavbar.propTypes = {
     transparent: PropTypes.bool
 };
 
-Navbar.defaultProps = {
+HippoNavbar.defaultProps = {
     transparent: false,
     accounts: []
 };
 
-export default withRouter(Navbar)
+export default withRouter(HippoNavbar)
