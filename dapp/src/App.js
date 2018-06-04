@@ -12,7 +12,7 @@ import Mint from './screens/Mint'
 import Wallet from './screens/Wallet'
 import EmergencyKit from './screens/emergency-kit'
 import { OpenCases } from './screens/open-cases'
-import { SignInRedirect } from './sign-in-redirect'
+import { SignInRedirectContainer } from './sign-in-redirect'
 import { TryMetamask } from './screens/try-metamask'
 import { LoginToMetaMask } from './screens/login-to-metamask'
 import { connect } from 'react-redux'
@@ -21,7 +21,7 @@ const App = class extends Component {
   render () {
     var result =
       <div>
-        <SignInRedirect />
+        <SignInRedirectContainer />
         <Route path='/emergency-kit' component={EmergencyKit} />
         <Route path='/login-metamask' component={LoginToMetaMask} />
         <Route path='/try-metamask' component={TryMetamask} />

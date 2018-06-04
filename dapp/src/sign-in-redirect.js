@@ -11,14 +11,16 @@ import { connect } from 'react-redux'
 
 function mapStateToProps (state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
+  let signedIn = isSignedIn()
   return {
     address,
+    signedIn,
     account: getAccount(address),
     web3Failed: state.sagaGenesis.web3.error
   }
 }
 
-export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends Component {
+export const SignInRedirect = class extends Component {
   constructor (props) {
     super(props)
     this.state = {}
@@ -65,9 +67,8 @@ export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends 
         requestedPathname: props.location.pathname
       }
     } else {
-      let signedIn = isSignedIn()
       let redirectPathname = redirectService({
-        isSignedIn: signedIn,
+        isSignedIn: props.signedIn,
         hasAccount: !!props.account,
         pathname: props.location.pathname
       })
@@ -78,6 +79,14 @@ export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends 
         }
       }
     }
+
+    if (!nextState.redirect && this.state.requestedPathname) {
+      nextState = {
+        redirect: this.state.requestedPathname,
+        requestedPathname: ''
+      }
+    }
+
     this.setState(nextState)
   }
 
@@ -92,4 +101,6 @@ export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends 
 
     return redirectComponent
   }
-}))
+}
+
+export const SignInRedirectContainer = withRouter(connect(mapStateToProps)(SignInRedirect))
