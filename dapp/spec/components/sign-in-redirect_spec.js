@@ -42,11 +42,7 @@ describe('components', () => {
         props.signedIn = true
         enzymeWrapper.setProps(props)
         expect(enzymeWrapper.state().requestedPathname).toBe('/foo')
-
-        console.log(enzymeWrapper.find('Redirect'))
-        console.log(enzymeWrapper.debug())
-
-        // expect(enzymeWrapper.find('Redirect').props().to).toBe('/foo')
+        expect(enzymeWrapper.find('Redirect').props().to).toBe('/foo')
       })
     })
   })

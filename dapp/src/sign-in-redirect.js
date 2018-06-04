@@ -41,7 +41,16 @@ export const SignInRedirect = class extends Component {
     if (this.props.address && this.props.address !== nextProps.address) {
       signOut()
     }
-    this.checkSignInRedirect(nextProps)
+
+    // When they've signed in properly and have a specific requested pathname
+    if (nextProps.signedIn && this.state.requestedPathname) {
+      this.setState({
+        redirect: this.state.requestedPathname,
+        requestedPathname: ''
+      })
+    } else {
+      this.checkSignInRedirect(nextProps)
+    }
   }
 
   unload = () => {
@@ -53,7 +62,6 @@ export const SignInRedirect = class extends Component {
   checkSignInRedirect (props) {
     let nextState = {
       redirect: ''
-      // requestedPathname: props.location.pathname
     }
 
     if (props.web3Failed) {
@@ -72,6 +80,7 @@ export const SignInRedirect = class extends Component {
         hasAccount: !!props.account,
         pathname: props.location.pathname
       })
+
       if (redirectPathname) {
         nextState = {
           redirect: redirectPathname,
@@ -80,12 +89,16 @@ export const SignInRedirect = class extends Component {
       }
     }
 
-    if (!nextState.redirect && this.state.requestedPathname) {
-      nextState = {
-        redirect: this.state.requestedPathname,
-        requestedPathname: ''
-      }
-    }
+    // if (!nextState.redirect && this.state.requestedPathname) {
+    //   nextState = {
+    //     redirect: this.state.requestedPathname
+    //   }
+    // } else if (nextState.redirect === this.state.requestedPathname) {
+    //   nextState = {
+    //     redirect: '',
+    //     requestedPathname: ''
+    //   }
+    // }
 
     this.setState(nextState)
   }

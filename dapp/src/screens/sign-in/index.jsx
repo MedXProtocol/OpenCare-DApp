@@ -17,9 +17,7 @@ function mapStateToProps(state, ownProps) {
 
 export const SignIn = withRouter(connect(mapStateToProps)(class extends Component {
   onSubmit = ({ secretKey, masterPassword }) => {
-    signInWithPublicKeyCheck(this.props.account, masterPassword).then(() => {
-      this.props.history.push('/')
-    })
+    signInWithPublicKeyCheck(this.props.account, masterPassword)
   }
 
   render () {
