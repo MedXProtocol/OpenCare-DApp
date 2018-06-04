@@ -25,9 +25,9 @@ export class MasterPassword extends Component {
             </h1>
             <div className="well" role="alert">
               <input
+                type="password"
                 value={this.state.masterPassword}
                 onChange={(event) => this.setState({masterPassword: event.target.value})}
-                type="text"
                 className="form-control master-password__input"
                 placeholder="Enter a password" />
             </div>

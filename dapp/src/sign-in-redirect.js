@@ -6,7 +6,7 @@ import { withRouter, Redirect } from 'react-router-dom'
 import get from 'lodash.get'
 import { getAccount } from '@/services/get-account'
 import { isSignedIn, signOut } from '@/services/sign-in'
-import redirect from '@/services/redirect'
+import redirectService from '@/services/redirect-service'
 import { connect } from 'react-redux'
 
 function mapStateToProps (state, ownProps) {
@@ -49,39 +49,47 @@ export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends 
   }
 
   checkSignInRedirect (props) {
+    let nextState = {
+      redirect: ''
+      // requestedPathname: props.location.pathname
+    }
+
     if (props.web3Failed) {
-      var state = {
+      nextState = {
         redirect: '/try-metamask',
         requestedPathname: props.location.pathname
       }
     } else if (!props.address) {
-      state = {
+      nextState = {
         redirect: '/login-metamask',
         requestedPathname: props.location.pathname
       }
-    } else if (props.address && props.location.pathname == '/login-metamask') {
-      state = {
-        redirect: '/',
-        requestedPathname: ''
-      }
     } else {
-      state = this.getSignInRedirectState(props)
+      let signedIn = isSignedIn()
+      let redirectPathname = redirectService({
+        isSignedIn: signedIn,
+        hasAccount: !!props.account,
+        pathname: props.location.pathname
+      })
+      if (redirectPathname) {
+        nextState = {
+          redirect: redirectPathname,
+          requestedPathname: props.location.pathname
+        }
+      }
     }
-    if (state) { this.setState(state) }
-  }
-
-  getSignInRedirectState = (props) => {
-    const { location } = props
-    if (!location) { return }
-    let signedIn = isSignedIn()
-    return redirect({isSignedIn: signedIn, hasAccount: !!props.account, pathname: location.pathname, state: this.state})
+    this.setState(nextState)
   }
 
   render () {
-    if (this.state.redirect && this.props.location.pathname !== this.state.redirect) {
-      return <Redirect to={this.state.redirect} />
-    } else {
-      return <span></span>
-    }
+    let redirectComponent = <span></span>
+
+    if (
+      this.state.redirect
+      && this.props.location.pathname !== this.state.redirect
+    )
+      redirectComponent = <Redirect to={this.state.redirect} />
+
+    return redirectComponent
   }
 }))
