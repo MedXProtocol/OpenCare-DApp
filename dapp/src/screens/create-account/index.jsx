@@ -10,8 +10,16 @@ import { buildAccount } from '@/services/build-account'
 import { createAccount } from '@/services/create-account'
 import { getAccount } from '@/services/get-account'
 import { signIn } from '@/services/sign-in'
+import { connect } from 'react-redux'
 
-export const CreateAccount = class extends Component {
+function mapStateToProps(state) {
+  const address = state.sagaGenesis.accounts[0]
+  return {
+    address
+  }
+}
+
+export const CreateAccount = connect(mapStateToProps)(class _CreateAccount extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -55,4 +63,4 @@ export const CreateAccount = class extends Component {
       </MainLayout>
     )
   }
-}
+})
