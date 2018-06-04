@@ -69,8 +69,12 @@
     "classnames": "^2.2.5",
     "copy-webpack-plugin": "^4.5.1",
     "elliptic": "^6.4.0",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "enzyme-to-json": "^3.3.4",
     "eslint-import-resolver-babel-root-import": "0.0.2",
     "eth-block-tracker": "^2.3.1",
+    "jasmine-enzyme": "^6.0.1",
     "js-cookie": "^2.2.0",
     "lodash.isequalwith": "^4.4.0",
     "node-sass-chokidar": "^0.0.3",
@@ -89,15 +93,21 @@
     "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
+    "verbose": true,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,mjs}"
     ],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
     "setupFiles": [
+      "<rootDir>/jest-setup.js",
       "<rootDir>/config/polyfills.js"
     ],
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,mjs}",
-      "<rootDir>/src/**/?(*.)(spec|test).{js,jsx,mjs}"
+      "<rootDir>/src/**/?(*.)(spec|test).{js,jsx,mjs}",
+      "<rootDir>/spec/**/(.*|\\.(spec|test))\\.(js)$"
     ],
     "testEnvironment": "node",
     "testURL": "http://localhost",
@@ -109,8 +119,12 @@
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
     ],
+    "moduleDirectories": ["node_modules"],
     "moduleNameMapper": {
-      "^react-native$": "react-native-web"
+      "^react-native$": "react-native-web",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
+        "<rootDir>/__mocks__/fileMock.js",
+      "\\.(css|scss|sass)$": "<rootDir>/__mocks__/styleMock.js"
     },
     "moduleFileExtensions": [
       "web.js",

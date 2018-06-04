@@ -6,19 +6,21 @@ import { withRouter, Redirect } from 'react-router-dom'
 import get from 'lodash.get'
 import { getAccount } from '@/services/get-account'
 import { isSignedIn, signOut } from '@/services/sign-in'
-import redirect from '@/services/redirect'
+import redirectService from '@/services/redirect-service'
 import { connect } from 'react-redux'
 
 function mapStateToProps (state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
+  let signedIn = isSignedIn()
   return {
     address,
+    signedIn,
     account: getAccount(address),
     web3Failed: state.sagaGenesis.web3.error
   }
 }
 
-export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends Component {
+export const SignInRedirect = class extends Component {
   constructor (props) {
     super(props)
     this.state = {}
@@ -39,7 +41,16 @@ export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends 
     if (this.props.address && this.props.address !== nextProps.address) {
       signOut()
     }
-    this.checkSignInRedirect(nextProps)
+
+    // When they've signed in properly and have a specific requested pathname
+    if (nextProps.signedIn && this.state.requestedPathname) {
+      this.setState({
+        redirect: this.state.requestedPathname,
+        requestedPathname: ''
+      })
+    } else {
+      this.checkSignInRedirect(nextProps)
+    }
   }
 
   unload = () => {
@@ -49,39 +60,49 @@ export const SignInRedirect = withRouter(connect(mapStateToProps)(class extends 
   }
 
   checkSignInRedirect (props) {
+    let nextState = {
+      redirect: ''
+    }
+
     if (props.web3Failed) {
-      var state = {
+      nextState = {
         redirect: '/try-metamask',
         requestedPathname: props.location.pathname
       }
     } else if (!props.address) {
-      state = {
+      nextState = {
         redirect: '/login-metamask',
         requestedPathname: props.location.pathname
       }
-    } else if (props.address && props.location.pathname == '/login-metamask') {
-      state = {
-        redirect: '/',
-        requestedPathname: ''
-      }
     } else {
-      state = this.getSignInRedirectState(props)
-    }
-    if (state) { this.setState(state) }
-  }
+      let redirectPathname = redirectService({
+        isSignedIn: props.signedIn,
+        hasAccount: !!props.account,
+        pathname: props.location.pathname
+      })
 
-  getSignInRedirectState = (props) => {
-    const { location } = props
-    if (!location) { return }
-    let signedIn = isSignedIn()
-    return redirect({isSignedIn: signedIn, hasAccount: !!props.account, pathname: location.pathname, state: this.state})
+      if (redirectPathname) {
+        nextState = {
+          redirect: redirectPathname,
+          requestedPathname: props.location.pathname
+        }
+      }
+    }
+
+    this.setState(nextState)
   }
 
   render () {
-    if (this.state.redirect && this.props.location.pathname !== this.state.redirect) {
-      return <Redirect to={this.state.redirect} />
-    } else {
-      return <span></span>
-    }
+    let redirectComponent = <span></span>
+
+    if (
+      this.state.redirect
+      && this.props.location.pathname !== this.state.redirect
+    )
+      redirectComponent = <Redirect to={this.state.redirect} />
+
+    return redirectComponent
   }
-}))
+}
+
+export const SignInRedirectContainer = withRouter(connect(mapStateToProps)(SignInRedirect))

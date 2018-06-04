@@ -7,7 +7,7 @@ export const LoginToMetaMask = class extends Component {
       <MainLayout>
         <div className='container'>
           <div className='row'>
-            <div className='col-sm-8 col-sm-offset-2'>
+            <div className='col-sm-8 col-sm-offset-2 text-center'>
               <h2>You need to log into Metamask to continue</h2>
             </div>
           </div>

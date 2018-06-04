@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { formatKey } from '@/services/format-key'
 
 import './secret-key.css'
@@ -22,6 +23,9 @@ export const SecretKey = ({ secretKey, onContinue }) => {
           </ol>
           <p className='text-center'>
             <button className='btn btn-primary' onClick={onContinue}>Continue</button>
+          </p>
+          <p className='text-center'>
+            Already have an account? <Link to='/sign-in'>Sign in</Link>
           </p>
         </div>
       </div>

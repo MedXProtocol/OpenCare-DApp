@@ -3,5 +3,10 @@ import { KEY_STORE } from './constants'
 
 export function getAccount(address) {
   const keyStore = Cookie.getJSON(KEY_STORE) || {}
+
+  // We had a problem where we were setting the address key to 'undefined'
+  // This clears those incorrect cookies:
+  delete keyStore[undefined]
+
   return keyStore[address]
 }
