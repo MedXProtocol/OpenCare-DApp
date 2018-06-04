@@ -89,17 +89,6 @@ export const SignInRedirect = class extends Component {
       }
     }
 
-    // if (!nextState.redirect && this.state.requestedPathname) {
-    //   nextState = {
-    //     redirect: this.state.requestedPathname
-    //   }
-    // } else if (nextState.redirect === this.state.requestedPathname) {
-    //   nextState = {
-    //     redirect: '',
-    //     requestedPathname: ''
-    //   }
-    // }
-
     this.setState(nextState)
   }
 
