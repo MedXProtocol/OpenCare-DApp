@@ -240,7 +240,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                             <label>Overview Photo<span className='star'>*</span></label>
                             <div>
                                 <label className="btn btn-primary">
-                                    Browse...<input onChange={this.captureFirstImage} type="file" className="form-control" style={{display: 'none'}} required/>
+                                    Browse...<input onChange={this.captureFirstImage} type="file" accept='image/*' className="form-control" style={{display: 'none'}} required/>
                                 </label>
                                 <span>
                                     {this.state.firstFileName}
@@ -251,7 +251,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                             <label>Close-up Photo<span className='star'>*</span></label>
                             <div>
                                 <label className="btn btn-primary">
-                                    Browse...<input onChange={this.captureSecondImage} type="file" className="form-control" style={{display: 'none'}} required/>
+                                    Browse...<input onChange={this.captureSecondImage} type="file" accept='image/*' className="form-control" style={{display: 'none'}} required/>
                                 </label>
                                 <span>
                                     {this.state.secondFileName}
@@ -327,7 +327,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                                </FormGroup>
                               </div>
                           </div>
-                        
+
                         <div className="form-group">
                             <div className="row">
                                 <div className="col-lg-2 col-md-2 col-sm-3 col-xs-5">
