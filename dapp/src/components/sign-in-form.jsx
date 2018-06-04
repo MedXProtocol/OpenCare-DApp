@@ -4,6 +4,8 @@ import { formatKey } from '@/services/format-key'
 import { getAccount } from '@/services/get-account'
 import { isAccountMasterPassword } from '@/services/is-account-master-password'
 
+const HIDDEN_KEY = formatKey(Array(33).join('X'))
+
 export const SignInForm = class extends Component {
   constructor (props) {
     super(props)
@@ -11,6 +13,27 @@ export const SignInForm = class extends Component {
       secretKey: '',
       masterPassword: ''
     }
+  }
+
+  componentDidMount () {
+    this.checkSecretKey(this.props)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.checkSecretKey(nextProps)
+  }
+
+  checkSecretKey (props) {
+    if (props.account && !this.state.secretKey) {
+      this.setState({
+        secretKey: HIDDEN_KEY
+      })
+    }
+  }
+
+  onChangeSecretKey = (e) => {
+    this.setState({secretKey: e.target.value})
+    this.checkSecretKey(this.props)
   }
 
   onSubmit = (e) => {
@@ -23,13 +46,6 @@ export const SignInForm = class extends Component {
   }
 
   render () {
-    var secretKeyDisabled = false
-    var secretKeyValue = this.state.secretKey
-    if (this.props.account) {
-      secretKeyDisabled = true
-      secretKeyValue = formatKey(Array(33).join('X'))
-    }
-
     var error
     if (this.state.masterPasswordError) {
       error = <div className='alert alert-danger' role='alert'>{this.state.masterPasswordError}</div>
@@ -40,10 +56,9 @@ export const SignInForm = class extends Component {
         <div className='form-group'>
           <label htmlFor="secretKey">Secret Key</label>
           <input
-            disabled={secretKeyDisabled}
-            value={secretKeyValue}
+            value={this.state.secretKey}
             autoComplete="off"
-            onChange={(e) => this.setState({secretKey: e.target.value})}
+            onChange={this.onChangeSecretKey}
             type="text" className="form-control" id="secretKey" />
         </div>
         <div className='form-group'>
