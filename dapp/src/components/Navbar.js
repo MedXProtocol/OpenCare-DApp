@@ -109,11 +109,16 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
         <Navbar.Header>
           <Navbar.Brand>
             <Link to='/' className="navbar-brand" id="collNav" href="">
-                <img src={logo} alt="MedCredits"></img>
+              <img src={logo} alt="MedCredits"></img>
             </Link>
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
+        <Nav>
+          <NavItem>
+            {networkName}
+          </NavItem>
+        </Nav>
         <Navbar.Collapse>
           <Nav pullRight>
             {myCasesItem}
@@ -123,17 +128,17 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
           </Nav>
         </Navbar.Collapse>
         <Modal show={showNetworkModal}>
-            <Modal.Body>
-                <div className="row">
-                    <div className="col text-center">
-                        <h4>You must switch to the Ropsten network</h4>
-                    </div>
-                </div>
-            </Modal.Body>
-          </Modal>
-        </Navbar>
-      );
-    }
+          <Modal.Body>
+            <div className="row">
+              <div className="col text-center">
+                <h4>You must switch to the Ropsten network</h4>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
+      </Navbar>
+    );
+  }
 })))
 
 HippoNavbar.propTypes = {
