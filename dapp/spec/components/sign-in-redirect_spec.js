@@ -43,6 +43,10 @@ describe('components', () => {
         enzymeWrapper.setProps(props)
         expect(enzymeWrapper.state().requestedPathname).toBe('/foo')
         expect(enzymeWrapper.find('Redirect').props().to).toBe('/foo')
+
+        enzymeWrapper.update()
+        expect(enzymeWrapper.state().redirect).toBe('')
+        expect(enzymeWrapper.state().requestedPathname).toBe('')
       })
     })
   })
