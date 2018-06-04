@@ -19,8 +19,8 @@ export const SignInForm = class extends Component {
     this.checkSecretKey(this.props)
   }
 
-  componentWillReceiveProps (props) {
-    this.checkSecretKey(props)
+  componentWillReceiveProps (nextProps) {
+    this.checkSecretKey(nextProps)
   }
 
   checkSecretKey (props) {
