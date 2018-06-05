@@ -8,6 +8,7 @@ import get from 'lodash.get'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
+  let overrideError = state.account.overrideError
   return {
     address,
     account: getAccount(address)
@@ -16,20 +17,15 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    signIn: ({ secretKey, masterPassword, account }) => {
-      dispatch({ type: 'SIGN_IN', secretKey, masterPassword, account })
+    signIn: ({ secretKey, masterPassword, account, address, overrideAccount }) => {
+      dispatch({ type: 'SIGN_IN', secretKey, masterPassword, account, address, overrideAccount })
     }
   }
 }
 
 export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {}
-  }
-
-  onSubmit = ({ secretKey, masterPassword }) => {
-    this.props.signIn({ secretKey, masterPassword, account: this.props.account })
+  onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
+    this.props.signIn({ secretKey, masterPassword, account: this.props.account, address: this.props.address, overrideAccount })
   }
 
   render () {

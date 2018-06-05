@@ -42,11 +42,11 @@ export const CreateAccount = connect(mapStateToProps, mapDispatchToProps)(class 
     })
   }
 
-  onConfirm = ({ secretKey, masterPassword }) => {
+  onConfirm = ({ secretKey, masterPassword, overrideAccount }) => {
     if (masterPassword !== this.state.masterPassword) {
       this.setState({ masterPasswordError: 'The password you entered does not match the master password' })
     } else {
-      this.props.signUp({ secretKey, masterPassword, address: this.props.address })
+      this.props.signUp({ secretKey: this.state.secretKey, masterPassword, address: this.props.address, overrideAccount })
     }
   }
 

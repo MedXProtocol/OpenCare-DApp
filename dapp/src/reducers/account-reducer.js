@@ -2,7 +2,9 @@ import update from 'immutability-helper';
 
 export default function (state, {type, overrideError, masterPasswordError, secretKeyError}) {
   if (typeof state === 'undefined') {
-    state = {}
+    state = {
+      signedIn: false
+    }
   }
 
   switch(type) {
@@ -10,6 +12,7 @@ export default function (state, {type, overrideError, masterPasswordError, secre
       state = {
         signingIn: true
       }
+      break
     case 'SIGN_IN_ERROR':
       state = {
         ...state,
@@ -17,6 +20,12 @@ export default function (state, {type, overrideError, masterPasswordError, secre
         overrideError,
         masterPasswordError,
         secretKeyError
+      }
+      break
+    case 'SIGN_IN_RESET_OVERRIDE':
+      state = {
+        ...state,
+        overrideError: false
       }
       break
     case 'SIGNED_IN':

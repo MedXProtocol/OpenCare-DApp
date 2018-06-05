@@ -6,17 +6,13 @@ import signInSaga from './sign-in-saga'
 import signOutSaga from './sign-out-saga'
 import signUpSaga from './sign-up-saga'
 
-function* start({ web3 }) {
+export default function* () {
+  yield fork(takeOnceAndRun, 'WEB3_INITIALIZED', addTopLevelContracts)
+  yield takeEvery('WEB3_NETWORK_ID', addRegistryContracts)
   yield all([
-    addRegistryContracts({ web3 }),
+    rootSagaGenesis(),
     signInSaga(),
     signOutSaga(),
     signUpSaga()
   ])
-}
-
-export default function* () {
-  yield fork(takeOnceAndRun, 'WEB3_INITIALIZED', addTopLevelContracts)
-  yield takeEvery('WEB3_NETWORK_ID', start)
-  yield rootSagaGenesis()
 }
