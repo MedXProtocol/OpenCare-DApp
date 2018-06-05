@@ -3,8 +3,6 @@ import { connect } from 'react-redux'
 import { NavDropdown } from 'react-bootstrap'
 
 function mapStateToProps(state) {
-  console.log(state.sagaGenesis.transactions)
-
   return {
     transactions: state.sagaGenesis.transactions
   }
@@ -34,11 +32,28 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
       return labelClass
     }
 
+    getDropdownClassName = (transactions) => {
+      let dropdownClass = 'nav-transactions-text--success'
+      let hasError
+      let hasPending
+
+      hasError = transactions.find(tx => tx[1].error)
+      hasPending = transactions.find(tx => !tx[1].confirmed)
+
+      if (hasError)
+        dropdownClass = 'nav-transactions-text--danger'
+      else if (hasPending)
+        dropdownClass = 'nav-transactions-text--warning'
+
+      return dropdownClass
+    }
+
     render () {
-      let transactions = Object.entries(this.props.transactions)
+      let transactions = []
+      let transactionsFromStore = Object.entries(this.props.transactions)
       let transactionHtml = null
 
-      if (transactions.length === 0) {
+      if (transactionsFromStore.length === 0) {
         transactionHtml = (
           <div className="blank-state">
             <div className="blank-state--inner text-center text-gray">
@@ -47,7 +62,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           </div>
         )
       } else {
-        transactions = transactions.reverse().map((tx) => {
+        transactions = transactionsFromStore.reverse().map(tx => {
           const key   = tx[0]
           const value = tx[1]
           let name = this.capitalizeAll(value.call.method)
@@ -65,7 +80,13 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
       }
 
       return (
-        <NavDropdown title={`${transactions.length} \u2b24`} id='transactions'>
+        <NavDropdown
+          id='transactions'
+          title={
+            <span>
+              {transactions.length} <span className={this.getDropdownClassName(transactionsFromStore)}>{'\u2b24'}</span>
+            </span>
+          }>
           <div className="nav-transactions">
             {transactionHtml}
           </div>
