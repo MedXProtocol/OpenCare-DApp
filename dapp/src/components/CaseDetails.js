@@ -70,14 +70,15 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                         <div className="col-xs-6 text-center">
                             <label>Close-up Photo:</label>
                         </div>
-                    </div>
-                    <div className="row">
+
                         <div className="col-xs-6 text-center">
                             <img src={this.state.firstImageUrl} alt="Overview" style={{maxHeight: 400}} />
                         </div>
                         <div className="col-xs-6 text-center">
                             <img src={this.state.secondImageUrl} alt="CloseUp" style={{maxHeight: 400}} />
                         </div>
+                      </div>
+                      <div className="row">
                         <div className="col-xs-12 top10">
                             <label>How long have you had this problem:</label>
                             <p>{this.state.details.howLong}</p>
