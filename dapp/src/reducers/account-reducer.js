@@ -1,5 +1,3 @@
-import update from 'immutability-helper';
-
 export default function (state, {type, overrideError, masterPasswordError, secretKeyError}) {
   if (typeof state === 'undefined') {
     state = {
