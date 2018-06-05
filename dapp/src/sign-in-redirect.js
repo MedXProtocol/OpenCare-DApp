@@ -88,31 +88,6 @@ export const SignInRedirect = class extends Component {
       }
 
       this.setState(nextState)
-
-
-      // if (!nextProps.signedIn) {
-      //   console.log({
-      //     isSignedIn: nextProps.signedIn,
-      //     hasAccount: !!nextProps.account,
-      //     pathname: nextProps.location.pathname
-      //   })
-      //   var redirect = redirectService({
-      //     isSignedIn: nextProps.signedIn,
-      //     hasAccount: !!nextProps.account,
-      //     pathname: nextProps.location.pathname
-      //   })
-      //   if (redirect)
-      //     this.props.history.replace(redirect)
-      // }
-      //
-      // if (nextProps.signedIn && this.state.requestedPathname) {
-      //   this.setState({
-      //     redirect: this.state.requestedPathname,
-      //     requestedPathname: ''
-      //   })
-      // } else {
-      //   this.checkSignInRedirect(nextProps)
-      // }
     }
   }
 
