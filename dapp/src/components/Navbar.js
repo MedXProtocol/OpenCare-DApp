@@ -21,6 +21,8 @@ import { cacheCall } from '@/saga-genesis/sagas'
 import { withContractRegistry, withSaga } from '@/saga-genesis/components'
 import { cacheCallValue, contractByName } from '@/saga-genesis/state-finders'
 
+import { CurrentTransactionsList } from '@/components/CurrentTransactionsList'
+
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   const DoctorManager = contractByName(state, 'DoctorManager')
@@ -121,6 +123,7 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
         </Nav>
         <Navbar.Collapse>
           <Nav pullRight>
+            <CurrentTransactionsList />
             {myCasesItem}
             {openCasesItem}
             {doctorsItem}

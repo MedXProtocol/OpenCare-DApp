@@ -2,5 +2,6 @@
 @import "./assets/sass/bootstrap-custom";
 @import "./assets/sass/navbar";
 @import "./assets/sass/star";
+@import "./assets/sass/dock";
 @import "./assets/sass/style";
 @import url(https://fonts.googleapis.com/css?family=Muli:400,300);
