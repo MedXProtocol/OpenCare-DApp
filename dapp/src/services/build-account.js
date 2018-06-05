@@ -2,7 +2,7 @@ import { deriveKey } from '@/utils/derive-key'
 import { genKey } from './gen-key'
 import aes from './aes'
 
-export function buildAccount(secretKey, masterPassword) {
+export function buildAccount(address, secretKey, masterPassword) {
   // Derive more entropy from the masterPassword
   var salt = genKey()
   var preimage = deriveKey(masterPassword, salt)
@@ -13,6 +13,7 @@ export function buildAccount(secretKey, masterPassword) {
   var encryptedSecretKey = aes.encrypt(secretKey, preimage)
 
   return {
+    address,
     salt,
     preimageSalt,
     storedMasterPassword,

@@ -11,6 +11,7 @@ import {
   END
 } from 'redux-saga'
 import { contractKeyByAddress } from '../state-finders'
+import { nextId } from './transaction-factory'
 
 function createTransactionEventChannel (web3, transactionId, send, options) {
   return eventChannel(emit => {
@@ -36,7 +37,7 @@ function createTransactionEventChannel (web3, transactionId, send, options) {
   })
 }
 
-export function* web3Send({ transactionId, call, options }) {
+export function* web3Send({ transactionId, call, options } = { transactionId: nextId() }) {
   const { address, method, args } = call
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
