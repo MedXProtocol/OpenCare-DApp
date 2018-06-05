@@ -1,10 +1,22 @@
 import React, { Component } from 'react'
 import MainLayout from '../../layouts/MainLayout'
+import { Redirect } from 'react-router-dom'
+import { connect } from 'react-redux'
 
-export const LoginToMetaMask = class extends Component {
+function mapStateToProps(state, ownProps) {
+  return {
+    account: state.sagaGenesis.accounts[0]
+  }
+}
+
+export const LoginToMetaMask = connect(mapStateToProps)(class extends Component {
   render () {
+    if (this.props.account) {
+      var redirect = <Redirect to='/' />
+    }
     return (
       <MainLayout>
+        {redirect}
         <div className='container'>
           <div className='row'>
             <div className='col-sm-8 col-sm-offset-2 text-center'>
@@ -15,4 +27,4 @@ export const LoginToMetaMask = class extends Component {
       </MainLayout>
     )
   }
-}
+})
