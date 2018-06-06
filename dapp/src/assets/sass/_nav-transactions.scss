@@ -1,0 +1,52 @@
+.nav-transactions {
+  bottom: 0;
+  height: 300px;
+  background-color: #fff;
+  padding: 10px 20px;
+  position: relative;
+  width: 200px;
+
+  @media (max-width: 768px) {
+    width: 100%
+  }
+}
+
+#transactions .caret {
+  display: none;
+}
+
+.nav-transactions--group {
+  margin-bottom: 20px;
+  padding-left: 0;
+}
+
+.nav-transactions--item:last-child {
+  margin-bottom: 0;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.nav-transactions--item:first-child {
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+}
+
+.nav-transactions--item {
+  position: relative;
+  display: block;
+  padding: 10px 5px;
+  margin-bottom: -1px;
+  background-color: #fff;
+}
+
+.nav-transactions-text--success {
+  color: #44ce46;
+}
+
+.nav-transactions-text--warning {
+  color: #f7e12e;
+}
+
+.nav-transactions-text--danger {
+  color: #f9434f;
+}

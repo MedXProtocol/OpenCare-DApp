@@ -8,15 +8,18 @@ export default function (state, {type, transactionId, call, error, receipt}) {
       state = {
         ...state,
         [transactionId]: {
-          inFlight: true,
+          ...state[transactionId],
+          call,
+          inFlight: true
         }
       }
       break
 
-    case 'TRANSACTION_RETURN':
+    case 'TRANSACTION_RECEIPT':
       state = {
         ...state,
         [transactionId]: {
+          ...state[transactionId],
           inFlight: false,
           complete: true,
           receipt
@@ -28,6 +31,7 @@ export default function (state, {type, transactionId, call, error, receipt}) {
       state = {
         ...state,
         [transactionId]: {
+          ...state[transactionId],
           confirmed: true
         }
       }
@@ -36,6 +40,7 @@ export default function (state, {type, transactionId, call, error, receipt}) {
       state = {
         ...state,
         [transactionId]: {
+          ...state[transactionId],
           inFlight: false,
           complete: true,
           error
