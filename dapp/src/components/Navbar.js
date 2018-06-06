@@ -100,9 +100,9 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
         </LinkContainer>
     }
 
-    if (this.props.networkId) {
-      var networkName = `${networkIdToName(this.props.networkId)} Network`
-      if (!/(Ropsten)|(Localhost)/.test(networkName)) {
+    var networkName = `${networkIdToName(this.props.networkId)} Network`
+    if (process.env.NODE_ENV === 'production') {
+      if (this.props.networkId !== 3) {
         var showNetworkModal = true
       }
     }
