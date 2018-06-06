@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavDropdown } from 'react-bootstrap'
 import { I18n } from 'react-i18next'
-import { CSSTransitionGroup, CSSTransition } from 'react-transition-group'
+import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 function mapStateToProps(state) {
   return {
@@ -23,15 +23,10 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
     componentWillReceiveProps(nextProps) {
       if (nextProps.transactions) {
         let transactions = Object.entries(nextProps.transactions)
-
-        console.log('original: ')
-        console.log(transactions)
-        transactions.filter(tx => (tx[1].error || !tx[1].confirmed))
-        console.log('filtered? ')
-        console.log(transactions)
+        let pendingOrErrorTransactions = transactions.filter(tx => (tx[1].error || !tx[1].confirmed))
 
         this.setState({
-          pendingOrErrorTransactions: transactions.filter(tx => (tx[1].error || !tx[1].confirmed))
+          pendingOrErrorTransactions: pendingOrErrorTransactions
         })
       }
     }
@@ -50,13 +45,12 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
     }
 
     getDropdownClassName = (transactions) => {
-      let transactionsFromStore = Object.entries(this.props.transactions)
       let dropdownClass = ''
       let hasError
       let hasPending
 
-      hasError = transactionsFromStore.find(tx => tx[1].error)
-      hasPending = transactionsFromStore.find(tx => !tx[1].confirmed)
+      hasError = this.state.pendingOrErrorTransactions.find(tx => tx[1].error)
+      hasPending = this.state.pendingOrErrorTransactions.find(tx => !tx[1].confirmed)
 
       if (hasError)
         dropdownClass = 'nav-transactions-text--danger'
@@ -70,9 +64,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
 
     getTransactionHtml = (t) => {
       let transactions = []
-      // let transactionsFromStore = Object.entries(this.props.transactions)
       let transactionHtml = null
-      // console.log(this.state.pendingOrErrorTransactions)
 
       if (this.state.pendingOrErrorTransactions.length === 0) {
         transactionHtml = (
@@ -88,7 +80,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           const value = tx[1]
           let name = value.call.method
           let mintMedxCount = 1000 // these numbers could be pulled from the tx call args
-          // let completed = (!value.error && value.confirmed)
+
           return (
             <CSSTransition
               key={`transaction-${key}`}
@@ -106,9 +98,9 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
 
         transactionHtml = (
           <ul className="nav-transactions--group">
-            <CSSTransitionGroup>
+            <TransitionGroup component={null}>
               {transactions}
-            </CSSTransitionGroup>
+            </TransitionGroup>
           </ul>
         )
       }
