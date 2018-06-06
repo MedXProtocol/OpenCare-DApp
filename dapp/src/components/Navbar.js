@@ -13,7 +13,6 @@ import { LinkContainer } from 'react-router-bootstrap'
 import PropTypes from 'prop-types'
 import logo from '../assets/img/logo.png'
 import './Navbar.css'
-import { isSignedIn, signOut } from '@/services/sign-in'
 import get from 'lodash.get'
 import networkIdToName from '@/utils/network-id-to-name'
 import { connect } from 'react-redux'
@@ -26,11 +25,21 @@ function mapStateToProps (state) {
   const DoctorManager = contractByName(state, 'DoctorManager')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account)
   const networkId = get(state, 'sagaGenesis.network.networkId')
+  const signedIn = state.account.signedIn
   return {
     account,
     isDoctor,
     networkId,
-    DoctorManager
+    DoctorManager,
+    signedIn
+  }
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    signOut: () => {
+      dispatch({type: 'SIGN_OUT'})
+    }
   }
 }
 
@@ -39,16 +48,16 @@ function* saga({ account, DoctorManager }) {
   yield cacheCall(DoctorManager, 'isDoctor', account)
 }
 
-const HippoNavbar = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager', 'MedXToken'] })(class _HippoNavbar extends Component {
+const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager', 'MedXToken'] })(class _HippoNavbar extends Component {
   signOut = () => {
-    signOut()
-    this.props.history.push('/')
+    this.props.signOut()
+    this.props.history.push('/sign-in')
   }
 
   render() {
     var isDoctor = this.props.isDoctor
 
-    if (isSignedIn()) {
+    if (this.props.signedIn) {
       var profileMenu =
         <NavDropdown title='My Account' id='my-account'>
           <LinkContainer to='/wallet'>
