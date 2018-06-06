@@ -65,7 +65,7 @@ const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchTo
             <div className="card-header">
                 <h4 className="card-title">Case Log</h4>
             </div>
-            <div className="card-content table-responsive">
+            <div className="card-body table-responsive">
             {
                 !this.props.caseListCount || this.props.caseListCount === '0' ?
                 <div className="alert alert-info text-center">

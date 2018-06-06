@@ -6,15 +6,15 @@ class NewCase extends Component {
     navigateToNewCaseScree = () => {
         this.props.history.push('/new-case');
     }
-  
+
     render() {
         return (
             <div className="card card-new-case">
-                <div className="card-content">
+                <div className="card-body">
                     <div className="row">
                         <div className="col-md-12 text-center">
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 className="btn btn-primary btn-fill btn-new-case"
                                 onClick={() => this.navigateToNewCaseScree()}>
                                 Start New Case

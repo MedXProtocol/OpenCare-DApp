@@ -67,27 +67,27 @@ export const SignInForm = connect(mapStateToProps, mapDispatchToProps)(class _Si
     return (
       <form onSubmit={this.onSubmit} autoComplete='off'>
         <Modal show={this.props.overrideError}>
-            <Modal.Body>
-                <div className="row">
-                    <div className="col text-center">
-                        <h3 className='warning'>
-                          <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                          Warning
-                        </h3>
-                        <p>
-                          By entering a new secret key you are about to overwrite an existing secret key for this address.  You will lose access to any cases that have been encrypted using your existing secret key.
-                        </p>
-                        <p>
-                          You can find your existing secret key in your <b>Emergency Kit</b>.  Your emergency kit is available under the profile menu when you are signed in.
-                        </p>
-                        <p className='lead'>Are you sure you want to continue?</p>
-                    </div>
-                </div>
-            </Modal.Body>
-            <Modal.Footer>
-              <button onClick={() => this.props.clearOverrideError()} className="btn btn-default">Cancel</button>
-              <button onClick={() => this.doSubmit(true)} className="btn btn-default">Continue</button>
-            </Modal.Footer>
+          <Modal.Body>
+            <div className="row">
+              <div className="col-xs-12 text-center">
+                <h3 className='warning'>
+                  <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                  Warning
+                </h3>
+                <p>
+                  By entering a new secret key you are about to overwrite an existing secret key for this address.  You will lose access to any cases that have been encrypted using your existing secret key.
+                </p>
+                <p>
+                  You can find your existing secret key in your <b>Emergency Kit</b>.  Your emergency kit is available under the profile menu when you are signed in.
+                </p>
+                <p className='lead'>Are you sure you want to continue?</p>
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <button onClick={() => this.props.clearOverrideError()} className="btn btn-lg btn-link">Cancel</button>
+            <button onClick={() => this.doSubmit(true)} className="btn btn-lg btn-primary">Continue</button>
+          </Modal.Footer>
         </Modal>
         <div className='form-group'>
           <label htmlFor="secretKey">Secret Key</label>

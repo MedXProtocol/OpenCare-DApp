@@ -120,7 +120,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
               <div className="card-header">
                   <h2 className="card-title">Diagnosis</h2>
               </div>
-              <div className="card-content">
+              <div className="card-body">
                   <div className="row">
 
                       <div className="col-xs-12">
@@ -151,7 +151,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
               <Modal show={this.state.showThankYouModal}>
                   <Modal.Body>
                       <div className="row">
-                          <div className="col text-center">
+                          <div className="col-xs-12 text-center">
                               <h4>Thank you for using MedCredits!</h4>
                           </div>
                       </div>
@@ -163,7 +163,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
               <Modal show={this.state.showChallengeModal}>
                   <Modal.Body>
                       <div className="row">
-                          <div className="col text-center">
+                          <div className="col-xs-12 text-center">
                               <h4>Another doctor will now review your case.</h4>
                           </div>
                       </div>

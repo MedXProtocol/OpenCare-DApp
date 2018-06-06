@@ -1,7 +1,21 @@
+.navbar {
+  border: 0;
+}
+
 .navbar-brand {
   padding: 10px;
 }
 
 .navbar-brand img {
   height: 100%;
+}
+
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus,
+{
+  background-color: transparent;
+}
+
+.navbar-inverse .navbar-toggle {
+  border-color: transparent;
 }

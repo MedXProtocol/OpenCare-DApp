@@ -46,7 +46,7 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
                 <div className="card-header">
                     <h2 className="card-title">{this.props.title}</h2>
                 </div>
-                <div className="card-content">
+                <div className="card-body">
                     <div className="row">
 
                         <div className="col-xs-12">

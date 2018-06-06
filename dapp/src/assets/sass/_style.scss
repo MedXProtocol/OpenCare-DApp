@@ -2,6 +2,19 @@ body {
   padding-bottom: 10rem;
 }
 
+h1 .small-inverse,
+h2 .small-inverse,
+h3 .small-inverse,
+h4 .small-inverse,
+h5 .small-inverse,
+h6 .small-inverse {
+  color: #4aa8f7;
+}
+
+.text-white {
+  color: white;
+}
+
 .form-group--image-upload {
   min-height: 90px;
 }
@@ -15,7 +28,7 @@ not(.nav) li {
 }
 
 .text-gray {
-  color: #ccc;
+  color: $medcredits-text-gray;
 }
 
 .blank-state {

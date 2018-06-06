@@ -92,17 +92,17 @@ export const CaseRow = withContractRegistry(withSend(class _CaseRow extends Comp
 
     var modal =
       <Modal show={this.state.showModal}>
-          <Modal.Body>
-              <div className="row">
-                  <div className="col text-center">
-                      <h4>A doctor has requested to diagnose your case.  Do you approve?</h4>
-                  </div>
-              </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button onClick={this.onApprove} type="button" className="btn btn-defult">Yes</button>
-            <button onClick={() => this.setState({showModal: false})} type="button" className="btn btn-defult">No</button>
-          </Modal.Footer>
+        <Modal.Body>
+          <div className="row">
+            <div className="col-xs-12 text-center">
+              <h4>A doctor has requested to diagnose your case.  Do you approve?</h4>
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <button onClick={this.onApprove} type="button" className="btn btn-defult">Yes</button>
+          <button onClick={() => this.setState({showModal: false})} type="button" className="btn btn-defult">No</button>
+        </Modal.Footer>
       </Modal>
 
     return (

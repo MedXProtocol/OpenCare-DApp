@@ -9,24 +9,30 @@ export const SecretKey = ({ secretKey, onContinue }) => {
     <div className='container'>
       <div className='row'>
         <div className='col-sm-8 col-sm-offset-2'>
-          <h1 className='text-center'>
-            This is your <b>Secret Key</b>
-          </h1>
-          <div className="well" role="alert">
-            <div className='secret-key__key'>
-              {formatKey(secretKey)}
+          <h3 className='text-center text-white'>
+            This is your <b>Secret Key</b>:
+          </h3>
+          <div className="form-wrapper">
+            <div className="well" role="alert">
+              <div className='secret-key__key'>
+                {formatKey(secretKey)}
+              </div>
             </div>
+            <ol>
+              <li>You’ll need this key to access your account from new devices and browsers.</li>
+              <li>Don't write it down; we’re going to give you an <b>Emergency Kit</b> that contains it.</li>
+            </ol>
+
+            <p className='text-center'>
+              <button className='btn btn-lg btn-primary' onClick={onContinue}>Continue</button>
+            </p>
           </div>
-          <ol>
-            <li>You’ll need this key to access your account from new devices and browsers.</li>
-            <li>Don't write it down; we’re going to give you an <b>Emergency Kit</b> that contains it.</li>
-          </ol>
-          <p className='text-center'>
-            <button className='btn btn-primary' onClick={onContinue}>Continue</button>
-          </p>
-          <p className='text-center'>
-            Already have an account? <Link to='/sign-in'>Sign in</Link>
-          </p>
+
+          <div className="form-wrapper--footer">
+            <p className='text-center text-white'>
+              Already have an account? <Link to='/sign-in' className='text-white'>Sign in</Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -123,7 +123,7 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
                           Submit Diagnosis
                       </h2>
                   </div>
-                  <div className="card-content">
+                  <div className="card-body">
                       <div className="form-group">
                           <label>Diagnosis<span className='star'>*</span></label>
                           <select onChange={this.updateDiagnosis} className="form-control">
@@ -173,7 +173,7 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
               <Modal show={this.state.showConfirmationModal}>
                   <Modal.Body>
                       <div className="row">
-                          <div className="col text-center">
+                          <div className="col-xs-12 text-center">
                               <h4>Are you sure?</h4>
                           </div>
                       </div>
@@ -186,7 +186,7 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
               <Modal show={showThankYou}>
                   <Modal.Body>
                       <div className="row">
-                          <div className="col text-center">
+                          <div className="col-xs-12 text-center">
                               <h4>Thank you! Your diagnosis submitted successfully.</h4>
                           </div>
                       </div>

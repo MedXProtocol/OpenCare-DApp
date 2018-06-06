@@ -62,7 +62,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                 <div className="card-header">
                     <h2 className="card-title">Case Overview</h2>
                 </div>
-                <div className="card-content">
+                <div className="card-body">
                     <div className="row">
                         <div className="col-xs-6 text-center">
                             <label>Overview Photo:</label>

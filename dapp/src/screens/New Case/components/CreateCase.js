@@ -410,7 +410,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                 <Modal show={this.state.showBalanceTooLowModal}>
                     <Modal.Body>
                         <div className="row">
-                            <div className="col text-center">
+                            <div className="col-xs-12 text-center">
                                 <h4>You need 15 MEDX to submit a case.</h4>
                             </div>
                         </div>
@@ -422,7 +422,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                 <Modal show={this.state.showConfirmSubmissionModal}>
                     <Modal.Body>
                         <div className="row">
-                            <div className="col text-center">
+                            <div className="col-xs-12 text-center">
                                 <h4>Are you sure?</h4>
                                 <h5>This will cost 5-15 MEDX (depending on second opinion option)</h5>
                             </div>
@@ -436,7 +436,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                 <Modal show={this.state.showThankYouModal}>
                     <Modal.Body>
                         <div className="row">
-                            <div className="col text-center">
+                            <div className="col-xs-12 text-center">
                                 <h4>Thank you! Your case submitted successfully.</h4>
                             </div>
                         </div>
