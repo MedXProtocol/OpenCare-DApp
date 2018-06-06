@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { Modal } from 'react-bootstrap'
+import { Alert, Modal } from 'react-bootstrap'
 import { HelpBlock } from 'react-bootstrap'
 import { formatKey } from '@/services/format-key'
 import { isAccountMasterPassword } from '@/services/is-account-master-password'
@@ -51,12 +51,12 @@ export const SignInForm = connect(mapStateToProps, mapDispatchToProps)(class _Si
   render () {
     var masterPasswordError
     if (this.props.masterPasswordError) {
-      masterPasswordError = <div className='alert alert-danger' role='alert'>{this.props.masterPasswordError}</div>
+      masterPasswordError = <Alert bsStyle='danger'>{this.props.masterPasswordError}</Alert>
     }
 
     var secretKeyError
     if (this.props.secretKeyError) {
-      secretKeyError = <div className='alert alert-danger' role='alert'>{this.props.secretKeyError}</div>
+      secretKeyError = <Alert bsStyle='danger'>{this.props.secretKeyError}</Alert>
     }
 
     if (this.props.hasAccount) {
@@ -70,8 +70,17 @@ export const SignInForm = connect(mapStateToProps, mapDispatchToProps)(class _Si
             <Modal.Body>
                 <div className="row">
                     <div className="col text-center">
-                        <h4>You will be overwriting an existing secret key for this address.</h4>
-                        <h4>Are you sure you want to continue?</h4>
+                        <h3 className='warning'>
+                          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                          Warning
+                        </h3>
+                        <p>
+                          By entering a new secret key you are about to overwrite an existing secret key for this address.  You will lose access to any cases that have been encrypted using your existing secret key.
+                        </p>
+                        <p>
+                          You can find your existing secret key in your <b>Emergency Kit</b>.  Your emergency kit is available under the profile menu when you are signed in.
+                        </p>
+                        <p className='lead'>Are you sure you want to continue?</p>
                     </div>
                 </div>
             </Modal.Body>
