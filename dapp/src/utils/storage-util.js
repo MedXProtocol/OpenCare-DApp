@@ -11,12 +11,16 @@ export async function uploadJson(rawJson, encryptionKey) {
     return uploadResult[0].hash;
 }
 
-export async function uploadFile(file, encryptionKey) {
+export async function uploadFile(file, encryptionKey, progressHandler) {
+    progressHandler(33)
     const reader = new window.FileReader()
     await promisifyFileReader(reader, file);
+    progressHandler(50)
     const buffer = Buffer.from(reader.result);
     const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
+    progressHandler(67)
     const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb));
+    progressHandler(100)
     return uploadResult[0].hash;
 }
 
