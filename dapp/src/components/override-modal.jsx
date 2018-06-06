@@ -15,7 +15,7 @@ export class OverrideModal extends Component {
               <div className="row">
                   <div className="col text-center">
                       <h3 className='warning'>
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         Warning
                       </h3>
                       <p>
