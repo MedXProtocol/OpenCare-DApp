@@ -3,6 +3,7 @@ import doctorCases from './doctor-cases-reducer'
 import cases from './cases-reducer'
 import caseCount from './case-count-reducer'
 import caseDates from './case-date-reducer'
+import account from './account-reducer'
 import { sagaGenesis } from '@/saga-genesis/reducers'
 
 export default combineReducers({
@@ -10,5 +11,6 @@ export default combineReducers({
   cases,
   caseDates,
   caseCount,
-  sagaGenesis
+  sagaGenesis,
+  account
 })

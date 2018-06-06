@@ -2,22 +2,30 @@ import React, { Component } from 'react'
 import MainLayout from '../../layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { getAccount } from '@/services/get-account'
-import { signInWithPublicKeyCheck } from '@/services/sign-in'
 import { SignInForm } from '@/components/sign-in-form'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
+  let overrideError = state.account.overrideError
   return {
     address,
     account: getAccount(address)
   }
 }
 
-export const SignIn = withRouter(connect(mapStateToProps)(class extends Component {
-  onSubmit = ({ secretKey, masterPassword }) => {
-    signInWithPublicKeyCheck(this.props.account, masterPassword)
+function mapDispatchToProps(dispatch) {
+  return {
+    signIn: ({ secretKey, masterPassword, account, address, overrideAccount }) => {
+      dispatch({ type: 'SIGN_IN', secretKey, masterPassword, account, address, overrideAccount })
+    }
+  }
+}
+
+export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
+  onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
+    this.props.signIn({ secretKey, masterPassword, account: this.props.account, address: this.props.address, overrideAccount })
   }
 
   render () {
@@ -27,7 +35,7 @@ export const SignIn = withRouter(connect(mapStateToProps)(class extends Componen
           <div className='row'>
             <div className='col-sm-8 col-sm-offset-2'>
               <h1>Sign In</h1>
-              <SignInForm onSubmit={this.onSubmit} account={this.props.account}>
+              <SignInForm onSubmit={this.onSubmit} hasAccount={!!this.props.account}>
                 <div className='form-group'>
                   <input type='submit' value='Sign In' className='btn btn-primary' />
                 </div>

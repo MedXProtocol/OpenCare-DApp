@@ -21,19 +21,6 @@ export async function getSelectedAccount() {
   return accounts[0]
 }
 
-export function setPublicKey(publicKey) {
-  return getAccountManagerContract().then(async (accountManager) => {
-    return accountManager.methods.setPublicKey('0x' + publicKey).send(await getDefaultTxOptions())
-  })
-}
-
-export async function getPublicKey(address) {
-  if (!address) { address = await getSelectedAccount() }
-  return getAccountManagerContract().then((accountManager) => {
-    return accountManager.methods.publicKeys(address).call()
-  })
-}
-
 export async function contractFromConfig (config, address) {
   const web3 = getWeb3()
   if (!address) {
