@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavDropdown } from 'react-bootstrap'
 import { I18n } from 'react-i18next'
-import { CSSTransitionGroup } from 'react-transition-group'
+import { CSSTransitionGroup, CSSTransition } from 'react-transition-group'
 
 function mapStateToProps(state) {
   return {
@@ -21,17 +21,19 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
     }
 
     componentWillReceiveProps(nextProps) {
-      let transactions = Object.entries(this.nextProps.transactions)
+      if (nextProps.transactions) {
+        let transactions = Object.entries(nextProps.transactions)
 
-      console.log('original: ')
-      console.log(transactions)
-      transactions.filter(tx => (tx[1].error || !tx[1].confirmed))
-      console.log('filtered? ')
-      console.log(transactions)
+        console.log('original: ')
+        console.log(transactions)
+        transactions.filter(tx => (tx[1].error || !tx[1].confirmed))
+        console.log('filtered? ')
+        console.log(transactions)
 
-      this.setState({
-        pendingOrErrorTransactions: transactions.filter(tx => (tx[1].error || !tx[1].confirmed))
-      })
+        this.setState({
+          pendingOrErrorTransactions: transactions.filter(tx => (tx[1].error || !tx[1].confirmed))
+        })
+      }
     }
 
     getClassName = (value) => {
@@ -70,7 +72,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
       let transactions = []
       // let transactionsFromStore = Object.entries(this.props.transactions)
       let transactionHtml = null
-      console.log(this.state.pendingOrErrorTransactions)
+      // console.log(this.state.pendingOrErrorTransactions)
 
       if (this.state.pendingOrErrorTransactions.length === 0) {
         transactionHtml = (
@@ -88,24 +90,26 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           let mintMedxCount = 1000 // these numbers could be pulled from the tx call args
           // let completed = (!value.error && value.confirmed)
           return (
-            <li className="nav-transactions--item" key={`transaction-${key}`}>
-              <span className={this.getClassName(value)}>{'\u2b24'}</span> &nbsp;
-              {t(`transactions.${name}`, {
-                mintMedxCount: mintMedxCount
-              })}
-            </li>
+            <CSSTransition
+              key={`transaction-${key}`}
+              timeout={500}
+              classNames="fade">
+              <li className="nav-transactions--item">
+                <span className={this.getClassName(value)}>{'\u2b24'}</span> &nbsp;
+                {t(`transactions.${name}`, {
+                  mintMedxCount: mintMedxCount
+                })}
+              </li>
+            </CSSTransition>
           )
         })
 
         transactionHtml = (
-          <CSSTransitionGroup
-            transitionName='fade'
-            transitionEnterTimeout={500}
-            transitionLeaveTimeout={300}>
-            <ul className="nav-transactions--group">
+          <ul className="nav-transactions--group">
+            <CSSTransitionGroup>
               {transactions}
-            </ul>
-          </CSSTransitionGroup>
+            </CSSTransitionGroup>
+          </ul>
         )
       }
 
