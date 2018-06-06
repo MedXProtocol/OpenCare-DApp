@@ -270,7 +270,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                     <h3>
                       Submit New Case
                     </h3>
-                    <p class="lead">
+                    <p className="lead">
                       <small>Provide the Doctor with details about your problem. This will be encrypted so only you and your physician(s) will be able to read it.</small>
                     </p>
                   </div>
