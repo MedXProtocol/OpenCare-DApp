@@ -13,3 +13,23 @@ body {
 not(.nav) li {
   margin-bottom: 0.5em;
 }
+
+.text-gray {
+  color: #ccc;
+}
+
+.blank-state {
+  display: grid;
+  grid-template-columns: none;
+  grid-gap: 0;
+  grid-auto-rows: 120px;
+  grid-template-areas:
+    ". a a ."
+    ". a a .";
+}
+
+.blank-state--inner {
+  grid-area: a;
+  align-self: center;
+  justify-self: center;
+}
