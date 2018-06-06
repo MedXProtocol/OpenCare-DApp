@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavDropdown } from 'react-bootstrap'
 import { I18n } from 'react-i18next'
+import { CSSTransitionGroup } from 'react-transition-group'
 
 function mapStateToProps(state) {
   return {
@@ -11,15 +12,26 @@ function mapStateToProps(state) {
 
 export const CurrentTransactionsList = connect(mapStateToProps)(
   class _CurrentTransactionsList extends Component {
-    constructor (props) {
+    constructor(props) {
       super(props)
+
       this.state = {
+        pendingOrErrorTransactions: []
       }
     }
 
-    capitalizeAll(string) {
-      string = string.replace( /([A-Z])/g, " $1" );
-      return string.replace(/(?:^|\s)\S/g, (a) => a.toUpperCase());
+    componentWillReceiveProps(nextProps) {
+      let transactions = Object.entries(this.nextProps.transactions)
+
+      console.log('original: ')
+      console.log(transactions)
+      transactions.filter(tx => (tx[1].error || !tx[1].confirmed))
+      console.log('filtered? ')
+      console.log(transactions)
+
+      this.setState({
+        pendingOrErrorTransactions: transactions.filter(tx => (tx[1].error || !tx[1].confirmed))
+      })
     }
 
     getClassName = (value) => {
@@ -56,10 +68,11 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
 
     getTransactionHtml = (t) => {
       let transactions = []
-      let transactionsFromStore = Object.entries(this.props.transactions)
+      // let transactionsFromStore = Object.entries(this.props.transactions)
       let transactionHtml = null
+      console.log(this.state.pendingOrErrorTransactions)
 
-      if (transactionsFromStore.length === 0) {
+      if (this.state.pendingOrErrorTransactions.length === 0) {
         transactionHtml = (
           <div className="blank-state">
             <div className="blank-state--inner text-center text-gray">
@@ -68,12 +81,12 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           </div>
         )
       } else {
-        transactions = transactionsFromStore.reverse().map(tx => {
+        transactions = this.state.pendingOrErrorTransactions.reverse().map(tx => {
           const key   = tx[0]
           const value = tx[1]
           let name = value.call.method
-          let mintMedxCount = 1000
-
+          let mintMedxCount = 1000 // these numbers could be pulled from the tx call args
+          // let completed = (!value.error && value.confirmed)
           return (
             <li className="nav-transactions--item" key={`transaction-${key}`}>
               <span className={this.getClassName(value)}>{'\u2b24'}</span> &nbsp;
@@ -84,9 +97,16 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           )
         })
 
-        transactionHtml = <ul className="nav-transactions--group">
-          {transactions}
-        </ul>
+        transactionHtml = (
+          <CSSTransitionGroup
+            transitionName='fade'
+            transitionEnterTimeout={500}
+            transitionLeaveTimeout={300}>
+            <ul className="nav-transactions--group">
+              {transactions}
+            </ul>
+          </CSSTransitionGroup>
+        )
       }
 
       return transactionHtml
@@ -98,7 +118,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           id='transactions'
           title={
             <span>
-              {Object.entries(this.props.transactions).length} <span className={this.getDropdownClassName()}>{'\u2b24'}</span>
+              {this.state.pendingOrErrorTransactions.length} <span className={this.getDropdownClassName()}>{'\u2b24'}</span>
             </span>
           }>
           <div className="nav-transactions">

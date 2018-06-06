@@ -1,0 +1,6 @@
+// Choose which animations you want to include in the CSS bundle here.
+// This overrides node_modules/animate-sass/helpers/_settings.scss
+// more at https://github.com/tgdev/animate-sass
+
+$use-fadeIn: true;
+$use-fadeOut: true;
