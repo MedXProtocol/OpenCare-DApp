@@ -3,7 +3,7 @@ import bugsnag from 'bugsnag-js'
 import createPlugin from 'bugsnag-react'
 
 const bugsnagClient = bugsnag({
-  apiKey: '3bef204414a2e3eca7010a1f93325376',
+  apiKey: 'bad41fdef44b43ee85b2e58b3d432d6e',
   notifyReleaseStages: ['production', 'staging']
 })
 export const ErrorBoundary = bugsnagClient.use(createPlugin(React))
