@@ -5,6 +5,7 @@ import { HelpBlock } from 'react-bootstrap'
 import { formatKey } from '@/services/format-key'
 import { isAccountMasterPassword } from '@/services/is-account-master-password'
 import { connect } from 'react-redux'
+import { OverrideModal } from '@/components/override-modal'
 
 const HIDDEN_KEY = formatKey(Array(33).join('X'))
 
@@ -66,29 +67,10 @@ export const SignInForm = connect(mapStateToProps, mapDispatchToProps)(class _Si
 
     return (
       <form onSubmit={this.onSubmit} autoComplete='off'>
-        <Modal show={this.props.overrideError}>
-            <Modal.Body>
-                <div className="row">
-                    <div className="col text-center">
-                        <h3 className='warning'>
-                          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                          Warning
-                        </h3>
-                        <p>
-                          By entering a new secret key you are about to overwrite an existing secret key for this address.  You will lose access to any cases that have been encrypted using your existing secret key.
-                        </p>
-                        <p>
-                          You can find your existing secret key in your <b>Emergency Kit</b>.  Your emergency kit is available under the profile menu when you are signed in.
-                        </p>
-                        <p className='lead'>Are you sure you want to continue?</p>
-                    </div>
-                </div>
-            </Modal.Body>
-            <Modal.Footer>
-              <button onClick={() => this.props.clearOverrideError()} className="btn btn-default">Cancel</button>
-              <button onClick={() => this.doSubmit(true)} className="btn btn-default">Continue</button>
-            </Modal.Footer>
-        </Modal>
+        <OverrideModal
+          show={this.props.overrideError}
+          onCancel={this.props.clearOverrideError}
+          onConfirm={() => this.doSubmit(true)} />
         <div className='form-group'>
           <label htmlFor="secretKey">Secret Key</label>
           <input

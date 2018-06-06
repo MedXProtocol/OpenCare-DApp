@@ -1,22 +1,41 @@
 import React from 'react'
 import { SignInForm } from '@/components/sign-in-form'
+import { Alert } from 'react-bootstrap'
+import { connect } from 'react-redux'
 
-export const ConfirmCreate = ({ onConfirm, hasAccount }) => {
+function mapStateToProps(state) {
+  return {
+    masterPasswordError: state.account.masterPasswordError,
+    secretKeyError: state.account.secretKeyError
+  }
+}
+
+export const ConfirmCreate = connect(mapStateToProps)(({ onConfirm, masterPasswordError, secretKeyError }) => {
+  if (masterPasswordError) {
+    var mpError = <Alert bsStyle='danger'>{masterPasswordError}</Alert>
+  }
+  if (secretKeyError) {
+    var skError = <Alert bsStyle='danger'>{secretKeyError}</Alert>
+  }
   return (
     <div className='container'>
       <div className='row'>
-        <div className='col-sm-8 col-sm-offset-2'>
-          <h1 className='text-center'>
-            You're ready!
+        <div className='col-sm-8 col-sm-offset-2 text-center'>
+          <h1>
+            You're almost ready!
           </h1>
-          <h3>Confirm your password to create your account</h3>
-          <SignInForm onSubmit={onConfirm} hasAccount={hasAccount}>
-            <p className='text-center'>
-              <input type='submit' className='btn btn-primary' value='Create Account' />
-            </p>
-          </SignInForm>
+
+          <p className='lead'>
+            The last thing we need to do is record your public key to the blockchain.  This key allows doctors
+            to view your cases.  Once you complete the sign up, you'll be prompted with a transaction.
+          </p>
+
+          <button className='btn btn-primary btn-lg' onClick={onConfirm}>Finish Sign Up</button>
+
+          {mpError}
+          {skError}
         </div>
       </div>
     </div>
   )
-}
+})

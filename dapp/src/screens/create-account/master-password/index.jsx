@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-
+import { Alert } from 'react-bootstrap'
+import masterPasswordInvalid from '@/services/master-password-invalid'
 import './master-password.css'
 
 export class MasterPassword extends Component {
@@ -12,10 +13,20 @@ export class MasterPassword extends Component {
 
   onSubmit = (e) => {
     e.preventDefault()
-    this.props.onMasterPassword(this.state.masterPassword)
+    var msg = masterPasswordInvalid(this.state.masterPassword)
+    if (msg) {
+      this.setState({
+        error: msg
+      })
+    } else {
+      this.props.onMasterPassword(this.state.masterPassword)
+    }
   }
 
   render () {
+    if (this.state.error) {
+      var error = <Alert className='text-center' bsStyle='danger'>{this.state.error}</Alert>
+    }
     return (
       <div className='container'>
         <form className='row' onSubmit={this.onSubmit}>
@@ -31,6 +42,7 @@ export class MasterPassword extends Component {
                 className="form-control master-password__input"
                 placeholder="Enter a password" />
             </div>
+            {error}
             <p className='text-center'>
               You'll use this password to sign in.
             </p>

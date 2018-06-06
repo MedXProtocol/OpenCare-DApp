@@ -19,8 +19,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    signUp: ({ address, secretKey, masterPassword }) => {
-      dispatch({ type: 'SIGN_UP', address, secretKey, masterPassword })
+    signUp: ({ address, secretKey, masterPassword, overrideAccount }) => {
+      dispatch({ type: 'SIGN_UP', address, secretKey, masterPassword, overrideAccount })
     }
   }
 }
@@ -42,12 +42,13 @@ export const CreateAccount = connect(mapStateToProps, mapDispatchToProps)(class 
     })
   }
 
-  onConfirm = ({ secretKey, masterPassword, overrideAccount }) => {
-    if (masterPassword !== this.state.masterPassword) {
-      this.setState({ masterPasswordError: 'The password you entered does not match the master password' })
-    } else {
-      this.props.signUp({ secretKey: this.state.secretKey, masterPassword, address: this.props.address, overrideAccount })
-    }
+  onConfirm = () => {
+    this.props.signUp({
+      secretKey: this.state.secretKey,
+      masterPassword: this.state.masterPassword,
+      address: this.props.address,
+      overrideAccount: true
+    })
   }
 
   render () {
