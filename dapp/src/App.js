@@ -20,6 +20,7 @@ import { SignInRedirectContainer } from './sign-in-redirect'
 import { TryMetamask } from './screens/try-metamask'
 import { LoginToMetaMask } from './screens/login-to-metamask'
 import { connect } from 'react-redux'
+import { hot } from 'react-hot-loader'
 
 const App = class extends Component {
   render () {
@@ -49,4 +50,4 @@ App.defaultProps = {
   accounts: []
 }
 
-export default withRouter(App)
+export default hot(module)(withRouter(App))
