@@ -80,6 +80,7 @@
     "node-sass-chokidar": "^0.0.3",
     "pbkdf2": "^3.0.16",
     "randombytes": "^2.0.6",
+    "react-hot-loader": "^4.3.0",
     "react-redux": "^5.0.7",
     "sass-loader": "^7.0.1",
     "uglifyjs-webpack-plugin": "^1.1.2",
@@ -119,11 +120,12 @@
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
     ],
-    "moduleDirectories": ["node_modules"],
+    "moduleDirectories": [
+      "node_modules"
+    ],
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
-        "<rootDir>/__mocks__/fileMock.js",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
       "\\.(css|scss|sass)$": "<rootDir>/__mocks__/styleMock.js"
     },
     "moduleFileExtensions": [
