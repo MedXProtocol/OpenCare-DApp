@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavDropdown } from 'react-bootstrap'
+import { I18n } from 'react-i18next'
 
 function mapStateToProps(state) {
   return {
@@ -22,33 +23,38 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
     }
 
     getClassName = (value) => {
-      let labelClass = 'nav-transactions-text--warning'
+      let labelClass = ''
 
       if (value.error)
         labelClass = 'nav-transactions-text--danger'
       else if (value.confirmed)
         labelClass = 'nav-transactions-text--success'
+      else
+        labelClass = 'nav-transactions-text--warning'
 
       return labelClass
     }
 
     getDropdownClassName = (transactions) => {
-      let dropdownClass = 'nav-transactions-text--success'
+      let transactionsFromStore = Object.entries(this.props.transactions)
+      let dropdownClass = ''
       let hasError
       let hasPending
 
-      hasError = transactions.find(tx => tx[1].error)
-      hasPending = transactions.find(tx => !tx[1].confirmed)
+      hasError = transactionsFromStore.find(tx => tx[1].error)
+      hasPending = transactionsFromStore.find(tx => !tx[1].confirmed)
 
       if (hasError)
         dropdownClass = 'nav-transactions-text--danger'
       else if (hasPending)
         dropdownClass = 'nav-transactions-text--warning'
+      else
+        dropdownClass = 'nav-transactions-text--success'
 
       return dropdownClass
     }
 
-    render () {
+    getTransactionHtml = (t) => {
       let transactions = []
       let transactionsFromStore = Object.entries(this.props.transactions)
       let transactionHtml = null
@@ -57,7 +63,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
         transactionHtml = (
           <div className="blank-state">
             <div className="blank-state--inner text-center text-gray">
-              Currently there are no pending transactions
+              {t('transactions.blankState')}
             </div>
           </div>
         )
@@ -65,11 +71,15 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
         transactions = transactionsFromStore.reverse().map(tx => {
           const key   = tx[0]
           const value = tx[1]
-          let name = this.capitalizeAll(value.call.method)
+          let name = value.call.method
+          let mintMedxCount = 1000
 
           return (
             <li className="nav-transactions--item" key={`transaction-${key}`}>
-              <span className={this.getClassName(value)}>{'\u2b24'}</span> {name}
+              <span className={this.getClassName(value)}>{'\u2b24'}</span> &nbsp;
+              {t(`transactions.${name}`, {
+                mintMedxCount: mintMedxCount
+              })}
             </li>
           )
         })
@@ -79,16 +89,30 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
         </ul>
       }
 
+      return transactionHtml
+    }
+
+    render () {
       return (
         <NavDropdown
           id='transactions'
           title={
             <span>
-              {transactions.length} <span className={this.getDropdownClassName(transactionsFromStore)}>{'\u2b24'}</span>
+              {Object.entries(this.props.transactions).length} <span className={this.getDropdownClassName()}>{'\u2b24'}</span>
             </span>
           }>
           <div className="nav-transactions">
-            {transactionHtml}
+            <I18n>
+              {
+                (t) => {
+                  return (
+                    <span>
+                      {this.getTransactionHtml(t)}
+                    </span>
+                  )
+                }
+              }
+            </I18n>
           </div>
         </NavDropdown>
       )

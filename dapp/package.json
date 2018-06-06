@@ -31,6 +31,7 @@
     "font-awesome": "^4.7.0",
     "fs-extra": "3.0.1",
     "html-webpack-plugin": "2.29.0",
+    "i18next": "^11.3.2",
     "immutability-helper": "^2.7.0",
     "ipfs-api": "^17.5.0",
     "jest": "20.0.4",
@@ -46,6 +47,7 @@
     "react-bootstrap": "^0.31.5",
     "react-dev-utils": "^4.2.1",
     "react-dom": "^16.1.1",
+    "react-i18next": "^7.7.0",
     "react-router-bootstrap": "^0.24.4",
     "react-router-dom": "^4.2.0",
     "react-spinners": "^0.2.5",
@@ -119,11 +121,12 @@
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
     ],
-    "moduleDirectories": ["node_modules"],
+    "moduleDirectories": [
+      "node_modules"
+    ],
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
-        "<rootDir>/__mocks__/fileMock.js",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
       "\\.(css|scss|sass)$": "<rootDir>/__mocks__/styleMock.js"
     },
     "moduleFileExtensions": [
