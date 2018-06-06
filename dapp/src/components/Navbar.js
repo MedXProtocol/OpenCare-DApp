@@ -60,6 +60,11 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
     if (this.props.signedIn) {
       var profileMenu =
         <NavDropdown title='My Account' id='my-account'>
+          <LinkContainer to='/asgdawegaw'>
+            <MenuItem href='/asgdawegaw'>
+              404 me
+            </MenuItem>
+          </LinkContainer>
           <LinkContainer to='/wallet'>
             <MenuItem href='/wallet'>
               My Balance
