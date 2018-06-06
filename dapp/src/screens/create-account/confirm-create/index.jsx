@@ -1,7 +1,7 @@
 import React from 'react'
 import { SignInForm } from '@/components/sign-in-form'
 
-export const ConfirmCreate = ({ onConfirm, account }) => {
+export const ConfirmCreate = ({ onConfirm, hasAccount }) => {
   return (
     <div className='container'>
       <div className='row'>
@@ -10,7 +10,7 @@ export const ConfirmCreate = ({ onConfirm, account }) => {
             You're ready!
           </h1>
           <h3>Confirm your password to create your account</h3>
-          <SignInForm onSubmit={onConfirm} account={account}>
+          <SignInForm onSubmit={onConfirm} hasAccount={hasAccount}>
             <p className='text-center'>
               <input type='submit' className='btn btn-primary' value='Create Account' />
             </p>

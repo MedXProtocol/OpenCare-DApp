@@ -1,5 +1,8 @@
 var toRegistryKey = require('./to-registry-key')
 
+/** @title deployAndRegister
+  * @dev Deploys a new contract and registers it with the Registry
+  */
 module.exports = function (deployer, contract, registry, key, constructorArgsArray) {
   constructorArgsArray = constructorArgsArray || []
   constructorArgsArray.unshift(contract)

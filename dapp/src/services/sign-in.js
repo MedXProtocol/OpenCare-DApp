@@ -2,7 +2,7 @@ import aes from './aes'
 import aesjs from 'aes-js'
 import Cookie from 'js-cookie'
 import { deriveKey } from '@/utils/derive-key'
-import { getPublicKey, setPublicKey } from '@/utils/web3-util'
+import decryptSecretKey from '@/services/decrypt-secret-key'
 import { deriveKeyPair } from '@/services/derive-key-pair'
 import hexToAscii from '@/utils/hex-to-ascii'
 
@@ -12,27 +12,8 @@ export function isSignedIn () {
   return !!signedInSecretKey()
 }
 
-export function isValidPublicKey (publicKey) {
-  return !!publicKey && !!hexToAscii(publicKey)
-}
-
-export async function signInWithPublicKeyCheck (account, masterPassword) {
-  var preimage = deriveKey(masterPassword, account.salt)
-  var secretKey = aes.decrypt(account.encryptedSecretKey, preimage)
-
-  return getPublicKey().then((publicKey) => {
-    if (!publicKey || !hexToAscii(publicKey)) {
-      let publicKey = deriveKeyPair(secretKey).getPublic(true, 'hex')
-      return setPublicKey(publicKey)
-    }
-  }).then(() => {
-    setSecretKey(secretKey)
-  })
-}
-
 export async function signIn (account, masterPassword) {
-  var preimage = deriveKey(masterPassword, account.salt)
-  var secretKey = aes.decrypt(account.encryptedSecretKey, preimage)
+  var secretKey = decryptSecretKey(account, masterPassword)
   setSecretKey(secretKey)
 }
 

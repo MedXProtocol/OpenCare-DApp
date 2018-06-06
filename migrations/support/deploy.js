@@ -1,6 +1,10 @@
 var deployAndRegister = require('./deploy-and-register')
 var deployAndRegisterDelegate = require('./deploy-and-register-delegate')
 
+/** @title deploy
+  * @dev Deploys a new Contract and registers it with the Registry then creates a new Delegate that points to the contract, and
+  is registered under the same name as the contract.
+  */
 module.exports = function(artifacts, deployer, contract) {
   const Delegate = artifacts.require('Delegate.sol')
   const Registry = artifacts.require('Registry.sol')

@@ -11,6 +11,7 @@ import {
   withSend,
   withSaga
 } from './components'
+export { nextId } from './transaction/transaction-factory'
 
 export {
   CallCountRegistry,
