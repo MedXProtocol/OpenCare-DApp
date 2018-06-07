@@ -26,6 +26,7 @@ $card-columns-margin:               $card-spacer-y;
   position: relative;
   display: flex;
   flex-direction: column;
+  margin-bottom: 30px;
   min-width: 0;
   word-wrap: break-word;
   background-color: $card-bg;
