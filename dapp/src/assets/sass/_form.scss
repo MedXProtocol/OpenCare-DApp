@@ -1,5 +1,8 @@
 .form-wrapper {
   border-radius: 3px;
+}
+
+.form-wrapper--body {
   padding: 3rem;
 }
 
@@ -13,16 +16,10 @@
 }
 
 .form-wrapper--footer {
-  margin-top: 30px;
-}
-
-.form-wrapper--footer a {
-  color: #65afec;
-}
-
-.form-wrapper--footer a:hover,
-.form-wrapper--footer a:focus {
-  color: #65afec;
+  background: rgba(250, 250, 250, 1);
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  padding: 20px;
 }
 
 .form-control:focus {

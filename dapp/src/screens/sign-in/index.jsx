@@ -39,15 +39,9 @@ export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(cl
                 <h3 className='text-white text-center'>
                   Sign in to <strong>Med</strong>Credits
                 </h3>
-                <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
-                  <SignInForm onSubmit={this.onSubmit} hasAccount={!!this.props.account}>
-                    <div className='text-right'>
-                      <input type='submit' value='Sign In' className='btn btn-lg btn-primary' />
-                    </div>
-                  </SignInForm>
-                </div>
+                <SignInForm onSubmit={this.onSubmit} hasAccount={!!this.props.account} />
 
-                <div className="form-wrapper--footer">
+                <div className="account--extras">
                   <p className='text-center text-white'>
                     Don't have an account? <Link to='/sign-up'>Sign up</Link>
                   </p>

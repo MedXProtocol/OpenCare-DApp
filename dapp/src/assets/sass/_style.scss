@@ -68,3 +68,20 @@ not(.nav) li {
     font-size: 17px;
   }
 }
+
+.account--extras {
+  margin-top: 15px;
+}
+
+.account--extras a {
+  color: #65afec;
+}
+
+.account--extras a:hover,
+.account--extras a:focus {
+  color: #65afec;
+}
+
+p.lead {
+  line-height: 1.6;
+}

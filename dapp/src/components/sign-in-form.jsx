@@ -66,35 +66,44 @@ export const SignInForm = connect(mapStateToProps, mapDispatchToProps)(class _Si
     }
 
     return (
-      <form onSubmit={this.onSubmit} autoComplete='off'>
-        <OverrideModal
-          show={this.props.overrideError}
-          onCancel={this.props.clearOverrideError}
-          onConfirm={() => this.doSubmit(true)} />
-        <div className='form-group'>
-          <label htmlFor="secretKey">Secret Key</label>
-          <input
-            value={this.state.secretKey}
-            autoComplete="off"
-            onChange={this.onChangeSecretKey}
-            placeholder={HIDDEN_KEY}
-            type="text" className="form-control"
-            name='secret-key'
-            minLength='39'
-            maxLength='39' />
-          {existingSecretKey}
-          {secretKeyError}
-        </div>
-        <div className='form-group'>
-          <label htmlFor="masterPassword">Master Password</label>
-          <input
-            value={this.state.masterPassword}
-            onChange={(e) => this.setState({masterPassword: e.target.value})}
-            type="password" className="form-control" />
-          {masterPasswordError}
-        </div>
-        {this.props.children}
-      </form>
+      <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
+        <form onSubmit={this.onSubmit} autoComplete='off'>
+          <div className="form-wrapper--body">
+            <OverrideModal
+              show={this.props.overrideError}
+              onCancel={this.props.clearOverrideError}
+              onConfirm={() => this.doSubmit(true)} />
+            <div className='form-group'>
+              <label htmlFor="secretKey">Secret Key</label>
+              <input
+                value={this.state.secretKey}
+                autoComplete="off"
+                onChange={this.onChangeSecretKey}
+                placeholder={HIDDEN_KEY}
+                type="text" className="form-control"
+                name='secret-key'
+                minLength='39'
+                maxLength='39' />
+              {existingSecretKey}
+              {secretKeyError}
+            </div>
+            <div className='form-group'>
+              <label htmlFor="masterPassword">Master Password</label>
+              <input
+                value={this.state.masterPassword}
+                onChange={(e) => this.setState({masterPassword: e.target.value})}
+                type="password" className="form-control" />
+              {masterPasswordError}
+            </div>
+            {this.props.children}
+          </div>
+          <div className="form-wrapper--footer">
+            <div className='text-right'>
+              <input type='submit' value='Sign In' className='btn btn-lg btn-primary' />
+            </div>
+          </div>
+        </form>
+      </div>
     )
   }
 })

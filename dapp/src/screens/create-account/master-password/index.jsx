@@ -37,22 +37,26 @@ export class MasterPassword extends Component {
                 Create your <b>Master Password</b>
               </h3>
               <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
-                <p className='text-gray'>
-                  You will use this password to sign in:
-                </p>
+                <div className="form-wrapper--body">
+                  <p className='text-gray'>
+                    You will use this password with your secret key to sign in:
+                  </p>
 
-                <div className="well" role="alert">
-                  <input
-                    type="password"
-                    value={this.state.masterPassword}
-                    onChange={(event) => this.setState({masterPassword: event.target.value})}
-                    className="form-control master-password__input"
-                    placeholder="Enter a password" />
+                  <div className="well" role="alert">
+                    <input
+                      type="password"
+                      value={this.state.masterPassword}
+                      onChange={(event) => this.setState({masterPassword: event.target.value})}
+                      className="form-control master-password__input"
+                      placeholder="Enter a password" />
+                  </div>
+                  {error}
                 </div>
-                {error}
 
-                <div className='text-right'>
-                  <input type='submit' className='btn btn-lg btn-primary' value='Continue' />
+                <div className="form-wrapper--footer">
+                  <div className='text-right'>
+                    <input type='submit' className='btn btn-lg btn-primary' value='Continue' />
+                  </div>
                 </div>
               </div>
             </div>
