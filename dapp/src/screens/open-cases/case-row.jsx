@@ -5,11 +5,11 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
-import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
-import { cacheCall } from '@/saga-genesis/sagas'
-import { doctorCaseStatusToName } from '@/utils/doctor-case-status-to-name'
-import getWeb3 from '@/get-web3'
-import { addContract } from '@/saga-genesis/sagas'
+import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
+import { cacheCall } from '~/saga-genesis/sagas'
+import { doctorCaseStatusToName } from '~/utils/doctor-case-status-to-name'
+import getWeb3 from '~/get-web3'
+import { addContract } from '~/saga-genesis/sagas'
 
 function mapStateToProps(state, { address }) {
   let account = get(state, 'sagaGenesis.accounts[0]')

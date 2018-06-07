@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { downloadJson } from '@/utils/storage-util'
-import { cacheCallValue, withSaga, cacheCall } from '@/saga-genesis'
+import { downloadJson } from '~/utils/storage-util'
+import { cacheCallValue, withSaga, cacheCall } from '~/saga-genesis'
 import { connect } from 'react-redux'
-import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
+import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 
 function mapStateToProps(state, { caseAddress }) {
   const diagnosisBLocationHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))

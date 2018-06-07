@@ -1,5 +1,5 @@
 import React from 'react'
-import { SignInForm } from '@/components/sign-in-form'
+import { SignInForm } from '~/components/sign-in-form'
 import { Alert } from 'react-bootstrap'
 import { connect } from 'react-redux'
 

@@ -4,8 +4,8 @@ import React, {
 import PropTypes from 'prop-types'
 import { withRouter, Redirect } from 'react-router-dom'
 import get from 'lodash.get'
-import { getAccount } from '@/services/get-account'
-import redirectService from '@/services/redirect-service'
+import { getAccount } from '~/services/get-account'
+import redirectService from '~/services/redirect-service'
 import { connect } from 'react-redux'
 
 function mapStateToProps (state, ownProps) {

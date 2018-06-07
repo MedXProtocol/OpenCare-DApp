@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import Spinner from '../../../components/Spinner'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
-import { withContractRegistry, withSend } from '@/saga-genesis'
-import { contractByName } from '@/saga-genesis/state-finders'
+import { withContractRegistry, withSend } from '~/saga-genesis'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 
 function mapStateToProps(state) {

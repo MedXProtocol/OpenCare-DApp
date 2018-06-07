@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withSaga, cacheCallValue } from '@/saga-genesis'
-import { cacheCall, addContract } from '@/saga-genesis/sagas'
+import { withSaga, cacheCallValue } from '~/saga-genesis'
+import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { select } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 

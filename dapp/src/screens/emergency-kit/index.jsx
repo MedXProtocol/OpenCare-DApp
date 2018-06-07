@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import MainLayout from '../../layouts/MainLayout';
-import { formatKey } from '@/services/format-key'
-import { signedInSecretKey } from '@/services/sign-in'
-import { deriveSharedKey } from '@/services/derive-shared-key'
+import { formatKey } from '~/services/format-key'
+import { signedInSecretKey } from '~/services/sign-in'
+import { deriveSharedKey } from '~/services/derive-shared-key'
 import { connect } from 'react-redux'
 
 function mapStateToProps(state) {

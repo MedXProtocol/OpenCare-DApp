@@ -1,5 +1,5 @@
 import { all, fork, takeEvery } from 'redux-saga/effects'
-import rootSagaGenesis, { takeOnceAndRun } from '@/saga-genesis/sagas'
+import rootSagaGenesis, { takeOnceAndRun } from '~/saga-genesis/sagas'
 import addTopLevelContracts from './add-top-level-contracts-saga'
 import addRegistryContracts from './add-registry-contracts-saga'
 import signInSaga from './sign-in-saga'

@@ -5,7 +5,7 @@ import doctorManagerContractConfig from '#/DoctorManager.json'
 import accountManagerConfig from '#/AccountManager.json'
 import registryConfig from '#/Registry.json'
 
-import { abiFactory } from '@/saga-genesis/utils'
+import { abiFactory } from '~/saga-genesis/utils'
 
 export default {
   contractFactories: {

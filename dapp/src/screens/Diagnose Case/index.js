@@ -2,18 +2,18 @@ import React, { Component } from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import CaseDetails from '../../components/CaseDetails';
 import SubmitDiagnosis from './components/SubmitDiagnosis';
-import ChallengedDiagnosis from '@/components/ChallengedDiagnosis';
-import Diagnosis from '@/components/Diagnosis';
-import { signedInSecretKey } from '@/services/sign-in'
-import { deriveSharedKey } from '@/services/derive-shared-key'
-import aes from '@/services/aes'
-import isBlank from '@/utils/is-blank'
+import ChallengedDiagnosis from '~/components/ChallengedDiagnosis';
+import Diagnosis from '~/components/Diagnosis';
+import { signedInSecretKey } from '~/services/sign-in'
+import { deriveSharedKey } from '~/services/derive-shared-key'
+import aes from '~/services/aes'
+import isBlank from '~/utils/is-blank'
 import get from 'lodash.get'
-import { withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
-import { cacheCall, addContract } from '@/saga-genesis/sagas'
-import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
+import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
+import { cacheCall, addContract } from '~/saga-genesis/sagas'
+import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
-import { contractByName } from '@/saga-genesis/state-finders'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress

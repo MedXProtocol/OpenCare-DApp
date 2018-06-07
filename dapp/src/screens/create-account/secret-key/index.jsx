@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { formatKey } from '@/services/format-key'
+import { formatKey } from '~/services/format-key'
 
 import './secret-key.css'
 
