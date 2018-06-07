@@ -1,4 +1,4 @@
-import getWeb3 from '@/get-web3'
+import getWeb3 from '~/get-web3'
 
 export function getFileHashFromBytes(bytes) {
   if(!bytes || bytes === "0x")

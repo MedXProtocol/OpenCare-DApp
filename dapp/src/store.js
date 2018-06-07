@@ -2,7 +2,7 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import sagas from './sagas'
 import reducers from './reducers'
-import { ContractRegistry, CallCountRegistry } from '@/saga-genesis'
+import { ContractRegistry, CallCountRegistry } from '~/saga-genesis'
 import contractRegistryOptions from './contract-registry-options'
 
 export const contractRegistry = new ContractRegistry(contractRegistryOptions)

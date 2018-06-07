@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import Spinner from '../../../components/Spinner';
 import get from 'lodash.get'
-import defined from '@/utils/defined'
+import defined from '~/utils/defined'
 import { connect } from 'react-redux'
-import { withContractRegistry, withSend } from '@/saga-genesis'
-import { contractByName } from '@/saga-genesis/state-finders'
+import { withContractRegistry, withSend } from '~/saga-genesis'
+import { contractByName } from '~/saga-genesis/state-finders'
 import {
   FormGroup,
   ControlLabel,
@@ -78,24 +78,36 @@ const MintTokens = withContractRegistry(connect(mapStateToProps)(withSend(class 
       return (
         <div className='container'>
           <div className='row'>
-            <div className='col-sm-12'>
-              <h1>Mint Tokens</h1>
-              <form onSubmit={this.handleSubmit}>
-                <FormGroup>
-                  <ControlLabel>Account Address</ControlLabel>
-                  <FormControl
-                    className="form-control"
-                    id="hash"
-                    value={this.state.address}
-                    onChange={this.updateAddress}
-                    required />
-                </FormGroup>
-                <button
-                  type="submit"
-                  className="btn btn-default"
-                  disabled={minting}>Mint Tokens</button>
-              </form>
-              <Spinner loading={minting}/>
+            <div className="col-sm-6 col-sm-offset-3">
+              <div className="card">
+                <div className="card-header">
+                  <h4 className="card-title">
+                    Mint Tokens
+                  </h4>
+                </div>
+                <div className="card-body">
+                  <div className="form-wrapper">
+                    <form onSubmit={this.handleSubmit}>
+                      <FormGroup>
+                        <ControlLabel>Account Address</ControlLabel>
+                        <FormControl
+                          className="form-control"
+                          id="hash"
+                          value={this.state.address}
+                          onChange={this.updateAddress}
+                          required />
+                      </FormGroup>
+                      <div className="text-right">
+                        <button
+                          type="submit"
+                          className="btn btn-lg btn-success"
+                          disabled={minting}>Mint Tokens</button>
+                      </div>
+                    </form>
+                    <Spinner loading={minting}/>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

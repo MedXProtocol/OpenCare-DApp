@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { downloadJson } from '@/utils/storage-util'
-import { cacheCallValue, withSaga, cacheCall } from '@/saga-genesis'
+import { downloadJson } from '~/utils/storage-util'
+import { cacheCallValue, withSaga, cacheCall } from '~/saga-genesis'
 import { connect } from 'react-redux'
-import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
+import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 
 function mapStateToProps(state, { caseAddress }) {
   const diagnosisBLocationHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
@@ -46,14 +46,14 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
                 <div className="card-header">
                     <h2 className="card-title">{this.props.title}</h2>
                 </div>
-                <div className="card-content">
+                <div className="card-body">
                     <div className="row">
 
                         <div className="col-xs-12">
                             <label>Diagnosis</label>
                             <p>{this.state.diagnosis.diagnosis}</p>
                         </div>
-                        <div className="col-lg-6 col-md-12 top10">
+                        <div className="col-lg-6 col-md-12">
                             <label>Recommendation</label>
                             <p>{this.state.diagnosis.recommendation}</p>
                         </div>

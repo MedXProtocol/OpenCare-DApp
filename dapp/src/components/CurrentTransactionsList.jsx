@@ -114,7 +114,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           id='transactions'
           title={
             <span>
-              {this.state.pendingOrErrorTransactions.length} <span className={this.getDropdownClassName()}>{'\u2b24'}</span>
+              Status <span className={this.getDropdownClassName()}>{'\u2b24'}</span>
             </span>
           }>
           <div className="nav-transactions">

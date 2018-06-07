@@ -19,7 +19,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class extends Component 
         {redirect}
         <div className='container'>
           <div className='row'>
-            <div className='col-sm-8 col-sm-offset-2 text-center'>
+            <div className='col-sm-6 col-sm-offset-3 text-center'>
               <h2>You need to log into Metamask to continue</h2>
             </div>
           </div>

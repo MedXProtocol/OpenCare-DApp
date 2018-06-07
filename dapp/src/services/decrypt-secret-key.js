@@ -1,5 +1,5 @@
-import aes from '@/services/aes'
-import { deriveKey } from '@/utils/derive-key'
+import aes from '~/services/aes'
+import { deriveKey } from '~/utils/derive-key'
 
 export default function decryptSecretKey(account, masterPassword) {
   var preimage = deriveKey(masterPassword, account.salt)

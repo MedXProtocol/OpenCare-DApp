@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import { Modal } from 'react-bootstrap'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import Spinner from '@/components/Spinner'
-import { downloadJson } from '@/utils/storage-util'
-import { withSaga, cacheCall, cacheCallValue, withSend } from '@/saga-genesis'
+import Spinner from '~/components/Spinner'
+import { downloadJson } from '~/utils/storage-util'
+import { withSaga, cacheCall, cacheCallValue, withSend } from '~/saga-genesis'
 import { connect } from 'react-redux'
-import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
+import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const status = cacheCallValue(state, caseAddress, 'status')
@@ -120,14 +120,14 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
               <div className="card-header">
                   <h2 className="card-title">Diagnosis</h2>
               </div>
-              <div className="card-content">
+              <div className="card-body">
                   <div className="row">
 
                       <div className="col-xs-12">
                           <label>Diagnosis</label>
                           <p>{this.state.diagnosis.diagnosis}</p>
                       </div>
-                      <div className="col-lg-6 col-md-12 top10">
+                      <div className="col-lg-6 col-md-12">
                           <label>Recommendation</label>
                           <p>{this.state.diagnosis.recommendation}</p>
                       </div>
@@ -140,9 +140,9 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                       <hr/>
                       <div className="row">
                           <div className="col-xs-12 text-center" >
-                              <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success btn-fill">Accept</button>
+                              <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
                               &nbsp;
-                              <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-danger btn-fill">Get Second Opinion</button>
+                              <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-danger">Get Second Opinion</button>
                           </div>
                       </div>
                   </div>
@@ -151,25 +151,25 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
               <Modal show={this.state.showThankYouModal}>
                   <Modal.Body>
                       <div className="row">
-                          <div className="col text-center">
+                          <div className="col-xs-12 text-center">
                               <h4>Thank you for using MedCredits!</h4>
                           </div>
                       </div>
                   </Modal.Body>
                   <Modal.Footer>
-                      <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-defult">OK</button>
+                    <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
                   </Modal.Footer>
               </Modal>
               <Modal show={this.state.showChallengeModal}>
                   <Modal.Body>
                       <div className="row">
-                          <div className="col text-center">
+                          <div className="col-xs-12 text-center">
                               <h4>Another doctor will now review your case.</h4>
                           </div>
                       </div>
                   </Modal.Body>
                   <Modal.Footer>
-                      <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-defult">OK</button>
+                      <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-primary">OK</button>
                   </Modal.Footer>
               </Modal>
               <Spinner loading={this.state.submitInProgress}/>

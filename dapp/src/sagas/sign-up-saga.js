@@ -1,8 +1,8 @@
 import { put, call, select, takeEvery } from 'redux-saga/effects'
 
-import { buildAccount } from '@/services/build-account'
-import { getAccount } from '@/services/get-account'
-import { setAccount } from '@/services/set-account'
+import { buildAccount } from '~/services/build-account'
+import { getAccount } from '~/services/get-account'
+import { setAccount } from '~/services/set-account'
 
 export function* signUpSaga({ address, secretKey, masterPassword, overrideAccount }) {
   if (!address) {

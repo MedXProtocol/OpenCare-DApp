@@ -1,7 +1,42 @@
+.navbar {
+  border: 0;
+}
+
 .navbar-brand {
   padding: 10px;
 }
 
 .navbar-brand img {
   height: 100%;
+}
+
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus,
+{
+  background-color: transparent;
+}
+
+.navbar-inverse .navbar-toggle {
+  border-color: transparent;
+}
+
+.nav--network-name {
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.navbar-inverse .navbar-nav > li.active > a {
+  border-bottom: 6px solid lighten($brand-info, 50%);
+}
+
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+  border-bottom: 6px solid white;
+}
+
+.navbar-nav > li > a {
+  @media (min-width: 768px) {
+    padding-bottom: 14px;
+  }
 }

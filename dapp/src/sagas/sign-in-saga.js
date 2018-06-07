@@ -1,14 +1,14 @@
 import { put, fork, spawn, call, takeEvery, select } from 'redux-saga/effects'
-import { isAccountMasterPassword } from '@/services/is-account-master-password'
-import decryptSecretKey from '@/services/decrypt-secret-key'
-import { createCall } from '@/saga-genesis/utils'
-import { cacheCall } from '@/saga-genesis/sagas'
-import { contractByName } from '@/saga-genesis/state-finders'
-import { deriveKeyPair } from '@/services/derive-key-pair'
+import { isAccountMasterPassword } from '~/services/is-account-master-password'
+import decryptSecretKey from '~/services/decrypt-secret-key'
+import { createCall } from '~/saga-genesis/utils'
+import { cacheCall } from '~/saga-genesis/sagas'
+import { contractByName } from '~/saga-genesis/state-finders'
+import { deriveKeyPair } from '~/services/derive-key-pair'
 import {
   signIn
-} from '@/services/sign-in'
-import { nextId } from '@/saga-genesis'
+} from '~/services/sign-in'
+import { nextId } from '~/saga-genesis'
 
 // Here the sign in should perform the check
 export function* signInSaga({ secretKey, masterPassword, account, address, overrideAccount }) {

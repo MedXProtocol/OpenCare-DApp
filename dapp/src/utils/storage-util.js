@@ -1,6 +1,6 @@
 import IpfsApi from 'ipfs-api';
 import {promisify} from './common-util';
-import aes from '@/services/aes'
+import aes from '~/services/aes'
 
 const ipfsApi = IpfsApi('ipfs.infura.io', '5001', {protocol: 'https'});
 

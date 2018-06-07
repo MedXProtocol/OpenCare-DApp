@@ -1,0 +1,44 @@
+.form-wrapper {
+  border-radius: 3px;
+}
+
+.form-wrapper--body {
+  padding: 3rem;
+}
+
+.form-wrapper--inverse {
+  box-shadow: 4px 4px 8px 0 rgba(0, 0, 0, 0.4);
+  background: white;
+}
+
+.form-wrapper--account {
+  margin-top: 30px;
+}
+
+.form-wrapper--footer {
+  background: rgba(250, 250, 250, 1);
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  padding: 20px;
+}
+
+.form-control:focus {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.075);
+}
+
+.help-block {
+  color: $medcredits-text-gray;
+}
+
+.btn {
+  font-size: 13px;
+  font-weight: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 15px 20px;
+}
+
+.btn-sm {
+  font-size: 12px;
+  padding: 7px 12px;
+}

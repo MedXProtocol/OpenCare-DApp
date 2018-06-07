@@ -2,6 +2,23 @@ body {
   padding-bottom: 10rem;
 }
 
+.body-inverse {
+  background: #051A38;
+}
+
+h1 .small-inverse,
+h2 .small-inverse,
+h3 .small-inverse,
+h4 .small-inverse,
+h5 .small-inverse,
+h6 .small-inverse {
+  color: #4aa8f7;
+}
+
+.text-white {
+  color: white;
+}
+
 .form-group--image-upload {
   min-height: 90px;
 }
@@ -15,7 +32,15 @@ not(.nav) li {
 }
 
 .text-gray {
-  color: #ccc;
+  color: $medcredits-text-gray;
+}
+
+.text-footer {
+  color: $medcredits-text-gray;
+}
+
+.body-inverse .text-footer {
+  color: rgba(138, 141, 156, 0.8);
 }
 
 .blank-state {
@@ -32,4 +57,31 @@ not(.nav) li {
   grid-area: a;
   align-self: center;
   justify-self: center;
+}
+
+.secret-key__key {
+  font-size: 2.4rem;
+  text-align: center;
+  font-weight: bold;
+
+  @media (max-width: 768px) {
+    font-size: 17px;
+  }
+}
+
+.account--extras {
+  margin-top: 15px;
+}
+
+.account--extras a {
+  color: #65afec;
+}
+
+.account--extras a:hover,
+.account--extras a:focus {
+  color: #65afec;
+}
+
+p.lead {
+  line-height: 1.6;
 }

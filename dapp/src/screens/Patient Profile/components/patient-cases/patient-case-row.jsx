@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import get from 'lodash.get'
 import { CaseRow } from './case-row'
 import { connect } from 'react-redux'
-import { withContractRegistry, cacheCallValue, withSaga } from '@/saga-genesis'
-import { cacheCall } from '@/saga-genesis/sagas'
-import { contractByName } from '@/saga-genesis/state-finders'
+import { withContractRegistry, cacheCallValue, withSaga } from '~/saga-genesis'
+import { cacheCall } from '~/saga-genesis/sagas'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state, { address, caseIndex }) {
   let CaseManager = contractByName(state, 'CaseManager')
