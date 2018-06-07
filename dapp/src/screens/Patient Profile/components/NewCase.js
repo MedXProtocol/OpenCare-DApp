@@ -15,7 +15,7 @@ class NewCase extends Component {
                         <div className="col-md-12 text-center">
                             <button
                                 type="button"
-                                className="btn btn-primary btn-fill btn-new-case"
+                                className="btn btn-primary btn-new-case"
                                 onClick={() => this.navigateToNewCaseScree()}>
                                 Start New Case
                             </button>

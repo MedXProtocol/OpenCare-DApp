@@ -127,7 +127,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                           <label>Diagnosis</label>
                           <p>{this.state.diagnosis.diagnosis}</p>
                       </div>
-                      <div className="col-lg-6 col-md-12 top10">
+                      <div className="col-lg-6 col-md-12">
                           <label>Recommendation</label>
                           <p>{this.state.diagnosis.recommendation}</p>
                       </div>
@@ -140,9 +140,9 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                       <hr/>
                       <div className="row">
                           <div className="col-xs-12 text-center" >
-                              <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success btn-fill">Accept</button>
+                              <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
                               &nbsp;
-                              <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-danger btn-fill">Get Second Opinion</button>
+                              <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-danger">Get Second Opinion</button>
                           </div>
                       </div>
                   </div>
@@ -157,7 +157,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                       </div>
                   </Modal.Body>
                   <Modal.Footer>
-                      <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-defult">OK</button>
+                    <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
                   </Modal.Footer>
               </Modal>
               <Modal show={this.state.showChallengeModal}>
@@ -169,7 +169,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                       </div>
                   </Modal.Body>
                   <Modal.Footer>
-                      <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-defult">OK</button>
+                      <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-primary">OK</button>
                   </Modal.Footer>
               </Modal>
               <Spinner loading={this.state.submitInProgress}/>

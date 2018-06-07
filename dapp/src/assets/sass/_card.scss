@@ -1,20 +1,20 @@
-$card-spacer-y:                     2rem !default;
-$card-spacer-x:                     2rem !default;
-$card-border-width:                 0 !default;
-$card-border-radius:                0 !default;
-$card-border-color:                 rgba(black, .125) !default;
-$card-inner-border-radius:          calc(#{$card-border-radius} - #{$card-border-width}) !default;
-$card-cap-bg:                       rgba(black, .03) !default;
-$card-bg:                           white !default;
+$card-spacer-y:                     2rem;
+$card-spacer-x:                     1rem;
+$card-border-width:                 0;
+$card-border-radius:                0;
+$card-border-color:                 rgba(black, .125);
+$card-inner-border-radius:          calc(#{$card-border-radius} - #{$card-border-width});
+$card-cap-bg:                       #f5f7f8;
+$card-bg:                           white;
 
-$card-img-overlay-padding:          1.25rem !default;
+$card-img-overlay-padding:          1.25rem;
 
-$card-group-margin:                 (10px / 2) !default;
-$card-deck-margin:                  $card-group-margin !default;
+$card-group-margin:                 (10px / 2);
+$card-deck-margin:                  $card-group-margin;
 
-$card-columns-count:                3 !default;
-$card-columns-gap:                  1.25rem !default;
-$card-columns-margin:               $card-spacer-y !default;
+$card-columns-count:                3;
+$card-columns-gap:                  1.25rem;
+$card-columns-margin:               $card-spacer-y;
 
 
 //
@@ -22,6 +22,7 @@ $card-columns-margin:               $card-spacer-y !default;
 //
 
 .card {
+  box-shadow: 2px 3px 4px 0 rgba(50, 70, 100, 0.05);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -59,6 +60,7 @@ $card-columns-margin:               $card-spacer-y !default;
 
 .card-title {
   margin-bottom: $card-spacer-y;
+  margin-top: $card-spacer-y;
 }
 
 .card-subtitle {
@@ -85,9 +87,10 @@ $card-columns-margin:               $card-spacer-y !default;
 //
 
 .card-header {
-  padding: $card-spacer-y $card-spacer-x;
+  padding: $card-spacer-x $card-spacer-y;
   margin-bottom: 0; // Removes the default margin-bottom of <hN>
   background-color: $card-cap-bg;
+  border-top: 6px solid lighten($brand-info, 45%);
   border-bottom: $card-border-width solid $card-border-color;
 
   &:first-child {

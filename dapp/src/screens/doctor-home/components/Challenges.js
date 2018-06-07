@@ -10,7 +10,7 @@ class Challenges extends Component {
                         <div className="col-xs-12 text-center">
                             <button
                                 type="button"
-                                className="btn btn-primary btn-fill btn-challenged-cases"
+                                className="btn btn-primary btn-challenged-cases"
                                 disabled="true">
                                 See Challenged Cases
                             </button>

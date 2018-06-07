@@ -100,15 +100,15 @@ export const CaseRow = withContractRegistry(withSend(class _CaseRow extends Comp
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <button onClick={this.onApprove} type="button" className="btn btn-defult">Yes</button>
-          <button onClick={() => this.setState({showModal: false})} type="button" className="btn btn-defult">No</button>
+          <button onClick={() => this.setState({showModal: false})} type="button" className="btn btn-link">No</button>
+          <button onClick={this.onApprove} type="button" className="btn btn-primary">Yes</button>
         </Modal.Footer>
       </Modal>
 
     return (
       <tr>
         {modal}
-        <td className="text-center">{this.props.caseIndex}</td>
+        <td className="text-center">{this.props.caseIndex+1}</td>
         <td><Link to={`/patient-case/${this.props.caseAddress}`}>{this.props.caseAddress}</Link></td>
         <td>{caseStatusToName(status)}</td>
         <td className="td-actions text-right">

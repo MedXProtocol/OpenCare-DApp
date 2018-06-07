@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
+import { Alert } from 'react-bootstrap'
+import masterPasswordInvalid from '@/services/master-password-invalid'
 import { BodyClass } from '@/components/BodyClass'
-
 import './master-password.css'
 
 export class MasterPassword extends Component {
@@ -13,15 +14,25 @@ export class MasterPassword extends Component {
 
   onSubmit = (e) => {
     e.preventDefault()
-    this.props.onMasterPassword(this.state.masterPassword)
+    var msg = masterPasswordInvalid(this.state.masterPassword)
+    if (msg) {
+      this.setState({
+        error: msg
+      })
+    } else {
+      this.props.onMasterPassword(this.state.masterPassword)
+    }
   }
 
   render () {
+    if (this.state.error) {
+      var error = <Alert className='text-center' bsStyle='danger'>{this.state.error}</Alert>
+    }
     return (
       <BodyClass isDark={true}>
         <div className='container'>
           <form className='row' onSubmit={this.onSubmit}>
-            <div className='col-sm-8 col-sm-offset-2'>
+            <div className='col-sm-6 col-sm-offset-3'>
               <h3 className='text-center text-white'>
                 Create your <b>Master Password</b>
               </h3>
@@ -34,13 +45,14 @@ export class MasterPassword extends Component {
                     className="form-control master-password__input"
                     placeholder="Enter a password" />
                 </div>
-                <p className='text-center'>
-                  You will use this password to sign in.
-                </p>
-                <p className='text-right'>
-                  <input type='submit' className='btn btn-lg btn-primary' value='Continue' />
-                </p>
               </div>
+              {error}
+              <p className='text-center'>
+                You'll use this password to sign in.
+              </p>
+              <p className='text-right'>
+                <input type='submit' className='btn btn-lg btn-primary' value='Continue' />
+              </p>
             </div>
           </form>
         </div>

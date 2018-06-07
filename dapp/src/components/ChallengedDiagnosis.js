@@ -53,7 +53,7 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
                             <label>Diagnosis</label>
                             <p>{this.state.diagnosis.diagnosis}</p>
                         </div>
-                        <div className="col-lg-6 col-md-12 top10">
+                        <div className="col-lg-6 col-md-12">
                             <label>Recommendation</label>
                             <p>{this.state.diagnosis.recommendation}</p>
                         </div>

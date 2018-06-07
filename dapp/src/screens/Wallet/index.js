@@ -28,13 +28,28 @@ const Wallet = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account
     return (
       <MainLayout>
         <div className="container text-center">
-          <h1>{this.props.balance} MEDX</h1>
-          <p className='lead'>For account <b>{this.props.account}</b></p>
-          <p>
-            <Link to='/mint' className="btn btn-primary btn-fill">
-              Buy MEDX
-            </Link>
-          </p>
+          <div className="row">
+            <div className="col-sm-6 col-sm-offset-3">
+              <div className="card">
+                <div className="card-header">
+                  <h4 className="card-title">
+                    Your Balance: {this.props.balance} MEDX
+                  </h4>
+                </div>
+                <div className="card-body">
+                  <p className='lead'>
+                    For account:
+                    <br /><small>{this.props.account}</small>
+                  </p>
+                  <p>
+                    <Link to='/mint' className="btn btn-primary btn-lg">
+                      Buy MEDX
+                    </Link>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </MainLayout>
     )

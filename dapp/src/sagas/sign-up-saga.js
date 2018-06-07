@@ -6,7 +6,16 @@ import { setAccount } from '@/services/set-account'
 
 export function* signUpSaga({ address, secretKey, masterPassword, overrideAccount }) {
   if (!address) {
-    yield put({ type: 'SIGN_UP_ERROR', addressError: 'Address is not defined' })
+    yield put({ type: 'SIGN_IN_ERROR', addressError: 'Address is not defined' })
+    return
+  }
+  if (!masterPassword) {
+    yield put({ type: 'SIGN_IN_ERROR', masterPasswordError: 'You must define a master password' })
+    return
+  }
+  if (masterPassword.length < 8) {
+    yield put({ type: 'SIGN_IN_ERROR', masterPasswordError: 'The master password must be at least 8 characters long' })
+    return
   }
   let account = getAccount(address)
   if (account && !overrideAccount) {

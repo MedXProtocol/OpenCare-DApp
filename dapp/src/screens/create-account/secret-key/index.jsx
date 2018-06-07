@@ -10,7 +10,7 @@ export const SecretKey = ({ secretKey, onContinue }) => {
     <BodyClass isDark={true}>
       <div className='container'>
         <div className='row'>
-          <div className='col-sm-8 col-sm-offset-2'>
+          <div className='col-sm-6 col-sm-offset-3'>
             <h3 className='text-center text-white'>
               This is your <b>Secret Key</b>:
             </h3>
