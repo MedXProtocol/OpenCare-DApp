@@ -20,11 +20,19 @@ function mapDispatchToProps(dispatch) {
   return {
     signIn: ({ secretKey, masterPassword, account, address, overrideAccount }) => {
       dispatch({ type: 'SIGN_IN', secretKey, masterPassword, account, address, overrideAccount })
+    },
+    signOut: () => {
+      dispatch({ type: 'SIGN_OUT' })
     }
   }
 }
 
 export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
+
+  componentDidMount() {
+    this.props.signOut()
+  }
+
   onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
     this.props.signIn({ secretKey, masterPassword, account: this.props.account, address: this.props.address, overrideAccount })
   }

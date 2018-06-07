@@ -42,7 +42,7 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     signOut: () => {
-      dispatch({type: 'SIGN_OUT'})
+      dispatch({ type: 'SIGN_OUT' })
     }
   }
 }
