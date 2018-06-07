@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import Spinner from '../../../components/Spinner';
 import get from 'lodash.get'
-import defined from '@/utils/defined'
+import defined from '~/utils/defined'
 import { connect } from 'react-redux'
-import { withContractRegistry, withSend } from '@/saga-genesis'
-import { contractByName } from '@/saga-genesis/state-finders'
+import { withContractRegistry, withSend } from '~/saga-genesis'
+import { contractByName } from '~/saga-genesis/state-finders'
 import {
   FormGroup,
   ControlLabel,

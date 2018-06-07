@@ -14,13 +14,13 @@ import PropTypes from 'prop-types'
 import logo from '../assets/img/logo.png'
 import './Navbar.css'
 import get from 'lodash.get'
-import networkIdToName from '@/utils/network-id-to-name'
+import networkIdToName from '~/utils/network-id-to-name'
 import { connect } from 'react-redux'
-import { cacheCall } from '@/saga-genesis/sagas'
-import { withContractRegistry, withSaga } from '@/saga-genesis/components'
-import { cacheCallValue, contractByName } from '@/saga-genesis/state-finders'
+import { cacheCall } from '~/saga-genesis/sagas'
+import { withContractRegistry, withSaga } from '~/saga-genesis/components'
+import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 
-import { CurrentTransactionsList } from '@/components/CurrentTransactionsList'
+import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')

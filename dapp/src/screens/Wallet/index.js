@@ -3,9 +3,9 @@ import MainLayout from '../../layouts/MainLayout'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { cacheCall } from '@/saga-genesis/sagas'
-import { withSaga } from '@/saga-genesis/components'
-import { cacheCallValue, contractByName } from '@/saga-genesis/state-finders'
+import { cacheCall } from '~/saga-genesis/sagas'
+import { withSaga } from '~/saga-genesis/components'
+import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')

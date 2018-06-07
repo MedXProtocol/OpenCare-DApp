@@ -3,9 +3,9 @@ import MainLayout from '../../layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
-import { getAccount } from '@/services/get-account'
-import { SignInForm } from '@/components/sign-in-form'
-import { BodyClass } from '@/components/BodyClass'
+import { getAccount } from '~/services/get-account'
+import { SignInForm } from '~/components/sign-in-form'
+import { BodyClass } from '~/components/BodyClass'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')

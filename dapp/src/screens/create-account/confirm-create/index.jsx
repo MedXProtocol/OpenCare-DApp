@@ -1,8 +1,8 @@
 import React from 'react'
 import { Alert } from 'react-bootstrap'
 import { connect } from 'react-redux'
-import { SignInForm } from '@/components/sign-in-form'
-import { BodyClass } from '@/components/BodyClass'
+import { SignInForm } from '~/components/sign-in-form'
+import { BodyClass } from '~/components/BodyClass'
 
 function mapStateToProps(state) {
   return {

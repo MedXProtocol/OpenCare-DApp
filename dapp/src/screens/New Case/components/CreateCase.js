@@ -6,20 +6,20 @@ import {
   Radio,
   ProgressBar
 } from 'react-bootstrap';
-import { genKey } from '@/services/gen-key'
+import { genKey } from '~/services/gen-key'
 import { withRouter } from 'react-router-dom';
 import classNames from 'classnames';
 import Spinner from '../../../components/Spinner';
 import { isNotEmptyString } from '../../../utils/common-util';
 import { uploadJson, uploadFile } from '../../../utils/storage-util';
-import { signedInSecretKey } from '@/services/sign-in'
-import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '@/saga-genesis'
-import hashToHex from '@/utils/hash-to-hex'
+import { signedInSecretKey } from '~/services/sign-in'
+import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
+import hashToHex from '~/utils/hash-to-hex'
 import { connect } from 'react-redux'
-import aes from '@/services/aes'
+import aes from '~/services/aes'
 import get from 'lodash.get'
-import getWeb3 from '@/get-web3'
-import { contractByName } from '@/saga-genesis/state-finders'
+import getWeb3 from '~/get-web3'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { formatKey } from '@/services/format-key'
-import { BodyClass } from '@/components/BodyClass'
+import { BodyClass } from '~/components/BodyClass'
+import { formatKey } from '~/services/format-key'
 
 import './secret-key.css'
 

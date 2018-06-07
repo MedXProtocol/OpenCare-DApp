@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Alert } from 'react-bootstrap'
-import masterPasswordInvalid from '@/services/master-password-invalid'
-import { BodyClass } from '@/components/BodyClass'
+import { BodyClass } from '~/components/BodyClass'
+import masterPasswordInvalid from '~/services/master-password-invalid'
 import './master-password.css'
 
 export class MasterPassword extends Component {

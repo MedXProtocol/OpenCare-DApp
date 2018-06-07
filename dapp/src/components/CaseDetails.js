@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { downloadJson, downloadImage, getFileUrl } from '../utils/storage-util';
-import { withContractRegistry, withSaga, cacheCallValue } from '@/saga-genesis'
+import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
 import { all } from 'redux-saga/effects'
-import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
+import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
-import { cacheCall, addContract } from '@/saga-genesis/sagas'
-import { contractByName } from '@/saga-genesis/state-finders'
+import { cacheCall, addContract } from '~/saga-genesis/sagas'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state, { caseAddress }) {
   let caseDetailLocationHash = cacheCallValue(state, caseAddress, 'caseDetailLocationHash')

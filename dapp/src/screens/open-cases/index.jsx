@@ -1,19 +1,19 @@
 import React, {
   Component
 } from 'react'
-import MainLayout from '@/layouts/MainLayout.js'
+import MainLayout from '~/layouts/MainLayout.js'
 import {
   Button,
   Table
 } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withSaga, cacheCallValue, withContractRegistry, withSend } from '@/saga-genesis'
-import { cacheCall } from '@/saga-genesis/sagas'
+import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
+import { cacheCall } from '~/saga-genesis/sagas'
 import { CaseRow } from './case-row'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
-import { contractByName } from '@/saga-genesis/state-finders'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')

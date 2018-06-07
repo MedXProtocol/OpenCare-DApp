@@ -5,7 +5,7 @@ import {
   takeWeb3Initialized,
   addContract,
   cacheCall
- } from '@/saga-genesis/sagas'
+ } from '~/saga-genesis/sagas'
 
 import medXTokenContractConfig from '#/MedXToken.json'
 import registryConfig from '#/Registry.json'

@@ -4,11 +4,11 @@ import {
 } from 'redux-saga/effects'
 import {
   contractByName
-} from '@/saga-genesis/state-finders'
+} from '~/saga-genesis/state-finders'
 import {
   addContract,
   cacheCall
-} from '@/saga-genesis/sagas'
+} from '~/saga-genesis/sagas'
 
 function* lookupAndAddContract(web3, name) {
   const Registry = yield select(contractByName, 'Registry')
