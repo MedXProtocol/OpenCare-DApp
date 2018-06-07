@@ -10,7 +10,7 @@ export const SecretKey = ({ secretKey, onContinue }) => {
     <BodyClass isDark={true}>
       <div className='container'>
         <div className='row'>
-          <div className='col-sm-6 col-sm-offset-3'>
+          <div className='col-sm-8 col-sm-offset-2'>
             <h3 className='text-center text-white'>
               This is your <b>Secret Key</b>:
             </h3>
@@ -25,7 +25,7 @@ export const SecretKey = ({ secretKey, onContinue }) => {
                 <li>Don't write it down; we’re going to give you an <b>Emergency Kit</b> that contains it.</li>
               </ol>
 
-              <p className='text-center'>
+              <p className='text-right'>
                 <button className='btn btn-lg btn-primary' onClick={onContinue}>Continue</button>
               </p>
             </div>

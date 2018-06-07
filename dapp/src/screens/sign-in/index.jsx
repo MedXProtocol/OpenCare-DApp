@@ -41,7 +41,7 @@ export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(cl
                 </h3>
                 <div className="form-wrapper">
                   <SignInForm onSubmit={this.onSubmit} hasAccount={!!this.props.account}>
-                    <div className='form-group'>
+                    <div className='form-group text-right'>
                       <input type='submit' value='Sign In' className='btn btn-lg btn-primary' />
                     </div>
                   </SignInForm>

@@ -16,7 +16,9 @@ class NewCase extends Component {
             type="button"
             className="btn btn-lg btn-success"
             onClick={() => this.navigateToNewCaseScree()}>
-            <FontAwesomeIcon icon={faFileMedical} />
+            <FontAwesomeIcon
+              icon={faFileMedical}
+              size='lg' />
             <i className="fa fa-file-medical" aria-hidden="true"></i>
             &nbsp; Start New Case
           </button>

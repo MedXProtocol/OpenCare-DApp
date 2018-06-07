@@ -19,3 +19,9 @@
 .navbar-inverse .navbar-toggle {
   border-color: transparent;
 }
+
+.nav--network-name {
+  @media (max-width: 768px) {
+    display: none;
+  }
+}

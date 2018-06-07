@@ -37,6 +37,10 @@ export class MasterPassword extends Component {
                 Create your <b>Master Password</b>
               </h3>
               <div className="form-wrapper">
+                <p className='text-gray'>
+                  You will use this password to sign in:
+                </p>
+
                 <div className="well" role="alert">
                   <input
                     type="password"
@@ -45,14 +49,12 @@ export class MasterPassword extends Component {
                     className="form-control master-password__input"
                     placeholder="Enter a password" />
                 </div>
+                {error}
+
+                <p className='text-right'>
+                  <input type='submit' className='btn btn-lg btn-primary' value='Continue' />
+                </p>
               </div>
-              {error}
-              <p className='text-center'>
-                You'll use this password to sign in.
-              </p>
-              <p className='text-right'>
-                <input type='submit' className='btn btn-lg btn-primary' value='Continue' />
-              </p>
             </div>
           </form>
         </div>

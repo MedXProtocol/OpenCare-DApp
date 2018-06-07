@@ -125,7 +125,7 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
-        <Nav>
+        <Nav className="nav--network-name">
           <NavItem>
             {networkName}
           </NavItem>

@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
-import { Modal } from 'react-bootstrap'
+import { Alert, Modal } from 'react-bootstrap'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faExclamationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle';
 import PropTypes from 'prop-types'
 
 export class OverrideModal extends Component {
@@ -13,11 +15,18 @@ export class OverrideModal extends Component {
       <Modal show={this.props.show}>
         <Modal.Body>
           <div className="row">
-            <div className="col text-center">
-              <h3 className='warning'>
-                <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                Warning
-              </h3>
+            <div className="col-xs-12 text-center">
+              <Alert bsStyle='warning'>
+                <br />
+                <FontAwesomeIcon
+                  icon={faExclamationTriangle}
+                  size='2x' />
+
+                <h3>
+                  Warning
+                </h3>
+              </Alert>
+
               <p>
                 By entering a new secret key you are about to overwrite an existing secret key for this address.  You will lose access to any cases that have been encrypted using your existing secret key.
               </p>
