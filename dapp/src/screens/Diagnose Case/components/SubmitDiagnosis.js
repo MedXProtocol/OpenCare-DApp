@@ -123,7 +123,7 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
                           Submit Diagnosis
                       </h2>
                   </div>
-                  <div className="card-content">
+                  <div className="card-body">
                       <div className="form-group">
                           <label>Diagnosis<span className='star'>*</span></label>
                           <select onChange={this.updateDiagnosis} className="form-control">
@@ -167,32 +167,32 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
                       <div className="category"><span className='star'>*</span> Required fields</div>
                   </div>
                   <div className="card-footer">
-                      <button disabled={!this.state.canSubmit} type="submit" className="btn btn-fill btn-primary">Submit</button>
+                      <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-primary">Submit</button>
                   </div>
               </form>
               <Modal show={this.state.showConfirmationModal}>
                   <Modal.Body>
                       <div className="row">
-                          <div className="col text-center">
+                          <div className="col-xs-12 text-center">
                               <h4>Are you sure?</h4>
                           </div>
                       </div>
                   </Modal.Body>
                   <Modal.Footer>
-                      <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-defult">Yes</button>
-                      <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-defult">No</button>
+                    <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
+                    <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
                   </Modal.Footer>
               </Modal>
               <Modal show={showThankYou}>
                   <Modal.Body>
                       <div className="row">
-                          <div className="col text-center">
+                          <div className="col-xs-12 text-center">
                               <h4>Thank you! Your diagnosis submitted successfully.</h4>
                           </div>
                       </div>
                   </Modal.Body>
                   <Modal.Footer>
-                    <Link to='/cases/open' className="btn btn-defult">OK</Link>
+                    <Link to='/cases/open' className="btn btn-primary">OK</Link>
                   </Modal.Footer>
               </Modal>
               <Spinner loading={loading} />

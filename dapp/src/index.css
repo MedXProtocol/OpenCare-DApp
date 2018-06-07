@@ -1,8 +1,14 @@
 @import "./assets/sass/bootstrap-overrides";
 @import "./assets/sass/bootstrap-custom";
+@import "./assets/sass/alert";
+@import "./assets/sass/animation";
+@import "./assets/sass/card";
+@import "./assets/sass/form";
+@import "./assets/sass/label";
+@import "./assets/sass/modal";
+@import "./assets/sass/nav-transaction";
 @import "./assets/sass/navbar";
 @import "./assets/sass/star";
-@import "./assets/sass/nav-transactions";
 @import "./assets/sass/style";
-@import "./assets/sass/animations";
+@import "./assets/sass/table";
 @import url(https://fonts.googleapis.com/css?family=Muli:400,300);

@@ -24,7 +24,7 @@ const DiagnoseCase = connect(mapStateToProps)(class _DiagnoseCase extends Compon
       <MainLayout>
         <div className='container'>
           <div className='row'>
-            <div className='col col-sm-8 col-sm-offset-2'>
+            <div className='col col-sm-6 col-sm-offset-3'>
               <div className='text-center'>
                 <h1>
                   Hippocrates Emergency Kit

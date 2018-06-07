@@ -290,7 +290,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                           <ProgressBar
                             active
                             striped
-                            bsStyle="info"
+                            bsStyle="primary"
                             now={this.state.firstImagePercent} />
                         </div>
                       </div>
@@ -311,7 +311,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                           <ProgressBar
                             active
                             striped
-                            bsStyle="info"
+                            bsStyle="primary"
                             now={this.state.secondImagePercent} />
                         </div>
                       </div>
@@ -405,44 +405,44 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                   <div className="form-group">
                     <div className="category"><span className='star'>*</span> Required fields</div>
                   </div>
-                  <button disabled={!this.state.canSubmit} type="submit" className="btn btn-fill btn-primary">Submit</button>
+                  <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-primary">Submit</button>
                 </form>
                 <Modal show={this.state.showBalanceTooLowModal}>
                     <Modal.Body>
-                        <div className="row">
-                            <div className="col text-center">
-                                <h4>You need 15 MEDX to submit a case.</h4>
-                            </div>
+                      <div className="row">
+                        <div className="col-xs-12 text-center">
+                          <h4>You need 15 MEDX to submit a case.</h4>
                         </div>
+                      </div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <button onClick={this.handleCloseBalanceTooLowModal} type="button" className="btn btn-defult">Close</button>
+                      <button onClick={this.handleCloseBalanceTooLowModal} type="button" className="btn btn-primary">Close</button>
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showConfirmSubmissionModal}>
                     <Modal.Body>
                         <div className="row">
-                            <div className="col text-center">
+                            <div className="col-xs-12 text-center">
                                 <h4>Are you sure?</h4>
                                 <h5>This will cost 5-15 MEDX (depending on second opinion option)</h5>
                             </div>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-defult">Yes</button>
-                        <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-defult">No</button>
+                      <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
+                      <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showThankYouModal}>
                     <Modal.Body>
-                        <div className="row">
-                            <div className="col text-center">
-                                <h4>Thank you! Your case submitted successfully.</h4>
-                            </div>
+                      <div className="row">
+                        <div className="col-xs-12 text-center">
+                          <h4>Thank you! Your case submitted successfully.</h4>
                         </div>
+                      </div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-defult">OK</button>
+                      <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
                     </Modal.Footer>
                 </Modal>
                 <Spinner loading={this.state.submitInProgress}/>

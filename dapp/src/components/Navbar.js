@@ -142,7 +142,7 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
         <Modal show={showNetworkModal}>
           <Modal.Body>
             <div className="row">
-              <div className="col text-center">
+              <div className="col-xs-12 text-center">
                 <h4>You must switch to the Ropsten network</h4>
               </div>
             </div>

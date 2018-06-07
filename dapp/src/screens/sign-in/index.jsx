@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import MainLayout from '../../layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
-import { getAccount } from '@/services/get-account'
-import { SignInForm } from '@/components/sign-in-form'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
+import { getAccount } from '@/services/get-account'
+import { SignInForm } from '@/components/sign-in-form'
+import { BodyClass } from '@/components/BodyClass'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
@@ -30,23 +31,32 @@ export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(cl
 
   render () {
     return (
-      <MainLayout>
-        <div className='container'>
-          <div className='row'>
-            <div className='col-sm-8 col-sm-offset-2'>
-              <h1>Sign In</h1>
-              <SignInForm onSubmit={this.onSubmit} hasAccount={!!this.props.account}>
-                <div className='form-group'>
-                  <input type='submit' value='Sign In' className='btn btn-primary' />
+      <BodyClass isDark={true}>
+        <MainLayout>
+          <div className='container'>
+            <div className='row'>
+              <div className='col-sm-6 col-sm-offset-3'>
+                <h3 className='text-white text-center'>
+                  Sign in to <strong>Med</strong>Credits
+                </h3>
+                <div className="form-wrapper">
+                  <SignInForm onSubmit={this.onSubmit} hasAccount={!!this.props.account}>
+                    <div className='form-group'>
+                      <input type='submit' value='Sign In' className='btn btn-lg btn-primary' />
+                    </div>
+                  </SignInForm>
                 </div>
-              </SignInForm>
-              <p>
-                Don't have an account? <Link to='/sign-up'>Sign up</Link>
-              </p>
+
+                <div className="form-wrapper--footer">
+                  <p className='text-center text-white'>
+                    Don't have an account? <Link to='/sign-up'>Sign up</Link>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </MainLayout>
+        </MainLayout>
+      </BodyClass>
     )
   }
 }))
