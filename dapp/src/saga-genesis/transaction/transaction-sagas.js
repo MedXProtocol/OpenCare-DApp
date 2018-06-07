@@ -12,6 +12,20 @@ import {
 } from 'redux-saga'
 import { contractKeyByAddress } from '../state-finders'
 
+function rejectedByUser(error) {
+  // This is the metamask error when a user pressed 'reject', I wrote this
+  // as we will probably have other error messages for different
+  // wallets / browsers / extensions
+  let transactionCancelledStrings = ['User denied transaction signature']
+  let cancelledByUser = false
+
+  for (let errorString of transactionCancelledStrings)
+    if (error.message.search(errorString) > 0)
+      cancelledByUser = true
+
+  return cancelledByUser
+}
+
 function createTransactionEventChannel (web3, transactionId, send, options) {
   return eventChannel(emit => {
     let promiEvent = send(options)
@@ -26,7 +40,11 @@ function createTransactionEventChannel (web3, transactionId, send, options) {
         emit({type: 'TRANSACTION_RECEIPT', transactionId, receipt})
       })
       .on('error', (error) => {
-        emit({type: 'TRANSACTION_ERROR', transactionId, error})
+        if (rejectedByUser(error))
+          emit({ type: 'TRANSACTION_REJECTED_BY_USER', transactionId, error })
+        else
+          emit({ type: 'TRANSACTION_ERROR', transactionId, error })
+
         emit(END)
       })
 

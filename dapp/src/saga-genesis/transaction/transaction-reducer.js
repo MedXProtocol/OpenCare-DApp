@@ -1,3 +1,5 @@
+import update from 'immutability-helper';
+
 export default function (state, {type, transactionId, call, error, receipt}) {
   if (typeof state === 'undefined') {
     state = {}
@@ -46,6 +48,12 @@ export default function (state, {type, transactionId, call, error, receipt}) {
           error
         }
       }
+      break
+
+    case 'TRANSACTION_REJECTED_BY_USER':
+      state = update(state, {
+        $unset: [transactionId]
+      })
       break
   }
 
