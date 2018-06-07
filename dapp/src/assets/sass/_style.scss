@@ -35,6 +35,14 @@ not(.nav) li {
   color: $medcredits-text-gray;
 }
 
+.text-footer {
+  color: $medcredits-text-gray;
+}
+
+.body-inverse .text-footer {
+  color: rgba(138, 141, 156, 0.8);
+}
+
 .blank-state {
   display: grid;
   grid-template-columns: none;
@@ -49,4 +57,14 @@ not(.nav) li {
   grid-area: a;
   align-self: center;
   justify-self: center;
+}
+
+.secret-key__key {
+  font-size: 2.4rem;
+  text-align: center;
+  font-weight: bold;
+
+  @media (max-width: 768px) {
+    font-size: 17px;
+  }
 }

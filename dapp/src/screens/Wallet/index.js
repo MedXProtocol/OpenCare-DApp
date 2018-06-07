@@ -3,6 +3,8 @@ import MainLayout from '../../layouts/MainLayout'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faPlus from '@fortawesome/fontawesome-free-solid/faPlus';
 import { cacheCall } from '~/saga-genesis/sagas'
 import { withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
@@ -27,25 +29,30 @@ const Wallet = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account
   render() {
     return (
       <MainLayout>
-        <div className="container text-center">
+        <div className="container">
           <div className="row">
             <div className="col-sm-6 col-sm-offset-3">
               <div className="card">
                 <div className="card-header">
                   <h4 className="card-title">
-                    Your Balance: {this.props.balance} MEDX
+                    <FontAwesomeIcon
+                      icon={faPlus} />
+                    &nbsp; Your Balance: {this.props.balance} MEDX
                   </h4>
                 </div>
                 <div className="card-body">
-                  <p className='lead'>
-                    For account:
-                    <br /><small>{this.props.account}</small>
-                  </p>
-                  <p>
-                    <Link to='/mint' className="btn btn-primary btn-lg">
-                      Buy MEDX
-                    </Link>
-                  </p>
+                  <div className="form-wrapper">
+                    <p className='lead'>
+                      For account:
+                      <br /><small className="text-gray">{this.props.account}</small>
+                    </p>
+
+                    <div className="text-right">
+                      <Link to='/mint' className="btn btn-primary btn-lg">
+                        Buy MEDX
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

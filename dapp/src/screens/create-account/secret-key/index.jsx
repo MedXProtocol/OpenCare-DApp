@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom'
 import { BodyClass } from '~/components/BodyClass'
 import { formatKey } from '~/services/format-key'
 
-import './secret-key.css'
-
 export const SecretKey = ({ secretKey, onContinue }) => {
   return (
     <BodyClass isDark={true}>
@@ -14,7 +12,7 @@ export const SecretKey = ({ secretKey, onContinue }) => {
             <h3 className='text-center text-white'>
               This is your <b>Secret Key</b>:
             </h3>
-            <div className="form-wrapper">
+            <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
               <div className="well" role="alert">
                 <div className='secret-key__key'>
                   {formatKey(secretKey)}

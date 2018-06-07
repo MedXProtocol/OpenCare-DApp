@@ -1,9 +1,15 @@
 .form-wrapper {
   border-radius: 3px;
+  padding: 3rem;
+}
+
+.form-wrapper--inverse {
   box-shadow: 4px 4px 8px 0 rgba(0, 0, 0, 0.4);
   background: white;
+}
+
+.form-wrapper--account {
   margin-top: 30px;
-  padding: 30px;
 }
 
 .form-wrapper--footer {
@@ -35,3 +41,7 @@
   padding: 15px 20px;
 }
 
+.btn-sm {
+  font-size: 12px;
+  padding: 7px 12px;
+}

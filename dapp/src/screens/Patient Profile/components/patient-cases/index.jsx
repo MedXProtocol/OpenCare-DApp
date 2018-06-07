@@ -72,7 +72,7 @@ const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchTo
                 <div className="alert alert-info text-center">
                   <span>You do not have any historical or pending cases.</span>
                 </div> :
-                <table className="table">
+                <table className="table table-striped">
                   <thead>
                     <tr>
                       <th className="text-center">#</th>

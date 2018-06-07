@@ -164,7 +164,6 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
                           <label>Recommendation<span className='star'>*</span></label>
                           <textarea onChange={this.updateRecommendation} className="form-control" rows="5" required />
                       </div>
-                      <div className="category"><span className='star'>*</span> Required fields</div>
                   </div>
                   <div className="card-footer">
                       <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-primary">Submit</button>

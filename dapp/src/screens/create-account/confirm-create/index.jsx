@@ -23,7 +23,7 @@ export const ConfirmCreate = connect(mapStateToProps)(({ onConfirm, masterPasswo
       <div className='container'>
         <div className='row'>
           <div className='col-sm-6 col-sm-offset-3 text-center'>
-            <div className="form-wrapper">
+            <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
               <h3>
                 You're almost ready!
               </h3>

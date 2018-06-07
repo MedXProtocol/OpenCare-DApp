@@ -8,11 +8,13 @@ import {
   NavDropdown,
   MenuItem
 } from 'react-bootstrap'
+import {
+  IndexLinkContainer,
+  LinkContainer
+} from 'react-router-bootstrap'
 import { withRouter, Link } from 'react-router-dom'
-import { LinkContainer } from 'react-router-bootstrap'
 import PropTypes from 'prop-types'
 import logo from '../assets/img/logo.png'
-import './Navbar.css'
 import get from 'lodash.get'
 import networkIdToName from '~/utils/network-id-to-name'
 import { connect } from 'react-redux'
@@ -79,11 +81,11 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
         </NavDropdown>
 
       var myCasesItem =
-        <LinkContainer to='/'>
+        <IndexLinkContainer to='/'  activeClassName="active">
           <NavItem href='/'>
             My Cases
           </NavItem>
-        </LinkContainer>
+        </IndexLinkContainer>
 
       if (isDoctor) {
         var openCasesItem =

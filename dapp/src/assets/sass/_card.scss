@@ -22,7 +22,7 @@ $card-columns-margin:               $card-spacer-y;
 //
 
 .card {
-  box-shadow: 2px 3px 4px 0 rgba(50, 70, 100, 0.05);
+  box-shadow: 2px 3px 4px 0 rgba(50, 70, 100, 0.02);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -56,7 +56,11 @@ $card-columns-margin:               $card-spacer-y;
   // Enable `flex-grow: 1` for decks and groups so that card blocks take up
   // as much space as possible, ensuring footers are aligned to the bottom.
   flex: 1 1 auto;
-  padding: $card-spacer-x;
+  padding: 2rem;
+}
+
+.card-body > .form-wrapper {
+  padding: 1rem;
 }
 
 .card-title {

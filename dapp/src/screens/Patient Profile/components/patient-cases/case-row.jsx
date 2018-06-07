@@ -5,6 +5,8 @@ import { Modal } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { caseStatusToName } from '~/utils/case-status-to-name'
 import get from 'lodash.get'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
 import dispatch from '~/dispatch'
 import bytesToHex from '~/utils/bytes-to-hex'
 import { signedInSecretKey } from '~/services/sign-in'
@@ -87,7 +89,14 @@ export const CaseRow = withContractRegistry(withSend(class _CaseRow extends Comp
 
     const status = +(this.props.status || '0')
     if (status === 3 || status === 8) {
-      var approvalButton = <button className='btn btn-primary' onClick={this.onApprove}>Approve</button>
+      var approvalButton = (
+        <button className='btn btn-sm btn-primary' onClick={this.onApprove}>
+          <FontAwesomeIcon
+            icon={faCheck}
+            size='lg' />
+          &nbsp; Approve
+        </button>
+      )
     }
 
     var modal =
