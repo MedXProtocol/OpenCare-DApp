@@ -1,4 +1,4 @@
-import { deriveKey } from '@/utils/derive-key'
+import { deriveKey } from '~/utils/derive-key'
 import { genKey } from './gen-key'
 import aes from './aes'
 

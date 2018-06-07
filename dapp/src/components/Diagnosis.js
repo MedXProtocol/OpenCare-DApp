@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import { Modal } from 'react-bootstrap'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import Spinner from '@/components/Spinner'
-import { downloadJson } from '@/utils/storage-util'
-import { withSaga, cacheCall, cacheCallValue, withSend } from '@/saga-genesis'
+import Spinner from '~/components/Spinner'
+import { downloadJson } from '~/utils/storage-util'
+import { withSaga, cacheCall, cacheCallValue, withSend } from '~/saga-genesis'
 import { connect } from 'react-redux'
-import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
+import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const status = cacheCallValue(state, caseAddress, 'status')

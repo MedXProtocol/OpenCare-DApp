@@ -6,20 +6,20 @@ import {
   Radio,
   ProgressBar
 } from 'react-bootstrap';
-import { genKey } from '@/services/gen-key'
+import { genKey } from '~/services/gen-key'
 import { withRouter } from 'react-router-dom';
 import classNames from 'classnames';
 import Spinner from '../../../components/Spinner';
 import { isNotEmptyString } from '../../../utils/common-util';
 import { uploadJson, uploadFile } from '../../../utils/storage-util';
-import { signedInSecretKey } from '@/services/sign-in'
-import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '@/saga-genesis'
-import hashToHex from '@/utils/hash-to-hex'
+import { signedInSecretKey } from '~/services/sign-in'
+import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
+import hashToHex from '~/utils/hash-to-hex'
 import { connect } from 'react-redux'
-import aes from '@/services/aes'
+import aes from '~/services/aes'
 import get from 'lodash.get'
-import getWeb3 from '@/get-web3'
-import { contractByName } from '@/saga-genesis/state-finders'
+import getWeb3 from '~/get-web3'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -263,192 +263,213 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
       )
 
         return (
-            <div>
-              <form onSubmit={this.handleSubmit} >
-                <div className="row">
-                  <div className="col-xs-12 col-md-6">
-                    <h3>
-                      Submit New Case
-                    </h3>
-                    <p className="lead">
-                      <small>Provide the Doctor with details about your problem. This will be encrypted so only you and your physician(s) will be able to read it.</small>
-                    </p>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-xs-12 col-sm-12 col-md-6">
-                    <div className="form-group form-group--image-upload">
-                      <label>Overview Photo<span className='star'>*</span></label>
-                      <div>
-                        <label className="btn btn-primary">
-                          Browse... <input onChange={this.captureFirstImage} type="file" accept='image/*' className="form-control" style={{display: 'none'}} required/>
-                        </label>
-                        <span>
-                          {this.state.firstFileName}
-                        </span>
-                        <div className={firstProgressClassNames}>
-                          <ProgressBar
-                            active
-                            striped
-                            bsStyle="primary"
-                            now={this.state.firstImagePercent} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-xs-12 col-sm-12 col-md-6">
-                    <div className="form-group">
-                      <label>Close-up Photo<span className='star'>*</span></label>
-                      <div>
-                        <label className="btn btn-primary">
-                            Browse... <input onChange={this.captureSecondImage} type="file" accept='image/*' className="form-control" style={{display: 'none'}} required/>
-                        </label>
-                        <span>
-                            {this.state.secondFileName}
-                        </span>
-                        <div className={secondProgressClassNames}>
-                          <ProgressBar
-                            active
-                            striped
-                            bsStyle="primary"
-                            now={this.state.secondImagePercent} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                  <div className="row">
-                    <div className="col-lg-6 col-md-6">
-                      <FormGroup>
-                        <p>
-                         <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
-                        </p>
-                        <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Days" required>
-                          Days
-                        </Radio>{' '}
-                        <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Weeks" required>
-                          Weeks
-                        </Radio>{' '}
-                        <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Months" required>
-                          Months
-                        </Radio>{' '}
-                        <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Years" required>
-                          Years
-                        </Radio>
-                      </FormGroup>
-                    </div>
-                    <div className="col-lg-6 col-md-6">
-                      <FormGroup>
-                        <p>
-                          <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
-                        </p>
-                        <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Growing" required>
-                          Growing
-                        </Radio>{' '}
-                        <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Shrinking" required>
-                          Shrinking
-                        </Radio>{' '}
-                        <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Same size" required>
-                          Same size
-                        </Radio>
-                      </FormGroup>
-                    </div>
-                  </div>
-
-                  <div className="row">
-                    <div className="col-lg-6 col-md-6">
-                      <FormGroup>
-                      <p>
-                        <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
-                       </p>
-                       <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="Yes" required>
-                         Yes
-                       </Radio>{' '}
-                       <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="No" required>
-                         No
-                       </Radio>
-                     </FormGroup>
-                    </div>
-                    <div className="col-lg-6 col-md-6">
-                      <FormGroup>
-                        <p>
-                          <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
-                        </p>
-                        <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="Yes" required>
-                          Yes
-                        </Radio>{' '}
-                        <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="No" required>
-                          No
-                        </Radio>
-                      </FormGroup>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
+          <div>
+            <div className="row">
+              <div className="col-xs-12">
+                <div className="card">
+                  <div className="card-header">
                     <div className="row">
-                      <div className="col-lg-2 col-md-2 col-sm-3 col-xs-5">
-                        <label>Age<span className='star'>*</span></label>
-                        <input onChange={this.updateAge} type="text" className="form-control" required />
+                      <div className="col-xs-12 col-md-6">
+                        <h2 className="card-title">
+                          Submit New Case
+                        </h2>
+                        <p className="lead">
+                          <small>Provide the Doctor with details about your problem. This will be encrypted so only you and your physician(s) will be able to read it.</small>
+                        </p>
                       </div>
                     </div>
                   </div>
-                  <div className="form-group">
-                      <label>Country<span className='star'>*</span></label>
-                      <input onChange={this.updateCountry} type="text" className="form-control" required />
-                  </div>
-                  <div className="form-group">
-                      <label>Please include any additional comments below</label>
-                      <textarea onChange={this.updateDescription} className="form-control" rows="5" />
-                  </div>
-                  <div className="form-group">
-                    <div className="category"><span className='star'>*</span> Required fields</div>
-                  </div>
-                  <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-primary">Submit</button>
-                </form>
-                <Modal show={this.state.showBalanceTooLowModal}>
-                    <Modal.Body>
-                      <div className="row">
-                        <div className="col-xs-12 text-center">
-                          <h4>You need 15 MEDX to submit a case.</h4>
-                        </div>
-                      </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                      <button onClick={this.handleCloseBalanceTooLowModal} type="button" className="btn btn-primary">Close</button>
-                    </Modal.Footer>
-                </Modal>
-                <Modal show={this.state.showConfirmSubmissionModal}>
-                    <Modal.Body>
+
+                  <div className="card-body">
+                    <div className="form-wrapper">
+                      <form onSubmit={this.handleSubmit} >
                         <div className="row">
-                            <div className="col-xs-12 text-center">
-                                <h4>Are you sure?</h4>
-                                <h5>This will cost 5-15 MEDX (depending on second opinion option)</h5>
+                          <div className="col-xs-12 col-sm-12 col-md-6">
+                            <div className="form-group form-group--image-upload">
+                              <label>Overview Photo<span className='star'>*</span></label>
+                              <div>
+                                <label className="btn btn-sm btn-primary">
+                                  Browse... <input onChange={this.captureFirstImage} type="file" accept='image/*' className="form-control" style={{display: 'none'}} required/>
+                                </label>
+                                <span>
+                                  {this.state.firstFileName}
+                                </span>
+                                <div className={firstProgressClassNames}>
+                                  <ProgressBar
+                                    active
+                                    striped
+                                    bsStyle="success"
+                                    now={this.state.firstImagePercent} />
+                                </div>
+                              </div>
                             </div>
+                          </div>
+
+                          <div className="col-xs-12 col-sm-12 col-md-6">
+                            <div className="form-group">
+                              <label>Close-up Photo<span className='star'>*</span></label>
+                              <div>
+                                <label className="btn btn-primary">
+                                    Browse... <input onChange={this.captureSecondImage} type="file" accept='image/*' className="form-control" style={{display: 'none'}} required/>
+                                </label>
+                                <span>
+                                    {this.state.secondFileName}
+                                </span>
+                                <div className={secondProgressClassNames}>
+                                  <ProgressBar
+                                    active
+                                    striped
+                                    bsStyle="success"
+                                    now={this.state.secondImagePercent} />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                      <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
-                      <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
-                    </Modal.Footer>
-                </Modal>
-                <Modal show={this.state.showThankYouModal}>
-                    <Modal.Body>
-                      <div className="row">
-                        <div className="col-xs-12 text-center">
-                          <h4>Thank you! Your case submitted successfully.</h4>
-                        </div>
+
+                          <div className="row">
+                            <div className="col-lg-6 col-md-6">
+                              <FormGroup>
+                                <p>
+                                 <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
+                                </p>
+                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Days" required>
+                                  Days
+                                </Radio>{' '}
+                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Weeks" required>
+                                  Weeks
+                                </Radio>{' '}
+                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Months" required>
+                                  Months
+                                </Radio>{' '}
+                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Years" required>
+                                  Years
+                                </Radio>
+                              </FormGroup>
+                            </div>
+                            <div className="col-lg-6 col-md-6">
+                              <FormGroup>
+                                <p>
+                                  <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
+                                </p>
+                                <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Growing" required>
+                                  Growing
+                                </Radio>{' '}
+                                <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Shrinking" required>
+                                  Shrinking
+                                </Radio>{' '}
+                                <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Same size" required>
+                                  Same size
+                                </Radio>
+                              </FormGroup>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-lg-6 col-md-6">
+                              <FormGroup>
+                              <p>
+                                <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
+                               </p>
+                               <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="Yes" required>
+                                 Yes
+                               </Radio>{' '}
+                               <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="No" required>
+                                 No
+                               </Radio>
+                             </FormGroup>
+                            </div>
+                            <div className="col-lg-6 col-md-6">
+                              <FormGroup>
+                                <p>
+                                  <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
+                                </p>
+                                <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="Yes" required>
+                                  Yes
+                                </Radio>{' '}
+                                <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="No" required>
+                                  No
+                                </Radio>
+                              </FormGroup>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-xs-5 col-sm-4 col-md-2">
+                              <div className="form-group">
+                                <label>Age<span className='star'>*</span></label>
+                                <input onChange={this.updateAge} type="text" className="form-control" required />
+                              </div>
+                            </div>
+                            <div className="col-xs-12 col-sm-8 col-md-4">
+                              <div className="form-group">
+                                <label>Country<span className='star'>*</span></label>
+                                <input onChange={this.updateCountry} type="text" className="form-control" required />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
+                              <div className="form-group">
+                                <label>Please include any additional comments below</label>
+                                <textarea onChange={this.updateDescription} className="form-control" rows="5" />
+                              </div>
+                            </div>
+                          </div>
+
+                          <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
+                        </form>
                       </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                      <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
-                    </Modal.Footer>
-                </Modal>
-                <Spinner loading={this.state.submitInProgress}/>
-            </div>
-        );
-    }
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+                    <Modal show={this.state.showBalanceTooLowModal}>
+                        <Modal.Body>
+                          <div className="row">
+                            <div className="col-xs-12 text-center">
+                              <h4>You need 15 MEDX to submit a case.</h4>
+                            </div>
+                          </div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                          <button onClick={this.handleCloseBalanceTooLowModal} type="button" className="btn btn-primary">Close</button>
+                        </Modal.Footer>
+                    </Modal>
+                    <Modal show={this.state.showConfirmSubmissionModal}>
+                        <Modal.Body>
+                            <div className="row">
+                                <div className="col-xs-12 text-center">
+                                    <h4>Are you sure?</h4>
+                                    <h5>This will cost 5-15 MEDX (depending on second opinion option)</h5>
+                                </div>
+                            </div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                          <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
+                          <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
+                        </Modal.Footer>
+                    </Modal>
+                    <Modal show={this.state.showThankYouModal}>
+                        <Modal.Body>
+                          <div className="row">
+                            <div className="col-xs-12 text-center">
+                              <h4>Thank you! Your case submitted successfully.</h4>
+                            </div>
+                          </div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                          <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-link">Close</button>
+                          <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-success">Great!</button>
+                        </Modal.Footer>
+                    </Modal>
+                    <Spinner loading={this.state.submitInProgress}/>
+      </div>
+    );
+  }
 }))))
 
 export default withRouter(CreateCase);

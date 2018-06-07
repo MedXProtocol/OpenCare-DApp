@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import Spinner from '../../../components/Spinner'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
-import { withContractRegistry, withSend } from '@/saga-genesis'
-import { contractByName } from '@/saga-genesis/state-finders'
+import { withContractRegistry, withSend } from '~/saga-genesis'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 
 function mapStateToProps(state) {
@@ -55,26 +55,36 @@ const RegisterDoctor = withContractRegistry(connect(mapStateToProps)(withSend(cl
 
     render() {
         return (
-          <div className='container'>
-            <div className='row'>
-              <div className='col-sm-12'>
-                <form onSubmit={this.handleSubmit}>
-                  <div>
-                    <h1>Register Doctor</h1>
+          <div className="container">
+            <div className="row">
+              <div className="col-sm-6 col-sm-offset-3">
+                <div className="card">
+                  <div className="card-header">
+                    <h4 className="card-title">
+                      Register a new Doctor
+                    </h4>
                   </div>
-                  <div className="form-group">
-                      <label htmlFor="hash">Account Address</label>
-                      <input
-                          className="form-control"
-                          id="hash"
-                          value={this.state.address}
-                          onChange={this.updateAddress}
-                          required
-                      />
+                  <div className="card-body">
+                    <div className="form-wrapper">
+                      <form onSubmit={this.handleSubmit}>
+                        <div className="form-group">
+                          <label htmlFor="hash">Account Address</label>
+                          <input
+                            className="form-control"
+                            id="hash"
+                            value={this.state.address}
+                            onChange={this.updateAddress}
+                            required
+                          />
+                        </div>
+                        <div className="text-right">
+                          <button type="submit" className="btn btn-success btn-default" disabled={this.state.submitInProgress}>Register</button>
+                        </div>
+                      </form>
+                    </div>
+                    <Spinner loading={this.state.submitInProgress}/>
                   </div>
-                  <button type="submit" className="btn btn-default" disabled={this.state.submitInProgress}>Register</button>
-                </form>
-                <Spinner loading={this.state.submitInProgress}/>
+                </div>
               </div>
             </div>
           </div>

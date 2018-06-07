@@ -8,19 +8,21 @@ import {
   NavDropdown,
   MenuItem
 } from 'react-bootstrap'
+import {
+  IndexLinkContainer,
+  LinkContainer
+} from 'react-router-bootstrap'
 import { withRouter, Link } from 'react-router-dom'
-import { LinkContainer } from 'react-router-bootstrap'
 import PropTypes from 'prop-types'
 import logo from '../assets/img/logo.png'
-import './Navbar.css'
 import get from 'lodash.get'
-import networkIdToName from '@/utils/network-id-to-name'
+import networkIdToName from '~/utils/network-id-to-name'
 import { connect } from 'react-redux'
-import { cacheCall } from '@/saga-genesis/sagas'
-import { withContractRegistry, withSaga } from '@/saga-genesis/components'
-import { cacheCallValue, contractByName } from '@/saga-genesis/state-finders'
+import { cacheCall } from '~/saga-genesis/sagas'
+import { withContractRegistry, withSaga } from '~/saga-genesis/components'
+import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 
-import { CurrentTransactionsList } from '@/components/CurrentTransactionsList'
+import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -79,11 +81,11 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
         </NavDropdown>
 
       var myCasesItem =
-        <LinkContainer to='/'>
+        <IndexLinkContainer to='/'  activeClassName="active">
           <NavItem href='/'>
             My Cases
           </NavItem>
-        </LinkContainer>
+        </IndexLinkContainer>
 
       if (isDoctor) {
         var openCasesItem =
@@ -125,7 +127,7 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
-        <Nav>
+        <Nav className="nav--network-name">
           <NavItem>
             {networkName}
           </NavItem>

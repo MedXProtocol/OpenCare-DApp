@@ -1,28 +1,29 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import './NewCase.css';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faFileMedical from '@fortawesome/fontawesome-free-solid/faFileMedical';
 
 class NewCase extends Component {
-    navigateToNewCaseScree = () => {
-        this.props.history.push('/new-case');
-    }
+  navigateToNewCaseScree = () => {
+    this.props.history.push('/new-case');
+  }
 
-    render() {
-        return (
-            <div className="card card-new-case">
-                <div className="card-body">
-                    <div className="row">
-                        <div className="col-md-12 text-center">
-                            <button
-                                type="button"
-                                className="btn btn-primary btn-new-case"
-                                onClick={() => this.navigateToNewCaseScree()}>
-                                Start New Case
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  render() {
+    return (
+      <div className="card">
+        <div className="card-body text-right">
+          <button
+            type="button"
+            className="btn btn-lg btn-success"
+            onClick={() => this.navigateToNewCaseScree()}>
+            <FontAwesomeIcon
+              icon={faFileMedical}
+              size='lg' />
+            <i className="fa fa-file-medical" aria-hidden="true"></i>
+            &nbsp; Start New Case
+          </button>
+        </div>
+      </div>
     );
   }
 }

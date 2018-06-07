@@ -30,13 +30,13 @@ const App = class extends Component {
           <Route path='/try-metamask' component={TryMetamask} />
           <Route path='/sign-in' component={ SignIn } />
           <Route path='/sign-up' component={ CreateAccount } />
-          <Route path='/new-case' component={ NewCase }/>
+          <Route exact path='/new-case' component={ NewCase }/>
           <Route path='/patient-case/:caseAddress' component={ PatientCase }/>
           <Route path='/diagnose-case/:caseAddress' component={ DiagnoseCase }/>
           <Route path='/doctors' component={ AddDoctor }/>
           <Route path='/mint' component={ Mint }/>
           <Route path='/wallet' component={ Wallet }/>
-          <Route path='/cases/open' component={ OpenCases } />
+          <Route exact path='/cases/open' component={ OpenCases } />
           <Route exact path='/' component={ PatientProfile }/>
           <Route path='/' component={FourOhFour} />
         </Switch>

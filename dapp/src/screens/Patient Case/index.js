@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import CaseStatus from './components/CaseStatus';
 import CaseDetails from '../../components/CaseDetails';
-import Diagnosis from '@/components/Diagnosis';
-import ChallengedDiagnosis from '@/components/ChallengedDiagnosis';
-import { signedInSecretKey } from '@/services/sign-in'
-import aes from '@/services/aes'
-import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
-import { cacheCall, addContract } from '@/saga-genesis/sagas'
-import bytesToHex from '@/utils/bytes-to-hex'
-import { getFileHashFromBytes } from '@/utils/get-file-hash-from-bytes'
+import Diagnosis from '~/components/Diagnosis';
+import ChallengedDiagnosis from '~/components/ChallengedDiagnosis';
+import { signedInSecretKey } from '~/services/sign-in'
+import aes from '~/services/aes'
+import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
+import { cacheCall, addContract } from '~/saga-genesis/sagas'
+import bytesToHex from '~/utils/bytes-to-hex'
+import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
 
 function mapStateToProps(state, { match }) {

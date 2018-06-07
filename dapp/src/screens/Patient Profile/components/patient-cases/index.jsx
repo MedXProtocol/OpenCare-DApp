@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import './PatientCases.css'
-import { withSaga, withContractRegistry, cacheCallValue } from '@/saga-genesis'
-import { cacheCall } from '@/saga-genesis/sagas'
+import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
+import { cacheCall } from '~/saga-genesis/sagas'
 import { CaseRow, caseRowSaga, mapStateToCaseRowProps } from './case-row'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { fork } from 'redux-saga/effects'
-import { contractByName } from '@/saga-genesis/state-finders'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state, { accounts }) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -72,7 +72,7 @@ const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchTo
                 <div className="alert alert-info text-center">
                   <span>You do not have any historical or pending cases.</span>
                 </div> :
-                <table className="table">
+                <table className="table table-striped">
                   <thead>
                     <tr>
                       <th className="text-center">#</th>

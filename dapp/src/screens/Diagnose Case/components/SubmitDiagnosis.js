@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import Spinner from '@/components/Spinner'
-import { isNotEmptyString } from '@/utils/common-util'
-import hashToHex from '@/utils/hash-to-hex'
-import { uploadJson, downloadJson } from '@/utils/storage-util'
-import isBlank from '@/utils/is-blank'
+import Spinner from '~/components/Spinner'
+import { isNotEmptyString } from '~/utils/common-util'
+import hashToHex from '~/utils/hash-to-hex'
+import { uploadJson, downloadJson } from '~/utils/storage-util'
+import isBlank from '~/utils/is-blank'
 import { connect } from 'react-redux'
-import { withSend } from '@/saga-genesis'
+import { withSend } from '~/saga-genesis'
 
 function mapStateToProps (state, ownProps) {
   return {
@@ -164,7 +164,6 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
                           <label>Recommendation<span className='star'>*</span></label>
                           <textarea onChange={this.updateRecommendation} className="form-control" rows="5" required />
                       </div>
-                      <div className="category"><span className='star'>*</span> Required fields</div>
                   </div>
                   <div className="card-footer">
                       <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-primary">Submit</button>
