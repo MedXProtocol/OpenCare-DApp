@@ -14,13 +14,13 @@ module.exports = {
       network_id: 1234
     },
     ropsten: {
-      provider: ropstenProvider,
+      provider: () => ropstenProvider,
       network_id: 3,
       gas: 4683623,
       gasPrice: 20 * 1000000000
     },
     rinkeby: {
-      provider: rinkebyProvider,
+      provider: () => rinkebyProvider,
       network_id: 4,
       gas: 4683623,
       gasPrice: 20 * 1000000000
