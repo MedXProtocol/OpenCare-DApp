@@ -105,10 +105,12 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
     }
 
     var networkName = `${networkIdToName(this.props.networkId)} Network`
-    if (process.env.NODE_ENV === 'production') {
-      if (this.props.networkId !== 3) {
-        var showNetworkModal = true
-      }
+    const requiredNetworkId = process.env.REACT_APP_REQUIRED_NETWORK_ID
+
+    if (requiredNetworkId &&
+        this.props.networkId !== parseInt(requiredNetworkId)) {
+      var requiredNetworkName = networkIdToName(parseInt(requiredNetworkId))
+      var showNetworkModal = true
     }
 
     let navbarClassName = classnames('navbar', { 'navbar-transparent': this.props.transparent, 'navbar-absolute': this.props.transparent, 'navbar-default': !this.props.transparent})
@@ -145,7 +147,7 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>You must switch to the Ropsten network</h4>
+                <h4>You must switch to the {requiredNetworkName} network</h4>
               </div>
             </div>
           </Modal.Body>

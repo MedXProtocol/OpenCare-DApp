@@ -5,7 +5,9 @@
     "start": "./scripts/ganache.sh",
     "test": "truffle test",
     "test-watch": "./scripts/watch-tests.sh",
-    "netlify-build": "./scripts/netlify-build.sh",
+    "netlify-build": "./scripts/staging-build.sh",
+    "staging-build": "./scripts/staging-build.sh",
+    "production-build": "./scripts/production-build.sh",
     "migrate": "truffle-migrate-off-chain",
     "migrate-reset": "truffle-migrate-off-chain --reset"
   },
