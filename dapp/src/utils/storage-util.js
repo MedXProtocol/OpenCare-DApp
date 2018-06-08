@@ -2,13 +2,15 @@ import IpfsApi from 'ipfs-api';
 import {promisify} from './common-util';
 import aes from '~/services/aes'
 
-const ipfsApi = IpfsApi('ipfs.infura.io', '5001', {protocol: 'https'});
+const ipfsApi = IpfsApi(process.env.IPFS_HOSTNAME, '5001', {protocol: 'http'})
 
 export async function uploadJson(rawJson, encryptionKey) {
     const buffer = Buffer.from(rawJson);
     const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
     const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb));
-    return uploadResult[0].hash;
+    const hash = uploadResult[0].hash;
+    await promisify(cb => ipfsApi.pin.add(hash, cb))
+    return hash
 }
 
 export async function uploadFile(file, encryptionKey, progressHandler) {
@@ -21,7 +23,9 @@ export async function uploadFile(file, encryptionKey, progressHandler) {
     progressHandler(67)
     const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb));
     progressHandler(100)
-    return uploadResult[0].hash;
+    const hash = uploadResult[0].hash
+    await promisify(cb => ipfsApi.pin.add(hash, cb))
+    return hash
 }
 
 export async function downloadJson(hash, encryptionKey) {
@@ -61,15 +65,3 @@ function promisifyFileReader(fileReader, file){
         fileReader.readAsArrayBuffer(file);
     });
 }
-
-// export async function uploadJson(rawJson) {
-//     const { web3 } = window;
-
-//     return await promisify(cb => web3.bzz.upload(rawJson, cb));
-// }
-
-// export async function downloadJson(hash) {
-//     const { web3 } = window;
-
-//     return await promisify(cb => web3.bzz.download(hash, cb));
-// }
