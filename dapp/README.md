@@ -1,15 +1,15 @@
 # Setup
 
-  $ npm install
+`$ npm install`
 
 # Running Webpack Dev server
 
-  $ npm start
+`$ npm start`
 
 # Testing app
 
-  $ npm test
+`$ npm test`
 
 # Building app
 
-  $ npm run build
+`$ npm run build`
