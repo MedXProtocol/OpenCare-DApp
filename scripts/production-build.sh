@@ -1,6 +1,5 @@
 #! /bin/sh
 
-DIR=`dirname "$0"`
-
-$DIR/default-build.sh && \
-npm run migrate -- --network rinkeby
+truffle compile && \
+npm run migrate -- --network rinkeby && \
+cd dapp && npm install && npm run build && cd ..

@@ -3,55 +3,55 @@
   "contracts": [
     {
       "contractName": "Migrations",
-      "address": "0x735d72c6a18281337113ec1fc8b604c14403ee58"
+      "address": "0x0ecd6beaac121e0c05b96dc12338d6ece1641f74"
     },
     {
       "contractName": "Registry",
-      "address": "0x05aa57f47151f24493c2b03967db710d3a673d62"
+      "address": "0x9cf778a73db438629bf970794b41a1d4e39d6b71"
     },
     {
       "contractName": "MedXToken",
-      "address": "0x4c2805ecc232df62aae233da9f4508c835164407"
+      "address": "0x0630b1932ef025ad857d67b2bcc0c2812257c0f2"
     },
     {
       "contractName": "AccountManager",
-      "address": "0x8658d88ff62e932a7fb36c1389fbfc96c9420a66"
+      "address": "0x1631671d78816a874770c36cbe66483afb3aceb1"
     },
     {
       "contractName": "Delegate",
-      "address": "0x5ef9f9047fff3a4a5fcbd3882bf41bc5c724d315"
+      "address": "0x0a703ef935fc196779c6946f1acba4b6905ad83a"
     },
     {
       "contractName": "SkipList",
-      "address": "0x5128f1162b8e2715f94a2c58a0be5b3de5bfa2b4"
+      "address": "0x6b9cc371daed07654fe1744bbd7fc3fe690ac7f7"
     },
     {
       "contractName": "CaseManager",
-      "address": "0x7cfaa0af966ee5be2446cb08d6211003124f31cd"
+      "address": "0x382bef160d1561b190898b62b9b2f2a194742a2b"
     },
     {
       "contractName": "Delegate",
-      "address": "0x1b4d7a5f920b2dcf798969ac4bef948753066051"
+      "address": "0xaa25c12c8081ac192be10a764f69335e6cb132f6"
     },
     {
       "contractName": "Case",
-      "address": "0x7bbb06e58d07d2154b557f8baf0d0437d114ee21"
+      "address": "0x98037e5ea2919d1af1b368f25e24f5020a98ce60"
     },
     {
       "contractName": "DoctorManager",
-      "address": "0x12654521e217e85780a8eb92c013add6e37df0a7"
+      "address": "0xe5f952b3c0d2cc7cc14ac6b759345fa6d2c49f92"
     },
     {
       "contractName": "Delegate",
-      "address": "0xc6088b96d6f1499aaa226bbfded93d96a8f8866f"
+      "address": "0xac0aeedeff3a10478c4101de138b7b91a2daf9a5"
     },
     {
       "contractName": "CaseManager",
-      "address": "0x4c871282553cf355d63a2ebbaadcd32bf4b1128e"
+      "address": "0xef47ecd8977d86666c7c3d6aeacdef87e206082c"
     },
     {
       "contractName": "Delegate",
-      "address": "0x886189fe76d6c6f319104c1719c702522cf0f8f6"
+      "address": "0x34ffdf2aa0fd719356cbefd8588c6c89736a08ee"
     }
   ]
 }

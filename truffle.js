@@ -1,10 +1,10 @@
-require('babel-register');
-require('babel-polyfill');
+require('babel-register')
+require('babel-polyfill')
 
-var HDWalletProvider = require("truffle-hdwallet-provider");
+var HDWalletProvider = require("truffle-hdwallet-provider")
 
-var ropstenProvider = new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.ROPSTEN_PROVIDER_URL);
-var rinkebyProvider = new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.ROPSTEN_PROVIDER_URL);
+var ropstenProvider = new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.ROPSTEN_PROVIDER_URL)
+var rinkebyProvider = new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.RINKEBY_PROVIDER_URL)
 
 module.exports = {
   networks: {
@@ -25,13 +25,5 @@ module.exports = {
       gas: 4683623,
       gasPrice: 20 * 1000000000
     }
-    // mainnet: {
-    //     provider: function() {
-    //         return new HDWalletProvider(process.env.MAINNET_MNEMONIC, "https://mainnet.infura.io/" + process.env.INFURA_API_KEY);
-    //     },
-    //     gas: 3000000,
-    //     gasPrice: 21000000000,
-    //     network_id: "1"
-    // }
   }
-};
+}
