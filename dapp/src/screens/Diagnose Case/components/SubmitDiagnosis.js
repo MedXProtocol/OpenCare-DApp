@@ -9,6 +9,7 @@ import { uploadJson, downloadJson } from '~/utils/storage-util'
 import isBlank from '~/utils/is-blank'
 import { connect } from 'react-redux'
 import { withSend } from '~/saga-genesis'
+import { recommendationOptions } from './recommendationOptions.js'
 
 function mapStateToProps (state, ownProps) {
   return {
@@ -26,6 +27,7 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
     constructor(props, context){
       super(props, context)
 
+  debugger
       this.state = {
         isChallenge: false,
         originalDiagnosis: null,

@@ -53,10 +53,15 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
             secondImagePercent: 0,
             howLong: null,
             size: null,
+            painful: null,
+            bleeding: null,
+            itching: null,
             skinCancer: null,
             sexuallyActive: null,
             age: null,
             country: null,
+            color: null,
+            prevTreatment: null,
             description: null,
             caseEncryptionKey: genKey(32),
 
@@ -128,31 +133,51 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
     }
 
     updateHowLong = (event) => {
-        this.setState({howLong: event.target.value}, this.validateInputs);
+        this.setState({ howLong: event.target.value }, this.validateInputs);
     }
 
-    updateSize= (event) => {
-        this.setState({size: event.target.value}, this.validateInputs);
+    updateSize = (event) => {
+        this.setState({ size: event.target.value }, this.validateInputs);
     }
 
-    updateSkinCancer= (event) => {
-        this.setState({skinCancer: event.target.value}, this.validateInputs);
+    updatePainful = (event) => {
+        this.setState({ painful: event.target.value }, this.validateInputs);
     }
 
-    updateSexuallyActive= (event) => {
-        this.setState({sexuallyActive: event.target.value}, this.validateInputs);
+    updateItching = (event) => {
+        this.setState({ itching: event.target.value }, this.validateInputs);
+    }
+
+    updateBleeding = (event) => {
+        this.setState({ bleeding: event.target.value }, this.validateInputs);
+    }
+
+    updateSkinCancer = (event) => {
+        this.setState({ skinCancer: event.target.value }, this.validateInputs);
+    }
+
+    updateColor = (event) => {
+        this.setState({ color: event.target.value }, this.validateInputs);
+    }
+
+    updatePreviousTreatment = (event) => {
+        this.setState({ prevTreatment: event.target.value }, this.validateInputs);
+    }
+
+    updateSexuallyActive = (event) => {
+        this.setState({ sexuallyActive: event.target.value }, this.validateInputs);
     }
 
     updateAge = (event) => {
-        this.setState({age: event.target.value}, this.validateInputs);
+        this.setState({ age: event.target.value }, this.validateInputs);
     }
 
     updateCountry = (event) => {
-        this.setState({country: event.target.value}, this.validateInputs);
+        this.setState({ country: event.target.value }, this.validateInputs);
     }
 
     updateDescription = (event) => {
-        this.setState({description: event.target.value});
+        this.setState({ description: event.target.value });
     }
 
     handleSubmit = (event) => {
@@ -165,17 +190,22 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
     }
 
     validateInputs = () => {
-        const valid =
-            isNotEmptyString(this.state.firstImageHash) &&
-            isNotEmptyString(this.state.secondImageHash) &&
-            isNotEmptyString(this.state.howLong) &&
-            isNotEmptyString(this.state.size) &&
-            isNotEmptyString(this.state.skinCancer) &&
-            isNotEmptyString(this.state.sexuallyActive) &&
-            isNotEmptyString(this.state.age) &&
-            isNotEmptyString(this.state.country);
+      const valid =
+        isNotEmptyString(this.state.firstImageHash) &&
+        isNotEmptyString(this.state.secondImageHash) &&
+        isNotEmptyString(this.state.howLong) &&
+        isNotEmptyString(this.state.size) &&
+        isNotEmptyString(this.state.painful) &&
+        isNotEmptyString(this.state.bleeding) &&
+        isNotEmptyString(this.state.itching) &&
+        isNotEmptyString(this.state.skinCancer) &&
+        isNotEmptyString(this.state.sexuallyActive) &&
+        isNotEmptyString(this.state.age) &&
+        isNotEmptyString(this.state.country) &&
+        isNotEmptyString(this.state.color) &&
+        isNotEmptyString(this.state.prevTreatment);
 
-            this.setState({ canSubmit: valid });
+      this.setState({ canSubmit: valid });
     }
 
     handleCloseBalanceTooLowModal = (event) => {
@@ -212,10 +242,15 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
             secondImageHash: this.state.secondImageHash,
             howLong: this.state.howLong,
             size: this.state.size,
+            painful: this.state.painful,
+            bleeding: this.state.bleeding,
+            itching: this.state.itching,
             skinCancer: this.state.skinCancer,
             sexuallyActive: this.state.sexuallyActive,
             age: this.state.age,
             country: this.state.country,
+            color: this.state.color,
+            prevTreatment: this.state.prevTreatment,
             description: this.state.description
         };
 
@@ -274,7 +309,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                           Submit New Case
                         </h2>
                         <p className="lead">
-                          <small>Provide the Doctor with details about your problem. This will be encrypted so only you and your physician(s) will be able to read it.</small>
+                          <small>Provide the physician with details about your problem. This will be encrypted so only you and your physician will be able to read it.</small>
                         </p>
                       </div>
                     </div>
@@ -289,10 +324,16 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                               <label>Overview Photo<span className='star'>*</span></label>
                               <div>
                                 <label className="btn btn-sm btn-primary">
-                                  Browse... <input onChange={this.captureFirstImage} type="file" accept='image/*' className="form-control" style={{display: 'none'}} required/>
+                                  Browse... <input
+                                              onChange={this.captureFirstImage}
+                                              type="file"
+                                              accept='image/*'
+                                              className="form-control"
+                                              style={{ display: 'none' }}
+                                              required />
                                 </label>
                                 <span>
-                                  {this.state.firstFileName}
+                                  &nbsp; {this.state.firstFileName}
                                 </span>
                                 <div className={firstProgressClassNames}>
                                   <ProgressBar
@@ -309,11 +350,17 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                             <div className="form-group">
                               <label>Close-up Photo<span className='star'>*</span></label>
                               <div>
-                                <label className="btn btn-primary">
-                                    Browse... <input onChange={this.captureSecondImage} type="file" accept='image/*' className="form-control" style={{display: 'none'}} required/>
+                                <label className="btn btn-sm btn-primary">
+                                    Browse... <input
+                                                onChange={this.captureSecondImage}
+                                                type="file"
+                                                accept='image/*'
+                                                className="form-control"
+                                                style={{ display: 'none' }}
+                                                required />
                                 </label>
                                 <span>
-                                    {this.state.secondFileName}
+                                    &nbsp; {this.state.secondFileName}
                                 </span>
                                 <div className={secondProgressClassNames}>
                                   <ProgressBar
@@ -330,9 +377,8 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                           <div className="row">
                             <div className="col-lg-6 col-md-6">
                               <FormGroup>
-                                <p>
-                                 <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
-                                </p>
+                               <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
+                               <br />
                                 <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Days" required>
                                   Days
                                 </Radio>{' '}
@@ -349,9 +395,8 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                             </div>
                             <div className="col-lg-6 col-md-6">
                               <FormGroup>
-                                <p>
-                                  <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
-                                </p>
+                                <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
+                                <br />
                                 <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Growing" required>
                                   Growing
                                 </Radio>{' '}
@@ -365,12 +410,56 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                             </div>
                           </div>
 
+
+                          <div className="row">
+                            <div className="col-md-6">
+                              <FormGroup>
+                                <ControlLabel>Is it painful?<span className='star'>*</span></ControlLabel>
+                                <br />
+                                <Radio name="radioGroup" inline onChange={this.updatePainful} name="painful" type="radio" value="Yes" required>
+                                  Yes
+                                </Radio>{' '}
+                                <Radio name="radioGroup" inline onChange={this.updatePainful} name="painful" type="radio" value="No" required>
+                                  No
+                                </Radio>
+                              </FormGroup>
+                            </div>
+
+                            <div className="col-md-6">
+                              <FormGroup>
+                                <ControlLabel>Is it bleeding?<span className='star'>*</span></ControlLabel>
+                                <br />
+                                <Radio name="radioGroup" inline onChange={this.updateBleeding} name="bleeding" type="radio" value="Yes" required>
+                                  Yes
+                                </Radio>{' '}
+                                <Radio name="radioGroup" inline onChange={this.updateBleeding} name="bleeding" type="radio" value="No" required>
+                                  No
+                                </Radio>
+                              </FormGroup>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-md-6">
+                              <FormGroup>
+                                <ControlLabel>Is it itching?<span className='star'>*</span></ControlLabel>
+                                <br />
+                                <Radio name="radioGroup" inline onChange={this.updateItching} name="itching" type="radio" value="Yes" required>
+                                  Yes
+                                </Radio>{' '}
+                                <Radio name="radioGroup" inline onChange={this.updateItching} name="itching" type="radio" value="No" required>
+                                  No
+                                </Radio>
+                              </FormGroup>
+                            </div>
+                          </div>
+
+
                           <div className="row">
                             <div className="col-lg-6 col-md-6">
                               <FormGroup>
-                              <p>
                                 <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
-                               </p>
+                                <br />
                                <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="Yes" required>
                                  Yes
                                </Radio>{' '}
@@ -379,11 +468,11 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                                </Radio>
                              </FormGroup>
                             </div>
+
                             <div className="col-lg-6 col-md-6">
                               <FormGroup>
-                                <p>
-                                  <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
-                                </p>
+                                <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
+                                <br />
                                 <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="Yes" required>
                                   Yes
                                 </Radio>{' '}
@@ -405,6 +494,23 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                               <div className="form-group">
                                 <label>Country<span className='star'>*</span></label>
                                 <input onChange={this.updateCountry} type="text" className="form-control" required />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-6">
+                              <div className="form-group">
+                                <label>Has it changed in color?<span className='star'>*</span></label>
+                                <input onChange={this.updateColor} type="text" className="form-control" required />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-6">
+                              <div className="form-group">
+                                <label>Have you tried any treatments so far?<span className='star'>*</span></label>
+                                <input onChange={this.updatePreviousTreatment} type="text" className="form-control" required />
                               </div>
                             </div>
                           </div>
