@@ -3,9 +3,6 @@ require('babel-polyfill')
 
 var HDWalletProvider = require("truffle-hdwallet-provider")
 
-var ropstenProvider = new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.ROPSTEN_PROVIDER_URL)
-var rinkebyProvider = new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.RINKEBY_PROVIDER_URL)
-
 module.exports = {
   networks: {
     development: {
@@ -14,13 +11,13 @@ module.exports = {
       network_id: 1234
     },
     ropsten: {
-      provider: () => ropstenProvider,
+      provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.ROPSTEN_PROVIDER_URL),
       network_id: 3,
       gas: 4683623,
       gasPrice: 20 * 1000000000
     },
     rinkeby: {
-      provider: () => rinkebyProvider,
+      provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.RINKEBY_PROVIDER_URL),
       network_id: 4,
       gas: 4683623,
       gasPrice: 20 * 1000000000
