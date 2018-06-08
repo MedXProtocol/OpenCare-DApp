@@ -1,0 +1,57 @@
+{
+  "migrationVersion": 1528304998,
+  "contracts": [
+    {
+      "contractName": "Migrations",
+      "address": "0x735d72c6a18281337113ec1fc8b604c14403ee58"
+    },
+    {
+      "contractName": "Registry",
+      "address": "0x05aa57f47151f24493c2b03967db710d3a673d62"
+    },
+    {
+      "contractName": "MedXToken",
+      "address": "0x4c2805ecc232df62aae233da9f4508c835164407"
+    },
+    {
+      "contractName": "AccountManager",
+      "address": "0x8658d88ff62e932a7fb36c1389fbfc96c9420a66"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0x5ef9f9047fff3a4a5fcbd3882bf41bc5c724d315"
+    },
+    {
+      "contractName": "SkipList",
+      "address": "0x5128f1162b8e2715f94a2c58a0be5b3de5bfa2b4"
+    },
+    {
+      "contractName": "CaseManager",
+      "address": "0x7cfaa0af966ee5be2446cb08d6211003124f31cd"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0x1b4d7a5f920b2dcf798969ac4bef948753066051"
+    },
+    {
+      "contractName": "Case",
+      "address": "0x7bbb06e58d07d2154b557f8baf0d0437d114ee21"
+    },
+    {
+      "contractName": "DoctorManager",
+      "address": "0x12654521e217e85780a8eb92c013add6e37df0a7"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0xc6088b96d6f1499aaa226bbfded93d96a8f8866f"
+    },
+    {
+      "contractName": "CaseManager",
+      "address": "0x4c871282553cf355d63a2ebbaadcd32bf4b1128e"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0x886189fe76d6c6f319104c1719c702522cf0f8f6"
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import IpfsApi from 'ipfs-api';
 import {promisify} from './common-util';
 import aes from '~/services/aes'
 
-const ipfsApi = IpfsApi(process.env.IPFS_HOSTNAME, '5001', {protocol: 'http'})
+const ipfsApi = IpfsApi(process.env.REACT_APP_IPFS_HOSTNAME, '5001', {protocol: 'http'})
 
 export async function uploadJson(rawJson, encryptionKey) {
     const buffer = Buffer.from(rawJson);
