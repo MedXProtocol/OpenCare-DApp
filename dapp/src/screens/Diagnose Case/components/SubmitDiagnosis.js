@@ -12,7 +12,9 @@ import isBlank from '~/utils/is-blank'
 import { connect } from 'react-redux'
 import { withSend } from '~/saga-genesis'
 import { recommendationOptions } from './recommendationOptions'
-// fixes <Select /> component for mobile:
+import { groupedDiagnosisOptions } from './diagnosisOptions'
+
+// The react-select <Select /> component uses inline CSS, this fixes it for mobile:
 const customStyles = {
   multiValue: (base, state) => ({
     ...base,
@@ -34,244 +36,229 @@ function mapDispatchToProps (dispatch) {
 }
 
 const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(class extends Component {
-    constructor(props, context){
-      super(props, context)
+  constructor(props, context){
+    super(props, context)
 
-      this.state = {
-        selectedRecommendation: [],
-        furtherRecommendation: null,
-        recommendationOptions: this.formatRecommendationOptions(),
+    this.state = {
+      selectedRecommendation: [],
+      furtherRecommendation: null,
+      recommendationOptions: this.formatRecommendationOptions(),
+      diagnosisOptions: groupedDiagnosisOptions,
 
-        isChallenge: false,
-        originalDiagnosis: null,
+      isChallenge: false,
+      originalDiagnosis: null,
 
-        diagnosis: null,
-        recommendation: null,
+      diagnosis: null,
+      recommendation: null,
 
-        canSubmit: false,
-        showConfirmationModal: false
-      }
+      canSubmit: false,
+      showConfirmationModal: false
     }
+  }
 
-    // Formats the simplified list of recommendations provided by MedCredits staff into options
-    // which react-select's <Select> component is happy with
-    formatRecommendationOptions = () => {
-      let options = []
-      let categories = Object.entries(recommendationOptions)
+  componentDidMount () {
+    this.init(this.props)
+  }
 
-      categories.forEach(category => {
-        category[1].options.forEach(option => {
-          options.push({ label: option, value: option })
+  componentWillReceiveProps(props) {
+    this.init(props)
+  }
+
+  init (props) {
+    if (props.diagnosisHash) {
+      downloadJson(props.diagnosisHash, props.caseKey).then((originalDiagnosis) => {
+        this.setState({
+          originalDiagnosis: JSON.parse(originalDiagnosis)
         })
       })
-
-      return options;
     }
+  }
 
-    componentDidMount () {
-      this.init(this.props)
+  // Formats the simplified data structures of diagnosis provided by MedCredits staff
+  // into options which react-select's <Select> component is happy with
+  formatRecommendationOptions = () => {
+    let options = []
+    let categories = Object.entries(recommendationOptions)
+
+    categories.forEach(category => {
+      category[1].options.forEach(option => {
+        options.push({ label: option, value: option })
+      })
+    })
+
+    return options;
+  }
+
+  // This is the diagnosis chosen in the 'react-select' <Select> component
+  updateDiagnosis = (newValue) => {
+    this.setState({ diagnosis: newValue }, this.validateInputs)
+  }
+
+  // This is the recommendation chosen by the 'react-select' multi <Select> component
+  updateRecommendation = (newValue) => {
+    let selectedRecommendation = newValue.map(option => option.value)
+
+    this.setState({ selectedRecommendation: selectedRecommendation }, this.buildFinalRecommendation)
+  }
+
+  // This is the recommendation the physician can type into the textarea below
+  updateFurtherRecommendation = (event) => {
+    let newValue = event.target.value.length ? event.target.value : null
+
+    this.setState({ furtherRecommendation: event.target.value }, this.buildFinalRecommendation)
+  }
+
+  // Combines the selectedRecommendation with the furtherRecommendation
+  buildFinalRecommendation = () => {
+    let recommendationArray = this.state.selectedRecommendation
+      .concat(this.state.furtherRecommendation)
+      .filter(element => {
+        return (element !== (undefined || null || ''))
+      })
+
+    this.setState({ recommendation: recommendationArray.join(', ') }, this.validateInputs)
+  }
+
+  validateInputs = () => {
+    const valid =
+      isNotEmptyString(this.state.diagnosis) &&
+      isNotEmptyString(this.state.recommendation)
+
+      this.setState({ canSubmit: valid })
+  }
+
+  handleSubmit = async (event) => {
+      event.preventDefault()
+      this.setState({showConfirmationModal: true})
+  }
+
+  handleCancelConfirmSubmissionModal = (event) => {
+      this.setState({showConfirmationModal: false})
+  }
+
+  handleAcceptConfirmSubmissionModal = async (event) => {
+      this.setState({showConfirmationModal: false})
+      await this.submitDiagnosis()
+  }
+
+  submitDiagnosis = async () => {
+    const diagnosisInformation = {
+      diagnosis: this.state.diagnosis,
+      recommendation: this.state.recommendation
     }
+    const diagnosisJson = JSON.stringify(diagnosisInformation)
+    const ipfsHash = await uploadJson(diagnosisJson, this.props.caseKey)
+    const hashHex = '0x' + hashToHex(ipfsHash)
 
-    componentWillReceiveProps(props) {
-      this.init(props)
+    if(!isBlank(this.props.diagnosisHash)) {
+      const accept = this.state.originalDiagnosis.diagnosis === this.state.diagnosis
+      this.setState({
+        transactionId: this.props.send(this.props.caseAddress, 'diagnoseChallengedCase', hashHex, accept)()
+      })
+    } else {
+      this.setState({
+        transactionId: this.props.send(this.props.caseAddress, 'diagnoseCase', hashHex)()
+      })
     }
+  }
 
-    init (props) {
-      if (props.diagnosisHash) {
-        downloadJson(props.diagnosisHash, props.caseKey).then((originalDiagnosis) => {
-          this.setState({
-            originalDiagnosis: JSON.parse(originalDiagnosis)
-          })
-        })
-      }
-    }
+  render() {
+    var transaction = this.props.transactions[this.state.transactionId]
+    var loading = !!(transaction && transaction.inFlight)
+    var showThankYou = !!(transaction && transaction.complete)
 
-    updateDiagnosis = (event) => {
-      this.setState({diagnosis: event.target.value}, this.validateInputs)
-    }
+    if (showThankYou)
+      this.props.refreshCase(this.props.caseAddress)
 
-    // This is the recommendation chosen by the 'react-select' multi <Select> component
-    updateRecommendation = (newValue, actionMeta) => {
-      let selectedRecommendation = newValue.map(option => option.value)
+    return (
+      <div>
+        <div className="card">
+          <form onSubmit={this.handleSubmit} >
+            <div className="card-header">
+              <h3 className="card-title">
+                Submit Diagnosis
+              </h3>
+            </div>
+            <div className="card-body">
+              <div className="form-group">
+                <label>Diagnosis<span className='star'>*</span></label>
+                <Select
+                  placeholder="--- Choose a diagnosis ---"
+                  styles={customStyles}
+                  components={Animated}
+                  closeMenuOnSelect={true}
+                  options={groupedDiagnosisOptions}
+                  onChange={this.updateDiagnosis}
+                  required />
+              </div>
 
-      this.setState({ selectedRecommendation: selectedRecommendation }, this.buildFinalRecommendation)
-    }
+              <div className="form-group">
+                <label>Recommendation<span className='star'>*</span></label>
 
-    // This is the recommendation the physician can type into the textarea below
-    updateFurtherRecommendation = (event) => {
-      let newValue = event.target.value.length ? event.target.value : null
+                <Select
+                  placeholder="--- Choose recommendations ---"
+                  styles={customStyles}
+                  components={Animated}
+                  closeMenuOnSelect={true}
+                  options={this.state.recommendationOptions}
+                  isMulti={true}
+                  onChange={this.updateRecommendation}
+                  required />
+              </div>
 
-      this.setState({ furtherRecommendation: event.target.value }, this.buildFinalRecommendation)
-    }
+              <div className="form-group">
+                <label>Further Recommendation</label>
 
-    // Combines the selectedRecommendation with the furtherRecommendation
-    buildFinalRecommendation = () => {
-      let recommendationArray = this.state.selectedRecommendation
-        .concat(this.state.furtherRecommendation)
-        .filter(element => {
-          return (element !== (undefined || null || ''))
-        })
+                <textarea
+                  onChange={this.updateFurtherRecommendation}
+                  className="form-control"
+                  rows="3"
+                  required />
+              </div>
 
-      this.setState({ recommendation: recommendationArray.join(', ') }, this.validateInputs)
-    }
+              <label className="label">Your recommendation:</label>
+              <p>
+                {this.state.recommendation}
+              </p>
+            </div>
+            <div className="card-footer text-right">
+              <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
+            </div>
+          </form>
+        </div>
 
-    validateInputs = () => {
-      const valid =
-        isNotEmptyString(this.state.diagnosis) &&
-        isNotEmptyString(this.state.recommendation)
+        <Modal show={this.state.showConfirmationModal}>
+          <Modal.Body>
+            <div className="row">
+              <div className="col-xs-12 text-center">
+                <h4>Are you sure?</h4>
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
+            <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
+          </Modal.Footer>
+        </Modal>
 
-        this.setState({ canSubmit: valid })
-    }
+        <Modal show={showThankYou}>
+          <Modal.Body>
+            <div className="row">
+              <div className="col-xs-12 text-center">
+                <h4>Thank you! Your diagnosis submitted successfully.</h4>
+              </div>
+            </div>
+          </Modal.Body>
 
-    handleSubmit = async (event) => {
-        event.preventDefault()
-        this.setState({showConfirmationModal: true})
-    }
+          <Modal.Footer>
+            <Link to='/cases/open' className="btn btn-primary">OK</Link>
+          </Modal.Footer>
+        </Modal>
 
-    handleCancelConfirmSubmissionModal = (event) => {
-        this.setState({showConfirmationModal: false})
-    }
-
-    handleAcceptConfirmSubmissionModal = async (event) => {
-        this.setState({showConfirmationModal: false})
-        await this.submitDiagnosis()
-    }
-
-    submitDiagnosis = async () => {
-      const diagnosisInformation = {
-        diagnosis: this.state.diagnosis,
-        recommendation: this.state.recommendation
-      }
-      const diagnosisJson = JSON.stringify(diagnosisInformation)
-      const ipfsHash = await uploadJson(diagnosisJson, this.props.caseKey)
-      const hashHex = '0x' + hashToHex(ipfsHash)
-
-      if(!isBlank(this.props.diagnosisHash)) {
-        const accept = this.state.originalDiagnosis.diagnosis === this.state.diagnosis
-        this.setState({
-          transactionId: this.props.send(this.props.caseAddress, 'diagnoseChallengedCase', hashHex, accept)()
-        })
-      } else {
-        this.setState({
-          transactionId: this.props.send(this.props.caseAddress, 'diagnoseCase', hashHex)()
-        })
-      }
-    }
-
-    render() {
-      var transaction = this.props.transactions[this.state.transactionId]
-      var loading = !!(transaction && transaction.inFlight)
-      var showThankYou = !!(transaction && transaction.complete)
-      if (showThankYou) {
-        this.props.refreshCase(this.props.caseAddress)
-      }
-
-      return (
-          <div className="card">
-              <form onSubmit={this.handleSubmit} >
-                  <div className="card-header">
-                      <h3 className="card-title">
-                          Submit Diagnosis
-                      </h3>
-                  </div>
-                  <div className="card-body">
-                      <div className="form-group">
-                          <label>Diagnosis<span className='star'>*</span></label>
-                          <select onChange={this.updateDiagnosis} className="form-control">
-                              <option value="" disabled defaultValue>--- Please select a diagnosis ---</option>
-                              <option value="Acne">Acne</option>
-                              <option value="Dermatitis">Dermatitis</option>
-                              <option value="Alopecia">Alopecia</option>
-                              <option value="Actinic Keratosis">Actinic Keratosis</option>
-                              <option value="Insect bite/sting">Insect bite/sting</option>
-                              <option value="Poison Ivy/Poison Oak">Poison Ivy/Poison Oak</option>
-                              <option value="Blister">Blister</option>
-                              <option value="Bed Sores">Bed Sores</option>
-                              <option value="Cellulitis">Cellulitis</option>
-                              <option value="Cold Sores">Cold Sores</option>
-                              <option value="Abrasion">Abrasion</option>
-                              <option value="Drug Rash">Drug Rash</option>
-                              <option value="Dry Skin">Dry Skin</option>
-                              <option value="Skin Cancer">Skin Cancer</option>
-                              <option value="Benign Skin Growth">Benign Skin Growth</option>
-                              <option value="Psoriasis">Psoriasis</option>
-                              <option value="Shingles (Herpes Zoster)">Shingles (Herpes Zoster)</option>
-                              <option value="Warts">Warts</option>
-                              <option value="Sunburn">Sunburn</option>
-                              <option value="Seborrheic Keratosis">Seborrheic Keratosis</option>
-                              <option value="Herpes Simplex Virus (HSV)">Herpes Simplex Virus (HSV)</option>
-                              <option value="Rosacea">Rosacea</option>
-                              <option value="Scars">Scars</option>
-                              <option value="Nevus">Nevus</option>
-                              <option value="Calluses or corns">Calluses or corns</option>
-                              <option value="Erythema Multiforme">Erythema Multiforme</option>
-                              <option value="Ingrown Hair">Ingrown Hair</option>
-                              <option value="Lice">Lice</option>
-                              <option value="Seborrheic Dermatitis">Seborrheic Dermatitis</option>
-                              <option value="Birthmark">Birthmark</option>
-                          </select>
-                      </div>
-                      <div className="form-group">
-                        <label>Recommendation<span className='star'>*</span></label>
-
-                        <Select
-                          placeholder="--- Choose recommendations ---"
-                          styles={customStyles}
-                          components={Animated}
-                          closeMenuOnSelect={true}
-                          options={this.state.recommendationOptions}
-                          isMulti={true}
-                          onChange={this.updateRecommendation}
-                          required />
-                      </div>
-
-                      <div className="form-group">
-                        <label>Further Recommendation</label>
-
-                        <textarea
-                          onChange={this.updateFurtherRecommendation}
-                          className="form-control"
-                          rows="3"
-                          required />
-                      </div>
-                      <label className="label">Your recommendation:</label>
-                      <p>
-                        {this.state.recommendation}
-                      </p>
-                  </div>
-                  <div className="card-footer text-right">
-                      <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
-                  </div>
-              </form>
-              <Modal show={this.state.showConfirmationModal}>
-                  <Modal.Body>
-                      <div className="row">
-                          <div className="col-xs-12 text-center">
-                              <h4>Are you sure?</h4>
-                          </div>
-                      </div>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
-                    <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
-                  </Modal.Footer>
-              </Modal>
-              <Modal show={showThankYou}>
-                  <Modal.Body>
-                      <div className="row">
-                          <div className="col-xs-12 text-center">
-                              <h4>Thank you! Your diagnosis submitted successfully.</h4>
-                          </div>
-                      </div>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <Link to='/cases/open' className="btn btn-primary">OK</Link>
-                  </Modal.Footer>
-              </Modal>
-              <Spinner loading={loading} />
-          </div>
-      )
-    }
+        <Spinner loading={loading} />
+      </div>
+    )
+  }
 }))
 
 SubmitDiagnosis.propTypes = {
