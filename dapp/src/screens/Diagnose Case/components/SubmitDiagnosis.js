@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import Select from 'react-select'
+import * as Animated from 'react-select/lib/animated';
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
@@ -9,7 +11,15 @@ import { uploadJson, downloadJson } from '~/utils/storage-util'
 import isBlank from '~/utils/is-blank'
 import { connect } from 'react-redux'
 import { withSend } from '~/saga-genesis'
-import { recommendationOptions } from './recommendationOptions.js'
+import { recommendationOptions } from './recommendationOptions'
+// fixes <Select /> component for mobile:
+const customStyles = {
+  multiValue: (base, state) => ({
+    ...base,
+    maxWidth: '260px',
+    whiteSpace: 'inherit'
+  })
+}
 
 function mapStateToProps (state, ownProps) {
   return {
@@ -27,8 +37,11 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
     constructor(props, context){
       super(props, context)
 
-  debugger
       this.state = {
+        selectedRecommendation: [],
+        furtherRecommendation: null,
+        recommendationOptions: this.formatRecommendationOptions(),
+
         isChallenge: false,
         originalDiagnosis: null,
 
@@ -38,6 +51,21 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
         canSubmit: false,
         showConfirmationModal: false
       }
+    }
+
+    // Formats the simplified list of recommendations provided by MedCredits staff into options
+    // which react-select's <Select> component is happy with
+    formatRecommendationOptions = () => {
+      let options = []
+      let categories = Object.entries(recommendationOptions)
+
+      categories.forEach(category => {
+        category[1].options.forEach(option => {
+          options.push({ label: option, value: option })
+        })
+      })
+
+      return options;
     }
 
     componentDidMount () {
@@ -59,19 +87,40 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
     }
 
     updateDiagnosis = (event) => {
-        this.setState({diagnosis: event.target.value}, this.validateInputs)
+      this.setState({diagnosis: event.target.value}, this.validateInputs)
     }
 
-    updateRecommendation = (event) => {
-        this.setState({recommendation: event.target.value}, this.validateInputs)
+    // This is the recommendation chosen by the 'react-select' multi <Select> component
+    updateRecommendation = (newValue, actionMeta) => {
+      let selectedRecommendation = newValue.map(option => option.value)
+
+      this.setState({ selectedRecommendation: selectedRecommendation }, this.buildFinalRecommendation)
+    }
+
+    // This is the recommendation the physician can type into the textarea below
+    updateFurtherRecommendation = (event) => {
+      let newValue = event.target.value.length ? event.target.value : null
+
+      this.setState({ furtherRecommendation: event.target.value }, this.buildFinalRecommendation)
+    }
+
+    // Combines the selectedRecommendation with the furtherRecommendation
+    buildFinalRecommendation = () => {
+      let recommendationArray = this.state.selectedRecommendation
+        .concat(this.state.furtherRecommendation)
+        .filter(element => {
+          return (element !== (undefined || null || ''))
+        })
+
+      this.setState({ recommendation: recommendationArray.join(', ') }, this.validateInputs)
     }
 
     validateInputs = () => {
-        const valid =
-            isNotEmptyString(this.state.diagnosis) &&
-            isNotEmptyString(this.state.recommendation)
+      const valid =
+        isNotEmptyString(this.state.diagnosis) &&
+        isNotEmptyString(this.state.recommendation)
 
-            this.setState({ canSubmit: valid })
+        this.setState({ canSubmit: valid })
     }
 
     handleSubmit = async (event) => {
@@ -90,8 +139,8 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
 
     submitDiagnosis = async () => {
       const diagnosisInformation = {
-          diagnosis: this.state.diagnosis,
-          recommendation: this.state.recommendation
+        diagnosis: this.state.diagnosis,
+        recommendation: this.state.recommendation
       }
       const diagnosisJson = JSON.stringify(diagnosisInformation)
       const ipfsHash = await uploadJson(diagnosisJson, this.props.caseKey)
@@ -121,15 +170,15 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
           <div className="card">
               <form onSubmit={this.handleSubmit} >
                   <div className="card-header">
-                      <h2 className="card-title">
+                      <h3 className="card-title">
                           Submit Diagnosis
-                      </h2>
+                      </h3>
                   </div>
                   <div className="card-body">
                       <div className="form-group">
                           <label>Diagnosis<span className='star'>*</span></label>
                           <select onChange={this.updateDiagnosis} className="form-control">
-                              <option value=""></option>
+                              <option value="" disabled defaultValue>--- Please select a diagnosis ---</option>
                               <option value="Acne">Acne</option>
                               <option value="Dermatitis">Dermatitis</option>
                               <option value="Alopecia">Alopecia</option>
@@ -163,12 +212,35 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
                           </select>
                       </div>
                       <div className="form-group">
-                          <label>Recommendation<span className='star'>*</span></label>
-                          <textarea onChange={this.updateRecommendation} className="form-control" rows="5" required />
+                        <label>Recommendation<span className='star'>*</span></label>
+
+                        <Select
+                          placeholder="--- Choose recommendations ---"
+                          styles={customStyles}
+                          components={Animated}
+                          closeMenuOnSelect={true}
+                          options={this.state.recommendationOptions}
+                          isMulti={true}
+                          onChange={this.updateRecommendation}
+                          required />
                       </div>
+
+                      <div className="form-group">
+                        <label>Further Recommendation</label>
+
+                        <textarea
+                          onChange={this.updateFurtherRecommendation}
+                          className="form-control"
+                          rows="3"
+                          required />
+                      </div>
+                      <label className="label">Your recommendation:</label>
+                      <p>
+                        {this.state.recommendation}
+                      </p>
                   </div>
-                  <div className="card-footer">
-                      <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-primary">Submit</button>
+                  <div className="card-footer text-right">
+                      <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
                   </div>
               </form>
               <Modal show={this.state.showConfirmationModal}>

@@ -62,13 +62,11 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     let html = <span></span>
     if (this.state.firstImageUrl.length > 0) {
       html = (
-        <a href={this.state.firstImageUrl} target="_blank">
-          <img
-            src={this.state.firstImageUrl}
-            alt="Overview"
-            style={{maxHeight: 400}}
-            className="img-responsive" />
-        </a>
+        <img
+          src={this.state.firstImageUrl}
+          alt="Overview"
+          style={{maxHeight: 400}}
+          className="img-responsive" />
       )
     }
 
@@ -79,13 +77,11 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     let html = <span></span>
     if (this.state.secondImageUrl.length > 0) {
       html = (
-        <a href={this.state.secondImageUrl} target="_blank">
-          <img
-            src={this.state.secondImageUrl}
-            alt="Close-up"
-            style={{maxHeight: 400}}
-            className="img-responsive" />
-        </a>
+        <img
+          src={this.state.secondImageUrl}
+          alt="Close-up"
+          style={{maxHeight: 400}}
+          className="img-responsive" />
       )
     }
 

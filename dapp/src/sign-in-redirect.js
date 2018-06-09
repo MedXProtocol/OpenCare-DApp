@@ -50,7 +50,6 @@ export const SignInRedirect = class extends Component {
 
   unload = () => {
     if (process.env.NODE_ENV !== 'development') {
-      console.log('unload')
       this.props.signOut()
     }
   }
