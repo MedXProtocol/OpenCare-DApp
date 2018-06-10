@@ -11,7 +11,7 @@ import { uploadJson, downloadJson } from '~/utils/storage-util'
 import isBlank from '~/utils/is-blank'
 import { connect } from 'react-redux'
 import { withSend } from '~/saga-genesis'
-import { recommendationOptions } from './recommendationOptions'
+import { groupedRecommendationOptions } from './recommendationOptions'
 import { groupedDiagnosisOptions } from './diagnosisOptions'
 
 // The react-select <Select /> component uses inline CSS, this fixes it for mobile:
@@ -42,8 +42,6 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
     this.state = {
       selectedRecommendation: [],
       furtherRecommendation: null,
-      recommendationOptions: this.formatRecommendationOptions(),
-      diagnosisOptions: groupedDiagnosisOptions,
 
       isChallenge: false,
       originalDiagnosis: null,
@@ -74,24 +72,9 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
     }
   }
 
-  // Formats the simplified data structures of diagnosis provided by MedCredits staff
-  // into options which react-select's <Select> component is happy with
-  formatRecommendationOptions = () => {
-    let options = []
-    let categories = Object.entries(recommendationOptions)
-
-    categories.forEach(category => {
-      category[1].options.forEach(option => {
-        options.push({ label: option, value: option })
-      })
-    })
-
-    return options;
-  }
-
   // This is the diagnosis chosen in the 'react-select' <Select> component
   updateDiagnosis = (newValue) => {
-    this.setState({ diagnosis: newValue }, this.validateInputs)
+    this.setState({ diagnosis: newValue.value }, this.validateInputs)
   }
 
   // This is the recommendation chosen by the 'react-select' multi <Select> component
@@ -180,46 +163,66 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
               </h3>
             </div>
             <div className="card-body">
-              <div className="form-group">
-                <label>Diagnosis<span className='star'>*</span></label>
-                <Select
-                  placeholder="--- Choose a diagnosis ---"
-                  styles={customStyles}
-                  components={Animated}
-                  closeMenuOnSelect={true}
-                  options={groupedDiagnosisOptions}
-                  onChange={this.updateDiagnosis}
-                  required />
+              <div className="row">
+                <div className="col-xs-12 col-md-8">
+                  <div className="form-group">
+                    <label>Diagnosis<span className='star'>*</span></label>
+                    <Select
+                      placeholder="--- Choose a diagnosis ---"
+                      styles={customStyles}
+                      components={Animated}
+                      closeMenuOnSelect={true}
+                      options={groupedDiagnosisOptions}
+                      onChange={this.updateDiagnosis}
+                      required />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Recommendation<span className='star'>*</span></label>
+
+                    <Select
+                      placeholder="--- Choose recommendations ---"
+                      styles={customStyles}
+                      components={Animated}
+                      closeMenuOnSelect={true}
+                      options={groupedRecommendationOptions}
+                      isMulti={true}
+                      onChange={this.updateRecommendation}
+                      required />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Further Recommendation</label>
+
+                    <textarea
+                      onChange={this.updateFurtherRecommendation}
+                      className="form-control"
+                      rows="3"
+                      required />
+                  </div>
+                </div>
+
+                <div className="col-xs-12 col-md-4">
+                  <div className="well">
+                    <label className="label">Your diagnosis:</label>
+                    <p>
+                      {(this.state.diagnosis !== null)
+                        ? this.state.diagnosis
+                        : 'no diagnosis entered.'}
+                    </p>
+
+                    <label className="label">Your recommendation:</label>
+                    <p>
+                      {(this.state.recommendation !== null)
+                        ? this.state.recommendation
+                        : 'no recommendation entered.'}
+                    </p>
+                  </div>
+                </div>
+
               </div>
 
-              <div className="form-group">
-                <label>Recommendation<span className='star'>*</span></label>
 
-                <Select
-                  placeholder="--- Choose recommendations ---"
-                  styles={customStyles}
-                  components={Animated}
-                  closeMenuOnSelect={true}
-                  options={this.state.recommendationOptions}
-                  isMulti={true}
-                  onChange={this.updateRecommendation}
-                  required />
-              </div>
-
-              <div className="form-group">
-                <label>Further Recommendation</label>
-
-                <textarea
-                  onChange={this.updateFurtherRecommendation}
-                  className="form-control"
-                  rows="3"
-                  required />
-              </div>
-
-              <label className="label">Your recommendation:</label>
-              <p>
-                {this.state.recommendation}
-              </p>
             </div>
             <div className="card-footer text-right">
               <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
