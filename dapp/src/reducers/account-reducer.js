@@ -1,7 +1,7 @@
 export default function (state, {type, overrideError, masterPasswordError, secretKeyError}) {
   if (typeof state === 'undefined') {
     state = {
-      signedIn: true
+      signedIn: false
     }
   }
 
