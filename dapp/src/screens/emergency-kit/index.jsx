@@ -1,85 +1,118 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+import { Alert, Button } from 'react-bootstrap'
+import get from 'lodash.get'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
-import MainLayout from '../../layouts/MainLayout';
-import { formatKey } from '~/services/format-key'
-import { signedInSecretKey } from '~/services/sign-in'
-import { deriveSharedKey } from '~/services/derive-shared-key'
-import { connect } from 'react-redux'
+import MainLayout from '~/layouts/MainLayout';
+import { EmergencyKitDisplay } from './EmergencyKitDisplay'
+import { getAccount } from '~/services/get-account'
 
-function mapStateToProps(state) {
-  const account = state.sagaGenesis.accounts[0]
+function mapStateToProps(state, ownProps) {
+  const address = get(state, 'sagaGenesis.accounts[0]')
   return {
-    account
+    masterPasswordError: state.account.masterPasswordError,
+    masterPasswordOk: state.account.masterPasswordOk,
+    address,
+    account: getAccount(address)
   }
 }
 
-const DiagnoseCase = connect(mapStateToProps)(class _DiagnoseCase extends Component {
-  print = () => {
-    window.print()
+function mapDispatchToProps(dispatch) {
+  return {
+    checkMasterPassword: ({ masterPassword, account, address }) => {
+      dispatch({ type: 'MASTER_PASSWORD_CHECK', masterPassword, account, address })
+    },
+    resetMasterPasswordCheck: () => {
+      dispatch({ type: 'MASTER_PASSWORD_RESET' })
+    },
+  }
+}
+
+const EmergencyKit = connect(mapStateToProps, mapDispatchToProps)(class _EmergencyKit extends Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      masterPassword: ''
+    }
+  }
+
+  componentWillUnmount() {
+    this.props.resetMasterPasswordCheck()
+  }
+
+  handleSubmit = (e) => {
+    if (e) e.preventDefault()
+
+    this.props.checkMasterPassword({
+      masterPassword: this.state.masterPassword,
+      account: this.props.account,
+      address: this.props.address
+    })
   }
 
   render () {
-    const secretKey = signedInSecretKey()
+    let emergencyKit = null
 
-    return (
-      <MainLayout>
-        <div className="container">
-          <div className='row'>
-            <div className='col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2'>
-              <div className="card">
-                <div className="card-header">
-                  <h3 className="card-title">
-                    Hippocrates Emergency Kit
-                  </h3>
-                </div>
+    if (this.props.masterPasswordOk) {
+      emergencyKit = <EmergencyKitDisplay />
+    }
+    else {
+      let masterPasswordError
+      if (this.props.masterPasswordError) {
+        masterPasswordError = <Alert bsStyle='danger'>{this.props.masterPasswordError}</Alert>
+      }
+      emergencyKit = (
+        <MainLayout>
+          <div className="container">
+            <div className='row'>
+              <div className='col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2'>
+                <div className="card">
 
-                <div className="card-body">
-
-                  <h4>
-                    This is your <b>Secret Key</b>
-                  </h4>
-                  <div className="well" role="alert">
-                    <div className='secret-key__key'>
-                      {formatKey(secretKey)}
+                  <form onSubmit={this.handleSubmit} autoComplete='off'>
+                    <div className="card-header">
+                      <h3 className="card-title">
+                        Hippocrates Emergency Kit
+                      </h3>
                     </div>
-                  </div>
 
-                  <hr />
-                  <h4 className='text-center'>
-                    To sign in on a new browser:
-                  </h4>
-                  <ol>
-                    <li>Ensure you are using a Web3-enabled browser and that the current account is <b>{this.props.account}</b></li>
-                    <li>Go to the Hippocrates sign up page: <a href='/sign-up' target='_blank'>/sign-up</a></li>
-                    <li>Enter the above secret key</li>
-                    <li>Enter a new master password to encrypt your data locally</li>
-                    <li>Confirm the master password, then create your account</li>
-                  </ol>
+                    <div className="card-body">
+                      <div className='form-group'>
+                        <label htmlFor="masterPassword">
+                          Master Password
+                        </label>
+                        <input
+                          value={this.state.masterPassword}
+                          onChange={(e) => this.setState({ masterPassword: e.target.value })}
+                          type="password"
+                          className="form-control" />
+                        {masterPasswordError}
+                      </div>
+                    </div>
 
-                  <hr />
+                    <div className="form-wrapper--footer">
+                      <div className='text-right'>
+                        <Button
+                          bsStyle='success'
+                          type='submit'
+                          className='btn-lg'>
+                          Unlock
+                        </Button>
+                      </div>
+                    </div>
+                  </form>
 
-                  <div className="text-center">
-                    <a href='javascript:;' onClick={this.print} className="btn btn-lg btn-success">
-                      <FontAwesomeIcon
-                        icon={faPrint}
-                        size='lg' /> &nbsp;
-                      Print
-                    </a>
-                  </div>
-                  <h3 className='text-center'>
-                    Or, save this page for your records.
-                  </h3>
-                  <br />
-                  <br />
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </MainLayout>
-    );
+        </MainLayout>
+      )
+    }
+
+    return emergencyKit
   }
 })
 
-export default DiagnoseCase;
+export { EmergencyKit }

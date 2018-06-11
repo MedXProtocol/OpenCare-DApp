@@ -34,7 +34,13 @@ export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(cl
   }
 
   onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
-    this.props.signIn({ secretKey, masterPassword, account: this.props.account, address: this.props.address, overrideAccount })
+    this.props.signIn({
+      secretKey,
+      masterPassword,
+      account: this.props.account,
+      address: this.props.address,
+      overrideAccount
+    })
   }
 
   render () {

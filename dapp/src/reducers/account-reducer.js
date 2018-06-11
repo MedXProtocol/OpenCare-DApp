@@ -36,6 +36,32 @@ export default function (state, {type, overrideError, masterPasswordError, secre
         signedIn: false
       }
       break
+    case 'MASTER_PASSWORD_OK':
+      state = {
+        ...state,
+        masterPasswordOk: true
+      }
+      break
+    case 'MASTER_PASSWORD_FAIL':
+      state = {
+        ...state,
+        masterPasswordOk: false,
+        masterPasswordError
+      }
+      break
+    case 'MASTER_PASSWORD_CHECK':
+      state = {
+        ...state,
+        masterPasswordOk: false
+      }
+      break
+    case 'MASTER_PASSWORD_RESET':
+      state = {
+        ...state,
+        masterPasswordOk: false,
+        masterPasswordError: ''
+      }
+      break
   }
 
   return state

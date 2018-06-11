@@ -50,7 +50,20 @@ export function* signInOkSaga({ account, masterPassword, address }) {
   yield put({type: 'SIGNED_IN'})
 }
 
+export function* checkMasterPasswordSaga({ masterPassword, account, address }) {
+  if (!masterPassword) {
+    yield put({type: 'MASTER_PASSWORD_FAIL', masterPasswordError: 'You must enter a master password' })
+    return
+  }
+  if (isAccountMasterPassword(account, masterPassword)) {
+    yield put({type: 'MASTER_PASSWORD_OK', account, masterPassword, address})
+  } else {
+    yield put({type: 'MASTER_PASSWORD_FAIL', masterPasswordError: 'The master password does not match the account password' })
+  }
+}
+
 export default function* rootSaga() {
   yield takeEvery('SIGN_IN', signInSaga)
   yield takeEvery('SIGN_IN_OK', signInOkSaga)
+  yield takeEvery('MASTER_PASSWORD_CHECK', checkMasterPasswordSaga)
 }
