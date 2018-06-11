@@ -4,7 +4,10 @@ import {
   FormGroup,
   Modal,
   Radio,
-  ProgressBar
+  ProgressBar,
+  ToggleButtonGroup,
+  ToggleButton,
+  ButtonToolbar
 } from 'react-bootstrap';
 import { genKey } from '~/services/gen-key'
 import { withRouter } from 'react-router-dom';
@@ -133,51 +136,51 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
     }
 
     updateHowLong = (event) => {
-        this.setState({ howLong: event.target.value }, this.validateInputs);
+      this.setState({ howLong: event.target.value }, this.validateInputs);
     }
 
     updateSize = (event) => {
-        this.setState({ size: event.target.value }, this.validateInputs);
+      this.setState({ size: event.target.value }, this.validateInputs);
     }
 
     updatePainful = (event) => {
-        this.setState({ painful: event.target.value }, this.validateInputs);
+      this.setState({ painful: event.target.value }, this.validateInputs);
     }
 
     updateItching = (event) => {
-        this.setState({ itching: event.target.value }, this.validateInputs);
+      this.setState({ itching: event.target.value }, this.validateInputs);
     }
 
     updateBleeding = (event) => {
-        this.setState({ bleeding: event.target.value }, this.validateInputs);
+      this.setState({ bleeding: event.target.value }, this.validateInputs);
     }
 
     updateSkinCancer = (event) => {
-        this.setState({ skinCancer: event.target.value }, this.validateInputs);
+      this.setState({ skinCancer: event.target.value }, this.validateInputs);
     }
 
     updateColor = (event) => {
-        this.setState({ color: event.target.value }, this.validateInputs);
+      this.setState({ color: event.target.value }, this.validateInputs);
     }
 
     updatePreviousTreatment = (event) => {
-        this.setState({ prevTreatment: event.target.value }, this.validateInputs);
+      this.setState({ prevTreatment: event.target.value }, this.validateInputs);
     }
 
     updateSexuallyActive = (event) => {
-        this.setState({ sexuallyActive: event.target.value }, this.validateInputs);
+      this.setState({ sexuallyActive: event.target.value }, this.validateInputs);
     }
 
     updateAge = (event) => {
-        this.setState({ age: event.target.value }, this.validateInputs);
+      this.setState({ age: event.target.value }, this.validateInputs);
     }
 
     updateCountry = (event) => {
-        this.setState({ country: event.target.value }, this.validateInputs);
+      this.setState({ country: event.target.value }, this.validateInputs);
     }
 
     updateDescription = (event) => {
-        this.setState({ description: event.target.value });
+      this.setState({ description: event.target.value });
     }
 
     handleSubmit = (event) => {
@@ -320,7 +323,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                       <form onSubmit={this.handleSubmit} >
                         <div className="row">
                           <div className="col-xs-12 col-sm-12 col-md-6">
-                            <div className="form-group form-group--image-upload">
+                            <div className="form-group">
                               <label>Overview Photo<span className='star'>*</span></label>
                               <div>
                                 <label className="btn btn-sm btn-primary">
@@ -345,7 +348,9 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                               </div>
                             </div>
                           </div>
+                        </div>
 
+                        <div className="row">
                           <div className="col-xs-12 col-sm-12 col-md-6">
                             <div className="form-group">
                               <label>Close-up Photo<span className='star'>*</span></label>
@@ -375,110 +380,192 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                         </div>
 
                           <div className="row">
-                            <div className="col-lg-6 col-md-6">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
-                               <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
-                               <br />
-                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Days" required>
-                                  Days
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Weeks" required>
-                                  Weeks
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Months" required>
-                                  Months
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Years" required>
-                                  Years
-                                </Radio>
+                                <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="howLong" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateHowLong}
+                                      value='Days'
+                                      required>
+                                      Days
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateHowLong}
+                                      value='Weeks'
+                                      required>
+                                      Weeks
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateHowLong}
+                                      value='Months'
+                                      required>
+                                      Months
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateHowLong}
+                                      value='Years'
+                                      required>
+                                      Years
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
                               </FormGroup>
                             </div>
-                            <div className="col-lg-6 col-md-6">
+                          </div>
+                          <div className="row">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
                                 <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
-                                <br />
-                                <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Growing" required>
-                                  Growing
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Shrinking" required>
-                                  Shrinking
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Same size" required>
-                                  Same size
-                                </Radio>
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="size" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateSize}
+                                      value='Growing'
+                                      required>
+                                      Growing
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateSize}
+                                      value='Shrinking'
+                                      required>
+                                      Shrinking
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateSize}
+                                      value='Same size'
+                                      required>
+                                      Same size
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
                               </FormGroup>
                             </div>
                           </div>
 
 
                           <div className="row">
-                            <div className="col-md-6">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
                                 <ControlLabel>Is it painful?<span className='star'>*</span></ControlLabel>
-                                <br />
-                                <Radio name="radioGroup" inline onChange={this.updatePainful} name="painful" type="radio" value="Yes" required>
-                                  Yes
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updatePainful} name="painful" type="radio" value="No" required>
-                                  No
-                                </Radio>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="painful" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updatePainful}
+                                      value='Yes'
+                                      required>
+                                      Yes
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updatePainful}
+                                      value='No'
+                                      required>
+                                      No
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
                               </FormGroup>
                             </div>
+                          </div>
 
-                            <div className="col-md-6">
+                          <div className="row">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
                                 <ControlLabel>Is it bleeding?<span className='star'>*</span></ControlLabel>
-                                <br />
-                                <Radio name="radioGroup" inline onChange={this.updateBleeding} name="bleeding" type="radio" value="Yes" required>
-                                  Yes
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateBleeding} name="bleeding" type="radio" value="No" required>
-                                  No
-                                </Radio>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="bleeding" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateBleeding}
+                                      value='Yes'
+                                      required>
+                                      Yes
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateBleeding}
+                                      value='No'
+                                      required>
+                                      No
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
                               </FormGroup>
                             </div>
                           </div>
 
                           <div className="row">
-                            <div className="col-md-6">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
                                 <ControlLabel>Is it itching?<span className='star'>*</span></ControlLabel>
-                                <br />
-                                <Radio name="radioGroup" inline onChange={this.updateItching} name="itching" type="radio" value="Yes" required>
-                                  Yes
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateItching} name="itching" type="radio" value="No" required>
-                                  No
-                                </Radio>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="itching" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateItching}
+                                      value='Yes'
+                                      required>
+                                      Yes
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateItching}
+                                      value='No'
+                                      required>
+                                      No
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
                               </FormGroup>
                             </div>
                           </div>
 
 
                           <div className="row">
-                            <div className="col-lg-6 col-md-6">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
                                 <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
-                                <br />
-                               <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="Yes" required>
-                                 Yes
-                               </Radio>{' '}
-                               <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="No" required>
-                                 No
-                               </Radio>
-                             </FormGroup>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="skinCancer" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateSkinCancer}
+                                      value='Yes'
+                                      required>
+                                      Yes
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateSkinCancer}
+                                      value='No'
+                                      required>
+                                      No
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
+                              </FormGroup>
                             </div>
 
-                            <div className="col-lg-6 col-md-6">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
                                 <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
-                                <br />
-                                <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="Yes" required>
-                                  Yes
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="No" required>
-                                  No
-                                </Radio>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="sexuallyActive" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateSexuallyActive}
+                                      value='Yes'
+                                      required>
+                                      Yes
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateSexuallyActive}
+                                      value='No'
+                                      required>
+                                      No
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
                               </FormGroup>
                             </div>
                           </div>
