@@ -4,115 +4,117 @@ import { Alert, Button } from 'react-bootstrap'
 import get from 'lodash.get'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
+import { getAccount } from '~/services/get-account'
+import { isAccountMasterPassword } from '~/services/is-account-master-password'
 import MainLayout from '~/layouts/MainLayout';
 import { EmergencyKitDisplay } from './EmergencyKitDisplay'
-import { getAccount } from '~/services/get-account'
 
 function mapStateToProps(state, ownProps) {
-  const address = get(state, 'sagaGenesis.accounts[0]')
+  const account = getAccount(get(state, 'sagaGenesis.accounts[0]'))
   return {
-    masterPasswordError: state.account.masterPasswordError,
-    masterPasswordOk: state.account.masterPasswordOk,
-    address,
-    account: getAccount(address)
+    account: account
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    checkMasterPassword: ({ masterPassword, account, address }) => {
-      dispatch({ type: 'MASTER_PASSWORD_CHECK', masterPassword, account, address })
-    },
-    resetMasterPasswordCheck: () => {
-      dispatch({ type: 'MASTER_PASSWORD_RESET' })
-    },
-  }
-}
+export const EmergencyKit = connect(mapStateToProps)(
+  class _EmergencyKit extends Component {
+    constructor (props) {
+      super(props)
 
-const EmergencyKit = connect(mapStateToProps, mapDispatchToProps)(class _EmergencyKit extends Component {
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      masterPassword: ''
-    }
-  }
-
-  componentWillUnmount() {
-    this.props.resetMasterPasswordCheck()
-  }
-
-  handleSubmit = (e) => {
-    if (e) e.preventDefault()
-
-    this.props.checkMasterPassword({
-      masterPassword: this.state.masterPassword,
-      account: this.props.account,
-      address: this.props.address
-    })
-  }
-
-  render () {
-    let emergencyKit = null
-
-    if (this.props.masterPasswordOk) {
-      emergencyKit = <EmergencyKitDisplay />
-    }
-    else {
-      let masterPasswordError
-      if (this.props.masterPasswordError) {
-        masterPasswordError = <Alert bsStyle='danger'>{this.props.masterPasswordError}</Alert>
+      this.state = {
+        masterPassword: '',
+        masterPasswordError: '',
+        masterPasswordOk: false,
+        isChecking: false
       }
-      emergencyKit = (
-        <MainLayout>
-          <div className="container">
-            <div className='row'>
-              <div className='col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2'>
-                <div className="card">
+    }
 
-                  <form onSubmit={this.handleSubmit} autoComplete='off'>
-                    <div className="card-header">
-                      <h3 className="card-title">
-                        Hippocrates Emergency Kit
-                      </h3>
-                    </div>
+    handleSubmit = (e) => {
+      if (e) e.preventDefault()
+      this.setState({ isChecking: true }, this.checkMasterPassword)
+    }
 
-                    <div className="card-body">
-                      <div className='form-group'>
-                        <label htmlFor="masterPassword">
-                          Master Password
-                        </label>
-                        <input
-                          value={this.state.masterPassword}
-                          onChange={(e) => this.setState({ masterPassword: e.target.value })}
-                          type="password"
-                          className="form-control" />
-                        {masterPasswordError}
+    checkMasterPassword = () => {
+      let error
+      let masterPasswordOk = false
+
+      if (!this.state.masterPassword)
+        error = 'You must enter a master password'
+      else if (isAccountMasterPassword(this.props.account, this.state.masterPassword))
+        masterPasswordOk = true
+      else
+        error = 'The master password does not match the account password'
+
+      this.setState({
+        masterPasswordOk: masterPasswordOk,
+        masterPasswordError: error,
+        isChecking: false
+      })
+    }
+
+    render () {
+      let emergencyKit = null
+      let { masterPasswordError } = this.state
+      const { isChecking, masterPasswordOk, masterPassword } = this.state
+
+      if (masterPasswordOk) {
+        emergencyKit = <EmergencyKitDisplay />
+      }
+      else {
+        if (masterPasswordError) {
+          masterPasswordError = <Alert bsStyle='danger'>{masterPasswordError}</Alert>
+        }
+        emergencyKit = (
+          <MainLayout>
+            <div className="container">
+              <div className='row'>
+                <div className='col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2'>
+                  <div className="card">
+
+                    <form onSubmit={this.handleSubmit} autoComplete='off'>
+                      <div className="card-header">
+                        <h3 className="card-title">
+                          Hippocrates Emergency Kit
+                          <br /><small className="text-gray">To access your secret key, please verify your account by entering your master password:</small>
+                        </h3>
                       </div>
-                    </div>
 
-                    <div className="form-wrapper--footer">
-                      <div className='text-right'>
-                        <Button
-                          bsStyle='success'
-                          type='submit'
-                          className='btn-lg'>
-                          Unlock
-                        </Button>
+                      <div className="card-body">
+                        <div className='form-group'>
+                          <label htmlFor="masterPassword">
+                            Master Password
+                          </label>
+                          <input
+                            value={masterPassword}
+                            onChange={(e) => this.setState({ masterPassword: e.target.value })}
+                            type="password"
+                            className="form-control" />
+                          {masterPasswordError}
+                        </div>
                       </div>
-                    </div>
-                  </form>
 
+                      <div className="form-wrapper--footer">
+                        <div className='text-right'>
+                          <Button
+                            bsStyle='success'
+                            type='submit'
+                            className='btn-lg'
+                            disabled={isChecking}>
+                            {isChecking ? 'Checking ...' : 'Unlock'}
+                          </Button>
+                        </div>
+                      </div>
+                    </form>
+
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </MainLayout>
-      )
+          </MainLayout>
+        )
+      }
+
+      return emergencyKit
     }
-
-    return emergencyKit
   }
-})
-
-export { EmergencyKit }
+)
