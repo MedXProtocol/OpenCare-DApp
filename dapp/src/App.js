@@ -40,9 +40,9 @@ const App = class extends Component {
           <Route path='/doctors/cases/diagnose/:caseAddress' component={DiagnoseCase}/>
           <Route path='/doctors/new' component={AddDoctor}/>
 
-          <Route path='/patients/cases/:caseAddress' component={PatientCase}/>
           <Route exact path='/patients/cases/new' component={NewCase}/>
           <Route exact path='/patients/cases' component={PatientProfile}/>
+          <Route path='/patients/cases/:caseAddress' component={PatientCase}/>
 
           <Route path='/' component={FourOhFour} />
         </Switch>
