@@ -41,10 +41,6 @@ ol {
   color: white;
 }
 
-.form-group--image-upload {
-  min-height: 90px;
-}
-
 .progress {
   margin-top: 10px;
 }
@@ -106,4 +102,46 @@ not(.nav) li {
 
 p.lead {
   line-height: 1.6;
+}
+
+small,
+.small {
+  font-size: 70%;
+
+  @media (max-width: 768px) {
+    font-size: 85%;
+  }
+}
+
+// Chuck, Move this to _button.scss once PR #23 is merged in:
+.btn-toolbar .btn {
+  border-radius: 2px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 8px 16px;
+}
+
+.btn-toolbar .btn-default:active,
+.btn-toolbar .btn-default.active {
+  color: #fff;
+  background-color: lighten($brand-info, 5%);
+  border-color: $brand-info;
+}
+
+.btn-toolbar .btn-default:active:hover,
+.btn-toolbar .btn-default:active:focus,
+.btn-toolbar .btn-default:active.focus,
+.btn-toolbar .btn-default.active:hover,
+.btn-toolbar .btn-default.active:focus,
+.btn-toolbar .btn-default.active.focus {
+  color: #fff;
+  background-color: darken($brand-info, 2%);
+  border-color: darken($brand-info, 4%);
+}
+
+.btn-group .btn + .btn,
+.btn-group .btn + .btn-group,
+.btn-group .btn-group + .btn,
+.btn-group .btn-group + .btn-group {
+  margin-left: 0;
 }

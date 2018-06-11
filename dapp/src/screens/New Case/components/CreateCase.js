@@ -4,7 +4,10 @@ import {
   FormGroup,
   Modal,
   Radio,
-  ProgressBar
+  ProgressBar,
+  ToggleButtonGroup,
+  ToggleButton,
+  ButtonToolbar
 } from 'react-bootstrap';
 import { genKey } from '~/services/gen-key'
 import { withRouter } from 'react-router-dom';
@@ -53,10 +56,15 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
             secondImagePercent: 0,
             howLong: null,
             size: null,
+            painful: null,
+            bleeding: null,
+            itching: null,
             skinCancer: null,
             sexuallyActive: null,
             age: null,
             country: null,
+            color: null,
+            prevTreatment: null,
             description: null,
             caseEncryptionKey: genKey(32),
 
@@ -128,31 +136,51 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
     }
 
     updateHowLong = (event) => {
-        this.setState({howLong: event.target.value}, this.validateInputs);
+      this.setState({ howLong: event.target.value }, this.validateInputs);
     }
 
-    updateSize= (event) => {
-        this.setState({size: event.target.value}, this.validateInputs);
+    updateSize = (event) => {
+      this.setState({ size: event.target.value }, this.validateInputs);
     }
 
-    updateSkinCancer= (event) => {
-        this.setState({skinCancer: event.target.value}, this.validateInputs);
+    updatePainful = (event) => {
+      this.setState({ painful: event.target.value }, this.validateInputs);
     }
 
-    updateSexuallyActive= (event) => {
-        this.setState({sexuallyActive: event.target.value}, this.validateInputs);
+    updateItching = (event) => {
+      this.setState({ itching: event.target.value }, this.validateInputs);
+    }
+
+    updateBleeding = (event) => {
+      this.setState({ bleeding: event.target.value }, this.validateInputs);
+    }
+
+    updateSkinCancer = (event) => {
+      this.setState({ skinCancer: event.target.value }, this.validateInputs);
+    }
+
+    updateColor = (event) => {
+      this.setState({ color: event.target.value }, this.validateInputs);
+    }
+
+    updatePreviousTreatment = (event) => {
+      this.setState({ prevTreatment: event.target.value }, this.validateInputs);
+    }
+
+    updateSexuallyActive = (event) => {
+      this.setState({ sexuallyActive: event.target.value }, this.validateInputs);
     }
 
     updateAge = (event) => {
-        this.setState({age: event.target.value}, this.validateInputs);
+      this.setState({ age: event.target.value }, this.validateInputs);
     }
 
     updateCountry = (event) => {
-        this.setState({country: event.target.value}, this.validateInputs);
+      this.setState({ country: event.target.value }, this.validateInputs);
     }
 
     updateDescription = (event) => {
-        this.setState({description: event.target.value});
+      this.setState({ description: event.target.value });
     }
 
     handleSubmit = (event) => {
@@ -165,17 +193,22 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
     }
 
     validateInputs = () => {
-        const valid =
-            isNotEmptyString(this.state.firstImageHash) &&
-            isNotEmptyString(this.state.secondImageHash) &&
-            isNotEmptyString(this.state.howLong) &&
-            isNotEmptyString(this.state.size) &&
-            isNotEmptyString(this.state.skinCancer) &&
-            isNotEmptyString(this.state.sexuallyActive) &&
-            isNotEmptyString(this.state.age) &&
-            isNotEmptyString(this.state.country);
+      const valid =
+        isNotEmptyString(this.state.firstImageHash) &&
+        isNotEmptyString(this.state.secondImageHash) &&
+        isNotEmptyString(this.state.howLong) &&
+        isNotEmptyString(this.state.size) &&
+        isNotEmptyString(this.state.painful) &&
+        isNotEmptyString(this.state.bleeding) &&
+        isNotEmptyString(this.state.itching) &&
+        isNotEmptyString(this.state.skinCancer) &&
+        isNotEmptyString(this.state.sexuallyActive) &&
+        isNotEmptyString(this.state.age) &&
+        isNotEmptyString(this.state.country) &&
+        isNotEmptyString(this.state.color) &&
+        isNotEmptyString(this.state.prevTreatment);
 
-            this.setState({ canSubmit: valid });
+      this.setState({ canSubmit: valid });
     }
 
     handleCloseBalanceTooLowModal = (event) => {
@@ -212,10 +245,15 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
             secondImageHash: this.state.secondImageHash,
             howLong: this.state.howLong,
             size: this.state.size,
+            painful: this.state.painful,
+            bleeding: this.state.bleeding,
+            itching: this.state.itching,
             skinCancer: this.state.skinCancer,
             sexuallyActive: this.state.sexuallyActive,
             age: this.state.age,
             country: this.state.country,
+            color: this.state.color,
+            prevTreatment: this.state.prevTreatment,
             description: this.state.description
         };
 
@@ -274,7 +312,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                           Submit New Case
                         </h2>
                         <p className="lead">
-                          <small>Provide the Doctor with details about your problem. This will be encrypted so only you and your physician(s) will be able to read it.</small>
+                          <small>Provide the physician with details about your problem. This will be encrypted so only you and your physician will be able to read it.</small>
                         </p>
                       </div>
                     </div>
@@ -285,14 +323,20 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                       <form onSubmit={this.handleSubmit} >
                         <div className="row">
                           <div className="col-xs-12 col-sm-12 col-md-6">
-                            <div className="form-group form-group--image-upload">
+                            <div className="form-group">
                               <label>Overview Photo<span className='star'>*</span></label>
                               <div>
                                 <label className="btn btn-sm btn-primary">
-                                  Browse... <input onChange={this.captureFirstImage} type="file" accept='image/*' className="form-control" style={{display: 'none'}} required/>
+                                  Browse... <input
+                                              onChange={this.captureFirstImage}
+                                              type="file"
+                                              accept='image/*'
+                                              className="form-control"
+                                              style={{ display: 'none' }}
+                                              required />
                                 </label>
                                 <span>
-                                  {this.state.firstFileName}
+                                  &nbsp; {this.state.firstFileName}
                                 </span>
                                 <div className={firstProgressClassNames}>
                                   <ProgressBar
@@ -304,16 +348,24 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                               </div>
                             </div>
                           </div>
+                        </div>
 
+                        <div className="row">
                           <div className="col-xs-12 col-sm-12 col-md-6">
                             <div className="form-group">
                               <label>Close-up Photo<span className='star'>*</span></label>
                               <div>
-                                <label className="btn btn-primary">
-                                    Browse... <input onChange={this.captureSecondImage} type="file" accept='image/*' className="form-control" style={{display: 'none'}} required/>
+                                <label className="btn btn-sm btn-primary">
+                                    Browse... <input
+                                                onChange={this.captureSecondImage}
+                                                type="file"
+                                                accept='image/*'
+                                                className="form-control"
+                                                style={{ display: 'none' }}
+                                                required />
                                 </label>
                                 <span>
-                                    {this.state.secondFileName}
+                                    &nbsp; {this.state.secondFileName}
                                 </span>
                                 <div className={secondProgressClassNames}>
                                   <ProgressBar
@@ -328,68 +380,192 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                         </div>
 
                           <div className="row">
-                            <div className="col-lg-6 col-md-6">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
-                                <p>
-                                 <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
-                                </p>
-                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Days" required>
-                                  Days
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Weeks" required>
-                                  Weeks
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Months" required>
-                                  Months
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateHowLong} name="lengthOfTime" type="radio" value="Years" required>
-                                  Years
-                                </Radio>
+                                <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="howLong" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateHowLong}
+                                      value='Days'
+                                      required>
+                                      Days
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateHowLong}
+                                      value='Weeks'
+                                      required>
+                                      Weeks
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateHowLong}
+                                      value='Months'
+                                      required>
+                                      Months
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateHowLong}
+                                      value='Years'
+                                      required>
+                                      Years
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
                               </FormGroup>
                             </div>
-                            <div className="col-lg-6 col-md-6">
+                          </div>
+                          <div className="row">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
-                                <p>
-                                  <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
-                                </p>
-                                <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Growing" required>
-                                  Growing
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Shrinking" required>
-                                  Shrinking
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateSize} name="size" type="radio" value="Same size" required>
-                                  Same size
-                                </Radio>
+                                <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="size" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateSize}
+                                      value='Growing'
+                                      required>
+                                      Growing
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateSize}
+                                      value='Shrinking'
+                                      required>
+                                      Shrinking
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateSize}
+                                      value='Same size'
+                                      required>
+                                      Same size
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
+                              </FormGroup>
+                            </div>
+                          </div>
+
+
+                          <div className="row">
+                            <div className="col-xs-12 col-md-6">
+                              <FormGroup>
+                                <ControlLabel>Is it painful?<span className='star'>*</span></ControlLabel>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="painful" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updatePainful}
+                                      value='Yes'
+                                      required>
+                                      Yes
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updatePainful}
+                                      value='No'
+                                      required>
+                                      No
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
                               </FormGroup>
                             </div>
                           </div>
 
                           <div className="row">
-                            <div className="col-lg-6 col-md-6">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
-                              <p>
-                                <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
-                               </p>
-                               <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="Yes" required>
-                                 Yes
-                               </Radio>{' '}
-                               <Radio name="radioGroup" inline onChange={this.updateSkinCancer} name="skinCancer" type="radio" value="No" required>
-                                 No
-                               </Radio>
-                             </FormGroup>
+                                <ControlLabel>Is it bleeding?<span className='star'>*</span></ControlLabel>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="bleeding" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateBleeding}
+                                      value='Yes'
+                                      required>
+                                      Yes
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateBleeding}
+                                      value='No'
+                                      required>
+                                      No
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
+                              </FormGroup>
                             </div>
-                            <div className="col-lg-6 col-md-6">
+                          </div>
+
+                          <div className="row">
+                            <div className="col-xs-12 col-md-6">
                               <FormGroup>
-                                <p>
-                                  <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
-                                </p>
-                                <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="Yes" required>
-                                  Yes
-                                </Radio>{' '}
-                                <Radio name="radioGroup" inline onChange={this.updateSexuallyActive} name="sexuallyActive" type="radio" value="No" required>
-                                  No
-                                </Radio>
+                                <ControlLabel>Is it itching?<span className='star'>*</span></ControlLabel>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="itching" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateItching}
+                                      value='Yes'
+                                      required>
+                                      Yes
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateItching}
+                                      value='No'
+                                      required>
+                                      No
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
+                              </FormGroup>
+                            </div>
+                          </div>
+
+
+                          <div className="row">
+                            <div className="col-xs-12 col-md-6">
+                              <FormGroup>
+                                <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="skinCancer" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateSkinCancer}
+                                      value='Yes'
+                                      required>
+                                      Yes
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateSkinCancer}
+                                      value='No'
+                                      required>
+                                      No
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
+                              </FormGroup>
+                            </div>
+
+                            <div className="col-xs-12 col-md-6">
+                              <FormGroup>
+                                <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
+
+                                <ButtonToolbar>
+                                  <ToggleButtonGroup name="sexuallyActive" type="radio">
+                                    <ToggleButton
+                                      onChange={this.updateSexuallyActive}
+                                      value='Yes'
+                                      required>
+                                      Yes
+                                    </ToggleButton>
+                                    <ToggleButton
+                                      onChange={this.updateSexuallyActive}
+                                      value='No'
+                                      required>
+                                      No
+                                    </ToggleButton>
+                                  </ToggleButtonGroup>
+                                </ButtonToolbar>
                               </FormGroup>
                             </div>
                           </div>
@@ -405,6 +581,23 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                               <div className="form-group">
                                 <label>Country<span className='star'>*</span></label>
                                 <input onChange={this.updateCountry} type="text" className="form-control" required />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-6">
+                              <div className="form-group">
+                                <label>Has it changed in color?<span className='star'>*</span></label>
+                                <input onChange={this.updateColor} type="text" className="form-control" required />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-6">
+                              <div className="form-group">
+                                <label>Have you tried any treatments so far?<span className='star'>*</span></label>
+                                <input onChange={this.updatePreviousTreatment} type="text" className="form-control" required />
                               </div>
                             </div>
                           </div>

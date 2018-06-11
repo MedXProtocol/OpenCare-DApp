@@ -25,7 +25,9 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
   constructor (props) {
     super(props)
     this.state = {
-      details: {}
+      details: {},
+      firstImageUrl: '',
+      secondImageUrl: ''
     }
   }
 
@@ -56,7 +58,37 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     })
   }
 
-    render() {
+  overviewPhotoHtml = () => {
+    let html = <span></span>
+    if (this.state.firstImageUrl.length > 0) {
+      html = (
+        <img
+          src={this.state.firstImageUrl}
+          alt="Overview"
+          style={{maxHeight: 400}}
+          className="img-responsive" />
+      )
+    }
+
+    return html
+  }
+
+  closeupPhotoHtml = () => {
+    let html = <span></span>
+    if (this.state.secondImageUrl.length > 0) {
+      html = (
+        <img
+          src={this.state.secondImageUrl}
+          alt="Close-up"
+          style={{maxHeight: 400}}
+          className="img-responsive" />
+      )
+    }
+
+    return html
+  }
+
+  render() {
         return (
             <div className="card">
                 <div className="card-header">
@@ -69,24 +101,17 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                         <div className="col-xs-12 col-md-6 text-center">
                           <br />
                           <label className="label text-gray">Overview Photo:</label>
-                          <img
-                            src={this.state.firstImageUrl}
-                            alt="Overview"
-                            style={{maxHeight: 400}}
-                            className="img-responsive" />
+                          {this.overviewPhotoHtml()}
                         </div>
                         <div className="col-xs-12 col-md-6 text-center">
                           <br />
                           <label className="label text-gray">Close-up Photo:</label>
-                          <img
-                            src={this.state.secondImageUrl}
-                            alt="CloseUp"
-                            style={{maxHeight: 400}}
-                            className="img-responsive" />
+                          {this.closeupPhotoHtml()}
                         </div>
                       </div>
+                      <hr />
                       <div className="row">
-                        <div className="col-xs-12">
+                        <div className="col-xs-6">
                             <label className="label text-gray">How long have you had this problem:</label>
                             <p>{this.state.details.howLong}</p>
                         </div>
@@ -94,6 +119,19 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                             <label className="label text-gray">Is it growing, shrinking or staying the same size:</label>
                             <p>{this.state.details.size}</p>
                         </div>
+                         <div className="col-md-6">
+                            <label className="label text-gray">Is it painful:</label>
+                            <p>{this.state.details.painful}</p>
+                        </div>
+                        <div className="col-md-6">
+                            <label className="label text-gray">Is it bleeding:</label>
+                            <p>{this.state.details.bleeding}</p>
+                        </div>
+                        <div className="col-md-6">
+                            <label className="label text-gray">Is it itching:</label>
+                            <p>{this.state.details.itching}</p>
+                        </div>
+
                         <div className="col-md-6">
                             <label className="label text-gray">Any history of skin cancer:</label>
                             <p>{this.state.details.skinCancer}</p>
@@ -109,6 +147,14 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                         <div className="col-md-6">
                             <label className="label text-gray">Country:</label>
                             <p>{this.state.details.country}</p>
+                        </div>
+                       <div className="col-xs-12">
+                            <label className="label text-gray">Has it changed in color:</label>
+                            <p>{this.state.details.color}</p>
+                        </div>
+                        <div className="col-xs-12">
+                            <label className="label text-gray">Have you tried any treatments so far:</label>
+                            <p>{this.state.details.prevTreatment}</p>
                         </div>
                         <div className="col-xs-12">
                             <label className="label text-gray">Additional comments:</label>
