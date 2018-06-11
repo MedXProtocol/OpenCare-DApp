@@ -191,7 +191,7 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
                       </div>
                   </Modal.Body>
                   <Modal.Footer>
-                    <Link to='/cases/open' className="btn btn-primary">OK</Link>
+                    <Link to='/doctors/cases/open' className="btn btn-primary">OK</Link>
                   </Modal.Footer>
               </Modal>
               <Spinner loading={loading} />

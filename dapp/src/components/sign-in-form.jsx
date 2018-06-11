@@ -92,7 +92,9 @@ export const SignInForm = connect(mapStateToProps, mapDispatchToProps)(class _Si
               <input
                 value={this.state.masterPassword}
                 onChange={(e) => this.setState({masterPassword: e.target.value})}
-                type="password" className="form-control" />
+                type="password"
+                className="form-control"
+                autoFocus={true} />
               {masterPasswordError}
             </div>
             {this.props.children}

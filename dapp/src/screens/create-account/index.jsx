@@ -54,7 +54,7 @@ export const CreateAccount = connect(mapStateToProps, mapDispatchToProps)(class 
   render () {
     var content
     if (this.props.signedIn) {
-      content = <Redirect to='/' />
+      content = <Redirect to='/patients/cases' />
     } else if (this.state.showConfirm) {
       content = <ConfirmCreate onConfirm={this.onConfirm} />
     } else if (this.state.showMasterPassword) {

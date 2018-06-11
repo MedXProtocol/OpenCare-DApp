@@ -6,6 +6,10 @@
   padding: 3rem;
 }
 
+.form-wrapper--body > h3:first-child {
+  margin-top: 0;
+}
+
 .form-wrapper--inverse {
   box-shadow: 4px 4px 8px 0 rgba(0, 0, 0, 0.4);
   background: white;
