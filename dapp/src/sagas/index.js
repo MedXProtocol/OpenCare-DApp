@@ -5,21 +5,15 @@ import addRegistryContracts from './add-registry-contracts-saga'
 import signInSaga from './sign-in-saga'
 import signOutSaga from './sign-out-saga'
 import signUpSaga from './sign-up-saga'
-import developmentSignedInSaga from './development-signed-in-saga'
 
 export default function* () {
   yield fork(takeOnceAndRun, 'WEB3_INITIALIZED', addTopLevelContracts)
   yield takeEvery('WEB3_NETWORK_ID', addRegistryContracts)
 
-  let sagaArray = [
+  yield all([
     rootSagaGenesis(),
     signInSaga(),
     signOutSaga(),
     signUpSaga()
-  ]
-
-  if (process.env.NODE_ENV !== 'development')
-    sagaArray.push(developmentSignedInSaga())
-
-  yield all(sagaArray)
+  ])
 }
