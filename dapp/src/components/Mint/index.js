@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 import { MainLayout } from '~/layouts/MainLayout';
-import MintTokens from './components/MintTokens';
+import { MintTokensContainer } from './MintTokens';
 
-class Mint extends Component {
-
+export const Mint = class extends Component {
   render() {
     return (
-        <MainLayout>
-            <MintTokens />
-        </MainLayout>
+      <MainLayout>
+        <MintTokensContainer />
+      </MainLayout>
     );
   }
 }
-
-export default Mint;

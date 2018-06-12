@@ -45,8 +45,8 @@ export function* caseRowSaga({ caseAddress, AccountManager }) {
     yield cacheCall(AccountManager, 'publicKeys', diagnosingDoctorB)
   }
 }
-//withSaga(caseRowSaga, { propTriggers: ['caseAddress']})(
-export const CaseRow = withContractRegistry(withSend(class _CaseRow extends Component {
+
+export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow extends Component {
   constructor (props, context) {
     super(props, context)
     this.state = {}
@@ -132,7 +132,7 @@ export const CaseRow = withContractRegistry(withSend(class _CaseRow extends Comp
   }
 }))
 
-CaseRow.propTypes = {
+CaseRowContainer.propTypes = {
   caseAddress: PropTypes.string,
   caseIndex: PropTypes.any,
   showModal: PropTypes.bool

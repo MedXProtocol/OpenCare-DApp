@@ -4,7 +4,7 @@ import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { getAccount } from '~/services/get-account'
-import { SignInForm } from '~/components/sign-in-form'
+import { SignInFormContainer } from './SignInForm'
 import { BodyClass } from '~/components/BodyClass'
 
 function mapStateToProps(state, ownProps) {
@@ -27,7 +27,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
+export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
 
   componentDidMount() {
     this.props.signOut()
@@ -53,7 +53,7 @@ export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(cl
                 <h3 className='text-white text-center'>
                   Sign in to <strong>Med</strong>Credits
                 </h3>
-                <SignInForm onSubmit={this.onSubmit} hasAccount={!!this.props.account} />
+                <SignInFormContainer onSubmit={this.onSubmit} hasAccount={!!this.props.account} />
 
                 <div className="account--extras">
                   <p className='text-center text-white'>

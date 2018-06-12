@@ -21,7 +21,7 @@ function mapStateToProps (state) {
   }
 }
 
-const MintTokens = withContractRegistry(connect(mapStateToProps)(withSend(class _MintTokens extends Component {
+export const MintTokensContainer = withContractRegistry(connect(mapStateToProps)(withSend(class _MintTokens extends Component {
     constructor(props){
         super(props)
         this.state = {
@@ -115,4 +115,3 @@ const MintTokens = withContractRegistry(connect(mapStateToProps)(withSend(class 
     }
 })))
 
-export default MintTokens

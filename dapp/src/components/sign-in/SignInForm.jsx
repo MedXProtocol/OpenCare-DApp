@@ -24,7 +24,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignInForm = connect(mapStateToProps, mapDispatchToProps)(class _SignInForm extends Component {
+export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(class _SignInForm extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -113,7 +113,7 @@ export const SignInForm = connect(mapStateToProps, mapDispatchToProps)(class _Si
   }
 })
 
-SignInForm.propTypes = {
+SignInFormContainer.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   hasAccount: PropTypes.bool,
   masterPasswordError: PropTypes.string,

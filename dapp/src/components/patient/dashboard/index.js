@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { MainLayout } from '~/layouts/MainLayout';
-import { NewCaseContainer } from './cases/NewCase';
-import { PatientCasesContainer } from './cases';
+import { PatientDashboardHeaderContainer } from '../cases/PatientDashboardHeader';
+import { PatientCasesContainer } from '../cases';
 
 export const PatientDashboard = class extends Component {
   render() {
@@ -10,7 +10,7 @@ export const PatientDashboard = class extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              <NewCaseContainer />
+              <PatientDashboardHeaderContainer />
             </div>
           </div>
           <div className="row">

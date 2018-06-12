@@ -43,7 +43,7 @@ function* saga({ account, MedXToken }) {
   yield cacheCall(MedXToken, 'balanceOf', account)
 }
 
-const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(withSend(class _CreateCase extends Component {
+export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(withSend(class _CreateCase extends Component {
     constructor(){
         super()
 
@@ -308,9 +308,9 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                   <div className="card-header">
                     <div className="row">
                       <div className="col-xs-12 col-md-6">
-                        <h2 className="card-title">
+                        <h3 className="title">
                           Submit New Case
-                        </h2>
+                        </h3>
                         <p className="lead">
                           <small>Provide the physician with details about your problem. This will be encrypted so only you and your physician will be able to read it.</small>
                         </p>
@@ -678,4 +678,4 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
   }
 }))))
 
-export default withRouter(CreateCase);
+export const CreateCaseContainer = withRouter(CreateCase);

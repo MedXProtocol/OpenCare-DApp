@@ -35,7 +35,7 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
-const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(class extends Component {
+export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToProps)(withSend(class extends Component {
   constructor(props, context){
     super(props, context)
 
@@ -328,10 +328,8 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
   }
 }))
 
-SubmitDiagnosis.propTypes = {
+SubmitDiagnosisContainer.propTypes = {
   caseAddress: PropTypes.string,
   caseKey: PropTypes.any,
   diagnosisHash: PropTypes.string
 }
-
-export default SubmitDiagnosis

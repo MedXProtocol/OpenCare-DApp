@@ -25,7 +25,7 @@ function* saga({ account, MedXToken }) {
   yield cacheCall(MedXToken, 'balanceOf', account)
 }
 
-const Wallet = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(class _Wallet extends Component {
+export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(class _Wallet extends Component {
   render() {
     return (
       <MainLayout>
@@ -62,5 +62,3 @@ const Wallet = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account
     )
   }
 }))
-
-export default Wallet

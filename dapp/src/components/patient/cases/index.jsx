@@ -4,7 +4,11 @@ import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
-import { CaseRow, caseRowSaga, mapStateToCaseRowProps } from './case-row'
+import {
+  CaseRowContainer,
+  caseRowSaga,
+  mapStateToCaseRowProps
+} from './CaseRow'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { fork } from 'redux-saga/effects'
@@ -81,7 +85,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
               </thead>
               <tbody>
                 {this.props.cases.map(({caseAddress, caseRowProps}, caseIndex) =>
-                  <CaseRow
+                  <CaseRowContainer
                     caseAddress={caseAddress}
                     caseIndex={caseIndex}
                     key={caseIndex} {...caseRowProps} />

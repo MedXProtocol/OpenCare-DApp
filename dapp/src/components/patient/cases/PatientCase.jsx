@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { MainLayout } from '~/layouts/MainLayout';
-import CaseStatus from './components/CaseStatus';
+import { CaseStatus } from './components/CaseStatus';
 import CaseDetails from '~/components/CaseDetails';
 import Diagnosis from '~/components/Diagnosis';
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis';
@@ -32,7 +32,7 @@ function* saga({ match }) {
   yield cacheCall(caseAddress, 'diagnosisALocationHash')
 }
 
-const PatientCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match']})(class _PatientCase extends Component {
+export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match']})(class _PatientCase extends Component {
   render() {
     if (this.props.diagnosisHash) {
       var diagnosis =
@@ -60,5 +60,3 @@ const PatientCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     );
   }
 })))
-
-export default PatientCase;

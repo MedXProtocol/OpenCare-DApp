@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
-import RegisterDoctor from './RegisterDoctor';
+import { RegisterDoctorContainer } from './RegisterDoctor';
 import { MainLayout } from '~/layouts/MainLayout';
 
-class AddDoctor extends Component {
+export const AddDoctor = class extends Component {
   render() {
     return (
       <MainLayout>
-        <RegisterDoctor />
+        <RegisterDoctorContainer />
       </MainLayout>
     );
   }
 }
-
-export default AddDoctor;

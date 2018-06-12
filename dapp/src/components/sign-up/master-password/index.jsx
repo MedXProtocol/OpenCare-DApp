@@ -31,23 +31,25 @@ export class MasterPassword extends Component {
       <BodyClass isDark={true}>
         <div className='container'>
           <form className='row' onSubmit={this.onSubmit}>
-            <div className='col-sm-6 col-sm-offset-3'>
+            <div className='col-sm-8 col-sm-offset-2'>
               <h3 className='text-center text-white'>
                 Create your <b>Master Password</b>
               </h3>
               <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
                 <div className="form-wrapper--body">
                   <p className='text-gray'>
-                    You will use this password with your secret key to sign in:
+                    You will use this password with your secret key to sign in.
                   </p>
+                  <br />
 
-                  <label className="label text-gray">Password:</label>
+                  <label className="label">Password:</label>
                   <div className="well" role="alert">
                     <input
                       type="password"
                       value={this.state.masterPassword}
                       onChange={(event) => this.setState({masterPassword: event.target.value})}
-                      className="form-control input-lg text-center"
+                      className="form-control input-lg"
+                      autoFocus={true}
                       placeholder="Enter a password" />
                   </div>
                   {error}

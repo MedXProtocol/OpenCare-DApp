@@ -25,7 +25,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const CreateAccount = connect(mapStateToProps, mapDispatchToProps)(class _CreateAccount extends Component {
+export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(class _CreateAccount extends Component {
   constructor (props) {
     super(props)
     this.state = {

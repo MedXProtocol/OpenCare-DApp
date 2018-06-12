@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { MainLayout } from '~/layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { getAccount } from '~/services/get-account'
-import { SignInForm } from '~/components/sign-in-form'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 

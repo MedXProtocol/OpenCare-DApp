@@ -15,7 +15,7 @@ function mapStateToProps(state) {
   }
 }
 
-const RegisterDoctor = withContractRegistry(connect(mapStateToProps)(withSend(class _RegisterDoctor extends Component {
+export const RegisterDoctorContainer = withContractRegistry(connect(mapStateToProps)(withSend(class _RegisterDoctor extends Component {
     constructor(props){
         super(props)
         this.state = {
@@ -91,5 +91,3 @@ const RegisterDoctor = withContractRegistry(connect(mapStateToProps)(withSend(cl
         )
     }
 })))
-
-export default RegisterDoctor

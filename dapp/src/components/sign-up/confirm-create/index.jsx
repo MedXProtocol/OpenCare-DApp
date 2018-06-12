@@ -1,7 +1,6 @@
 import React from 'react'
 import { Alert } from 'react-bootstrap'
 import { connect } from 'react-redux'
-import { SignInForm } from '~/components/sign-in-form'
 import { BodyClass } from '~/components/BodyClass'
 
 export const ConfirmCreate = (({ onConfirm }) => {
@@ -9,7 +8,7 @@ export const ConfirmCreate = (({ onConfirm }) => {
     <BodyClass isDark={true}>
       <div className='container'>
         <div className='row'>
-          <div className='col-sm-6 col-sm-offset-3'>
+          <div className='col-sm-8 col-sm-offset-2'>
             <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
               <div className="form-wrapper--body">
                 <h3>

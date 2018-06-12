@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faFileMedical from '@fortawesome/fontawesome-free-solid/faFileMedical';
 
-export const NewCase = class extends Component {
+export const PatientDashboardHeader = class extends Component {
   navigateToNewCase = () => {
     this.props.history.push('/patients/cases/new');
   }
@@ -40,4 +40,4 @@ export const NewCase = class extends Component {
   }
 }
 
-export const NewCaseContainer = withRouter(NewCase)
+export const PatientDashboardHeaderContainer = withRouter(PatientDashboardHeader)

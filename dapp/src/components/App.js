@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { withRouter, Route, Redirect, Switch } from 'react-router-dom'
-import { CreateAccount } from './create-account'
-import { SignIn } from './sign-in'
+import { SignUpContainer } from './sign-up'
+import { SignInContainer } from './sign-in'
 import { PatientDashboard } from './patient/dashboard/'
-import { NewCase } from './New Case'
-import PatientCase from './Patient Case'
-import DiagnoseCase from './Diagnose Case'
-import AddDoctor from './doctors/new'
-import Mint from './Mint'
-import Wallet from './Wallet'
+import { NewCase } from './patient/cases/NewCase'
+import { PatientCaseContainer } from './patient/cases'
+import { DiagnoseCaseContainer } from './patient/cases/diagnose'
+import { AddDoctor } from './doctors/new'
+import { Mint } from './mint'
+import { WalletContainer } from './wallet'
 import { EmergencyKit } from './emergency-kit'
 import { OpenCasesContainer } from './open-cases'
 import { SignInRedirectContainer } from './sign-in-redirect'
@@ -31,18 +31,18 @@ const App = class extends Component {
           <Route path='/try-metamask' component={TryMetamask} />
 
           <Route path='/emergency-kit' component={EmergencyKit} />
-          <Route path='/sign-in' component={SignIn} />
-          <Route path='/sign-up' component={CreateAccount} />
-          <Route path='/mint' component={Mint}/>
-          <Route path='/wallet' component={Wallet}/>
+          <Route path='/sign-in' component={SignInContainer} />
+          <Route path='/sign-up' component={SignUpContainer} />
+          <Route path='/mint' component={Mint} />
+          <Route path='/wallet' component={WalletContainer} />
 
           <Route path='/doctors/cases/open' component={OpenCasesContainer} />
-          <Route path='/doctors/cases/diagnose/:caseAddress' component={DiagnoseCase}/>
-          <Route path='/doctors/new' component={AddDoctor}/>
+          <Route path='/doctors/cases/diagnose/:caseAddress' component={DiagnoseCaseContainer} />
+          <Route path='/doctors/new' component={AddDoctor} />
 
-          <Route exact path='/patients/cases/new' component={NewCase}/>
+          <Route exact path='/patients/cases/new' component={NewCase} />
           <Route exact path='/patients/cases' component={PatientDashboard} />
-          <Route path='/patients/cases/:caseAddress' component={PatientCase}/>
+          <Route path='/patients/cases/:caseAddress' component={PatientCaseContainer} />
 
           <Route path='/' component={FourOhFour} />
         </Switch>
