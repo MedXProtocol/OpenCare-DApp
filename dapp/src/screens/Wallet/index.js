@@ -37,14 +37,14 @@ const Wallet = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account
                   <h4 className="card-title">
                     <FontAwesomeIcon
                       icon={faPlus} />
-                    &nbsp; Your Balance: {parseInt(this.props.balance).toLocaleString()} MEDX
+                    &nbsp; <span className="title">Your Balance:</span> {parseInt(this.props.balance).toLocaleString()} MEDX
                   </h4>
                 </div>
                 <div className="card-body">
                   <div className="form-wrapper">
                     <p className='lead'>
                       For account:
-                      <br /><small className="text-gray">{this.props.account}</small>
+                      <br /><small className="eth-address text-gray">{this.props.account}</small>
                     </p>
 
                     <div className="text-right">

@@ -14,7 +14,12 @@ class NewCase extends Component {
         <div className='card-body'>
           <div className='row'>
             <div className='col-md-8 col-sm-12'>
-              <h1>My Cases</h1>
+              <h3 className="title">
+                My Cases
+              </h3>
+              <span className="sm-block text-gray">
+                <strong>Current &amp; Previously Evaluated</strong>
+              </span>
             </div>
             <div className='col-md-4 col-sm-12 button-container'>
               <button

@@ -321,6 +321,9 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                   <div className="card-body">
                     <div className="form-wrapper">
                       <form onSubmit={this.handleSubmit} >
+                        <div className="form-group--heading">
+                          Imagery:
+                        </div>
                         <div className="row">
                           <div className="col-xs-12 col-sm-12 col-md-6">
                             <div className="form-group">
@@ -377,6 +380,10 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                               </div>
                             </div>
                           </div>
+                        </div>
+
+                        <div className="form-group--heading">
+                          Details:
                         </div>
 
                           <div className="row">
@@ -545,7 +552,9 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                                 </ButtonToolbar>
                               </FormGroup>
                             </div>
+                          </div>
 
+                          <div className="row">
                             <div className="col-xs-12 col-md-6">
                               <FormGroup>
                                 <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
@@ -571,6 +580,27 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                           </div>
 
                           <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-6">
+                              <div className="form-group">
+                                <label>Has it changed in color?<span className='star'>*</span></label>
+                                <input onChange={this.updateColor} type="text" className="form-control" required />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-xs-12 col-sm-12 col-md-6">
+                              <div className="form-group">
+                                <label>Have you tried any treatments so far?<span className='star'>*</span></label>
+                                <input onChange={this.updatePreviousTreatment} type="text" className="form-control" required />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="form-group--heading">
+                            Additional Info:
+                          </div>
+                          <div className="row">
                             <div className="col-xs-5 col-sm-4 col-md-2">
                               <div className="form-group">
                                 <label>Age<span className='star'>*</span></label>
@@ -581,23 +611,6 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
                               <div className="form-group">
                                 <label>Country<span className='star'>*</span></label>
                                 <input onChange={this.updateCountry} type="text" className="form-control" required />
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-6">
-                              <div className="form-group">
-                                <label>Has it changed in color?<span className='star'>*</span></label>
-                                <input onChange={this.updateColor} type="text" className="form-control" required />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-6">
-                              <div className="form-group">
-                                <label>Have you tried any treatments so far?<span className='star'>*</span></label>
-                                <input onChange={this.updatePreviousTreatment} type="text" className="form-control" required />
                               </div>
                             </div>
                           </div>

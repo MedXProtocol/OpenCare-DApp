@@ -73,7 +73,7 @@ export const EmergencyKit = connect(mapStateToProps)(
 
                     <form onSubmit={this.handleSubmit} autoComplete='off'>
                       <div className="card-header">
-                        <h3 className="card-title">
+                        <h3 className="title card-title">
                           Hippocrates Emergency Kit
                           <br /><small className="text-gray">To access your secret key, please verify your account by entering your master password:</small>
                         </h3>
