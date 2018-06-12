@@ -1,10 +1,5 @@
 import {
-  select
-} from 'redux-saga/effects'
-import {
-  takeWeb3Initialized,
-  addContract,
-  cacheCall
+  addContract
  } from '~/saga-genesis/sagas'
 
 import medXTokenContractConfig from '#/MedXToken.json'

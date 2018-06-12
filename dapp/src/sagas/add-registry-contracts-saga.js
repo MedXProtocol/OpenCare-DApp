@@ -1,6 +1,5 @@
 import {
-  select,
-  getContext
+  select
 } from 'redux-saga/effects'
 import {
   contractByName

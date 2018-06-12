@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 let lastSagaKey = 0
 
-export function withSaga(saga, { propTriggers: propTriggers, storeKey: storeKey } = { storeKey: 'store' }) {
+export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' }) {
   return function (WrappedComponent) {
     function mapDispatchToProps(dispatch, props) {
       return {
