@@ -67,25 +67,25 @@ const other = [
   "You may have a more complex condition that should be evaluated by your primary care physician or local dermatologist. We highly encourage you to seek a live consultation"
 ]
 
-export const groupedRecommendationOptions = [
-  {
+export const groupedRecommendationOptions = {
+  "overTheCounter": {
     "label": "Over the Counter Remedies or Courses of Action",
     "options": overTheCounter.map(option => ({ "value": option, "label": option }))
   },
-  {
+  "topicalMedications": {
     "label": "Topical Medications (From your primary care doctor or local dermatologist)",
     "options": topicalMedications.map(option => ({ "value": option, "label": option }))
   },
-  {
+  "oralMedications": {
     "label": "Oral Medications (From your primary care doctor or local dermatologist)",
     "options": oralMedications.map(option => ({ "value": option, "label": option }))
   },
-  {
+  "procedures": {
     "label": "Procedures (By your primary care doctor or local dermatologist)",
     "options": procedures.map(option => ({ "value": option, "label": option }))
   },
-  {
+  "other": {
     "label": "Other",
     "options": other.map(option => ({ "value": option, "label": option }))
   }
-]
+}

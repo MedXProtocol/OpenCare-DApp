@@ -40,8 +40,12 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
     super(props, context)
 
     this.state = {
-      selectedRecommendation: [],
-      furtherRecommendation: null,
+      overTheCounterRecommendation: [],
+      topicalMedicationsRecommendation: [],
+      oralMedicationsRecommendation: [],
+      proceduresRecommendation: [],
+      otherRecommendation: [],
+      additionalRecommendation: '',
 
       isChallenge: false,
       originalDiagnosis: null,
@@ -72,34 +76,41 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
     }
   }
 
+  recommendationSelectUpdated = (key) => {
+    return (newValue) => {
+      this.setState({
+        [key]: newValue.map(option => option.value)
+      }, this.buildFinalRecommendation)
+    }
+  }
+
   // This is the diagnosis chosen in the 'react-select' <Select> component
   updateDiagnosis = (newValue) => {
     this.setState({ diagnosis: newValue.value }, this.validateInputs)
   }
 
-  // This is the recommendation chosen by the 'react-select' multi <Select> component
-  updateRecommendation = (newValue) => {
-    let selectedRecommendation = newValue.map(option => option.value)
-
-    this.setState({ selectedRecommendation: selectedRecommendation }, this.buildFinalRecommendation)
-  }
-
   // This is the recommendation the physician can type into the textarea below
-  updateFurtherRecommendation = (event) => {
+  updateAdditionalRecommendation = (event) => {
     let newValue = event.target.value.length ? event.target.value : null
 
-    this.setState({ furtherRecommendation: event.target.value }, this.buildFinalRecommendation)
+    this.setState({ additionalRecommendation: event.target.value }, this.buildFinalRecommendation)
   }
 
-  // Combines the selectedRecommendation with the furtherRecommendation
+  // Combines the selected recommendation arrays with the additionalRecommendation
   buildFinalRecommendation = () => {
-    let recommendationArray = this.state.selectedRecommendation
-      .concat(this.state.furtherRecommendation)
-      .filter(element => {
-        return (element !== (undefined || null || ''))
-      })
+    let recommendation = [
+      this.state.overTheCounterRecommendation.join(', '),
+      this.state.topicalMedicationsRecommendation.join(', '),
+      this.state.oralMedicationsRecommendation.join(', '),
+      this.state.proceduresRecommendation.join(', '),
+      this.state.otherRecommendation.join(', ')
+    ].filter(element => (element !== (undefined || null || '')))
+     .join(', ')
 
-    this.setState({ recommendation: recommendationArray.join(', ') }, this.validateInputs)
+    if (this.state.additionalRecommendation.length > 0)
+      recommendation = `${recommendation}. ${this.state.additionalRecommendation}`
+
+    this.setState({ recommendation }, this.validateInputs)
   }
 
   validateInputs = () => {
@@ -160,6 +171,7 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
             <div className="card-header">
               <h3 className="card-title">
                 Submit Diagnosis
+                <br /><small><a className="link--internal" href="#view-case-details">View Case Details</a></small>
               </h3>
             </div>
             <div className="card-body">
@@ -178,24 +190,79 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
                   </div>
 
                   <div className="form-group">
-                    <label>Recommendation<span className='star'>*</span></label>
+                    <label>Recommendation(s)<span className='star'>*</span></label>
 
-                    <Select
-                      placeholder="--- Choose recommendations ---"
-                      styles={customStyles}
-                      components={Animated}
-                      closeMenuOnSelect={true}
-                      options={groupedRecommendationOptions}
-                      isMulti={true}
-                      onChange={this.updateRecommendation}
-                      required />
+                    <div className="form-group">
+                      <Select
+                        placeholder={groupedRecommendationOptions.overTheCounter.label}
+                        styles={customStyles}
+                        components={Animated}
+                        closeMenuOnSelect={true}
+                        options={groupedRecommendationOptions.overTheCounter.options}
+                        isMulti={true}
+                        onChange={this.recommendationSelectUpdated('overTheCounterRecommendation')}
+                        selected={this.state.overTheCounterRecommendation}
+                        required />
+                    </div>
+
+                    <div className="form-group">
+                      <Select
+                        placeholder={groupedRecommendationOptions.topicalMedications.label}
+                        styles={customStyles}
+                        components={Animated}
+                        closeMenuOnSelect={true}
+                        options={groupedRecommendationOptions.topicalMedications.options}
+                        isMulti={true}
+                        onChange={this.recommendationSelectUpdated('topicalMedicationsRecommendation')}
+                        selected={this.state.topicalMedicationsRecommendation}
+                        required />
+                    </div>
+
+                    <div className="form-group">
+                      <Select
+                        placeholder={groupedRecommendationOptions.oralMedications.label}
+                        styles={customStyles}
+                        components={Animated}
+                        closeMenuOnSelect={true}
+                        options={groupedRecommendationOptions.oralMedications.options}
+                        isMulti={true}
+                        onChange={this.recommendationSelectUpdated('oralMedicationsRecommendation')}
+                        selected={this.state.oralMedicationsRecommendation}
+                        required />
+                    </div>
+
+                    <div className="form-group">
+                      <Select
+                        placeholder={groupedRecommendationOptions.procedures.label}
+                        styles={customStyles}
+                        components={Animated}
+                        closeMenuOnSelect={true}
+                        options={groupedRecommendationOptions.procedures.options}
+                        isMulti={true}
+                        onChange={this.recommendationSelectUpdated('proceduresRecommendation')}
+                        selected={this.state.proceduresRecommendation}
+                        required />
+                    </div>
+
+                    <div className="form-group">
+                      <Select
+                        placeholder={groupedRecommendationOptions.other.label}
+                        styles={customStyles}
+                        components={Animated}
+                        closeMenuOnSelect={true}
+                        options={groupedRecommendationOptions.other.options}
+                        isMulti={true}
+                        onChange={this.recommendationSelectUpdated('otherRecommendation')}
+                        selected={this.state.otherRecommendation}
+                        required />
+                    </div>
                   </div>
 
                   <div className="form-group">
-                    <label>Further Recommendation</label>
+                    <label>Additional Recommendation</label>
 
                     <textarea
-                      onChange={this.updateFurtherRecommendation}
+                      onChange={this.updateAdditionalRecommendation}
                       className="form-control"
                       rows="3"
                       required />
