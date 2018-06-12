@@ -100,7 +100,7 @@ const DiagnoseCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga
           <div className='row'>
             {diagnosis}
             {challenge}
-            <div className='col-xs-12'>
+            <div id="view-case-details" className='col-xs-12'>
               <CaseDetails caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
             </div>
           </div>

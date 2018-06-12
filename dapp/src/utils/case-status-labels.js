@@ -15,3 +15,21 @@ export function caseStatusToName(status) {
   }
   return statuses[status]
 }
+
+export function caseStatusToClass(status) {
+  var statuses = {
+    0: 'default',
+    1: 'info',
+    2: 'danger',
+    3: 'warning',
+    4: 'info',
+    5: 'default',
+    6: 'default',
+    7: 'warning',
+    8: 'warning',
+    9: 'info',
+    10: 'danger',
+    11: 'success'
+  }
+  return statuses[status]
+}
