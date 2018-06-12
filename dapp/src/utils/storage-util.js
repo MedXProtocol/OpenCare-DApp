@@ -3,7 +3,7 @@ import {promisify} from './common-util';
 import aes from '~/services/aes'
 
 const ipfsApi = IpfsApi(
-  process.env.REACT_APP_IPFS_HOSTNAME || 'ipfs.infura.io',
+  process.env.REACT_APP_IPFS_HOSTNAME || 'ipfs.medcredits.io',
   process.env.REACT_APP_IPFS_PORT || '5001',
   {protocol:
   process.env.REACT_APP_IPFS_PROTOCOL || 'https'})
