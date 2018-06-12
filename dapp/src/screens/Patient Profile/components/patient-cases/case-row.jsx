@@ -118,7 +118,10 @@ export const CaseRow = withContractRegistry(withSend(class _CaseRow extends Comp
       <tr>
         {modal}
         <td className="text-center">{this.props.caseIndex+1}</td>
-        <td><Link to={`/patients/cases/${this.props.caseAddress}`}>{this.props.caseAddress}</Link></td>
+        feature/big-titles
+        <td className="eth-address">
+          <Link to={`/patients/cases/${this.props.caseAddress}`}>{this.props.caseAddress}</Link>
+        </td>
         <td>{caseStatusToName(status)}</td>
         <td className="td-actions text-right">
           {approvalButton}

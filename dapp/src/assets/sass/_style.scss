@@ -1,5 +1,11 @@
 body {
   padding-bottom: 10rem;
+  letter-spacing: 0.025rem;
+  font-feature-settings: "liga1" on;
+}
+
+.eth-address {
+  font-family: "Space Mono", monospace;
 }
 
 .body-inverse {
