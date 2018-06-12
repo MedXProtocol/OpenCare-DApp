@@ -13,16 +13,19 @@ function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   const MedXToken = contractByName(state, 'MedXToken')
   const balance = '' + cacheCallValue(state, MedXToken, 'balanceOf', account)
+  const canMint = cacheCallValue(state, MedXToken, 'owner') === account
   return {
     account,
     MedXToken,
-    balance
+    balance,
+    canMint
   }
 }
 
 function* saga({ account, MedXToken }) {
   if (!account || !MedXToken) { return }
   yield cacheCall(MedXToken, 'balanceOf', account)
+  yield cacheCall(MedXToken, 'owner')
 }
 
 export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(class _Wallet extends Component {
@@ -47,11 +50,13 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
                       <br /><small className="eth-address text-gray">{this.props.account}</small>
                     </p>
 
-                    <div className="text-right">
-                      <Link to='/mint' className="btn btn-primary btn-lg">
-                        Buy MEDX
-                      </Link>
-                    </div>
+                    {this.props.canMint &&
+                      <div className="text-right">
+                        <Link to='/mint' className="btn btn-primary btn-lg">
+                          Buy MEDX
+                        </Link>
+                      </div>
+                    }
                   </div>
                 </div>
               </div>
