@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { Alert, Modal } from 'react-bootstrap'
-import { HelpBlock } from 'react-bootstrap'
+import { Alert, HelpBlock, Modal } from 'react-bootstrap'
 import { formatKey } from '~/services/format-key'
 import { isAccountMasterPassword } from '~/services/is-account-master-password'
 import { connect } from 'react-redux'
@@ -46,7 +45,11 @@ export const SignInForm = connect(mapStateToProps, mapDispatchToProps)(class _Si
 
   doSubmit = (overrideAccount) => {
     var strippedSecretKey = this.state.secretKey.replace(/[^\w]/g, '')
-    this.props.onSubmit({ secretKey: strippedSecretKey, masterPassword: this.state.masterPassword, overrideAccount })
+    this.props.onSubmit({
+      secretKey: strippedSecretKey,
+      masterPassword: this.state.masterPassword,
+      overrideAccount
+    })
   }
 
   render () {
@@ -92,7 +95,9 @@ export const SignInForm = connect(mapStateToProps, mapDispatchToProps)(class _Si
               <input
                 value={this.state.masterPassword}
                 onChange={(e) => this.setState({masterPassword: e.target.value})}
-                type="password" className="form-control" />
+                type="password"
+                className="form-control"
+                autoFocus={true} />
               {masterPasswordError}
             </div>
             {this.props.children}

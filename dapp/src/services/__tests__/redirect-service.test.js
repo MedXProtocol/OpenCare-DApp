@@ -9,9 +9,9 @@ describe('redirect-service', () => {
   })
 
   describe('no previous account in cookies', () => {
-    it('should send them to sign up', () => {
+    it('should send them to welcome', () => {
       expect(redirectService({isSignedIn: false, hasAccount: false, pathname: '/'}))
-        .toEqual('/sign-up')
+        .toEqual('/welcome')
     })
 
     it('should do nothing if already on sign up page', () => {
@@ -49,12 +49,12 @@ describe('redirect-service', () => {
 
       it('should redirect if they try to sign in', () => {
         expect(redirectService({isSignedIn: true, hasAccount: true, pathname: '/sign-in'}))
-          .toEqual('/')
+          .toEqual('/patients/cases')
       })
 
       it('should redirect if they try to sign up', () => {
         expect(redirectService({isSignedIn: true, hasAccount: true, pathname: '/sign-up'}))
-          .toEqual('/')
+          .toEqual('/patients/cases')
       })
     })
   })

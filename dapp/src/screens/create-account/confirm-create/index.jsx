@@ -19,11 +19,11 @@ export const ConfirmCreate = (({ onConfirm }) => {
 
                 <p className='lead'>
                   The last thing we need to do is record your public key to the blockchain.  This key allows doctors
-                  to view your cases.  Once you complete the sign up, you'll be prompted with a transaction.
+                  to view your cases.
                 </p>
-
-                <hr />
-
+                <p className='lead'>
+                  Once you complete the sign up, you'll be prompted with a transaction.
+                </p>
               </div>
               <div className="form-wrapper--footer text-right">
                 <button className='btn btn-success btn-lg' onClick={onConfirm}>Finish Sign Up</button>

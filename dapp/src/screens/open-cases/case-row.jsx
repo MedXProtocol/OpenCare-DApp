@@ -45,7 +45,7 @@ const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga,
     let isApprovedDiagnosingADoctor = this.props.diagnosingDoctorA == this.props.account && status > 3
     let isApprovedDiagnosingBDoctor = this.props.diagnosingDoctorB == this.props.account && status > 8
     if (isApprovedDiagnosingADoctor || isApprovedDiagnosingBDoctor) {
-      var address = <Link to={`/diagnose-case/${this.props.address}`}>{this.props.address}</Link>
+      var address = <Link to={`/doctors/cases/diagnose/${this.props.address}`}>{this.props.address}</Link>
     } else {
       address = this.props.address
     }

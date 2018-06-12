@@ -34,7 +34,13 @@ export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(cl
   }
 
   onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
-    this.props.signIn({ secretKey, masterPassword, account: this.props.account, address: this.props.address, overrideAccount })
+    this.props.signIn({
+      secretKey,
+      masterPassword,
+      account: this.props.account,
+      address: this.props.address,
+      overrideAccount
+    })
   }
 
   render () {
@@ -43,7 +49,7 @@ export const SignIn = withRouter(connect(mapStateToProps, mapDispatchToProps)(cl
         <MainLayout>
           <div className='container'>
             <div className='row'>
-              <div className='col-sm-6 col-sm-offset-3'>
+              <div className='col-sm-8 col-sm-offset-2 col-sm-8 col-sm-offset-2'>
                 <h3 className='text-white text-center'>
                   Sign in to <strong>Med</strong>Credits
                 </h3>

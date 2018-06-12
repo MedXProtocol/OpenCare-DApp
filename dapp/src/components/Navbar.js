@@ -81,24 +81,24 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
         </NavDropdown>
 
       var myCasesItem =
-        <IndexLinkContainer to='/'  activeClassName="active">
-          <NavItem href='/'>
+        <IndexLinkContainer to='/patients/cases'  activeClassName="active">
+          <NavItem href='/patients/cases'>
             My Cases
           </NavItem>
         </IndexLinkContainer>
 
       if (isDoctor) {
         var openCasesItem =
-          <LinkContainer to='/cases/open'>
-            <NavItem href='/cases/open'>
+          <LinkContainer to='/doctors/cases/open'>
+            <NavItem href='/doctors/cases/open'>
               Diagnose Cases
             </NavItem>
           </LinkContainer>
       }
 
       var doctorsItem =
-        <LinkContainer to='/doctors'>
-          <NavItem href='/doctors'>
+        <LinkContainer to='/doctors/new'>
+          <NavItem href='/doctors/new'>
             Doctors
           </NavItem>
         </LinkContainer>
@@ -115,6 +115,8 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
 
     let navbarClassName = classnames('navbar', { 'navbar-transparent': this.props.transparent, 'navbar-absolute': this.props.transparent, 'navbar-default': !this.props.transparent})
 
+    let dynamicHomePath = this.props.signedIn ? '/patients/cases' : '/'
+
     return (
       <Navbar
         inverse
@@ -123,7 +125,7 @@ const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToP
         className={navbarClassName}>
         <Navbar.Header>
           <Navbar.Brand>
-            <Link to='/' className="navbar-brand" id="collNav" href="">
+            <Link to={dynamicHomePath} className="navbar-brand">
               <img src={logo} alt="MedCredits"></img>
             </Link>
           </Navbar.Brand>

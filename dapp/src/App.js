@@ -10,9 +10,10 @@ import DiagnoseCase from './screens/Diagnose Case'
 import AddDoctor from './screens/Add Doctor'
 import Mint from './screens/Mint'
 import Wallet from './screens/Wallet'
-import EmergencyKit from './screens/emergency-kit'
+import { EmergencyKit } from './screens/emergency-kit'
 import { OpenCases } from './screens/open-cases'
 import { SignInRedirectContainer } from './sign-in-redirect'
+import { Welcome } from './components/welcome'
 import { TryMetamask } from './screens/try-metamask'
 import { LoginToMetaMask } from './screens/login-to-metamask'
 import FourOhFour from './screens/four-oh-four'
@@ -21,28 +22,32 @@ import { hot } from 'react-hot-loader'
 
 const App = class extends Component {
   render () {
-    var result =
+    return (
       <div>
         <SignInRedirectContainer />
         <Switch>
-          <Route path='/emergency-kit' component={EmergencyKit} />
+          <Route path='/welcome' component={Welcome} />
           <Route path='/login-metamask' component={LoginToMetaMask} />
           <Route path='/try-metamask' component={TryMetamask} />
-          <Route path='/sign-in' component={ SignIn } />
-          <Route path='/sign-up' component={ CreateAccount } />
-          <Route exact path='/new-case' component={ NewCase }/>
-          <Route path='/patient-case/:caseAddress' component={ PatientCase }/>
-          <Route path='/diagnose-case/:caseAddress' component={ DiagnoseCase }/>
-          <Route path='/doctors' component={ AddDoctor }/>
-          <Route path='/mint' component={ Mint }/>
-          <Route path='/wallet' component={ Wallet }/>
-          <Route exact path='/cases/open' component={ OpenCases } />
-          <Route exact path='/' component={ PatientProfile }/>
+
+          <Route path='/emergency-kit' component={EmergencyKit} />
+          <Route path='/sign-in' component={SignIn} />
+          <Route path='/sign-up' component={CreateAccount} />
+          <Route path='/mint' component={Mint}/>
+          <Route path='/wallet' component={Wallet}/>
+
+          <Route path='/doctors/cases/open' component={OpenCases} />
+          <Route path='/doctors/cases/diagnose/:caseAddress' component={DiagnoseCase}/>
+          <Route path='/doctors/new' component={AddDoctor}/>
+
+          <Route exact path='/patients/cases/new' component={NewCase}/>
+          <Route exact path='/patients/cases' component={PatientProfile}/>
+          <Route path='/patients/cases/:caseAddress' component={PatientCase}/>
+
           <Route path='/' component={FourOhFour} />
         </Switch>
       </div>
-
-    return result
+    )
   }
 }
 

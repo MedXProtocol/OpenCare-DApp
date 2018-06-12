@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Alert } from 'react-bootstrap'
 import { BodyClass } from '~/components/BodyClass'
 import masterPasswordInvalid from '~/services/master-password-invalid'
-import './master-password.css'
 
 export class MasterPassword extends Component {
   constructor (props) {
@@ -42,12 +41,13 @@ export class MasterPassword extends Component {
                     You will use this password with your secret key to sign in:
                   </p>
 
+                  <label className="label text-gray">Password:</label>
                   <div className="well" role="alert">
                     <input
                       type="password"
                       value={this.state.masterPassword}
                       onChange={(event) => this.setState({masterPassword: event.target.value})}
-                      className="form-control master-password__input"
+                      className="form-control input-lg text-center"
                       placeholder="Enter a password" />
                   </div>
                   {error}

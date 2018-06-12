@@ -222,7 +222,7 @@ const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, 
 
         this.setState({showThankYouModal: false});
 
-        this.props.history.push('/');
+        this.props.history.push('/patients/cases');
     }
 
     handleCancelConfirmSubmissionModal = (event) => {

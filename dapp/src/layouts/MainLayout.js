@@ -14,7 +14,7 @@ class MainLayout extends Component {
             <div className="row">
               <div className="col-sm-12 text-center">
                 <p className="text-footer">
-                  &copy; MedCredits 2018
+                  &copy; 2018 MedCredits Inc. - All Rights Reserved.
                 </p>
               </div>
             </div>
