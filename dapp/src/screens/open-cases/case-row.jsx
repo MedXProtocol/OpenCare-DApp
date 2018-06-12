@@ -54,9 +54,9 @@ const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga,
     }
     return (
       <tr>
-        <td>{address}</td>
-        <td>{status}</td>
-        <td></td>
+        <td className="eth-address text"><span>{address}</span></td>
+        <td width="10%">{status}</td>
+        <td width="15%"></td>
       </tr>
     )
   }

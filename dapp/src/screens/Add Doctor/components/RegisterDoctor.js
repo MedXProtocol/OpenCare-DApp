@@ -60,7 +60,7 @@ const RegisterDoctor = withContractRegistry(connect(mapStateToProps)(withSend(cl
               <div className="col-sm-6 col-sm-offset-3">
                 <div className="card">
                   <div className="card-header">
-                    <h4 className="card-title">
+                    <h4 className="title card-title">
                       Register a new Doctor
                     </h4>
                   </div>

@@ -34,15 +34,11 @@
   color: $medcredits-text-gray;
 }
 
-.btn {
+.form-group--heading {
+  color: $medcredits-text-gray;
+  font-weight: 700;
   font-size: 13px;
-  font-weight: normal;
   letter-spacing: 1px;
+  margin: 1rem 0;
   text-transform: uppercase;
-  padding: 15px 20px;
-}
-
-.btn-sm {
-  font-size: 12px;
-  padding: 7px 12px;
 }

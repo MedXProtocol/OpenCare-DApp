@@ -1,5 +1,20 @@
 body {
   padding-bottom: 10rem;
+  letter-spacing: 0.025rem;
+  font-feature-settings: "liga1" on;
+}
+
+.title {
+  font-weight: 700;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.eth-address {
+  font-family: "Space Mono", monospace;
+  text-transform: lowercase;
 }
 
 .body-inverse {

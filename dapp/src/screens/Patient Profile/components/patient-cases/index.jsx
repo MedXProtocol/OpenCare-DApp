@@ -3,6 +3,8 @@ import { withRouter } from 'react-router-dom'
 import './PatientCases.css'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
 import { CaseRow, caseRowSaga, mapStateToCaseRowProps } from './case-row'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
@@ -61,38 +63,35 @@ const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchTo
   render() {
     return (
         <div className="card">
-            <div className="card-header">
-              <h4 className="card-title">
-                Case Log
-              </h4>
-            </div>
-            <div className="card-body table-responsive">
-            {
-                !this.props.caseListCount || this.props.caseListCount === '0' ?
-                <div className="alert alert-info text-center">
-                  <span>You do not have any historical or pending cases.</span>
-                </div> :
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <th className="text-center">#</th>
-                      <th>Case Address</th>
-                      <th>Status</th>
-                      <th className="text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {this.props.cases.map(({caseAddress, caseRowProps}, caseIndex) =>
-                      <CaseRow
-                        caseAddress={caseAddress}
-                        caseIndex={caseIndex}
-                        key={caseIndex} {...caseRowProps} />
-                    )}
-                  </tbody>
-                </table>
-            }
-            </div>
+          <div className="card-body table-responsive">
+          {
+            !this.props.caseListCount || this.props.caseListCount === '0' ?
+            <div className="alert alert-info text-center">
+              <span>You do not have any historical or pending cases.</span>
+            </div> :
+            <table className="table table-striped">
+              <thead>
+                <tr>
+                  <th className="text-center">#</th>
+                  <th>Case Address</th>
+                  <th>Status</th>
+                  <th className="text-right">
+                    <FontAwesomeIcon icon={faEdit} />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.props.cases.map(({caseAddress, caseRowProps}, caseIndex) =>
+                  <CaseRow
+                    caseAddress={caseAddress}
+                    caseIndex={caseIndex}
+                    key={caseIndex} {...caseRowProps} />
+                )}
+              </tbody>
+            </table>
+          }
         </div>
+      </div>
     )
   }
 })))

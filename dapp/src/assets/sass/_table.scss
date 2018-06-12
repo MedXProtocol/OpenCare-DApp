@@ -4,5 +4,30 @@
 .table > tbody > tr > td,
 .table > tfoot > tr > th,
 .table > tfoot > tr > td {
-  border: 0
+  border: 0;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th {
+  color: #aaa;
+  font-weight: 400;
+}
+
+.table td.text {
+  max-width: 177px;
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 100%;
+  }
+}
+
+.table-responsive {
+  @media screen and (max-width: 767px) {
+    border: 0;
+  }
 }

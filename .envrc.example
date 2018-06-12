@@ -9,4 +9,5 @@ export GENERATE_SOURCEMAP=true
 # Below are variables for the dapp.  They must be prefixed with `REACT_APP_` to be included.
 
 export REACT_APP_REQUIRED_NETWORK_ID=1234
-export REACT_APP_IPFS_HOSTNAME=ipfs.infura.io
+export REACT_APP_IPFS_HOSTNAME=ipfs.medcredits.io
+export REACT_APP_IPFS_PORT=5001

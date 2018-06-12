@@ -10,6 +10,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
+import faNotesMedical from '@fortawesome/fontawesome-free-solid/faNotesMedical';
 import { CaseRow } from './case-row'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
@@ -56,35 +59,43 @@ const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, {
     return (
       <MainLayout>
         <div className="container">
+          <div className='header-card card'>
+            <div className='card-body'>
+              <div className='row'>
+                <div className='col-md-8 col-sm-12'>
+                  <h3 className="title">
+                    Diagnose Cases
+                  </h3>
+                  <span className="sm-block text-gray">
+                    <strong>Open Cases:</strong> {this.props.openCaseCount} &nbsp;
+                  </span>
+                </div>
+                <div className='col-md-4 col-sm-12 button-container'>
+                  <Button
+                    disabled={this.props.openCaseCount === '0'}
+                    onClick={this.onClickRequestCase}
+                    bsStyle="info">
+                    <FontAwesomeIcon
+                      icon={faNotesMedical}
+                      size='lg' /> &nbsp; Request Case
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="row">
             <div className='col-xs-12'>
               <div className="card">
-                <div className='card-header'>
-                  <div className="pull-left">
-                    <h4 className="card-title">
-                      Open Cases: {this.props.openCaseCount}
-                    </h4>
-                  </div>
-
-                  <div className="pull-right">
-                    <Button
-                      className=""
-                      disabled={this.props.openCaseCount === '0'}
-                      onClick={this.onClickRequestCase}
-                      bsStyle="success">Request Case</Button>
-                  </div>
-                </div>
                 <div className='card-body'>
-                  <h2>
-                    Cases
-                  </h2>
-
                   <Table className="table table-striped">
                     <thead>
                       <tr>
                         <th>Address</th>
                         <th>Status</th>
-                        <th></th>
+                        <th className="text-right">
+                          <FontAwesomeIcon icon={faEdit} />
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -112,3 +123,9 @@ OpenCases.defaultProps = {
 }
 
 export { OpenCases }
+
+// <div className='card-header'>
+//   <h4 className="card-title">
+//     All Cases
+//   </h4>
+// </div>
