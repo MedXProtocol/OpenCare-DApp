@@ -4,6 +4,7 @@ import sagas from './sagas'
 import reducers from './reducers'
 import { ContractRegistry, CallCountRegistry } from '~/saga-genesis'
 import contractRegistryOptions from './contract-registry-options'
+import { preloadedState } from '~/services/preloadedStateService'
 
 export const contractRegistry = new ContractRegistry(contractRegistryOptions)
 export const callCountRegistry = new CallCountRegistry()
@@ -15,7 +16,12 @@ const sagaMiddleware = createSagaMiddleware({
     callCountRegistry
   }
 })
-let store = createStore(reducers, undefined, composeEnhancers(applyMiddleware(sagaMiddleware)))
+
+let store = createStore(
+  reducers,
+  preloadedState(),
+  composeEnhancers(applyMiddleware(sagaMiddleware))
+)
 sagaMiddleware.run(sagas)
 
 export default store
