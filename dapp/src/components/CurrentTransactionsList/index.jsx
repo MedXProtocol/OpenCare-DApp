@@ -3,6 +3,9 @@ import { connect } from 'react-redux'
 import { NavDropdown } from 'react-bootstrap'
 import { I18n } from 'react-i18next'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
+import classnames from 'classnames'
+
+import './CurrentTransactionsList.scss'
 
 function mapStateToProps(state) {
   return {
@@ -45,19 +48,12 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
     }
 
     getDropdownClassName = (transactions) => {
-      let dropdownClass = ''
-      let hasError
-      let hasPending
+      let error = this.state.pendingOrErrorTransactions.find(tx => tx[1].error)
+      let notConfirmed = this.state.pendingOrErrorTransactions.find(tx => !tx[1].confirmed)
 
-      hasError = this.state.pendingOrErrorTransactions.find(tx => tx[1].error)
-      hasPending = this.state.pendingOrErrorTransactions.find(tx => !tx[1].confirmed)
-
-      if (hasError)
-        dropdownClass = 'nav-transactions-text--danger'
-      else if (hasPending)
-        dropdownClass = 'nav-transactions-text--warning'
-      else
-        dropdownClass = 'nav-transactions-text--success'
+      let dropdownClass = this.getClassName({
+        error, confirmed: !notConfirmed
+      })
 
       return dropdownClass
     }
@@ -87,7 +83,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
               timeout={500}
               classNames="fade">
               <li className="nav-transactions--item">
-                <span className={this.getClassName(value)}>{'\u2b24'}</span> &nbsp;
+                <span className={classnames('nav-transactions--circle', this.getClassName(value))} /> &nbsp;
                 {t(`transactions.${name}`, {
                   mintMedxCount: mintMedxCount
                 })}
@@ -114,7 +110,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           id='transactions'
           title={
             <span>
-              Status <span className={this.getDropdownClassName()}>{'\u2b24'}</span>
+              <span className={classnames('nav-transactions--circle', this.getDropdownClassName())} /> Status
             </span>
           }>
           <div className="nav-transactions">
