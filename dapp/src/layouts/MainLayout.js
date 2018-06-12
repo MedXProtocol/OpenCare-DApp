@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types'
-import Navbar from "~/components/Navbar";
+import { HippoNavbarContainer } from "../components/HippoNavbar";
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 
-class MainLayout extends Component {
+export const MainLayout = class extends Component {
   static propTypes = {
     doNetworkCheck: PropTypes.bool
   }
@@ -19,7 +19,7 @@ class MainLayout extends Component {
     return (
       <div className="wrapper">
         <div className="main-panel">
-          <Navbar />
+          <HippoNavbarContainer />
           {networkCheckmodal}
           <div className="content">{this.props.children}</div>
         </div>
@@ -38,5 +38,3 @@ class MainLayout extends Component {
     );
   }
 }
-
-export default MainLayout;

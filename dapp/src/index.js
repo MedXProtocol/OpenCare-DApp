@@ -8,7 +8,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '~/config/i18n';
 import './assets/css/themify-icons.css'
 import './index.css'
-import App from './App'
+import App from '~/components/App'
 import store, { contractRegistry } from '~/store'
 
 window.addEventListener('load', () => {
