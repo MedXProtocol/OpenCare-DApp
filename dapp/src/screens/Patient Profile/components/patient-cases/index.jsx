@@ -63,7 +63,7 @@ const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchTo
         <div className="card">
             <div className="card-header">
               <h4 className="card-title">
-                Case Log
+                All Cases
               </h4>
             </div>
             <div className="card-body table-responsive">

@@ -56,29 +56,35 @@ const OpenCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, {
     return (
       <MainLayout>
         <div className="container">
+          <div className='header-card card'>
+            <div className='card-body'>
+              <div className='row'>
+                <div className='col-md-8 col-sm-12'>
+                  <h1>Diagnose Cases</h1>
+                </div>
+                <div className='col-md-4 col-sm-12 button-container'>
+                  <span className="card-title sm-block">
+                    Open Cases: {this.props.openCaseCount} &nbsp;
+                  </span>
+                  <Button
+                    className=""
+                    disabled={this.props.openCaseCount === '0'}
+                    onClick={this.onClickRequestCase}
+                    bsStyle="success">Request Case</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="row">
             <div className='col-xs-12'>
               <div className="card">
                 <div className='card-header'>
-                  <div className="pull-left">
-                    <h4 className="card-title">
-                      Open Cases: {this.props.openCaseCount}
-                    </h4>
-                  </div>
-
-                  <div className="pull-right">
-                    <Button
-                      className=""
-                      disabled={this.props.openCaseCount === '0'}
-                      onClick={this.onClickRequestCase}
-                      bsStyle="success">Request Case</Button>
-                  </div>
+                  <h4 className="card-title">
+                    All Cases
+                  </h4>
                 </div>
                 <div className='card-body'>
-                  <h2>
-                    Cases
-                  </h2>
-
                   <Table className="table table-striped">
                     <thead>
                       <tr>
