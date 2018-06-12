@@ -5,6 +5,7 @@
   padding: 10px 20px;
   position: relative;
   width: 260px;
+  overflow: scroll;
 
   @media (max-width: 768px) {
     width: 100%
