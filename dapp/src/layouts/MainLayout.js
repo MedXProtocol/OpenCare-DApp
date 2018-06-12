@@ -1,12 +1,26 @@
 import React, { Component } from "react";
-import Navbar from "../components/Navbar";
+import PropTypes from 'prop-types'
+import Navbar from "~/components/Navbar";
+import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 
 class MainLayout extends Component {
+  static propTypes = {
+    doNetworkCheck: PropTypes.bool
+  }
+
+  static defaultProps = {
+    doNetworkCheck: true
+  }
+
   render() {
+    if (this.props.doNetworkCheck) {
+      var networkCheckmodal = <NetworkCheckModal />
+    }
     return (
       <div className="wrapper">
         <div className="main-panel">
           <Navbar />
+          {networkCheckmodal}
           <div className="content">{this.props.children}</div>
         </div>
         <footer className="footer">
@@ -24,4 +38,5 @@ class MainLayout extends Component {
     );
   }
 }
+
 export default MainLayout;
