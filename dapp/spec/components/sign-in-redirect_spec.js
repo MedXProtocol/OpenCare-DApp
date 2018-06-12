@@ -1,6 +1,5 @@
 import React from 'react';
-
-import { SignInRedirect } from '~/sign-in-redirect';
+import { SignInRedirect } from '~/components/sign-in-redirect';
 
 function buildProps({ pathname, address, account, signedIn, web3Failed } = { web3Failed: false }) {
   return {

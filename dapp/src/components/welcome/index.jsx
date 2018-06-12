@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Checkbox, FormGroup } from 'react-bootstrap'
-import MainLayout from '~/layouts/MainLayout'
+import { MainLayout } from '~/layouts/MainLayout'
 import { BodyClass } from '~/components/BodyClass'
 
 export const Welcome = class extends Component {

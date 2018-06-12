@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import Navbar from "../components/Navbar";
+import { HippoNavbarContainer } from "../components/HippoNavbar";
 
-class MainLayout extends Component {
+export const MainLayout = class extends Component {
   render() {
     return (
       <div className="wrapper">
         <div className="main-panel">
-          <Navbar />
+          <HippoNavbarContainer />
           <div className="content">{this.props.children}</div>
         </div>
         <footer className="footer">
@@ -24,4 +24,3 @@ class MainLayout extends Component {
     );
   }
 }
-export default MainLayout;
