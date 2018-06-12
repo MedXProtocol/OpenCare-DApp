@@ -61,13 +61,17 @@ export const SignInRedirect = class extends Component {
       let nextState = {
         redirect: ''
       }
+      let welcome = (
+        nextProps.location.pathname === '/welcome'
+        || nextProps.location.pathname === '/'
+      )
 
-      if (nextProps.web3Failed) {
+      if (nextProps.web3Failed && !welcome) {
         nextState = {
           redirect: '/try-metamask',
           requestedPathname: nextProps.location.pathname
         }
-      } else if (!nextProps.address) {
+      } else if (!nextProps.address && !welcome) {
         nextState = {
           redirect: '/login-metamask',
           requestedPathname: nextProps.location.pathname

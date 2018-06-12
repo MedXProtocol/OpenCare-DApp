@@ -4,8 +4,8 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faFileMedical from '@fortawesome/fontawesome-free-solid/faFileMedical';
 
 class NewCase extends Component {
-  navigateToNewCaseScree = () => {
-    this.props.history.push('/new-case');
+  navigateToNewCase = () => {
+    this.props.history.push('/patients/cases/new');
   }
 
   render() {
@@ -15,7 +15,7 @@ class NewCase extends Component {
           <button
             type="button"
             className="btn btn-lg btn-success"
-            onClick={() => this.navigateToNewCaseScree()}>
+            onClick={() => this.navigateToNewCase()}>
             <FontAwesomeIcon
               icon={faFileMedical}
               size='lg' />

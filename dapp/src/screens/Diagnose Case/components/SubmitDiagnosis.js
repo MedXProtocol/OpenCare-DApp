@@ -219,10 +219,7 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
                     </p>
                   </div>
                 </div>
-
               </div>
-
-
             </div>
             <div className="card-footer text-right">
               <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
@@ -254,7 +251,7 @@ const SubmitDiagnosis = connect(mapStateToProps, mapDispatchToProps)(withSend(cl
           </Modal.Body>
 
           <Modal.Footer>
-            <Link to='/cases/open' className="btn btn-primary">OK</Link>
+            <Link to='/doctors/cases/open' className="btn btn-primary">OK</Link>
           </Modal.Footer>
         </Modal>
 
