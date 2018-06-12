@@ -34,6 +34,7 @@ export function* cacheCall(address, method, ...args) {
             return action.response
           case 'WEB3_CALL_ERROR':
             throw action.error
+          // no default
         }
       }
     }

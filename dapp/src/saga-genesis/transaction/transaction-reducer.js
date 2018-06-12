@@ -37,6 +37,7 @@ export default function (state, {type, transactionId, call, error, receipt}) {
           confirmed: true
         }
       }
+      break
 
     case 'TRANSACTION_ERROR':
       state = {
@@ -55,6 +56,8 @@ export default function (state, {type, transactionId, call, error, receipt}) {
         $unset: [transactionId]
       })
       break
+
+    // no default
   }
 
   return state
