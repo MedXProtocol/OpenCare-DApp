@@ -17,6 +17,41 @@ $card-columns-gap:                  1.25rem;
 $card-columns-margin:               $card-spacer-y;
 
 
+.header-card {
+  @media (min-width: $screen-sm) {
+    .button-container {
+      text-align: right;
+    }
+  }
+
+  .sm-block {
+    margin-right: 20px;
+
+    @media (max-width: $screen-sm) {
+      display: block;
+    }
+  }
+
+  .sm-block + button {
+    margin-top: 0;
+  }
+
+  @media (max-width: $screen-sm) {
+    button {
+      margin-top: 1rem;
+    }
+  }
+
+  .card-body {
+    padding: 2rem;
+  }
+
+  .title {
+    margin: 0;
+  }
+}
+
+
 //
 // Base styles
 //

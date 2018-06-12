@@ -9,6 +9,7 @@ import signUpSaga from './sign-up-saga'
 export default function* () {
   yield fork(takeOnceAndRun, 'WEB3_INITIALIZED', addTopLevelContracts)
   yield takeEvery('WEB3_NETWORK_ID', addRegistryContracts)
+
   yield all([
     rootSagaGenesis(),
     signInSaga(),

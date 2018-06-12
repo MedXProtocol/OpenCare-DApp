@@ -1,3 +1,13 @@
 .btn {
+  font-size: 13px;
+  font-weight: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 15px 20px;
   transition: all 150ms ease-in;
+}
+
+.btn-sm {
+  font-size: 12px;
+  padding: 7px 12px;
 }

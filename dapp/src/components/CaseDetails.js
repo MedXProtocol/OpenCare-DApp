@@ -140,6 +140,14 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                             <label className="label text-gray">Are you sexually active:</label>
                             <p>{this.state.details.sexuallyActive}</p>
                         </div>
+                        <div className="col-xs-12">
+                             <label className="label text-gray">Has it changed in color:</label>
+                             <p>{this.state.details.color}</p>
+                         </div>
+                         <div className="col-xs-12">
+                             <label className="label text-gray">Have you tried any treatments so far:</label>
+                             <p>{this.state.details.prevTreatment}</p>
+                         </div>
                         <div className="col-md-6">
                             <label className="label text-gray">Age:</label>
                             <p>{this.state.details.age}</p>
@@ -147,14 +155,6 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                         <div className="col-md-6">
                             <label className="label text-gray">Country:</label>
                             <p>{this.state.details.country}</p>
-                        </div>
-                       <div className="col-xs-12">
-                            <label className="label text-gray">Has it changed in color:</label>
-                            <p>{this.state.details.color}</p>
-                        </div>
-                        <div className="col-xs-12">
-                            <label className="label text-gray">Have you tried any treatments so far:</label>
-                            <p>{this.state.details.prevTreatment}</p>
                         </div>
                         <div className="col-xs-12">
                             <label className="label text-gray">Additional comments:</label>
