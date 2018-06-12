@@ -21,6 +21,9 @@ export function* deregisterKey({key}) {
 
 export function* registerCall(call) {
   let key = yield getContext('key')
+  if (!key) {
+    throw new Error(`registerCall called without a key scope: ${JSON.stringify(call)}`)
+  }
   let callCountRegistry = yield getContext('callCountRegistry')
   callCountRegistry.register(call, key)
 }
