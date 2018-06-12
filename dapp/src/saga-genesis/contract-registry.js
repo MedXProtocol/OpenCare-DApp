@@ -12,7 +12,7 @@ export class ContractRegistry {
     var contract = this.contractCache[address]
     if (!contract) {
       if (!contractKey) {
-        throw `No contract found for address ${address}, you must pass a contractKey for it to be constructed`
+        throw new Error(`No contract found for address ${address}, you must pass a contractKey for it to be constructed`)
       }
       contract = this.config.contractFactories[contractKey](web3, address)
       this.contractCache[address] = contract

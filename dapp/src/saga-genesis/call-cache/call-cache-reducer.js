@@ -43,6 +43,8 @@ export default function (state, {type, call, response, error, calls}) {
         }
       }
       break
+
+    // no default
   }
 
   return state

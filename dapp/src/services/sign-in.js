@@ -1,10 +1,7 @@
 import aes from './aes'
 import aesjs from 'aes-js'
 import Cookie from 'js-cookie'
-import { deriveKey } from '~/utils/derive-key'
 import decryptSecretKey from '~/services/decrypt-secret-key'
-import { deriveKeyPair } from '~/services/derive-key-pair'
-import hexToAscii from '~/utils/hex-to-ascii'
 
 let secretKey = ''
 

@@ -36,6 +36,8 @@ export default function (state, {type, overrideError, masterPasswordError, secre
         signedIn: false
       }
       break
+
+    // no default
   }
 
   return state
