@@ -35,9 +35,13 @@ export async function uploadFile(file, encryptionKey, progressHandler) {
 export async function downloadJson(hash, encryptionKey) {
     return await promisify(cb => {
       ipfsApi.cat(hash, (error, result) => {
-        result = aes.decryptBytes(result, encryptionKey)
-        const buffer = Buffer.from(result)
-        cb(error, buffer.toString('utf8'))
+        if (error) {
+          cb(error, result)
+        } else {
+          result = aes.decryptBytes(result, encryptionKey)
+          const buffer = Buffer.from(result)
+          cb(error, buffer.toString('utf8'))
+        }
       })
     });
 }
