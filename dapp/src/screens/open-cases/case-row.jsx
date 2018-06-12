@@ -7,7 +7,7 @@ import get from 'lodash.get'
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
-import { doctorCaseStatusToName } from '~/utils/doctor-case-status-to-name'
+import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctor-case-status-labels'
 import getWeb3 from '~/get-web3'
 import { addContract } from '~/saga-genesis/sagas'
 
@@ -51,11 +51,14 @@ const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga,
     }
     if (this.props.status) {
       var status = doctorCaseStatusToName(parseInt(this.props.status))
+      var statusClass = doctorCaseStatusToClass(parseInt(this.props.status))
     }
     return (
       <tr>
         <td>{address}</td>
-        <td>{status}</td>
+        <td>
+          <label className={`label label-${statusClass}`}>{status}</label>
+        </td>
         <td></td>
       </tr>
     )

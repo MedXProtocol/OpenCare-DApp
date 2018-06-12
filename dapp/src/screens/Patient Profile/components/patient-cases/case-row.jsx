@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import { connect } from 'react-redux'
-import { caseStatusToName } from '~/utils/case-status-to-name'
+import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
 import get from 'lodash.get'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
@@ -119,7 +119,11 @@ export const CaseRow = withContractRegistry(withSend(class _CaseRow extends Comp
         {modal}
         <td className="text-center">{this.props.caseIndex+1}</td>
         <td><Link to={`/patients/cases/${this.props.caseAddress}`}>{this.props.caseAddress}</Link></td>
-        <td>{caseStatusToName(status)}</td>
+        <td>
+          <label className={`label label-${caseStatusToClass(status)}`}>
+            {caseStatusToName(status)}
+          </label>
+        </td>
         <td className="td-actions text-right">
           {approvalButton}
         </td>
