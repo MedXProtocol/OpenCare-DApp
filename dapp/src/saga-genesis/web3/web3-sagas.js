@@ -1,9 +1,5 @@
 import {
-  put,
-  setContext,
-  take,
-  call,
-  fork
+  put
 } from 'redux-saga/effects'
 
 import Web3 from 'web3'

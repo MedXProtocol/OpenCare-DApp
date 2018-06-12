@@ -5,6 +5,7 @@
   padding: 10px 20px;
   position: relative;
   width: 260px;
+  overflow: scroll;
 
   @media (max-width: 768px) {
     width: 100%
@@ -13,6 +14,15 @@
 
 #transactions .caret {
   display: none;
+}
+
+.nav-transactions--circle:before {
+  border-radius: 100%;
+  content: "";
+  height: 1rem;
+  width: 1rem;
+  z-index: 1;
+  display: inline-block;
 }
 
 .nav-transactions--group {
@@ -39,14 +49,14 @@
   background-color: #fff;
 }
 
-.nav-transactions-text--success {
-  color: #44ce46;
+.nav-transactions-text--success:before {
+  background-color: #44ce46;
 }
 
-.nav-transactions-text--warning {
-  color: #f7e12e;
+.nav-transactions-text--warning:before {
+  background-color: #f7e12e;
 }
 
-.nav-transactions-text--danger {
-  color: #f9434f;
+.nav-transactions-text--danger:before {
+  background-color: #f9434f;
 }

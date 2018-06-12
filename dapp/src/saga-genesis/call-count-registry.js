@@ -67,7 +67,7 @@ export class CallCountRegistry {
     let result = 0
     if (callState) {
       callState.count -= 1
-      if (callState.count == 0) {
+      if (callState.count === 0) {
         delete this.getContractCalls(call.address)[call.hash]
       } else {
         result = callState.count

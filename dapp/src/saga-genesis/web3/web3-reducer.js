@@ -21,6 +21,7 @@ export default function (state, {type}) {
       }
       break
 
+    // no default
   }
 
   return state

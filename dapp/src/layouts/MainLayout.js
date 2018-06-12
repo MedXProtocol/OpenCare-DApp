@@ -1,12 +1,26 @@
 import React, { Component } from "react";
+import PropTypes from 'prop-types'
 import { HippoNavbarContainer } from "../components/HippoNavbar";
+import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 
 export const MainLayout = class extends Component {
+  static propTypes = {
+    doNetworkCheck: PropTypes.bool
+  }
+
+  static defaultProps = {
+    doNetworkCheck: true
+  }
+
   render() {
+    if (this.props.doNetworkCheck) {
+      var networkCheckmodal = <NetworkCheckModal />
+    }
     return (
       <div className="wrapper">
         <div className="main-panel">
           <HippoNavbarContainer />
+          {networkCheckmodal}
           <div className="content">{this.props.children}</div>
         </div>
         <footer className="footer">

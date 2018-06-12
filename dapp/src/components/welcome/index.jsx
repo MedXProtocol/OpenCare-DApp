@@ -8,7 +8,7 @@ export const Welcome = class extends Component {
   render () {
     return (
       <BodyClass isDark={true}>
-        <MainLayout>
+        <MainLayout doNetworkCheck={false}>
           <div className='container'>
             <div className='row'>
               <div className='col-xs-12 col-md-10 col-md-offset-1'>

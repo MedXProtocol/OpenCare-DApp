@@ -1,9 +1,9 @@
-import { put, call, takeEvery, select } from 'redux-saga/effects'
+import { takeEvery } from 'redux-saga/effects'
 import {
   signOut
 } from '~/services/sign-in'
 
-export function* signOutSaga() {
+export function signOutSaga() {
   signOut()
 }
 

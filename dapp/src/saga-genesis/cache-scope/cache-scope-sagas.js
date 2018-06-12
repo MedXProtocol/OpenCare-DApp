@@ -1,5 +1,4 @@
 import {
-  all,
   put,
   select,
   takeEvery,

@@ -1,4 +1,4 @@
-import { put, call, select, takeEvery } from 'redux-saga/effects'
+import { put, call, takeEvery } from 'redux-saga/effects'
 
 import { buildAccount } from '~/services/build-account'
 import { getAccount } from '~/services/get-account'

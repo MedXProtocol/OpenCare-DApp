@@ -11,6 +11,8 @@ export default function (state, {type, networkId}) {
         networkId
       }
       break
+
+    // no default
   }
 
   return state

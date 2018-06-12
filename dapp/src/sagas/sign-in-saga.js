@@ -1,4 +1,4 @@
-import { put, fork, spawn, call, takeEvery, select } from 'redux-saga/effects'
+import { put, spawn, call, takeEvery, select } from 'redux-saga/effects'
 import { isAccountMasterPassword } from '~/services/is-account-master-password'
 import decryptSecretKey from '~/services/decrypt-secret-key'
 import { createCall } from '~/saga-genesis/utils'
