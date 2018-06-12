@@ -78,7 +78,7 @@ const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchTo
                       <th className="text-center">#</th>
                       <th>Case Address</th>
                       <th>Status</th>
-                      <th></th>
+                      <th className="text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
