@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { withRouter, Route, Redirect, Switch } from 'react-router-dom'
+import { withRouter, Route, Switch } from 'react-router-dom'
 import { SignUpContainer } from './sign-up'
 import { SignInContainer } from './sign-in'
 import { PatientDashboard } from './patient/dashboard/'
@@ -17,7 +16,6 @@ import { Welcome } from '~/components/welcome'
 import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
-import { connect } from 'react-redux'
 import { hot } from 'react-hot-loader'
 
 const App = class extends Component {

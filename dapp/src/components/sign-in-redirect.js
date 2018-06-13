@@ -1,7 +1,6 @@
 import React, {
   Component
 } from 'react'
-import PropTypes from 'prop-types'
 import { withRouter, Redirect } from 'react-router-dom'
 import get from 'lodash.get'
 import { getAccount } from '~/services/get-account'

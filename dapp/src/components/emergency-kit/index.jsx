@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { Alert, Button } from 'react-bootstrap'
 import get from 'lodash.get'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
 import { getAccount } from '~/services/get-account'
 import { isAccountMasterPassword } from '~/services/is-account-master-password'
 import { MainLayout } from '~/layouts/MainLayout';

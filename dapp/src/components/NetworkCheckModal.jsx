@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Modal } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
@@ -14,8 +14,8 @@ function mapStateToProps(state, ownProps) {
 export const NetworkCheckModal = connect(mapStateToProps)(function({ networkId }) {
   const requiredNetworkId = process.env.REACT_APP_REQUIRED_NETWORK_ID
   if (requiredNetworkId &&
-      networkId !== parseInt(requiredNetworkId)) {
-    var requiredNetworkName = networkIdToName(parseInt(requiredNetworkId))
+      networkId !== parseInt(requiredNetworkId, 10)) {
+    var requiredNetworkName = networkIdToName(parseInt(requiredNetworkId, 10))
     var showNetworkModal = true
   }
 

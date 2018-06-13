@@ -40,7 +40,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   }
 
   async componentDidMount() {
-      const status = parseInt(this.props.status)
+      const status = parseInt(this.props.status, 10)
 
       this.setState({status: status})
 

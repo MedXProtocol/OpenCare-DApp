@@ -91,8 +91,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
 
   // This is the recommendation the physician can type into the textarea below
   updateAdditionalRecommendation = (event) => {
-    let newValue = event.target.value.length ? event.target.value : null
-
     this.setState({ additionalRecommendation: event.target.value }, this.buildFinalRecommendation)
   }
 

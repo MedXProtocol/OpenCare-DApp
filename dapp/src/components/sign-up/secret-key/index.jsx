@@ -44,9 +44,7 @@ export const SecretKey = class extends Component {
                   <br />
                   <p>
                     By signing up you are agreeing to the terms:
-                    &nbsp;<a
-                      href="javascript:;"
-                      onClick={(e) => this.setState({ showTermsModal: true })}>READ TERMS</a>
+                    &nbsp;<a onClick={(e) => this.setState({ showTermsModal: true })}>READ TERMS</a>
                   </p>
                   <ReactTooltip
                     effect='solid'
