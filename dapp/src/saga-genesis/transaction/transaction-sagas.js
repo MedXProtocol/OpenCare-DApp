@@ -39,6 +39,7 @@ function createTransactionEventChannel (web3, transactionId, send, options) {
         emit({type: 'TRANSACTION_RECEIPT', transactionId, receipt})
       })
       .on('error', (error) => {
+        console.error(error)
         if (rejectedByUser(error))
           emit({ type: 'TRANSACTION_REJECTED_BY_USER', transactionId, error })
         else

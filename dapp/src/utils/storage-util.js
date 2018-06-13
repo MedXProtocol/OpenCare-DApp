@@ -38,7 +38,7 @@ export async function downloadJson(hash, encryptionKey) {
         if (error) {
           cb(error, result)
         } else {
-          result = aes.decryptBytes(result, encryptionKey)
+          result = aes.decryptBytes(result || '', encryptionKey)
           const buffer = Buffer.from(result)
           cb(error, buffer.toString('utf8'))
         }
@@ -50,7 +50,7 @@ export async function downloadImage(hash, encryptionKey) {
   return await promisify(cb => {
     ipfsApi.cat(hash, (error, result) => {
       if (error) {
-        cb(error, null)
+        cb(error, result)
       } else {
         result = aes.decryptBytes(result, encryptionKey)
         var reader = new window.FileReader()
