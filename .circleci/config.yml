@@ -35,4 +35,4 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # Test!
-      - run: cd dapp && eslint src && npm test
+      - run: cd dapp && $(npm bin)/eslint src && npm test
