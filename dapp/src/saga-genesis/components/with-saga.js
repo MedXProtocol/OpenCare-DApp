@@ -19,7 +19,7 @@ export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' 
     const SagaWrapper = connect(() => { return {} }, mapDispatchToProps)(class _SagaWrapper extends Component {
       constructor(props, context) {
         super(props, context)
-        this.sagaKey = lastSagaKey++
+        this.sagaKey = ++lastSagaKey
       }
 
       componentDidMount() {
