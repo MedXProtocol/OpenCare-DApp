@@ -8,7 +8,6 @@ import { signedInSecretKey } from '~/services/sign-in'
 import aes from '~/services/aes'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
-import bytesToHex from '~/utils/bytes-to-hex'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
 

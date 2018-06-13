@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withSaga, cacheCallValue } from '~/saga-genesis'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
-import { select } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 
 function mapStateToProps(state, { caseAddress }) {
@@ -19,7 +18,7 @@ function* saga({ caseAddress }) {
 
 const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(class _CaseStatus extends Component {
     render() {
-      var status = parseInt(this.props.status)
+      var status = parseInt(this.props.status, 10)
       let alert
       switch (status) {
         case 1:
