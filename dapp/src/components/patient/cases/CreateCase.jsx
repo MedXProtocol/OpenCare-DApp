@@ -300,379 +300,384 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         }
       )
 
-        return (
-          <div>
-            <div className="row">
-              <div className="col-xs-12">
-                <div className="card">
-                  <div className="card-header">
-                    <div className="row">
-                      <div className="col-xs-12 col-md-6">
-                        <h3 className="title">
-                          Submit New Case
-                        </h3>
-                        <p className="lead">
-                          <small>Provide the physician with details about your problem. This will be encrypted so only you and your physician will be able to read it.</small>
-                        </p>
-                      </div>
+      return (
+        <div>
+          <div className="row">
+            <div className="col-xs-12">
+              <div className="card">
+                <div className="card-header">
+                  <div className="row">
+                    <div className="col-xs-12 col-md-6">
+                      <h3 className="title">
+                        Submit New Case
+                      </h3>
+                      <p className="lead">
+                        <small>Provide the physician with details about your problem. This will be encrypted so only you and your physician will be able to read it.</small>
+                      </p>
                     </div>
                   </div>
+                </div>
 
-                  <div className="card-body">
-                    <div className="form-wrapper">
-                      <form onSubmit={this.handleSubmit} >
-                        <div className="form-group--heading">
-                          Imagery:
+                <div className="card-body">
+                  <div className="form-wrapper">
+                    <form onSubmit={this.handleSubmit} >
+                      <div className="form-group--heading">
+                        Imagery:
+                      </div>
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-6">
+                          <div className="form-group">
+                            <label>Overview Photo<span className='star'>*</span></label>
+                            <div>
+                              <label className="btn btn-sm btn-info">
+                                Select File ... <input
+                                            onChange={this.captureFirstImage}
+                                            type="file"
+                                            accept='image/*'
+                                            className="form-control"
+                                            style={{ display: 'none' }}
+                                            required />
+                              </label>
+                              <span>
+                                &nbsp; {this.state.firstFileName}
+                              </span>
+                              <div className={firstProgressClassNames}>
+                                <ProgressBar
+                                  active
+                                  striped
+                                  bsStyle="success"
+                                  now={this.state.firstImagePercent} />
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="row">
-                          <div className="col-xs-12 col-sm-12 col-md-6">
-                            <div className="form-group">
-                              <label>Overview Photo<span className='star'>*</span></label>
-                              <div>
-                                <label className="btn btn-sm btn-primary">
-                                  Browse... <input
-                                              onChange={this.captureFirstImage}
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-6">
+                          <div className="form-group">
+                            <label>Close-up Photo<span className='star'>*</span></label>
+                            <div>
+                              <label className="btn btn-sm btn-info">
+                                  Select File ... <input
+                                              onChange={this.captureSecondImage}
                                               type="file"
                                               accept='image/*'
                                               className="form-control"
                                               style={{ display: 'none' }}
                                               required />
-                                </label>
-                                <span>
-                                  &nbsp; {this.state.firstFileName}
-                                </span>
-                                <div className={firstProgressClassNames}>
-                                  <ProgressBar
-                                    active
-                                    striped
-                                    bsStyle="success"
-                                    now={this.state.firstImagePercent} />
-                                </div>
+                              </label>
+                              <span>
+                                  &nbsp; {this.state.secondFileName}
+                              </span>
+                              <div className={secondProgressClassNames}>
+                                <ProgressBar
+                                  active
+                                  striped
+                                  bsStyle="success"
+                                  now={this.state.secondImagePercent} />
                               </div>
                             </div>
                           </div>
                         </div>
-
-                        <div className="row">
-                          <div className="col-xs-12 col-sm-12 col-md-6">
-                            <div className="form-group">
-                              <label>Close-up Photo<span className='star'>*</span></label>
-                              <div>
-                                <label className="btn btn-sm btn-primary">
-                                    Browse... <input
-                                                onChange={this.captureSecondImage}
-                                                type="file"
-                                                accept='image/*'
-                                                className="form-control"
-                                                style={{ display: 'none' }}
-                                                required />
-                                </label>
-                                <span>
-                                    &nbsp; {this.state.secondFileName}
-                                </span>
-                                <div className={secondProgressClassNames}>
-                                  <ProgressBar
-                                    active
-                                    striped
-                                    bsStyle="success"
-                                    now={this.state.secondImagePercent} />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="form-group--heading">
-                          Details:
-                        </div>
-
-                          <div className="row">
-                            <div className="col-xs-12 col-md-6">
-                              <FormGroup>
-                                <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
-
-                                <ButtonToolbar>
-                                  <ToggleButtonGroup name="howLong" type="radio">
-                                    <ToggleButton
-                                      onChange={this.updateHowLong}
-                                      value='Days'
-                                      required>
-                                      Days
-                                    </ToggleButton>
-                                    <ToggleButton
-                                      onChange={this.updateHowLong}
-                                      value='Weeks'
-                                      required>
-                                      Weeks
-                                    </ToggleButton>
-                                    <ToggleButton
-                                      onChange={this.updateHowLong}
-                                      value='Months'
-                                      required>
-                                      Months
-                                    </ToggleButton>
-                                    <ToggleButton
-                                      onChange={this.updateHowLong}
-                                      value='Years'
-                                      required>
-                                      Years
-                                    </ToggleButton>
-                                  </ToggleButtonGroup>
-                                </ButtonToolbar>
-                              </FormGroup>
-                            </div>
-                          </div>
-                          <div className="row">
-                            <div className="col-xs-12 col-md-6">
-                              <FormGroup>
-                                <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
-                                <ButtonToolbar>
-                                  <ToggleButtonGroup name="size" type="radio">
-                                    <ToggleButton
-                                      onChange={this.updateSize}
-                                      value='Growing'
-                                      required>
-                                      Growing
-                                    </ToggleButton>
-                                    <ToggleButton
-                                      onChange={this.updateSize}
-                                      value='Shrinking'
-                                      required>
-                                      Shrinking
-                                    </ToggleButton>
-                                    <ToggleButton
-                                      onChange={this.updateSize}
-                                      value='Same size'
-                                      required>
-                                      Same size
-                                    </ToggleButton>
-                                  </ToggleButtonGroup>
-                                </ButtonToolbar>
-                              </FormGroup>
-                            </div>
-                          </div>
-
-
-                          <div className="row">
-                            <div className="col-xs-12 col-md-6">
-                              <FormGroup>
-                                <ControlLabel>Is it painful?<span className='star'>*</span></ControlLabel>
-
-                                <ButtonToolbar>
-                                  <ToggleButtonGroup name="painful" type="radio">
-                                    <ToggleButton
-                                      onChange={this.updatePainful}
-                                      value='Yes'
-                                      required>
-                                      Yes
-                                    </ToggleButton>
-                                    <ToggleButton
-                                      onChange={this.updatePainful}
-                                      value='No'
-                                      required>
-                                      No
-                                    </ToggleButton>
-                                  </ToggleButtonGroup>
-                                </ButtonToolbar>
-                              </FormGroup>
-                            </div>
-                          </div>
-
-                          <div className="row">
-                            <div className="col-xs-12 col-md-6">
-                              <FormGroup>
-                                <ControlLabel>Is it bleeding?<span className='star'>*</span></ControlLabel>
-
-                                <ButtonToolbar>
-                                  <ToggleButtonGroup name="bleeding" type="radio">
-                                    <ToggleButton
-                                      onChange={this.updateBleeding}
-                                      value='Yes'
-                                      required>
-                                      Yes
-                                    </ToggleButton>
-                                    <ToggleButton
-                                      onChange={this.updateBleeding}
-                                      value='No'
-                                      required>
-                                      No
-                                    </ToggleButton>
-                                  </ToggleButtonGroup>
-                                </ButtonToolbar>
-                              </FormGroup>
-                            </div>
-                          </div>
-
-                          <div className="row">
-                            <div className="col-xs-12 col-md-6">
-                              <FormGroup>
-                                <ControlLabel>Is it itching?<span className='star'>*</span></ControlLabel>
-
-                                <ButtonToolbar>
-                                  <ToggleButtonGroup name="itching" type="radio">
-                                    <ToggleButton
-                                      onChange={this.updateItching}
-                                      value='Yes'
-                                      required>
-                                      Yes
-                                    </ToggleButton>
-                                    <ToggleButton
-                                      onChange={this.updateItching}
-                                      value='No'
-                                      required>
-                                      No
-                                    </ToggleButton>
-                                  </ToggleButtonGroup>
-                                </ButtonToolbar>
-                              </FormGroup>
-                            </div>
-                          </div>
-
-
-                          <div className="row">
-                            <div className="col-xs-12 col-md-6">
-                              <FormGroup>
-                                <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
-
-                                <ButtonToolbar>
-                                  <ToggleButtonGroup name="skinCancer" type="radio">
-                                    <ToggleButton
-                                      onChange={this.updateSkinCancer}
-                                      value='Yes'
-                                      required>
-                                      Yes
-                                    </ToggleButton>
-                                    <ToggleButton
-                                      onChange={this.updateSkinCancer}
-                                      value='No'
-                                      required>
-                                      No
-                                    </ToggleButton>
-                                  </ToggleButtonGroup>
-                                </ButtonToolbar>
-                              </FormGroup>
-                            </div>
-                          </div>
-
-                          <div className="row">
-                            <div className="col-xs-12 col-md-6">
-                              <FormGroup>
-                                <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
-
-                                <ButtonToolbar>
-                                  <ToggleButtonGroup name="sexuallyActive" type="radio">
-                                    <ToggleButton
-                                      onChange={this.updateSexuallyActive}
-                                      value='Yes'
-                                      required>
-                                      Yes
-                                    </ToggleButton>
-                                    <ToggleButton
-                                      onChange={this.updateSexuallyActive}
-                                      value='No'
-                                      required>
-                                      No
-                                    </ToggleButton>
-                                  </ToggleButtonGroup>
-                                </ButtonToolbar>
-                              </FormGroup>
-                            </div>
-                          </div>
-
-                          <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-6">
-                              <div className="form-group">
-                                <label>Has it changed in color?<span className='star'>*</span></label>
-                                <input onChange={this.updateColor} type="text" className="form-control" required />
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-6">
-                              <div className="form-group">
-                                <label>Have you tried any treatments so far?<span className='star'>*</span></label>
-                                <input onChange={this.updatePreviousTreatment} type="text" className="form-control" required />
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="form-group--heading">
-                            Additional Info:
-                          </div>
-                          <div className="row">
-                            <div className="col-xs-5 col-sm-4 col-md-2">
-                              <div className="form-group">
-                                <label>Age<span className='star'>*</span></label>
-                                <input onChange={this.updateAge} type="text" className="form-control" required />
-                              </div>
-                            </div>
-                            <div className="col-xs-12 col-sm-8 col-md-4">
-                              <div className="form-group">
-                                <label>Country<span className='star'>*</span></label>
-                                <input onChange={this.updateCountry} type="text" className="form-control" required />
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="row">
-                            <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
-                              <div className="form-group">
-                                <label>Please include any additional comments below</label>
-                                <textarea onChange={this.updateDescription} className="form-control" rows="5" />
-                              </div>
-                            </div>
-                          </div>
-
-                          <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
-                        </form>
                       </div>
-                    </div>
+
+                      <div className="form-group--heading">
+                        Details:
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-md-6">
+                          <FormGroup>
+                            <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
+
+                            <ButtonToolbar>
+                              <ToggleButtonGroup name="howLong" type="radio">
+                                <ToggleButton
+                                  onChange={this.updateHowLong}
+                                  value='Days'
+                                  required>
+                                  Days
+                                </ToggleButton>
+                                <ToggleButton
+                                  onChange={this.updateHowLong}
+                                  value='Weeks'
+                                  required>
+                                  Weeks
+                                </ToggleButton>
+                                <ToggleButton
+                                  onChange={this.updateHowLong}
+                                  value='Months'
+                                  required>
+                                  Months
+                                </ToggleButton>
+                                <ToggleButton
+                                  onChange={this.updateHowLong}
+                                  value='Years'
+                                  required>
+                                  Years
+                                </ToggleButton>
+                              </ToggleButtonGroup>
+                            </ButtonToolbar>
+                          </FormGroup>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-xs-12 col-md-6">
+                          <FormGroup>
+                            <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
+                            <ButtonToolbar>
+                              <ToggleButtonGroup name="size" type="radio">
+                                <ToggleButton
+                                  onChange={this.updateSize}
+                                  value='Growing'
+                                  required>
+                                  Growing
+                                </ToggleButton>
+                                <ToggleButton
+                                  onChange={this.updateSize}
+                                  value='Shrinking'
+                                  required>
+                                  Shrinking
+                                </ToggleButton>
+                                <ToggleButton
+                                  onChange={this.updateSize}
+                                  value='Same size'
+                                  required>
+                                  Same size
+                                </ToggleButton>
+                              </ToggleButtonGroup>
+                            </ButtonToolbar>
+                          </FormGroup>
+                        </div>
+                      </div>
+
+
+                      <div className="row">
+                        <div className="col-xs-12 col-md-6">
+                          <FormGroup>
+                            <ControlLabel>Is it painful?<span className='star'>*</span></ControlLabel>
+
+                            <ButtonToolbar>
+                              <ToggleButtonGroup name="painful" type="radio">
+                                <ToggleButton
+                                  onChange={this.updatePainful}
+                                  value='Yes'
+                                  required>
+                                  Yes
+                                </ToggleButton>
+                                <ToggleButton
+                                  onChange={this.updatePainful}
+                                  value='No'
+                                  required>
+                                  No
+                                </ToggleButton>
+                              </ToggleButtonGroup>
+                            </ButtonToolbar>
+                          </FormGroup>
+                        </div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-md-6">
+                          <FormGroup>
+                            <ControlLabel>Is it bleeding?<span className='star'>*</span></ControlLabel>
+
+                            <ButtonToolbar>
+                              <ToggleButtonGroup name="bleeding" type="radio">
+                                <ToggleButton
+                                  onChange={this.updateBleeding}
+                                  value='Yes'
+                                  required>
+                                  Yes
+                                </ToggleButton>
+                                <ToggleButton
+                                  onChange={this.updateBleeding}
+                                  value='No'
+                                  required>
+                                  No
+                                </ToggleButton>
+                              </ToggleButtonGroup>
+                            </ButtonToolbar>
+                          </FormGroup>
+                        </div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-md-6">
+                          <FormGroup>
+                            <ControlLabel>Is it itching?<span className='star'>*</span></ControlLabel>
+
+                            <ButtonToolbar>
+                              <ToggleButtonGroup name="itching" type="radio">
+                                <ToggleButton
+                                  onChange={this.updateItching}
+                                  value='Yes'
+                                  required>
+                                  Yes
+                                </ToggleButton>
+                                <ToggleButton
+                                  onChange={this.updateItching}
+                                  value='No'
+                                  required>
+                                  No
+                                </ToggleButton>
+                              </ToggleButtonGroup>
+                            </ButtonToolbar>
+                          </FormGroup>
+                        </div>
+                      </div>
+
+
+                      <div className="row">
+                        <div className="col-xs-12 col-md-6">
+                          <FormGroup>
+                            <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
+
+                            <ButtonToolbar>
+                              <ToggleButtonGroup name="skinCancer" type="radio">
+                                <ToggleButton
+                                  onChange={this.updateSkinCancer}
+                                  value='Yes'
+                                  required>
+                                  Yes
+                                </ToggleButton>
+                                <ToggleButton
+                                  onChange={this.updateSkinCancer}
+                                  value='No'
+                                  required>
+                                  No
+                                </ToggleButton>
+                              </ToggleButtonGroup>
+                            </ButtonToolbar>
+                          </FormGroup>
+                        </div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-md-6">
+                          <FormGroup>
+                            <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
+
+                            <ButtonToolbar>
+                              <ToggleButtonGroup name="sexuallyActive" type="radio">
+                                <ToggleButton
+                                  onChange={this.updateSexuallyActive}
+                                  value='Yes'
+                                  required>
+                                  Yes
+                                </ToggleButton>
+                                <ToggleButton
+                                  onChange={this.updateSexuallyActive}
+                                  value='No'
+                                  required>
+                                  No
+                                </ToggleButton>
+                              </ToggleButtonGroup>
+                            </ButtonToolbar>
+                          </FormGroup>
+                        </div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-6">
+                          <div className="form-group">
+                            <label>Has it changed in color?<span className='star'>*</span></label>
+                            <input onChange={this.updateColor} type="text" className="form-control" required />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-6">
+                          <div className="form-group">
+                            <label>Have you tried any treatments so far?<span className='star'>*</span></label>
+                            <input onChange={this.updatePreviousTreatment} type="text" className="form-control" required />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="form-group--heading">
+                        Additional Info:
+                      </div>
+                      <div className="row">
+                        <div className="col-xs-5 col-sm-4 col-md-2">
+                          <div className="form-group">
+                            <label>Age<span className='star'>*</span></label>
+                            <input onChange={this.updateAge} type="text" className="form-control" required />
+                          </div>
+                        </div>
+                        <div className="col-xs-12 col-sm-8 col-md-4">
+                          <div className="form-group">
+                            <label>Country<span className='star'>*</span></label>
+                            <input onChange={this.updateCountry} type="text" className="form-control" required />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
+                          <div className="form-group">
+                            <label>Please include any additional comments below</label>
+                            <textarea onChange={this.updateDescription} className="form-control" rows="5" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
+                    </form>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
 
 
-                    <Modal show={this.state.showBalanceTooLowModal}>
-                        <Modal.Body>
-                          <div className="row">
-                            <div className="col-xs-12 text-center">
-                              <h4>You need 15 MEDX to submit a case.</h4>
-                            </div>
-                          </div>
-                        </Modal.Body>
-                        <Modal.Footer>
-                          <button onClick={this.handleCloseBalanceTooLowModal} type="button" className="btn btn-primary">Close</button>
-                        </Modal.Footer>
-                    </Modal>
-                    <Modal show={this.state.showConfirmSubmissionModal}>
-                        <Modal.Body>
-                            <div className="row">
-                                <div className="col-xs-12 text-center">
-                                    <h4>Are you sure?</h4>
-                                    <h5>This will cost 5-15 MEDX (depending on second opinion option)</h5>
-                                </div>
-                            </div>
-                        </Modal.Body>
-                        <Modal.Footer>
-                          <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
-                          <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
-                        </Modal.Footer>
-                    </Modal>
-                    <Modal show={this.state.showThankYouModal}>
-                        <Modal.Body>
-                          <div className="row">
-                            <div className="col-xs-12 text-center">
-                              <h4>Thank you! Your case submitted successfully.</h4>
-                            </div>
-                          </div>
-                        </Modal.Body>
-                        <Modal.Footer>
-                          <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-link">Close</button>
-                          <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-success">Great!</button>
-                        </Modal.Footer>
-                    </Modal>
-                    <Spinner loading={this.state.submitInProgress}/>
+        <Modal show={this.state.showBalanceTooLowModal}>
+          <Modal.Body>
+            <div className="row">
+              <div className="col-xs-12 text-center">
+                <h4>You need 15 MEDX to submit a case.</h4>
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <button onClick={this.handleCloseBalanceTooLowModal} type="button" className="btn btn-primary">Close</button>
+          </Modal.Footer>
+        </Modal>
+        <Modal show={this.state.showConfirmSubmissionModal}>
+          <Modal.Body>
+            <div className="row">
+              <div className="col-xs-12 text-center">
+                <h4>
+                  Are you sure?
+                </h4>
+                <h5>
+                  This will cost 5-15 MEDX
+                  <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
+                </h5>
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
+            <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
+          </Modal.Footer>
+        </Modal>
+        <Modal show={this.state.showThankYouModal}>
+          <Modal.Body>
+            <div className="row">
+              <div className="col-xs-12 text-center">
+                <h4>Thank you! Your case submitted successfully.</h4>
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-link">Close</button>
+            <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-success">Great!</button>
+          </Modal.Footer>
+        </Modal>
+        <Spinner loading={this.state.submitInProgress}/>
       </div>
     );
   }
