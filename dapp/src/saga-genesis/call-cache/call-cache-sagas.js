@@ -22,20 +22,25 @@ export function* cacheCall(address, method, ...args) {
   if (isHot) {
     return callState.response
   } else { // Retrieve or wait for the new state
-    if (!callState || !callState.inFlight) {
-      yield spawn(put, {type: 'WEB3_CALL', call})
-    }
-    // wait for call to return
-    while (true) {
-      let action = yield take(['WEB3_CALL_RETURN', 'WEB3_CALL_ERROR'])
-      if (action.call.hash === call.hash) {
-        switch (action.type) {
-          case 'WEB3_CALL_RETURN':
-            return action.response
-          case 'WEB3_CALL_ERROR':
-            throw action.error
-          // no default
-        }
+    return yield web3Call(address, method, ...args)
+  }
+}
+
+export function* web3Call(address, method, ...args) {
+  let call = createCall(address, method, ...args)
+  let callState = yield select(state => state.sagaGenesis.callCache[call.hash])
+  if (!callState || !callState.inFlight) {
+    yield spawn(put, {type: 'WEB3_CALL', call})
+  }
+  // wait for call to return
+  while (true) {
+    let action = yield take(['WEB3_CALL_RETURN', 'WEB3_CALL_ERROR'])
+    if (action.call.hash === call.hash) {
+      switch (action.type) {
+        case 'WEB3_CALL_RETURN':
+          return action.response
+        default:
+          throw action.error
       }
     }
   }
@@ -44,7 +49,7 @@ export function* cacheCall(address, method, ...args) {
 /*
 Triggers the web3 call.
 */
-export function* web3Call({call}) {
+function* web3CallExecute({call}) {
   const { address, method, args } = call
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
@@ -54,7 +59,7 @@ export function* web3Call({call}) {
     const contractKey = yield select(contractKeyByAddress, address)
     const contract = contractRegistry.get(address, contractKey, web3)
     const callMethod = contract.methods[method](...args).call
-    // console.log('web3Call: ', address, method, ...args, options)
+    // console.log('web3CallExecute: ', address, method, ...args, options)
     yield spawn(function* () {
       try {
         let response = yield sagaCall(callMethod, options, 'pending')
@@ -70,5 +75,5 @@ export function* web3Call({call}) {
 }
 
 export default function* () {
-  yield takeEvery('WEB3_CALL', web3Call)
+  yield takeEvery('WEB3_CALL', web3CallExecute)
 }

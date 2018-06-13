@@ -2,7 +2,7 @@ import { put, spawn, call, takeEvery, select } from 'redux-saga/effects'
 import { isAccountMasterPassword } from '~/services/is-account-master-password'
 import decryptSecretKey from '~/services/decrypt-secret-key'
 import { createCall } from '~/saga-genesis/utils'
-import { cacheCall } from '~/saga-genesis/sagas'
+import { web3Call } from '~/saga-genesis/sagas'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { deriveKeyPair } from '~/services/derive-key-pair'
 import {
@@ -34,7 +34,7 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
 export function* checkPublicKey(account, masterPassword, address) {
   const secretKey = yield call(decryptSecretKey, account, masterPassword)
   const AccountManager = yield select(contractByName, 'AccountManager')
-  const existingKey = yield cacheCall(AccountManager, 'publicKeys', address)
+  const existingKey = yield web3Call(AccountManager, 'publicKeys', address)
 
   var publicKey = yield call(deriveKeyPair, secretKey)
   var hexPublicKey = '0x' + (yield call([publicKey, publicKey.getPublic], true, 'hex'))
