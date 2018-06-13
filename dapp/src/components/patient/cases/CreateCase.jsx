@@ -89,7 +89,19 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       }
     }
 
+    fileTooLarge (size) {
+      return size > 10485760 // 10 megabytes
+    }
+
     captureFirstImage = async (event) => {
+      this.setState({firstFileError: null})
+      if (this.fileTooLarge(event.target.files[0].size)) {
+        this.setState({
+          firstFileError: 'The file must be smaller than 10MB'
+        })
+        return
+      }
+
       const fileName = event.target.files[0].name;
       const progressHandler = (percent) => {
         this.setState({ firstImagePercent: percent })
@@ -108,6 +120,14 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     captureSecondImage = async (event) => {
+      this.setState({secondFileError: null})
+      if (this.fileTooLarge(event.target.files[0].size)) {
+        this.setState({
+          secondFileError: 'The file must be smaller than 10MB'
+        })
+        return
+      }
+
       const fileName = event.target.files[0].name;
       const progressHandler = (percent) => {
         this.setState({ secondImagePercent: percent })
@@ -299,6 +319,18 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         }
       )
 
+      if (this.state.firstFileError) {
+        var firstFileError =
+          <p className='has-error help-block'>{this.state.firstFileError}</p>
+        var firstFileClassName = 'has-error'
+      }
+
+      if (this.state.secondFileError) {
+        var secondFileError =
+          <p className='has-error help-block'>{this.state.secondFileError}</p>
+        var secondFileClassName = 'has-error'
+      }
+
       return (
         <div>
           <div className="row">
@@ -325,8 +357,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       </div>
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className="form-group">
-                            <label>Overview Photo<span className='star'>*</span></label>
+                          <div className={classNames('form-group', firstFileClassName)}>
+                            <label className='control-label'>Overview Photo<span className='star'>*</span></label>
                             <div>
                               <label className="btn btn-sm btn-info">
                                 Select File ... <input
@@ -347,6 +379,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                                   bsStyle="success"
                                   now={this.state.firstImagePercent} />
                               </div>
+                              {firstFileError}
                             </div>
                           </div>
                         </div>
@@ -354,7 +387,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className="form-group">
+                          <div className={classNames('form-group', secondFileClassName)}>
                             <label>Close-up Photo<span className='star'>*</span></label>
                             <div>
                               <label className="btn btn-sm btn-info">
@@ -376,6 +409,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                                   bsStyle="success"
                                   now={this.state.secondImagePercent} />
                               </div>
+                              {secondFileError}
                             </div>
                           </div>
                         </div>
