@@ -4,6 +4,7 @@ import { NavDropdown } from 'react-bootstrap'
 import { I18n } from 'react-i18next'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import classnames from 'classnames'
+import { transactionErrorToCode } from '~/services/transaction-error-to-code'
 
 import './CurrentTransactionsList.scss'
 
@@ -34,12 +35,12 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
       }
     }
 
-    getClassName = (value) => {
+    getClassName = (error, confirmed) => {
       let labelClass = ''
 
-      if (value.error)
+      if (error)
         labelClass = 'nav-transactions-text--danger'
-      else if (value.confirmed)
+      else if (confirmed)
         labelClass = 'nav-transactions-text--success'
       else
         labelClass = 'nav-transactions-text--warning'
@@ -51,9 +52,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
       let error = this.state.pendingOrErrorTransactions.find(tx => tx[1].error)
       let notConfirmed = this.state.pendingOrErrorTransactions.find(tx => !tx[1].confirmed)
 
-      let dropdownClass = this.getClassName({
-        error, confirmed: !notConfirmed
-      })
+      let dropdownClass = this.getClassName(error, !notConfirmed)
 
       return dropdownClass
     }
@@ -73,9 +72,19 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
       } else {
         transactions = this.state.pendingOrErrorTransactions.reverse().map(tx => {
           const key   = tx[0]
-          const value = tx[1]
-          let name = value.call.method
+          const { call, error, confirmed } = tx[1]
+          let name = call.method
           let mintMedxCount = 1000 // these numbers could be pulled from the tx call args
+
+          if (error) {
+            var code = transactionErrorToCode(error)
+            if (code) {
+              var errorMessage =
+                <div>
+                  {t(`transactionErrors.${code}`)}
+                </div>
+            }
+          }
 
           return (
             <CSSTransition
@@ -83,10 +92,11 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
               timeout={500}
               classNames="fade">
               <li className="nav-transactions--item">
-                <span className={classnames('nav-transactions--circle', this.getClassName(value))} /> &nbsp;
+                <span className={classnames('nav-transactions--circle', this.getClassName(error, confirmed))} /> &nbsp;
                 {t(`transactions.${name}`, {
                   mintMedxCount: mintMedxCount
                 })}
+                {errorMessage}
               </li>
             </CSSTransition>
           )

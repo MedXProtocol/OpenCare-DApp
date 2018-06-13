@@ -10,19 +10,10 @@ import {
   END
 } from 'redux-saga'
 import { contractKeyByAddress } from '../state-finders'
+import { transactionErrorToCode } from '~/services/transaction-error-to-code'
 
 function rejectedByUser(error) {
-  // This is the metamask error when a user pressed 'reject', I wrote this
-  // as we will probably have other error messages for different
-  // wallets / browsers / extensions
-  let transactionCancelledStrings = ['User denied transaction signature']
-  let cancelledByUser = false
-
-  for (let errorString of transactionCancelledStrings)
-    if (error.message.search(errorString) > 0)
-      cancelledByUser = true
-
-  return cancelledByUser
+  return transactionErrorToCode(error) === 'userRevert'
 }
 
 function createTransactionEventChannel (web3, transactionId, send, options) {
