@@ -28,6 +28,7 @@ function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account)
+  const canRegister = cacheCallValue(state, DoctorManager, 'owner') === account
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const signedIn = state.account.signedIn
   return {
@@ -35,7 +36,8 @@ function mapStateToProps (state) {
     isDoctor,
     networkId,
     DoctorManager,
-    signedIn
+    signedIn,
+    canRegister
   }
 }
 
@@ -49,6 +51,7 @@ function mapDispatchToProps (dispatch) {
 
 function* saga({ account, DoctorManager }) {
   if (!account || !DoctorManager) { return }
+  yield cacheCall(DoctorManager, 'owner')
   yield cacheCall(DoctorManager, 'isDoctor', account)
 }
 
@@ -96,12 +99,14 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
           </LinkContainer>
       }
 
-      var doctorsItem =
-        <LinkContainer to='/doctors/new'>
-          <NavItem href='/doctors/new'>
-            Doctors
-          </NavItem>
-        </LinkContainer>
+      if (this.props.canRegister) {
+        var doctorsItem =
+          <LinkContainer to='/doctors/new'>
+            <NavItem href='/doctors/new'>
+              Doctors
+            </NavItem>
+          </LinkContainer>
+      }
     }
 
     let navbarClassName = classnames('navbar', { 'navbar-transparent': this.props.transparent, 'navbar-absolute': this.props.transparent, 'navbar-default': !this.props.transparent})
