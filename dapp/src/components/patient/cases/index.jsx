@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
+import { toastr } from 'react-redux-toastr'
 import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
@@ -19,12 +20,14 @@ function mapStateToProps(state, { accounts }) {
   const CaseManager = contractByName(state, 'CaseManager')
   const AccountManager = contractByName(state, 'AccountManager')
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
+
   const cases = []
   let showingApprovalModal = false
   for (let caseIndex = 0; caseIndex < caseListCount; caseIndex++) {
     let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
-    let caseRowProps = mapStateToCaseRowProps(state, { caseAddress })
+
     if (caseAddress) {
+      let caseRowProps = mapStateToCaseRowProps(state, { caseAddress })
       if (/3|8/.test(caseRowProps.status) && !showingApprovalModal) {
         showingApprovalModal = true
         caseRowProps.showModal = true
@@ -59,8 +62,9 @@ function* saga({ account, CaseManager, AccountManager }) {
   }
 }
 
-export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager']})(class _PatientCases extends Component {
+export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager', 'caseListCount']})(class _PatientCases extends Component {
   componentDidMount () {
+    toastr.light('Success', 'Your case has been submitted.', { icon: 'success', status: 'success' })
     this.props.invalidate(this.props.CaseManager)
   }
   render() {
@@ -88,7 +92,8 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
                   <CaseRowContainer
                     caseAddress={caseAddress}
                     caseIndex={caseIndex}
-                    key={caseIndex} {...caseRowProps} />
+                    key={caseIndex}
+                    {...caseRowProps} />
                 )}
               </tbody>
             </table>

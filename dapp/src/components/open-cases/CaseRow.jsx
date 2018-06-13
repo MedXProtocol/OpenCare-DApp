@@ -53,7 +53,7 @@ export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(pr
     return (
       <tr>
         <td className="eth-address text"><span>{address}</span></td>
-        <td width="10%">
+        <td width="15%">
           <label className={`label label-${statusClass}`}>{status}</label>
         </td>
         <td width="15%"></td>

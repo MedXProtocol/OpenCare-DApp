@@ -1,0 +1,109 @@
+.redux-toastr .toastr {
+  background: #222;
+}
+
+.redux-toastr .toastr .toastr-status {
+  height: 8px;
+}
+
+.redux-toastr .toastr .rrt-middle-container {
+  font-family: inherit;
+}
+
+.redux-toastr .toastr .close-toastr {
+  height: 86px;
+  font-family: inherit;
+}
+
+.redux-toastr .toastr .rrt-middle-container .rrt-title {
+  margin-bottom: 0;
+  font-size: inherit;
+}
+
+.redux-toastr .top-center,
+.redux-toastr .bottom-center {
+  left: 0;
+  margin-left: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.redux-toastr .bottom-left {
+  left: 10px;
+  bottom: 20px;
+  width: 50%;
+
+  @media (max-width: $screen-sm) {
+    bottom: 0;
+    left: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+  }
+  @media (min-width: $screen-lg) {
+    width: 38%;
+  }
+}
+
+.redux-toastr .toastr {
+  box-shadow: none;
+  border-radius: 2px;
+  margin: 0;
+  opacity: 1;
+}
+
+.redux-toastr .toastr .close-toastr {
+  color: white;
+  height: 100%;
+  width: 15%;
+
+  @media (max-width: $screen-sm) {
+    width: 15%;
+  }
+  @media (min-width: $screen-lg) {
+    width: 8%;
+  }
+}
+
+.redux-toastr .toastr:hover:not(.rrt-message) {
+  box-shadow: none;
+}
+
+// Light theme overrides
+.redux-toastr .toastr.rrt-light {
+  border-bottom: 2px solid #111;
+  color: white;
+}
+
+.redux-toastr .toastr.rrt-light .rrt-middle-container .rrt-title {
+  color: #ccc;
+}
+
+.redux-toastr .toastr.rrt-light .toastr-icon {
+  fill: #ccc !important;
+}
+
+.redux-toastr .rrt-light .close-toastr {
+  color: #ccc;
+}
+
+.redux-toastr .toastr.rrt-info,
+.redux-toastr .toastr .toastr-status.info {
+  background-color: $brand-info;
+}
+
+.redux-toastr .toastr.rrt-success,
+.redux-toastr .toastr .toastr-status.success {
+  background-color: $brand-success;
+}
+
+.redux-toastr .toastr.rrt-error,
+.redux-toastr .toastr .toastr-status.error {
+  background-color: $brand-danger;
+}
+
+.redux-toastr .toastr.rrt-warning,
+.redux-toastr .toastr .toastr-status.warning {
+  background-color: $brand-warning;
+}
+

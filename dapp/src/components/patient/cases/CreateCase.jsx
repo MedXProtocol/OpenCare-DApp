@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+import { toastr } from 'react-redux-toastr'
 import {
   ControlLabel,
   FormGroup,
@@ -11,13 +13,11 @@ import {
 import { genKey } from '~/services/gen-key'
 import { withRouter } from 'react-router-dom';
 import classNames from 'classnames';
-import Spinner from '~/components/Spinner';
 import { isNotEmptyString } from '~/utils/common-util';
 import { uploadJson, uploadFile } from '~/utils/storage-util';
 import { signedInSecretKey } from '~/services/sign-in'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
-import { connect } from 'react-redux'
 import aes from '~/services/aes'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
@@ -67,9 +67,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             description: null,
             caseEncryptionKey: genKey(32),
 
-
             canSubmit: false,
-            submitInProgress: false,
             showBalanceTooLowModal: false,
             showConfirmSubmissionModal: false,
             showThankYouModal: false
@@ -78,13 +76,19 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
     componentWillReceiveProps (props) {
       if (this.state.transactionId) {
-        if (get(props, `transactions[${this.state.transactionId}].complete`)) {
-          let error = props.transactions[this.state.transactionId].error
-          if (error) {
-            this.onError(error)
-          } else {
-            this.onSuccess()
-          }
+        console.log('complete: ' + get(props, `transactions[${this.state.transactionId}].complete`))
+        console.log('submitted: ' + get(props, `transactions[${this.state.transactionId}].submitted`))
+
+        if (get(props, `transactions[${this.state.transactionId}].submitted`)) {
+          // toastr.light('Success', 'Your case has been submitted.', { icon: 'success', status: 'success' })
+          toastr.success('Success', 'Your case has been submitted.', { icon: 'success', status: 'success' })
+          this.props.history.push('/patients/cases');
+          // let error = props.transactions[this.state.transactionId].error
+          // if (error) {
+          //   this.onError(error)
+          // } else {
+          //   this.onSuccess()
+          // }
         }
       }
     }
@@ -230,15 +234,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     handleAcceptConfirmSubmissionModal = async (event) => {
-        event.preventDefault();
+      event.preventDefault();
 
-        this.setState({showConfirmSubmissionModal: false});
-        await this.createNewCase();
+      await this.createNewCase();
     }
 
     createNewCase = async () => {
-        this.setState({submitInProgress: true});
-
         const caseInformation = {
             firstImageHash: this.state.firstImageHash,
             secondImageHash: this.state.secondImageHash,
@@ -261,25 +262,29 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         const encryptedCaseKey = aes.encrypt(this.state.caseEncryptionKey, signedInSecretKey())
 
         const { send, MedXToken, CaseManager } = this.props
-        var hashHex = hashToHex(hash)
+        let hashHex = hashToHex(hash)
 
-        var CaseManagerContract = this.props.contractRegistry.get(this.props.CaseManager, 'CaseManager', getWeb3())
-        var data = CaseManagerContract.methods.createCase(this.props.account, '0x' + encryptedCaseKey, '0x' + hashHex).encodeABI()
+        let CaseManagerContract = this.props.contractRegistry.get(this.props.CaseManager, 'CaseManager', getWeb3())
+        let data = CaseManagerContract.methods.createCase(this.props.account, '0x' + encryptedCaseKey, '0x' + hashHex).encodeABI()
+        let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
 
-        this.setState({transactionId: send(MedXToken, 'approveAndCall', CaseManager, 15, data)()})
+        this.setState({ transactionId })
     }
 
     onError = (error) => {
       console.error(error)
+      // this.setState({
+      //     error: error,
+      //     submitInProgress: false
+      // });
       this.setState({
-          error: error,
-          submitInProgress: false
+        error: error
       });
     }
 
     onSuccess = () => {
-        this.setState({submitInProgress: false});
-        this.setState({showThankYouModal: true});
+        // this.setState({submitInProgress: false});
+      this.setState({ showThankYouModal: true });
     }
 
     render() {
@@ -676,7 +681,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-success">Great!</button>
           </Modal.Footer>
         </Modal>
-        <Spinner loading={this.state.submitInProgress}/>
       </div>
     );
   }
