@@ -24,6 +24,9 @@ i18next
             mint: 'Mint {{mintMedxCount}} MEDX',
             requestNextCase: 'Requesting Case',
             setPublicKey: 'Setting Public Key'
+          },
+          transactionErrors: {
+            outOfGas: 'Transaction ran out of gas'
           }
         }
       }
