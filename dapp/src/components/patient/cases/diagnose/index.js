@@ -53,7 +53,7 @@ function* saga({ match, account, AccountManager }) {
   yield cacheCall(AccountManager, 'publicKeys', patientAddress)
   yield cacheCall(caseAddress, 'approvedDoctorKeys', account)
 
-  let status = parseInt(yield cacheCall(caseAddress, 'status'))
+  let status = parseInt(yield cacheCall(caseAddress, 'status'), 10)
 
   if (status >= 3) { yield cacheCall(caseAddress, 'diagnosingDoctorA') }
   if (status >= 5) { yield cacheCall(caseAddress, 'diagnosisALocationHash') }
@@ -65,7 +65,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
   render () {
     var challenging = this.props.doctorB === this.props.account
     if (this.props.status) {
-      var status = parseInt(this.props.status)
+      var status = parseInt(this.props.status, 10)
     } else {
       status = 0
     }

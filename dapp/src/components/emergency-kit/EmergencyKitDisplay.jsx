@@ -4,7 +4,6 @@ import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
 import { MainLayout } from '~/layouts/MainLayout';
 import { formatKey } from '~/services/format-key'
 import { signedInSecretKey } from '~/services/sign-in'
-import { connect } from 'react-redux'
 
 const EmergencyKitDisplay = class extends Component {
   print = () => {
@@ -40,7 +39,7 @@ const EmergencyKitDisplay = class extends Component {
                   <br />
 
                   <div className="text-center">
-                    <a href='javascript:;' onClick={this.print} className="btn btn-lg btn-success">
+                    <a onClick={this.print} className="btn btn-lg btn-success">
                       <FontAwesomeIcon
                         icon={faPrint}
                         size='lg' /> &nbsp;

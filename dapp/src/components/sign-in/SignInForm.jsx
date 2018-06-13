@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { Alert, HelpBlock, Modal } from 'react-bootstrap'
+import { Alert, HelpBlock } from 'react-bootstrap'
 import { formatKey } from '~/services/format-key'
-import { isAccountMasterPassword } from '~/services/is-account-master-password'
 import { connect } from 'react-redux'
 import { OverrideModal } from '~/components/override-modal'
 

@@ -9,7 +9,6 @@ import { BodyClass } from '~/components/BodyClass'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
-  let overrideError = state.account.overrideError
   return {
     address,
     account: getAccount(address)

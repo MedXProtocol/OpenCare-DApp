@@ -2,15 +2,16 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
-import { connect } from 'react-redux'
 import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
-import get from 'lodash.get'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
-import dispatch from '~/dispatch'
-import bytesToHex from '~/utils/bytes-to-hex'
 import { signedInSecretKey } from '~/services/sign-in'
-import { withSaga, cacheCall, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
+import {
+  cacheCall,
+  cacheCallValue,
+  withContractRegistry,
+  withSend
+} from '~/saga-genesis'
 import reencryptCaseKey from '~/services/reencrypt-case-key'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'

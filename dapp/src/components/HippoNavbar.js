@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
 import {
-  Modal,
   Nav,
   Navbar,
   NavItem,
@@ -75,7 +74,7 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
             </MenuItem>
           </LinkContainer>
           <MenuItem divider />
-          <MenuItem href='javascript:;' onClick={this.signOut}>
+          <MenuItem onClick={this.signOut}>
             Sign Out
           </MenuItem>
         </NavDropdown>

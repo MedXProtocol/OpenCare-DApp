@@ -1,6 +1,4 @@
 import React from 'react'
-import { Alert } from 'react-bootstrap'
-import { connect } from 'react-redux'
 import { BodyClass } from '~/components/BodyClass'
 
 export const ConfirmCreate = (({ onConfirm }) => {

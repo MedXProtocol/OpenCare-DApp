@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-export const BodyClass = class extends Component {
+export const BodyClass = class extends React.Component {
   static defaultProps = {
     isDark: false
   }

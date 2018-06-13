@@ -166,6 +166,10 @@ export const groupedDiagnosisOptions = [
     "options": rashesOptions.map(option => ({ "value": option, "label": option }))
   },
   {
+    "label": "Hair loss",
+    "options": hairLossOptions.map(option => ({ "value": option, "label": option }))
+  },
+  {
     "label": "Other",
     "options": otherOptions.map(option => ({ "value": option, "label": option }))
   }

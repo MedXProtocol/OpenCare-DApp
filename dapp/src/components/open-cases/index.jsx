@@ -48,7 +48,7 @@ function* saga({ account, CaseManager }) {
 
 export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager'] })(withSend(class _OpenCases extends Component {
   onClickRequestCase = (e) => {
-    const { send, CaseManager, contractRegistry } = this.props
+    const { send, CaseManager } = this.props
     send(CaseManager, 'requestNextCase')()
   }
 

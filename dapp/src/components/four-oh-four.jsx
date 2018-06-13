@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { MainLayout } from '~/layouts/MainLayout'
 
 export const FourOhFour = function () {

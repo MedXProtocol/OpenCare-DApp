@@ -4,11 +4,9 @@ import React, {
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
-import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctor-case-status-labels'
-import getWeb3 from '~/get-web3'
 import { addContract } from '~/saga-genesis/sagas'
 
 function mapStateToProps(state, { address }) {
@@ -27,9 +25,8 @@ function mapStateToProps(state, { address }) {
 }
 
 function* propSaga({address}) {
-  let props = {}
   yield addContract({address, contractKey: 'Case'})
-  let status = parseInt(yield cacheCall(address, 'status'))
+  let status = parseInt(yield cacheCall(address, 'status'), 10)
   yield cacheCall(address, 'caseFee')
   if (status >= 3) {
     yield cacheCall(address, 'diagnosingDoctorA')
@@ -41,17 +38,17 @@ function* propSaga({address}) {
 
 export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga, { propTriggers: ['address'] })(class _CaseRow extends Component {
   render () {
-    var status = parseInt(this.props.status || 0)
-    let isApprovedDiagnosingADoctor = this.props.diagnosingDoctorA == this.props.account && status > 3
-    let isApprovedDiagnosingBDoctor = this.props.diagnosingDoctorB == this.props.account && status > 8
+    var status = parseInt(this.props.status || 0, 10)
+    let isApprovedDiagnosingADoctor = this.props.diagnosingDoctorA === this.props.account && status > 3
+    let isApprovedDiagnosingBDoctor = this.props.diagnosingDoctorB === this.props.account && status > 8
     if (isApprovedDiagnosingADoctor || isApprovedDiagnosingBDoctor) {
       var address = <Link to={`/doctors/cases/diagnose/${this.props.address}`}>{this.props.address}</Link>
     } else {
       address = this.props.address
     }
     if (this.props.status) {
-      var status = doctorCaseStatusToName(parseInt(this.props.status))
-      var statusClass = doctorCaseStatusToClass(parseInt(this.props.status))
+      status = doctorCaseStatusToName(parseInt(this.props.status, 10))
+      var statusClass = doctorCaseStatusToClass(parseInt(this.props.status, 10))
     }
     return (
       <tr>

@@ -3,7 +3,6 @@ import {
   ControlLabel,
   FormGroup,
   Modal,
-  Radio,
   ProgressBar,
   ToggleButtonGroup,
   ToggleButton,

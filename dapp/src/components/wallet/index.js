@@ -37,7 +37,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
                   <h4 className="card-title">
                     <FontAwesomeIcon
                       icon={faPlus} />
-                    &nbsp; <span className="title">Your Balance:</span> {parseInt(this.props.balance).toLocaleString()} MEDX
+                    &nbsp; <span className="title">Your Balance:</span> {parseInt(this.props.balance, 10).toLocaleString()} MEDX
                   </h4>
                 </div>
                 <div className="card-body">
