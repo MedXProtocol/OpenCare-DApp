@@ -9,18 +9,23 @@ import { connect } from 'react-redux'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
+  const account = state.sagaGenesis.accounts[0]
   const status = cacheCallValue(state, caseAddress, 'status')
+  const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const diagnosisALocationHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
   const transactions = state.sagaGenesis.transactions
+  const isPatient = account === patientAddress
   return {
     status,
     diagnosisALocationHash,
-    transactions
+    transactions,
+    isPatient
   }
 }
 
 function* saga({ caseAddress }) {
   yield cacheCall(caseAddress, 'status')
+  yield cacheCall(caseAddress, 'patient')
   yield cacheCall(caseAddress, 'diagnosisALocationHash')
 }
 
@@ -41,15 +46,11 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
 
   async componentDidMount() {
     const status = parseInt(this.props.status, 10)
-
-    this.setState({status: status})
-
-    if (status === 5) {
+    this.setState({status})
+    if (status === 5 && this.props.isPatient) {
       this.setState({ buttonsHidden: false })
     }
-
     const diagnosisHash = this.props.diagnosisALocationHash
-
     if (diagnosisHash !== null && diagnosisHash !== "0x") {
       const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey);
       const diagnosis = JSON.parse(diagnosisJson);
