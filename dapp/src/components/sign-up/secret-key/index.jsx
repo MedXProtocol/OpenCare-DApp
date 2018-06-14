@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import ReactTooltip from 'react-tooltip'
 import { Button, Modal } from 'react-bootstrap'
 import { BodyClass } from '~/components/BodyClass'
 import { formatKey } from '~/services/format-key'
@@ -46,10 +45,6 @@ export const SecretKey = class extends Component {
                     By signing up you are agreeing to the terms:
                     &nbsp;<a onClick={(e) => this.setState({ showTermsModal: true })}>READ TERMS</a>
                   </p>
-                  <ReactTooltip
-                    effect='solid'
-                    border={true}
-                    multiline={true} />
                 </div>
 
                 <div className="form-wrapper--footer">

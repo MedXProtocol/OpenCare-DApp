@@ -177,8 +177,12 @@ contract CaseManager is Ownable, Pausable, Initializable {
       return caseContract;
     }
 
+    /**
+     * @dev - This will find the next case address the requesting Doctor can
+              request, and should exclude any cases they've previously diagnosed
+     * @return - address of the Doctor's next case to diagnose
+     */
     function peekNextCase() external view returns (address) {
-      require(openCaseQueue.length() > 0);
       uint256 caseIndex = openCaseQueue.peek(msg.sender);
       if (caseIndex > 0) {
         return caseList[caseIndex];
