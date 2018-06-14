@@ -10,6 +10,7 @@ module.exports = function(deployer, network, accounts) {
     let skipListInstance = await SkipList.deployed()
     let registryInstance = await Registry.deployed()
     let medXTokenInstance = await MedXToken.deployed()
+    deployer.link(SkipList, CaseManager)
     return deployAndRegister(deployer, CaseManager, Registry, 'CaseManagerTarget')
   })
 };
