@@ -72,6 +72,7 @@
   },
   "devDependencies": {
     "aes-js": "^3.1.1",
+    "babel-cli": "^6.26.0",
     "babel-plugin-root-import": "^5.1.0",
     "babel-preset-env": "^1.6.1",
     "bugsnag-sourcemaps": "^1.0.3",
