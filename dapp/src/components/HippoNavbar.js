@@ -13,6 +13,9 @@ import {
 } from 'react-router-bootstrap'
 import { withRouter, Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import ReactTooltip from 'react-tooltip'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle';
 import logo from '../assets/img/logo.png'
 import get from 'lodash.get'
 import networkIdToName from '~/utils/network-id-to-name'
@@ -108,7 +111,11 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
       }
     }
 
-    let navbarClassName = classnames('navbar', { 'navbar-transparent': this.props.transparent, 'navbar-absolute': this.props.transparent, 'navbar-default': !this.props.transparent})
+    let navbarClassName = classnames('navbar', {
+      'navbar-transparent': this.props.transparent,
+      'navbar-absolute': this.props.transparent,
+      'navbar-default': !this.props.transparent
+    })
 
     let dynamicHomePath = this.props.signedIn ? '/patients/cases' : '/'
 
@@ -127,6 +134,14 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
           <Navbar.Toggle />
         </Navbar.Header>
         <Nav className="nav--network-name">
+          <NavItem>
+            <FontAwesomeIcon
+              icon={faUserCircle}
+              size='sm'
+              className='text-gold'
+              data-tip='This Ethereum account is a Contract Owner' />
+            <ReactTooltip effect='solid' position='bottom' />
+          </NavItem>
           <NavItem>
             {networkIdToName(this.props.networkId)} Network
           </NavItem>
