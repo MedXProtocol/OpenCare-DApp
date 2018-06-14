@@ -134,14 +134,16 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
           <Navbar.Toggle />
         </Navbar.Header>
         <Nav className="nav--network-name">
-          <NavItem>
-            <FontAwesomeIcon
-              icon={faUserCircle}
-              size='sm'
-              className='text-gold'
-              data-tip='This Ethereum account is a Contract Owner' />
-            <ReactTooltip effect='solid' position='bottom' />
-          </NavItem>
+          {this.props.canRegister ? (
+            <NavItem>
+              <FontAwesomeIcon
+                icon={faUserCircle}
+                size='sm'
+                className='text-gold'
+                data-tip='This Ethereum account is a Contract Owner' />
+              <ReactTooltip effect='solid' position='bottom' />
+            </NavItem>
+          ) : null}
           <NavItem>
             {networkIdToName(this.props.networkId)} Network
           </NavItem>
