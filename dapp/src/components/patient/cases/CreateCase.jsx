@@ -44,34 +44,32 @@ function* saga({ account, MedXToken }) {
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(withSend(class _CreateCase extends Component {
     constructor(){
-        super()
+      super()
 
-        this.state = {
-            firstImageHash: null,
-            firstFileName: null,
-            firstImagePercent: 0,
-            secondImageHash: null,
-            secondFileName: null,
-            secondImagePercent: 0,
-            howLong: null,
-            size: null,
-            painful: null,
-            bleeding: null,
-            itching: null,
-            skinCancer: null,
-            sexuallyActive: null,
-            age: null,
-            country: null,
-            color: null,
-            prevTreatment: null,
-            description: null,
-            caseEncryptionKey: genKey(32),
-
-            canSubmit: false,
-            showBalanceTooLowModal: false,
-            showConfirmSubmissionModal: false,
-            showThankYouModal: false
-        };
+      this.state = {
+        firstImageHash: null,
+        firstFileName: null,
+        firstImagePercent: 0,
+        secondImageHash: null,
+        secondFileName: null,
+        secondImagePercent: 0,
+        howLong: null,
+        size: null,
+        painful: null,
+        bleeding: null,
+        itching: null,
+        skinCancer: null,
+        sexuallyActive: null,
+        age: null,
+        country: null,
+        color: null,
+        prevTreatment: null,
+        description: null,
+        caseEncryptionKey: genKey(32),
+        canSubmit: false,
+        showBalanceTooLowModal: false,
+        showConfirmSubmissionModal: false
+      };
     }
 
     componentWillReceiveProps (props) {
@@ -179,9 +177,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     handleSubmit = (event) => {
       event.preventDefault()
       if(this.props.balance < 15) {
-          this.setState({showBalanceTooLowModal: true});
+        this.setState({showBalanceTooLowModal: true});
       } else {
-          this.setState({showConfirmSubmissionModal: true});
+        this.setState({showConfirmSubmissionModal: true});
       }
     }
 
@@ -205,22 +203,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     handleCloseBalanceTooLowModal = (event) => {
-        event.preventDefault();
-
-        this.setState({showBalanceTooLowModal: false});
-    }
-
-    handleCloseThankYouModal = (event) => {
-        event.preventDefault();
-
-        this.setState({showThankYouModal: false});
-
-        this.props.history.push('/patients/cases');
+      event.preventDefault();
+      this.setState({ showBalanceTooLowModal: false });
     }
 
     handleCancelConfirmSubmissionModal = (event) => {
-        event.preventDefault();
-        this.setState({showConfirmSubmissionModal: false});
+      event.preventDefault();
+      this.setState({ showConfirmSubmissionModal: false });
     }
 
     handleAcceptConfirmSubmissionModal = async (event) => {
@@ -610,7 +599,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             </div>
           </div>
 
-
         <Modal show={this.state.showBalanceTooLowModal}>
           <Modal.Body>
             <div className="row">
@@ -640,19 +628,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           <Modal.Footer>
             <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
             <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
-          </Modal.Footer>
-        </Modal>
-        <Modal show={this.state.showThankYouModal}>
-          <Modal.Body>
-            <div className="row">
-              <div className="col-xs-12 text-center">
-                <h4>Thank you! Your case submitted successfully.</h4>
-              </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-link">Close</button>
-            <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-success">Great!</button>
           </Modal.Footer>
         </Modal>
       </div>

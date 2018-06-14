@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
-import { toastr } from 'react-redux-toastr'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';

@@ -1,5 +1,8 @@
 // These are actually 'slide'-style animations, however react-redux-toastr's animation types
 // are deeply entrenched and enforced by propTypes, so this is a simple override
+//
+// Don't use these for anything other than toasts
+// Use the standard _animation.scss file for animations not related to toasts
 
 .animated {
   animation-duration: 1s;
