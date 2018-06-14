@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { toastr } from 'react-redux-toastr'
+import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
@@ -23,7 +24,7 @@ function mapStateToProps(state, { accounts }) {
 
   const cases = []
   let showingApprovalModal = false
-  for (let caseIndex = 0; caseIndex < caseListCount; caseIndex++) {
+  for (let caseIndex = caseListCount; caseIndex >= 0; --caseIndex) {
     let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
 
     if (caseAddress) {
@@ -34,10 +35,12 @@ function mapStateToProps(state, { accounts }) {
       }
       cases.push({
         caseAddress,
-        caseRowProps
+        caseRowProps,
+        caseIndex
       })
     }
   }
+
   return {
     account,
     caseListCount,
@@ -64,9 +67,9 @@ function* saga({ account, CaseManager, AccountManager }) {
 
 export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager', 'caseListCount']})(class _PatientCases extends Component {
   componentDidMount () {
-    toastr.light('Success', 'Your case has been submitted.', { icon: 'success', status: 'success' })
     this.props.invalidate(this.props.CaseManager)
   }
+
   render() {
     return (
         <div className="card">
@@ -88,13 +91,21 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
                 </tr>
               </thead>
               <tbody>
-                {this.props.cases.map(({caseAddress, caseRowProps}, caseIndex) =>
-                  <CaseRowContainer
-                    caseAddress={caseAddress}
-                    caseIndex={caseIndex}
-                    key={caseIndex}
-                    {...caseRowProps} />
-                )}
+                <TransitionGroup component={null}>
+                  {this.props.cases.map(({caseAddress, caseRowProps, caseIndex}) =>
+                    <CSSTransition
+                      key={caseIndex}
+                      timeout={500}
+                      appear={true}
+                      classNames="fade">
+                        <CaseRowContainer
+                          caseAddress={caseAddress}
+                          caseIndex={caseIndex}
+                          key={caseIndex}
+                          {...caseRowProps} />
+                    </CSSTransition>
+                  )}
+                </TransitionGroup>
               </tbody>
             </table>
           }

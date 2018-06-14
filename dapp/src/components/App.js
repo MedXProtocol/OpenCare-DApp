@@ -46,7 +46,7 @@ const App = class extends Component {
           <Route path='/' component={FourOhFour} />
         </Switch>
         <ReduxToastr
-          timeOut={7000}
+          timeOut={700000}
           newestOnTop={true}
           tapToDismiss={false}
           position="bottom-left"

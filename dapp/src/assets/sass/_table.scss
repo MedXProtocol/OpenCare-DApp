@@ -1,3 +1,7 @@
+.table tr {
+  transition: all 800ms ease-in;
+}
+
 .table > thead > tr > th,
 .table > thead > tr > td,
 .table > tbody > tr > th,
@@ -5,6 +9,7 @@
 .table > tfoot > tr > th,
 .table > tfoot > tr > td {
   border: 0;
+  padding: 10px 8px 3px;
 }
 
 .table > thead > tr > th,
@@ -15,7 +20,7 @@
 }
 
 .table td.text {
-  max-width: 177px;
+  max-width: 80px;
 
   span {
     white-space: nowrap;

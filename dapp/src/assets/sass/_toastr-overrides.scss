@@ -1,5 +1,6 @@
 .redux-toastr .toastr {
   background: #222;
+  font-size: 14px;
 }
 
 .redux-toastr .toastr .toastr-status {
@@ -10,14 +11,14 @@
   font-family: inherit;
 }
 
-.redux-toastr .toastr .close-toastr {
-  height: 86px;
-  font-family: inherit;
+.redux-toastr .toastr .rrt-left-container .rrt-holder {
+  top: 56%;
 }
 
 .redux-toastr .toastr .rrt-middle-container .rrt-title {
-  margin-bottom: 0;
   font-size: inherit;
+  margin-bottom: 0;
+  text-transform: uppercase;
 }
 
 .redux-toastr .top-center,
@@ -54,7 +55,10 @@
 
 .redux-toastr .toastr .close-toastr {
   color: white;
-  height: 100%;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  height: 57px;
   width: 15%;
 
   @media (max-width: $screen-sm) {
@@ -76,15 +80,15 @@
 }
 
 .redux-toastr .toastr.rrt-light .rrt-middle-container .rrt-title {
-  color: #ccc;
+  color: #777;
 }
 
 .redux-toastr .toastr.rrt-light .toastr-icon {
-  fill: #ccc !important;
+  fill: #777 !important;
 }
 
 .redux-toastr .rrt-light .close-toastr {
-  color: #ccc;
+  color: #999;
 }
 
 .redux-toastr .toastr.rrt-info,

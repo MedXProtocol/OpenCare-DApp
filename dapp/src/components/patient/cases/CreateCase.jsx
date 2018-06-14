@@ -80,8 +80,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         console.log('submitted: ' + get(props, `transactions[${this.state.transactionId}].submitted`))
 
         if (get(props, `transactions[${this.state.transactionId}].submitted`)) {
-          // toastr.light('Success', 'Your case has been submitted.', { icon: 'success', status: 'success' })
-          toastr.success('Success', 'Your case has been submitted.', { icon: 'success', status: 'success' })
+          toastr.light('Success', 'Your case has been submitted.', { icon: 'success', status: 'success' })
           this.props.history.push('/patients/cases');
           // let error = props.transactions[this.state.transactionId].error
           // if (error) {

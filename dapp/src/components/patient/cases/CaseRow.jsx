@@ -91,7 +91,7 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
     const status = +(this.props.status || '0')
     if (status === 3 || status === 8) {
       var approvalButton = (
-        <button className='btn btn-sm btn-primary' onClick={this.onApprove}>
+        <button className='btn btn-xs btn-primary' onClick={this.onApprove}>
           <FontAwesomeIcon
             icon={faCheck}
             size='lg' />
