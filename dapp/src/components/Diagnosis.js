@@ -40,24 +40,24 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   }
 
   async componentDidMount() {
-      const status = parseInt(this.props.status, 10)
+    const status = parseInt(this.props.status, 10)
 
-      this.setState({status: status})
+    this.setState({status: status})
 
-      if(status === 5) {
-          this.setState({buttonsHidden: false})
-      }
+    if (status === 5) {
+      this.setState({ buttonsHidden: false })
+    }
 
-      const diagnosisHash = this.props.diagnosisALocationHash
+    const diagnosisHash = this.props.diagnosisALocationHash
 
-      if(diagnosisHash !== null && diagnosisHash !== "0x") {
-          const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey);
-          const diagnosis = JSON.parse(diagnosisJson);
-          this.setState({
-              diagnosis: diagnosis,
-              hidden: false
-          });
-      }
+    if (diagnosisHash !== null && diagnosisHash !== "0x") {
+      const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey);
+      const diagnosis = JSON.parse(diagnosisJson);
+      this.setState({
+        diagnosis: diagnosis,
+        hidden: false
+      });
+    }
   }
 
   componentWillReceiveProps (props) {

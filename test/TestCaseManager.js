@@ -110,4 +110,12 @@ contract('CaseManager', function (accounts) {
       })
     })
   })
+
+  describe('peekNextCase()', () => {
+    it('should work', async () => {
+      assert.equal(await env.caseManager.peekNextCase({ from: doctor }), 0)
+      let address = await createCase(env, patient)
+      assert.equal(await env.caseManager.peekNextCase({ from: doctor }), address)
+    })
+  })
 });

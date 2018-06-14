@@ -6,6 +6,7 @@ import {
   Button,
   Table
 } from 'react-bootstrap'
+import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
@@ -29,12 +30,15 @@ function mapStateToProps(state) {
     let c = cacheCallValue(state, CaseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
     if (c) { cases.push(c) }
   }
+  const peekNextCase = cacheCallValue(state, CaseManager, 'peekNextCase')
+
   return {
     account,
     openCaseCount,
     caseCount,
     cases,
-    CaseManager
+    CaseManager,
+    peekNextCase
   }
 }
 
@@ -45,10 +49,11 @@ function* saga({ account, CaseManager }) {
   for (let i = 0; i < caseCount; i++) {
     yield cacheCall(CaseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
   }
+  yield cacheCall(CaseManager, 'peekNextCase')
 }
 
 export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager'] })(withSend(class _OpenCases extends Component {
-  onClickRequestCase = (e) => {
+  handleRequestCase = (e) => {
     const { send, CaseManager } = this.props
     send(CaseManager, 'requestNextCase')()
   }
@@ -56,6 +61,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
   render () {
     let caseKeys = keys(this.props.cases)
     let cases = caseKeys.reverse().map((key) => this.props.cases[key])
+    let noCasesAvailableForDoc = (parseInt(this.props.peekNextCase, 16) === 0)
 
     return (
       <MainLayout>
@@ -68,18 +74,26 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                     Diagnose Cases
                   </h3>
                   <span className="sm-block text-gray">
-                    <strong>Open Cases:</strong> {this.props.openCaseCount} &nbsp;
+                    Cases you are currently evaluating &amp; have diagnosed
                   </span>
                 </div>
                 <div className='col-md-4 col-sm-12 button-container'>
-                  <Button
-                    disabled={this.props.openCaseCount === '0'}
-                    onClick={this.onClickRequestCase}
-                    bsStyle="info">
-                    <FontAwesomeIcon
-                      icon={faNotesMedical}
-                      size='lg' /> &nbsp; Request Case
-                  </Button>
+                  <span
+                    data-tip=''
+                    data-for='button-tooltip'>
+                    <Button
+                      disabled={noCasesAvailableForDoc}
+                      onClick={this.handleRequestCase}
+                      bsStyle="info">
+                      <FontAwesomeIcon
+                        icon={faNotesMedical}
+                        size='lg' /> &nbsp; Request Case
+                    </Button>
+                  </span>
+                  <ReactTooltip
+                    id='button-tooltip'
+                    effect='solid'
+                    getContent={() => noCasesAvailableForDoc ? 'Currently no cases available' : undefined } />
                 </div>
               </div>
             </div>
@@ -132,9 +146,3 @@ OpenCasesContainer.propTypes = {
 OpenCasesContainer.defaultProps = {
   cases: []
 }
-
-// <div className='card-header'>
-//   <h4 className="card-title">
-//     All Cases
-//   </h4>
-// </div>
