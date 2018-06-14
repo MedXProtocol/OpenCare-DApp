@@ -1,0 +1,113 @@
+.redux-toastr .toastr {
+  background: #222;
+  font-size: 14px;
+}
+
+.redux-toastr .toastr .toastr-status {
+  height: 8px;
+}
+
+.redux-toastr .toastr .rrt-middle-container {
+  font-family: inherit;
+}
+
+.redux-toastr .toastr .rrt-left-container .rrt-holder {
+  top: 56%;
+}
+
+.redux-toastr .toastr .rrt-middle-container .rrt-title {
+  font-size: inherit;
+  margin-bottom: 0;
+  text-transform: uppercase;
+}
+
+.redux-toastr .top-center,
+.redux-toastr .bottom-center {
+  left: 0;
+  margin-left: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.redux-toastr .bottom-left {
+  left: 10px;
+  bottom: 20px;
+  width: 50%;
+
+  @media (max-width: $screen-sm) {
+    bottom: 0;
+    left: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+  }
+  @media (min-width: $screen-lg) {
+    width: 38%;
+  }
+}
+
+.redux-toastr .toastr {
+  box-shadow: none;
+  border-radius: 2px;
+  margin: 0;
+  opacity: 1;
+}
+
+.redux-toastr .toastr .close-toastr {
+  color: white;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  height: 57px;
+  width: 15%;
+
+  @media (max-width: $screen-sm) {
+    width: 15%;
+  }
+  @media (min-width: $screen-lg) {
+    width: 8%;
+  }
+}
+
+.redux-toastr .toastr:hover:not(.rrt-message) {
+  box-shadow: none;
+}
+
+// Light theme overrides
+.redux-toastr .toastr.rrt-light {
+  border-bottom: 2px solid #111;
+  color: white;
+}
+
+.redux-toastr .toastr.rrt-light .rrt-middle-container .rrt-title {
+  color: #777;
+}
+
+.redux-toastr .toastr.rrt-light .toastr-icon {
+  fill: #777 !important;
+}
+
+.redux-toastr .rrt-light .close-toastr {
+  color: #999;
+}
+
+.redux-toastr .toastr.rrt-info,
+.redux-toastr .toastr .toastr-status.info {
+  background-color: $brand-info;
+}
+
+.redux-toastr .toastr.rrt-success,
+.redux-toastr .toastr .toastr-status.success {
+  background-color: $brand-success;
+}
+
+.redux-toastr .toastr.rrt-error,
+.redux-toastr .toastr .toastr-status.error {
+  background-color: $brand-danger;
+}
+
+.redux-toastr .toastr.rrt-warning,
+.redux-toastr .toastr .toastr-status.warning {
+  background-color: $brand-warning;
+}
+

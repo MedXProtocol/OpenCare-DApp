@@ -19,6 +19,9 @@ function rejectedByUser(error) {
 function createTransactionEventChannel (web3, transactionId, send, options) {
   return eventChannel(emit => {
     let promiEvent = send(options)
+      .on('transactionHash', (txHash) => {
+        emit({type: 'TRANSACTION_HASH', transactionId, txHash})
+      })
       .on('confirmation', (confirmationNumber, receipt) => {
         emit({type: 'TRANSACTION_CONFIRMATION', transactionId, confirmationNumber, receipt})
         if (confirmationNumber > 2) {

@@ -1,6 +1,6 @@
 import update from 'immutability-helper';
 
-export default function (state, {type, transactionId, call, error, receipt}) {
+export default function (state, {type, transactionId, call, error, receipt, txHash}) {
   if (typeof state === 'undefined') {
     state = {}
   }
@@ -13,6 +13,18 @@ export default function (state, {type, transactionId, call, error, receipt}) {
           ...state[transactionId],
           call,
           inFlight: true
+        }
+      }
+      break
+
+    case 'TRANSACTION_HASH':
+      state = {
+        ...state,
+        [transactionId]: {
+          ...state[transactionId],
+          inFlight: false,
+          submitted: true,
+          txHash
         }
       }
       break

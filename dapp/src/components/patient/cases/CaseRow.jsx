@@ -91,7 +91,7 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
     const status = +(this.props.status || '0')
     if (status === 3 || status === 8) {
       var approvalButton = (
-        <button className='btn btn-sm btn-primary' onClick={this.onApprove}>
+        <button className='btn btn-xs btn-primary' onClick={this.onApprove}>
           <FontAwesomeIcon
             icon={faCheck}
             size='lg' />
@@ -119,8 +119,12 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
       <tr>
         {modal}
         <td width="5%" className="text-center">{this.props.caseIndex+1}</td>
-        <td><Link to={`/patients/cases/${this.props.caseAddress}`}>{this.props.caseAddress}</Link></td>
-        <td className="eth-address text" width="10%">
+        <td className="eth-address text">
+          <span>
+            <Link to={`/patients/cases/${this.props.caseAddress}`}>{this.props.caseAddress}</Link>
+          </span>
+        </td>
+        <td width="15%" className="td--status">
           <label className={`label label-${caseStatusToClass(status)}`}>
             {caseStatusToName(status)}
           </label>

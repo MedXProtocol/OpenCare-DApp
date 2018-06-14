@@ -24,7 +24,7 @@ export const PatientDashboardHeader = class extends Component {
             <div className='col-md-4 col-sm-12 button-container'>
               <button
                 type="button"
-                className="btn btn-lg btn-success"
+                className="btn btn-success"
                 onClick={() => this.navigateToNewCase()}>
                 <FontAwesomeIcon
                   icon={faFileMedical}

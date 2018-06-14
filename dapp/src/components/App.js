@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter, Route, Switch } from 'react-router-dom'
+import ReduxToastr from 'react-redux-toastr'
 import { SignUpContainer } from './sign-up'
 import { SignInContainer } from './sign-in'
 import { PatientDashboard } from './patient/dashboard/'
@@ -44,6 +45,13 @@ const App = class extends Component {
 
           <Route path='/' component={FourOhFour} />
         </Switch>
+        <ReduxToastr
+          timeOut={7000}
+          newestOnTop={true}
+          tapToDismiss={false}
+          position="bottom-left"
+          transitionIn="bounceIn"
+          transitionOut="bounceOut" />
       </div>
     )
   }

@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+import { toastr } from 'react-redux-toastr'
 import {
   ControlLabel,
   FormGroup,
@@ -11,13 +13,11 @@ import {
 import { genKey } from '~/services/gen-key'
 import { withRouter } from 'react-router-dom';
 import classNames from 'classnames';
-import Spinner from '~/components/Spinner';
 import { isNotEmptyString } from '~/utils/common-util';
 import { uploadJson, uploadFile } from '~/utils/storage-util';
 import { signedInSecretKey } from '~/services/sign-in'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
-import { connect } from 'react-redux'
 import aes from '~/services/aes'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
@@ -44,47 +44,39 @@ function* saga({ account, MedXToken }) {
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(withSend(class _CreateCase extends Component {
     constructor(){
-        super()
+      super()
 
-        this.state = {
-            firstImageHash: null,
-            firstFileName: null,
-            firstImagePercent: 0,
-            secondImageHash: null,
-            secondFileName: null,
-            secondImagePercent: 0,
-            howLong: null,
-            size: null,
-            painful: null,
-            bleeding: null,
-            itching: null,
-            skinCancer: null,
-            sexuallyActive: null,
-            age: null,
-            country: null,
-            color: null,
-            prevTreatment: null,
-            description: null,
-            caseEncryptionKey: genKey(32),
-
-
-            canSubmit: false,
-            submitInProgress: false,
-            showBalanceTooLowModal: false,
-            showConfirmSubmissionModal: false,
-            showThankYouModal: false
-        };
+      this.state = {
+        firstImageHash: null,
+        firstFileName: null,
+        firstImagePercent: 0,
+        secondImageHash: null,
+        secondFileName: null,
+        secondImagePercent: 0,
+        howLong: null,
+        size: null,
+        painful: null,
+        bleeding: null,
+        itching: null,
+        skinCancer: null,
+        sexuallyActive: null,
+        age: null,
+        country: null,
+        color: null,
+        prevTreatment: null,
+        description: null,
+        caseEncryptionKey: genKey(32),
+        canSubmit: false,
+        showBalanceTooLowModal: false,
+        showConfirmSubmissionModal: false
+      };
     }
 
     componentWillReceiveProps (props) {
       if (this.state.transactionId) {
-        if (get(props, `transactions[${this.state.transactionId}].complete`)) {
-          let error = props.transactions[this.state.transactionId].error
-          if (error) {
-            this.onError(error)
-          } else {
-            this.onSuccess()
-          }
+        if (get(props, `transactions[${this.state.transactionId}].submitted`)) {
+          toastr.light('Success', 'Your case has been submitted.', { icon: 'success', status: 'success' })
+          this.props.history.push('/patients/cases');
         }
       }
     }
@@ -205,9 +197,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     handleSubmit = (event) => {
       event.preventDefault()
       if(this.props.balance < 15) {
-          this.setState({showBalanceTooLowModal: true});
+        this.setState({showBalanceTooLowModal: true});
       } else {
-          this.setState({showConfirmSubmissionModal: true});
+        this.setState({showConfirmSubmissionModal: true});
       }
     }
 
@@ -231,34 +223,22 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     handleCloseBalanceTooLowModal = (event) => {
-        event.preventDefault();
-
-        this.setState({showBalanceTooLowModal: false});
-    }
-
-    handleCloseThankYouModal = (event) => {
-        event.preventDefault();
-
-        this.setState({showThankYouModal: false});
-
-        this.props.history.push('/patients/cases');
+      event.preventDefault();
+      this.setState({ showBalanceTooLowModal: false });
     }
 
     handleCancelConfirmSubmissionModal = (event) => {
-        event.preventDefault();
-        this.setState({showConfirmSubmissionModal: false});
+      event.preventDefault();
+      this.setState({ showConfirmSubmissionModal: false });
     }
 
     handleAcceptConfirmSubmissionModal = async (event) => {
-        event.preventDefault();
+      event.preventDefault();
 
-        this.setState({showConfirmSubmissionModal: false});
-        await this.createNewCase();
+      await this.createNewCase();
     }
 
     createNewCase = async () => {
-        this.setState({submitInProgress: true});
-
         const caseInformation = {
             firstImageHash: this.state.firstImageHash,
             secondImageHash: this.state.secondImageHash,
@@ -281,25 +261,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         const encryptedCaseKey = aes.encrypt(this.state.caseEncryptionKey, signedInSecretKey())
 
         const { send, MedXToken, CaseManager } = this.props
-        var hashHex = hashToHex(hash)
+        let hashHex = hashToHex(hash)
 
-        var CaseManagerContract = this.props.contractRegistry.get(this.props.CaseManager, 'CaseManager', getWeb3())
-        var data = CaseManagerContract.methods.createCase(this.props.account, '0x' + encryptedCaseKey, '0x' + hashHex).encodeABI()
+        let CaseManagerContract = this.props.contractRegistry.get(this.props.CaseManager, 'CaseManager', getWeb3())
+        let data = CaseManagerContract.methods.createCase(this.props.account, '0x' + encryptedCaseKey, '0x' + hashHex).encodeABI()
+        let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
 
-        this.setState({transactionId: send(MedXToken, 'approveAndCall', CaseManager, 15, data)()})
-    }
-
-    onError = (error) => {
-      console.error(error)
-      this.setState({
-          error: error,
-          submitInProgress: false
-      });
-    }
-
-    onSuccess = () => {
-        this.setState({submitInProgress: false});
-        this.setState({showThankYouModal: true});
+        this.setState({ transactionId })
     }
 
     render() {
@@ -665,7 +633,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             </div>
           </div>
 
-
         <Modal show={this.state.showBalanceTooLowModal}>
           <Modal.Body>
             <div className="row">
@@ -697,20 +664,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
           </Modal.Footer>
         </Modal>
-        <Modal show={this.state.showThankYouModal}>
-          <Modal.Body>
-            <div className="row">
-              <div className="col-xs-12 text-center">
-                <h4>Thank you! Your case submitted successfully.</h4>
-              </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-link">Close</button>
-            <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-success">Great!</button>
-          </Modal.Footer>
-        </Modal>
-        <Spinner loading={this.state.submitInProgress}/>
       </div>
     );
   }
