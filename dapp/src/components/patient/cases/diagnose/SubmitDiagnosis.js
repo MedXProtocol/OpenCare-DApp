@@ -84,17 +84,17 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
     }
   }
 
-  // This is the diagnosis chosen in the 'react-select' <Select> component
+  // This is the diagnosis chosen in the 'react-select' <Select> components
   updateDiagnosis = (newValue) => {
     this.setState({ diagnosis: newValue.value }, this.validateInputs)
   }
 
   // This is the recommendation the physician can type into the textarea below
   updateAdditionalRecommendation = (event) => {
-    this.setState({ additionalRecommendation: event.target.value }, this.buildFinalRecommendation)
+    this.setState({ additionalRecommendation: event.target.value })
   }
 
-  // Combines the selected recommendation arrays with the additionalRecommendation
+  // Combines the selected recommendation arrays
   buildFinalRecommendation = () => {
     let recommendation = [
       this.state.overTheCounterRecommendation.join(', '),
@@ -105,9 +105,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
     ].filter(element => (element !== (undefined || null || '')))
      .join(', ')
 
-    if (this.state.additionalRecommendation.length > 0)
-      recommendation = `${recommendation}. ${this.state.additionalRecommendation}`
-
     this.setState({ recommendation }, this.validateInputs)
   }
 
@@ -116,7 +113,7 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
       isNotEmptyString(this.state.diagnosis) &&
       isNotEmptyString(this.state.recommendation)
 
-      this.setState({ canSubmit: valid })
+    this.setState({ canSubmit: valid })
   }
 
   handleSubmit = async (event) => {
@@ -136,7 +133,8 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
   submitDiagnosis = async () => {
     const diagnosisInformation = {
       diagnosis: this.state.diagnosis,
-      recommendation: this.state.recommendation
+      recommendation: this.state.recommendation,
+      additionalRecommendation: this.state.additionalRecommendation
     }
     const diagnosisJson = JSON.stringify(diagnosisInformation)
     const ipfsHash = await uploadJson(diagnosisJson, this.props.caseKey)
@@ -257,31 +255,44 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
                   </div>
 
                   <div className="form-group">
-                    <label>Additional Recommendation</label>
+                    <label>
+                      Additional Recommendation
+                      &nbsp; <span className="text-gray">(Optional)</span>
+                    </label>
 
                     <textarea
                       onChange={this.updateAdditionalRecommendation}
                       className="form-control"
-                      rows="3"
-                      required />
+                      rows="3" />
                   </div>
                 </div>
 
                 <div className="col-xs-12 col-md-4">
                   <div className="well">
-                    <label className="label">Your diagnosis:</label>
+                    <label className="text-gray">Your diagnosis:</label>
                     <p>
                       {(this.state.diagnosis !== null)
                         ? this.state.diagnosis
                         : 'no diagnosis entered.'}
                     </p>
 
-                    <label className="label">Your recommendation:</label>
+                    <label className="text-gray">Your recommendation:</label>
                     <p>
                       {(this.state.recommendation !== null)
                         ? this.state.recommendation
                         : 'no recommendation entered.'}
                     </p>
+
+                    {(this.state.additionalRecommendation.length > 0)
+                      ? (
+                          <div>
+                            <label className="text-gray">Your additional recommendation:</label>
+                            <p>
+                              {this.state.additionalRecommendation}
+                            </p>
+                          </div>
+                        )
+                      : null}
                   </div>
                 </div>
               </div>

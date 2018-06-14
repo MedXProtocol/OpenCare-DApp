@@ -114,69 +114,80 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   }
 
   render() {
-      return ( this.state.hidden ?
-          <div /> :
-          <div className="card">
-              <div className="card-header">
-                  <h2 className="card-title">Diagnosis</h2>
-              </div>
-              <div className="card-body">
-                  <div className="row">
-
-                      <div className="col-xs-12">
-                          <label>Diagnosis</label>
-                          <p>{this.state.diagnosis.diagnosis}</p>
-                      </div>
-                      <div className="col-lg-6 col-md-12">
-                          <label>Recommendation</label>
-                          <p>
-                            {this.state.diagnosis.recommendation}
-                          </p>
-                      </div>
+    return ( this.state.hidden ?
+      <div /> :
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title">Diagnosis</h2>
+        </div>
+        <div className="card-body">
+          <div className="row">
+            <div className="col-xs-12">
+              <label>Diagnosis</label>
+              <p>
+                {this.state.diagnosis.diagnosis}
+              </p>
+            </div>
+            <div className="col-xs-12">
+              <label>Recommendation</label>
+              <p>
+                {this.state.diagnosis.recommendation}
+              </p>
+            </div>
+            {(this.state.diagnosis.additionalRecommendation.length > 0)
+              ? (
+                  <div className="col-xs-12">
+                    <label>Additional Recommendation:</label>
+                    <p>
+                      {this.state.diagnosis.additionalRecommendation}
+                    </p>
                   </div>
-              </div>
-
-              {
-                  this.state.buttonsHidden ? null :
-                  <div className="card-footer">
-                      <hr/>
-                      <div className="row">
-                          <div className="col-xs-12 text-center" >
-                              <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
-                              &nbsp;
-                              <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-danger">Get Second Opinion</button>
-                          </div>
-                      </div>
-                  </div>
-              }
-
-              <Modal show={this.state.showThankYouModal}>
-                  <Modal.Body>
-                      <div className="row">
-                          <div className="col-xs-12 text-center">
-                              <h4>Thank you for using MedCredits!</h4>
-                          </div>
-                      </div>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
-                  </Modal.Footer>
-              </Modal>
-              <Modal show={this.state.showChallengeModal}>
-                  <Modal.Body>
-                      <div className="row">
-                          <div className="col-xs-12 text-center">
-                              <h4>Another doctor will now review your case.</h4>
-                          </div>
-                      </div>
-                  </Modal.Body>
-                  <Modal.Footer>
-                      <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-primary">OK</button>
-                  </Modal.Footer>
-              </Modal>
-              <Spinner loading={this.state.submitInProgress}/>
+                )
+              : null}
           </div>
-      );
+        </div>
+
+        {
+          this.state.buttonsHidden ? null :
+          <div className="card-footer">
+            <hr/>
+            <div className="row">
+              <div className="col-xs-12 text-right" >
+                <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
+                &nbsp;
+                <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
+              </div>
+            </div>
+          </div>
+        }
+
+        <Modal show={this.state.showThankYouModal}>
+          <Modal.Body>
+            <div className="row">
+              <div className="col-xs-12 text-center">
+                <h4>Thank you for using MedCredits!</h4>
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
+          </Modal.Footer>
+        </Modal>
+        <Modal show={this.state.showChallengeModal}>
+          <Modal.Body>
+            <div className="row">
+              <div className="col-xs-12 text-center">
+                <h4>Another doctor will now review your case.</h4>
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-primary">OK</button>
+          </Modal.Footer>
+        </Modal>
+        <Spinner loading={this.state.submitInProgress}/>
+      </div>
+    );
   }
 })))
 
