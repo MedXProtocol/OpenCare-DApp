@@ -124,7 +124,7 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
             <Link to={`/patients/cases/${this.props.caseAddress}`}>{this.props.caseAddress}</Link>
           </span>
         </td>
-        <td width="15%">
+        <td width="15%" className="td--status">
           <label className={`label label-${caseStatusToClass(status)}`}>
             {caseStatusToName(status)}
           </label>

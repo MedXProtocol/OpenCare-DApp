@@ -8,6 +8,7 @@ import {
 } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
@@ -99,9 +100,19 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                       </tr>
                     </thead>
                     <tbody>
-                      {
-                        cases.map(address => <CaseRow address={address} key={address} />)
-                      }
+                      <TransitionGroup component={null}>
+                        {
+                          cases.map(address => (
+                            <CSSTransition
+                              key={address}
+                              timeout={500}
+                              appear={true}
+                              classNames="fade">
+                              <CaseRow address={address} key={address} />
+                            </CSSTransition>
+                          ))
+                        }
+                      </TransitionGroup>
                     </tbody>
                   </Table>
                 </div>

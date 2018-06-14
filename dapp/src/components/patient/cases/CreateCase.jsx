@@ -76,18 +76,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
     componentWillReceiveProps (props) {
       if (this.state.transactionId) {
-        console.log('complete: ' + get(props, `transactions[${this.state.transactionId}].complete`))
-        console.log('submitted: ' + get(props, `transactions[${this.state.transactionId}].submitted`))
-
         if (get(props, `transactions[${this.state.transactionId}].submitted`)) {
           toastr.light('Success', 'Your case has been submitted.', { icon: 'success', status: 'success' })
           this.props.history.push('/patients/cases');
-          // let error = props.transactions[this.state.transactionId].error
-          // if (error) {
-          //   this.onError(error)
-          // } else {
-          //   this.onSuccess()
-          // }
         }
       }
     }
@@ -268,22 +259,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
 
         this.setState({ transactionId })
-    }
-
-    onError = (error) => {
-      console.error(error)
-      // this.setState({
-      //     error: error,
-      //     submitInProgress: false
-      // });
-      this.setState({
-        error: error
-      });
-    }
-
-    onSuccess = () => {
-        // this.setState({submitInProgress: false});
-      this.setState({ showThankYouModal: true });
     }
 
     render() {
