@@ -4,21 +4,27 @@
   font-weight: normal;
   letter-spacing: 1px;
   text-transform: uppercase;
-  padding: 15px 20px;
+  padding: 10px 20px;
   transition: all 100ms ease-in-out;
+}
+
+.btn-lg {
+  font-size: 14px;
+  padding: 16px 22px;
+}
+
+.btn-sm {
+  font-size: 12px;
+  padding: 8px 12px;
+}
+
+.btn-xs {
+  font-size: 12px;
+  padding: 4px 10px;
 }
 
 .btn-link {
   box-shadow: none;
-}
-
-.btn-sm {
-  font-size: 13px;
-  padding: 10px 14px;
-}
-
-.btn-xs {
-  padding: 0.5rem 1rem;
 }
 
 .btn-info {

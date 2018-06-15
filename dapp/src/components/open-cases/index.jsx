@@ -84,7 +84,8 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                     <Button
                       disabled={noCasesAvailableForDoc}
                       onClick={this.handleRequestCase}
-                      bsStyle="info">
+                      bsStyle="info"
+                      className="btn-lg">
                       <FontAwesomeIcon
                         icon={faNotesMedical}
                         size='lg' /> &nbsp; Request Case
@@ -119,7 +120,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                           cases.map(address => (
                             <CSSTransition
                               key={address}
-                              timeout={500}
+                              timeout={100}
                               appear={true}
                               classNames="fade">
                               <CaseRow address={address} key={address} />

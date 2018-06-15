@@ -94,7 +94,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
                   {this.props.cases.map(({caseAddress, caseRowProps, caseIndex}) =>
                     <CSSTransition
                       key={caseIndex}
-                      timeout={500}
+                      timeout={100}
                       appear={true}
                       classNames="fade">
                         <CaseRowContainer
