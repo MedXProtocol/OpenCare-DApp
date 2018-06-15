@@ -42,3 +42,16 @@
   margin: 1rem 0;
   text-transform: uppercase;
 }
+
+.form-control::-moz-placeholder {
+  color: #ccc;
+  opacity: 1;
+}
+
+.form-control:-ms-input-placeholder {
+  color: #ccc;
+}
+
+.form-control::-webkit-input-placeholder {
+  color: #ccc;
+}

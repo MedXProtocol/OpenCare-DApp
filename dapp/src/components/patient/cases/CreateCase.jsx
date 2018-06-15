@@ -328,7 +328,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                           <div className={classNames('form-group', firstFileClassName)}>
                             <label className='control-label'>Overview Photo<span className='star'>*</span></label>
                             <div>
-                              <label className="btn btn-sm btn-info">
+                              <label className="btn btn btn-info">
                                 Select File ... <input
                                             onChange={this.captureFirstImage}
                                             type="file"
@@ -358,7 +358,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                           <div className={classNames('form-group', secondFileClassName)}>
                             <label>Close-up Photo<span className='star'>*</span></label>
                             <div>
-                              <label className="btn btn-sm btn-info">
+                              <label className="btn btn btn-info">
                                   Select File ... <input
                                               onChange={this.captureSecondImage}
                                               type="file"
@@ -625,7 +625,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         </div>
                       </div>
 
-                      <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
+                          <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit Case</button>
+                        </div>
+                      </div>
                     </form>
                   </div>
                 </div>

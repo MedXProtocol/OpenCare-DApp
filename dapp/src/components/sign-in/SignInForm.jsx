@@ -82,7 +82,8 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
                 autoComplete="off"
                 onChange={this.onChangeSecretKey}
                 placeholder={HIDDEN_KEY}
-                type="text" className="form-control"
+                type="text"
+                className="form-control input-lg"
                 name='secret-key'
                 minLength='39'
                 maxLength='39' />
@@ -93,9 +94,9 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
               <label htmlFor="masterPassword">Master Password</label>
               <input
                 value={this.state.masterPassword}
-                onChange={(e) => this.setState({masterPassword: e.target.value})}
+                onChange={(e) => this.setState({ masterPassword: e.target.value })}
                 type="password"
-                className="form-control"
+                className="form-control input-lg"
                 autoFocus={true} />
               {masterPasswordError}
             </div>

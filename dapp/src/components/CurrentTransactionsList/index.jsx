@@ -89,7 +89,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           return (
             <CSSTransition
               key={`transaction-${key}`}
-              timeout={500}
+              timeout={100}
               classNames="fade">
               <li className="nav-transactions--item">
                 <span className={classnames('nav-transactions--circle', this.getClassName(error, confirmed))} /> &nbsp;

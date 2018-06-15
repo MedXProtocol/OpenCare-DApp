@@ -7,13 +7,14 @@ export class MasterPassword extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      masterPassword: ''
+      masterPassword: '',
+      confirmMasterPassword: ''
     }
   }
 
   onSubmit = (e) => {
     e.preventDefault()
-    var msg = masterPasswordInvalid(this.state.masterPassword)
+    let msg = masterPasswordInvalid(this.state)
     if (msg) {
       this.setState({
         error: msg
@@ -38,21 +39,30 @@ export class MasterPassword extends Component {
               <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
                 <div className="form-wrapper--body">
                   <p className='text-gray'>
-                    You will use this password with your secret key to sign in.
+                    You will use this password combined with your secret key to sign in.
                   </p>
-                  <br />
 
-                  <label className="label">Password:</label>
-                  <div className="well" role="alert">
+                  <div className='form-group'>
+                    <label>Password:</label>
                     <input
                       type="password"
                       value={this.state.masterPassword}
-                      onChange={(event) => this.setState({masterPassword: event.target.value})}
+                      onChange={(event) => this.setState({ masterPassword: event.target.value })}
                       className="form-control input-lg"
                       autoFocus={true}
                       placeholder="Enter a password" />
+                    {error}
                   </div>
-                  {error}
+
+                  <div className='form-group'>
+                    <label>Confirm Password:</label>
+                    <input
+                      type="password"
+                      value={this.state.confirmMasterPassword}
+                      onChange={(event) => this.setState({ confirmMasterPassword: event.target.value })}
+                      className="form-control input-lg"
+                      placeholder="Enter password again" />
+                  </div>
                 </div>
 
                 <div className="form-wrapper--footer">
