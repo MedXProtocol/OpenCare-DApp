@@ -6,7 +6,7 @@ import { formatKey } from '~/services/format-key'
 import { signedInSecretKey } from '~/services/sign-in'
 
 const EmergencyKitDisplay = class extends Component {
-  print = () => {
+  handlePrint = () => {
     window.print()
   }
 
@@ -26,7 +26,6 @@ const EmergencyKitDisplay = class extends Component {
                 </div>
 
                 <div className="card-body">
-
                   <h4>
                     This is your <b>Secret Key</b>
                   </h4>
@@ -39,7 +38,7 @@ const EmergencyKitDisplay = class extends Component {
                   <br />
 
                   <div className="text-center">
-                    <a onClick={this.print} className="btn btn-lg btn-success">
+                    <a onClick={this.handlePrint} className="btn btn-lg btn-success">
                       <FontAwesomeIcon
                         icon={faPrint}
                         size='lg' /> &nbsp;
@@ -47,7 +46,7 @@ const EmergencyKitDisplay = class extends Component {
                     </a>
                   </div>
                   <h3 className='text-center'>
-                    Or save this page for your records!
+                    Or save this page for your records.
                   </h3>
 
                   <br />
