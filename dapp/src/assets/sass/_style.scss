@@ -4,6 +4,10 @@ body {
   font-feature-settings: "liga1" on;
 }
 
+.content {
+  padding-top: 30px;
+}
+
 .title {
   font-weight: 700;
 }
@@ -68,6 +72,10 @@ not(.nav) li {
   color: $medcredits-text-gray;
 }
 
+.text-gold {
+  color: $medcredits-text-gold;
+}
+
 .text-footer {
   color: $medcredits-text-gray;
 }
@@ -121,9 +129,5 @@ p.lead {
 
 small,
 .small {
-  font-size: 70%;
-
-  @media (max-width: 768px) {
-    font-size: 85%;
-  }
+  font-size: 85%;
 }

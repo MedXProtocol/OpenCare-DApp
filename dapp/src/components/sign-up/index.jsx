@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { MainLayout } from '~/layouts/MainLayout';
+import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { genKey } from '~/services/gen-key'
 import { Redirect } from 'react-router-dom'
 
@@ -63,9 +63,9 @@ export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(clas
       content = <SecretKey secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
     }
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         {content}
-      </MainLayout>
+      </MainLayoutContainer>
     )
   }
 })

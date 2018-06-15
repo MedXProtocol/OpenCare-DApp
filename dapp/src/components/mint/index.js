@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import { MainLayout } from '~/layouts/MainLayout';
+import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { MintTokensContainer } from './MintTokens';
 
 export const Mint = class extends Component {
   render() {
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         <MintTokensContainer />
-      </MainLayout>
+      </MainLayoutContainer>
     );
   }
 }

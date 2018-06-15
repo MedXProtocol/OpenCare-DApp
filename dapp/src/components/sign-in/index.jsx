@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
@@ -45,7 +45,7 @@ export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchTo
   render () {
     return (
       <BodyClass isDark={true}>
-        <MainLayout>
+        <MainLayoutContainer>
           <div className='container'>
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
@@ -62,7 +62,7 @@ export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchTo
               </div>
             </div>
           </div>
-        </MainLayout>
+        </MainLayoutContainer>
       </BodyClass>
     )
   }

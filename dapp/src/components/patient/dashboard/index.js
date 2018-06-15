@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { MainLayout } from '~/layouts/MainLayout';
+import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { PatientDashboardHeaderContainer } from '../cases/PatientDashboardHeader';
 import { PatientCasesContainer } from '../cases';
 
 export const PatientDashboard = class extends Component {
   render() {
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         <div className="container">
           <div className="row">
             <div className="col-md-12">
@@ -19,7 +19,7 @@ export const PatientDashboard = class extends Component {
             </div>
           </div>
         </div>
-      </MainLayout>
+      </MainLayoutContainer>
     );
   }
 }

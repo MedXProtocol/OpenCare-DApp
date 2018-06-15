@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import CaseStatus from './CaseStatus'
 import CaseDetails from '~/components/CaseDetails'
 import Diagnosis from '~/components/Diagnosis'
@@ -40,7 +40,7 @@ export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps
         </div>
     }
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         <div className="container">
           <div className="row">
             <div className='col-xs-12'>
@@ -55,7 +55,7 @@ export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps
             </div>
           </div>
         </div>
-      </MainLayout>
+      </MainLayoutContainer>
     )
   }
 })))

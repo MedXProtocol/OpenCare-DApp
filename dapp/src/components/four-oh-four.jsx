@@ -1,9 +1,9 @@
 import React from 'react'
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 
 export const FourOhFour = function () {
   return (
-    <MainLayout>
+    <MainLayoutContainer>
       <div className='container'>
         <div className='row'>
           <div className='col-sm-12 text-center'>
@@ -12,6 +12,6 @@ export const FourOhFour = function () {
           </div>
         </div>
       </div>
-    </MainLayout>
+    </MainLayoutContainer>
   )
 }

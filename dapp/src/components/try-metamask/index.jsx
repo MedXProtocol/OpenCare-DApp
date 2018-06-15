@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 
 export const TryMetamask = class extends Component {
   render () {
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         <div className='container'>
           <div className='row'>
             <div className='col-sm-6 col-sm-offset-3'>
@@ -18,7 +18,7 @@ export const TryMetamask = class extends Component {
             </div>
           </div>
         </div>
-      </MainLayout>
+      </MainLayoutContainer>
     )
   }
 }
