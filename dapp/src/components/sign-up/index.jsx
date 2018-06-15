@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { genKey } from '~/services/gen-key'
+import { hexToSecretKey } from '~/utils/hex-to-secret-key'
 import { Redirect } from 'react-router-dom'
 
 import { ConfirmCreate } from './confirm-create'
