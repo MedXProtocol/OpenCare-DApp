@@ -16,7 +16,7 @@ function mapStateToProps(state, { match }) {
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
   if (encryptedCaseKey) {
     const account = getAccount()
-    var caseKey = account.decrypt(encryptedCaseKey.substring(2), caseKeySalt)
+    var caseKey = account.decrypt(encryptedCaseKey.substring(2), caseKeySalt.substring(2))
   }
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
   return {

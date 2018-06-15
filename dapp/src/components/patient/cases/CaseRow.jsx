@@ -79,12 +79,12 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
     if (status === '3') {
       let doctor = this.props.diagnosingDoctorA
       let doctorPublicKey = this.props.diagnosingDoctorAPublicKey.substring(2)
-      const doctorEncryptedCaseKey = reencryptCaseKey({account: getAccount(), encryptedCaseKey, doctorPublicKey})
+      const doctorEncryptedCaseKey = reencryptCaseKey({account: getAccount(), encryptedCaseKey, doctorPublicKey, caseKeySalt})
       send(caseAddress, 'authorizeDiagnosisDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
     } else if (status === '8') {
       let doctor = this.props.diagnosingDoctorB
       let doctorPublicKey = this.props.diagnosingDoctorBPublicKey.substring(2)
-      const doctorEncryptedCaseKey = reencryptCaseKey({account: getAccount(), encryptedCaseKey, doctorPublicKey})
+      const doctorEncryptedCaseKey = reencryptCaseKey({account: getAccount(), encryptedCaseKey, doctorPublicKey, caseKeySalt})
       send(caseAddress, 'authorizeChallengeDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
     }
   }

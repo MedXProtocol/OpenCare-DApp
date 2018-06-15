@@ -35,7 +35,7 @@ contract('Case', function (accounts) {
       assert.equal(await env.doctorManager.isDoctor(doctorAddress), true)
       assert.equal(await caseInstance.status.call(), caseStatus('Open'))
       expectThrow(() => {
-        caseInstance.initialize(accounts[0], 'alaksefj', [1, 2], caseFee, env.medXToken.address, env.registry.address)
+        caseInstance.initialize(accounts[0], 'alaksefj', 'caseKeySalt', [1, 2], caseFee, env.medXToken.address, env.registry.address)
       })
     })
   })
