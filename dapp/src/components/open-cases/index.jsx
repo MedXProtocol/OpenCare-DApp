@@ -1,7 +1,7 @@
 import React, {
   Component
 } from 'react'
-import { MainLayout } from '~/layouts/MainLayout.js'
+import { MainLayoutContainer } from '~/layouts/MainLayout.js'
 import {
   Button,
   Table
@@ -64,7 +64,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
     let noCasesAvailableForDoc = (parseInt(this.props.peekNextCase, 16) === 0)
 
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         <div className="container">
           <div className='header-card card'>
             <div className='card-body'>
@@ -134,7 +134,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
             </div>
           </div>
         </div>
-      </MainLayout>
+      </MainLayoutContainer>
     )
   }
 }))))

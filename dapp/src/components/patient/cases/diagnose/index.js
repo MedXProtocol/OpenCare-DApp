@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MainLayout } from '~/layouts/MainLayout';
+import { MainLayoutContainer } from '~/layouts/MainLayout';
 import CaseDetails from '~/components/CaseDetails';
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis';
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis';
@@ -104,7 +104,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
     }
 
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         <div className='container'>
           <div className='row'>
             {diagnosis}
@@ -116,7 +116,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             </div>
           </div>
         </div>
-      </MainLayout>
+      </MainLayoutContainer>
     );
   }
 })))

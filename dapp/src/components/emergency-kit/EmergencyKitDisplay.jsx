@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
-import { MainLayout } from '~/layouts/MainLayout';
+import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { formatKey } from '~/services/format-key'
 import { signedInSecretKey } from '~/services/sign-in'
 
@@ -14,7 +14,7 @@ const EmergencyKitDisplay = class extends Component {
     const secretKey = signedInSecretKey()
 
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         <div className="container">
           <div className='row'>
             <div className='col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2'>
@@ -75,7 +75,7 @@ const EmergencyKitDisplay = class extends Component {
             </div>
           </div>
         </div>
-      </MainLayout>
+      </MainLayoutContainer>
     );
   }
 }

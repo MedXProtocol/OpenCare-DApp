@@ -4,7 +4,7 @@ import { Alert, Button } from 'react-bootstrap'
 import get from 'lodash.get'
 import { getAccount } from '~/services/get-account'
 import { isAccountMasterPassword } from '~/services/is-account-master-password'
-import { MainLayout } from '~/layouts/MainLayout';
+import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { EmergencyKitDisplay } from './EmergencyKitDisplay'
 
 function mapStateToProps(state, ownProps) {
@@ -63,7 +63,7 @@ export const EmergencyKit = connect(mapStateToProps)(
           masterPasswordError = <Alert bsStyle='danger'>{masterPasswordError}</Alert>
         }
         emergencyKit = (
-          <MainLayout>
+          <MainLayoutContainer>
             <div className="container">
               <div className='row'>
                 <div className='col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2'>
@@ -108,7 +108,7 @@ export const EmergencyKit = connect(mapStateToProps)(
                 </div>
               </div>
             </div>
-          </MainLayout>
+          </MainLayoutContainer>
         )
       }
 

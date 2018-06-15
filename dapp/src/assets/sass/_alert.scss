@@ -1,6 +1,13 @@
 .alert {
   margin-top: 10px;
 }
+
 .alert-danger {
   color: white
+}
+
+.alert--banner {
+  border-radius: 0;
+  border: 0;
+  margin: 0;
 }

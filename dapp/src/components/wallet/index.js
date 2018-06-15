@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -31,7 +31,7 @@ function* saga({ account, MedXToken }) {
 export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(class _Wallet extends Component {
   render() {
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         <div className="container">
           <div className="row">
             <div className="col-sm-6 col-sm-offset-3">
@@ -63,7 +63,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
             </div>
           </div>
         </div>
-      </MainLayout>
+      </MainLayoutContainer>
     )
   }
 }))
