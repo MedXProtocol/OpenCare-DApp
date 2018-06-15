@@ -39,6 +39,8 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
 
   onSubmit = (e) => {
     if (e) e.preventDefault()
+
+    this.props.mixpanel.track('signInSubmit')
     this.doSubmit()
   }
 

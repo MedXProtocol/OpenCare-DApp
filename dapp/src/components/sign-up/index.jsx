@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { MainLayout } from '~/layouts/MainLayout';
 import { genKey } from '~/services/gen-key'
 import { Redirect } from 'react-router-dom'
+import { withMixpanel } from '~/services/withMixpanelService'
 
 import { ConfirmCreate } from './confirm-create'
 import { SecretKey } from './secret-key'
@@ -25,7 +26,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(class _CreateAccount extends Component {
+export const SignUp = class extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -49,6 +50,8 @@ export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(clas
       address: this.props.address,
       overrideAccount: true
     })
+
+    this.props.mixpanel.track("Signup Attempt");
   }
 
   render () {
@@ -68,4 +71,6 @@ export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(clas
       </MainLayout>
     )
   }
-})
+}
+
+export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(withMixpanel(SignUp))
