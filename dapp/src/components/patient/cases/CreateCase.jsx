@@ -254,18 +254,24 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             color: this.state.color,
             prevTreatment: this.state.prevTreatment,
             description: this.state.description
-        };
+        }
 
-        const caseJson = JSON.stringify(caseInformation);
-        const hash = await uploadJson(caseJson, this.state.caseEncryptionKey);
+        const caseJson = JSON.stringify(caseInformation)
+        const hash = await uploadJson(caseJson, this.state.caseEncryptionKey)
         const account = getAccount()
-        const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey)
+        const caseKeySalt = genKey(32)
+        const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 
         const { send, MedXToken, CaseManager } = this.props
         let hashHex = hashToHex(hash)
 
         let CaseManagerContract = this.props.contractRegistry.get(this.props.CaseManager, 'CaseManager', getWeb3())
-        let data = CaseManagerContract.methods.createCase(this.props.account, '0x' + encryptedCaseKey, '0x' + hashHex).encodeABI()
+        let data = CaseManagerContract.methods.createCase(
+          this.props.account,
+          '0x' + encryptedCaseKey,
+          '0x' + hashHex,
+          '0x' + caseKeySalt
+        ).encodeABI()
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
 
         this.setState({ transactionId })

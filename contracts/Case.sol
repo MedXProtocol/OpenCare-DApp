@@ -25,6 +25,7 @@ contract Case is Ownable, Initializable {
     CaseStatus public status;
 
     bytes public encryptedCaseKey;
+    bytes public caseKeySalt;
 
     mapping(address => bytes) public approvedDoctorKeys;
 
@@ -84,6 +85,7 @@ contract Case is Ownable, Initializable {
     function initialize (
         address _patient,
         bytes _encryptedCaseKey,
+        bytes _caseKeySalt,
         bytes _caseHash,
         uint256 _caseFee,
         MedXToken _token,
@@ -93,6 +95,7 @@ contract Case is Ownable, Initializable {
         owner = msg.sender;
         status = CaseStatus.Open;
         encryptedCaseKey = _encryptedCaseKey; // don't need to store this
+        caseKeySalt = _caseKeySalt;
         patient = _patient;
         caseDetailLocationHash = _caseHash; // don't need to store this
         caseFee = _caseFee;

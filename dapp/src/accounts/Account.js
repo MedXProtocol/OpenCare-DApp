@@ -1,5 +1,6 @@
 import decryptSecretKey from './decrypt-secret-key'
 import aes from '~/services/aes'
+import { deriveKey } from '~/utils/derive-key'
 import { deriveKeyPair } from './derive-key-pair'
 import { deriveSharedKey } from './derive-shared-key'
 import { buildAccount } from './build-account'
@@ -18,12 +19,12 @@ export class Account {
     this._json = json
   }
 
-  encrypt (string) {
-    return aes.encrypt(string, this.hexSecretKey())
+  encrypt (string, optionalSalt) {
+    return aes.encrypt(string, keyWithOptionalSalt(this.hexSecretKey(), optionalSalt))
   }
 
-  decrypt (string) {
-    return aes.decrypt(string, this.hexSecretKey())
+  decrypt (string, optionalSalt) {
+    return aes.decrypt(string, keyWithOptionalSalt(this.hexSecretKey(), optionalSalt))
   }
 
   deriveSharedKey (publicKey) {
@@ -109,4 +110,11 @@ Account.get = function (address) {
     account = new Account(json)
   }
   return account
+}
+
+function keyWithOptionalSalt(secretKey, salt) {
+  let key = secretKey
+  if (salt)
+    key = deriveKey(secretKey, salt)
+  return key
 }
