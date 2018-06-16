@@ -108,6 +108,8 @@ not(.nav) li {
   font-size: 2.4rem;
   text-align: center;
   font-weight: bold;
+  font-family: "Space Mono", monospace;
+  text-transform: uppercase;
 
   @media (max-width: 768px) {
     font-size: 17px;

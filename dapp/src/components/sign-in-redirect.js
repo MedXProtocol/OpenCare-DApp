@@ -3,7 +3,7 @@ import React, {
 } from 'react'
 import { withRouter, Redirect } from 'react-router-dom'
 import get from 'lodash.get'
-import { getAccount } from '~/services/get-account'
+import { Account } from '~/accounts/Account'
 import redirectService from '~/services/redirect-service'
 import { connect } from 'react-redux'
 
@@ -13,7 +13,7 @@ function mapStateToProps (state, ownProps) {
   return {
     address,
     signedIn,
-    account: getAccount(address),
+    account: Account.get(address),
     web3Failed: state.sagaGenesis.web3.error
   }
 }
