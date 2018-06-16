@@ -6,14 +6,15 @@ let mockMixpanel = {
   }
 }
 
+export const mixpanelOrMock = (window && window.mixpanel) ? window.mixpanel : mockMixpanel
+
 export const withMixpanel = function(WrappedComponent) {
   const MixpanelWrapper = class extends Component {
 
     constructor(props) {
       super(props)
-      this.mixpanel = (window && window.mixpanel) ? window.mixpanel : mockMixpanel
+      this.mixpanel = mixpanelOrMock
     }
-
 
     render () {
       return <WrappedComponent {...this.props} mixpanel={this.mixpanel} />

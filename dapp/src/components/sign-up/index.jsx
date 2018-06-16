@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import { MainLayout } from '~/layouts/MainLayout';
 import { genKey } from '~/services/gen-key'
 import { Redirect } from 'react-router-dom'
-import { withMixpanel } from '~/services/withMixpanelService'
-
+import { withMixpanel } from '~/services/mixpanelService'
 import { ConfirmCreate } from './confirm-create'
 import { SecretKey } from './secret-key'
 import { MasterPassword } from './master-password'

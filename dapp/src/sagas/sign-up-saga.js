@@ -1,5 +1,4 @@
-import { put, call, takeEvery } from 'redux-saga/effects'
-
+import { put, call, getContext, takeEvery } from 'redux-saga/effects'
 import { buildAccount } from '~/services/build-account'
 import { getAccount } from '~/services/get-account'
 import { setAccount } from '~/services/set-account'
@@ -24,6 +23,9 @@ export function* signUpSaga({ address, secretKey, masterPassword, overrideAccoun
     const account = yield call(buildAccount, address, secretKey, masterPassword)
     yield call(setAccount, address, account)
     yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
+
+    const mixpanel = yield getContext('mixpanel')
+    mixpanel.track("Signup");
   }
 }
 

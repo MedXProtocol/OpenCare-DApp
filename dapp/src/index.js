@@ -11,6 +11,9 @@ import './index.css'
 import App from '~/components/App'
 import store, { contractRegistry } from '~/store'
 
+import { mixpanelInit } from '~/utils/hippocrates-mixpanel'
+mixpanelInit()
+
 window.addEventListener('load', () => {
   let coreApp =
     <ErrorBoundary>

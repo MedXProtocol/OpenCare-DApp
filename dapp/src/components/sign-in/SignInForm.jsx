@@ -23,7 +23,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(class _SignInForm extends Component {
+export const SignInForm = class extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -40,7 +40,6 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
   onSubmit = (e) => {
     if (e) e.preventDefault()
 
-    this.props.mixpanel.track('signInSubmit')
     this.doSubmit()
   }
 
@@ -112,7 +111,9 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
       </div>
     )
   }
-})
+}
+
+export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(SignInForm)
 
 SignInFormContainer.propTypes = {
   onSubmit: PropTypes.func.isRequired,
