@@ -7,6 +7,7 @@ import { downloadJson } from '~/utils/storage-util'
 import { withSaga, cacheCall, cacheCallValue, withSend } from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
+import { mixpanel } from '~/mixpanel'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -52,12 +53,12 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     }
     const diagnosisHash = this.props.diagnosisALocationHash
     if (diagnosisHash !== null && diagnosisHash !== "0x") {
-      const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey);
-      const diagnosis = JSON.parse(diagnosisJson);
+      const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey)
+      const diagnosis = JSON.parse(diagnosisJson)
       this.setState({
         diagnosis: diagnosis,
         hidden: false
-      });
+      })
     }
   }
 
@@ -75,7 +76,8 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     this.setState({
       submitInProgress: true,
       acceptTransactionId
-    });
+    })
+    mixpanel.track('Accept Diagnosis')
   }
 
   handleChallengeDiagnosis = () => {
@@ -83,19 +85,20 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     this.setState({
       submitInProgress: true,
       challengeTransactionId
-    });
+    })
+    mixpanel.track('Challenge Diagnosis')
   }
 
   handleCloseThankYouModal = (event) => {
-      event.preventDefault();
-      this.setState({showThankYouModal: false});
-      this.props.history.push('/patients/cases');
+      event.preventDefault()
+      this.setState({showThankYouModal: false})
+      this.props.history.push('/patients/cases')
   }
 
   handleCloseChallengeModal = (event) => {
-      event.preventDefault();
-      this.setState({showChallengeModal: false});
-      this.props.history.push('/patients/cases');
+      event.preventDefault()
+      this.setState({showChallengeModal: false})
+      this.props.history.push('/patients/cases')
   }
 
   onAcceptSuccess = () => {
@@ -103,7 +106,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       acceptTransactionId: null,
       submitInProgress: false,
       showThankYouModal: true
-    });
+    })
   }
 
   onChallengeSuccess = () => {
@@ -111,7 +114,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       challengeTransactionId: null,
       submitInProgress: false,
       showChallengeModal: true
-    });
+    })
   }
 
   render() {
@@ -188,17 +191,17 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
         </Modal>
         <Spinner loading={this.state.submitInProgress}/>
       </div>
-    );
+    )
   }
 })))
 
 Diagnosis.propTypes = {
     caseAddress: PropTypes.string,
     caseKey: PropTypes.string
-};
+}
 
 Diagnosis.defaultProps = {
     caseAddress: null
-};
+}
 
-export default withRouter(Diagnosis);
+export default withRouter(Diagnosis)

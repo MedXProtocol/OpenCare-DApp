@@ -1,6 +1,7 @@
-import { put, call, getContext, takeEvery } from 'redux-saga/effects'
+import { put, call, takeEvery } from 'redux-saga/effects'
 import masterPasswordInvalid from '~/services/master-password-invalid'
 import { Account } from '~/accounts/Account'
+import { mixpanel } from '~/mixpanel'
 
 export function* signUpSaga({ address, secretKey, masterPassword, overrideAccount }) {
   if (!address) {
@@ -18,9 +19,7 @@ export function* signUpSaga({ address, secretKey, masterPassword, overrideAccoun
   } else {
     const account = yield call(Account.create, { address, secretKey, masterPassword })
     yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
-
-    const mixpanel = yield getContext('mixpanel')
-    mixpanel.track("Signup");
+    mixpanel.track("Signup")
   }
 }
 

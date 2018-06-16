@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import { MainLayoutContainer } from '~/layouts/MainLayout';
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { genKey } from '~/services/gen-key'
 import { Redirect } from 'react-router-dom'
-import { withMixpanel } from '~/services/mixpanelService'
+import { mixpanel } from '~/mixpanel'
 import { ConfirmCreate } from './confirm-create'
 import { SecretKey } from './secret-key'
 import { MasterPassword } from './master-password'
@@ -50,7 +50,7 @@ export const SignUp = class extends Component {
       overrideAccount: true
     })
 
-    this.props.mixpanel.track("Signup Attempt");
+    mixpanel.track("Signup Attempt");
   }
 
   render () {
@@ -72,4 +72,4 @@ export const SignUp = class extends Component {
   }
 }
 
-export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(withMixpanel(SignUp))
+export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(SignUp)
