@@ -116,6 +116,6 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
           </div>
         </div>
       </MainLayoutContainer>
-    );
+    )
   }
 })))

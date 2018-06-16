@@ -99,7 +99,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
           sig |= bytes4(_extraData[i]) >> 8*i;
         }
 
-        require(sig == bytes4(keccak256('createCase(address,bytes,bytes)')));
+        require(sig == bytes4(keccak256('createCase(address,bytes,bytes,bytes)')));
 
         address _this = address(this);
         address newCase;
@@ -150,10 +150,10 @@ contract CaseManager is Ownable, Pausable, Initializable {
      * @param _patient - the patient creating the case
      * @return - address of the case contract created
      */
-    function createCase(address _patient, bytes _encryptedCaseKey, bytes _ipfsHash) public onlyThis returns (address) {
+    function createCase(address _patient, bytes _encryptedCaseKey, bytes _caseKeySalt, bytes _ipfsHash) public onlyThis returns (address) {
       Delegate delegate = new Delegate(registry, keccak256("Case"));
       Case newCase = Case(delegate);
-      newCase.initialize(_patient, _encryptedCaseKey, _ipfsHash, caseFee, medXToken, registry);
+      newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
       openCaseQueue.enqueue(address(0), caseIndex);
