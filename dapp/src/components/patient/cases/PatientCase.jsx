@@ -4,8 +4,7 @@ import CaseStatus from './CaseStatus'
 import CaseDetails from '~/components/CaseDetails'
 import Diagnosis from '~/components/Diagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
-import { signedInSecretKey } from '~/services/sign-in'
-import aes from '~/services/aes'
+import { getAccount } from '~/services/sign-in'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
@@ -15,7 +14,8 @@ function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   if (encryptedCaseKey) {
-    var caseKey = aes.decrypt(encryptedCaseKey.substring(2), signedInSecretKey())
+    const account = getAccount()
+    var caseKey = account.decrypt(encryptedCaseKey.substring(2))
   }
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
   return {

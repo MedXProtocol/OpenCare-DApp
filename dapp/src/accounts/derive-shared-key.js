@@ -1,5 +1,5 @@
 import { ec } from '~/utils/ec'
-import { deriveKeyPair } from '~/services/derive-key-pair'
+import { deriveKeyPair } from '~/accounts/derive-key-pair'
 
 export function deriveSharedKey(secretKey, publicKey) {
   const privateKeyPair = deriveKeyPair(secretKey)

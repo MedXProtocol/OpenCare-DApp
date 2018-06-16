@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { MainLayout } from '~/layouts/MainLayout'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 
 function mapStateToProps (state) {

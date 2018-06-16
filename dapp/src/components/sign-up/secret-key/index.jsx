@@ -4,7 +4,7 @@ import { Button, Modal } from 'react-bootstrap'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
 import { BodyClass } from '~/components/BodyClass'
-import { formatKey } from '~/services/format-key'
+import { formatSecretKey } from '~/services/format-secret-key'
 
 export const SecretKey = class extends Component {
   constructor(props) {
@@ -37,7 +37,7 @@ export const SecretKey = class extends Component {
                 <div className="form-wrapper--body">
                   <div className="well" role="alert">
                     <div className='secret-key__key'>
-                      {formatKey(this.props.secretKey)}
+                      {formatSecretKey(this.props.secretKey)}
                     </div>
                   </div>
                   <p>

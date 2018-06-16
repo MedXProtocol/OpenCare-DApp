@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { Alert, HelpBlock } from 'react-bootstrap'
-import { formatKey } from '~/services/format-key'
+import { formatSecretKey } from '~/services/format-secret-key'
 import { connect } from 'react-redux'
 import { OverrideModal } from '~/components/override-modal'
 
-const HIDDEN_KEY = formatKey(Array(33).join('X'))
+const HIDDEN_KEY = formatSecretKey(Array(51).join('X'))
 
 function mapStateToProps(state, ownProps) {
   return {
@@ -34,7 +34,7 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   onChangeSecretKey = (e) => {
-    this.setState({secretKey: formatKey(e.target.value)})
+    this.setState({secretKey: formatSecretKey(e.target.value)})
   }
 
   onSubmit = (e) => {
@@ -85,8 +85,8 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
                 type="text"
                 className="form-control input-lg"
                 name='secret-key'
-                minLength='39'
-                maxLength='39' />
+                minLength='59'
+                maxLength='59' />
               {existingSecretKey}
               {secretKeyError}
             </div>

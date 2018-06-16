@@ -29,7 +29,7 @@ export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(clas
   constructor (props) {
     super(props)
     this.state = {
-      secretKey: genKey(16).toUpperCase(),
+      secretKey: genKey(32),
       showMasterPassword: false,
       showConfirm: false
     }

@@ -2,15 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { Alert, Button } from 'react-bootstrap'
 import get from 'lodash.get'
-import { getAccount } from '~/services/get-account'
-import { isAccountMasterPassword } from '~/services/is-account-master-password'
+import { Account } from '~/accounts/Account'
 import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { EmergencyKitDisplay } from './EmergencyKitDisplay'
 
 function mapStateToProps(state, ownProps) {
-  const account = getAccount(get(state, 'sagaGenesis.accounts[0]'))
+  const account = Account.get(get(state, 'sagaGenesis.accounts[0]'))
   return {
-    account: account
+    account
   }
 }
 
@@ -38,7 +37,7 @@ export const EmergencyKit = connect(mapStateToProps)(
 
       if (!this.state.masterPassword)
         error = 'You must enter a master password'
-      else if (isAccountMasterPassword(this.props.account, this.state.masterPassword))
+      else if (this.props.account.isMasterPassword(this.state.masterPassword))
         masterPasswordOk = true
       else
         error = 'The master password does not match the account password'

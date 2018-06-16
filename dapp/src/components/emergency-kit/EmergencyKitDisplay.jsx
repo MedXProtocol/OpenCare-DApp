@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
 import { MainLayoutContainer } from '~/layouts/MainLayout';
-import { formatKey } from '~/services/format-key'
-import { signedInSecretKey } from '~/services/sign-in'
+import { formatSecretKey } from '~/services/format-secret-key'
+import { getAccount } from '~/services/sign-in'
 
 const EmergencyKitDisplay = class extends Component {
   handlePrint = () => {
@@ -11,7 +11,7 @@ const EmergencyKitDisplay = class extends Component {
   }
 
   render () {
-    const secretKey = signedInSecretKey()
+    const secretKey = getAccount().secretKey()
 
     return (
       <MainLayoutContainer>
@@ -31,7 +31,7 @@ const EmergencyKitDisplay = class extends Component {
                   </h4>
                   <div className="well" role="alert">
                     <div className='secret-key__key'>
-                      {formatKey(secretKey)}
+                      {formatSecretKey(secretKey)}
                     </div>
                   </div>
 
