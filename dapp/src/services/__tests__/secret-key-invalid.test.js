@@ -5,13 +5,13 @@ test('secret keys cannot be empty', () => {
 })
 
 test('secret key must conform to length', () => {
-  expect(secretKeyInvalid('ASDF')).toEqual('The secret key must contain 50 characters')
+  expect(secretKeyInvalid('ASDF')).toEqual('The secret key must contain 64 characters')
 })
 
-test('secret key works for a valid 50 character base 36 number', () => {
-  expect(secretKeyInvalid('asdffasdffasdffasdffasdffasdffasdffasdffasdffasdff')).toEqual(false)
+test('secret key works for a valid 64 character base 36 number', () => {
+  expect(secretKeyInvalid('1234567812345678123456781234567812345678123456781234567812345678')).toEqual(false)
 })
 
-test('secret key fails for an invalid 50 character string', () => {
-  expect(secretKeyInvalid('_sdffasdffasdffasdffasdffasdffasdffasdffasdffasdff')).toEqual('The secret key is not valid')
+test('secret key fails for an invalid 64 character string', () => {
+  expect(secretKeyInvalid('123456781234567812345678123456781234567812345678123456781234567G')).toEqual('The secret key is not valid')
 })

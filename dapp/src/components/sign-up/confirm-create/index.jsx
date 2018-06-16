@@ -1,7 +1,7 @@
 import React from 'react'
 import { BodyClass } from '~/components/BodyClass'
 
-export const ConfirmCreate = (({ onConfirm }) => {
+export const ConfirmCreate = ({ onConfirm }) => {
   return (
     <BodyClass isDark={true}>
       <div className='container'>
@@ -31,4 +31,4 @@ export const ConfirmCreate = (({ onConfirm }) => {
       </div>
     </BodyClass>
   )
-})
+}

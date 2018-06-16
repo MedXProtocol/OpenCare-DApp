@@ -14,7 +14,10 @@ export class MasterPassword extends Component {
 
   onSubmit = (e) => {
     e.preventDefault()
-    let msg = masterPasswordInvalid(this.state)
+    let msg = masterPasswordInvalid(this.state.masterPassword)
+    if (this.state.masterPassword !== this.state.confirmMasterPassword) {
+      msg = 'Both passwords must match'
+    }
     if (msg) {
       this.setState({
         error: msg

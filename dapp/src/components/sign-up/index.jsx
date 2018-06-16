@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { genKey } from '~/services/gen-key'
-import { hexToSecretKey } from '~/utils/hex-to-secret-key'
 import { Redirect } from 'react-router-dom'
 
 import { ConfirmCreate } from './confirm-create'
@@ -30,7 +29,7 @@ export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(clas
   constructor (props) {
     super(props)
     this.state = {
-      secretKey: hexToSecretKey(genKey(32)),
+      secretKey: genKey(32),
       showMasterPassword: false,
       showConfirm: false
     }

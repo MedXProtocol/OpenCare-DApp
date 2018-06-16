@@ -6,7 +6,12 @@ import { buildAccount } from './build-account'
 import { getAccount } from './get-account'
 import { setAccount } from './set-account'
 import { isAccountMasterPassword } from './is-account-master-password'
-import { secretKeyToHex } from '~/utils/secret-key-to-hex'
+
+// NOTE: Increment this to destroy old accounts.
+// NOTE: DANGEROUS
+// NOTE: DO NOT CHANGE THIS
+// NOTE: NOTE:
+export const ACCOUNT_VERSION = 1
 
 export class Account {
   constructor (json) {
@@ -49,7 +54,7 @@ export class Account {
   }
 
   hexSecretKey () {
-    return secretKeyToHex(this.secretKey())
+    return this.secretKey()
   }
 
   hexPublicKey () {
@@ -80,11 +85,18 @@ export class Account {
   getVersion() {
     return this._json.version
   }
+
+  destroy () {
+    setAccount(this.address(), null)
+  }
 }
+
+Account.currentVersion = ACCOUNT_VERSION
 
 Account.create = function ({address, secretKey, masterPassword}) {
   const json = buildAccount(address, secretKey, masterPassword)
   const account = new Account(json)
+  account.setVersion(ACCOUNT_VERSION)
   account.unlock(masterPassword)
   account.store()
   return account
@@ -92,5 +104,9 @@ Account.create = function ({address, secretKey, masterPassword}) {
 
 Account.get = function (address) {
   const json = getAccount(address)
-  return new Account(json)
+  let account = null
+  if (json) {
+    account = new Account(json)
+  }
+  return account
 }

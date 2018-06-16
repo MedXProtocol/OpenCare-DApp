@@ -18,7 +18,6 @@ import { uploadJson, uploadFile } from '~/utils/storage-util';
 import { getAccount } from '~/services/sign-in'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
-import aes from '~/services/aes'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { contractByName } from '~/saga-genesis/state-finders'

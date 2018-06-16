@@ -23,17 +23,15 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
       return
     }
     yield put({type: 'SIGN_UP', address, secretKey, masterPassword, overrideAccount})
-  } else { // We're using the existing account
-    if (account) { // Check the existing account
-      try {
-        account.unlock(masterPassword)
-        yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
-      } catch (error) {
-        yield put({type: 'SIGN_IN_ERROR', masterPasswordError: error })
-      }
-    } else { // error! no existing account
-      yield put({type: 'SIGN_IN_ERROR', secretKeyError: 'You must enter a secret key'})
+  } else if (account) { // Check the existing account
+    try {
+      account.unlock(masterPassword)
+      yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
+    } catch (error) {
+      yield put({type: 'SIGN_IN_ERROR', masterPasswordError: error })
     }
+  } else { // error! no existing account
+    yield put({type: 'SIGN_IN_ERROR', secretKeyError: 'You must enter a secret key'})
   }
 }
 
