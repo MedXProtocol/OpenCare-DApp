@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
-import { getAccount } from '~/services/get-account'
+import { Account } from '~/accounts/Account'
 import { SignInFormContainer } from './SignInForm'
 import { BodyClass } from '~/components/BodyClass'
 
@@ -11,7 +11,7 @@ function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
   return {
     address,
-    account: getAccount(address)
+    account: Account.get(address)
   }
 }
 
@@ -42,16 +42,33 @@ export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchTo
     })
   }
 
+  destroyAndSignUp = () => {
+    this.props.account.destroy()
+    this.props.history.push('/')
+  }
+
   render () {
+    if (this.props.account && this.props.account.getVersion() !== Account.currentVersion) {
+      var warning =
+        <div className='alert alert-danger'>
+          <p>
+            You have an old account that no longer works.
+          </p>
+          <button className='btn btn-danger btn-outline-inverse btn-no-shadow' onClick={this.destroyAndSignUp}>
+            Reset Account
+          </button>
+        </div>
+    }
     return (
       <BodyClass isDark={true}>
-        <MainLayout>
+        <MainLayoutContainer>
           <div className='container'>
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
                 <h3 className='text-white text-center'>
                   Sign in to <strong>Med</strong>Credits
                 </h3>
+                {warning}
                 <SignInFormContainer onSubmit={this.onSubmit} hasAccount={!!this.props.account} />
 
                 <div className="account--extras">
@@ -62,7 +79,7 @@ export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchTo
               </div>
             </div>
           </div>
-        </MainLayout>
+        </MainLayoutContainer>
       </BodyClass>
     )
   }

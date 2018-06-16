@@ -42,6 +42,7 @@
     "lodash.get": "^4.4.2",
     "lodash.keys": "^4.2.0",
     "lodash.values": "^4.3.0",
+    "mixpanel-browser": "^2.22.4",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.8",
@@ -101,7 +102,8 @@
     "watch-css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "test": "node scripts/test.js --env=jsdom",
+    "console": "NODE_ENV=development babel-node"
   },
   "jest": {
     "verbose": true,

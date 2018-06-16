@@ -1,5 +1,6 @@
 .navbar {
   border: 0;
+  margin-bottom: 0;
 }
 
 .navbar-brand {
@@ -24,6 +25,11 @@
   @media (max-width: 768px) {
     display: none;
   }
+}
+
+.nav--network-name li > a {
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .navbar-inverse .navbar-nav > li.active > a::after,

@@ -4,21 +4,27 @@
   font-weight: normal;
   letter-spacing: 1px;
   text-transform: uppercase;
-  padding: 15px 20px;
+  padding: 10px 20px;
   transition: all 100ms ease-in-out;
+}
+
+.btn-lg {
+  font-size: 14px;
+  padding: 16px 22px;
+}
+
+.btn-sm {
+  font-size: 12px;
+  padding: 8px 12px;
+}
+
+.btn-xs {
+  font-size: 12px;
+  padding: 4px 10px;
 }
 
 .btn-link {
   box-shadow: none;
-}
-
-.btn-sm {
-  font-size: 13px;
-  padding: 10px 14px;
-}
-
-.btn-xs {
-  padding: 0.5rem 1rem;
 }
 
 .btn-info {
@@ -55,4 +61,91 @@
 .btn-group .btn-group + .btn,
 .btn-group .btn-group + .btn-group {
   margin-left: 0;
+}
+
+// Below taken from https://gist.github.com/Gurylev/ae78a534d873c9aeb853
+
+.btn-outline {
+    background-color: transparent;
+}
+
+.btn-primary.btn-outline {
+    color: $btn-primary-bg;
+    &:hover {
+      background-color: $btn-primary-bg;
+          border-color: $btn-primary-border;
+    }
+}
+
+.btn-success.btn-outline {
+    color: $btn-success-bg;
+    &:hover {
+      background-color: $btn-success-bg;
+          border-color: $btn-success-border;
+    }
+}
+
+.btn-info.btn-outline {
+    color: $btn-info-bg;
+    &:hover {
+      background-color: $btn-info-bg;
+          border-color: $btn-info-border;
+    }
+}
+
+.btn-warning.btn-outline {
+    color: $btn-warning-bg;
+    &:hover {
+      background-color: $btn-warning-bg;
+          border-color: $btn-warning-border;
+    }
+}
+
+.btn-danger.btn-outline {
+    color: $btn-danger-bg;
+    &:hover {
+      background-color: $btn-danger-bg;
+          border-color: $btn-danger-border;
+    }
+}
+
+.btn-primary.btn-outline:hover,
+.btn-success.btn-outline:hover,
+.btn-info.btn-outline:hover,
+.btn-warning.btn-outline:hover,
+.btn-danger.btn-outline:hover {
+    color: #fff;
+}
+
+// Button outline style on inverse background
+.btn-outline-inverse {
+    background-color: transparent;
+    border-color: #fff;
+    color: #fff;
+    &:hover {
+      background-color: #fff;
+    }
+}
+.btn-primary.btn-outline-inverse:hover {
+    color: $brand-primary;
+}
+
+.btn-success.btn-outline-inverse:hover {
+    color: $brand-success;
+}
+
+.btn-info.btn-outline-inverse:hover {
+    color: $brand-info;
+}
+
+.btn-warning.btn-outline-inverse:hover {
+    color: $brand-warning;
+}
+
+.btn-danger.btn-outline-inverse:hover {
+    color: $brand-danger;
+}
+
+.btn.btn-no-shadow {
+  box-shadow: none;
 }

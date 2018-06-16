@@ -3,7 +3,7 @@ import aesjs from 'aes-js'
 import randomBytes from 'randombytes'
 
 test('Can encrypt and decrypt', () => {
-  var keyBytes = randomBytes(16)
+  var keyBytes = randomBytes(32)
   var text = 'hello'
 
   var cipherHex = aes.encrypt(text, keyBytes)

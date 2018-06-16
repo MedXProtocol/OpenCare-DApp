@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { BodyClass } from '~/components/BodyClass'
 
 export const Welcome = class extends Component {
   render () {
     return (
       <BodyClass isDark={true}>
-        <MainLayout doNetworkCheck={false}>
+        <MainLayoutContainer doNetworkCheck={false}>
           <div className='container'>
             <div className='row'>
               <div className='col-xs-12 col-md-10 col-md-offset-1'>
@@ -52,7 +52,7 @@ export const Welcome = class extends Component {
               </div>
             </div>
           </div>
-        </MainLayout>
+        </MainLayoutContainer>
       </BodyClass>
     )
   }

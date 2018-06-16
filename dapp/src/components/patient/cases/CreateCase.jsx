@@ -15,10 +15,9 @@ import { withRouter } from 'react-router-dom';
 import classNames from 'classnames';
 import { isNotEmptyString } from '~/utils/common-util';
 import { uploadJson, uploadFile } from '~/utils/storage-util';
-import { signedInSecretKey } from '~/services/sign-in'
+import { getAccount } from '~/services/sign-in'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
-import aes from '~/services/aes'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { contractByName } from '~/saga-genesis/state-finders'
@@ -163,6 +162,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     updateBleeding = (event) => {
+
       this.setState({ bleeding: event.target.value }, this.validateInputs);
     }
 
@@ -254,17 +254,24 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             color: this.state.color,
             prevTreatment: this.state.prevTreatment,
             description: this.state.description
-        };
+        }
 
-        const caseJson = JSON.stringify(caseInformation);
-        const hash = await uploadJson(caseJson, this.state.caseEncryptionKey);
-        const encryptedCaseKey = aes.encrypt(this.state.caseEncryptionKey, signedInSecretKey())
+        const caseJson = JSON.stringify(caseInformation)
+        const hash = await uploadJson(caseJson, this.state.caseEncryptionKey)
+        const account = getAccount()
+        const caseKeySalt = genKey(32)
+        const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 
         const { send, MedXToken, CaseManager } = this.props
         let hashHex = hashToHex(hash)
 
         let CaseManagerContract = this.props.contractRegistry.get(this.props.CaseManager, 'CaseManager', getWeb3())
-        let data = CaseManagerContract.methods.createCase(this.props.account, '0x' + encryptedCaseKey, '0x' + hashHex).encodeABI()
+        let data = CaseManagerContract.methods.createCase(
+          this.props.account,
+          '0x' + encryptedCaseKey,
+          '0x' + caseKeySalt,
+          '0x' + hashHex
+        ).encodeABI()
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
 
         this.setState({ transactionId })
@@ -328,7 +335,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                           <div className={classNames('form-group', firstFileClassName)}>
                             <label className='control-label'>Overview Photo<span className='star'>*</span></label>
                             <div>
-                              <label className="btn btn-sm btn-info">
+                              <label className="btn btn btn-info">
                                 Select File ... <input
                                             onChange={this.captureFirstImage}
                                             type="file"
@@ -358,7 +365,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                           <div className={classNames('form-group', secondFileClassName)}>
                             <label>Close-up Photo<span className='star'>*</span></label>
                             <div>
-                              <label className="btn btn-sm btn-info">
+                              <label className="btn btn btn-info">
                                   Select File ... <input
                                               onChange={this.captureSecondImage}
                                               type="file"
@@ -625,7 +632,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         </div>
                       </div>
 
-                      <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
+                          <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit Case</button>
+                        </div>
+                      </div>
                     </form>
                   </div>
                 </div>

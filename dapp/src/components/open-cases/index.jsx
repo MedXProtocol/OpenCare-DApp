@@ -1,7 +1,7 @@
 import React, {
   Component
 } from 'react'
-import { MainLayout } from '~/layouts/MainLayout.js'
+import { MainLayoutContainer } from '~/layouts/MainLayout.js'
 import {
   Button,
   Table
@@ -64,7 +64,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
     let noCasesAvailableForDoc = (parseInt(this.props.peekNextCase, 16) === 0)
 
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         <div className="container">
           <div className='header-card card'>
             <div className='card-body'>
@@ -84,7 +84,8 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                     <Button
                       disabled={noCasesAvailableForDoc}
                       onClick={this.handleRequestCase}
-                      bsStyle="info">
+                      bsStyle="info"
+                      className="btn-lg">
                       <FontAwesomeIcon
                         icon={faNotesMedical}
                         size='lg' /> &nbsp; Request Case
@@ -119,7 +120,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                           cases.map(address => (
                             <CSSTransition
                               key={address}
-                              timeout={500}
+                              timeout={100}
                               appear={true}
                               classNames="fade">
                               <CaseRow address={address} key={address} />
@@ -134,7 +135,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
             </div>
           </div>
         </div>
-      </MainLayout>
+      </MainLayoutContainer>
     )
   }
 }))))

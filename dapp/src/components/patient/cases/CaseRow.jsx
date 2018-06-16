@@ -5,7 +5,7 @@ import { Modal } from 'react-bootstrap'
 import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
-import { signedInSecretKey } from '~/services/sign-in'
+import { getAccount } from '~/services/sign-in'
 import {
   cacheCall,
   cacheCallValue,
@@ -21,10 +21,12 @@ export function mapStateToCaseRowProps(state, { caseAddress }) {
   const diagnosingDoctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
   const diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
+  const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
   const status = cacheCallValue(state, caseAddress, 'status')
   return {
     status,
     encryptedCaseKey,
+    caseKeySalt,
     diagnosingDoctorA,
     diagnosingDoctorB,
     diagnosingDoctorAPublicKey: cacheCallValue(state, AccountManager, 'publicKeys', diagnosingDoctorA),
@@ -37,6 +39,7 @@ export function* caseRowSaga({ caseAddress, AccountManager }) {
   if (!caseAddress || !AccountManager) { return {} }
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'encryptedCaseKey')
+  yield cacheCall(caseAddress, 'caseKeySalt')
   let status = yield cacheCall(caseAddress, 'status')
   if (status === '3') {
     let diagnosingDoctorA = yield cacheCall(caseAddress, 'diagnosingDoctorA')
@@ -71,16 +74,17 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
     this.setState({showModal: false})
     const status = this.props.status
     const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
+    const caseKeySalt = this.props.caseKeySalt.substring(2)
     const { send, caseAddress } = this.props
     if (status === '3') {
       let doctor = this.props.diagnosingDoctorA
       let doctorPublicKey = this.props.diagnosingDoctorAPublicKey.substring(2)
-      const doctorEncryptedCaseKey = reencryptCaseKey({secretKey: signedInSecretKey(), encryptedCaseKey, doctorPublicKey})
+      const doctorEncryptedCaseKey = reencryptCaseKey({account: getAccount(), encryptedCaseKey, doctorPublicKey, caseKeySalt})
       send(caseAddress, 'authorizeDiagnosisDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
     } else if (status === '8') {
       let doctor = this.props.diagnosingDoctorB
       let doctorPublicKey = this.props.diagnosingDoctorBPublicKey.substring(2)
-      const doctorEncryptedCaseKey = reencryptCaseKey({secretKey: signedInSecretKey(), encryptedCaseKey, doctorPublicKey})
+      const doctorEncryptedCaseKey = reencryptCaseKey({account: getAccount(), encryptedCaseKey, doctorPublicKey, caseKeySalt})
       send(caseAddress, 'authorizeChallengeDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
     }
   }

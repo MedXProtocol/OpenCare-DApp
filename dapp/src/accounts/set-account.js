@@ -1,5 +1,5 @@
 import Cookie from 'js-cookie'
-import { KEY_STORE } from './constants'
+import { KEY_STORE } from '~/accounts/constants'
 
 export function setAccount(address, account) {
   let keyStore = Cookie.getJSON(KEY_STORE)

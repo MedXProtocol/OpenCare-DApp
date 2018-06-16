@@ -1,6 +1,6 @@
 import randomBytes from 'randombytes'
-import { toHexString } from './to-hex-string'
 
-export function genKey(length = 16) {
-  return toHexString(randomBytes(length))
+export function genKey(length = 32) {
+  const bytes = randomBytes(length)
+  return Buffer.from(bytes).toString('hex')
 }

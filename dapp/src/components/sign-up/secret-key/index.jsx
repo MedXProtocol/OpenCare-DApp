@@ -1,17 +1,22 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Modal } from 'react-bootstrap'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
 import { BodyClass } from '~/components/BodyClass'
-import { formatKey } from '~/services/format-key'
+import { formatSecretKey } from '~/services/format-secret-key'
 
 export const SecretKey = class extends Component {
-
   constructor(props) {
     super(props)
 
     this.state = {
       showTermsModal: false
     }
+  }
+
+  handlePrint = () => {
+    window.print()
   }
 
   handleCloseTermsModal = (event) => {
@@ -32,15 +37,24 @@ export const SecretKey = class extends Component {
                 <div className="form-wrapper--body">
                   <div className="well" role="alert">
                     <div className='secret-key__key'>
-                      {formatKey(this.props.secretKey)}
+                      {formatSecretKey(this.props.secretKey)}
                     </div>
                   </div>
-                  <ol>
-                    <li>You’ll need this key to access your account from new devices and browsers.</li>
-                    <li>Don't write it down; we’re going to give you an <b>Emergency Kit</b> that contains it.</li>
-                  </ol>
+                  <p>
+                    You will need this key to access your account from new devices and browsers.
+                    Without it you <em>will not</em> be able to view your previous cases. Save
+                    it in a password manager or print it:
+                  </p>
+                  <div className="text-center">
+                    <a onClick={this.handlePrint} className="btn btn-lg btn-success">
+                      <FontAwesomeIcon
+                        icon={faPrint}
+                        size='lg' /> &nbsp;
+                      Print or save as PDF
+                    </a>
+                  </div>
 
-                  <br />
+                  <hr />
                   <p>
                     By signing up you are agreeing to the terms:
                     &nbsp;<a onClick={(e) => this.setState({ showTermsModal: true })}>READ TERMS</a>

@@ -1,45 +1,32 @@
-import aes from './aes'
-import aesjs from 'aes-js'
 import Cookie from 'js-cookie'
-import decryptSecretKey from '~/services/decrypt-secret-key'
+import { Account } from '~/accounts/Account'
 
-let secretKey = ''
+let account = null
 
-export function isSignedIn () {
-  return !!signedInSecretKey()
+export function getAccount() {
+  if (process.env.NODE_ENV === 'development') {
+    if (!account) {
+      const json = Cookie.get('REFRESH_ACCOUNT')
+      const secretKey = Cookie.get('REFRESH_SECRET_KEY')
+      account = new Account(json)
+      account._secretKey = secretKey
+    }
+  }
+  return account
 }
 
-export async function signIn (account, masterPassword) {
-  var secretKey = decryptSecretKey(account, masterPassword)
-  setSecretKey(secretKey)
+export function signIn (_account) {
+  if (process.env.NODE_ENV === 'development') {
+    Cookie.set('REFRESH_ACCOUNT', _account.toJson())
+    Cookie.set('REFRESH_SECRET_KEY', _account.secretKey())
+  }
+  account = _account
 }
 
 export function signOut () {
-  setSecretKey('')
-}
-
-function setSecretKey(secret) {
   if (process.env.NODE_ENV === 'development') {
-    Cookie.set('SECRET_KEY', secret)
-  } else {
-    secretKey = secret
+    Cookie.set('REFRESH_ACCOUNT', '')
+    Cookie.set('REFRESH_SECRET_KEY', '')
   }
-}
-
-export function signedInSecretKey() {
-  if (process.env.NODE_ENV === 'development') {
-    return Cookie.get('SECRET_KEY')
-  } else {
-    return secretKey
-  }
-}
-
-export function decrypt(data) {
-  var keyBytes = aesjs.utils.hex.toBytes(signedInSecretKey())
-  return aes.decryptBytes(data, keyBytes)
-}
-
-export function encrypt(data) {
-  var keyBytes = aesjs.utils.hex.toBytes(signedInSecretKey())
-  return aes.encryptBytes(data, keyBytes)
+  account = null
 }

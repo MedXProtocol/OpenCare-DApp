@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { MainLayout } from '~/layouts/MainLayout';
+import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { genKey } from '~/services/gen-key'
 import { Redirect } from 'react-router-dom'
 import { withMixpanel } from '~/services/mixpanelService'
@@ -29,7 +29,7 @@ export const SignUp = class extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      secretKey: genKey(16).toUpperCase(),
+      secretKey: genKey(32),
       showMasterPassword: false,
       showConfirm: false
     }
@@ -65,9 +65,9 @@ export const SignUp = class extends Component {
       content = <SecretKey secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
     }
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         {content}
-      </MainLayout>
+      </MainLayoutContainer>
     )
   }
 }

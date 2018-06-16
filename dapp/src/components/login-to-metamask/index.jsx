@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 
@@ -15,7 +15,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class extends Component 
       var redirect = <Redirect to='/' />
     }
     return (
-      <MainLayout>
+      <MainLayoutContainer>
         {redirect}
         <div className='container'>
           <div className='row'>
@@ -24,7 +24,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class extends Component 
             </div>
           </div>
         </div>
-      </MainLayout>
+      </MainLayoutContainer>
     )
   }
 })
