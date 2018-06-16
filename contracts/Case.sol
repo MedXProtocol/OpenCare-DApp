@@ -92,6 +92,9 @@ contract Case is Ownable, Initializable {
         Registry _registry
     ) external notInitialized {
         setInitialized();
+        require(_encryptedCaseKey.length != 0);
+        require(_caseKeySalt.length != 0);
+        require(_caseHash.length != 0);
         owner = msg.sender;
         status = CaseStatus.Open;
         encryptedCaseKey = _encryptedCaseKey; // don't need to store this

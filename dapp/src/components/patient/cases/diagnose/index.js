@@ -115,12 +115,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             </div>
           </div>
         </div>
-<<<<<<< HEAD
       </MainLayoutContainer>
-    );
-=======
-      </MainLayout>
     )
->>>>>>> Increased secret key size to 256 bits and refactored a shit ton of the encryption code
   }
 })))

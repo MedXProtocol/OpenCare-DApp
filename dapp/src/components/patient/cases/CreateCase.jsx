@@ -269,8 +269,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         let data = CaseManagerContract.methods.createCase(
           this.props.account,
           '0x' + encryptedCaseKey,
-          '0x' + hashHex,
-          '0x' + caseKeySalt
+          '0x' + caseKeySalt,
+          '0x' + hashHex
         ).encodeABI()
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
 
