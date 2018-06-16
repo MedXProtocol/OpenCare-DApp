@@ -19,12 +19,14 @@ export class Account {
     this._json = json
   }
 
-  encrypt (string, optionalSalt) {
-    return aes.encrypt(string, keyWithOptionalSalt(this.hexSecretKey(), optionalSalt))
+  encrypt (string, salt) {
+    const key = deriveKey(this.hexSecretKey(), salt)
+    return aes.encrypt(string, key)
   }
 
-  decrypt (string, optionalSalt) {
-    return aes.decrypt(string, keyWithOptionalSalt(this.hexSecretKey(), optionalSalt))
+  decrypt (string, salt) {
+    const key = deriveKey(this.hexSecretKey(), salt)
+    return aes.decrypt(string, key)
   }
 
   deriveSharedKey (publicKey) {
@@ -110,11 +112,4 @@ Account.get = function (address) {
     account = new Account(json)
   }
   return account
-}
-
-function keyWithOptionalSalt(secretKey, salt) {
-  let key = secretKey
-  if (salt)
-    key = deriveKey(secretKey, salt)
-  return key
 }
