@@ -3,6 +3,7 @@ import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { genKey } from '~/services/gen-key'
 import { Redirect } from 'react-router-dom'
 
+import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
 import { ConfirmCreate } from './confirm-create'
 import { SecretKey } from './secret-key'
 import { MasterPassword } from './master-password'
@@ -11,9 +12,11 @@ import { connect } from 'react-redux'
 function mapStateToProps(state) {
   const address = state.sagaGenesis.accounts[0]
   const signedIn = state.account.signedIn
+  const overrideError = state.account.overrideError
   return {
     address,
-    signedIn
+    signedIn,
+    overrideError
   }
 }
 
@@ -21,6 +24,9 @@ function mapDispatchToProps(dispatch) {
   return {
     signUp: ({ address, secretKey, masterPassword, overrideAccount }) => {
       dispatch({ type: 'SIGN_UP', address, secretKey, masterPassword, overrideAccount })
+    },
+    clearOverrideError: () => {
+      dispatch({ type: 'SIGN_IN_RESET_OVERRIDE' })
     }
   }
 }
@@ -46,8 +52,7 @@ export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(clas
     this.props.signUp({
       secretKey: this.state.secretKey,
       masterPassword: this.state.masterPassword,
-      address: this.props.address,
-      overrideAccount: true
+      address: this.props.address
     })
   }
 
@@ -65,6 +70,9 @@ export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(clas
     return (
       <MainLayoutContainer>
         {content}
+        <OverrideDisallowedModal
+          show={this.props.overrideError}
+          onOk={this.props.clearOverrideError} />
       </MainLayoutContainer>
     )
   }
