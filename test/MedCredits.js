@@ -13,7 +13,7 @@ let doctorManager;
 let theCase;
 let registry;
 
-let CaseStatus = { None:0, Open:1, Evaluated:2, Closed:3, Challenged:4, Canceled:5, ClosedRejected:6, ClosedConfirmed:7};
+let CaseStatus = { None:0, Open:1, Evaluated:2, Closed:3, Challenged:4, ClosedRejected:6, ClosedConfirmed:7};
 let AuthStatus = { None:0, Requested:1, Approved:2 };
 
 let baseFee = 150;
@@ -126,7 +126,7 @@ contract.skip('MedCredits', function (accounts) {
             let latestPatientCaseIndex = (await caseManager.getPatientCaseListCount(testPatientAccount)) - 1;
             let patientCase = Case.at(await caseManager.patientCases(testPatientAccount, latestPatientCaseIndex));
             assert.equal(await patientCase.status(), CaseStatus.Open);
-            assert.equal(web3.toAscii(await patientCase.caseDetailLocationHash()), swarmHash);
+            assert.equal(web3.toAscii(await patientCase.caseDataHash()), swarmHash);
         });
 
         it("should cancel latest case", async () => {
@@ -152,7 +152,7 @@ contract.skip('MedCredits', function (accounts) {
 
             let latestCase = Case.at(latestPatientCaseAddress);
             assert.equal(await latestCase.status(), CaseStatus.Open);
-            assert.equal(web3.toAscii(await latestCase.caseDetailLocationHash()), swarmHash2);
+            assert.equal(web3.toAscii(await latestCase.caseDataHash()), swarmHash2);
             assert.equal(await medXToken.balanceOf(latestCase.address), (baseFee + halfBaseFee));
 
             /* Try to cancel case with account who isn't the patient for that case */
@@ -185,9 +185,9 @@ contract.skip('MedCredits', function (accounts) {
             /* Doctor A diagnoses case */
             await patientCase.diagnoseCase("diagnosisHash", { from: drAccountA });
             smartLog("Patient case status [" + await patientCase.status() + "]");
-            smartLog("Patient case diagnosing doctor A [" + await patientCase.diagnosingDoctorA() + "]");
+            smartLog("Patient case diagnosing doctor A [" + await patientCase.diagnosingDoctor() + "]");
             assert.equal(await patientCase.status(), CaseStatus.Evaluated);
-            assert.equal(await patientCase.diagnosingDoctorA(), drAccountA);
+            assert.equal(await patientCase.diagnosingDoctor(), drAccountA);
 
             /* Patient accepts diagnosis */
             await patientCase.acceptDiagnosis({ from: testPatientAccount });
@@ -220,9 +220,9 @@ contract.skip('MedCredits', function (accounts) {
             /* Doctor A diagnoses case */
             await patientCase.diagnoseCase("diagnosisHash", { from: drAccountA });
             smartLog("Patient case status [" + await patientCase.status() + "]");
-            smartLog("Patient case diagnosing doctor A [" + await patientCase.diagnosingDoctorA() + "]");
+            smartLog("Patient case diagnosing doctor A [" + await patientCase.diagnosingDoctor() + "]");
             assert.equal(await patientCase.status(), CaseStatus.Evaluated);
-            assert.equal(await patientCase.diagnosingDoctorA(), drAccountA);
+            assert.equal(await patientCase.diagnosingDoctor(), drAccountA);
 
             /* Patient challenges case */
             await patientCase.challengeDiagnosis({ from: testPatientAccount });
@@ -240,7 +240,7 @@ contract.skip('MedCredits', function (accounts) {
             /* Doctor B confirms original diagnosis */
             await patientCase.diagnoseChallengedCase("secondaryDiagnosisHash", true, { from: drAccountB });
             assert.equal(await patientCase.status(), CaseStatus.ClosedConfirmed);
-            assert.equal(await patientCase.diagnosingDoctorB(), drAccountB);
+            assert.equal(await patientCase.challengingDoctor(), drAccountB);
 
             /* Transfer tokens as payment */
             assert.equal(await medXToken.balanceOf(drAccountA), baseFee);
@@ -269,7 +269,7 @@ contract.skip('MedCredits', function (accounts) {
             /* Doctor diagnoses case */
             await patientCase.diagnoseCase("diagnosisHash", { from: drAccountA });
             assert.equal(await patientCase.status(), CaseStatus.Evaluated);
-            assert.equal(await patientCase.diagnosingDoctorA(), drAccountA);
+            assert.equal(await patientCase.diagnosingDoctor(), drAccountA);
 
             /* Patient challenges case */
             await patientCase.challengeDiagnosis({ from: testPatientAccount });
@@ -287,7 +287,7 @@ contract.skip('MedCredits', function (accounts) {
             /* Doctor B rejects original diagnosis by doctor A */
             await patientCase.diagnoseChallengedCase("secondaryDiagnosisHash", false, { from: drAccountB });
             assert.equal(await patientCase.status(), CaseStatus.ClosedRejected);
-            assert.equal(await patientCase.diagnosingDoctorB(), drAccountB);
+            assert.equal(await patientCase.challengingDoctor(), drAccountB);
 
             /* Transfer tokens as payment */
             assert.equal(await medXToken.balanceOf(drAccountA), 0);

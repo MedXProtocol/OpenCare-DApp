@@ -54,7 +54,7 @@ contract('CaseManager', function (accounts) {
       var caseEncryptedCaseKey = await caseInstance.encryptedCaseKey()
 
       assert.equal(caseEncryptedCaseKey, encryptedCaseKey)
-      assert.equal(await caseInstance.caseDetailLocationHash.call(), ipfsHash)
+      assert.equal(await caseInstance.caseDataHash.call(), ipfsHash)
     })
   })
 
@@ -90,14 +90,14 @@ contract('CaseManager', function (accounts) {
         assert.equal(result.args.doctor, doctor)
       })
       assert.equal(await env.caseManager.openCaseCount(), 0)
-      assert.equal(await env.caseManager.doctorAuthorizationRequestCount(doctor), 1)
-      assert.equal(await env.caseManager.doctorAuthorizationRequestCaseAtIndex(doctor, 0), caseContract.address)
+      assert.equal(await env.caseManager.doctorCasesCount(doctor), 1)
+      assert.equal(await env.caseManager.doctorCaseAtIndex(doctor, 0), caseContract.address)
     })
 
     describe('for case that has been diagnosed and challenged', () => {
       beforeEach(async () => {
         await env.caseManager.requestNextCase({ from: doctor })
-        await caseContract.authorizeDiagnosisDoctor(doctor, 'encryptedCaseKey', { from: patient })
+        await caseContract.setDiagnosingDoctor(doctor, 'encryptedCaseKey', { from: patient })
         await caseContract.diagnoseCase('diagnosisHash', { from: doctor })
         await caseContract.challengeDiagnosis({ from: patient })
       })

@@ -6,14 +6,14 @@ import { connect } from 'react-redux'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 
 function mapStateToProps(state, { caseAddress }) {
-  const diagnosisBLocationHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
+  const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
   return {
-    diagnosisBLocationHash
+    challengeHash
   }
 }
 
 function* saga({ caseAddress }) {
-  yield cacheCall(caseAddress, 'diagnosisBLocationHash')
+  yield cacheCall(caseAddress, 'challengeHash')
 }
 
 const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: 'caseAddress' })(class _ChallengedDiagnosis extends Component {
@@ -27,7 +27,7 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
     }
 
     async componentDidMount() {
-        const diagnosisHash = this.props.diagnosisBLocationHash
+        const diagnosisHash = this.props.challengeHash
 
         if(diagnosisHash !== null && diagnosisHash !== "0x") {
             const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey)

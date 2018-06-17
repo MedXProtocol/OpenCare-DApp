@@ -12,12 +12,12 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
   const status = cacheCallValue(state, caseAddress, 'status')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
-  const diagnosisALocationHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
+  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
   const transactions = state.sagaGenesis.transactions
   const isPatient = account === patientAddress
   return {
     status,
-    diagnosisALocationHash,
+    diagnosisHash,
     transactions,
     isPatient
   }
@@ -26,7 +26,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
 function* saga({ caseAddress }) {
   yield cacheCall(caseAddress, 'status')
   yield cacheCall(caseAddress, 'patient')
-  yield cacheCall(caseAddress, 'diagnosisALocationHash')
+  yield cacheCall(caseAddress, 'diagnosisHash')
 }
 
 const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(withSend(class _Diagnosis extends Component {
@@ -50,7 +50,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     if (status === 5 && this.props.isPatient) {
       this.setState({ buttonsHidden: false })
     }
-    const diagnosisHash = this.props.diagnosisALocationHash
+    const diagnosisHash = this.props.diagnosisHash
     if (diagnosisHash !== null && diagnosisHash !== "0x") {
       const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey);
       const diagnosis = JSON.parse(diagnosisJson);

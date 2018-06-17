@@ -57,11 +57,11 @@ contract('Case', function (accounts) {
     })
   })
 
-  describe('authorizeDiagnosisDoctor()', () => {
+  describe('setDiagnosingDoctor()', () => {
     it('should set that doctor as the diagnosing doctor', async () => {
       await caseInstance.requestDiagnosisAuthorization(doctorAddress)
-      await caseInstance.authorizeDiagnosisDoctor(doctorAddress, 'an encrypted key')
-      assert.equal(await caseInstance.diagnosingDoctorA.call(), doctorAddress)
+      await caseInstance.setDiagnosingDoctor(doctorAddress, 'an encrypted key')
+      assert.equal(await caseInstance.diagnosingDoctor.call(), doctorAddress)
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
     })
   })
@@ -69,20 +69,20 @@ contract('Case', function (accounts) {
   describe('diagnoseCase()', () => {
     beforeEach(async () => {
       await caseInstance.requestDiagnosisAuthorization(doctorAddress)
-      await caseInstance.authorizeDiagnosisDoctor(doctorAddress, 'an encrypted key')
+      await caseInstance.setDiagnosingDoctor(doctorAddress, 'an encrypted key')
     })
 
     it('should allow the diagnosing doctor to submit the diagnosis', async () => {
       await caseInstance.diagnoseCase('diagnosis hash', { from: doctorAddress })
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluated'))
-      assert(await caseInstance.diagnosisALocationHash.call())
+      assert(await caseInstance.diagnosisHash.call())
     })
   })
 
   context('is diagnosed', () => {
     beforeEach(async () => {
       await caseInstance.requestDiagnosisAuthorization(doctorAddress)
-      await caseInstance.authorizeDiagnosisDoctor(doctorAddress, 'an encrypted key')
+      await caseInstance.setDiagnosingDoctor(doctorAddress, 'an encrypted key')
       await caseInstance.diagnoseCase('diagnosis hash', { from: doctorAddress })
     })
 
@@ -123,17 +123,17 @@ contract('Case', function (accounts) {
           await caseInstance.requestChallengeAuthorization(doctorAddress2)
         })
 
-        describe('authorizeChallengeDoctor()', () => {
+        describe('setChallengingDoctor()', () => {
           it('should set that doctor as the second diagnosing doc', async () => {
-            await caseInstance.authorizeChallengeDoctor(doctorAddress2, 'encrypted key')
-            assert.equal(await caseInstance.diagnosingDoctorB.call(), doctorAddress2)
+            await caseInstance.setChallengingDoctor(doctorAddress2, 'encrypted key')
+            assert.equal(await caseInstance.challengingDoctor.call(), doctorAddress2)
             assert.equal(await caseInstance.status.call(), caseStatus('Challenging'))
           })
         })
 
         context('approved', () => {
           beforeEach(async () => {
-            await caseInstance.authorizeChallengeDoctor(doctorAddress2, 'encrypted key')
+            await caseInstance.setChallengingDoctor(doctorAddress2, 'encrypted key')
           })
 
           describe('diagnoseChallengedCase()', () => {
@@ -141,7 +141,7 @@ contract('Case', function (accounts) {
               let doctorBalance = await env.medXToken.balanceOf(doctorAddress)
               let doctorBalance2 = await env.medXToken.balanceOf(doctorAddress2)
               let result = await caseInstance.diagnoseChallengedCase('diagnosis hash', true, { from: doctorAddress2 })
-              assert(await caseInstance.diagnosisBLocationHash.call())
+              assert(await caseInstance.challengeHash.call())
               assert.equal((await env.medXToken.balanceOf(doctorAddress)).toString(), doctorBalance.plus(caseFee).toString())
               assert.equal((await env.medXToken.balanceOf(doctorAddress2)).toString(), doctorBalance2.plus(caseFee / 2).toString())
               assert.equal(result.logs[0].event, 'CaseClosedConfirmed')

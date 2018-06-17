@@ -18,8 +18,8 @@ import { addContract } from '~/saga-genesis/sagas'
 
 export function mapStateToCaseRowProps(state, { caseAddress }) {
   const AccountManager = contractByName(state, 'AccountManager')
-  const diagnosingDoctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
-  const diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
+  const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
+  const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
   const status = cacheCallValue(state, caseAddress, 'status')
@@ -27,10 +27,10 @@ export function mapStateToCaseRowProps(state, { caseAddress }) {
     status,
     encryptedCaseKey,
     caseKeySalt,
-    diagnosingDoctorA,
-    diagnosingDoctorB,
-    diagnosingDoctorAPublicKey: cacheCallValue(state, AccountManager, 'publicKeys', diagnosingDoctorA),
-    diagnosingDoctorBPublicKey: cacheCallValue(state, AccountManager, 'publicKeys', diagnosingDoctorB),
+    diagnosingDoctor,
+    challengingDoctor,
+    diagnosingDoctorPublicKey: cacheCallValue(state, AccountManager, 'publicKeys', diagnosingDoctor),
+    challengingDoctorPublicKey: cacheCallValue(state, AccountManager, 'publicKeys', challengingDoctor),
     AccountManager
   }
 }
@@ -42,11 +42,11 @@ export function* caseRowSaga({ caseAddress, AccountManager }) {
   yield cacheCall(caseAddress, 'caseKeySalt')
   let status = yield cacheCall(caseAddress, 'status')
   if (status === '3') {
-    let diagnosingDoctorA = yield cacheCall(caseAddress, 'diagnosingDoctorA')
-    yield cacheCall(AccountManager, 'publicKeys', diagnosingDoctorA)
+    let diagnosingDoctor = yield cacheCall(caseAddress, 'diagnosingDoctor')
+    yield cacheCall(AccountManager, 'publicKeys', diagnosingDoctor)
   } else if (status === '8') {
-    let diagnosingDoctorB = yield cacheCall(caseAddress, 'diagnosingDoctorB')
-    yield cacheCall(AccountManager, 'publicKeys', diagnosingDoctorB)
+    let challengingDoctor = yield cacheCall(caseAddress, 'challengingDoctor')
+    yield cacheCall(AccountManager, 'publicKeys', challengingDoctor)
   }
 }
 
@@ -77,15 +77,15 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
     const caseKeySalt = this.props.caseKeySalt.substring(2)
     const { send, caseAddress } = this.props
     if (status === '3') {
-      let doctor = this.props.diagnosingDoctorA
-      let doctorPublicKey = this.props.diagnosingDoctorAPublicKey.substring(2)
+      let doctor = this.props.diagnosingDoctor
+      let doctorPublicKey = this.props.diagnosingDoctorPublicKey.substring(2)
       const doctorEncryptedCaseKey = reencryptCaseKey({account: getAccount(), encryptedCaseKey, doctorPublicKey, caseKeySalt})
-      send(caseAddress, 'authorizeDiagnosisDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
+      send(caseAddress, 'setDiagnosingDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
     } else if (status === '8') {
-      let doctor = this.props.diagnosingDoctorB
-      let doctorPublicKey = this.props.diagnosingDoctorBPublicKey.substring(2)
+      let doctor = this.props.challengingDoctor
+      let doctorPublicKey = this.props.challengingDoctorPublicKey.substring(2)
       const doctorEncryptedCaseKey = reencryptCaseKey({account: getAccount(), encryptedCaseKey, doctorPublicKey, caseKeySalt})
-      send(caseAddress, 'authorizeChallengeDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
+      send(caseAddress, 'setChallengingDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
     }
   }
 

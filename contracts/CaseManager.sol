@@ -7,11 +7,9 @@ import "./Delegate.sol";
 import "./Initializable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
-import "./SkipList.sol";
 
 contract CaseManager is Ownable, Pausable, Initializable {
     using SafeMath for uint256;
-    using SkipList for SkipList.UInt256;
 
     uint256 public caseFee;
 
@@ -22,15 +20,11 @@ contract CaseManager is Ownable, Pausable, Initializable {
     MedXToken public medXToken;
     Registry public registry;
 
-    SkipList.UInt256 openCaseQueue;
-
-    mapping (address => uint256[]) public doctorAuthorizationRequests;
+    mapping (address => address[]) public doctorCases;
 
     event NewCase(address indexed caseAddress, uint256 indexed index);
-    event CaseDequeued(address indexed caseAddress);
-    event CaseQueued(address indexed caseAddress);
 
-    modifier onlyCase(address _case) {
+    modifier isCase(address _case) {
       require(_case != address(0));
       require(caseIndices[_case] != uint256(0));
       _;
@@ -66,6 +60,10 @@ contract CaseManager is Ownable, Pausable, Initializable {
         revert();
     }
 
+    function createCaseCost () internal view returns (uint256) {
+      return caseFee.add(caseFee.mul(50).div(100));
+    }
+
     /**
      * @dev - initial payment it 150% of the fee, 50% refunded if first diagnosis accepted
      * @param _from - owner of the tokens
@@ -74,7 +72,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
      * @param _extraData - unused
      */
     function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external whenNotPaused {
-        require(_value == caseFee.add(caseFee.mul(50).div(100)));
+        require(_value == createCaseCost());
         require(medXToken.balanceOf(_from) >= _value);
 
         /**
@@ -99,11 +97,9 @@ contract CaseManager is Ownable, Pausable, Initializable {
           sig |= bytes4(_extraData[i]) >> 8*i;
         }
 
-        require(sig == bytes4(keccak256('createCase(address,bytes,bytes,bytes)')));
+        require(sig == bytes4(keccak256('createAndAssignCase(address,bytes,bytes,bytes,address,bytes)')));
 
         address _this = address(this);
-        address newCase;
-
         uint256 inputSize = _extraData.length;
 
         assembly {
@@ -115,12 +111,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
           switch result
           case 0 { revert(ptr, size) }
-          default {
-            newCase := mload(ptr)
-          }
+          default { return(ptr, size) }
         }
-
-        medXToken.transferFrom(_from, newCase, _value);
     }
 
     /**
@@ -145,83 +137,35 @@ contract CaseManager is Ownable, Pausable, Initializable {
         return patientCases[_patient].length;
     }
 
-    /**
-     * @dev - Internal function to create a new case which will have the required tokens already transferred to it
-     * @param _patient - the patient creating the case
-     * @return - address of the case contract created
-     */
-    function createCase(address _patient, bytes _encryptedCaseKey, bytes _caseKeySalt, bytes _ipfsHash) public onlyThis returns (address) {
-      Delegate delegate = new Delegate(registry, keccak256("Case"));
-      Case newCase = Case(delegate);
+    function createAndAssignCase(
+      address _patient,
+      bytes _encryptedCaseKey,
+      bytes _caseKeySalt,
+      bytes _ipfsHash,
+      address _doctor,
+      bytes _doctorEncryptedKey) public onlyThis {
+      require(tx.origin == _patient); // Only patients can create cases for themselves
+      Case newCase = Case(new Delegate(registry, keccak256("Case")));
       newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
+      newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
-      openCaseQueue.enqueue(address(0), caseIndex);
       patientCases[_patient].push(address(newCase));
+      doctorCases[_doctor].push(newCase);
+      medXToken.transferFrom(_patient, newCase, createCaseCost());
       emit NewCase(newCase, caseIndex);
-      return newCase;
     }
 
-    function requestNextCase() external returns (address) {
-      require(openCaseQueue.length() > 0, 'No more cases');
-      uint256 caseIndex = openCaseQueue.dequeue(msg.sender);
-      require(caseIndex > 0, 'Invalid case index');
-      Case caseContract = Case(caseList[caseIndex]);
-      if (caseContract.status() == Case.CaseStatus.Open) {
-        caseContract.requestDiagnosisAuthorization(msg.sender);
-      } else {
-        caseContract.requestChallengeAuthorization(msg.sender);
-      }
-      doctorAuthorizationRequests[msg.sender].push(caseIndex);
-      emit CaseDequeued(caseContract);
-      return caseContract;
+    function addChallengeDoctor(address _doctor) external isCase(msg.sender) {
+      doctorCases[_doctor].push(msg.sender);
     }
 
-    /**
-     * @dev - This will find the next case address the requesting Doctor can
-              request, and should exclude any cases they've previously diagnosed
-     * @return - address of the Doctor's next case to diagnose
-     */
-    function peekNextCase() external view returns (address) {
-      uint256 caseIndex = openCaseQueue.peek(msg.sender);
-      if (caseIndex > 0) {
-        return caseList[caseIndex];
-      } else {
-        return address(0);
-      }
+    function doctorCasesCount(address _doctor) external view returns (uint256) {
+      return doctorCases[_doctor].length;
     }
 
-    function addCaseToQueue(address _case) external onlyCase(_case) {
-      Case caseContract = Case(_case);
-      require(caseContract.status() == Case.CaseStatus.Challenged);
-      openCaseQueue.enqueue(caseContract.diagnosingDoctorA(), caseIndices[_case]);
-      emit CaseQueued(_case);
+    function doctorCaseAtIndex(address _doctor, uint256 _doctorAuthIndex) external view returns (address) {
+      require(_doctorAuthIndex < doctorCases[_doctor].length);
+      return doctorCases[_doctor][_doctorAuthIndex];
     }
-
-    function openCaseCount() external view returns (uint256) {
-      return openCaseQueue.length();
-    }
-
-    function doctorAuthorizationRequestCount(address _doctor) external view returns (uint256) {
-      return doctorAuthorizationRequests[_doctor].length;
-    }
-
-    function doctorAuthorizationRequestCaseAtIndex(address _doctor, uint256 _doctorAuthIndex) external view returns (address) {
-      require(_doctorAuthIndex < doctorAuthorizationRequests[_doctor].length);
-      uint256 index = doctorAuthorizationRequests[_doctor][_doctorAuthIndex];
-      require(index < caseList.length);
-      return caseList[index];
-    }
-
-    /**
-     * @dev Converts bytes to bytes32
-     * see https://ethereum.stackexchange.com/questions/7702/how-to-convert-byte-array-to-bytes32-in-solidity
-     */
-    /* function bytesToBytes32(bytes b, uint256 offset) internal pure returns (bytes32) {
-      bytes32 out;
-      for (uint256 i = 0; i < 32; i++) {
-        out |= bytes32(b[offset + i] & 0xFF) >> (i * 8);
-      }
-      return out;
-    } */
 }

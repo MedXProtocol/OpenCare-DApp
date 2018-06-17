@@ -13,13 +13,13 @@ function mapStateToProps(state, { address }) {
   let account = get(state, 'sagaGenesis.accounts[0]')
   const status = cacheCallValue(state, address, 'status')
   const caseFee = cacheCallValue(state, address, 'caseFee')
-  const diagnosingDoctorA = cacheCallValue(state, address, 'diagnosingDoctorA')
-  const diagnosingDoctorB = cacheCallValue(state, address, 'diagnosingDoctorB')
+  const diagnosingDoctor = cacheCallValue(state, address, 'diagnosingDoctor')
+  const challengingDoctor = cacheCallValue(state, address, 'challengingDoctor')
   return {
     status,
     caseFee,
-    diagnosingDoctorA,
-    diagnosingDoctorB,
+    diagnosingDoctor,
+    challengingDoctor,
     account
   }
 }
@@ -29,18 +29,18 @@ function* propSaga({address}) {
   let status = parseInt(yield cacheCall(address, 'status'), 10)
   yield cacheCall(address, 'caseFee')
   if (status >= 3) {
-    yield cacheCall(address, 'diagnosingDoctorA')
+    yield cacheCall(address, 'diagnosingDoctor')
   }
   if (status >= 7) {
-    yield cacheCall(address, 'diagnosingDoctorB')
+    yield cacheCall(address, 'challengingDoctor')
   }
 }
 
 export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga, { propTriggers: ['address'] })(class _CaseRow extends Component {
   render () {
     var status = parseInt(this.props.status || 0, 10)
-    let isApprovedDiagnosingADoctor = this.props.diagnosingDoctorA === this.props.account && status > 3
-    let isApprovedDiagnosingBDoctor = this.props.diagnosingDoctorB === this.props.account && status > 8
+    let isApprovedDiagnosingADoctor = this.props.diagnosingDoctor === this.props.account && status > 3
+    let isApprovedDiagnosingBDoctor = this.props.challengingDoctor === this.props.account && status > 8
     if (isApprovedDiagnosingADoctor || isApprovedDiagnosingBDoctor) {
       var address = <Link to={`/doctors/cases/diagnose/${this.props.address}`}>{this.props.address}</Link>
     } else {

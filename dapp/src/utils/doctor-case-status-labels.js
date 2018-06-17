@@ -2,7 +2,6 @@ export function doctorCaseStatusToName(status) {
   var statuses = {
     0: 'None',
     1: 'Open',
-    2: 'Canceled',
     3: 'Pending Approval',
     4: 'Evaluating',
     5: 'Evaluated',

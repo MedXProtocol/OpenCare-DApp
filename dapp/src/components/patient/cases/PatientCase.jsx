@@ -18,7 +18,7 @@ function mapStateToProps(state, { match }) {
     const account = getAccount()
     var caseKey = account.decrypt(encryptedCaseKey.substring(2), caseKeySalt.substring(2))
   }
-  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
+  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
   return {
     caseKey,
     diagnosisHash
@@ -30,7 +30,7 @@ function* saga({ match }) {
   addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'encryptedCaseKey')
   yield cacheCall(caseAddress, 'caseKeySalt')
-  yield cacheCall(caseAddress, 'diagnosisALocationHash')
+  yield cacheCall(caseAddress, 'diagnosisHash')
 }
 
 export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match']})(class _PatientCase extends Component {

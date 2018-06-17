@@ -22,10 +22,10 @@ function mapStateToProps(state, { match }) {
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'approvedDoctorKeys', account)
   const status = cacheCallValue(state, caseAddress, 'status')
-  const doctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
-  const doctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
-  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
-  const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
+  const doctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
+  const doctorB = cacheCallValue(state, caseAddress, 'challengingDoctor')
+  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
+  const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
   if (patientPublicKey && encryptedCaseKey) {
     const sharedKey = getAccount().deriveSharedKey(patientPublicKey.substring(2))
     var caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
@@ -54,10 +54,10 @@ function* saga({ match, account, AccountManager }) {
 
   let status = parseInt(yield cacheCall(caseAddress, 'status'), 10)
 
-  if (status >= 3) { yield cacheCall(caseAddress, 'diagnosingDoctorA') }
-  if (status >= 5) { yield cacheCall(caseAddress, 'diagnosisALocationHash') }
-  if (status >= 9) { yield cacheCall(caseAddress, 'diagnosingDoctorB') }
-  if (status >= 10) { yield cacheCall(caseAddress, 'diagnosisBLocationHash') }
+  if (status >= 3) { yield cacheCall(caseAddress, 'diagnosingDoctor') }
+  if (status >= 5) { yield cacheCall(caseAddress, 'diagnosisHash') }
+  if (status >= 9) { yield cacheCall(caseAddress, 'challengingDoctor') }
+  if (status >= 10) { yield cacheCall(caseAddress, 'challengeHash') }
 }
 
 export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'account', 'AccountManager']})(class _DiagnoseCase extends Component {

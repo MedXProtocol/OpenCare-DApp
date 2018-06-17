@@ -7,15 +7,15 @@ import { connect } from 'react-redux'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
 
 function mapStateToProps(state, { caseAddress }) {
-  let caseDetailLocationHash = cacheCallValue(state, caseAddress, 'caseDetailLocationHash')
+  let caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
   return {
-    caseDetailsHash: getFileHashFromBytes(caseDetailLocationHash)
+    caseDetailsHash: getFileHashFromBytes(caseDataHash)
   }
 }
 
 function* saga({ caseAddress, networkId }) {
   yield addContract({ address: caseAddress, contractKey: 'Case' })
-  yield cacheCall(caseAddress, 'caseDetailLocationHash')
+  yield cacheCall(caseAddress, 'caseDataHash')
 }
 
 const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(

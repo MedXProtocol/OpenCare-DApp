@@ -24,10 +24,10 @@ function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   let CaseManager = contractByName(state, 'CaseManager')
   const openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount')
-  let caseCount = cacheCallValue(state, CaseManager, 'doctorAuthorizationRequestCount', account)
+  let caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', account)
   let cases = []
   for (let i = 0; i < caseCount; i++) {
-    let c = cacheCallValue(state, CaseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
+    let c = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', account, i)
     if (c) { cases.push(c) }
   }
   const peekNextCase = cacheCallValue(state, CaseManager, 'peekNextCase')
@@ -45,9 +45,9 @@ function mapStateToProps(state) {
 function* saga({ account, CaseManager }) {
   if (!account || !CaseManager) { return }
   yield cacheCall(CaseManager, 'openCaseCount')
-  let caseCount = yield cacheCall(CaseManager, 'doctorAuthorizationRequestCount', account)
+  let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', account)
   for (let i = 0; i < caseCount; i++) {
-    yield cacheCall(CaseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
+    yield cacheCall(CaseManager, 'doctorCaseAtIndex', account, i)
   }
   yield cacheCall(CaseManager, 'peekNextCase')
 }
