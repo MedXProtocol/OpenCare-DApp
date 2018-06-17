@@ -21,6 +21,8 @@ import hashToHex from '~/utils/hash-to-hex'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { contractByName } from '~/saga-genesis/state-finders'
+import { DoctorSelect } from '~/components/DoctorSelect'
+import { reencryptCaseKey } from '~/services/reencryptCaseKey'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -67,7 +69,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         caseEncryptionKey: genKey(32),
         canSubmit: false,
         showBalanceTooLowModal: false,
-        showConfirmSubmissionModal: false
+        showConfirmSubmissionModal: false,
+        doctorAddress: '',
+        doctorPublicKey: ''
       };
     }
 
@@ -238,6 +242,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       await this.createNewCase();
     }
 
+    onChangeDoctor = (option) => {
+      this.setState({
+        doctorAddress: option.value,
+        doctorPublicKey: option.publicKey
+      })
+    }
+
     createNewCase = async () => {
         const caseInformation = {
             firstImageHash: this.state.firstImageHash,
@@ -262,15 +273,20 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         const caseKeySalt = genKey(32)
         const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 
+        const doctorPublicKey = this.state.doctorPublicKey.substring(2)
+        const doctorEncryptedCaseKey = reencryptCaseKey({account, encryptedCaseKey, doctorPublicKey, caseKeySalt})
+
         const { send, MedXToken, CaseManager } = this.props
         let hashHex = hashToHex(hash)
 
         let CaseManagerContract = this.props.contractRegistry.get(this.props.CaseManager, 'CaseManager', getWeb3())
-        let data = CaseManagerContract.methods.createCase(
+        let data = CaseManagerContract.methods.createAndAssignCase(
           this.props.account,
           '0x' + encryptedCaseKey,
           '0x' + caseKeySalt,
-          '0x' + hashHex
+          '0x' + hashHex,
+          this.state.doctorAddress,
+          doctorEncryptedCaseKey
         ).encodeABI()
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
 
@@ -628,6 +644,15 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                           <div className="form-group">
                             <label>Please include any additional comments below</label>
                             <textarea onChange={this.updateDescription} className="form-control" rows="5" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
+                          <div className="form-group">
+                            <label>Select a Doctor</label>
+                            <DoctorSelect selected={this.state.doctorAddress} isClearable={false} onChange={this.onChangeDoctor} />
                           </div>
                         </div>
                       </div>

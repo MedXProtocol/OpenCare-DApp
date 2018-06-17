@@ -33,9 +33,17 @@ contract('DoctorManager', function (accounts) {
 
   describe('addDoctor()', () => {
     it('should work', async () => {
-      await doctorManager.addDoctor(doctor)
+      await doctorManager.addDoctor(doctor, 'Doogie')
       assert.equal(await doctorManager.doctorCount.call(), 1)
       assert.equal(await doctorManager.isDoctor(doctor), true)
+      assert.equal(await doctorManager.doctorNames.call(0), 'Doogie')
+    })
+
+    it('should not allow double adds', async () => {
+      await doctorManager.addDoctor(doctor2, 'Dr. Hibbert')
+      expectThrow(async () => {
+        await doctorManager.addDoctor(doctor2, 'Dr. Hibbert')
+      })
     })
   })
 })

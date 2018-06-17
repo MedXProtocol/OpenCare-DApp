@@ -20,7 +20,7 @@ function mapStateToProps(state, { match }) {
   const AccountManager = contractByName(state, 'AccountManager')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
-  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'approvedDoctorKeys', account)
+  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'doctorEncryptedCaseKeys', account)
   const status = cacheCallValue(state, caseAddress, 'status')
   const doctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const doctorB = cacheCallValue(state, caseAddress, 'challengingDoctor')
@@ -50,7 +50,7 @@ function* saga({ match, account, AccountManager }) {
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield cacheCall(AccountManager, 'publicKeys', patientAddress)
-  yield cacheCall(caseAddress, 'approvedDoctorKeys', account)
+  yield cacheCall(caseAddress, 'doctorEncryptedCaseKeys', account)
 
   let status = parseInt(yield cacheCall(caseAddress, 'status'), 10)
 

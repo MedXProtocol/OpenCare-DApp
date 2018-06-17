@@ -28,7 +28,7 @@ contract Case is Ownable, Initializable {
   bytes public encryptedCaseKey;
   bytes public caseKeySalt;
 
-  mapping(address => bytes) public approvedDoctorKeys;
+  mapping(address => bytes) public doctorEncryptedCaseKeys;
 
   enum CaseStatus {
     None,
@@ -126,7 +126,7 @@ contract Case is Ownable, Initializable {
     require(diagnosingDoctor == address(0));
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
-    approvedDoctorKeys[_doctor] = _doctorEncryptedKey;
+    doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit SetDiagnosingDoctor(patient, msg.sender, _doctorEncryptedKey);
   }
 
@@ -164,7 +164,7 @@ contract Case is Ownable, Initializable {
   function setChallengingDoctor (address _doctor, bytes _doctorEncryptedKey) internal isDoctor(_doctor) {
     require(_doctor != diagnosingDoctor);
     challengingDoctor = _doctor;
-    approvedDoctorKeys[_doctor] = _doctorEncryptedKey;
+    doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit SetChallengingDoctor(patient, msg.sender, _doctorEncryptedKey);
   }
 

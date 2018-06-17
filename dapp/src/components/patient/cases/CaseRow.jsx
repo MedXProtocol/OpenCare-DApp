@@ -12,7 +12,7 @@ import {
   withContractRegistry,
   withSend
 } from '~/saga-genesis'
-import reencryptCaseKey from '~/services/reencrypt-case-key'
+import { reencryptCaseKey } from '~/services/reencryptCaseKey'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
 
@@ -41,13 +41,12 @@ export function* caseRowSaga({ caseAddress, AccountManager }) {
   yield cacheCall(caseAddress, 'encryptedCaseKey')
   yield cacheCall(caseAddress, 'caseKeySalt')
   let status = yield cacheCall(caseAddress, 'status')
-  if (status === '3') {
-    let diagnosingDoctor = yield cacheCall(caseAddress, 'diagnosingDoctor')
+  let diagnosingDoctor = yield cacheCall(caseAddress, 'diagnosingDoctor')
+  if (diagnosingDoctor)
     yield cacheCall(AccountManager, 'publicKeys', diagnosingDoctor)
-  } else if (status === '8') {
-    let challengingDoctor = yield cacheCall(caseAddress, 'challengingDoctor')
+  let challengingDoctor = yield cacheCall(caseAddress, 'challengingDoctor')
+  if (challengingDoctor)
     yield cacheCall(AccountManager, 'publicKeys', challengingDoctor)
-  }
 }
 
 export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow extends Component {
