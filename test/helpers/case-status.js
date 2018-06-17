@@ -2,13 +2,13 @@ module.exports = function (statusString) {
   var statusMap = {
     None: 0,
     Open: 1,
-    Evaluating: 4,
-    Evaluated: 5,
-    Closed: 6,
-    Challenged: 7,
-    Challenging: 9,
-    ClosedRejected: 10,
-    ClosedConfirmed: 11
+    Evaluating: 2,
+    Evaluated: 3,
+    Closed: 4,
+    Challenged: 5,
+    Challenging: 6,
+    ClosedRejected: 7,
+    ClosedConfirmed: 8
   }
   var status = statusMap[statusString]
   if (!status) { throw new Error('Unknown status: ', statusString) }
