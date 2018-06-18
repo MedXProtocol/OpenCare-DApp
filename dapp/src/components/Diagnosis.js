@@ -13,6 +13,7 @@ import { isBlank } from '~/utils/isBlank'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
 import { TransactionEvents } from '~/saga-genesis/TransactionEvents'
+import { mixpanel } from '~/mixpanel'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -104,6 +105,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       submitInProgress: true,
       acceptTransactionId
     })
+    mixpanel.track('Accept Diagnosis')
   }
 
   handleChallengeDiagnosis = () => {

@@ -3,9 +3,9 @@ import React, { Component } from 'react'
 import { Alert, HelpBlock } from 'react-bootstrap'
 import { formatSecretKey } from '~/services/format-secret-key'
 import { connect } from 'react-redux'
-import { OverrideModal } from '~/components/override-modal'
+import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
 
-const HIDDEN_KEY = formatSecretKey(Array(51).join('X'))
+const HIDDEN_KEY = formatSecretKey(Array(65).join('X'))
 
 function mapStateToProps(state, ownProps) {
   return {
@@ -23,7 +23,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(class _SignInForm extends Component {
+export const SignInForm = class extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -39,6 +39,7 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
 
   onSubmit = (e) => {
     if (e) e.preventDefault()
+
     this.doSubmit()
   }
 
@@ -71,10 +72,9 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
       <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
         <form onSubmit={this.onSubmit} autoComplete='off'>
           <div className="form-wrapper--body">
-            <OverrideModal
-              show={this.props.overrideError}
-              onCancel={this.props.clearOverrideError}
-              onConfirm={() => this.doSubmit(true)} />
+            <OverrideDisallowedModal
+              show={!!this.props.overrideError}
+              onOk={this.props.clearOverrideError} />
             <div className='form-group'>
               <label htmlFor="secretKey">Secret Key</label>
               <input
@@ -85,8 +85,8 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
                 type="text"
                 className="form-control input-lg"
                 name='secret-key'
-                minLength='59'
-                maxLength='59' />
+                minLength='79'
+                maxLength='79' />
               {existingSecretKey}
               {secretKeyError}
             </div>
@@ -111,7 +111,9 @@ export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(
       </div>
     )
   }
-})
+}
+
+export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(SignInForm)
 
 SignInFormContainer.propTypes = {
   onSubmit: PropTypes.func.isRequired,

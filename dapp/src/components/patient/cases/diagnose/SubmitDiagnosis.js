@@ -6,6 +6,7 @@ import { Modal } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import Spinner from '~/components/Spinner'
 import { isNotEmptyString } from '~/utils/common-util'
+import { mixpanel } from '~/mixpanel'
 import hashToHex from '~/utils/hash-to-hex'
 import { uploadJson, downloadJson } from '~/utils/storage-util'
 import { isBlank } from '~/utils/isBlank'
@@ -144,10 +145,12 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
       this.setState({
         transactionId: this.props.send(this.props.caseAddress, 'diagnoseChallengedCase', hashHex, accept)()
       })
+      mixpanel.track('Diagnose Challenged Case')
     } else {
       this.setState({
         transactionId: this.props.send(this.props.caseAddress, 'diagnoseCase', hashHex)()
       })
+      mixpanel.track('Diagnose Case')
     }
   }
 

@@ -23,6 +23,7 @@ import getWeb3 from '~/get-web3'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
+import { mixpanel } from '~/mixpanel'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -290,7 +291,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           '0x' + doctorEncryptedCaseKey
         ).encodeABI()
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
-
+        mixpanel.track('Create Case')
         this.setState({ transactionId })
     }
 
