@@ -12,38 +12,32 @@ export class OverrideModal extends Component {
   }
   render () {
     return (
-      <Modal show={this.props.show}>
-        <Modal.Body>
-          <div className="row">
-            <div className="col-xs-12 text-center">
-              <Alert bsStyle='warning'>
-                <br />
-                <FontAwesomeIcon
-                  icon={faExclamationTriangle}
-                  size='2x' />
-
-                <h3>
-                  Warning
-                </h3>
-              </Alert>
-
-              <p>
-                By entering a new secret key you are about to overwrite an existing secret key for this address.  You will lose access to any cases that have been encrypted using your existing secret key.
-              </p>
-              <p>
-                You can find your existing secret key in your <b>Emergency Kit</b>.  Your emergency kit is available under the profile menu when you are signed in.
-              </p>
-              <p className='lead'>
-                Are you sure you want to continue?
-              </p>
-            </div>
+      <ErrorModal
+        show={this.props.show}
+        onHide={this.props.onCancel}
+        title='Warning'
+        bsStyle='warning'
+        icon={faExclamationTriangle}
+        modalFooter={
+          <Modal.Footer>
+            <button onClick={this.props.onCancel} className="btn btn-lg btn-link">Cancel</button>
+            <button onClick={this.props.onConfirm} className="btn btn-lg btn-primary">Continue</button>
+          </Modal.Footer>
+        }>
+        <div className="row">
+          <div className="col-xs-12">
+            <p>
+              By entering a new secret key you are about to overwrite an existing secret key for this address.  You will lose access to any cases that have been encrypted using your existing secret key.
+            </p>
+            <p>
+              You can find your existing secret key in your <b>Emergency Kit</b>.  Your emergency kit is available under the profile menu when you are signed in.
+            </p>
+            <p className='lead'>
+              Are you sure you want to continue?
+            </p>
           </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <button onClick={this.props.onCancel} className="btn btn-lg btn-link">Cancel</button>
-          <button onClick={this.props.onConfirm} className="btn btn-lg btn-primary">Continue</button>
-        </Modal.Footer>
-      </Modal>
+        </div>
+      </ErrorModal>
     )
   }
 }
