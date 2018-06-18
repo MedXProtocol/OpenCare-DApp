@@ -292,22 +292,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     render() {
-      let firstProgressClassNames = classNames(
-        'progress-bar--wrapper',
-        {
-          show: this.state.firstImagePercent > 0 && this.state.firstImagePercent < 100,
-          hide: this.state.firstImagePercent === 0 || this.state.firstImagePercent === 100
-        }
-      )
-
-      let secondProgressClassNames = classNames(
-        'progress-bar--wrapper',
-        {
-          show: this.state.secondImagePercent > 0 && this.state.secondImagePercent < 100,
-          hide: this.state.secondImagePercent === 0 || this.state.secondImagePercent === 100
-        }
-      )
-
       if (this.state.firstFileError) {
         var firstFileError =
           <p className='has-error help-block'>{this.state.firstFileError}</p>
@@ -361,10 +345,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <span>
                                 &nbsp; {this.state.firstFileName}
                               </span>
-                              <div className={firstProgressClassNames}>
+                              <div>
                                 <ProgressBar
                                   active
-                                  striped
                                   bsStyle="success"
                                   now={this.state.firstImagePercent} />
                               </div>
@@ -391,10 +374,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <span>
                                   &nbsp; {this.state.secondFileName}
                               </span>
-                              <div className={secondProgressClassNames}>
+                              <div>
                                 <ProgressBar
                                   active
-                                  striped
                                   bsStyle="success"
                                   now={this.state.secondImagePercent} />
                               </div>
