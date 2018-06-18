@@ -29,7 +29,7 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
     async componentDidMount() {
         const diagnosisHash = this.props.diagnosisBLocationHash
 
-        if(diagnosisHash !== null && diagnosisHash !== "0x") {
+        if(diagnosisHash !== null && diagnosisHash !== "0x" && this.props.caseKey) {
             const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey)
             const diagnosis = JSON.parse(diagnosisJson)
             this.setState({

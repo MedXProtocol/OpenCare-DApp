@@ -22,7 +22,7 @@ import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { mixpanel } from '~/mixpanel'
-import { TransactionEvents } from '~/saga-genesis/TransactionEvents'
+import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -75,7 +75,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
     componentWillReceiveProps (props) {
       if (this.state.createCaseEvents) {
-        this.state.createCaseEvents.check(props.transactions[this.state.transactionId])
+        this.state.createCaseEvents.handle(props.transactions[this.state.transactionId])
           .onError((error) => {
             toastr.transactionError(error)
             this.setState({
@@ -287,7 +287,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
         this.setState({
           transactionId,
-          createCaseEvents: new TransactionEvents()
+          createCaseEvents: new TransactionStateHandler()
         })
     }
 

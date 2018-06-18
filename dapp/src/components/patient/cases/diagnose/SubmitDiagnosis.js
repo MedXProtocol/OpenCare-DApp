@@ -68,7 +68,7 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
   }
 
   init (props) {
-    if (props.diagnosisHash) {
+    if (props.diagnosisHash && props.caseKey) {
       downloadJson(props.diagnosisHash, props.caseKey).then((originalDiagnosis) => {
         this.setState({
           originalDiagnosis: JSON.parse(originalDiagnosis)

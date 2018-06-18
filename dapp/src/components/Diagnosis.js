@@ -2,12 +2,13 @@ import React, { Component } from 'react'
 import { Modal } from 'react-bootstrap'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import Spinner from '~/components/Spinner'
 import { downloadJson } from '~/utils/storage-util'
 import { withSaga, cacheCall, cacheCallValue, withSend } from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { mixpanel } from '~/mixpanel'
+import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { toastr } from '~/toastr'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -36,10 +37,9 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
 
     this.state = {
       diagnosis: {},
-      status: {},
+      status: '',
       hidden: true,
       buttonsHidden: true,
-      submitInProgress: false,
       showThankYouModal: false,
       showChallengeModal: false
     }
@@ -52,7 +52,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       this.setState({ buttonsHidden: false })
     }
     const diagnosisHash = this.props.diagnosisALocationHash
-    if (diagnosisHash !== null && diagnosisHash !== "0x") {
+    if (diagnosisHash !== null && diagnosisHash !== "0x" && this.props.caseKey) {
       const diagnosisJson = await downloadJson(diagnosisHash, this.props.caseKey)
       const diagnosis = JSON.parse(diagnosisJson)
       this.setState({
@@ -63,58 +63,59 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   }
 
   componentWillReceiveProps (props) {
-    if (this.state.acceptTransactionId && props.transactions[this.state.acceptTransactionId].complete) {
-      this.onAcceptSuccess()
+    if (this.state.challengeHandler) {
+      this.state.challengeHandler.handle(props.transactions[this.state.challengeTransactionId])
+        .onError(toastr.transactionError)
+        .onReceipt(() => {
+          toastr.success('Your case is being challenged')
+          mixpanel.track('Challenge Diagnosis Submitted')
+          this.setState({
+            challengeHandler: null,
+            showChallengeModal: true
+          })
+        })
     }
-    if (this.state.challengeTransactionId && props.transactions[this.state.challengeTransactionId].complete) {
-      this.onChallengeSuccess()
+
+    if (this.state.acceptHandler) {
+      this.state.acceptHandler.handle(props.transactions[this.state.acceptTransactionId])
+        .onError(toastr.transactionError)
+        .onReceipt(() => {
+          toastr.success('Your case has been accepted')
+          mixpanel.track('Accept Diagnosis Submitted')
+          this.setState({
+            acceptHandler: null,
+            showThankYouModal: true
+          })
+        })
     }
   }
 
   handleAcceptDiagnosis = () => {
     const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptDiagnosis')()
     this.setState({
-      submitInProgress: true,
-      acceptTransactionId
+      acceptTransactionId,
+      acceptHandler: new TransactionStateHandler()
     })
-    mixpanel.track('Accept Diagnosis')
   }
 
   handleChallengeDiagnosis = () => {
     const challengeTransactionId = this.props.send(this.props.caseAddress, 'challengeDiagnosis')()
     this.setState({
-      submitInProgress: true,
-      challengeTransactionId
+      challengeTransactionId,
+      challengeHandler: new TransactionStateHandler()
     })
-    mixpanel.track('Challenge Diagnosis')
   }
 
   handleCloseThankYouModal = (event) => {
-      event.preventDefault()
-      this.setState({showThankYouModal: false})
-      this.props.history.push('/patients/cases')
+    event.preventDefault()
+    this.setState({showThankYouModal: false})
+    this.props.history.push('/patients/cases')
   }
 
   handleCloseChallengeModal = (event) => {
-      event.preventDefault()
-      this.setState({showChallengeModal: false})
-      this.props.history.push('/patients/cases')
-  }
-
-  onAcceptSuccess = () => {
-    this.setState({
-      acceptTransactionId: null,
-      submitInProgress: false,
-      showThankYouModal: true
-    })
-  }
-
-  onChallengeSuccess = () => {
-    this.setState({
-      challengeTransactionId: null,
-      submitInProgress: false,
-      showChallengeModal: true
-    })
+    event.preventDefault()
+    this.setState({showChallengeModal: false})
+    this.props.history.push('/patients/cases')
   }
 
   render() {
@@ -177,6 +178,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
             <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
           </Modal.Footer>
         </Modal>
+
         <Modal show={this.state.showChallengeModal}>
           <Modal.Body>
             <div className="row">
@@ -189,7 +191,6 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
             <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-primary">OK</button>
           </Modal.Footer>
         </Modal>
-        <Spinner loading={this.state.submitInProgress}/>
       </div>
     )
   }
