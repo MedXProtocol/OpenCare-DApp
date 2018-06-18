@@ -61,6 +61,10 @@ export default function (state, {type, transactionId, call, error, receipt, txHa
       }
       break
 
+    case 'TRANSACTIONS_CLEAR':
+      state = {}
+      break
+
     // no default
   }
 
