@@ -19,21 +19,29 @@ export const Welcome = class extends Component {
                     </h3>
 
                     <hr />
+                    <p className="text-danger">
+                      <strong>NOTE:</strong> This is the Beta v1 of Hippocrates. It's goal is to gather feedback as we improve the software prior to release. Real cases <strong><em>will not</em></strong> be diagnosed by a medical doctor.
+                    </p>
+
+                    <hr />
                     <p>
-                      Get a medical recommendation instantly from a global network of dermatologists, with one free evaluation during Beta testing on the <strong>Rinkeby</strong> Testnet.
+                      Hippocrates provides you with medical recommendations instantly from a global network of dermatologists. Doctors will be compensated in real MEDX for services rendered.
                     </p>
                     <p>
-                      Doctors are compensated in real MEDX for services rendered.
+                      Beta testing is on the <strong>Rinkeby</strong> Testnet. To get started:
                     </p>
                     <ol>
                       <li>
-                        Download the Metamask Chrome Extension
+                        Download the Metamask Extension (<a target='_blank' rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">Chrome</a> / <a target='_blank' rel="noopener noreferrer" href="https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/">Firefox</a>) or the Trust mobile browser (<a target='_blank' rel="noopener noreferrer" href="https://itunes.apple.com/us/app/trust-ethereum-wallet/id1288339409?mt=8">iOS</a> / <a target='_blank' rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp">Android</a>)
                       </li>
                       <li>
-                        Obtain free ETH on Rinkeby Test Net from a public faucet
+                        Obtain free ETH &amp; MEDX Test Tokens (MEDT) on Rinkeby from <a
+                          target="_blank"
+                          href="https://t.me/MedCredits"
+                          rel="noopener noreferrer">our Telegram group</a>
                       </li>
                       <li>
-                        Obtain MEDX Test tokens (MEDT) from a public faucet
+                        Sign in, give the DApp a try and provide us with constructive feedback
                       </li>
                     </ol>
                   </div>
