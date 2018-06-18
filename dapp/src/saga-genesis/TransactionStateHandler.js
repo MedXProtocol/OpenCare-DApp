@@ -1,5 +1,5 @@
-export class TransactionEvents {
-  check (transaction) {
+export class TransactionStateHandler {
+  handle (transaction) {
     return {
       onError: (cb) => {
         if (!this.hasError && transaction && transaction.error) {
@@ -7,7 +7,7 @@ export class TransactionEvents {
           this.hasError = true
         }
 
-        return this.check(transaction)
+        return this.handle(transaction)
       },
 
       onReceipt: (cb) => {
@@ -16,7 +16,7 @@ export class TransactionEvents {
           this.hasReceipt = true
         }
 
-        return this.check(transaction)
+        return this.handle(transaction)
       },
 
       onConfirmed: (cb) => {
@@ -24,8 +24,8 @@ export class TransactionEvents {
           cb()
           this.hasConfirmed = true
         }
-        
-        return this.check(transaction)
+
+        return this.handle(transaction)
       }
     }
   }
