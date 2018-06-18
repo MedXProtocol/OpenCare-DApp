@@ -1,0 +1,34 @@
+.dropdown-menu {
+  border-top: 0;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  padding: 15px 0;
+  min-width: 230px;
+}
+
+.dropdown-header {
+  margin-top: 15px;
+}
+
+.dropdown-header:first-child {
+  margin-top: 0;
+}
+
+.dropdown-menu .divider {
+  margin: 15px 0;
+}
+
+.dropdown-menu > li > a {
+  padding: 5px 20px 4px;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+  background-color: lighten($brand-info, 30%);
+  color: white;
+}
+
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+  background-color: $brand-info;
+}

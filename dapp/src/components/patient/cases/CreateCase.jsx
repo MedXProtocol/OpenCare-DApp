@@ -15,7 +15,7 @@ import { withRouter } from 'react-router-dom'
 import classNames from 'classnames'
 import { isNotEmptyString } from '~/utils/common-util'
 import { uploadJson, uploadFile } from '~/utils/storage-util'
-import { getAccount } from '~/services/sign-in'
+import { currentAccount } from '~/services/sign-in'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
 import get from 'lodash.get'
@@ -270,7 +270,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
         const caseJson = JSON.stringify(caseInformation)
         const hash = await uploadJson(caseJson, this.state.caseEncryptionKey)
-        const account = getAccount()
+        const account = currentAccount()
         const caseKeySalt = genKey(32)
         const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 

@@ -4,7 +4,7 @@ import CaseDetails from '~/components/CaseDetails'
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import Diagnosis from '~/components/Diagnosis'
-import { getAccount } from '~/services/sign-in'
+import { currentAccount } from '~/services/sign-in'
 import aes from '~/services/aes'
 import isBlank from '~/utils/is-blank'
 import get from 'lodash.get'
@@ -27,7 +27,7 @@ function mapStateToProps(state, { match }) {
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
   if (patientPublicKey && encryptedCaseKey) {
-    const sharedKey = getAccount().deriveSharedKey(patientPublicKey.substring(2))
+    const sharedKey = currentAccount().deriveSharedKey(patientPublicKey.substring(2))
     var caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
   }
   return {
