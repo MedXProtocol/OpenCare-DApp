@@ -85,7 +85,7 @@ export const EmergencyKit = connect(mapStateToProps)(
                             value={masterPassword}
                             onChange={(e) => this.setState({ masterPassword: e.target.value })}
                             type="password"
-                            className="form-control" />
+                            className="form-control input-lg" />
                           {masterPasswordError}
                         </div>
                       </div>
