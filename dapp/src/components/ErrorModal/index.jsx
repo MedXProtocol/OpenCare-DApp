@@ -10,11 +10,30 @@ export class ErrorModal extends Component {
   static propTypes = {
     title: PropTypes.string,
     show: PropTypes.bool.isRequired,
-    onHide: PropTypes.func.isRequired
+    onHide: PropTypes.func.isRequired,
+    modalFooter: PropTypes.func,
+    bsStyle: PropTypes.string,
+    icon: PropTypes.object
   }
 
   static defaultProps = {
-    title: 'Error'
+    title: 'Error',
+    bsStyle: 'danger',
+    icon: faExclamationCircle
+  }
+
+  renderModalFooter () {
+    let children
+    if (this.props.modalFooter) {
+      children = this.props.modalFooter()
+    } else {
+      children = (
+        <Modal.Footer>
+          <button onClick={this.props.onHide} className="btn btn-lg btn-danger">Ok</button>
+        </Modal.Footer>
+      )
+    }
+    return children
   }
 
   render () {
@@ -23,23 +42,21 @@ export class ErrorModal extends Component {
         <Modal.Body>
           <div className="row">
             <div className="col-xs-12">
-              <Alert bsStyle='danger' className='error-modal_alert'>
+              <Alert bsStyle={this.props.bsStyle} className='error-modal_alert'>
                 <h3 className='error-modal_alert_title'>
                   <FontAwesomeIcon
                     className='error-modal_alert_title_icon'
-                    icon={faExclamationCircle}
+                    icon={this.props.icon}
                     size='2x' />
                   &nbsp;
-                  Error
+                  {this.props.title}
                 </h3>
               </Alert>
             </div>
           </div>
           {this.props.children}
         </Modal.Body>
-        <Modal.Footer>
-          <button onClick={this.props.onHide} className="btn btn-lg btn-danger">Ok</button>
-        </Modal.Footer>
+        {this.renderModalFooter()}
       </Modal>
     )
   }

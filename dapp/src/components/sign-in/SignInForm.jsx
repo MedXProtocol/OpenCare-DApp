@@ -73,7 +73,7 @@ export const SignInForm = class extends Component {
         <form onSubmit={this.onSubmit} autoComplete='off'>
           <div className="form-wrapper--body">
             <OverrideDisallowedModal
-              show={this.props.overrideError}
+              show={!!this.props.overrideError}
               onOk={this.props.clearOverrideError} />
             <div className='form-group'>
               <label htmlFor="secretKey">Secret Key</label>

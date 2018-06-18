@@ -74,7 +74,7 @@ export const SignUp = class extends Component {
       <MainLayoutContainer>
         {content}
         <OverrideDisallowedModal
-          show={this.props.overrideError}
+          show={!!this.props.overrideError}
           onOk={this.props.clearOverrideError} />
       </MainLayoutContainer>
     )
