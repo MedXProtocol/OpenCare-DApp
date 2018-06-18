@@ -11,11 +11,13 @@ function cookiesAreSet() {
 }
 
 export function currentAccount() {
-  if (process.env.NODE_ENV === 'development' && !account && cookiesAreSet()) {
-    const json = JSON.parse(Cookie.get('REFRESH_ACCOUNT'))
-    const secretKey = Cookie.get('REFRESH_SECRET_KEY')
-    account = new Account(json)
-    account._secretKey = secretKey
+  if (process.env.NODE_ENV === 'development') {
+    if (!account && cookiesAreSet()) {
+      const json = JSON.parse(Cookie.get('REFRESH_ACCOUNT'))
+      const secretKey = Cookie.get('REFRESH_SECRET_KEY')
+      account = new Account(json)
+      account._secretKey = secretKey
+    }
   }
   return account
 }
