@@ -26,7 +26,9 @@ i18next
             setPublicKey: 'Setting Public Key'
           },
           transactionErrors: {
-            outOfGas: 'Transaction ran out of gas'
+            userRevert: 'The user reverted the transaction',
+            outOfGas: 'The transaction ran out of gas',
+            evmRevert: 'There was an error in the contract'
           }
         }
       }

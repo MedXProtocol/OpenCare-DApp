@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { toastr } from 'react-redux-toastr'
 import {
   ControlLabel,
   FormGroup,
@@ -9,12 +8,13 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   ButtonToolbar
-} from 'react-bootstrap';
+} from 'react-bootstrap'
+import { toastr } from '~/toastr'
 import { genKey } from '~/services/gen-key'
-import { withRouter } from 'react-router-dom';
-import classNames from 'classnames';
-import { isNotEmptyString } from '~/utils/common-util';
-import { uploadJson, uploadFile } from '~/utils/storage-util';
+import { withRouter } from 'react-router-dom'
+import classNames from 'classnames'
+import { isNotEmptyString } from '~/utils/common-util'
+import { uploadJson, uploadFile } from '~/utils/storage-util'
 import { getAccount } from '~/services/sign-in'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
@@ -22,6 +22,7 @@ import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { mixpanel } from '~/mixpanel'
+import { TransactionEvents } from '~/saga-genesis/TransactionEvents'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -69,15 +70,25 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         canSubmit: false,
         showBalanceTooLowModal: false,
         showConfirmSubmissionModal: false
-      };
+      }
     }
 
     componentWillReceiveProps (props) {
-      if (this.state.transactionId) {
-        if (get(props, `transactions[${this.state.transactionId}].submitted`)) {
-          toastr.light('Success', 'Your case has been submitted.', { icon: 'success', status: 'success' })
-          this.props.history.push('/patients/cases');
-        }
+      if (this.state.createCaseEvents) {
+        this.state.createCaseEvents.check(props.transactions[this.state.transactionId])
+          .onError((error) => {
+            toastr.transactionError(error)
+            this.setState({
+              createCaseEvents: null,
+              transactionId: '',
+              showConfirmSubmissionModal: false
+            })
+          })
+          .onReceipt(() => {
+            toastr.success('Your case has been submitted.')
+            mixpanel.track('Create Case')
+            this.props.history.push('/patients/cases')
+          })
       }
     }
 
@@ -94,7 +105,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         return
       }
 
-      const fileName = event.target.files[0].name;
+      const fileName = event.target.files[0].name
       const progressHandler = (percent) => {
         this.setState({ firstImagePercent: percent })
       }
@@ -102,13 +113,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setState({
         firstImageHash: null,
         firstFileName: null
-      });
+      })
 
-      const imageHash = await this.captureFile(event, progressHandler);
+      const imageHash = await this.captureFile(event, progressHandler)
       this.setState({
         firstImageHash: imageHash,
         firstFileName: fileName
-      }, this.validateInputs);
+      }, this.validateInputs)
     }
 
     captureSecondImage = async (event) => {
@@ -120,7 +131,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         return
       }
 
-      const fileName = event.target.files[0].name;
+      const fileName = event.target.files[0].name
       const progressHandler = (percent) => {
         this.setState({ secondImagePercent: percent })
       }
@@ -128,79 +139,79 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setState({
         secondImageHash: null,
         secondFileName: null
-      });
+      })
 
-      const imageHash = await this.captureFile(event, progressHandler);
+      const imageHash = await this.captureFile(event, progressHandler)
       this.setState({
         secondImageHash: imageHash,
         secondFileName: fileName
-      }, this.validateInputs);
+      }, this.validateInputs)
     }
 
     captureFile = async (event, progressHandler) => {
       event.stopPropagation()
       event.preventDefault()
       const file = event.target.files[0]
-      const imageHash = await uploadFile(file, this.state.caseEncryptionKey, progressHandler);
+      const imageHash = await uploadFile(file, this.state.caseEncryptionKey, progressHandler)
 
-      return imageHash;
+      return imageHash
     }
 
     updateHowLong = (event) => {
-      this.setState({ howLong: event.target.value }, this.validateInputs);
+      this.setState({ howLong: event.target.value }, this.validateInputs)
     }
 
     updateSize = (event) => {
-      this.setState({ size: event.target.value }, this.validateInputs);
+      this.setState({ size: event.target.value }, this.validateInputs)
     }
 
     updatePainful = (event) => {
-      this.setState({ painful: event.target.value }, this.validateInputs);
+      this.setState({ painful: event.target.value }, this.validateInputs)
     }
 
     updateItching = (event) => {
-      this.setState({ itching: event.target.value }, this.validateInputs);
+      this.setState({ itching: event.target.value }, this.validateInputs)
     }
 
     updateBleeding = (event) => {
 
-      this.setState({ bleeding: event.target.value }, this.validateInputs);
+      this.setState({ bleeding: event.target.value }, this.validateInputs)
     }
 
     updateSkinCancer = (event) => {
-      this.setState({ skinCancer: event.target.value }, this.validateInputs);
+      this.setState({ skinCancer: event.target.value }, this.validateInputs)
     }
 
     updateColor = (event) => {
-      this.setState({ color: event.target.value }, this.validateInputs);
+      this.setState({ color: event.target.value }, this.validateInputs)
     }
 
     updatePreviousTreatment = (event) => {
-      this.setState({ prevTreatment: event.target.value }, this.validateInputs);
+      this.setState({ prevTreatment: event.target.value }, this.validateInputs)
     }
 
     updateSexuallyActive = (event) => {
-      this.setState({ sexuallyActive: event.target.value }, this.validateInputs);
+      this.setState({ sexuallyActive: event.target.value }, this.validateInputs)
     }
 
     updateAge = (event) => {
-      this.setState({ age: event.target.value }, this.validateInputs);
+      this.setState({ age: event.target.value }, this.validateInputs)
     }
 
     updateCountry = (event) => {
-      this.setState({ country: event.target.value }, this.validateInputs);
+      this.setState({ country: event.target.value }, this.validateInputs)
     }
 
     updateDescription = (event) => {
-      this.setState({ description: event.target.value });
+      this.setState({ description: event.target.value })
     }
 
     handleSubmit = (event) => {
       event.preventDefault()
       if(this.props.balance < 15) {
-        this.setState({showBalanceTooLowModal: true});
+        this.setState({showBalanceTooLowModal: true})
       } else {
-        this.setState({showConfirmSubmissionModal: true});
+        this.setState({showConfirmSubmissionModal: true})
       }
     }
 
@@ -218,25 +229,25 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         isNotEmptyString(this.state.age) &&
         isNotEmptyString(this.state.country) &&
         isNotEmptyString(this.state.color) &&
-        isNotEmptyString(this.state.prevTreatment);
+        isNotEmptyString(this.state.prevTreatment)
 
-      this.setState({ canSubmit: valid });
+      this.setState({ canSubmit: valid })
     }
 
     handleCloseBalanceTooLowModal = (event) => {
-      event.preventDefault();
-      this.setState({ showBalanceTooLowModal: false });
+      event.preventDefault()
+      this.setState({ showBalanceTooLowModal: false })
     }
 
     handleCancelConfirmSubmissionModal = (event) => {
-      event.preventDefault();
-      this.setState({ showConfirmSubmissionModal: false });
+      event.preventDefault()
+      this.setState({ showConfirmSubmissionModal: false })
     }
 
     handleAcceptConfirmSubmissionModal = async (event) => {
-      event.preventDefault();
+      event.preventDefault()
 
-      await this.createNewCase();
+      await this.createNewCase()
     }
 
     createNewCase = async () => {
@@ -274,8 +285,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           '0x' + hashHex
         ).encodeABI()
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
-        mixpanel.track('Create Case')
-        this.setState({ transactionId })
+        this.setState({
+          transactionId,
+          createCaseEvents: new TransactionEvents()
+        })
     }
 
     render() {
@@ -677,8 +690,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           </Modal.Footer>
         </Modal>
       </div>
-    );
+    )
   }
 }))))
 
-export const CreateCaseContainer = withRouter(CreateCase);
+export const CreateCaseContainer = withRouter(CreateCase)
