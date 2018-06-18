@@ -42,6 +42,7 @@
     "lodash.get": "^4.4.2",
     "lodash.keys": "^4.2.0",
     "lodash.values": "^4.3.0",
+    "mixpanel-browser": "^2.22.4",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.8",

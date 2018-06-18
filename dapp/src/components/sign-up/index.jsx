@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import { MainLayoutContainer } from '~/layouts/MainLayout';
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { genKey } from '~/services/gen-key'
 import { Redirect } from 'react-router-dom'
-
+import { mixpanel } from '~/mixpanel'
 import { ConfirmCreate } from './confirm-create'
 import { SecretKey } from './secret-key'
 import { MasterPassword } from './master-password'
@@ -25,7 +25,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(class _CreateAccount extends Component {
+export const SignUp = class extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -49,6 +49,8 @@ export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(clas
       address: this.props.address,
       overrideAccount: true
     })
+
+    mixpanel.track("Signup Attempt");
   }
 
   render () {
@@ -68,4 +70,6 @@ export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(clas
       </MainLayoutContainer>
     )
   }
-})
+}
+
+export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(SignUp)

@@ -21,6 +21,7 @@ import hashToHex from '~/utils/hash-to-hex'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { contractByName } from '~/saga-genesis/state-finders'
+import { mixpanel } from '~/mixpanel'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -273,7 +274,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           '0x' + hashHex
         ).encodeABI()
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
-
+        mixpanel.track('Create Case')
         this.setState({ transactionId })
     }
 
