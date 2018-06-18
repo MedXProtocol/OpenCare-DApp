@@ -1,5 +1,5 @@
 .redux-toastr .toastr {
-  background: #222;
+  background: $brand-dark-blue;
   font-size: 14px;
 }
 
@@ -110,4 +110,3 @@
 .redux-toastr .toastr .toastr-status.warning {
   background-color: $brand-warning;
 }
-

@@ -27,10 +27,12 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
     componentWillReceiveProps(nextProps) {
       if (nextProps.transactions) {
         let transactions = Object.entries(nextProps.transactions)
-        let pendingOrErrorTransactions = transactions.filter(tx => (tx[1].error || !tx[1].confirmed))
-
+        let pendingOrErrorTransactions = transactions.filter(tx => {
+          return (!tx[1].confirmed && !tx[1].error) ||
+            (tx[1].error && transactionErrorToCode(tx[1].error) !== 'userRevert')
+        })
         this.setState({
-          pendingOrErrorTransactions: pendingOrErrorTransactions
+          pendingOrErrorTransactions
         })
       }
     }
