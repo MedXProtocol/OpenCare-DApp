@@ -141,3 +141,26 @@ small,
 .small {
   font-size: 85%;
 }
+
+.floating-feedback-link {
+  background: white;
+  border-radius: 2px;
+  box-shadow: 0 2px 10px rgba(180, 200, 230, 0.2);
+  bottom: 20px;
+  color: $brand-info;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 0;
+  position: absolute;
+  right: 20px;
+  width: 130px;
+  z-index: 11;
+}
+
+.floating-feedback-link:hover {
+  text-decoration: none;
+}
+
+.floating-feedback-link svg {
+  margin-right: 4px;
+}
