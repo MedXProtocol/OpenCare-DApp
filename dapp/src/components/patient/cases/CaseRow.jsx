@@ -5,7 +5,7 @@ import { Modal } from 'react-bootstrap'
 import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
-import { getAccount } from '~/services/sign-in'
+import { currentAccount } from '~/services/sign-in'
 import {
   cacheCall,
   cacheCallValue,
@@ -79,12 +79,12 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
     if (status === '3') {
       let doctor = this.props.diagnosingDoctorA
       let doctorPublicKey = this.props.diagnosingDoctorAPublicKey.substring(2)
-      const doctorEncryptedCaseKey = reencryptCaseKey({account: getAccount(), encryptedCaseKey, doctorPublicKey, caseKeySalt})
+      const doctorEncryptedCaseKey = reencryptCaseKey({account: currentAccount(), encryptedCaseKey, doctorPublicKey, caseKeySalt})
       send(caseAddress, 'authorizeDiagnosisDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
     } else if (status === '8') {
       let doctor = this.props.diagnosingDoctorB
       let doctorPublicKey = this.props.diagnosingDoctorBPublicKey.substring(2)
-      const doctorEncryptedCaseKey = reencryptCaseKey({account: getAccount(), encryptedCaseKey, doctorPublicKey, caseKeySalt})
+      const doctorEncryptedCaseKey = reencryptCaseKey({account: currentAccount(), encryptedCaseKey, doctorPublicKey, caseKeySalt})
       send(caseAddress, 'authorizeChallengeDoctor', doctor, '0x' + doctorEncryptedCaseKey)()
     }
   }

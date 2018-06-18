@@ -7,6 +7,7 @@ import { buildAccount } from './build-account'
 import { getAccount } from './get-account'
 import { setAccount } from './set-account'
 import { isAccountMasterPassword } from './is-account-master-password'
+import isBlank from '~/utils/is-blank'
 
 // NOTE: Increment this to destroy old accounts.
 // NOTE: DANGEROUS
@@ -102,15 +103,17 @@ export class Account {
   destroy () {
     setAccount(this.address(), null)
   }
-
-  updateMasterPassword (newMasterPassword) {
-    this.requireUnlocked()
-  }
 }
 
 Account.currentVersion = ACCOUNT_VERSION
 
-Account.create = function ({address, secretKey, masterPassword}) {
+Account.create = function ({ address, secretKey, masterPassword }) {
+  if (isBlank(address) || isBlank(secretKey) || isBlank(masterPassword)) {
+    throw new Error(
+      'address, secretKey and masterPassword need to be provided as args to Account.create'
+    );
+  }
+
   const json = buildAccount(address, secretKey, masterPassword)
   const account = new Account(json)
   account.setVersion(ACCOUNT_VERSION)
@@ -125,12 +128,5 @@ Account.get = function (address) {
   if (json) {
     account = new Account(json)
   }
-  return account
-}
-
-Account.updateMasterPassword = function ({account, currentMasterPassword, newMasterPassword}) {
-  account.unlock(currentMasterPassword)
-  account.updateMasterPassword(newMasterPassword)
-  account.store()
   return account
 }

@@ -3,10 +3,10 @@ import { Account } from '~/accounts/Account'
 
 let account = null
 
-export function getAccount() {
+export function currentAccount() {
   if (process.env.NODE_ENV === 'development') {
     if (!account) {
-      const json = Cookie.get('REFRESH_ACCOUNT')
+      const json = JSON.parse(Cookie.get('REFRESH_ACCOUNT'))
       const secretKey = Cookie.get('REFRESH_SECRET_KEY')
       account = new Account(json)
       account._secretKey = secretKey
