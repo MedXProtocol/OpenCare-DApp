@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { withRouter, Route, Switch } from 'react-router-dom'
+import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 import ReduxToastr from 'react-redux-toastr'
 import { SignUpContainer } from './sign-up'
 import { SignInContainer } from './sign-in'
@@ -45,6 +45,8 @@ const App = class extends Component {
           <Route exact path='/patients/cases/new' component={NewCase} />
           <Route exact path='/patients/cases' component={PatientDashboard} />
           <Route path='/patients/cases/:caseAddress' component={PatientCaseContainer} />
+
+          <Redirect from='/' exact to='/patients/cases' />
 
           <Route path='/' component={FourOhFour} />
         </Switch>
