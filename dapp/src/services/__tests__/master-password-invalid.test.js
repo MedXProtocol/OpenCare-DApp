@@ -9,5 +9,5 @@ test('master password must conform to length', () => {
 })
 
 test('master password is valid for good passwords', () => {
-  expect(masterPasswordInvalid('asdffasdffasdffasdffasdffasdffasdffasdffasdffasdff')).toEqual(false)
+  expect(masterPasswordInvalid('asdffasdffasdffasdffasdffasdffasdffasdffasdffasdff')).toEqual('')
 })
