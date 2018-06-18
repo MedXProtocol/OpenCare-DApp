@@ -127,8 +127,6 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
       'navbar-default': !this.props.transparent
     })
 
-    let dynamicHomePath = this.props.signedIn ? '/patients/cases' : '/'
-
     return (
       <Navbar
         inverse
@@ -137,7 +135,7 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
         className={navbarClassName}>
         <Navbar.Header>
           <Navbar.Brand>
-            <Link to={dynamicHomePath} className="navbar-brand">
+            <Link to='/' className="navbar-brand">
               <img src={logo} alt="MedCredits"></img>
             </Link>
           </Navbar.Brand>

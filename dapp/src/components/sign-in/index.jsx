@@ -66,7 +66,7 @@ export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchTo
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
                 <h3 className='text-white text-center'>
-                  Sign in to <strong>Med</strong>Credits
+                  Sign in to Hippocrates
                 </h3>
                 {warning}
                 <SignInFormContainer onSubmit={this.onSubmit} hasAccount={!!this.props.account} />
