@@ -59,7 +59,12 @@ export function* web3Send({ transactionId, call, options }) {
     const web3 = yield getContext('web3')
     const contractKey = yield select(contractKeyByAddress, address)
     const contract = contractRegistry.get(address, contractKey, web3)
-    const func = contract.methods[method](...args)
+    const contractMethod = contract.methods[method]
+    if (!contractMethod) {
+      yield put({type: 'TRANSACTION_ERROR', transactionId, call, error: `Address ${address} does not have method '${method}'`})
+      return
+    }
+    const func = contractMethod(...args)
     const send = func.send
 
     const transactionChannel = createTransactionEventChannel(web3, transactionId, send, options)

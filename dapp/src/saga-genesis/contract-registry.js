@@ -5,10 +5,16 @@ export class ContractRegistry {
   }
 
   has(address) {
+    if (address) {
+      address = address.toLowerCase()
+    }
     return !!this.contractCache[address]
   }
 
   get(address, contractKey, web3) {
+    if (address) {
+      address = address.toLowerCase()
+    }
     var contract = this.contractCache[address]
     if (!contract) {
       if (!contractKey) {

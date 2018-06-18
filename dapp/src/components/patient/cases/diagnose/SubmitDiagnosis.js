@@ -8,7 +8,7 @@ import Spinner from '~/components/Spinner'
 import { isNotEmptyString } from '~/utils/common-util'
 import hashToHex from '~/utils/hash-to-hex'
 import { uploadJson, downloadJson } from '~/utils/storage-util'
-import isBlank from '~/utils/is-blank'
+import { isBlank } from '~/utils/isBlank'
 import { connect } from 'react-redux'
 import { withSend } from '~/saga-genesis'
 import { groupedRecommendationOptions } from './recommendationOptions'
@@ -67,13 +67,12 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
   }
 
   init (props) {
-    if (props.diagnosisHash) {
-      downloadJson(props.diagnosisHash, props.caseKey).then((originalDiagnosis) => {
-        this.setState({
-          originalDiagnosis: JSON.parse(originalDiagnosis)
-        })
+    if (this.state.originalDiagnosis || !props.diagnosisHash || !props.caseKey) { return }
+    downloadJson(props.diagnosisHash, props.caseKey).then((originalDiagnosis) => {
+      this.setState({
+        originalDiagnosis: JSON.parse(originalDiagnosis)
       })
-    }
+    })
   }
 
   recommendationSelectUpdated = (key) => {

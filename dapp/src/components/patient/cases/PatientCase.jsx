@@ -14,7 +14,7 @@ function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
-  if (encryptedCaseKey) {
+  if (encryptedCaseKey && caseKeySalt) {
     const account = getAccount()
     var caseKey = account.decrypt(encryptedCaseKey.substring(2), caseKeySalt.substring(2))
   }
@@ -27,7 +27,7 @@ function mapStateToProps(state, { match }) {
 
 function* saga({ match }) {
   const caseAddress = match.params.caseAddress
-  addContract({ address: caseAddress, contractKey: 'Case' })
+  yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'encryptedCaseKey')
   yield cacheCall(caseAddress, 'caseKeySalt')
   yield cacheCall(caseAddress, 'diagnosisHash')

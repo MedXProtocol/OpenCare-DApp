@@ -38,9 +38,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
   }
 
   async init (props) {
-    if (!props.caseDetailsHash || !props.caseKey) {
-      return
-    }
+    if (!this.state.details || !props.caseDetailsHash || !props.caseKey) { return }
     const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
     const details = JSON.parse(detailsJson);
 

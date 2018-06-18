@@ -37,6 +37,7 @@ contract('DoctorManager', function (accounts) {
       assert.equal(await doctorManager.doctorCount.call(), 1)
       assert.equal(await doctorManager.isDoctor(doctor), true)
       assert.equal(await doctorManager.doctorNames.call(0), 'Doogie')
+      assert.equal(await doctorManager.name.call(doctor), 'Doogie')
     })
 
     it('should not allow double adds', async () => {

@@ -17,7 +17,7 @@ export function doctorCaseStatusToClass(status) {
   var statuses = {
     0: 'default',
     1: 'info',
-    2: 'danger',
+    2: 'warning',
     3: 'warning',
     4: 'default',
     5: 'default',

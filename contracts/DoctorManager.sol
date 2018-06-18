@@ -32,4 +32,10 @@ contract DoctorManager is Ownable, Initializable {
     uint256 index = doctorIndices[_doctor];
     return doctorAddresses[index] == _doctor;
   }
+
+  function name(address _doctor) public view returns (string) {
+    require(_doctor != address(0));
+    uint256 index = doctorIndices[_doctor];
+    return doctorNames[index];
+  }
 }

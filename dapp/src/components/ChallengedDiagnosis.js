@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { downloadJson } from '~/utils/storage-util'
-import { cacheCallValue, withSaga, cacheCall } from '~/saga-genesis'
+import { cacheCallValue, withSaga, cacheCall, addContract } from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 
@@ -13,6 +13,7 @@ function mapStateToProps(state, { caseAddress }) {
 }
 
 function* saga({ caseAddress }) {
+  yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'challengeHash')
 }
 

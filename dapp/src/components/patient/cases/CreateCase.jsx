@@ -286,7 +286,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           '0x' + caseKeySalt,
           '0x' + hashHex,
           this.state.doctorAddress,
-          doctorEncryptedCaseKey
+          '0x' + doctorEncryptedCaseKey
         ).encodeABI()
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
 
@@ -652,7 +652,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
                           <div className="form-group">
                             <label>Select a Doctor</label>
-                            <DoctorSelect selected={this.state.doctorAddress} isClearable={false} onChange={this.onChangeDoctor} />
+                            <DoctorSelect
+                              excludeDoctorAddresses={[this.props.account]}
+                              selected={this.state.doctorAddress}
+                              isClearable={false}
+                              onChange={this.onChangeDoctor} />
                           </div>
                         </div>
                       </div>

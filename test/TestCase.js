@@ -19,10 +19,10 @@ contract('Case', function (accounts) {
     await env.medXToken.mint(patient, 1000000000000)
 
     doctorAddress = accounts[1]
-    await env.doctorManager.addDoctor(doctorAddress)
+    await env.doctorManager.addDoctor(doctorAddress, 'Doogie')
 
     doctorAddress2 = accounts[2]
-    await env.doctorManager.addDoctor(doctorAddress2)
+    await env.doctorManager.addDoctor(doctorAddress2, 'Dr. Hibbert')
   })
 
   beforeEach(async () => {

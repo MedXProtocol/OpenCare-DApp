@@ -58,7 +58,12 @@ function* web3CallExecute({call}) {
     const web3 = yield getContext('web3')
     const contractKey = yield select(contractKeyByAddress, address)
     const contract = contractRegistry.get(address, contractKey, web3)
-    const callMethod = contract.methods[method](...args).call
+    const contractMethod = contract.methods[method]
+    if (!contractMethod) {
+      yield fork(put, {type: 'WEB3_CALL_ERROR', call, error: `Address ${address} does not have method '${method}'`})
+      return
+    }
+    const callMethod = contractMethod(...args).call
     // console.log('web3CallExecute: ', address, method, ...args, options)
     yield spawn(function* () {
       try {
