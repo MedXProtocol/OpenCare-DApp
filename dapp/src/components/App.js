@@ -61,5 +61,4 @@ App.defaultProps = {
   accounts: []
 }
 
-export default withRouter(App)
-// export default hot(module)(withRouter(App))
+export default hot(module)(withRouter(App))
