@@ -35,9 +35,9 @@ function* propSaga({address}) {
 export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga, { propTriggers: ['address'] })(class _CaseRow extends Component {
   render () {
     var status = parseInt(this.props.status || 0, 10)
-    let isApprovedDiagnosingADoctor = this.props.diagnosingDoctor === this.props.account
-    let isApprovedDiagnosingBDoctor = this.props.challengingDoctor === this.props.account
-    if (isApprovedDiagnosingADoctor || isApprovedDiagnosingBDoctor) {
+    let isDiagnosingDoctor = this.props.diagnosingDoctor === this.props.account
+    let isChalleningDoctor = this.props.challengingDoctor === this.props.account
+    if (isDiagnosingDoctor || isChalleningDoctor) {
       var address = <Link to={`/doctors/cases/diagnose/${this.props.address}`}>{this.props.address}</Link>
     } else {
       address = this.props.address
