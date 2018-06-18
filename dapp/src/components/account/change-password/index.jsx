@@ -5,6 +5,7 @@ import { Alert, Button } from 'react-bootstrap'
 import get from 'lodash.get'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { mixpanel } from '~/mixpanel'
+import { toastr } from '~/toastr'
 import masterPasswordInvalid from '~/services/master-password-invalid'
 import { currentAccount, signIn } from '~/services/sign-in'
 import { Account } from '~/accounts/Account'
@@ -72,7 +73,7 @@ export const ChangePassword = class extends Component {
 
     mixpanel.track("Change Password")
 
-    // toastr.success('Your Master Password for this account has been changed.')
+    toastr.success('Your Master Password for this account has been changed.')
     this.props.history.push(dynamicNextPath)
   }
 
