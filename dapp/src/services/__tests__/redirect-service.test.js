@@ -49,12 +49,12 @@ describe('redirect-service', () => {
 
       it('should redirect if they try to sign in', () => {
         expect(redirectService({isSignedIn: true, hasAccount: true, pathname: '/sign-in'}))
-          .toEqual('/')
+          .toEqual('/patients/cases')
       })
 
       it('should redirect if they try to sign up', () => {
         expect(redirectService({isSignedIn: true, hasAccount: true, pathname: '/sign-up'}))
-          .toEqual('/')
+          .toEqual('/patients/cases')
       })
     })
   })
