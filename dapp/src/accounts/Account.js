@@ -17,15 +17,16 @@ export const ACCOUNT_VERSION = 1
 export class Account {
   constructor (json) {
     this._json = json
+    this.secretKeyWithSaltCache = {}
   }
 
   encrypt (string, salt) {
-    const key = deriveKey(this.hexSecretKey(), salt)
+    const key = this.secretKeyWithSalt(salt)
     return aes.encrypt(string, key)
   }
 
   decrypt (string, salt) {
-    const key = deriveKey(this.hexSecretKey(), salt)
+    const key = this.secretKeyWithSalt(salt)
     return aes.decrypt(string, key)
   }
 
@@ -67,6 +68,15 @@ export class Account {
 
   deriveKeyPair () {
     return deriveKeyPair(this.hexSecretKey())
+  }
+
+  secretKeyWithSalt (salt) {
+    let key = this.secretKeyWithSaltCache[salt]
+    if (!key) {
+      key = deriveKey(this.hexSecretKey(), salt)
+      this.secretKeyWithSaltCache[salt] = key
+    }
+    return key
   }
 
   store () {
