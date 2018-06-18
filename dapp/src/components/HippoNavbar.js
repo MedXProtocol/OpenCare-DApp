@@ -68,17 +68,27 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
 
     if (this.props.signedIn) {
       var profileMenu =
-        <NavDropdown title='My Account' id='my-account'>
-          <LinkContainer to='/wallet'>
-            <MenuItem href='/wallet'>
-              My Balance
+        <NavDropdown title='Account' id='account-dropdown'>
+          <MenuItem header>Profile</MenuItem>
+
+          <LinkContainer to='/account/wallet'>
+            <MenuItem href='/account/wallet'>
+              MEDX Balance
             </MenuItem>
           </LinkContainer>
-          <LinkContainer to='/emergency-kit'>
-            <MenuItem href='/emergency-kit'>
-              My Emergency Kit
+
+          <MenuItem header>Security</MenuItem>
+          <LinkContainer to='/account/emergency-kit'>
+            <MenuItem href='/account/emergency-kit'>
+              Emergency Kit
             </MenuItem>
           </LinkContainer>
+          <LinkContainer to='/account/change-password'>
+            <MenuItem href='/account/change-password'>
+              Change Password
+            </MenuItem>
+          </LinkContainer>
+
           <MenuItem divider />
           <MenuItem onClick={this.signOut}>
             Sign Out

@@ -102,6 +102,10 @@ export class Account {
   destroy () {
     setAccount(this.address(), null)
   }
+
+  updateMasterPassword (newMasterPassword) {
+    this.requireUnlocked()
+  }
 }
 
 Account.currentVersion = ACCOUNT_VERSION
@@ -121,5 +125,12 @@ Account.get = function (address) {
   if (json) {
     account = new Account(json)
   }
+  return account
+}
+
+Account.updateMasterPassword = function ({account, currentMasterPassword, newMasterPassword}) {
+  account.unlock(currentMasterPassword)
+  account.updateMasterPassword(newMasterPassword)
+  account.store()
   return account
 }
