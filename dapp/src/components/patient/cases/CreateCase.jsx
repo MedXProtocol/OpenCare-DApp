@@ -221,7 +221,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         isNotEmptyString(this.state.age) &&
         isNotEmptyString(this.state.country) &&
         isNotEmptyString(this.state.color) &&
-        isNotEmptyString(this.state.prevTreatment);
+        isNotEmptyString(this.state.prevTreatment) &&
+        isNotEmptyString(this.state.doctorAddress)
 
       this.setState({ canSubmit: valid });
     }
@@ -246,7 +247,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setState({
         doctorAddress: option.value,
         doctorPublicKey: option.publicKey
-      })
+      }, this.validateInputs)
     }
 
     createNewCase = async () => {
@@ -651,7 +652,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
                           <div className="form-group">
-                            <label>Select a Doctor</label>
+                            <label>Select a Doctor<span className='star'>*</span></label>
                             <DoctorSelect
                               excludeDoctorAddresses={[this.props.account]}
                               selected={this.state.doctorAddress}

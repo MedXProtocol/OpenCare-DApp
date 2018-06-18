@@ -63,7 +63,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   }
 
   async componentDidMount() {
-    if (this.state.diagnosis || isBlank(this.props.diagnosisHash)) { return }
+    if (!this.state.hidden || isBlank(this.props.diagnosisHash) || isBlank(this.props.caseKey)) { return }
     const diagnosisJson = await downloadJson(this.props.diagnosisHash, this.props.caseKey)
     const diagnosis = JSON.parse(diagnosisJson)
     this.setState({

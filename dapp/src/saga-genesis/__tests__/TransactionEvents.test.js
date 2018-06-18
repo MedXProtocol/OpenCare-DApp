@@ -25,5 +25,28 @@ describe('CallCountRegistry', () => {
       events.check({ receipt: 'secondReceipt' }).onReceipt(_receipt => receipt = _receipt)
       expect(receipt).toEqual('firstReceipt')
     })
+
+    it('should allow taking null', () => {
+      const events = new TransactionEvents()
+      let receipt = false
+      events.check(null).onReceipt(() => receipt = true)
+      expect(receipt).toBeFalsy()
+    })
+  })
+
+  describe('chaining()', () => {
+    it('should support chaining', () => {
+      const events = new TransactionEvents()
+
+      let error = false
+      let receipt = false
+
+      events.check({ error: 'ur', receipt: 'rispt' })
+        .onError(err => error = err)
+        .onReceipt(rec => receipt = rec)
+
+      expect(error).toEqual('ur')
+      expect(receipt).toEqual('rispt')
+    })
   })
 })
