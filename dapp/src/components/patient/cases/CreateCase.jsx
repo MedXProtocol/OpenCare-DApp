@@ -84,7 +84,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
               showConfirmSubmissionModal: false
             })
           })
-          .onReceipt(() => {
+          .onTxHash(() => {
             toastr.success('Your case has been submitted.')
             mixpanel.track('Case Submitted')
             this.props.history.push('/patients/cases')

@@ -26,7 +26,7 @@ i18next
             setPublicKey: 'Setting Public Key'
           },
           transactionErrors: {
-            userRevert: 'The user reverted the transaction',
+            userRevert: 'You rejected the transaction, please submit a valid transaction to proceed',
             outOfGas: 'The transaction ran out of gas',
             evmRevert: 'There was an error in the contract'
           }
