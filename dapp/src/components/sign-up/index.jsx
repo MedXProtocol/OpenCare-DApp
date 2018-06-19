@@ -9,15 +9,18 @@ import { ConfirmCreate } from './confirm-create'
 import { SecretKey } from './secret-key'
 import { MasterPassword } from './master-password'
 import { connect } from 'react-redux'
+import { Account } from '~/accounts/Account'
 
 function mapStateToProps(state) {
   const address = state.sagaGenesis.accounts[0]
+  const account = Account.get(address)
   const signedIn = state.account.signedIn
   const overrideError = state.account.overrideError
   return {
     address,
     signedIn,
-    overrideError
+    overrideError,
+    account
   }
 }
 
@@ -38,8 +41,32 @@ export const SignUp = class extends Component {
     this.state = {
       secretKey: genKey(32),
       showMasterPassword: false,
-      showConfirm: false
+      showConfirm: false,
+      showOverrideModal: false,
+      overrideModalHasBeenShown: false
     }
+  }
+
+  componentDidMount () {
+    this.init(this.props)
+  }
+
+  componentWillReceiveProps (props) {
+    this.init(props)
+  }
+
+  init(props) {
+    if (!this.state.overrideModalHasBeenShown && props.account) {
+      this.setState({
+        showOverrideModal: true,
+        overrideModalHasBeenShown: true
+      })
+    }
+  }
+
+  closeOverrideModal = () => {
+    this.setState({ showOverrideModal: false })
+    this.props.clearOverrideError()
   }
 
   onMasterPassword = (password) => {
@@ -74,8 +101,8 @@ export const SignUp = class extends Component {
       <MainLayoutContainer>
         {content}
         <OverrideDisallowedModal
-          show={!!this.props.overrideError}
-          onOk={this.props.clearOverrideError} />
+          show={this.state.showOverrideModal || !!this.props.overrideError}
+          onOk={this.closeOverrideModal} />
       </MainLayoutContainer>
     )
   }
