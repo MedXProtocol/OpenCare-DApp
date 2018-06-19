@@ -8,6 +8,7 @@ import {
 import { nextId } from '~/saga-genesis'
 import secretKeyInvalid from '~/services/secret-key-invalid'
 import masterPasswordInvalid from '~/services/master-password-invalid'
+import { mixpanel } from '~/mixpanel'
 
 // Here the sign in should perform the check
 export function* signInSaga({ secretKey, masterPassword, account, address, overrideAccount }) {
@@ -51,6 +52,7 @@ export function* checkPublicKey(account, masterPassword, address) {
 
 export function* signInOkSaga({ account, masterPassword, address }) {
   signIn(account)
+  mixpanel.identify(account.address())
   yield spawn(checkPublicKey, account, masterPassword, address)
   yield put({type: 'SIGNED_IN'})
 }

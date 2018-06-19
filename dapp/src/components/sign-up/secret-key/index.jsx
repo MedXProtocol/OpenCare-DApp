@@ -5,6 +5,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
 import { BodyClass } from '~/components/BodyClass'
 import { formatSecretKey } from '~/services/format-secret-key'
+import * as routes from '~/config/routes'
 
 export const SecretKey = class extends Component {
   constructor(props) {
@@ -74,7 +75,7 @@ export const SecretKey = class extends Component {
 
               <div className="account--extras">
                 <p className='text-center text-white'>
-                  Already have an account? <Link to='/sign-in' className='text-white'>Sign in</Link>
+                  Already have an account? <Link to={routes.SIGN_IN} className='text-white'>Sign in</Link>
                 </p>
               </div>
             </div>

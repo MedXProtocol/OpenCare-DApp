@@ -9,6 +9,7 @@ import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -109,13 +110,13 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   handleCloseThankYouModal = (event) => {
     event.preventDefault()
     this.setState({showThankYouModal: false})
-    this.props.history.push('/patients/cases')
+    this.props.history.push(routes.PATIENTS_CASES)
   }
 
   handleCloseChallengeModal = (event) => {
     event.preventDefault()
     this.setState({showChallengeModal: false})
-    this.props.history.push('/patients/cases')
+    this.props.history.push(routes.PATIENTS_CASES)
   }
 
   render() {

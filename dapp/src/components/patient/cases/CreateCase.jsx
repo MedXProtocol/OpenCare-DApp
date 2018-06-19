@@ -84,7 +84,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
               showConfirmSubmissionModal: false
             })
           })
-          .onReceipt(() => {
+          .onTxHash(() => {
             toastr.success('Your case has been submitted.')
             mixpanel.track('Case Submitted')
             this.props.history.push('/patients/cases')
@@ -291,23 +291,16 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         })
     }
 
+    progressClassNames = (percent) => {
+      return classNames(
+        {
+          'progress--wrapper__show': percent > 0 && percent < 100,
+          'progress--wrapper__hide': percent === 0 || percent === 100
+        }
+      )
+    }
+
     render() {
-      let firstProgressClassNames = classNames(
-        'progress-bar--wrapper',
-        {
-          show: this.state.firstImagePercent > 0 && this.state.firstImagePercent < 100,
-          hide: this.state.firstImagePercent === 0 || this.state.firstImagePercent === 100
-        }
-      )
-
-      let secondProgressClassNames = classNames(
-        'progress-bar--wrapper',
-        {
-          show: this.state.secondImagePercent > 0 && this.state.secondImagePercent < 100,
-          hide: this.state.secondImagePercent === 0 || this.state.secondImagePercent === 100
-        }
-      )
-
       if (this.state.firstFileError) {
         var firstFileError =
           <p className='has-error help-block'>{this.state.firstFileError}</p>
@@ -361,10 +354,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <span>
                                 &nbsp; {this.state.firstFileName}
                               </span>
-                              <div className={firstProgressClassNames}>
+                              <div className={this.progressClassNames(this.state.firstImagePercent)}>
                                 <ProgressBar
                                   active
-                                  striped
                                   bsStyle="success"
                                   now={this.state.firstImagePercent} />
                               </div>
@@ -391,10 +383,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <span>
                                   &nbsp; {this.state.secondFileName}
                               </span>
-                              <div className={secondProgressClassNames}>
+                              <div className={this.progressClassNames(this.state.secondImagePercent)}>
                                 <ProgressBar
                                   active
-                                  striped
                                   bsStyle="success"
                                   now={this.state.secondImagePercent} />
                               </div>

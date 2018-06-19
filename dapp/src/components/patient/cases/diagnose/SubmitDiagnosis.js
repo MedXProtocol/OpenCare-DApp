@@ -16,6 +16,7 @@ import { groupedRecommendationOptions } from './recommendationOptions'
 import { groupedDiagnosisOptions } from './diagnosisOptions'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
+import * as routes from '~/config/routes'
 
 // The react-select <Select /> component uses inline CSS, this fixes it for mobile:
 const customStyles = {
@@ -349,7 +350,7 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
           </Modal.Body>
 
           <Modal.Footer>
-            <Link to='/doctors/cases/open' className="btn btn-primary">OK</Link>
+            <Link to={routes.DOCTORS_CASES_OPEN} className="btn btn-primary">OK</Link>
           </Modal.Footer>
         </Modal>
 

@@ -3,6 +3,9 @@ import mixpanelBrowser from 'mixpanel-browser'
 let mixpanel = {
   track: (...args) => {
     console.log('mixpanel.track() noop: ', args)
+  },
+  identify: (...args) => {
+    console.log('mixpanel.identify() noop: ', args)
   }
 }
 

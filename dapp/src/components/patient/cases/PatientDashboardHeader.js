@@ -18,7 +18,7 @@ export const PatientDashboardHeader = class extends Component {
                 My Cases
               </h3>
               <span className="sm-block text-gray">
-                <strong>Current &amp; Previously Evaluated</strong>
+                <strong>Current &amp; Historical</strong>
               </span>
             </div>
             <div className='col-md-4 col-sm-12 button-container'>

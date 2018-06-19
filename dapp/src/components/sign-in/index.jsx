@@ -6,6 +6,7 @@ import get from 'lodash.get'
 import { Account } from '~/accounts/Account'
 import { SignInFormContainer } from './SignInForm'
 import { BodyClass } from '~/components/BodyClass'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
@@ -66,14 +67,14 @@ export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchTo
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
                 <h3 className='text-white text-center'>
-                  Sign in to <strong>Med</strong>Credits
+                  Sign in to Hippocrates
                 </h3>
                 {warning}
                 <SignInFormContainer onSubmit={this.onSubmit} hasAccount={!!this.props.account} />
 
                 <div className="account--extras">
                   <p className='text-center text-white'>
-                    Don't have an account? <Link to='/sign-up'>Sign up</Link>
+                    Don't have an account? <Link to={routes.SIGN_UP}>Sign up</Link>
                   </p>
                 </div>
               </div>
