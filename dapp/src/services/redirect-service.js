@@ -1,12 +1,14 @@
 export default function({ isSignedIn, hasAccount, pathname }) {
   let redirect = ''
-
+  
   if (isSignedIn && hasAccount)
     if (pathname === '/sign-up' || pathname === '/sign-in')
       redirect = '/patients/cases'
 
   if (!isSignedIn && hasAccount) {
     if (pathname === '/sign-up')
+      redirect = ''
+    else if (pathname === '/welcome')
       redirect = ''
     else
       redirect = '/sign-in'

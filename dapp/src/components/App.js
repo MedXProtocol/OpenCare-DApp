@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { withRouter, Route, Switch } from 'react-router-dom'
+import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 import ReduxToastr from 'react-redux-toastr'
 import { SignUpContainer } from './sign-up'
 import { SignInContainer } from './sign-in'
@@ -20,7 +20,7 @@ import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
 import { hot } from 'react-hot-loader'
 
-const App = class extends Component {
+const App = class _App extends Component {
   render () {
     return (
       <div>
@@ -46,6 +46,8 @@ const App = class extends Component {
           <Route exact path='/patients/cases' component={PatientDashboard} />
           <Route path='/patients/cases/:caseAddress' component={PatientCaseContainer} />
 
+          <Redirect from='/' exact to='/welcome' />
+
           <Route path='/' component={FourOhFour} />
         </Switch>
         <ReduxToastr
@@ -58,10 +60,6 @@ const App = class extends Component {
       </div>
     )
   }
-}
-
-App.defaultProps = {
-  accounts: []
 }
 
 export default hot(module)(withRouter(App))

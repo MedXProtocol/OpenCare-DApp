@@ -2,9 +2,31 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { BodyClass } from '~/components/BodyClass'
+import { connect } from 'react-redux'
+import get from 'lodash.get'
+import { Account } from '~/accounts/Account'
 
-export const Welcome = class extends Component {
+function mapStateToProps (state) {
+  let address = get(state, 'sagaGenesis.accounts[0]')
+  let signedIn = get(state, 'account.signedIn')
+  return {
+    address,
+    signedIn,
+    account: Account.get(address)
+  }
+}
+
+export const Welcome = connect(mapStateToProps)(class _Welcome extends Component {
   render () {
+    if (this.props.signedIn) {
+      var launchLink = '/patients/cases'
+    } else
+    if (this.props.account) {
+      launchLink = '/sign-in'
+    } else {
+      launchLink = '/sign-up'
+    }
+
     return (
       <BodyClass isDark={true}>
         <MainLayoutContainer doNetworkCheck={false}>
@@ -42,7 +64,7 @@ export const Welcome = class extends Component {
                     <div className='text-right'>
                       <Link
                         className="btn btn-success"
-                        to='/sign-up'>
+                        to={launchLink}>
                           Launch Hippocrates
                       </Link>
                     </div>
@@ -56,4 +78,4 @@ export const Welcome = class extends Component {
       </BodyClass>
     )
   }
-}
+})
