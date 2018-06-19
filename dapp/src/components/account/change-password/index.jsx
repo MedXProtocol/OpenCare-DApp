@@ -63,7 +63,7 @@ export const ChangePassword = class extends Component {
   }
 
   onNewMasterPassword = (account) => {
-    let dynamicNextPath = this.props.isDoctor ? '/patients/cases/open' : '/patients/cases'
+    let dynamicNextPath = this.props.isDoctor ? '/doctors/cases/open' : '/patients/cases'
     let newAccount = Account.create({
       address: account.address(),
       secretKey: account.secretKey(),
