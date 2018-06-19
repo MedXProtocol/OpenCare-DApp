@@ -1,26 +1,28 @@
+import * as routes from '~/config/routes'
+
 export default function({ isSignedIn, hasAccount, pathname }) {
   let redirect = ''
-  
+
   if (isSignedIn && hasAccount)
-    if (pathname === '/sign-up' || pathname === '/sign-in')
-      redirect = '/patients/cases'
+    if (pathname === routes.SIGN_UP || pathname === routes.SIGN_IN)
+      redirect = routes.PATIENTS_CASES
 
   if (!isSignedIn && hasAccount) {
-    if (pathname === '/sign-up')
+    if (pathname === routes.SIGN_UP)
       redirect = ''
-    else if (pathname === '/welcome')
+    else if (pathname === routes.WELCOME)
       redirect = ''
     else
-      redirect = '/sign-in'
+      redirect = routes.SIGN_IN
   }
 
   if (!isSignedIn && !hasAccount) {
-    if (pathname === '/sign-in')
+    if (pathname === routes.SIGN_IN)
       redirect = ''
-    else if (pathname === '/sign-up')
+    else if (pathname === routes.SIGN_UP)
       redirect = ''
     else
-      redirect = '/welcome'
+      redirect = routes.WELCOME
   }
 
   // Clear any redirects if the current path is the same as the

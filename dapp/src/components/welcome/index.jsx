@@ -5,6 +5,7 @@ import { BodyClass } from '~/components/BodyClass'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { Account } from '~/accounts/Account'
+import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
   let address = get(state, 'sagaGenesis.accounts[0]')
@@ -19,12 +20,12 @@ function mapStateToProps (state) {
 export const Welcome = connect(mapStateToProps)(class _Welcome extends Component {
   render () {
     if (this.props.signedIn) {
-      var launchLink = '/patients/cases'
+      var launchLink = routes.PATIENTS_CASES
     } else
     if (this.props.account) {
-      launchLink = '/sign-in'
+      launchLink = routes.SIGN_IN
     } else {
-      launchLink = '/sign-up'
+      launchLink = routes.SIGN_UP
     }
 
     return (

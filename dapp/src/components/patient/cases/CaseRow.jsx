@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import faCheck from '@fortawesome/fontawesome-free-solid/faCheck'
+import { formatRoute } from 'react-router-named-routes'
+import * as routes from '~/config/routes'
 import { currentAccount } from '~/services/sign-in'
 import {
   cacheCall,
@@ -92,6 +94,8 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
   render () {
     if (!this.props.status) { return <tr></tr> }
 
+    const caseRoute = formatRoute(routes.PATIENTS_CASE, { caseAddress: this.props.caseAddress })
+
     const status = +(this.props.status || '0')
     if (status === 3 || status === 8) {
       var approvalButton = (
@@ -125,7 +129,7 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
         <td width="5%" className="text-center">{this.props.caseIndex+1}</td>
         <td className="eth-address text">
           <span>
-            <Link to={`/patients/cases/${this.props.caseAddress}`}>{this.props.caseAddress}</Link>
+            <Link to={caseRoute}>{this.props.caseAddress}</Link>
           </span>
         </td>
         <td width="15%" className="td--status">

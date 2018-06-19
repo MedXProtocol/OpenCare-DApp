@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 import ReduxToastr from 'react-redux-toastr'
+import { hot } from 'react-hot-loader'
 import { SignUpContainer } from './sign-up'
 import { SignInContainer } from './sign-in'
 import { PatientDashboard } from './patient/dashboard/'
@@ -18,7 +19,7 @@ import { Welcome } from '~/components/welcome'
 import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
-import { hot } from 'react-hot-loader'
+import * as routes from '~/config/routes'
 
 const App = class _App extends Component {
   render () {
@@ -26,29 +27,29 @@ const App = class _App extends Component {
       <div>
         <SignInRedirectContainer />
         <Switch>
-          <Route path='/welcome' component={Welcome} />
-          <Route path='/login-metamask' component={LoginToMetaMask} />
-          <Route path='/try-metamask' component={TryMetamask} />
+          <Route path={routes.WELCOME} component={Welcome} />
+          <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
+          <Route path={routes.TRY_METAMASK} component={TryMetamask} />
 
-          <Route path='/account/emergency-kit' component={EmergencyKit} />
-          <Route path='/account/change-password' component={ChangePasswordContainer} />
-          <Route path='/account/mint' component={Mint} />
-          <Route path='/account/wallet' component={WalletContainer} />
+          <Route path={routes.ACCOUNT_EMERGENCY_KIT} component={EmergencyKit} />
+          <Route path={routes.ACCOUNT_CHANGE_PASSWORD} component={ChangePasswordContainer} />
+          <Route path={routes.ACCOUNT_MINT} component={Mint} />
+          <Route path={routes.ACCOUNT_WALLET} component={WalletContainer} />
 
-          <Route path='/sign-in' component={SignInContainer} />
-          <Route path='/sign-up' component={SignUpContainer} />
+          <Route path={routes.SIGN_IN} component={SignInContainer} />
+          <Route path={routes.SIGN_UP} component={SignUpContainer} />
 
-          <Route path='/doctors/cases/open' component={OpenCasesContainer} />
-          <Route path='/doctors/cases/diagnose/:caseAddress' component={DiagnoseCaseContainer} />
-          <Route path='/doctors/new' component={AddDoctor} />
+          <Route path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
+          <Route path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={DiagnoseCaseContainer} />
+          <Route path={routes.DOCTORS_NEW} component={AddDoctor} />
 
-          <Route exact path='/patients/cases/new' component={NewCase} />
-          <Route exact path='/patients/cases' component={PatientDashboard} />
-          <Route path='/patients/cases/:caseAddress' component={PatientCaseContainer} />
+          <Route exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
+          <Route exact path={routes.PATIENTS_CASES} component={PatientDashboard} />
+          <Route path={routes.PATIENTS_CASE} component={PatientCaseContainer} />
 
-          <Redirect from='/' exact to='/welcome' />
+          <Redirect from={routes.HOME} exact to={routes.WELCOME} />
 
-          <Route path='/' component={FourOhFour} />
+          <Route path={routes.HOME} component={FourOhFour} />
         </Switch>
         <ReduxToastr
           timeOut={7000}
