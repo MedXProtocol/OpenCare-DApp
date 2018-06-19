@@ -143,11 +143,11 @@ small,
 }
 
 .floating-feedback-link {
-  background: white;
+  background: $brand-info;
   border-radius: 2px;
   box-shadow: 0 2px 10px rgba(180, 200, 230, 0.2);
   bottom: 20px;
-  color: $brand-info;
+  color: white;
   font-size: 13px;
   font-weight: 700;
   padding: 4px 0;
@@ -157,7 +157,11 @@ small,
   z-index: 11;
 }
 
-.floating-feedback-link:hover {
+.floating-feedback-link:hover,
+.floating-feedback-link:active,
+.floating-feedback-link:focus {
+  background: lighten($brand-info, 10%);
+  color: white;
   text-decoration: none;
 }
 
