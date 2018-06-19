@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faTelegramPlane from '@fortawesome/fontawesome-free-brands/faTelegramPlane';
 import { HippoNavbarContainer } from '../components/HippoNavbar';
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 import get from 'lodash.get'
@@ -38,7 +40,22 @@ export const MainLayout = class extends Component {
             </div>
           ) : null}
           {networkCheckmodal}
-          <div className="content">{this.props.children}</div>
+          <div className="content">
+            {this.props.children}
+          </div>
+
+          <a
+            target="_blank"
+            href="https://t.me/MedCredits"
+            className="floating-feedback-link text-center"
+            rel="noopener noreferrer">
+            <FontAwesomeIcon
+              icon={faTelegramPlane}
+              size='sm' />
+            <span>
+              Give Feedback
+            </span>
+          </a>
         </div>
         <footer className="footer">
           <div className="container">
