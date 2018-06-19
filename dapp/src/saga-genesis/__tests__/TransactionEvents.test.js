@@ -14,6 +14,26 @@ describe('CallCountRegistry', () => {
     })
   })
 
+  describe('onTxHash()', () => {
+    it('should call onTxHash when a transaction hash is available', () => {
+      const events = new TransactionStateHandler()
+      let txHash = false
+      events.handle({ foo: 'bar' }).onTxHash(() => txHash = true)
+      expect(txHash).toBeFalsy()
+      events.handle({ txHash: 'firstTxHash' }).onTxHash(_txHash => txHash = _txHash)
+      expect(txHash).toEqual('firstTxHash')
+      events.handle({ txHash: 'secondTxHash' }).onTxHash(_txHash => txHash = _txHash)
+      expect(txHash).toEqual('firstTxHash')
+    })
+
+    it('should allow taking null', () => {
+      const events = new TransactionStateHandler()
+      let txHash = false
+      events.handle(null).onTxHash(() => txHash = true)
+      expect(txHash).toBeFalsy()
+    })
+  })
+
   describe('onReceipt()', () => {
     it('should call onReceipt when a receipt is available', () => {
       const events = new TransactionStateHandler()
