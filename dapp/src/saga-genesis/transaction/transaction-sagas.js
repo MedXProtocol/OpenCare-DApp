@@ -10,11 +10,6 @@ import {
   END
 } from 'redux-saga'
 import { contractKeyByAddress } from '../state-finders'
-import { transactionErrorToCode } from '~/services/transaction-error-to-code'
-
-function rejectedByUser(error) {
-  return transactionErrorToCode(error) === 'userRevert'
-}
 
 function createTransactionEventChannel (web3, transactionId, send, options) {
   return eventChannel(emit => {
@@ -34,11 +29,7 @@ function createTransactionEventChannel (web3, transactionId, send, options) {
       })
       .on('error', (error) => {
         console.error(error)
-        if (rejectedByUser(error))
-          emit({ type: 'TRANSACTION_REJECTED_BY_USER', transactionId, error })
-        else
-          emit({ type: 'TRANSACTION_ERROR', transactionId, error })
-
+        emit({ type: 'TRANSACTION_ERROR', transactionId, error })
         emit(END)
       })
 

@@ -31,15 +31,13 @@ function* saga({ caseAddress, DoctorManager }) {
   yield cacheCall(caseAddress, 'status')
   let diagnosingDoctor = yield cacheCall(caseAddress, 'diagnosingDoctor')
   let challengingDoctor = yield cacheCall(caseAddress, 'challengingDoctor')
-  if (diagnosingDoctor) {
-    yield cacheCall(DoctorManager, 'name', diagnosingDoctor)
-  }
+  yield cacheCall(DoctorManager, 'name', diagnosingDoctor)
   if (!isBlank(challengingDoctor)) {
     yield cacheCall(DoctorManager, 'name', challengingDoctor)
   }
 }
 
-const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress', 'DoctorManager'] })(class _CaseStatus extends Component {
+const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress', 'DoctorManager', 'diagnosingDoctor', 'challengingDoctor'] })(class _CaseStatus extends Component {
     render() {
       var status = parseInt(this.props.status, 10)
       let alert

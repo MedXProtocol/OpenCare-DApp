@@ -3,7 +3,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
 import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { formatSecretKey } from '~/services/format-secret-key'
-import { getAccount } from '~/services/sign-in'
+import { currentAccount } from '~/services/sign-in'
 
 const EmergencyKitDisplay = class extends Component {
   handlePrint = () => {
@@ -11,7 +11,7 @@ const EmergencyKitDisplay = class extends Component {
   }
 
   render () {
-    const secretKey = getAccount().secretKey()
+    const secretKey = currentAccount().secretKey()
 
     return (
       <MainLayoutContainer>

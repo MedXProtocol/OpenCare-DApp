@@ -3,8 +3,8 @@ import { Alert, Modal } from 'react-bootstrap'
 import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { getAccount } from '~/services/sign-in'
 import Spinner from '~/components/Spinner'
+import { currentAccount } from '~/services/sign-in'
 import { downloadJson } from '~/utils/storage-util'
 import { withSaga, cacheCall, cacheCallValue, withSend, addContract } from '~/saga-genesis'
 import { connect } from 'react-redux'
@@ -12,8 +12,9 @@ import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { isBlank } from '~/utils/isBlank'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
-import { TransactionEvents } from '~/saga-genesis/TransactionEvents'
 import { mixpanel } from '~/mixpanel'
+import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { toastr } from '~/toastr'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -53,9 +54,9 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
 
     this.state = {
       diagnosis: {},
-      status: {},
+      status: '',
       hidden: true,
-      submitInProgress: false,
+      buttonsHidden: true,
       showThankYouModal: false,
       showChallengeModal: false,
       doctorAddress: '',
@@ -74,38 +75,37 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   }
 
   componentWillReceiveProps (props) {
-    if (this.state.challengeEvents) {
-      this.state.challengeEvents.check(props.transactions[this.state.challengeTransactionId])
-        .onError((error) => {
-          this.setState({
-            showErrorModal: true,
-            message: `There was an error challenging the case: ${error}`
-          })
-        })
+    if (this.state.challengeHandler) {
+      this.state.challengeHandler.handle(props.transactions[this.state.challengeTransactionId])
+        .onError(toastr.transactionError)
         .onReceipt(() => {
+          toastr.success('Your case is being challenged')
+          mixpanel.track('Challenge Diagnosis Submitted')
           this.setState({
-            challengeTransactionId: null,
-            submitInProgress: false
+            challengeHandler: null
           })
         })
     }
-
-    if (this.state.acceptTransactionId && props.transactions[this.state.acceptTransactionId].complete) {
-      this.setState({
-        acceptTransactionId: null,
-        submitInProgress: false,
-        showThankYouModal: true
-      })
+    if (this.state.acceptHandler) {
+      this.state.acceptHandler.handle(props.transactions[this.state.acceptTransactionId])
+        .onError(toastr.transactionError)
+        .onReceipt(() => {
+          toastr.success('Your case has been accepted')
+          mixpanel.track('Accept Diagnosis Submitted')
+          this.setState({
+            acceptHandler: null,
+            showThankYouModal: true
+          })
+        })
     }
   }
 
   handleAcceptDiagnosis = () => {
     const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptDiagnosis')()
     this.setState({
-      submitInProgress: true,
-      acceptTransactionId
+      acceptTransactionId,
+      acceptHandler: new TransactionStateHandler()
     })
-    mixpanel.track('Accept Diagnosis')
   }
 
   handleChallengeDiagnosis = () => {
@@ -140,7 +140,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       const doctorPublicKey = this.state.doctorPublicKey.substring(2)
       const caseKeySalt = this.props.caseKeySalt.substring(2)
       const doctorEncryptedCaseKey = reencryptCaseKey({
-        account: getAccount(),
+        account: currentAccount(),
         encryptedCaseKey,
         doctorPublicKey,
         caseKeySalt
@@ -151,15 +151,15 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
 
       this.setState({
         showChallengeModal: false,
-        submitInProgress: true,
         challengeTransactionId,
-        challengeEvents: new TransactionEvents()
+        challengeHandler: new TransactionStateHandler()
       })
     }
   }
 
   render() {
     const buttonsHidden = !this.props.isPatient || this.props.status !== '3'
+    const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
 
     return ( this.state.hidden ?
       <div /> :
@@ -200,9 +200,9 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
             <hr/>
             <div className="row">
               <div className="col-xs-12 text-right" >
-                <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
+                <button disabled={transactionRunning} onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
                 &nbsp;
-                <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
+                <button disabled={transactionRunning} onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
               </div>
             </div>
           </div>
@@ -268,7 +268,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
             </Modal.Footer>
           </form>
         </Modal>
-        <Spinner loading={this.state.submitInProgress}/>
+        <Spinner loading={transactionRunning} />
       </div>
     )
   }

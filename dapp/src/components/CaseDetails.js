@@ -23,7 +23,6 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
   constructor (props) {
     super(props)
     this.state = {
-      details: {},
       firstImageUrl: '',
       secondImageUrl: ''
     }
@@ -38,7 +37,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
   }
 
   async init (props) {
-    if (!this.state.details || !props.caseDetailsHash || !props.caseKey) { return }
+    if (this.state.details || !(props.caseDetailsHash && props.caseKey)) { return }
     const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
     const details = JSON.parse(detailsJson);
 
@@ -85,6 +84,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
   }
 
   render() {
+    const details = this.state.details || {}
         return (
             <div className="card">
                 <div className="card-header">
@@ -109,52 +109,52 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                       <div className="row">
                         <div className="col-xs-6">
                             <label className="label text-gray">How long have you had this problem:</label>
-                            <p>{this.state.details.howLong}</p>
+                            <p>{details.howLong}</p>
                         </div>
                         <div className="col-md-6">
                             <label className="label text-gray">Is it growing, shrinking or staying the same size:</label>
-                            <p>{this.state.details.size}</p>
+                            <p>{details.size}</p>
                         </div>
                          <div className="col-md-6">
                             <label className="label text-gray">Is it painful:</label>
-                            <p>{this.state.details.painful}</p>
+                            <p>{details.painful}</p>
                         </div>
                         <div className="col-md-6">
                             <label className="label text-gray">Is it bleeding:</label>
-                            <p>{this.state.details.bleeding}</p>
+                            <p>{details.bleeding}</p>
                         </div>
                         <div className="col-md-6">
                             <label className="label text-gray">Is it itching:</label>
-                            <p>{this.state.details.itching}</p>
+                            <p>{details.itching}</p>
                         </div>
 
                         <div className="col-md-6">
                             <label className="label text-gray">Any history of skin cancer:</label>
-                            <p>{this.state.details.skinCancer}</p>
+                            <p>{details.skinCancer}</p>
                         </div>
                         <div className="col-md-6">
                             <label className="label text-gray">Are you sexually active:</label>
-                            <p>{this.state.details.sexuallyActive}</p>
+                            <p>{details.sexuallyActive}</p>
                         </div>
                         <div className="col-xs-12">
                              <label className="label text-gray">Has it changed in color:</label>
-                             <p>{this.state.details.color}</p>
+                             <p>{details.color}</p>
                          </div>
                          <div className="col-xs-12">
                              <label className="label text-gray">Have you tried any treatments so far:</label>
-                             <p>{this.state.details.prevTreatment}</p>
+                             <p>{details.prevTreatment}</p>
                          </div>
                         <div className="col-md-6">
                             <label className="label text-gray">Age:</label>
-                            <p>{this.state.details.age}</p>
+                            <p>{details.age}</p>
                         </div>
                         <div className="col-md-6">
                             <label className="label text-gray">Country:</label>
-                            <p>{this.state.details.country}</p>
+                            <p>{details.country}</p>
                         </div>
                         <div className="col-xs-12">
                             <label className="label text-gray">Additional comments:</label>
-                            <p>{this.state.details.description}</p>
+                            <p>{details.description}</p>
                         </div>
                     </div>
                 </div>

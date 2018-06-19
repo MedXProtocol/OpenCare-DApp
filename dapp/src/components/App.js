@@ -8,9 +8,10 @@ import { NewCase } from './patient/cases/NewCase'
 import { PatientCaseContainer } from './patient/cases/PatientCase'
 import { DiagnoseCaseContainer } from './patient/cases/diagnose'
 import { AddDoctor } from './doctors/new'
-import { Mint } from './mint'
-import { WalletContainer } from './wallet'
-import { EmergencyKit } from './emergency-kit'
+import { Mint } from './account/mint'
+import { WalletContainer } from './account/wallet'
+import { EmergencyKit } from './account/emergency-kit'
+import { ChangePasswordContainer } from './account/change-password'
 import { OpenCasesContainer } from './open-cases'
 import { SignInRedirectContainer } from './sign-in-redirect'
 import { Welcome } from '~/components/welcome'
@@ -29,11 +30,13 @@ const App = class extends Component {
           <Route path='/login-metamask' component={LoginToMetaMask} />
           <Route path='/try-metamask' component={TryMetamask} />
 
-          <Route path='/emergency-kit' component={EmergencyKit} />
+          <Route path='/account/emergency-kit' component={EmergencyKit} />
+          <Route path='/account/change-password' component={ChangePasswordContainer} />
+          <Route path='/account/mint' component={Mint} />
+          <Route path='/account/wallet' component={WalletContainer} />
+
           <Route path='/sign-in' component={SignInContainer} />
           <Route path='/sign-up' component={SignUpContainer} />
-          <Route path='/mint' component={Mint} />
-          <Route path='/wallet' component={WalletContainer} />
 
           <Route path='/doctors/cases/open' component={OpenCasesContainer} />
           <Route path='/doctors/cases/diagnose/:caseAddress' component={DiagnoseCaseContainer} />

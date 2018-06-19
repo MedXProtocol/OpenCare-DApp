@@ -39,8 +39,13 @@ export function* checkPublicKey(account, masterPassword, address) {
   const AccountManager = yield select(contractByName, 'AccountManager')
   const existingKey = yield web3Call(AccountManager, 'publicKeys', address)
   const hexPublicKey = '0x' + account.hexPublicKey()
+
   if (existingKey !== hexPublicKey) {
-    yield put({ type: 'SEND_TRANSACTION', transactionId: nextId(), call: createCall(AccountManager, 'setPublicKey', hexPublicKey) })
+    yield put({
+      type: 'SEND_TRANSACTION',
+      transactionId: nextId(),
+      call: createCall(AccountManager, 'setPublicKey', hexPublicKey)
+    })
   }
 }
 

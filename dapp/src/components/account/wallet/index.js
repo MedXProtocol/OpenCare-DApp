@@ -52,7 +52,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
 
                     {this.props.canMint &&
                       <div className="text-right">
-                        <Link to='/mint' className="btn btn-primary btn-lg">
+                        <Link to='/account/mint' className="btn btn-primary btn-lg">
                           Buy MEDX
                         </Link>
                       </div>
