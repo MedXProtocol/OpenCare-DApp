@@ -4,7 +4,7 @@ import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faPlus from '@fortawesome/fontawesome-free-solid/faPlus';
+import faHeartbeat from '@fortawesome/fontawesome-free-solid/faHeartbeat';
 import { cacheCall } from '~/saga-genesis/sagas'
 import { withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
@@ -38,16 +38,16 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
               <div className="card">
                 <div className="card-header">
                   <h4 className="card-title">
-                    <FontAwesomeIcon
-                      icon={faPlus} />
-                    &nbsp; <span className="title">Your Balance:</span> {parseInt(this.props.balance, 10).toLocaleString()} MEDX
+                    MEDX Balance
+                    <br /><small className="eth-address text-gray">for account: {this.props.account}</small>
                   </h4>
                 </div>
                 <div className="card-body">
                   <div className="form-wrapper">
-                    <p className='lead'>
-                      For account:
-                      <br /><small className="eth-address text-gray">{this.props.account}</small>
+                    <p className='lead text-center'>
+                      <FontAwesomeIcon
+                        icon={faHeartbeat} />
+                      &nbsp; {parseInt(this.props.balance, 10).toLocaleString()} MEDX
                     </p>
 
                     {this.props.canMint &&
