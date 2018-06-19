@@ -84,7 +84,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
               showConfirmSubmissionModal: false
             })
           })
-          .onReceipt(() => {
+          .onTxHash(() => {
             toastr.success('Your case has been submitted.')
             mixpanel.track('Case Submitted')
             this.props.history.push('/patients/cases')
@@ -291,6 +291,15 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         })
     }
 
+    progressClassNames = (percent) => {
+      return classNames(
+        {
+          'progress--wrapper__show': percent > 0 && percent < 100,
+          'progress--wrapper__hide': percent === 0 || percent === 100
+        }
+      )
+    }
+
     render() {
       if (this.state.firstFileError) {
         var firstFileError =
@@ -345,7 +354,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <span>
                                 &nbsp; {this.state.firstFileName}
                               </span>
-                              <div>
+                              <div className={this.progressClassNames(this.state.firstImagePercent)}>
                                 <ProgressBar
                                   active
                                   bsStyle="success"
@@ -374,7 +383,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <span>
                                   &nbsp; {this.state.secondFileName}
                               </span>
-                              <div>
+                              <div className={this.progressClassNames(this.state.secondImagePercent)}>
                                 <ProgressBar
                                   active
                                   bsStyle="success"

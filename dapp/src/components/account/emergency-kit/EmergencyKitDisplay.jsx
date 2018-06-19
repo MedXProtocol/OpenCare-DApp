@@ -59,7 +59,7 @@ const EmergencyKitDisplay = class extends Component {
                   </p>
                   <ol>
                     <li>Ensure you are using a Web3-enabled browser and that the current account is <b>{this.props.account}</b></li>
-                    <li>Go to the Hippocrates sign up page: <a href={routes.SIGN_UP} target='_blank'>/sign-up</a></li>
+                    <li>Go to the Hippocrates sign up page: <a href={routes.SIGN_UP} target='_blank' rel="noopener noreferrer">/sign-up</a></li>
                     <li>Enter the above secret key</li>
                     <li>Enter a new master password to encrypt your data locally</li>
                     <li>Confirm the master password, then create your account</li>
