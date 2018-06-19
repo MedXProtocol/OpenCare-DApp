@@ -22,7 +22,6 @@ function mapStateToProps(state, { accounts }) {
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
 
   const cases = []
-  let showingApprovalModal = false
   for (let caseIndex = caseListCount; caseIndex >= 0; --caseIndex) {
     let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
 
