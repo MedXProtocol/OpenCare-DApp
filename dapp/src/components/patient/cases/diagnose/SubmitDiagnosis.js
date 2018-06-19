@@ -14,6 +14,8 @@ import { connect } from 'react-redux'
 import { withSend } from '~/saga-genesis'
 import { groupedRecommendationOptions } from './recommendationOptions'
 import { groupedDiagnosisOptions } from './diagnosisOptions'
+import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { toastr } from '~/toastr'
 
 // The react-select <Select /> component uses inline CSS, this fixes it for mobile:
 const customStyles = {
@@ -37,6 +39,12 @@ function mapDispatchToProps (dispatch) {
 }
 
 export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToProps)(withSend(class extends Component {
+  static propTypes = {
+    caseAddress: PropTypes.string,
+    caseKey: PropTypes.any,
+    diagnosisHash: PropTypes.string
+  }
+
   constructor(props, context){
     super(props, context)
 
@@ -54,8 +62,10 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
       diagnosis: null,
       recommendation: null,
 
-      canSubmit: false,
-      showConfirmationModal: false
+      formIsValid: false,
+      showConfirmationModal: false,
+
+      showThankYou: false
     }
   }
 
@@ -65,16 +75,31 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
 
   componentWillReceiveProps(props) {
     this.init(props)
+    const transaction = props.transactions[this.state.transactionId]
+    if (this.state.transactionHandler) {
+      this.state.transactionHandler.handle(transaction)
+        .onError((error) => {
+          toastr.transactionError(error)
+          this.setState({
+            transactionHandler: null
+          })
+        })
+        .onReceipt(() => {
+          this.setState({
+            transactionHandler: null,
+            showThankYou: true
+          })
+        })
+    }
   }
 
   init (props) {
-    if (props.diagnosisHash && props.caseKey) {
-      downloadJson(props.diagnosisHash, props.caseKey).then((originalDiagnosis) => {
-        this.setState({
-          originalDiagnosis: JSON.parse(originalDiagnosis)
-        })
+    if (this.state.originalDiagnosis || !props.diagnosisHash || !props.caseKey) { return }
+    downloadJson(props.diagnosisHash, props.caseKey).then((originalDiagnosis) => {
+      this.setState({
+        originalDiagnosis: JSON.parse(originalDiagnosis)
       })
-    }
+    })
   }
 
   recommendationSelectUpdated = (key) => {
@@ -114,21 +139,18 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
       isNotEmptyString(this.state.diagnosis) &&
       isNotEmptyString(this.state.recommendation)
 
-    this.setState({ canSubmit: valid })
+    this.setState({ formIsValid: valid })
   }
 
   handleSubmit = async (event) => {
-      event.preventDefault()
-      this.setState({showConfirmationModal: true})
+    event.preventDefault()
+    this.setState({
+      showConfirmationModal: true
+    })
   }
 
   handleCancelConfirmSubmissionModal = (event) => {
-      this.setState({showConfirmationModal: false})
-  }
-
-  handleAcceptConfirmSubmissionModal = async (event) => {
-      this.setState({showConfirmationModal: false})
-      await this.submitDiagnosis()
+    this.setState({showConfirmationModal: false})
   }
 
   submitDiagnosis = async () => {
@@ -141,27 +163,24 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
     const ipfsHash = await uploadJson(diagnosisJson, this.props.caseKey)
     const hashHex = '0x' + hashToHex(ipfsHash)
 
+    let transactionId
     if(!isBlank(this.props.diagnosisHash)) {
       const accept = this.state.originalDiagnosis.diagnosis === this.state.diagnosis
-      this.setState({
-        transactionId: this.props.send(this.props.caseAddress, 'diagnoseChallengedCase', hashHex, accept)()
-      })
-      mixpanel.track('Diagnose Challenged Case')
+      transactionId = this.props.send(this.props.caseAddress, 'diagnoseChallengedCase', hashHex, accept)()
+      mixpanel.track('Submit Challenged Case Diagnosis')
     } else {
-      this.setState({
-        transactionId: this.props.send(this.props.caseAddress, 'diagnoseCase', hashHex)()
-      })
-      mixpanel.track('Diagnose Case')
+      transactionId = this.props.send(this.props.caseAddress, 'diagnoseCase', hashHex)()
+      mixpanel.track('Submit Case Diagnosis')
     }
+    this.setState({
+      transactionId,
+      transactionHandler: new TransactionStateHandler(),
+      showConfirmationModal: false
+    })
   }
 
   render() {
-    var transaction = this.props.transactions[this.state.transactionId]
-    var loading = !!(transaction && transaction.inFlight)
-    var showThankYou = !!(transaction && transaction.complete)
-
-    if (showThankYou)
-      this.props.refreshCase(this.props.caseAddress)
+    const loading = !!this.state.transactionHandler
 
     return (
       <div>
@@ -301,7 +320,7 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
               </div>
             </div>
             <div className="card-footer text-right">
-              <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit</button>
+              <button disabled={loading || !this.state.formIsValid} type="submit" className="btn btn-lg btn-success">Submit</button>
             </div>
           </form>
         </div>
@@ -316,11 +335,11 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
           </Modal.Body>
           <Modal.Footer>
             <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
-            <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
+            <button onClick={this.submitDiagnosis} type="button" className="btn btn-primary">Yes</button>
           </Modal.Footer>
         </Modal>
 
-        <Modal show={showThankYou}>
+        <Modal show={this.state.showThankYou}>
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
@@ -339,9 +358,3 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
     )
   }
 }))
-
-SubmitDiagnosisContainer.propTypes = {
-  caseAddress: PropTypes.string,
-  caseKey: PropTypes.any,
-  diagnosisHash: PropTypes.string
-}
