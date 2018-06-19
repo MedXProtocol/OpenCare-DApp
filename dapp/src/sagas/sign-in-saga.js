@@ -29,7 +29,7 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
       account.unlock(masterPassword)
       yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
     } catch (error) {
-      yield put({type: 'SIGN_IN_ERROR', masterPasswordError: error })
+      yield put({type: 'SIGN_IN_ERROR', masterPasswordError: error.message })
     }
   } else { // error! no existing account
     yield put({type: 'SIGN_IN_ERROR', secretKeyError: 'You must enter a secret key'})
