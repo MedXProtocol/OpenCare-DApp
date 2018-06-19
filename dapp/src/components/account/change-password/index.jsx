@@ -10,6 +10,7 @@ import masterPasswordInvalid from '~/services/master-password-invalid'
 import { currentAccount, signIn } from '~/services/sign-in'
 import { Account } from '~/accounts/Account'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
+import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -63,7 +64,7 @@ export const ChangePassword = class extends Component {
   }
 
   onNewMasterPassword = (account) => {
-    let dynamicNextPath = this.props.isDoctor ? '/patients/cases/open' : '/patients/cases'
+    let dynamicNextPath = this.props.isDoctor ? routes.DOCTORS_CASES_OPEN : routes.PATIENTS_CASES
     let newAccount = Account.create({
       address: account.address(),
       secretKey: account.secretKey(),
@@ -110,7 +111,7 @@ export const ChangePassword = class extends Component {
                 </div>
                 <div className="card-body">
                   <p className='text-gray'>
-                    This password is combined with your Secret Key to sign in. To retrieve your Secret Key, visit your <Link to='/account/emergency-kit'>Emergency Kit</Link>.
+                    This password is combined with your Secret Key to sign in. To retrieve your Secret Key, visit your <Link to={routes.ACCOUNT_EMERGENCY_KIT}>Emergency Kit</Link>.
                   </p>
 
                   {success}

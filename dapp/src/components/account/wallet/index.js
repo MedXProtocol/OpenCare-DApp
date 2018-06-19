@@ -8,6 +8,7 @@ import faHeartbeat from '@fortawesome/fontawesome-free-solid/faHeartbeat';
 import { cacheCall } from '~/saga-genesis/sagas'
 import { withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
+import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -52,7 +53,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
 
                     {this.props.canMint &&
                       <div className="text-right">
-                        <Link to='/mint' className="btn btn-primary btn-lg">
+                        <Link to={routes.ACCOUNT_MINT} className="btn btn-primary btn-lg">
                           Buy MEDX
                         </Link>
                       </div>

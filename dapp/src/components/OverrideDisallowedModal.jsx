@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { ErrorModal } from '~/components/ErrorModal'
+import * as routes from '~/config/routes'
 
 export class OverrideDisallowedModal extends Component {
   static propTypes = {
@@ -15,7 +16,7 @@ export class OverrideDisallowedModal extends Component {
           <div className="col-xs-12">
             <p>
               You already have an account for this address and you cannot override it.
-              Please enter your original secret key and master password on the <Link to='/sign-in'>sign in</Link> page.  You should have a copy in your Emergency Kit.
+              Please enter your original secret key and master password on the <Link to={routes.SIGN_IN}>sign in</Link> page.  You should have a copy in your Emergency Kit.
             </p>
           </div>
         </div>

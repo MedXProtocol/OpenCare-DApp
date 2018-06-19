@@ -4,6 +4,8 @@ import React, {
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
+import { formatRoute } from 'react-router-named-routes'
+import * as routes from '~/config/routes'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctor-case-status-labels'
@@ -38,11 +40,12 @@ function* propSaga({address}) {
 
 export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga, { propTriggers: ['address'] })(class _CaseRow extends Component {
   render () {
+    const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress: this.props.address })
     var status = parseInt(this.props.status || 0, 10)
     let isApprovedDiagnosingADoctor = this.props.diagnosingDoctorA === this.props.account && status > 3
     let isApprovedDiagnosingBDoctor = this.props.diagnosingDoctorB === this.props.account && status > 8
     if (isApprovedDiagnosingADoctor || isApprovedDiagnosingBDoctor) {
-      var address = <Link to={`/doctors/cases/diagnose/${this.props.address}`}>{this.props.address}</Link>
+      var address = <Link to={caseRoute}>{this.props.address}</Link>
     } else {
       address = this.props.address
     }

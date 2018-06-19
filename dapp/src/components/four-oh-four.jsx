@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
+import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
   const signedIn = state.account.signedIn
@@ -13,7 +14,7 @@ function mapStateToProps (state) {
 export const FourOhFour = connect(mapStateToProps)(
   class extends Component {
     render() {
-      let dynamicHomePath = this.props.signedIn ? '/patients/cases' : '/'
+      let dynamicHomePath = this.props.signedIn ? routes.PATIENTS_CASES : routes.HOME
 
       return (
         <MainLayoutContainer>
