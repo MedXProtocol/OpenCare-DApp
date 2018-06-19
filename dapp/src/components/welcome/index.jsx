@@ -20,28 +20,31 @@ export const Welcome = class extends Component {
 
                     <hr />
                     <p className="text-danger">
-                      <strong>NOTE:</strong> This is the Beta v1 of Hippocrates. It's goal is to gather feedback as we improve the software prior to release. Real cases <strong><em>will not</em></strong> be diagnosed by a medical doctor.
+                      NOTE: This is the private beta v1 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. In this version, submitted cases <strong><em>will not</em></strong> be diagnosed by licensed medical doctors. The goal for this release is to obtain user feedback in preparation for the public beta launch of Hippocrates in July 2018.
                     </p>
 
                     <hr />
                     <p>
-                      Hippocrates provides you with medical recommendations instantly from a global network of dermatologists. Doctors will be compensated in real MEDX for services rendered.
+                      Use Hippocrates to obtain a rapid medical recommendation from a global network of dermatologists.
                     </p>
                     <p>
-                      Beta testing is on the <strong>Rinkeby</strong> Testnet. To get started:
+                      Beta testing is on the Rinkeby Testnet. To get started:
                     </p>
                     <ol>
                       <li>
                         Download the Metamask Extension (<a target='_blank' rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">Chrome</a> / <a target='_blank' rel="noopener noreferrer" href="https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/">Firefox</a>) or the Trust mobile browser (<a target='_blank' rel="noopener noreferrer" href="https://itunes.apple.com/us/app/trust-ethereum-wallet/id1288339409?mt=8">iOS</a> / <a target='_blank' rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp">Android</a>)
                       </li>
                       <li>
-                        Obtain free ETH &amp; MEDX Test Tokens (MEDT) on Rinkeby from <a
+                        Obtain free ETH &amp; MEDX Test Tokens (MEDT) on Rinkeby by providing your Rinkeby address <a
                           target="_blank"
                           href="https://t.me/MedCredits"
-                          rel="noopener noreferrer">our Telegram group</a>
+                          rel="noopener noreferrer">on our Telegram</a>
                       </li>
                       <li>
-                        Sign in, give the DApp a try and provide us with constructive feedback
+                        Sign in, submit your skin problem, and visit our <a
+                          target="_blank"
+                          href="https://t.me/MedCredits"
+                          rel="noopener noreferrer">Telegram</a> to provide us with helpful feedback
                       </li>
                     </ol>
                   </div>
