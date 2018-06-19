@@ -28,10 +28,6 @@ function mapStateToProps(state, { accounts }) {
 
     if (caseAddress) {
       let caseRowProps = mapStateToCaseRowProps(state, { caseAddress })
-      if (/3|8/.test(caseRowProps.status) && !showingApprovalModal) {
-        showingApprovalModal = true
-        caseRowProps.showModal = true
-      }
       cases.push({
         caseAddress,
         caseRowProps,
@@ -70,6 +66,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
   }
 
   render() {
+    let modalHasBeenShown = false
     return (
         <div className="card">
           <div className="card-body table-responsive">
@@ -91,19 +88,27 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
               </thead>
               <tbody>
                 <TransitionGroup component={null}>
-                  {this.props.cases.map(({caseAddress, caseRowProps, caseIndex}) =>
-                    <CSSTransition
-                      key={caseIndex}
-                      timeout={100}
-                      appear={true}
-                      classNames="fade">
-                        <CaseRowContainer
-                          caseAddress={caseAddress}
-                          caseIndex={caseIndex}
-                          key={caseIndex}
-                          {...caseRowProps} />
-                    </CSSTransition>
-                  )}
+                  {this.props.cases.map(({caseAddress, caseRowProps, caseIndex}) => {
+                    let showModal = false
+                    if (/3|8/.test(caseRowProps.status) && !modalHasBeenShown) {
+                      modalHasBeenShown = true
+                      showModal = true
+                    }
+                    return (
+                      <CSSTransition
+                        key={caseIndex}
+                        timeout={100}
+                        appear={true}
+                        classNames="fade">
+                          <CaseRowContainer
+                            caseAddress={caseAddress}
+                            caseIndex={caseIndex}
+                            key={caseIndex}
+                            {...caseRowProps}
+                            showModal={showModal} />
+                      </CSSTransition>
+                    )
+                  })}
                 </TransitionGroup>
               </tbody>
             </table>
