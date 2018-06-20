@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import Spinner from '~/components/Spinner';
 import get from 'lodash.get'
-import defined from '~/utils/defined'
 import { connect } from 'react-redux'
 import { withContractRegistry, withSend } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
@@ -23,28 +21,26 @@ function mapStateToProps (state) {
 
 export const MintTokensContainer = withContractRegistry(connect(mapStateToProps)(withSend(class _MintTokens extends Component {
     constructor(props){
-        super(props)
-        this.state = {
-            address: props.account || '',
-            error: null,
-            submitInProgress: false
-        };
+      super(props)
+      this.state = {
+        address: props.account || ''
+      }
     }
 
     componentWillReceiveProps (props) {
       if (!this.props.account && props.account)
-      this.setState({
-        address: props.account
-      })
+        this.setState({
+          address: props.account
+        })
     }
 
     updateAddress = (event) => {
-        this.setState({address: event.target.value});
+      this.setState({address: event.target.value});
     }
 
     handleSubmit = (event) => {
-        event.preventDefault();
-        this.mintTokens();
+      event.preventDefault();
+      this.mintTokens();
     }
 
     mintTokens = () => {
@@ -53,28 +49,7 @@ export const MintTokensContainer = withContractRegistry(connect(mapStateToProps)
       this.setState({transactionId})
     }
 
-    onSuccess = () => {
-        this.setState({submitInProgress: false});
-    }
-
-    onError = (error) => {
-        this.setState({error: error});
-        this.setState({submitInProgress: false});
-    }
-
     render() {
-      var minting = false
-      if (defined(this.state.stackId)) {
-        const txHash = this.props.transactionStack[this.state.stackId]
-        minting = true
-        if (defined(txHash)) {
-          var transactionStatus = this.props.transactions[txHash].status
-          if (transactionStatus === 'success') {
-            minting = false
-          }
-        }
-      }
-
       return (
         <div className='container'>
           <div className='row'>
@@ -100,11 +75,9 @@ export const MintTokensContainer = withContractRegistry(connect(mapStateToProps)
                       <div className="text-right">
                         <button
                           type="submit"
-                          className="btn btn-lg btn-success"
-                          disabled={minting}>Mint Tokens</button>
+                          className="btn btn-lg btn-success">Mint Tokens</button>
                       </div>
                     </form>
-                    <Spinner loading={minting}/>
                   </div>
                 </div>
               </div>
