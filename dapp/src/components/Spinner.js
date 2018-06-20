@@ -10,6 +10,8 @@ export const Spinner = class extends Component {
           <img width="60" height="60" src={medCreditsLoadingImg} alt="MedCredits Loading Indicator" />
           <p>
             Working on your request ...
+            <br />
+            <span className="text-gray small">(You may need to check your MetaMask)</span>
           </p>
         </div>
       </div> : null;
