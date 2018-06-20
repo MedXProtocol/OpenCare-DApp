@@ -105,8 +105,6 @@ export class Account {
   }
 }
 
-Account.currentVersion = ACCOUNT_VERSION
-
 Account.create = function ({ address, secretKey, masterPassword }) {
   if (isBlank(address) || isBlank(secretKey) || isBlank(masterPassword)) {
     throw new Error(
@@ -127,6 +125,7 @@ Account.get = function (address) {
   let account = null
   if (json) {
     account = new Account(json)
+    account.store() // ensure cookie is retained indefinitely
   }
   return account
 }
