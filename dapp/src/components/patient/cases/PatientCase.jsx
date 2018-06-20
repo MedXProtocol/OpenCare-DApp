@@ -14,7 +14,7 @@ function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
-  if (encryptedCaseKey) {
+  if (encryptedCaseKey && caseKeySalt) {
     const account = currentAccount()
     var caseKey = account.decrypt(encryptedCaseKey.substring(2), caseKeySalt.substring(2))
   }
