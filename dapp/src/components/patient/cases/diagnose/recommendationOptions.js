@@ -69,19 +69,19 @@ const other = [
 
 export const groupedRecommendationOptions = {
   "overTheCounter": {
-    "label": "Over the Counter Remedies or Courses of Action",
+    "label": "Over the Counter Remedies",
     "options": overTheCounter.map(option => ({ "value": option, "label": option }))
   },
   "topicalMedications": {
-    "label": "Topical Medications (From your primary care doctor or local dermatologist)",
+    "label": "Topical Medications",
     "options": topicalMedications.map(option => ({ "value": option, "label": option }))
   },
   "oralMedications": {
-    "label": "Oral Medications (From your primary care doctor or local dermatologist)",
+    "label": "Oral Medications",
     "options": oralMedications.map(option => ({ "value": option, "label": option }))
   },
   "procedures": {
-    "label": "Procedures (By your primary care doctor or local dermatologist)",
+    "label": "Procedures",
     "options": procedures.map(option => ({ "value": option, "label": option }))
   },
   "other": {
