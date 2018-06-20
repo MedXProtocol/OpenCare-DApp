@@ -239,7 +239,7 @@ module.exports = {
   },
   plugins: [
     new BugsnagSourceMapPlugin({
-      apiKey: process.env.BUGSNAG_API_KEY,
+      apiKey: process.env.REACT_APP_BUGSNAG_API_KEY,
       publicPath: `${process.env.DEPLOY_URL}/static/js`,
       appVersion: '1.0.0',
     }),

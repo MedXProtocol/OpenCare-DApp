@@ -12,4 +12,6 @@ export REACT_APP_REQUIRED_NETWORK_ID=1234
 export REACT_APP_IPFS_HOSTNAME=ipfs.medcredits.io
 export REACT_APP_IPFS_PORT=5001
 export REACT_APP_IPFS_PROTOCOL=https
+# export REACT_APP_BUGSNAG_API_KEY=<your bug snag key>
+# export REACT_APP_ENV=<your env ie staging or production>
 # export REACT_APP_MIXPANEL_KEY=<your_dev_key>

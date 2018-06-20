@@ -4,9 +4,9 @@ import createPlugin from 'bugsnag-react'
 
 let boundary
 
-if (process.env.BUGSNAG_API_KEY && process.env.REACT_APP_ENV) {
+if (process.env.REACT_APP_BUGSNAG_API_KEY && process.env.REACT_APP_ENV) {
   const bugsnagClient = bugsnag({
-    apiKey: process.env.BUGSNAG_API_KEY,
+    apiKey: process.env.REACT_APP_BUGSNAG_API_KEY,
     notifyReleaseStages: ['production', 'staging'],
     releaseStage: process.env.REACT_APP_ENV
   })
