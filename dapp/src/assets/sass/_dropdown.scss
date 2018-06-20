@@ -33,3 +33,7 @@
 .dropdown-menu > .active > a:focus {
   background-color: $brand-info;
 }
+
+.dropdown-menu a {
+  transition: none;
+}
