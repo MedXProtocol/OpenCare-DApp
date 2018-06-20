@@ -330,7 +330,12 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>Are you sure?</h4>
+                <h4>
+                  Are you sure?
+                </h4>
+                <h5>
+                  This will send your diagnosis and recommendation to the patient.
+                </h5>
               </div>
             </div>
           </Modal.Body>
@@ -344,7 +349,8 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>Thank you! Your diagnosis submitted successfully.</h4>
+                <h4>Thank you!</h4>
+                <h5>Your diagnosis submitted successfully.</h5>
               </div>
             </div>
           </Modal.Body>

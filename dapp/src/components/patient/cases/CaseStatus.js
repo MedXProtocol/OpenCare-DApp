@@ -24,19 +24,19 @@ const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['cas
         case 1:
           alert =
             <div className="alert alert-info">
-                Your case is waiting to be assigned to a doctor.
+              Your case is waiting to be assigned to a doctor.
             </div>
           break
         case 2:
           alert =
-            <div className="alert alert-info">
-                A doctor has requested to diagnose your case.  Please authorize the diagnosis.
+            <div className="alert alert-danger">
+              You have cancelled this case.
             </div>
           break
         case 3:
           alert =
-            <div className="alert alert-danger">
-                You have cancelled this case.
+            <div className="alert alert-warning">
+              A doctor has requested to diagnose your case.  Please authorize the diagnosis.
             </div>
           break
         case 4:
