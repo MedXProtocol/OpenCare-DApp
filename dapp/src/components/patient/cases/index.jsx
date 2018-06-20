@@ -5,6 +5,7 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
+import faFileMedical from '@fortawesome/fontawesome-free-solid/faFileMedical';
 import {
   CaseRowContainer,
   caseRowSaga,
@@ -14,6 +15,7 @@ import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { fork } from 'redux-saga/effects'
 import { contractByName } from '~/saga-genesis/state-finders'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { accounts }) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -71,8 +73,24 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
           <div className="card-body table-responsive">
           {
             !this.props.caseListCount || this.props.caseListCount === '0' ?
-            <div className="alert alert-info text-center">
-              <span>You do not have any historical or pending cases.</span>
+            <div className="blank-state">
+              <div className="blank-state--inner text-center text-gray">
+                <button
+                  type="button"
+                  className="btn btn-sm btn-link"
+                  onClick={() => { return this.props.history.push(routes.PATIENTS_CASES_NEW) } }
+                >
+                  <FontAwesomeIcon
+                    icon={faFileMedical}
+                    size='3x'
+                  />
+                  <br />
+                  <br />
+                  Open Your First Case
+                </button>
+                <hr />
+                <span>You do not have any historical or pending cases.</span>
+              </div>
             </div> :
             <table className="table table-striped">
               <thead>

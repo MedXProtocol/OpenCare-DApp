@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faTelegramPlane from '@fortawesome/fontawesome-free-brands/faTelegramPlane';
 import { HippoNavbarContainer } from '../components/HippoNavbar';
+import { PublicKeyCheck } from '../components/PublicKeyCheck';
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 import get from 'lodash.get'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
@@ -30,15 +31,18 @@ export const MainLayout = class extends Component {
     if (this.props.doNetworkCheck) {
       var networkCheckmodal = <NetworkCheckModal />
     }
+    if (this.props.isOwner) {
+      var ownerWarning =
+        <div className="alert alert-warning alert--banner text-center">
+          <small>NOTE: You are currently using the contract owner's Ethereum address, please do not submit or diagnose cases with this account for encryption reasons.</small>
+        </div>
+    }
     return (
       <div className="wrapper">
         <div className="main-panel">
           <HippoNavbarContainer />
-          {this.props.isOwner ? (
-            <div className="alert alert-warning alert--banner text-center">
-              <small>NOTE: You are currently using the contract owner's Ethereum address, please do not submit or diagnose cases with this account for encryption reasons.</small>
-            </div>
-          ) : null}
+          {ownerWarning}
+          <PublicKeyCheck />
           {networkCheckmodal}
           <div className="content">
             {this.props.children}
