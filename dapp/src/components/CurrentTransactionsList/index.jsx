@@ -73,7 +73,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
             } else {
               errorMessage =
                 <p className="small">
-                  {error}
+                  {error.toString()}
                 </p>
             }
           }
