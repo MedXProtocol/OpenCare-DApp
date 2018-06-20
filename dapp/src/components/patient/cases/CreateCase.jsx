@@ -669,7 +669,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                   Are you sure?
                 </h4>
                 <h5>
-                  This will cost 5-15 MEDX
+                  This will cost you between 5 - 15 MEDX.
                   <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
                 </h5>
               </div>
