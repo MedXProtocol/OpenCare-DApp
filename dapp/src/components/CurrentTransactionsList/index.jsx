@@ -66,8 +66,12 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           if (error) {
             var code = transactionErrorToCode(error)
             if (code) {
-              // {t(`transactionErrors.${code}`)}
               var errorMessage =
+                <p className="small">
+                  {t(`transactionErrors.${code}`)}
+                </p>
+            } else {
+              errorMessage =
                 <p className="small">
                   {error}
                 </p>
