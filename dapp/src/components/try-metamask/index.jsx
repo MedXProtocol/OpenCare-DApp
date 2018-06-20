@@ -20,20 +20,32 @@ export const TryMetamask = class extends Component {
                 <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
                   <div className="form-wrapper--body form-wrapper--body__extra-padding text-center">
                     <h4>
-                      <a href='https://metamask.io/' title='MetaMask' target='_blank' rel="noopener noreferrer">MetaMask</a> is a wallet extension for Chrome, Firefox and Brave browsers:
+                      <a href='https://metamask.io/' title='MetaMask' target="_blank" rel="noopener noreferrer">MetaMask</a> is a wallet extension for Chrome, Firefox and Brave browsers:
                     </h4>
                     <br />
-                    <a href="https://metamask.io" title="Download Metamask" rel="noopener noreferrer"><img src={DownloadMetamaskButtonImg} alt="Metamask Download Button" width="200" /></a>
+                    <a href="https://metamask.io" title="Download Metamask" target="_blank" rel="noopener noreferrer"><img src={DownloadMetamaskButtonImg} alt="Metamask Download Button" width="200" /></a>
                     <br />
                     <br />
                     <hr />
                     <br />
                     <h4>
-                      On mobile? Try the Trust browser:
+                      On mobile? Try the Cipher browser:
                     </h4>
-                    <a href="https://itunes.apple.com/us/app/trust-ethereum-/id1288339409" title="Download Trust from Apple App Store"><img src={AppStoreButtonImg} alt="Apple App Store Button" /></a>
+                    <a
+                      href="https://itunes.apple.com/app/cipher-browser-for-ethereum/id1294572970"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Download Cipher from Apple App Store">
+                      <img src={AppStoreButtonImg} alt="Apple App Store Button" />
+                    </a>
                     &nbsp; &nbsp; &nbsp;
-                    <a href="https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp" title="Download Trust from Google Play Store"><img src={PlayStoreButtonImg} alt="Google Play Store Button" /></a>
+                    <a
+                      href="https://play.google.com/store/apps/details?id=com.cipherbrowser.cipher"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Download Cipher from Google Play Store">
+                      <img src={PlayStoreButtonImg} alt="Google Play Store Button" />
+                    </a>
                   </div>
                 </div>
               </div>
