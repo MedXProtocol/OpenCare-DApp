@@ -8,7 +8,6 @@ export default function (state, {type, transactionId, call, error, receipt, txHa
       state = {
         ...state,
         [transactionId]: {
-          ...state[transactionId],
           call,
           inFlight: true
         }

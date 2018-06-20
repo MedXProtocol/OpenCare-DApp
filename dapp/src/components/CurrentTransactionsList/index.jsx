@@ -20,7 +20,15 @@ function mapStateToProps(state) {
   }
 }
 
-export const CurrentTransactionsList = connect(mapStateToProps)(
+function mapDispatchToProps (dispatch) {
+  return {
+    send: (transactionId, call) => {
+      dispatch({ type: 'SEND_TRANSACTION', transactionId, call })
+    }
+  }
+}
+
+export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToProps)(
   class _CurrentTransactionsList extends Component {
     getClassName = (error, confirmed) => {
       let labelClass = ''
@@ -71,6 +79,10 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
                   {t(`transactionErrors.${code}`)}
                 </p>
             }
+            var resendButton =
+              <button onClick={() => this.props.send(key, call)} className='btn btn-sm btn-primary'>
+                Retry
+              </button>
           }
 
           return (
@@ -84,6 +96,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
                   mintMedxCount: mintMedxCount
                 })}
                 {errorMessage}
+                {resendButton}
               </li>
             </CSSTransition>
           )
