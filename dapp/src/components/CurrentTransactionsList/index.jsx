@@ -9,34 +9,19 @@ import { transactionErrorToCode } from '~/services/transaction-error-to-code'
 import './CurrentTransactionsList.scss'
 
 function mapStateToProps(state) {
+  let transactions = Object.entries(state.sagaGenesis.transactions)
+  let pendingOrErrorTransactions = transactions.filter(tx => {
+    return (!tx[1].confirmed && !tx[1].error) ||
+      (tx[1].error && transactionErrorToCode(tx[1].error) !== 'userRevert')
+  })
+
   return {
-    transactions: state.sagaGenesis.transactions
+    pendingOrErrorTransactions
   }
 }
 
 export const CurrentTransactionsList = connect(mapStateToProps)(
   class _CurrentTransactionsList extends Component {
-    constructor(props) {
-      super(props)
-
-      this.state = {
-        pendingOrErrorTransactions: []
-      }
-    }
-
-    componentWillReceiveProps(nextProps) {
-      if (nextProps.transactions) {
-        let transactions = Object.entries(nextProps.transactions)
-        let pendingOrErrorTransactions = transactions.filter(tx => {
-          return (!tx[1].confirmed && !tx[1].error) ||
-            (tx[1].error && transactionErrorToCode(tx[1].error) !== 'userRevert')
-        })
-        this.setState({
-          pendingOrErrorTransactions
-        })
-      }
-    }
-
     getClassName = (error, confirmed) => {
       let labelClass = ''
 
@@ -50,9 +35,9 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
       return labelClass
     }
 
-    getDropdownClassName = (transactions) => {
-      let error = this.state.pendingOrErrorTransactions.find(tx => tx[1].error)
-      let notConfirmed = this.state.pendingOrErrorTransactions.find(tx => !tx[1].confirmed)
+    getDropdownClassName = () => {
+      let error = this.props.pendingOrErrorTransactions.find(tx => tx[1].error)
+      let notConfirmed = this.props.pendingOrErrorTransactions.find(tx => !tx[1].confirmed)
 
       let dropdownClass = this.getClassName(error, !notConfirmed)
 
@@ -63,7 +48,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
       let transactions = []
       let transactionHtml = null
 
-      if (this.state.pendingOrErrorTransactions.length === 0) {
+      if (this.props.pendingOrErrorTransactions.length === 0) {
         transactionHtml = (
           <div className="blank-state">
             <div className="blank-state--inner text-center text-gray">
@@ -72,7 +57,7 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
           </div>
         )
       } else {
-        transactions = this.state.pendingOrErrorTransactions.reverse().map(tx => {
+        transactions = this.props.pendingOrErrorTransactions.reverse().map(tx => {
           const key   = tx[0]
           const { call, error, confirmed } = tx[1]
           let name = call.method
@@ -82,9 +67,9 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
             var code = transactionErrorToCode(error)
             if (code) {
               var errorMessage =
-                <div>
+                <p className="small">
                   {t(`transactionErrors.${code}`)}
-                </div>
+                </p>
             }
           }
 

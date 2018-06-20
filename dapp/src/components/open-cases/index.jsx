@@ -74,7 +74,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                     Diagnose Cases
                   </h3>
                   <span className="sm-block text-gray">
-                    Cases you are currently evaluating &amp; have diagnosed
+                    <strong>Currently Evaluating &amp; Historical</strong>
                   </span>
                 </div>
                 <div className='col-md-4 col-sm-12 button-container'>
