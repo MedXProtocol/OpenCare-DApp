@@ -110,19 +110,21 @@ export const CurrentTransactionsList = connect(mapStateToProps)(
               <span className={classnames('nav-transactions--circle', this.getDropdownClassName())} /> Status
             </span>
           }>
-          <div className="nav-transactions">
-            <I18n>
-              {
-                (t) => {
-                  return (
-                    <span>
-                      {this.getTransactionHtml(t)}
-                    </span>
-                  )
+          <li>
+            <div className="nav-transactions">
+              <I18n>
+                {
+                  (t) => {
+                    return (
+                      <span>
+                        {this.getTransactionHtml(t)}
+                      </span>
+                    )
+                  }
                 }
-              }
-            </I18n>
-          </div>
+              </I18n>
+            </div>
+          </li>
         </NavDropdown>
       )
     }
