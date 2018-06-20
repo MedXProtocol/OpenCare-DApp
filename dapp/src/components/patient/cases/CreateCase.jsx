@@ -23,6 +23,7 @@ import getWeb3 from '~/get-web3'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { Spinner } from '~/components/Spinner'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -69,7 +70,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         caseEncryptionKey: genKey(32),
         canSubmit: false,
         showBalanceTooLowModal: false,
-        showConfirmSubmissionModal: false
+        showConfirmSubmissionModal: false,
+        isSubmitting: false
       }
     }
 
@@ -81,7 +83,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             this.setState({
               createCaseEvents: null,
               transactionId: '',
-              showConfirmSubmissionModal: false
+              showConfirmSubmissionModal: true,
+              isSubmitting: false
             })
           })
           .onTxHash(() => {
@@ -209,9 +212,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     handleSubmit = (event) => {
       event.preventDefault()
       if(this.props.balance < 15) {
-        this.setState({showBalanceTooLowModal: true})
+        this.setState({ showBalanceTooLowModal: true })
       } else {
-        this.setState({showConfirmSubmissionModal: true})
+        this.setState({ showConfirmSubmissionModal: true })
       }
     }
 
@@ -246,6 +249,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
     handleAcceptConfirmSubmissionModal = async (event) => {
       event.preventDefault()
+
+      this.setState({
+        showConfirmSubmissionModal: false,
+        isSubmitting: true
+      })
 
       await this.createNewCase()
     }
@@ -639,7 +647,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
-                          <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit Case</button>
+                          <button
+                            disabled={!this.state.canSubmit}
+                            type="submit"
+                            className="btn btn-lg btn-success">
+                            Submit Case
+                          </button>
                         </div>
                       </div>
                     </form>
@@ -677,9 +690,17 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           </Modal.Body>
           <Modal.Footer>
             <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
-            <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
+            <button
+              disabled={this.state.isSubmitting}
+              onClick={this.handleAcceptConfirmSubmissionModal}
+              type="button"
+              className="btn btn-primary">
+              Yes
+            </button>
           </Modal.Footer>
         </Modal>
+
+        <Spinner loading={this.state.isSubmitting} />
       </div>
     )
   }

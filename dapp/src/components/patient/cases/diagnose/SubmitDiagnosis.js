@@ -66,7 +66,8 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
       formIsValid: false,
       showConfirmationModal: false,
 
-      showThankYou: false
+      showThankYou: false,
+      isSubmitting: false
     }
   }
 
@@ -82,13 +83,15 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
         .onError((error) => {
           toastr.transactionError(error)
           this.setState({
-            transactionHandler: null
+            transactionHandler: null,
+            isSubmitting: false
           })
         })
         .onTxHash(() => {
           this.setState({
             transactionHandler: null,
-            showThankYou: true
+            showThankYou: true,
+            isSubmitting: false
           })
         })
     }
@@ -145,16 +148,19 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
 
   handleSubmit = async (event) => {
     event.preventDefault()
-    this.setState({
-      showConfirmationModal: true
-    })
+    this.setState({ showConfirmationModal: true })
   }
 
   handleCancelConfirmSubmissionModal = (event) => {
-    this.setState({showConfirmationModal: false})
+    this.setState({ showConfirmationModal: false })
   }
 
   submitDiagnosis = async () => {
+    this.setState({
+      isSubmitting: true,
+      showConfirmationModal: false
+    })
+
     const diagnosisInformation = {
       diagnosis: this.state.diagnosis,
       recommendation: this.state.recommendation,
@@ -175,13 +181,12 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
     }
     this.setState({
       transactionId,
-      transactionHandler: new TransactionStateHandler(),
-      showConfirmationModal: false
+      transactionHandler: new TransactionStateHandler()
     })
   }
 
   render() {
-    const loading = !!this.state.transactionHandler
+    const loading = this.state.isSubmitting
 
     return (
       <div>
@@ -321,7 +326,10 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
               </div>
             </div>
             <div className="card-footer text-right">
-              <button disabled={loading || !this.state.formIsValid} type="submit" className="btn btn-lg btn-success">Submit</button>
+              <button
+                disabled={loading || !this.state.formIsValid}
+                type="submit"
+                className="btn btn-lg btn-success">Submit Diagnosis</button>
             </div>
           </form>
         </div>
@@ -340,8 +348,19 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
-            <button onClick={this.submitDiagnosis} type="button" className="btn btn-primary">Yes</button>
+            <button
+              onClick={this.handleCancelConfirmSubmissionModal}
+              type="button"
+              className="btn btn-link">
+              No
+            </button>
+            <button
+              onClick={this.submitDiagnosis}
+              type="button"
+              className="btn btn-primary"
+              disabled={loading}>
+              Yes
+            </button>
           </Modal.Footer>
         </Modal>
 
