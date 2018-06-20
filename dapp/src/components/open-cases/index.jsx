@@ -62,7 +62,9 @@ function* saga({ account, CaseManager, AccountManager }) {
 export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager', 'AccountManager'] })(withSend(class _OpenCases extends Component {
   constructor (props) {
     super(props)
-    this.state = {}
+    this.state = {
+      showPublicKeyModal: false
+    }
   }
 
   handleRequestCase = (e) => {
