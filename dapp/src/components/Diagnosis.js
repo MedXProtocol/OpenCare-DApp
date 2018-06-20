@@ -120,7 +120,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   }
 
   render() {
-    const buttonsHidden = this.props.status !== '5'
+    const buttonsVisible = this.props.status === '5' && this.props.isPatient
     const loading = !!this.state.acceptHandler || !!this.state.challengeHandler
     return ( this.state.hidden ?
       <div /> :
@@ -156,17 +156,17 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
         </div>
 
         {
-          buttonsHidden ? null :
-          <div className="card-footer">
-            <hr/>
-            <div className="row">
-              <div className="col-xs-12 text-right" >
-                <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
-                &nbsp;
-                <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
+          buttonsVisible ?
+            <div className="card-footer">
+              <hr/>
+              <div className="row">
+                <div className="col-xs-12 text-right" >
+                  <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
+                  &nbsp;
+                  <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
+                </div>
               </div>
-            </div>
-          </div>
+            </div> : null
         }
 
         <Modal show={this.state.showThankYouModal}>
