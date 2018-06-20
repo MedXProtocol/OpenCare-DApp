@@ -49,16 +49,19 @@ export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchTo
   }
 
   render () {
-    if (this.props.account && this.props.account.getVersion() !== Account.currentVersion) {
-      var warning =
-        <div className='alert alert-danger'>
-          <p>
-            You have an old account that no longer works.
-          </p>
-          <button className='btn btn-danger btn-outline-inverse btn-no-shadow' onClick={this.destroyAndSignUp}>
-            Reset Account
-          </button>
-        </div>
+    if (this.props.account) {
+      const version = this.props.account.getVersion() || 0
+      if (version < 1) {
+        var warning =
+          <div className='alert alert-danger'>
+            <p>
+              You have an old account that no longer works.
+            </p>
+            <button className='btn btn-danger btn-outline-inverse btn-no-shadow' onClick={this.destroyAndSignUp}>
+              Reset Account
+            </button>
+          </div>
+      }
     }
     return (
       <BodyClass isDark={true}>
