@@ -19,7 +19,9 @@ export const TryMetamask = class extends Component {
 
                 <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
                   <div className="form-wrapper--body form-wrapper--body__extra-padding text-center">
-                    <a href='https://metamask.io/' title='MetaMask' target='_blank' rel="noopener noreferrer">MetaMask</a> is an extension for Chrome, Firefox and Brave browsers:
+                    <h4>
+                      <a href='https://metamask.io/' title='MetaMask' target='_blank' rel="noopener noreferrer">MetaMask</a> is a wallet extension for Chrome, Firefox and Brave browsers:
+                    </h4>
                     <br />
                     <a href="https://metamask.io" title="Download Metamask" rel="noopener noreferrer"><img src={DownloadMetamaskButtonImg} alt="Metamask Download Button" width="200" /></a>
                     <br />
