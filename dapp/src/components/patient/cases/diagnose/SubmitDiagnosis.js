@@ -85,7 +85,7 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
             transactionHandler: null
           })
         })
-        .onReceipt(() => {
+        .onTxHash(() => {
           this.setState({
             transactionHandler: null,
             showThankYou: true
