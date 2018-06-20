@@ -161,9 +161,19 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
               <hr/>
               <div className="row">
                 <div className="col-xs-12 text-right" >
-                  <button onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
+                  <button
+                    onClick={this.handleChallengeDiagnosis}
+                    type="button"
+                    className="btn btn-warning">
+                    Get Second Opinion
+                  </button>
                   &nbsp;
-                  <button onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
+                  <button
+                    onClick={this.handleAcceptDiagnosis}
+                    type="button"
+                    className="btn btn-success">
+                    Accept
+                  </button>
                 </div>
               </div>
             </div> : null
