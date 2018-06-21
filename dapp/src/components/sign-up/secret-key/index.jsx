@@ -7,6 +7,7 @@ import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope';
 import { BodyClass } from '~/components/BodyClass'
 import { formatSecretKey } from '~/services/format-secret-key'
 import * as routes from '~/config/routes'
+import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
 
 export const SecretKey = class extends Component {
   constructor(props) {
@@ -39,6 +40,7 @@ export const SecretKey = class extends Component {
   render () {
     return (
       <BodyClass isDark={true}>
+        <ScrollToTopOnMount />
         <div className='container'>
           <div className='row'>
             <div className='col-sm-8 col-sm-offset-2'>
