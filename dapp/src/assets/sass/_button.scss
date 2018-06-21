@@ -31,6 +31,17 @@
   background-color: $brand-info;
 }
 
+.btn.disabled,
+.btn.disabled:hover,
+.btn.disabled:focus,
+.btn.disabled.focus,
+.btn[disabled],
+.btn[disabled]:hover,
+.btn[disabled]:focus,
+.btn[disabled].focus {
+  opacity: 0.5;
+}
+
 // This is to be used against a colored / dark background
 .btn-clear {
   background-color: rgba(255, 255, 255, 0.2);
@@ -47,15 +58,12 @@
   color: white;
 }
 
-.btn-info.disabled:hover,
-.btn-info.disabled:focus,
-.btn-info.disabled.focus,
-.btn-info[disabled]:hover,
-.btn-info[disabled]:focus,
-.btn-info[disabled].focus,
-fieldset[disabled] .btn-info:hover,
-fieldset[disabled] .btn-info:focus,
-fieldset[disabled] .btn-info.focus {
+.btn-clear.disabled:hover,
+.btn-clear.disabled:focus,
+.btn-clear.disabled.focus,
+.btn-clear[disabled]:hover,
+.btn-clear[disabled]:focus,
+.btn-clear[disabled].focus {
   background-color: inherit;
   border-color: inherit;
 }
