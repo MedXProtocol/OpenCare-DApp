@@ -1,9 +1,11 @@
 import React from 'react'
 import { BodyClass } from '~/components/BodyClass'
+import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
 
 export const ConfirmCreate = ({ onConfirm }) => {
   return (
     <BodyClass isDark={true}>
+      <ScrollToTopOnMount />
       <div className='container'>
         <div className='row'>
           <div className='col-sm-8 col-sm-offset-2'>
