@@ -15,7 +15,7 @@ import {
   withContractRegistry,
   withSend
 } from '~/saga-genesis'
-import { decryptCaseKey } from '~/services/decrypt-case-key'
+import { decryptCaseKeyAsync } from '~/services/decrypt-case-key'
 import reencryptCaseKey from '~/services/reencrypt-case-key'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
@@ -26,10 +26,9 @@ export function mapStateToCaseRowProps(state, { caseAddress }) {
   const diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
-  const caseKey = decryptCaseKey(state, currentAccount(), caseAddress)
+
   const status = cacheCallValue(state, caseAddress, 'status')
   return {
-    caseKey,
     status,
     encryptedCaseKey,
     caseKeySalt,
@@ -66,8 +65,24 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
     this.init(this.props)
   }
 
-  componentWillReceiveProps (props) {
-    this.init(props)
+  componentWillReceiveProps (nextProps) {
+    if (!this.state.gettingCaseKey && nextProps.encryptedCaseKey && nextProps.caseKeySalt) {
+      this.setState({
+        gettingCaseKey: true
+      }, () => {
+        decryptCaseKeyAsync(
+          nextProps.encryptedCaseKey,
+          nextProps.caseKeySalt,
+          currentAccount()
+        ).then(key => {
+          this.setState({
+            caseKey: key
+          })
+        })
+      })
+    }
+
+    this.init(nextProps)
   }
 
   init (props) {
@@ -109,14 +124,14 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
             <span>
               {this.props.caseAddress}
             </span>
-          </td>
-          <td width="15%" className="td--status"></td>
-          <td width="15%" className="td-actions">
             <ReactTooltip
               key={`tooltip-${this.props.caseAddress}`}
               id={`tooltip-${this.props.caseAddress}`}
               effect='solid'
               position='bottom' />
+          </td>
+          <td width="15%" className="td--status"></td>
+          <td width="15%" className="td-actions">
           </td>
         </tr>
       )

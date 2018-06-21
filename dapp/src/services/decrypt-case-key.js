@@ -17,3 +17,14 @@ export const decryptCaseKey = function (state, account, caseAddress) {
 
   return caseKey
 }
+
+export const decryptCaseKeyAsync = function (encryptedCaseKey, caseKeySalt, account) {
+  return account.decryptAsync(encryptedCaseKey.substring(2), caseKeySalt.substring(2)).then(key => {
+    // Test if the caseKey is undefined or NaN (if we were able to decrypt it properly)
+    // This should be replaced with an HMAC test
+    if (isNaN(parseInt(key, 16)) || parseInt(key, 16) === undefined)
+      key = null
+
+    return key
+  })
+}
