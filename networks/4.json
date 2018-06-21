@@ -3,79 +3,47 @@
   "contracts": [
     {
       "contractName": "Migrations",
-      "address": "0x0ecd6beaac121e0c05b96dc12338d6ece1641f74"
+      "address": "0x339ef7cdac9047dfb7da82752a6b9553ee541416"
     },
     {
       "contractName": "Registry",
-      "address": "0x9cf778a73db438629bf970794b41a1d4e39d6b71"
+      "address": "0x42b3ff7ead0d5e28ada472ed34e851e298c74986"
     },
     {
       "contractName": "MedXToken",
-      "address": "0x0630b1932ef025ad857d67b2bcc0c2812257c0f2"
+      "address": "0xc542a01ffad4355cebedbd1bbbcaf42359832b1c"
     },
     {
       "contractName": "AccountManager",
-      "address": "0x1631671d78816a874770c36cbe66483afb3aceb1"
+      "address": "0xe655bbcbef1b3c8e2ae2bf2ca2e242fc81bedb0e"
     },
     {
       "contractName": "Delegate",
-      "address": "0x0a703ef935fc196779c6946f1acba4b6905ad83a"
+      "address": "0x10ed9f5e5dfbeb9897bc98584e81a729442f10a5"
     },
     {
       "contractName": "SkipList",
-      "address": "0x6b9cc371daed07654fe1744bbd7fc3fe690ac7f7"
+      "address": "0xe67bcda514427cae665ae9fe9cd4736116db1816"
     },
     {
       "contractName": "CaseManager",
-      "address": "0x382bef160d1561b190898b62b9b2f2a194742a2b"
+      "address": "0xe2868ed6cec03e78e45059a66a9e15bf6607d178"
     },
     {
       "contractName": "Delegate",
-      "address": "0xaa25c12c8081ac192be10a764f69335e6cb132f6"
-    },
-    {
-      "contractName": "Case",
-      "address": "0x98037e5ea2919d1af1b368f25e24f5020a98ce60"
+      "address": "0xa4b7196272e3b89a7d692a64b830f7820850697f"
     },
     {
       "contractName": "DoctorManager",
-      "address": "0xe5f952b3c0d2cc7cc14ac6b759345fa6d2c49f92"
+      "address": "0xdfe3dc51fd6e68318845ac414eb0694fb4efa0c9"
     },
     {
       "contractName": "Delegate",
-      "address": "0xac0aeedeff3a10478c4101de138b7b91a2daf9a5"
-    },
-    {
-      "contractName": "CaseManager",
-      "address": "0xef47ecd8977d86666c7c3d6aeacdef87e206082c"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x34ffdf2aa0fd719356cbefd8588c6c89736a08ee"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xdea8154d21ce71861453deb7762c87751ce017d3"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xc099aa406a233397c1c54ea17f7bb361ba141c40"
-    },
-    {
-      "contractName": "CaseManager",
-      "address": "0xbedc4b0e686b3b0014789530cae0d34c41c054f1"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x6a2d4af0ecb769e74e584ce78870b9b5ff73beec"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x8c430ae3c4e7960607e4e824eac5c01e92cec645"
+      "address": "0xb5e0495e1eac7122ba4aca8a806d255a1b1dc139"
     },
     {
       "contractName": "Case",
-      "address": "0xd0d78792ea5eb97a9d446177e1f2aca5a0053893"
+      "address": "0xf7f028137f370cc24285863253e4915db93055ee"
     }
   ]
 }
