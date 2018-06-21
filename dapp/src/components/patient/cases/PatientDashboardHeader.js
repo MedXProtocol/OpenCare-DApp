@@ -6,6 +6,7 @@ import faFileMedical from '@fortawesome/fontawesome-free-solid/faFileMedical';
 import { connect } from 'react-redux'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall, withSaga, cacheCallValue } from '~/saga-genesis'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state, ownProps) {
   const account = state.sagaGenesis.accounts[0]
@@ -34,7 +35,7 @@ export const PatientDashboardHeader = connect(mapStateToProps)(withSaga(saga, { 
     if (!this.props.publicKey) {
       this.setState({showPublicKeyModal: true})
     } else {
-      this.props.history.push('/patients/cases/new')
+      this.props.history.push(routes.PATIENTS_CASES_NEW)
     }
   }
 
@@ -67,11 +68,12 @@ export const PatientDashboardHeader = connect(mapStateToProps)(withSaga(saga, { 
               <button
                 type="button"
                 className="btn btn-lg btn-success"
-                onClick={this.navigateToNewCase}>
+                onClick={this.navigateToNewCase}
+              >
                 <FontAwesomeIcon
                   icon={faFileMedical}
-                  size='lg' />
-                <i className="fa fa-file-medical" aria-hidden="true"></i>
+                  size='lg'
+                />
                 &nbsp; Start New Case
               </button>
             </div>

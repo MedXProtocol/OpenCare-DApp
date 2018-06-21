@@ -19,7 +19,7 @@ export const ConfirmCreate = ({ onConfirm }) => {
                   to view your cases.
                 </p>
                 <p className='lead'>
-                  Once you complete the sign up, you'll be prompted with a transaction.
+                  Once you complete the sign up, you'll be prompted to set your public key.
                 </p>
               </div>
               <div className="form-wrapper--footer text-right">

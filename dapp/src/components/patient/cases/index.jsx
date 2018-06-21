@@ -71,8 +71,10 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
           <div className="card-body table-responsive">
           {
             !this.props.caseListCount || this.props.caseListCount === '0' ?
-            <div className="alert alert-info text-center">
-              <span>You do not have any historical or pending cases.</span>
+            <div className="blank-state">
+              <div className="blank-state--inner text-center text-gray">
+                <span>You do not have any historical or pending cases.</span>
+              </div>
             </div> :
             <table className="table table-striped">
               <thead>

@@ -11,7 +11,7 @@ import {
 } from 'redux-saga'
 import { contractKeyByAddress } from '../state-finders'
 
-function createTransactionEventChannel (web3, transactionId, send, options) {
+function createTransactionEventChannel (web3, call, transactionId, send, options) {
   return eventChannel(emit => {
     let promiEvent = send(options)
       .on('transactionHash', (txHash) => {
@@ -20,7 +20,7 @@ function createTransactionEventChannel (web3, transactionId, send, options) {
       .on('confirmation', (confirmationNumber, receipt) => {
         emit({type: 'TRANSACTION_CONFIRMATION', transactionId, confirmationNumber, receipt})
         if (confirmationNumber > 2) {
-          emit({type: 'TRANSACTION_CONFIRMED', transactionId, confirmationNumber, receipt})
+          emit({type: 'TRANSACTION_CONFIRMED', transactionId, call, confirmationNumber, receipt})
           emit(END)
         }
       })
@@ -53,7 +53,7 @@ export function* web3Send({ transactionId, call, options }) {
     const func = contract.methods[method](...args)
     const send = func.send
 
-    const transactionChannel = createTransactionEventChannel(web3, transactionId, send, options)
+    const transactionChannel = createTransactionEventChannel(web3, call, transactionId, send, options)
     try {
       while (true) {
         yield put(yield take(transactionChannel))
