@@ -240,7 +240,7 @@ module.exports = {
   plugins: [
     new BugsnagSourceMapPlugin({
       apiKey: process.env.REACT_APP_BUGSNAG_API_KEY,
-      publicPath: `${process.env.DEPLOY_URL}/static/js`,
+      publicPath: `${process.env.URL}/static/js`,
       appVersion: '1.0.0',
     }),
     new CopyWebpackPlugin([
