@@ -17,8 +17,9 @@ function mapStateToProps (state) {
   const AccountManager = contractByName(state, 'AccountManager')
   const transactions = state.sagaGenesis.transactions
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account.address())
+  const publicKeyIsDefined = publicKey !== undefined
   const publicKeyMatches = publicKey === '0x' + account.hexPublicKey()
-  const isVisible = !publicKeyMatches
+  const isVisible = publicKeyIsDefined && !publicKeyMatches
 
   return {
     account,
@@ -72,8 +73,6 @@ export const PublicKeyCheck = connect(mapStateToProps)(
           })
       }
     }
-
-    // unmount
 
     render() {
       return (

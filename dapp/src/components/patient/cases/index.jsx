@@ -5,7 +5,6 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
-import faFileMedical from '@fortawesome/fontawesome-free-solid/faFileMedical';
 import {
   CaseRowContainer,
   caseRowSaga,
@@ -15,7 +14,6 @@ import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { fork } from 'redux-saga/effects'
 import { contractByName } from '~/saga-genesis/state-finders'
-import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { accounts }) {
   const account = get(state, 'sagaGenesis.accounts[0]')
