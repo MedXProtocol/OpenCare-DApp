@@ -23,8 +23,9 @@ export const SecretKey = class extends Component {
     let subject = 'Important! Hippocrates Secret Key -- KEEP THIS SAFE!'
     let body    = `Dear Hippocrates user,%0A%0AYour secret key data is encrypted and stored safe using this secret key:%0A%0A${formatSecretKey(this.props.secretKey)}%0A%0AKeep this somewhere safe and secure, and use it to log in to Hippocrates from any other browser.%0A%0AThanks for using Hippocrates!%0A- The MedCredits Team`
 
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank', 'noopener');
-    // newWindow.opener = null;
+    // window.open(`mailto:?subject=${subject}&body=${body}`, '_blank', 'noopener');
+    let newWindow = window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+    newWindow.opener = null;
   }
 
   handlePrint = (e) => {
