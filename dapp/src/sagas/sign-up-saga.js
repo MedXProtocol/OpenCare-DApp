@@ -4,6 +4,7 @@ import { Account } from '~/accounts/Account'
 import { mixpanel } from '~/mixpanel'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { web3Call } from '~/saga-genesis'
+import { buildAccount } from '~/accounts/build-account'
 
 export function* signUpSaga({ address, secretKey, masterPassword, overrideAccount }) {
   if (!address) {
@@ -15,9 +16,20 @@ export function* signUpSaga({ address, secretKey, masterPassword, overrideAccoun
     yield put({ type: 'SIGN_IN_ERROR', masterPasswordError })
     return
   }
-  const AccountManager = yield select(contractByName, 'AccountManager')
-  let publicKey = yield web3Call(AccountManager, 'publicKeys', address)
-  if ((Account.get(address) || publicKey) && !overrideAccount) {
+
+  let account = Account.get(address)
+  let differentAccountExists = false
+  if (account) {
+    differentAccountExists = true
+  } else {
+    account = Account.build({ address, secretKey, masterPassword })
+    const AccountManager = yield select(contractByName, 'AccountManager')
+    let existingPublicKey = yield web3Call(AccountManager, 'publicKeys', address)
+    let expectedPublicKey = '0x' + account.hexPublicKey()
+    differentAccountExists = existingPublicKey && existingPublicKey !== expectedPublicKey
+  }
+
+  if (differentAccountExists && !overrideAccount) {
     yield put({type: 'SIGN_IN_ERROR', overrideError: true })
   } else {
     const account = yield call(Account.create, { address, secretKey, masterPassword })
