@@ -3,7 +3,7 @@ import { Modal } from 'react-bootstrap'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { downloadJson } from '~/utils/storage-util'
-import { Spinner } from '~/components/Spinner'
+import { Loading } from '~/components/Loading'
 import { withSaga, cacheCall, cacheCallValue, withSend } from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
@@ -205,7 +205,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
           </Modal.Footer>
         </Modal>
 
-        <Spinner loading={loading} />
+        <Loading loading={loading} />
       </div>
     )
   }

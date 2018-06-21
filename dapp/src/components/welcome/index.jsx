@@ -34,7 +34,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
           <div className='container'>
             <div className='row'>
               <div className='col-xs-12 col-md-10 col-md-offset-1'>
-                <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
+                <div className="form-wrapper form-wrapper--inverse">
                   <div className="form-wrapper--body">
                     <h3>
                       Welcome to Hippocrates!

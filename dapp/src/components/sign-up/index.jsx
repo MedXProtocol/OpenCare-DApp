@@ -10,17 +10,29 @@ import { SecretKey } from './secret-key'
 import { MasterPassword } from './master-password'
 import { connect } from 'react-redux'
 import { Account } from '~/accounts/Account'
+import {
+  cacheCall,
+  cacheCallValue,
+  withSaga
+} from '~/saga-genesis'
+import {
+  contractByName
+} from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state) {
   const address = state.sagaGenesis.accounts[0]
   const account = Account.get(address)
   const signedIn = state.account.signedIn
   const overrideError = state.account.overrideError
+  const AccountManager = contractByName(state, 'AccountManager')
+  const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
   return {
     address,
     signedIn,
     overrideError,
-    account
+    account,
+    publicKey,
+    AccountManager
   }
 }
 
@@ -35,7 +47,12 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignUp = class extends Component {
+function* saga({ address, AccountManager }) {
+  if (!address || !AccountManager) { return }
+  yield cacheCall(AccountManager, 'publicKeys', address)
+}
+
+export const SignUp = class _SignUp extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -56,7 +73,7 @@ export const SignUp = class extends Component {
   }
 
   init(props) {
-    if (!this.state.overrideModalHasBeenShown && props.account) {
+    if (!this.state.overrideModalHasBeenShown && (props.account || props.publicKey)) {
       this.setState({
         showOverrideModal: true,
         overrideModalHasBeenShown: true
@@ -108,4 +125,4 @@ export const SignUp = class extends Component {
   }
 }
 
-export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(SignUp)
+export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['address', 'AccountManager'] })(SignUp))
