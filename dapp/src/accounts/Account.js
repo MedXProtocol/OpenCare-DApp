@@ -55,7 +55,7 @@ export class Account {
 
   secretKey () {
     this.requireUnlocked()
-    return this._secretKey
+    return this._secretKey.toLowerCase()
   }
 
   hexSecretKey () {
@@ -111,7 +111,6 @@ Account.create = function ({ address, secretKey, masterPassword }) {
       'address, secretKey and masterPassword need to be provided as args to Account.create'
     );
   }
-
   const json = buildAccount(address, secretKey, masterPassword)
   const account = new Account(json)
   account.setVersion(ACCOUNT_VERSION)
