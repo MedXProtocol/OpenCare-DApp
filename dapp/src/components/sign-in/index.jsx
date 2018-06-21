@@ -3,7 +3,7 @@ import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
-import { Account } from '~/accounts/Account'
+import { Account, ACCOUNT_VERSION } from '~/accounts/Account'
 import { SignInFormContainer } from './SignInForm'
 import { BodyClass } from '~/components/BodyClass'
 import * as routes from '~/config/routes'
@@ -51,7 +51,7 @@ export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchTo
   render () {
     if (this.props.account) {
       const version = this.props.account.getVersion() || 0
-      if (version < 1) {
+      if (version < ACCOUNT_VERSION) {
         var warning =
           <div className='alert alert-danger'>
             <p>
