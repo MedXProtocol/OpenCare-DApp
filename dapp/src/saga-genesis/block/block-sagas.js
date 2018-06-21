@@ -1,4 +1,5 @@
 import {
+  call,
   put,
   takeEvery,
   getContext,
@@ -42,29 +43,38 @@ function* startBlockTracker () {
   }
 }
 
-export function* latestBlock({block}) {
-  const web3 = yield getContext('web3')
-  const addressSet = new Set()
-  const addAddress = function* (address) {
-    if (!address) { return false }
-    const contractKey = yield select(contractKeyByAddress, address)
-    if (contractKey) {
-      addressSet.add(address)
-      return true
-    }
-    return false
+function* addAddressIfExists(addressSet, address) {
+  if (!address) { return false }
+  const contractKey = yield select(contractKeyByAddress, address)
+  if (contractKey) {
+    addressSet.add(address)
+    return true
   }
-  yield* block.transactions.map(function* (addressSet, transaction) {
-    const to = yield addAddress(transaction.to)
-    const from = yield addAddress(transaction.from)
-    if (to || from) {
-      const receipt = yield web3.eth.getTransactionReceipt(transaction.hash)
-      yield* receipt.logs.map(function* (log) {
-        yield addAddress(log.address)
-      })
-    }
-  })
+  return false
+}
 
+export function* collectTransactionAddresses(addressSet, transaction) {
+  const web3 = yield getContext('web3')
+  const to = yield call(addAddressIfExists, addressSet, transaction.to)
+  const from = yield call(addAddressIfExists, addressSet, transaction.from)
+  if (to || from) {
+    const receipt = yield web3.eth.getTransactionReceipt(transaction.hash)
+    yield* receipt.logs.map(function* (log) {
+      yield call(addAddressIfExists, addressSet, log.address)
+    })
+  }
+}
+
+export function* collectAllTransactionAddresses(transactions) {
+  const addressSet = new Set()
+  yield* transactions.map(function* (transaction) {
+    yield call(collectTransactionAddresses, addressSet, transaction)
+  })
+  return addressSet
+}
+
+export function* latestBlock({block}) {
+  const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
   yield* Array.from(addressSet).map(function* (address) {
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   })
