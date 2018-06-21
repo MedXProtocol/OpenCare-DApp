@@ -24,6 +24,7 @@ export function mapStateToCaseRowProps(state, { caseAddress }) {
   const diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
+
   const status = cacheCallValue(state, caseAddress, 'status')
   return {
     status,
@@ -62,8 +63,8 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
     this.init(this.props)
   }
 
-  componentWillReceiveProps (props) {
-    this.init(props)
+  componentWillReceiveProps (nextProps) {
+    this.init(nextProps)
   }
 
   init (props) {

@@ -1,6 +1,6 @@
 import decryptSecretKey from './decrypt-secret-key'
 import aes from '~/services/aes'
-import { deriveKey } from '~/utils/derive-key'
+import { deriveKey, deriveKeyAsync } from '~/utils/derive-key'
 import { deriveKeyPair } from './derive-key-pair'
 import { deriveSharedKey } from './derive-shared-key'
 import { buildAccount } from './build-account'
@@ -13,7 +13,7 @@ import isBlank from '~/utils/is-blank'
 // NOTE: DANGEROUS
 // NOTE: DO NOT CHANGE THIS
 // NOTE: NOTE:
-export const ACCOUNT_VERSION = 1
+export const ACCOUNT_VERSION = 4
 
 export class Account {
   constructor (json) {
@@ -31,8 +31,18 @@ export class Account {
     return aes.decrypt(string, key)
   }
 
+  decryptAsync (string, salt) {
+    return this.secretKeyWithSaltAsync(salt).then(key => {
+      return aes.decrypt(string, key)
+    })
+  }
+
   deriveSharedKey (publicKey) {
     return deriveSharedKey(this.hexSecretKey(), publicKey)
+  }
+
+  deriveKey (salt) {
+    return deriveKey(this.hexSecretKey(), salt)
   }
 
   unlock (masterPassword) {
@@ -74,10 +84,24 @@ export class Account {
   secretKeyWithSalt (salt) {
     let key = this.secretKeyWithSaltCache[salt]
     if (!key) {
-      key = deriveKey(this.hexSecretKey(), salt)
+      key = this.deriveKey(salt)
       this.secretKeyWithSaltCache[salt] = key
     }
     return key
+  }
+
+  secretKeyWithSaltAsync (salt) {
+    let key = this.secretKeyWithSaltCache[salt]
+    if (key) {
+      // console.log(key, 'cached')
+      return Promise.resolve(key)
+    } else {
+      return deriveKeyAsync(this.hexSecretKey(), salt).then(key => {
+        this.secretKeyWithSaltCache[salt] = key
+        // console.log('the cached version is now: ', this.secretKeyWithSaltCache[salt])
+        return key
+      })
+    }
   }
 
   store () {
