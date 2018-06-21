@@ -23,7 +23,7 @@ import getWeb3 from '~/get-web3'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
-import { Spinner } from '~/components/Spinner'
+import { Loading } from '~/components/Loading'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -700,7 +700,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           </Modal.Footer>
         </Modal>
 
-        <Spinner loading={this.state.isSubmitting} />
+        <Loading loading={this.state.isSubmitting} />
       </div>
     )
   }
