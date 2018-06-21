@@ -6,14 +6,13 @@ import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
 import {
-  CaseRowContainer,
-  caseRowSaga,
-  mapStateToCaseRowProps
+  CaseRowContainer
 } from './CaseRow'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { fork } from 'redux-saga/effects'
 import { contractByName } from '~/saga-genesis/state-finders'
+import { addContract } from '~/saga-genesis/sagas'
 
 function mapStateToProps(state, { accounts }) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -24,12 +23,11 @@ function mapStateToProps(state, { accounts }) {
   const cases = []
   for (let caseIndex = caseListCount; caseIndex >= 0; --caseIndex) {
     let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
-
     if (caseAddress) {
-      let caseRowProps = mapStateToCaseRowProps(state, { caseAddress })
+      let status = cacheCallValue(state, caseAddress, 'status')
       cases.push({
         caseAddress,
-        caseRowProps,
+        status,
         caseIndex
       })
     }
@@ -55,7 +53,8 @@ function* saga({ account, CaseManager, AccountManager }) {
   let patientCaseListCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', account)
   for (let i = 0; i < patientCaseListCount; i++) {
     let caseAddress = yield cacheCall(CaseManager, 'patientCases', account, i)
-    yield fork(caseRowSaga, {caseAddress, AccountManager})
+    yield addContract({ address: caseAddress, contractKey: 'Case' })
+    yield cacheCall(caseAddress, 'status')
   }
 }
 
@@ -89,9 +88,9 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
               </thead>
               <tbody>
                 <TransitionGroup component={null}>
-                  {this.props.cases.map(({caseAddress, caseRowProps, caseIndex}) => {
+                  {this.props.cases.map(({caseAddress, status, caseIndex}) => {
                     let showModal = false
-                    if (/3|8/.test(caseRowProps.status) && !modalHasBeenShown) {
+                    if (/3|8/.test(status) && !modalHasBeenShown) {
                       modalHasBeenShown = true
                       showModal = true
                     }
@@ -104,8 +103,8 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
                           <CaseRowContainer
                             caseAddress={caseAddress}
                             caseIndex={caseIndex}
+                            status={status}
                             key={caseIndex}
-                            {...caseRowProps}
                             showModal={showModal} />
                       </CSSTransition>
                     )
