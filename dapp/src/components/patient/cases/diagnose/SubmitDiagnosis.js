@@ -4,7 +4,7 @@ import * as Animated from 'react-select/lib/animated';
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import { Spinner } from '~/components/Spinner'
+import { Loading } from '~/components/Loading'
 import { isNotEmptyString } from '~/utils/common-util'
 import { mixpanel } from '~/mixpanel'
 import hashToHex from '~/utils/hash-to-hex'
@@ -379,7 +379,7 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
           </Modal.Footer>
         </Modal>
 
-        <Spinner loading={loading} />
+        <Loading loading={loading} />
       </div>
     )
   }

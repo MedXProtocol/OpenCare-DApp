@@ -1,10 +1,6 @@
 .loading {
-  background: white;
-  border-radius: 3px;
-  box-shadow: 1px 2px 20px 0 rgba(20, 20, 20, 0.6);
   position: fixed;
   height: 24rem;
-  width: 36rem;
   margin: auto;
   padding: 6rem 0 2rem 0;
   top: -200px;
@@ -17,11 +13,12 @@
 }
 
 .loading p {
+  color: white;
   margin-top: 10px;
 }
 
-.loading svg {
-  fill-color: black;
+.loading .small {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .loading--overlay {
