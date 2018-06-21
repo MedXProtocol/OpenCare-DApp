@@ -87,82 +87,104 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
   }
 
   render() {
-        return (
-            <div className="card">
-                <div className="card-header">
-                  <h3 className="card-title">
-                    Case Overview
-                  </h3>
-                </div>
-                <div className="card-body">
-                    <div className="row">
-                        <div className="col-xs-12 col-md-6 text-center">
-                          <br />
-                          <label className="label text-gray">Overview Photo:</label>
-                          {this.overviewPhotoHtml()}
-                        </div>
-                        <div className="col-xs-12 col-md-6 text-center">
-                          <br />
-                          <label className="label text-gray">Close-up Photo:</label>
-                          {this.closeupPhotoHtml()}
-                        </div>
-                      </div>
-                      <hr />
-                      <div className="row">
-                        <div className="col-xs-6">
-                            <label className="label text-gray">How long have you had this problem:</label>
-                            <p>{this.state.details.howLong}</p>
-                        </div>
-                        <div className="col-md-6">
-                            <label className="label text-gray">Is it growing, shrinking or staying the same size:</label>
-                            <p>{this.state.details.size}</p>
-                        </div>
-                         <div className="col-md-6">
-                            <label className="label text-gray">Is it painful:</label>
-                            <p>{this.state.details.painful}</p>
-                        </div>
-                        <div className="col-md-6">
-                            <label className="label text-gray">Is it bleeding:</label>
-                            <p>{this.state.details.bleeding}</p>
-                        </div>
-                        <div className="col-md-6">
-                            <label className="label text-gray">Is it itching:</label>
-                            <p>{this.state.details.itching}</p>
-                        </div>
+    let jsx
+    if (!this.props.caseKey) {
+      jsx = (
+        <div className="row">
+          <div className="col-xs-12 col-md-6 col-md-offset-3">
+            <h4 className="text-danger">
+              Unable to decrypt case data
+            </h4>
+            <div className="alert alert-warning">
+              <p>
+                This case data was likely encrypted with a different secret key than the one you are currently using. Please use the secret key in your previous Emergency Kit or email to decrypt this case.
+              </p>
 
-                        <div className="col-md-6">
-                            <label className="label text-gray">Any history of skin cancer:</label>
-                            <p>{this.state.details.skinCancer}</p>
-                        </div>
-                        <div className="col-md-6">
-                            <label className="label text-gray">Are you sexually active:</label>
-                            <p>{this.state.details.sexuallyActive}</p>
-                        </div>
-                        <div className="col-xs-12">
-                             <label className="label text-gray">Has it changed in color:</label>
-                             <p>{this.state.details.color}</p>
-                         </div>
-                         <div className="col-xs-12">
-                             <label className="label text-gray">Have you tried any treatments so far:</label>
-                             <p>{this.state.details.prevTreatment}</p>
-                         </div>
-                        <div className="col-md-6">
-                            <label className="label text-gray">Age:</label>
-                            <p>{this.state.details.age}</p>
-                        </div>
-                        <div className="col-md-6">
-                            <label className="label text-gray">Country:</label>
-                            <p>{this.state.details.country}</p>
-                        </div>
-                        <div className="col-xs-12">
-                            <label className="label text-gray">Additional comments:</label>
-                            <p>{this.state.details.description}</p>
-                        </div>
-                    </div>
-                </div>
+              <br />
+              <small>Case address: <span className="eth-address">{this.props.caseAddress}</span></small>
             </div>
-        );
+          </div>
+        </div>
+      )
+    } else {
+      jsx = (
+          <div className="card">
+              <div className="card-header">
+                <h3 className="card-title">
+                  Case Overview
+                </h3>
+              </div>
+              <div className="card-body">
+                  <div className="row">
+                      <div className="col-xs-12 col-md-6 text-center">
+                        <br />
+                        <label className="label text-gray">Overview Photo:</label>
+                        {this.overviewPhotoHtml()}
+                      </div>
+                      <div className="col-xs-12 col-md-6 text-center">
+                        <br />
+                        <label className="label text-gray">Close-up Photo:</label>
+                        {this.closeupPhotoHtml()}
+                      </div>
+                    </div>
+                    <hr />
+                    <div className="row">
+                      <div className="col-xs-6">
+                          <label className="label text-gray">How long have you had this problem:</label>
+                          <p>{this.state.details.howLong}</p>
+                      </div>
+                      <div className="col-md-6">
+                          <label className="label text-gray">Is it growing, shrinking or staying the same size:</label>
+                          <p>{this.state.details.size}</p>
+                      </div>
+                       <div className="col-md-6">
+                          <label className="label text-gray">Is it painful:</label>
+                          <p>{this.state.details.painful}</p>
+                      </div>
+                      <div className="col-md-6">
+                          <label className="label text-gray">Is it bleeding:</label>
+                          <p>{this.state.details.bleeding}</p>
+                      </div>
+                      <div className="col-md-6">
+                          <label className="label text-gray">Is it itching:</label>
+                          <p>{this.state.details.itching}</p>
+                      </div>
+
+                      <div className="col-md-6">
+                          <label className="label text-gray">Any history of skin cancer:</label>
+                          <p>{this.state.details.skinCancer}</p>
+                      </div>
+                      <div className="col-md-6">
+                          <label className="label text-gray">Are you sexually active:</label>
+                          <p>{this.state.details.sexuallyActive}</p>
+                      </div>
+                      <div className="col-xs-12">
+                           <label className="label text-gray">Has it changed in color:</label>
+                           <p>{this.state.details.color}</p>
+                       </div>
+                       <div className="col-xs-12">
+                           <label className="label text-gray">Have you tried any treatments so far:</label>
+                           <p>{this.state.details.prevTreatment}</p>
+                       </div>
+                      <div className="col-md-6">
+                          <label className="label text-gray">Age:</label>
+                          <p>{this.state.details.age}</p>
+                      </div>
+                      <div className="col-md-6">
+                          <label className="label text-gray">Country:</label>
+                          <p>{this.state.details.country}</p>
+                      </div>
+                      <div className="col-xs-12">
+                          <label className="label text-gray">Additional comments:</label>
+                          <p>{this.state.details.description}</p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      );
     }
+    return jsx
+  }
 })))
 
 CaseDetails.propTypes = {

@@ -7,6 +7,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import faCheck from '@fortawesome/fontawesome-free-solid/faCheck'
 import { formatRoute } from 'react-router-named-routes'
 import * as routes from '~/config/routes'
+import ReactTooltip from 'react-tooltip'
 import { currentAccount } from '~/services/sign-in'
 import {
   cacheCall,
@@ -14,6 +15,7 @@ import {
   withContractRegistry,
   withSend
 } from '~/saga-genesis'
+import { decryptCaseKey } from '~/services/decrypt-case-key'
 import reencryptCaseKey from '~/services/reencrypt-case-key'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
@@ -24,8 +26,10 @@ export function mapStateToCaseRowProps(state, { caseAddress }) {
   const diagnosingDoctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
+  const caseKey = decryptCaseKey(state, currentAccount(), caseAddress)
   const status = cacheCallValue(state, caseAddress, 'status')
   return {
+    caseKey,
     status,
     encryptedCaseKey,
     caseKeySalt,
@@ -93,6 +97,30 @@ export const CaseRowContainer = withContractRegistry(withSend(class _CaseRow ext
 
   render () {
     if (!this.props.status) { return <tr></tr> }
+
+    if (!this.props.caseKey) {
+      return (
+        <tr
+          data-tip="Could not decrypt case key with the secret key you've signed in with"
+          data-for={`tooltip-${this.props.caseAddress}`}
+        >
+          <td width="5%" className="text-center">{this.props.caseIndex+1}</td>
+          <td className="eth-address text">
+            <span>
+              {this.props.caseAddress}
+            </span>
+          </td>
+          <td width="15%" className="td--status"></td>
+          <td width="15%" className="td-actions">
+            <ReactTooltip
+              key={`tooltip-${this.props.caseAddress}`}
+              id={`tooltip-${this.props.caseAddress}`}
+              effect='solid'
+              position='bottom' />
+          </td>
+        </tr>
+      )
+    }
 
     const caseRoute = formatRoute(routes.PATIENTS_CASE, { caseAddress: this.props.caseAddress })
 

@@ -101,7 +101,8 @@ export const PublicKeyCheck = connect(mapStateToProps)(
               id='set-public-key-tooltip'
               effect='solid'
               place='bottom'
-              getContent={() => this.state.isSubmitting ? 'Setting Public Key, please wait ... (You may need to check MetaMask)' : 'Setting your public key allows us to encrypt your data.' } />
+              html={true}
+              getContent={() => this.state.isSubmitting ? 'Setting Public Key, please wait ... <br/><small>(You may need to check MetaMask)</small>' : 'Setting your public key allows us to encrypt your data.' } />
           </div>
         </CSSTransition>
       )
