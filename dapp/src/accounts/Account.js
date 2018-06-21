@@ -130,6 +130,13 @@ export class Account {
 }
 
 Account.create = function ({ address, secretKey, masterPassword }) {
+  let account = Account.build({ address, secretKey, masterPassword })
+  account.unlock(masterPassword)
+  account.store()
+  return account
+}
+
+Account.build = function ({ address, secretKey, masterPassword }) {
   if (isBlank(address) || isBlank(secretKey) || isBlank(masterPassword)) {
     throw new Error(
       'address, secretKey and masterPassword need to be provided as args to Account.create'
@@ -138,8 +145,7 @@ Account.create = function ({ address, secretKey, masterPassword }) {
   const json = buildAccount(address, secretKey, masterPassword)
   const account = new Account(json)
   account.setVersion(ACCOUNT_VERSION)
-  account.unlock(masterPassword)
-  account.store()
+  account._secretKey = secretKey
   return account
 }
 
