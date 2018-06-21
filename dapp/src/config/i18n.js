@@ -20,7 +20,7 @@ i18next
             challengeDiagnosis: 'Getting Second Opinion',
             diagnoseCase: 'Sending Diagnosis',
             diagnoseChallengedCase: 'Sending Second Opinion',
-            getPublicKey: 'Getting Public Key',
+            publicKeys: 'Getting Public Key',
             mint: 'Mint {{mintMedxCount}} MEDX',
             requestNextCase: 'Requesting Case',
             setPublicKey: 'Setting Public Key'

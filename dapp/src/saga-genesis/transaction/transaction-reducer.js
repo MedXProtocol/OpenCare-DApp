@@ -43,6 +43,7 @@ export default function (state, {type, transactionId, call, error, receipt, txHa
         ...state,
         [transactionId]: {
           ...state[transactionId],
+          call,
           confirmed: true
         }
       }

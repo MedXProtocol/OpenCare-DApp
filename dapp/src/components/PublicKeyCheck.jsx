@@ -6,6 +6,7 @@ import { currentAccount } from '~/services/sign-in'
 import { cacheCallValue, withSend, withSaga, cacheCall } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { mixpanel } from '~/mixpanel'
+import { CSSTransition } from 'react-transition-group'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
 
@@ -16,10 +17,9 @@ function mapStateToProps (state) {
   const AccountManager = contractByName(state, 'AccountManager')
   const transactions = state.sagaGenesis.transactions
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account.address())
-  // console.log(publicKey)
   const publicKeyMatches = publicKey === '0x' + account.hexPublicKey()
-  // console.log(publicKeyMatches)
   const isVisible = !publicKeyMatches
+
   return {
     account,
     AccountManager,
@@ -30,7 +30,6 @@ function mapStateToProps (state) {
 
 function* saga({ account, AccountManager }) {
   if (!account || !AccountManager) { return }
-  console.log(account, AccountManager)
   yield cacheCall(AccountManager, 'publicKeys', account.address())
 }
 
@@ -65,11 +64,11 @@ export const PublicKeyCheck = connect(mapStateToProps)(
             })
           })
           .onReceipt(() => {
+            toastr.success('Your public key transaction has been sent.')
+          })
+          .onConfirmed(() => {
             toastr.success('Your public key was set successfully.')
             mixpanel.track('Public Key Set')
-            this.setState({
-              isSubmitting: false
-            })
           })
       }
     }
@@ -77,10 +76,14 @@ export const PublicKeyCheck = connect(mapStateToProps)(
     // unmount
 
     render() {
-      let jsx = null
-      if (this.props.isVisible) {
-        jsx = (
-          <div className="alert alert-info alert--banner alert--banner__large text-center">
+      return (
+        <CSSTransition
+          in={this.props.isVisible}
+          timeout={1200}
+          unmountOnExit
+          classNames="slide-down"
+        >
+          <div className="alert alert-info alert--banner alert--banner__large alert--banner__in-content text-center">
             <p>
               Your public key needs to be confirmed on the Ethereum network prior to submitting or diagnosing cases.
             </p>
@@ -98,13 +101,11 @@ export const PublicKeyCheck = connect(mapStateToProps)(
             <ReactTooltip
               id='set-public-key-tooltip'
               effect='solid'
-              place='right'
-              getContent={() => this.state.isSubmitting ? 'Setting Public Key ... Please wait.' : 'Setting your public key allows us to encrypt your data.' } />
+              place='bottom'
+              getContent={() => this.state.isSubmitting ? 'Setting Public Key, please wait ... (You may need to check MetaMask)' : 'Setting your public key allows us to encrypt your data.' } />
           </div>
-        )
-      }
-
-      return jsx
+        </CSSTransition>
+      )
     }
   }))
 )

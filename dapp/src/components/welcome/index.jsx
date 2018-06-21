@@ -30,7 +30,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
 
     return (
       <BodyClass isDark={true}>
-        <MainLayoutContainer doNetworkCheck={false}>
+        <MainLayoutContainer doNetworkCheck={false} doPublicKeyCheck={false}>
           <div className='container'>
             <div className='row'>
               <div className='col-xs-12 col-md-10 col-md-offset-1'>

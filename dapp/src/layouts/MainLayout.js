@@ -20,16 +20,21 @@ function mapStateToProps (state) {
 
 export const MainLayout = class extends Component {
   static propTypes = {
-    doNetworkCheck: PropTypes.bool
+    doNetworkCheck: PropTypes.bool,
+    doPublicKeyCheck: PropTypes.bool
   }
 
   static defaultProps = {
-    doNetworkCheck: true
+    doNetworkCheck: true,
+    doPublicKeyCheck: true
   }
 
   render() {
     if (this.props.doNetworkCheck) {
       var networkCheckmodal = <NetworkCheckModal />
+    }
+    if (this.props.doPublicKeyCheck) {
+      var publicKeyCheck = <PublicKeyCheck />
     }
     if (this.props.isOwner) {
       var ownerWarning =
@@ -42,9 +47,10 @@ export const MainLayout = class extends Component {
         <div className="main-panel">
           <HippoNavbarContainer />
           {ownerWarning}
-          <PublicKeyCheck />
           {networkCheckmodal}
           <div className="content">
+            {publicKeyCheck}
+
             {this.props.children}
           </div>
 

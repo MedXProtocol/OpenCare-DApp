@@ -40,9 +40,12 @@ export function* invalidateAddress({ address }) {
 }
 
 export function* invalidateTransaction({transactionId, call, receipt}) {
-  const contractAddresses = Object.values(receipt.events || {}).reduce((addressSet, event) => {
+  let contractAddresses = Object.values(receipt.events || {}).reduce((addressSet, event) => {
     return addressSet.add(event.address)
   }, new Set())
+
+  contractAddresses.add(call.address)
+
   yield* Array.from(contractAddresses).map(function* (address) {
     const contractKey = yield select(contractKeyByAddress, address)
     if (contractKey) {

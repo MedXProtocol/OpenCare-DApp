@@ -13,9 +13,19 @@
 }
 
 .alert--banner__large {
-  padding: 4rem 2rem;
+  padding: 3.5rem 2rem;
 }
 
 .alert--banner__large p {
   margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
+}
+
+.alert--banner__in-content {
+  height: 155px;
+  position: relative;
+  top: -30px;
 }

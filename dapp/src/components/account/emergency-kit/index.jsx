@@ -73,6 +73,7 @@ export const EmergencyKit = (
                             Master Password
                           </label>
                           <input
+                            autoFocus={true}
                             value={masterPassword}
                             onChange={(e) => this.setState({ masterPassword: e.target.value })}
                             type="password"
