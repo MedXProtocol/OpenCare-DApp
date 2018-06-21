@@ -68,6 +68,7 @@ export const PatientDashboardHeader = connect(mapStateToProps)(withSaga(saga, { 
               <button
                 type="button"
                 className="btn btn-lg btn-success"
+                onClick={this.navigateToNewCase}
               >
                 <FontAwesomeIcon
                   icon={faFileMedical}

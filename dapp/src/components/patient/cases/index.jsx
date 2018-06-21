@@ -75,20 +75,6 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
             !this.props.caseListCount || this.props.caseListCount === '0' ?
             <div className="blank-state">
               <div className="blank-state--inner text-center text-gray">
-                <button
-                  type="button"
-                  className="btn btn-sm btn-link"
-                  onClick={() => { return this.props.history.push(routes.PATIENTS_CASES_NEW) } }
-                >
-                  <FontAwesomeIcon
-                    icon={faFileMedical}
-                    size='3x'
-                  />
-                  <br />
-                  <br />
-                  Open Your First Case
-                </button>
-                <hr />
                 <span>You do not have any historical or pending cases.</span>
               </div>
             </div> :
