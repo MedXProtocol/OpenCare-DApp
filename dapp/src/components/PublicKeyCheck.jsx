@@ -64,7 +64,7 @@ export const PublicKeyCheck = connect(mapStateToProps)(
               isSubmitting: false
             })
           })
-          .onReceipt(() => {
+          .onTxHash(() => {
             toastr.success('Your public key transaction has been sent.')
           })
           .onConfirmed(() => {
