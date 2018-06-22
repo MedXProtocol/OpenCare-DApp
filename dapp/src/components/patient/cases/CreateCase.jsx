@@ -193,7 +193,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     updateBleeding = (event) => {
-
       this.setState({ bleeding: event.target.value })
     }
 
@@ -220,6 +219,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       }
 
       await this.setState({ errors: errors })
+
+      // Highlight first error field
+      if (errors.length > 0) {
+        // window.location.hash = "#" + firstField;
+        this[`${errors[0]}Input`].focus()
+      }
     }
 
     handleSubmit = async (event) => {
@@ -247,10 +252,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         'itching',
         'skinCancer',
         'sexuallyActive',
-        'age',
-        'country',
         'color',
-        'prevTreatment'
+        'prevTreatment',
+        'age',
+        'country'
       ]
     }
 
@@ -335,18 +340,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           </p>
       }
 
-      // Highlight first error field
-      let firstField = this.requiredFields().find(field => {
-        if (errors.hasOwnProperty(field))
-          return field
-        else
-          return undefined
-      })
-      // if (firstField) {
-      //   // window.location.hash = "#" + firstField;
-      //   this[`${firstField}Input`].focus()
-      // }
-
       if (this.state.firstFileError) {
         var firstFileError = <p className='has-error help-block'>{this.state.firstFileError}</p>
       }
@@ -415,7 +408,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <div className="row">
                         <div id="secondImageHash" className="col-xs-12 col-sm-12 col-md-6">
                           <div className={classNames('form-group', { 'has-error': errors['secondImageHash'] || secondFileError })}>
-                            <label>Close-up Photo<span className='star'>*</span></label>
+                            <label className='control-label'>Close-up Photo<span className='star'>*</span></label>
                             <div>
                               <div style={{ height: '0', width: '0', overflow: 'hidden' }}>
                                 <input ref={this.setSecondImageHashRef} style={{ opacity: '0', pointerEvents: 'none' }} />
