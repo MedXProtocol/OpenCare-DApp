@@ -377,8 +377,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                           <div className={classNames('form-group', { 'has-error': errors['firstImageHash'] || firstFileError })}>
                             <label className='control-label'>Overview Photo<span className='star'>*</span></label>
                             <div>
-                              <div style={{ height: '0', width: '0', overflow: 'hidden' }}>
-                                <input ref={this.setFirstImageHashRef} style={{ opacity: '0', pointerEvents: 'none' }} />
+                              <div className="hidden-input-mask">
+                                <input ref={this.setFirstImageHashRef} />
                               </div>
                               <label className="btn btn btn-info">
                                 Select File ... <input
@@ -410,8 +410,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                           <div className={classNames('form-group', { 'has-error': errors['secondImageHash'] || secondFileError })}>
                             <label className='control-label'>Close-up Photo<span className='star'>*</span></label>
                             <div>
-                              <div style={{ height: '0', width: '0', overflow: 'hidden' }}>
-                                <input ref={this.setSecondImageHashRef} style={{ opacity: '0', pointerEvents: 'none' }} />
+                              <div className="hidden-input-mask">
+                                <input ref={this.setSecondImageHashRef} />
                               </div>
                               <label className="btn btn btn-info">
                                   Select File ... <input
@@ -446,8 +446,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         <div className="col-xs-12 col-md-6">
                           <div className={classNames('form-group', { 'has-error': errors['howLong'] })}>
                             <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
-                            <div style={{ height: '0', width: '0', overflow: 'hidden' }}>
-                              <input ref={this.setHowLongRef} style={{ opacity: '0', pointerEvents: 'none' }} />
+                            <div className="hidden-input-mask">
+                              <input ref={this.setHowLongRef} />
                             </div>
                             <ButtonToolbar>
                               <ToggleButtonGroup name="howLong" type="radio">
@@ -481,8 +481,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         <div className="col-xs-12 col-md-6">
                           <div className={classNames('form-group', { 'has-error': errors['size'] })}>
                             <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
-                            <div style={{ height: '0', width: '0', overflow: 'hidden' }}>
-                              <input ref={this.setSizeRef} style={{ opacity: '0', pointerEvents: 'none' }} />
+                            <div className="hidden-input-mask">
+                              <input ref={this.setSizeRef} />
                             </div>
                             <ButtonToolbar>
                               <ToggleButtonGroup name="size" type="radio">
@@ -513,8 +513,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         <div className="col-xs-12 col-md-6">
                           <div className={classNames('form-group', { 'has-error': errors['painful'] })}>
                             <ControlLabel>Is it painful?<span className='star'>*</span></ControlLabel>
-                            <div style={{ height: '0', width: '0', overflow: 'hidden' }}>
-                              <input ref={this.setPainfulRef} style={{ opacity: '0', pointerEvents: 'none' }} />
+                            <div className="hidden-input-mask">
+                              <input ref={this.setPainfulRef} />
                             </div>
                             <ButtonToolbar>
                               <ToggleButtonGroup name="painful" type="radio">
@@ -540,8 +540,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                           <div className={classNames('form-group', { 'has-error': errors['bleeding'] })}>
                             <ControlLabel>Is it bleeding?<span className='star'>*</span></ControlLabel>
 
-                            <div style={{ height: '0', width: '0', overflow: 'hidden' }}>
-                              <input ref={this.setBleedingRef} style={{ opacity: '0', pointerEvents: 'none' }} />
+                            <div className="hidden-input-mask">
+                              <input ref={this.setBleedingRef} />
                             </div>
                             <ButtonToolbar>
                               <ToggleButtonGroup name="bleeding" type="radio">
@@ -567,8 +567,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         <div className="col-xs-12 col-md-6">
                           <div className={classNames('form-group', { 'has-error': errors['itching'] })}>
                             <ControlLabel>Is it itching?<span className='star'>*</span></ControlLabel>
-                            <div style={{ height: '0', width: '0', overflow: 'hidden' }}>
-                              <input ref={this.setItchingRef} style={{ opacity: '0', pointerEvents: 'none' }} />
+                            <div className="hidden-input-mask">
+                              <input ref={this.setItchingRef} />
                             </div>
 
                             <ButtonToolbar>
@@ -596,8 +596,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         <div className="col-xs-12 col-md-6">
                           <div className={classNames('form-group', { 'has-error': errors['skinCancer'] })}>
                             <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
-                            <div style={{ height: '0', width: '0', overflow: 'hidden' }}>
-                              <input ref={this.setSkinCancerRef} style={{ opacity: '0', pointerEvents: 'none' }} />
+                            <div className="hidden-input-mask">
+                              <input ref={this.setSkinCancerRef} />
                             </div>
 
                             <ButtonToolbar>
@@ -624,8 +624,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         <div className="col-xs-12 col-md-6">
                           <div className={classNames('form-group', { 'has-error': errors['sexuallyActive'] })}>
                             <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
-                            <div style={{ height: '0', width: '0', overflow: 'hidden' }}>
-                              <input ref={this.setSexuallyActiveRef} style={{ opacity: '0', pointerEvents: 'none' }} />
+                            <div className="hidden-input-mask">
+                              <input ref={this.setSexuallyActiveRef} />
                             </div>
 
                             <ButtonToolbar>

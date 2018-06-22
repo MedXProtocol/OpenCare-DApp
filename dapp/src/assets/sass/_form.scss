@@ -59,3 +59,14 @@
 .form-control::-webkit-input-placeholder {
   color: #ccc;
 }
+
+.hidden-input-mask {
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.hidden-input-mask input {
+  opacity: 0;
+  pointer-events: none;
+}
