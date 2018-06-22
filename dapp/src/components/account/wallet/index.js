@@ -52,9 +52,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
                     <p className='lead text-center'>
                       <FontAwesomeIcon
                         icon={faHeartbeat} />
-                      &nbsp; {parseInt(
-                        this.props.balance ? this.props.balance : 0, 10
-                      ).toLocaleString()} MEDX
+                      &nbsp; {parseInt(this.props.balance, 10).toLocaleString()} MEDX
                     </p>
 
                     {this.props.canMint &&
