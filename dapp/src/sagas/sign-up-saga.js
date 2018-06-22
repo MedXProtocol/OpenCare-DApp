@@ -4,7 +4,6 @@ import { Account } from '~/accounts/Account'
 import { mixpanel } from '~/mixpanel'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { web3Call } from '~/saga-genesis'
-import { buildAccount } from '~/accounts/build-account'
 
 export function* signUpSaga({ address, secretKey, masterPassword, overrideAccount }) {
   if (!address) {

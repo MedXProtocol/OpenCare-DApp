@@ -72,7 +72,12 @@ export const CaseRowContainer = withContractRegistry(
 
       init (props) {
         if (props.showModal) {
-          this.setState({showModal: true})
+          if (props.status === '3' && props.diagnosingDoctorA && props.diagnosingDoctorAPublicKey) {
+            this.setState({ showModal: true })
+          }
+          if (props.status === '8' && props.diagnosingDoctorB && props.diagnosingDoctorBPublicKey) {
+            this.setState({ showModal: true })
+          }
         }
       }
 
@@ -101,7 +106,16 @@ export const CaseRowContainer = withContractRegistry(
         const caseRoute = formatRoute(routes.PATIENTS_CASE, { caseAddress: this.props.caseAddress })
 
         const status = +(this.props.status || '0')
-        if (status === 3 || status === 8) {
+
+        if (
+          (status === 3
+            && this.props.diagnosingDoctorA
+            && this.props.diagnosingDoctorAPublicKey)
+          ||
+          (status === 8
+            && this.props.diagnosingDoctorB
+            && this.props.diagnosingDoctorBPublicKey)
+        ) {
           var approvalButton = (
             <button className='btn btn-xs btn-primary' onClick={this.onApprove}>
               <FontAwesomeIcon

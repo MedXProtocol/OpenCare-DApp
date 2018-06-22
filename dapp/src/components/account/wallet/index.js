@@ -13,7 +13,11 @@ import * as routes from '~/config/routes'
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   const MedXToken = contractByName(state, 'MedXToken')
-  const balance = '' + cacheCallValue(state, MedXToken, 'balanceOf', account)
+  let balance = '' + cacheCallValue(state, MedXToken, 'balanceOf', account)
+  // avoid NaN
+  if (balance === 'undefined')
+    balance = 0
+
   const canMint = cacheCallValue(state, MedXToken, 'owner') === account
   return {
     account,
@@ -48,7 +52,9 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
                     <p className='lead text-center'>
                       <FontAwesomeIcon
                         icon={faHeartbeat} />
-                      &nbsp; {parseInt(this.props.balance, 10).toLocaleString()} MEDX
+                      &nbsp; {parseInt(
+                        this.props.balance ? this.props.balance : 0, 10
+                      ).toLocaleString()} MEDX
                     </p>
 
                     {this.props.canMint &&
