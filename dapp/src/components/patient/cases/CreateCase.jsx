@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import {
   ControlLabel,
-  FormGroup,
   Modal,
   ProgressBar,
   ToggleButtonGroup,
@@ -68,11 +67,28 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         prevTreatment: null,
         description: null,
         caseEncryptionKey: genKey(32),
-        canSubmit: false,
         showBalanceTooLowModal: false,
         showConfirmSubmissionModal: false,
-        isSubmitting: false
+        isSubmitting: false,
+        errors: []
       }
+
+      // We need to update to React 0.16.3 to get this nice syntax instead:
+      // this.ageInput = React.createRef();
+
+      this.setFirstImageHashRef = element => { this.firstImageHashInput = element }
+      this.setSecondImageHashRef = element => { this.secondImageHashInput = element }
+      this.setHowLongRef = element => { this.howLongInput = element }
+      this.setSizeRef = element => { this.sizeInput = element }
+      this.setPainfulRef = element => { this.painfulInput = element }
+      this.setBleedingRef = element => { this.bleedingInput = element }
+      this.setItchingRef = element => { this.itchingInput = element }
+      this.setSkinCancerRef = element => { this.skinCancerInput = element }
+      this.setSexuallyActiveRef = element => { this.sexuallyActiveInput = element }
+      this.setColorRef = element => { this.colorInput = element }
+      this.setPrevTreatmentRef = element => { this.prevTreatmentInput = element }
+      this.setAgeRef = element => { this.ageInput = element }
+      this.setCountryRef = element => { this.countryInput = element }
     }
 
     componentWillReceiveProps (props) {
@@ -122,7 +138,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setState({
         firstImageHash: imageHash,
         firstFileName: fileName
-      }, this.validateInputs)
+      })
     }
 
     captureSecondImage = async (event) => {
@@ -148,7 +164,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setState({
         secondImageHash: imageHash,
         secondFileName: fileName
-      }, this.validateInputs)
+      })
     }
 
     captureFile = async (event, progressHandler) => {
@@ -161,80 +177,86 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     updateHowLong = (event) => {
-      this.setState({ howLong: event.target.value }, this.validateInputs)
+      this.setState({ howLong: event.target.value })
     }
 
     updateSize = (event) => {
-      this.setState({ size: event.target.value }, this.validateInputs)
+      this.setState({ size: event.target.value })
     }
 
     updatePainful = (event) => {
-      this.setState({ painful: event.target.value }, this.validateInputs)
+      this.setState({ painful: event.target.value })
     }
 
     updateItching = (event) => {
-      this.setState({ itching: event.target.value }, this.validateInputs)
+      this.setState({ itching: event.target.value })
     }
 
     updateBleeding = (event) => {
-
-      this.setState({ bleeding: event.target.value }, this.validateInputs)
+      this.setState({ bleeding: event.target.value })
     }
 
     updateSkinCancer = (event) => {
-      this.setState({ skinCancer: event.target.value }, this.validateInputs)
-    }
-
-    updateColor = (event) => {
-      this.setState({ color: event.target.value }, this.validateInputs)
-    }
-
-    updatePreviousTreatment = (event) => {
-      this.setState({ prevTreatment: event.target.value }, this.validateInputs)
+      this.setState({ skinCancer: event.target.value })
     }
 
     updateSexuallyActive = (event) => {
-      this.setState({ sexuallyActive: event.target.value }, this.validateInputs)
+      this.setState({ sexuallyActive: event.target.value })
     }
 
-    updateAge = (event) => {
-      this.setState({ age: event.target.value }, this.validateInputs)
-    }
+    runValidation = async () => {
+      // reset error states
+      await this.setState({ errors: [] })
 
-    updateCountry = (event) => {
-      this.setState({ country: event.target.value }, this.validateInputs)
-    }
+      let errors = []
+      let requiredFields = this.requiredFields()
+      let length = requiredFields.length
 
-    updateDescription = (event) => {
-      this.setState({ description: event.target.value })
-    }
+      for (var fieldIndex = 0; fieldIndex < length; fieldIndex++) {
+        let fieldName = requiredFields[fieldIndex]
+        if (!isNotEmptyString(this.state[fieldName]))
+          errors.push(fieldName)
+      }
 
-    handleSubmit = (event) => {
-      event.preventDefault()
-      if(this.props.balance < 15) {
-        this.setState({ showBalanceTooLowModal: true })
-      } else {
-        this.setState({ showConfirmSubmissionModal: true })
+      await this.setState({ errors: errors })
+
+      // Highlight first error field
+      if (errors.length > 0) {
+        // window.location.hash = "#" + firstField;
+        this[`${errors[0]}Input`].focus()
       }
     }
 
-    validateInputs = () => {
-      const valid =
-        isNotEmptyString(this.state.firstImageHash) &&
-        isNotEmptyString(this.state.secondImageHash) &&
-        isNotEmptyString(this.state.howLong) &&
-        isNotEmptyString(this.state.size) &&
-        isNotEmptyString(this.state.painful) &&
-        isNotEmptyString(this.state.bleeding) &&
-        isNotEmptyString(this.state.itching) &&
-        isNotEmptyString(this.state.skinCancer) &&
-        isNotEmptyString(this.state.sexuallyActive) &&
-        isNotEmptyString(this.state.age) &&
-        isNotEmptyString(this.state.country) &&
-        isNotEmptyString(this.state.color) &&
-        isNotEmptyString(this.state.prevTreatment)
+    handleSubmit = async (event) => {
+      event.preventDefault()
 
-      this.setState({ canSubmit: valid })
+      await this.runValidation()
+
+      if (this.state.errors.length === 0) {
+        if (this.props.balance < 15) {
+          this.setState({ showBalanceTooLowModal: true })
+        } else {
+          this.setState({ showConfirmSubmissionModal: true })
+        }
+      }
+    }
+
+    requiredFields = () => {
+      return [
+        'firstImageHash',
+        'secondImageHash',
+        'howLong',
+        'size',
+        'painful',
+        'bleeding',
+        'itching',
+        'skinCancer',
+        'sexuallyActive',
+        'color',
+        'prevTreatment',
+        'age',
+        'country'
+      ]
     }
 
     handleCloseBalanceTooLowModal = (event) => {
@@ -309,16 +331,21 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     render() {
+      let errors = {}
+      for (var i = 0; i < this.state.errors.length; i++) {
+        let fieldName = this.state.errors[i]
+        errors[fieldName] =
+          <p key={`errors-${i}`} className='has-error help-block small'>
+            must be filled out
+          </p>
+      }
+
       if (this.state.firstFileError) {
-        var firstFileError =
-          <p className='has-error help-block'>{this.state.firstFileError}</p>
-        var firstFileClassName = 'has-error'
+        var firstFileError = <p className='has-error help-block'>{this.state.firstFileError}</p>
       }
 
       if (this.state.secondFileError) {
-        var secondFileError =
-          <p className='has-error help-block'>{this.state.secondFileError}</p>
-        var secondFileClassName = 'has-error'
+        var secondFileError = <p className='has-error help-block'>{this.state.secondFileError}</p>
       }
 
       return (
@@ -341,23 +368,26 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
                 <div className="card-body">
                   <div className="form-wrapper">
-                    <form onSubmit={this.handleSubmit} >
+                    <form onSubmit={this.handleSubmit}>
                       <div className="form-group--heading">
                         Imagery:
                       </div>
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className={classNames('form-group', firstFileClassName)}>
+                        <div id="firstImageHash" className="col-xs-12 col-sm-12 col-md-6">
+                          <div className={classNames('form-group', { 'has-error': errors['firstImageHash'] || firstFileError })}>
                             <label className='control-label'>Overview Photo<span className='star'>*</span></label>
                             <div>
+                              <div className="hidden-input-mask">
+                                <input ref={this.setFirstImageHashRef} />
+                              </div>
                               <label className="btn btn btn-info">
                                 Select File ... <input
+                                            name="firstImage"
                                             onChange={this.captureFirstImage}
                                             type="file"
                                             accept='image/*'
                                             className="form-control"
-                                            style={{ display: 'none' }}
-                                            required />
+                                            style={{ display: 'none' }} />
                               </label>
                               <span>
                                 &nbsp; {this.state.firstFileName}
@@ -368,6 +398,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                                   bsStyle="success"
                                   now={this.state.firstImagePercent} />
                               </div>
+                              {errors['firstImageHash']}
                               {firstFileError}
                             </div>
                           </div>
@@ -375,18 +406,21 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className={classNames('form-group', secondFileClassName)}>
-                            <label>Close-up Photo<span className='star'>*</span></label>
+                        <div id="secondImageHash" className="col-xs-12 col-sm-12 col-md-6">
+                          <div className={classNames('form-group', { 'has-error': errors['secondImageHash'] || secondFileError })}>
+                            <label className='control-label'>Close-up Photo<span className='star'>*</span></label>
                             <div>
+                              <div className="hidden-input-mask">
+                                <input ref={this.setSecondImageHashRef} />
+                              </div>
                               <label className="btn btn btn-info">
                                   Select File ... <input
+                                              name="secondImage"
                                               onChange={this.captureSecondImage}
                                               type="file"
                                               accept='image/*'
                                               className="form-control"
-                                              style={{ display: 'none' }}
-                                              required />
+                                              style={{ display: 'none' }} />
                               </label>
                               <span>
                                   &nbsp; {this.state.secondFileName}
@@ -397,6 +431,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                                   bsStyle="success"
                                   now={this.state.secondImagePercent} />
                               </div>
+                              {errors['secondImageHash']}
                               {secondFileError}
                             </div>
                           </div>
@@ -409,211 +444,234 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
                       <div className="row">
                         <div className="col-xs-12 col-md-6">
-                          <FormGroup>
+                          <div className={classNames('form-group', { 'has-error': errors['howLong'] })}>
                             <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
-
+                            <div className="hidden-input-mask">
+                              <input ref={this.setHowLongRef} />
+                            </div>
                             <ButtonToolbar>
                               <ToggleButtonGroup name="howLong" type="radio">
                                 <ToggleButton
                                   onChange={this.updateHowLong}
-                                  value='Days'
-                                  required>
+                                  value='Days'>
                                   Days
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateHowLong}
-                                  value='Weeks'
-                                  required>
+                                  value='Weeks'>
                                   Weeks
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateHowLong}
-                                  value='Months'
-                                  required>
+                                  value='Months'>
                                   Months
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateHowLong}
-                                  value='Years'
-                                  required>
+                                  value='Years'>
                                   Years
                                 </ToggleButton>
                               </ToggleButtonGroup>
                             </ButtonToolbar>
-                          </FormGroup>
+                            {errors['howLong']}
+                          </div>
                         </div>
                       </div>
                       <div className="row">
                         <div className="col-xs-12 col-md-6">
-                          <FormGroup>
+                          <div className={classNames('form-group', { 'has-error': errors['size'] })}>
                             <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
+                            <div className="hidden-input-mask">
+                              <input ref={this.setSizeRef} />
+                            </div>
                             <ButtonToolbar>
                               <ToggleButtonGroup name="size" type="radio">
                                 <ToggleButton
                                   onChange={this.updateSize}
-                                  value='Growing'
-                                  required>
+                                  value='Growing'>
                                   Growing
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateSize}
-                                  value='Shrinking'
-                                  required>
+                                  value='Shrinking'>
                                   Shrinking
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateSize}
-                                  value='Same size'
-                                  required>
+                                  value='Same size'>
                                   Same size
                                 </ToggleButton>
                               </ToggleButtonGroup>
                             </ButtonToolbar>
-                          </FormGroup>
+                            {errors['size']}
+                          </div>
                         </div>
                       </div>
 
 
                       <div className="row">
                         <div className="col-xs-12 col-md-6">
-                          <FormGroup>
+                          <div className={classNames('form-group', { 'has-error': errors['painful'] })}>
                             <ControlLabel>Is it painful?<span className='star'>*</span></ControlLabel>
-
+                            <div className="hidden-input-mask">
+                              <input ref={this.setPainfulRef} />
+                            </div>
                             <ButtonToolbar>
                               <ToggleButtonGroup name="painful" type="radio">
                                 <ToggleButton
                                   onChange={this.updatePainful}
-                                  value='Yes'
-                                  required>
+                                  value='Yes'>
                                   Yes
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updatePainful}
-                                  value='No'
-                                  required>
+                                  value='No'>
                                   No
                                 </ToggleButton>
                               </ToggleButtonGroup>
                             </ButtonToolbar>
-                          </FormGroup>
+                            {errors['painful']}
+                          </div>
                         </div>
                       </div>
 
                       <div className="row">
                         <div className="col-xs-12 col-md-6">
-                          <FormGroup>
+                          <div className={classNames('form-group', { 'has-error': errors['bleeding'] })}>
                             <ControlLabel>Is it bleeding?<span className='star'>*</span></ControlLabel>
 
+                            <div className="hidden-input-mask">
+                              <input ref={this.setBleedingRef} />
+                            </div>
                             <ButtonToolbar>
                               <ToggleButtonGroup name="bleeding" type="radio">
                                 <ToggleButton
                                   onChange={this.updateBleeding}
-                                  value='Yes'
-                                  required>
+                                  value='Yes'>
                                   Yes
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateBleeding}
-                                  value='No'
-                                  required>
+                                  value='No'>
                                   No
                                 </ToggleButton>
                               </ToggleButtonGroup>
                             </ButtonToolbar>
-                          </FormGroup>
+                            {errors['bleeding']}
+
+                          </div>
                         </div>
                       </div>
 
                       <div className="row">
                         <div className="col-xs-12 col-md-6">
-                          <FormGroup>
+                          <div className={classNames('form-group', { 'has-error': errors['itching'] })}>
                             <ControlLabel>Is it itching?<span className='star'>*</span></ControlLabel>
+                            <div className="hidden-input-mask">
+                              <input ref={this.setItchingRef} />
+                            </div>
 
                             <ButtonToolbar>
                               <ToggleButtonGroup name="itching" type="radio">
                                 <ToggleButton
                                   onChange={this.updateItching}
-                                  value='Yes'
-                                  required>
+                                  value='Yes'>
                                   Yes
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateItching}
-                                  value='No'
-                                  required>
+                                  value='No'>
                                   No
                                 </ToggleButton>
                               </ToggleButtonGroup>
                             </ButtonToolbar>
-                          </FormGroup>
+                            {errors['itching']}
+
+                          </div>
                         </div>
                       </div>
 
 
                       <div className="row">
                         <div className="col-xs-12 col-md-6">
-                          <FormGroup>
+                          <div className={classNames('form-group', { 'has-error': errors['skinCancer'] })}>
                             <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
+                            <div className="hidden-input-mask">
+                              <input ref={this.setSkinCancerRef} />
+                            </div>
 
                             <ButtonToolbar>
                               <ToggleButtonGroup name="skinCancer" type="radio">
                                 <ToggleButton
                                   onChange={this.updateSkinCancer}
-                                  value='Yes'
-                                  required>
+                                  value='Yes'>
                                   Yes
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateSkinCancer}
-                                  value='No'
-                                  required>
+                                  value='No'>
                                   No
                                 </ToggleButton>
                               </ToggleButtonGroup>
                             </ButtonToolbar>
-                          </FormGroup>
+                            {errors['skinCancer']}
+
+                          </div>
                         </div>
                       </div>
 
                       <div className="row">
                         <div className="col-xs-12 col-md-6">
-                          <FormGroup>
+                          <div className={classNames('form-group', { 'has-error': errors['sexuallyActive'] })}>
                             <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
+                            <div className="hidden-input-mask">
+                              <input ref={this.setSexuallyActiveRef} />
+                            </div>
 
                             <ButtonToolbar>
                               <ToggleButtonGroup name="sexuallyActive" type="radio">
                                 <ToggleButton
                                   onChange={this.updateSexuallyActive}
-                                  value='Yes'
-                                  required>
+                                  value='Yes'>
                                   Yes
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateSexuallyActive}
-                                  value='No'
-                                  required>
+                                  value='No'>
                                   No
                                 </ToggleButton>
                               </ToggleButtonGroup>
                             </ButtonToolbar>
-                          </FormGroup>
-                        </div>
-                      </div>
+                            {errors['sexuallyActive']}
 
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className="form-group">
-                            <label>Has it changed in color?<span className='star'>*</span></label>
-                            <input onChange={this.updateColor} type="text" className="form-control" required />
                           </div>
                         </div>
                       </div>
 
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className="form-group">
+                          <div className={classNames('form-group', { 'has-error': errors['color'] })}>
+                            <label>Has it changed in color?<span className='star'>*</span></label>
+                            <input
+                              onChange={(event) => this.setState({ color: event.target.value })}
+                              type="text"
+                              ref={this.setColorRef}
+                              className="form-control" />
+                            {errors['color']}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-6">
+                          <div className={classNames('form-group', { 'has-error': errors['prevTreatment'] })}>
                             <label>Have you tried any treatments so far?<span className='star'>*</span></label>
-                            <input onChange={this.updatePreviousTreatment} type="text" className="form-control" required />
+                            <input
+                              onChange={(event) => this.setState({ prevTreatment: event.target.value })}
+                              type="text"
+                              ref={this.setPrevTreatmentRef}
+                              className="form-control" />
+                            {errors['prevTreatment']}
                           </div>
                         </div>
                       </div>
@@ -623,15 +681,25 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       </div>
                       <div className="row">
                         <div className="col-xs-5 col-sm-4 col-md-2">
-                          <div className="form-group">
+                          <div className={classNames('form-group', { 'has-error': errors['age'] })}>
                             <label>Age<span className='star'>*</span></label>
-                            <input onChange={this.updateAge} type="text" className="form-control" required />
+                            <input
+                              ref={this.setAgeRef}
+                              onChange={(event) => this.setState({ age: event.target.value })}
+                              type="text"
+                              className="form-control" />
+                            {errors['age']}
                           </div>
                         </div>
                         <div className="col-xs-12 col-sm-8 col-md-4">
-                          <div className="form-group">
+                          <div className={classNames('form-group', { 'has-error': errors['country'] })}>
                             <label>Country<span className='star'>*</span></label>
-                            <input onChange={this.updateCountry} type="text" className="form-control" required />
+                            <input
+                              type="text"
+                              onChange={(event) => this.setState({ country: event.target.value })}
+                              ref={this.setCountryRef}
+                              className="form-control" />
+                            {errors['country']}
                           </div>
                         </div>
                       </div>
@@ -640,7 +708,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
                           <div className="form-group">
                             <label>Please include any additional comments below</label>
-                            <textarea onChange={this.updateDescription} className="form-control" rows="5" />
+                            <textarea
+                              onChange={(event) => this.setState({ description: event.target.value })}
+                              className="form-control"
+                              rows="5" />
                           </div>
                         </div>
                       </div>
@@ -648,7 +719,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
                           <button
-                            disabled={!this.state.canSubmit}
                             type="submit"
                             className="btn btn-lg btn-success">
                             Submit Case
