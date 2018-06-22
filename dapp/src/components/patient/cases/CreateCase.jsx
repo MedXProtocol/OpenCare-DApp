@@ -101,7 +101,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
     captureFirstImage = async (event) => {
       this.setState({firstFileError: null})
-      if (this.fileTooLarge(event.target.files[0].size)) {
+      if (event.target.files[0] && this.fileTooLarge(event.target.files[0].size)) {
         this.setState({
           firstFileError: 'The file must be smaller than 10MB'
         })
@@ -127,7 +127,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
     captureSecondImage = async (event) => {
       this.setState({secondFileError: null})
-      if (this.fileTooLarge(event.target.files[0].size)) {
+      if (event.target.files[0] && this.fileTooLarge(event.target.files[0].size)) {
         this.setState({
           secondFileError: 'The file must be smaller than 10MB'
         })
