@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Button, Modal } from 'react-bootstrap'
 import get from 'lodash.get'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
-import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import faPrint from '@fortawesome/fontawesome-free-solid/faPrint'
+import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
 import { BodyClass } from '~/components/BodyClass'
 import { formatSecretKey } from '~/services/format-secret-key'
 import * as routes from '~/config/routes'

@@ -1,14 +1,35 @@
-import React, { Component } from 'react';
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
-import { MainLayoutContainer } from '~/layouts/MainLayout';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import get from 'lodash.get'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import faPrint from '@fortawesome/fontawesome-free-solid/faPrint'
+import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { formatSecretKey } from '~/services/format-secret-key'
 import { currentAccount } from '~/services/sign-in'
 import * as routes from '~/config/routes'
 
-const EmergencyKitDisplay = class extends Component {
-  handlePrint = () => {
+function mapStateToProps(state) {
+  let address = get(state, 'sagaGenesis.accounts[0]')
+
+  return {
+    address
+  }
+}
+
+export const EmergencyKitDisplay = class extends Component {
+  handlePrint = (e) => {
+    e.preventDefault()
     window.print()
+  }
+
+  handleEmail = (e) => {
+    e.preventDefault()
+
+    let subject = 'Important! Hippocrates Secret Key -- KEEP THIS SAFE!'
+    let body    = `Dear Hippocrates user,%0A%0AYour secret key data is encrypted and stored safe using this secret key:%0A%0A${formatSecretKey(currentAccount().secretKey())}%0A%0AFor ETH address: ${this.props.address}%0A%0A%0AKeep this somewhere safe and secure, and use it to log in to Hippocrates from any other browser.%0A%0AThanks for using Hippocrates!%0A- The MedCredits Team`
+
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank', 'noopener');
   }
 
   render () {
@@ -35,24 +56,33 @@ const EmergencyKitDisplay = class extends Component {
                       {formatSecretKey(secretKey)}
                     </div>
                   </div>
+                  <p className="small text-center">
+                    <span className="eth-address text-gray">For eth address: {this.props.address}</span>
+                  </p>
 
                   <br />
 
-                  <div className="text-center">
-                    <a onClick={this.handlePrint} className="btn btn-lg btn-success">
-                      <FontAwesomeIcon
-                        icon={faPrint}
-                        size='lg' /> &nbsp;
-                      Print
-                    </a>
+                  <div className="visible-sm visible-md visible-lg">
+                    <div className="text-center">
+                      <a onClick={this.handlePrint} className="btn btn-lg btn-success">
+                        <FontAwesomeIcon
+                          icon={faPrint}
+                          size='lg' /> &nbsp;
+                        Print or save as PDF
+                      </a>
+                    </div>
                   </div>
-                  <h3 className='text-center'>
-                    Or save this page for your records.
-                  </h3>
+                  <div className="visible-xs">
+                    <div className="text-center">
+                      <a onClick={this.handleEmail} className="btn btn-success">
+                        <FontAwesomeIcon
+                          icon={faEnvelope} />&nbsp;
+                        Send Key To Your Email
+                      </a>
+                    </div>
+                  </div>
 
-                  <br />
                   <hr />
-                  <br />
 
                   <p className="title">
                     To sign in on a new browser:
@@ -80,4 +110,4 @@ const EmergencyKitDisplay = class extends Component {
   }
 }
 
-export { EmergencyKitDisplay };
+export const EmergencyKitDisplayContainer = connect(mapStateToProps)(EmergencyKitDisplay)
