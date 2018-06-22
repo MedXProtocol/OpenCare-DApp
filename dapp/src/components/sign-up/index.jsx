@@ -2,11 +2,10 @@ import React, { Component } from 'react'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { genKey } from '~/services/gen-key'
 import { Redirect } from 'react-router-dom'
-
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
 import { mixpanel } from '~/mixpanel'
 import { ConfirmCreate } from './confirm-create'
-import { SecretKey } from './secret-key'
+import { SecretKeyContainer } from './secret-key'
 import { MasterPassword } from './master-password'
 import { connect } from 'react-redux'
 import { Account } from '~/accounts/Account'
@@ -112,7 +111,7 @@ export const SignUp = class _SignUp extends Component {
     } else if (this.state.showMasterPassword) {
       content = <MasterPassword onMasterPassword={this.onMasterPassword} />
     } else {
-      content = <SecretKey secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
+      content = <SecretKeyContainer secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
     }
     return (
       <MainLayoutContainer>
