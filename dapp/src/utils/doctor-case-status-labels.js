@@ -10,7 +10,7 @@ export function doctorCaseStatusToName(status) {
     7: 'Evaluated',
     8: 'Pending Approval',
     9: 'Evaluating',
-    10: 'Diagnosis Rejected',
+    10: 'Diagnosis Sent',
     11: 'Diagnosis Confirmed'
   }
   return statuses[status]
@@ -28,7 +28,7 @@ export function doctorCaseStatusToClass(status) {
     7: 'default',
     8: 'info',
     9: 'warning',
-    10: 'danger',
+    10: 'default',
     11: 'success'
   }
   return statuses[status]
