@@ -50,14 +50,14 @@ export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(pr
       address = this.props.address
     }
     if (this.props.status) {
-      status = doctorCaseStatusToName(parseInt(this.props.status, 10))
-      var statusClass = doctorCaseStatusToClass(parseInt(this.props.status, 10))
+      status = doctorCaseStatusToName(isApprovedDiagnosingADoctor, parseInt(this.props.status, 10))
+      var statusClass = doctorCaseStatusToClass(isApprovedDiagnosingADoctor, parseInt(this.props.status, 10))
     }
     return (
       <tr>
         <td className="eth-address text"><span>{address}</span></td>
         <td width="20%" className="td--status">
-          <label className={`label label-${statusClass}`}>{status}</label>
+          <label className={`label label-${statusClass}`}>{status === 0 ? '' : status}</label>
         </td>
         <td width="5%"></td>
       </tr>

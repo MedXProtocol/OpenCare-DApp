@@ -81,7 +81,9 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
   render () {
     let caseKeys = keys(this.props.cases)
     let cases = caseKeys.reverse().map((key) => this.props.cases[key])
-    let noCasesAvailableForDoc = (parseInt(this.props.peekNextCase, 16) === 0)
+    let noCasesAvailableForDoc = !isBlank(this.props.peekNextCase) ?
+      (parseInt(this.props.peekNextCase, 16) === 0)
+      : true
 
     return (
       <MainLayoutContainer>
