@@ -10,7 +10,6 @@ import {
 } from './CaseRow'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
-import { fork } from 'redux-saga/effects'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
 
