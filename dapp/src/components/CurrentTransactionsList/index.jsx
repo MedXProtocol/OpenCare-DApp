@@ -68,7 +68,18 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
         transactions = this.props.pendingOrErrorTransactions.reverse().map(tx => {
           const key   = tx[0]
           const { call, error, confirmed } = tx[1]
-          let name = call.method
+          let name
+
+          // This is a patch to prevent the page from crashing, we need to figure out
+          // what is actually wrong with call being undefined sometimes:
+          // (same applies to Line 93's if (call !== undefined) {})
+          if (call === undefined) {
+            debugger
+            name = '???'
+          } else {
+            name = call.method
+          }
+
           let mintMedxCount = 1000 // these numbers could be pulled from the tx call args
 
           if (error) {
@@ -79,10 +90,12 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                   {t(`transactionErrors.${code}`)}
                 </p>
             }
-            var resendButton =
-              <button onClick={() => this.props.send(key, call)} className='btn btn-sm btn-primary'>
-                Retry
-              </button>
+            if (call !== undefined) {
+              var resendButton =
+                <button onClick={() => this.props.send(key, call)} className='btn btn-sm btn-primary'>
+                  Retry
+                </button>
+            }
           }
 
           return (
