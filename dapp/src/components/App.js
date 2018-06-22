@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 import ReduxToastr from 'react-redux-toastr'
-import { hot } from 'react-hot-loader'
+// import { hot } from 'react-hot-loader'
 import { SignUpContainer } from './sign-up'
 import { SignInContainer } from './sign-in'
 import { PatientDashboard } from './patient/dashboard/'
@@ -63,4 +63,4 @@ const App = class _App extends Component {
   }
 }
 
-export default hot(module)(withRouter(App))
+export default withRouter(App)

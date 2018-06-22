@@ -71,7 +71,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         canSubmit: false,
         showBalanceTooLowModal: false,
         showConfirmSubmissionModal: false,
-        isSubmitting: false
+        isSubmitting: false,
+        errors: []
       }
     }
 
@@ -209,32 +210,73 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setState({ description: event.target.value })
     }
 
-    handleSubmit = (event) => {
+    runValidation = async () => {
+      // reset error states
+      await this.setState({ errors: [] })
+
+      let errors = []
+      let requiredFields = this.requiredFields()
+      let length = requiredFields.length
+
+      for (var fieldIndex = 0; fieldIndex < length; fieldIndex++) {
+        let fieldName = requiredFields[fieldIndex]
+        if (!isNotEmptyString(this.state[fieldName]))
+          errors.push(fieldName)
+      }
+
+      await this.setState({ errors: errors })
+    }
+
+    handleSubmit = async (event) => {
       event.preventDefault()
-      if(this.props.balance < 15) {
-        this.setState({ showBalanceTooLowModal: true })
-      } else {
-        this.setState({ showConfirmSubmissionModal: true })
+
+      await this.runValidation()
+      console.log(this.state.errors)
+
+      if (this.state.errors.length === 0) {
+        if (this.props.balance < 15) {
+          this.setState({ showBalanceTooLowModal: true })
+        } else {
+          this.setState({ showConfirmSubmissionModal: true })
+        }
       }
     }
 
-    validateInputs = () => {
-      const valid =
-        isNotEmptyString(this.state.firstImageHash) &&
-        isNotEmptyString(this.state.secondImageHash) &&
-        isNotEmptyString(this.state.howLong) &&
-        isNotEmptyString(this.state.size) &&
-        isNotEmptyString(this.state.painful) &&
-        isNotEmptyString(this.state.bleeding) &&
-        isNotEmptyString(this.state.itching) &&
-        isNotEmptyString(this.state.skinCancer) &&
-        isNotEmptyString(this.state.sexuallyActive) &&
-        isNotEmptyString(this.state.age) &&
-        isNotEmptyString(this.state.country) &&
-        isNotEmptyString(this.state.color) &&
-        isNotEmptyString(this.state.prevTreatment)
+    requiredFields = () => {
+      return [
+        'firstImageHash',
+        'secondImageHash',
+        'howLong',
+        'size',
+        'painful',
+        'bleeding',
+        'itching',
+        'skinCancer',
+        'sexuallyActive',
+        'age',
+        'country',
+        'color',
+        'prevTreatment'
+      ]
+    }
 
-      this.setState({ canSubmit: valid })
+    validateInputs = () => {
+      // const valid = this.requiredFields().find(field => isNotEmptyString(field))
+        // isNotEmptyString(this.state.firstImageHash) &&
+        // isNotEmptyString(this.state.secondImageHash) &&
+        // isNotEmptyString(this.state.howLong) &&
+        // isNotEmptyString(this.state.size) &&
+        // isNotEmptyString(this.state.painful) &&
+        // isNotEmptyString(this.state.bleeding) &&
+        // isNotEmptyString(this.state.itching) &&
+        // isNotEmptyString(this.state.skinCancer) &&
+        // isNotEmptyString(this.state.sexuallyActive) &&
+        // isNotEmptyString(this.state.age) &&
+        // isNotEmptyString(this.state.country) &&
+        // isNotEmptyString(this.state.color) &&
+        // isNotEmptyString(this.state.prevTreatment)
+
+      // this.setState({ canSubmit: valid })
     }
 
     handleCloseBalanceTooLowModal = (event) => {
@@ -309,6 +351,15 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     render() {
+      let errors = {}
+      for (var i = 0; i < this.state.errors.length; i++) {
+        let fieldName = this.state.errors[i]
+        errors[fieldName] =
+          <p key={`errors-${i}`} className='has-error help-block'>
+            {fieldName} must be filled out
+          </p>
+      }
+
       if (this.state.firstFileError) {
         var firstFileError =
           <p className='has-error help-block'>{this.state.firstFileError}</p>
@@ -319,6 +370,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         var secondFileError =
           <p className='has-error help-block'>{this.state.secondFileError}</p>
         var secondFileClassName = 'has-error'
+      }
+
+      if (this.state.updateAgeError) {
+        var updateAgeError =
+          <p className='has-error help-block'>{this.state.updateAgeError}</p>
+        var updateAgeClassName = 'has-error'
       }
 
       return (
@@ -341,7 +398,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
                 <div className="card-body">
                   <div className="form-wrapper">
-                    <form onSubmit={this.handleSubmit} >
+                    <form onSubmit={this.handleSubmit}>
                       <div className="form-group--heading">
                         Imagery:
                       </div>
@@ -352,12 +409,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                             <div>
                               <label className="btn btn btn-info">
                                 Select File ... <input
+                                            name="firstImage"
                                             onChange={this.captureFirstImage}
                                             type="file"
                                             accept='image/*'
                                             className="form-control"
-                                            style={{ display: 'none' }}
-                                            required />
+                                            style={{ display: 'none' }} />
                               </label>
                               <span>
                                 &nbsp; {this.state.firstFileName}
@@ -381,12 +438,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                             <div>
                               <label className="btn btn btn-info">
                                   Select File ... <input
+                                              name="secondImage"
                                               onChange={this.captureSecondImage}
                                               type="file"
                                               accept='image/*'
                                               className="form-control"
-                                              style={{ display: 'none' }}
-                                              required />
+                                              style={{ display: 'none' }} />
                               </label>
                               <span>
                                   &nbsp; {this.state.secondFileName}
@@ -416,26 +473,22 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <ToggleButtonGroup name="howLong" type="radio">
                                 <ToggleButton
                                   onChange={this.updateHowLong}
-                                  value='Days'
-                                  required>
+                                  value='Days'>
                                   Days
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateHowLong}
-                                  value='Weeks'
-                                  required>
+                                  value='Weeks'>
                                   Weeks
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateHowLong}
-                                  value='Months'
-                                  required>
+                                  value='Months'>
                                   Months
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateHowLong}
-                                  value='Years'
-                                  required>
+                                  value='Years'>
                                   Years
                                 </ToggleButton>
                               </ToggleButtonGroup>
@@ -451,20 +504,17 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <ToggleButtonGroup name="size" type="radio">
                                 <ToggleButton
                                   onChange={this.updateSize}
-                                  value='Growing'
-                                  required>
+                                  value='Growing'>
                                   Growing
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateSize}
-                                  value='Shrinking'
-                                  required>
+                                  value='Shrinking'>
                                   Shrinking
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateSize}
-                                  value='Same size'
-                                  required>
+                                  value='Same size'>
                                   Same size
                                 </ToggleButton>
                               </ToggleButtonGroup>
@@ -483,14 +533,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <ToggleButtonGroup name="painful" type="radio">
                                 <ToggleButton
                                   onChange={this.updatePainful}
-                                  value='Yes'
-                                  required>
+                                  value='Yes'>
                                   Yes
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updatePainful}
-                                  value='No'
-                                  required>
+                                  value='No'>
                                   No
                                 </ToggleButton>
                               </ToggleButtonGroup>
@@ -508,14 +556,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <ToggleButtonGroup name="bleeding" type="radio">
                                 <ToggleButton
                                   onChange={this.updateBleeding}
-                                  value='Yes'
-                                  required>
+                                  value='Yes'>
                                   Yes
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateBleeding}
-                                  value='No'
-                                  required>
+                                  value='No'>
                                   No
                                 </ToggleButton>
                               </ToggleButtonGroup>
@@ -533,14 +579,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <ToggleButtonGroup name="itching" type="radio">
                                 <ToggleButton
                                   onChange={this.updateItching}
-                                  value='Yes'
-                                  required>
+                                  value='Yes'>
                                   Yes
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateItching}
-                                  value='No'
-                                  required>
+                                  value='No'>
                                   No
                                 </ToggleButton>
                               </ToggleButtonGroup>
@@ -559,14 +603,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <ToggleButtonGroup name="skinCancer" type="radio">
                                 <ToggleButton
                                   onChange={this.updateSkinCancer}
-                                  value='Yes'
-                                  required>
+                                  value='Yes'>
                                   Yes
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateSkinCancer}
-                                  value='No'
-                                  required>
+                                  value='No'>
                                   No
                                 </ToggleButton>
                               </ToggleButtonGroup>
@@ -584,14 +626,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               <ToggleButtonGroup name="sexuallyActive" type="radio">
                                 <ToggleButton
                                   onChange={this.updateSexuallyActive}
-                                  value='Yes'
-                                  required>
+                                  value='Yes'>
                                   Yes
                                 </ToggleButton>
                                 <ToggleButton
                                   onChange={this.updateSexuallyActive}
-                                  value='No'
-                                  required>
+                                  value='No'>
                                   No
                                 </ToggleButton>
                               </ToggleButtonGroup>
@@ -604,7 +644,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         <div className="col-xs-12 col-sm-12 col-md-6">
                           <div className="form-group">
                             <label>Has it changed in color?<span className='star'>*</span></label>
-                            <input onChange={this.updateColor} type="text" className="form-control" required />
+                            <input onChange={this.updateColor} type="text" className="form-control" />
                           </div>
                         </div>
                       </div>
@@ -613,7 +653,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         <div className="col-xs-12 col-sm-12 col-md-6">
                           <div className="form-group">
                             <label>Have you tried any treatments so far?<span className='star'>*</span></label>
-                            <input onChange={this.updatePreviousTreatment} type="text" className="form-control" required />
+                            <input onChange={this.updatePreviousTreatment} type="text" className="form-control" />
                           </div>
                         </div>
                       </div>
@@ -623,15 +663,16 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       </div>
                       <div className="row">
                         <div className="col-xs-5 col-sm-4 col-md-2">
-                          <div className="form-group">
+                          <div className={classNames('form-group', updateAgeClassName)}>
                             <label>Age<span className='star'>*</span></label>
-                            <input onChange={this.updateAge} type="text" className="form-control" required />
+                            <input onChange={this.updateAge} type="text" className="form-control" />
+                            {errors['age']}
                           </div>
                         </div>
                         <div className="col-xs-12 col-sm-8 col-md-4">
                           <div className="form-group">
                             <label>Country<span className='star'>*</span></label>
-                            <input onChange={this.updateCountry} type="text" className="form-control" required />
+                            <input onChange={this.updateCountry} type="text" className="form-control" />
                           </div>
                         </div>
                       </div>
@@ -648,7 +689,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
                           <button
-                            disabled={!this.state.canSubmit}
                             type="submit"
                             className="btn btn-lg btn-success">
                             Submit Case
