@@ -13,7 +13,7 @@ export function buildAccount(address, secretKey, masterPassword) {
   var preimageSalt = genKey()
   var storedMasterPassword = deriveKey(preimage, preimageSalt).toString('hex')
 
-  console.log(secretKey, preimage)
+  // console.log(secretKey, preimage)
   var encryptedSecretKey = aes.encrypt(secretKey, preimage)
 
   return {
