@@ -88,7 +88,7 @@ const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['cas
             </div>
           break
         default:
-          alert = <div className="alert alert-info">Open</div>
+          alert = <div />
       }
       return alert
     }

@@ -126,7 +126,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       <div /> :
       <div className="card">
         <div className="card-header">
-          <h2 className="card-title">Diagnosis</h2>
+          <h3 className="card-title">Diagnosis</h3>
         </div>
         <div className="card-body">
           <div className="row">
