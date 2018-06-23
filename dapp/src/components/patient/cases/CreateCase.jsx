@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import {
   ControlLabel,
   Modal,
-  ProgressBar,
   ToggleButtonGroup,
   ToggleButton,
   ButtonToolbar
@@ -23,6 +22,8 @@ import { contractByName } from '~/saga-genesis/state-finders'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
+import { ImageInput } from '~/components/ImageInput'
+import { HippoToggleButtonGroup } from '~/components/HippoToggleButtonGroup'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -372,281 +373,107 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <div className="form-group--heading">
                         Imagery:
                       </div>
-                      <div className="row">
-                        <div id="firstImageHash" className="col-xs-12 col-sm-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['firstImageHash'] || firstFileError })}>
-                            <label className='control-label'>Overview Photo<span className='star'>*</span></label>
-                            <div>
-                              <div className="hidden-input-mask">
-                                <input ref={this.setFirstImageHashRef} />
-                              </div>
-                              <label className="btn btn btn-info">
-                                Select File ... <input
-                                            name="firstImage"
-                                            onChange={this.captureFirstImage}
-                                            type="file"
-                                            accept='image/*'
-                                            className="form-control"
-                                            style={{ display: 'none' }} />
-                              </label>
-                              <span>
-                                &nbsp; {this.state.firstFileName}
-                              </span>
-                              <div className={this.progressClassNames(this.state.firstImagePercent)}>
-                                <ProgressBar
-                                  active
-                                  bsStyle="success"
-                                  now={this.state.firstImagePercent} />
-                              </div>
-                              {errors['firstImageHash']}
-                              {firstFileError}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <ImageInput
+                        name='firstImage'
+                        id='firstImageHash'
+                        label="Overview Photo:"
+                        required={true}
+                        error={errors['firstImageHash']}
+                        fileError={firstFileError}
+                        setRef={this.setFirstImageHashRef}
+                        onChange={this.captureFirstImage}
+                        currentValue={this.state.firstFileName}
+                        progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
+                        progressPercent={this.state.firstImagePercent}
+                      />
 
-                      <div className="row">
-                        <div id="secondImageHash" className="col-xs-12 col-sm-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['secondImageHash'] || secondFileError })}>
-                            <label className='control-label'>Close-up Photo<span className='star'>*</span></label>
-                            <div>
-                              <div className="hidden-input-mask">
-                                <input ref={this.setSecondImageHashRef} />
-                              </div>
-                              <label className="btn btn btn-info">
-                                  Select File ... <input
-                                              name="secondImage"
-                                              onChange={this.captureSecondImage}
-                                              type="file"
-                                              accept='image/*'
-                                              className="form-control"
-                                              style={{ display: 'none' }} />
-                              </label>
-                              <span>
-                                  &nbsp; {this.state.secondFileName}
-                              </span>
-                              <div className={this.progressClassNames(this.state.secondImagePercent)}>
-                                <ProgressBar
-                                  active
-                                  bsStyle="success"
-                                  now={this.state.secondImagePercent} />
-                              </div>
-                              {errors['secondImageHash']}
-                              {secondFileError}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <ImageInput
+                        name='secondImage'
+                        id='secondImageHash'
+                        label="Close-up Photo:"
+                        required={true}
+                        error={errors['secondImageHash']}
+                        fileError={secondFileError}
+                        setRef={this.setSecondImageHashRef}
+                        onChange={this.captureSecondImage}
+                        currentValue={this.state.secondFileName}
+                        progressClassNames={this.progressClassNames(this.state.secondImagePercent)}
+                        progressPercent={this.state.secondImagePercent}
+                      />
 
                       <div className="form-group--heading">
                         Details:
                       </div>
 
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['howLong'] })}>
-                            <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
-                            <div className="hidden-input-mask">
-                              <input ref={this.setHowLongRef} />
-                            </div>
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="howLong" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateHowLong}
-                                  value='Days'>
-                                  Days
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateHowLong}
-                                  value='Weeks'>
-                                  Weeks
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateHowLong}
-                                  value='Months'>
-                                  Months
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateHowLong}
-                                  value='Years'>
-                                  Years
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                            {errors['howLong']}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['size'] })}>
-                            <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
-                            <div className="hidden-input-mask">
-                              <input ref={this.setSizeRef} />
-                            </div>
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="size" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateSize}
-                                  value='Growing'>
-                                  Growing
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateSize}
-                                  value='Shrinking'>
-                                  Shrinking
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateSize}
-                                  value='Same size'>
-                                  Same size
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                            {errors['size']}
-                          </div>
-                        </div>
-                      </div>
+                      <HippoToggleButtonGroup
+                        name="howLong"
+                        required={true}
+                        label='How long have you had this problem?'
+                        error={errors['howLong']}
+                        setRef={this.setHowLongRef}
+                        onChange={this.updateHowLong}
+                        values={['Days', 'Weeks', 'Months', 'Years']}
+                      />
 
+                      <HippoToggleButtonGroup
+                        name="size"
+                        required={true}
+                        label='Is it growing, shrinking or staying the same size?'
+                        error={errors['size']}
+                        setRef={this.setSizeRef}
+                        onChange={this.updateSize}
+                        values={['Growing', 'Shrinking', 'Same size']}
+                      />
 
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['painful'] })}>
-                            <ControlLabel>Is it painful?<span className='star'>*</span></ControlLabel>
-                            <div className="hidden-input-mask">
-                              <input ref={this.setPainfulRef} />
-                            </div>
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="painful" type="radio">
-                                <ToggleButton
-                                  onChange={this.updatePainful}
-                                  value='Yes'>
-                                  Yes
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updatePainful}
-                                  value='No'>
-                                  No
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                            {errors['painful']}
-                          </div>
-                        </div>
-                      </div>
+                      <HippoToggleButtonGroup
+                        name="painful"
+                        required={true}
+                        label='Is it painful?'
+                        error={errors['painful']}
+                        setRef={this.setPainfulRef}
+                        onChange={this.updatePainful}
+                        values={['Yes', 'No']}
+                      />
 
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['bleeding'] })}>
-                            <ControlLabel>Is it bleeding?<span className='star'>*</span></ControlLabel>
+                      <HippoToggleButtonGroup
+                        name="bleeding"
+                        required={true}
+                        label='Is it bleeding?'
+                        error={errors['bleeding']}
+                        setRef={this.setBleedingRef}
+                        onChange={this.updateBleeding}
+                        values={['Yes', 'No']}
+                      />
 
-                            <div className="hidden-input-mask">
-                              <input ref={this.setBleedingRef} />
-                            </div>
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="bleeding" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateBleeding}
-                                  value='Yes'>
-                                  Yes
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateBleeding}
-                                  value='No'>
-                                  No
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                            {errors['bleeding']}
+                      <HippoToggleButtonGroup
+                        name="itching"
+                        required={true}
+                        label='Is it itching?'
+                        error={errors['itching']}
+                        setRef={this.setItchingRef}
+                        onChange={this.updateItching}
+                        values={['Yes', 'No']}
+                      />
 
-                          </div>
-                        </div>
-                      </div>
+                      <HippoToggleButtonGroup
+                        name="skinCancer"
+                        required={true}
+                        label='Any history of skin cancer?'
+                        error={errors['skinCancer']}
+                        setRef={this.setSkinCancerRef}
+                        onChange={this.updateSkinCancer}
+                        values={['Yes', 'No']}
+                      />
 
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['itching'] })}>
-                            <ControlLabel>Is it itching?<span className='star'>*</span></ControlLabel>
-                            <div className="hidden-input-mask">
-                              <input ref={this.setItchingRef} />
-                            </div>
-
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="itching" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateItching}
-                                  value='Yes'>
-                                  Yes
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateItching}
-                                  value='No'>
-                                  No
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                            {errors['itching']}
-
-                          </div>
-                        </div>
-                      </div>
-
-
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['skinCancer'] })}>
-                            <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
-                            <div className="hidden-input-mask">
-                              <input ref={this.setSkinCancerRef} />
-                            </div>
-
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="skinCancer" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateSkinCancer}
-                                  value='Yes'>
-                                  Yes
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateSkinCancer}
-                                  value='No'>
-                                  No
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                            {errors['skinCancer']}
-
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['sexuallyActive'] })}>
-                            <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
-                            <div className="hidden-input-mask">
-                              <input ref={this.setSexuallyActiveRef} />
-                            </div>
-
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="sexuallyActive" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateSexuallyActive}
-                                  value='Yes'>
-                                  Yes
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateSexuallyActive}
-                                  value='No'>
-                                  No
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                            {errors['sexuallyActive']}
-
-                          </div>
-                        </div>
-                      </div>
+                      <HippoToggleButtonGroup
+                        name="sexuallyActive"
+                        required={true}
+                        label='Are you sexually active?'
+                        error={errors['sexuallyActive']}
+                        setRef={this.setSexuallyActiveRef}
+                        onChange={this.updateSexuallyActive}
+                        values={['Yes', 'No']}
+                      />
 
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-6">
