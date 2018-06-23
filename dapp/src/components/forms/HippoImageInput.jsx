@@ -2,10 +2,10 @@ import React, { Component } from 'react'
 import { ProgressBar } from 'react-bootstrap'
 import classNames from 'classnames'
 
-export const ImageInput = class extends Component {
+export const HippoImageInput = class extends Component {
   render() {
     const { name, id, label, error, fileError, setRef, onChange,
-      currentValue, progressClassNames, progressPercent } = this.props
+      currentValue, progressClassNames, progressPercent, colClasses } = this.props
 
     let required
     if (this.props.required)
@@ -13,7 +13,7 @@ export const ImageInput = class extends Component {
 
     return (
       <div className="row">
-        <div id={id} className="col-xs-12 col-sm-12 col-md-6">
+        <div id={id} className={colClasses}>
           <div className={classNames('form-group', { 'has-error': error || fileError })}>
             <label className='control-label'>{label} {required}</label>
             <div>
@@ -48,12 +48,3 @@ export const ImageInput = class extends Component {
   }
 }
 
-// name='firstImage'
-// id='firstImageHash'
-// error={errors['firstImageHash']}
-// fileError={firstFileError}
-// setRef={this.setFirstImageHashRef}
-// onChange={this.captureFirstImage}
-// currentValue={this.state.firstFileName}
-// progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
-// progressPercent={this.state.firstImagePercent}

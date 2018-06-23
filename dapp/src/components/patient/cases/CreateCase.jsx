@@ -1,12 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import {
-  ControlLabel,
-  Modal,
-  ToggleButtonGroup,
-  ToggleButton,
-  ButtonToolbar
-} from 'react-bootstrap'
+import { Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import { genKey } from '~/services/gen-key'
 import { withRouter } from 'react-router-dom'
@@ -22,8 +16,9 @@ import { contractByName } from '~/saga-genesis/state-finders'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
-import { ImageInput } from '~/components/ImageInput'
-import { HippoToggleButtonGroup } from '~/components/HippoToggleButtonGroup'
+import { HippoImageInput } from '~/components/forms/HippoImageInput'
+import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
+import { HippoTextInput } from '~/components/forms/HippoTextInput'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -221,10 +216,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
       await this.setState({ errors: errors })
 
-      // Highlight first error field
+      // Go to first error field
       if (errors.length > 0) {
-        // window.location.hash = "#" + firstField;
-        this[`${errors[0]}Input`].focus()
+        window.location.hash = `#${errors[0]}`;
+        // this[`${errors[0]}Input`].focus() // this only works on text fields
       }
     }
 
@@ -373,10 +368,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <div className="form-group--heading">
                         Imagery:
                       </div>
-                      <ImageInput
+                      <HippoImageInput
                         name='firstImage'
                         id='firstImageHash'
                         label="Overview Photo:"
+                        colClasses='col-xs-12 col-sm-12 col-md-6'
                         required={true}
                         error={errors['firstImageHash']}
                         fileError={firstFileError}
@@ -387,10 +383,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         progressPercent={this.state.firstImagePercent}
                       />
 
-                      <ImageInput
+                      <HippoImageInput
                         name='secondImage'
                         id='secondImageHash'
                         label="Close-up Photo:"
+                        colClasses='col-xs-12 col-sm-12 col-md-6'
                         required={true}
                         error={errors['secondImageHash']}
                         fileError={secondFileError}
@@ -406,8 +403,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       </div>
 
                       <HippoToggleButtonGroup
+                        id='howLong'
                         name="howLong"
                         required={true}
+                        colClasses='col-xs-12 col-md-6'
                         label='How long have you had this problem?'
                         error={errors['howLong']}
                         setRef={this.setHowLongRef}
@@ -416,8 +415,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       />
 
                       <HippoToggleButtonGroup
+                        id='size'
                         name="size"
                         required={true}
+                        colClasses='col-xs-12 col-md-6'
                         label='Is it growing, shrinking or staying the same size?'
                         error={errors['size']}
                         setRef={this.setSizeRef}
@@ -426,8 +427,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       />
 
                       <HippoToggleButtonGroup
+                        id='painful'
                         name="painful"
                         required={true}
+                        colClasses='col-xs-12 col-md-6'
                         label='Is it painful?'
                         error={errors['painful']}
                         setRef={this.setPainfulRef}
@@ -436,8 +439,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       />
 
                       <HippoToggleButtonGroup
+                        id='bleeding'
                         name="bleeding"
                         required={true}
+                        colClasses='col-xs-12 col-md-6'
                         label='Is it bleeding?'
                         error={errors['bleeding']}
                         setRef={this.setBleedingRef}
@@ -446,8 +451,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       />
 
                       <HippoToggleButtonGroup
+                        id='itching'
                         name="itching"
                         required={true}
+                        colClasses='col-xs-12 col-md-6'
                         label='Is it itching?'
                         error={errors['itching']}
                         setRef={this.setItchingRef}
@@ -456,8 +463,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       />
 
                       <HippoToggleButtonGroup
+                        id='skinCancer'
                         name="skinCancer"
                         required={true}
+                        colClasses='col-xs-12 col-md-6'
                         label='Any history of skin cancer?'
                         error={errors['skinCancer']}
                         setRef={this.setSkinCancerRef}
@@ -466,8 +475,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       />
 
                       <HippoToggleButtonGroup
+                        id='sexuallyActive'
                         name="sexuallyActive"
                         required={true}
+                        colClasses='col-xs-12 col-md-6'
                         label='Are you sexually active?'
                         error={errors['sexuallyActive']}
                         setRef={this.setSexuallyActiveRef}
@@ -475,59 +486,55 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         values={['Yes', 'No']}
                       />
 
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['color'] })}>
-                            <label>Has it changed in color?<span className='star'>*</span></label>
-                            <input
-                              onChange={(event) => this.setState({ color: event.target.value })}
-                              type="text"
-                              ref={this.setColorRef}
-                              className="form-control" />
-                            {errors['color']}
-                          </div>
-                        </div>
-                      </div>
+                      <HippoTextInput
+                        id='color'
+                        name="color"
+                        required={true}
+                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        label='Has it changed in color?'
+                        error={errors['color']}
+                        setRef={this.setColorRef}
+                        onChange={(event) => this.setState({ color: event.target.value })}
+                      />
 
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className={classNames('form-group', { 'has-error': errors['prevTreatment'] })}>
-                            <label>Have you tried any treatments so far?<span className='star'>*</span></label>
-                            <input
-                              onChange={(event) => this.setState({ prevTreatment: event.target.value })}
-                              type="text"
-                              ref={this.setPrevTreatmentRef}
-                              className="form-control" />
-                            {errors['prevTreatment']}
-                          </div>
-                        </div>
-                      </div>
+                      <HippoTextInput
+                        id='prevTreatment'
+                        name="prevTreatment"
+                        required={true}
+                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        label='Have you tried any treatments so far?'
+                        error={errors['prevTreatment']}
+                        setRef={this.setPrevTreatmentRef}
+                        onChange={(event) => this.setState({ prevTreatment: event.target.value })}
+                      />
+
 
                       <div className="form-group--heading">
                         Additional Info:
                       </div>
+
                       <div className="row">
                         <div className="col-xs-5 col-sm-4 col-md-2">
-                          <div className={classNames('form-group', { 'has-error': errors['age'] })}>
-                            <label>Age<span className='star'>*</span></label>
-                            <input
-                              ref={this.setAgeRef}
-                              onChange={(event) => this.setState({ age: event.target.value })}
-                              type="text"
-                              className="form-control" />
-                            {errors['age']}
-                          </div>
+                          <HippoTextInput
+                            id='age'
+                            name="age"
+                            required={true}
+                            label='Age'
+                            error={errors['age']}
+                            setRef={this.setAgeRef}
+                            onChange={(event) => this.setState({ age: event.target.value })}
+                          />
                         </div>
                         <div className="col-xs-12 col-sm-8 col-md-4">
-                          <div className={classNames('form-group', { 'has-error': errors['country'] })}>
-                            <label>Country<span className='star'>*</span></label>
-                            <input
-                              type="text"
-                              onChange={(event) => this.setState({ country: event.target.value })}
-                              ref={this.setCountryRef}
-                              className="form-control" />
-                            {errors['country']}
-                          </div>
+                          <HippoTextInput
+                            id='country'
+                            name="country"
+                            required={true}
+                            label='Country'
+                            error={errors['country']}
+                            setRef={this.setCountryRef}
+                            onChange={(event) => this.setState({ country: event.target.value })}
+                          />
                         </div>
                       </div>
 
@@ -552,6 +559,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                           </button>
                         </div>
                       </div>
+
                     </form>
                   </div>
                 </div>
@@ -559,48 +567,49 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             </div>
           </div>
 
-        <Modal show={this.state.showBalanceTooLowModal}>
-          <Modal.Body>
-            <div className="row">
-              <div className="col-xs-12 text-center">
-                <h4>You need 15 MEDX to submit a case.</h4>
+          <Modal show={this.state.showBalanceTooLowModal}>
+            <Modal.Body>
+              <div className="row">
+                <div className="col-xs-12 text-center">
+                  <h4>You need 15 MEDX to submit a case.</h4>
+                </div>
               </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button onClick={this.handleCloseBalanceTooLowModal} type="button" className="btn btn-primary">Close</button>
-          </Modal.Footer>
-        </Modal>
-        <Modal show={this.state.showConfirmSubmissionModal}>
-          <Modal.Body>
-            <div className="row">
-              <div className="col-xs-12 text-center">
-                <h4>
-                  Are you sure?
-                </h4>
-                <h5>
-                  This will cost you between 5 - 15 MEDX.
-                  <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
-                </h5>
-              </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
-            <button
-              disabled={this.state.isSubmitting}
-              onClick={this.handleAcceptConfirmSubmissionModal}
-              type="button"
-              className="btn btn-primary">
-              Yes
-            </button>
-          </Modal.Footer>
-        </Modal>
+            </Modal.Body>
+            <Modal.Footer>
+              <button onClick={this.handleCloseBalanceTooLowModal} type="button" className="btn btn-primary">Close</button>
+            </Modal.Footer>
+          </Modal>
 
-        <Loading loading={this.state.isSubmitting} />
-      </div>
-    )
-  }
+          <Modal show={this.state.showConfirmSubmissionModal}>
+            <Modal.Body>
+              <div className="row">
+                <div className="col-xs-12 text-center">
+                  <h4>
+                    Are you sure?
+                  </h4>
+                  <h5>
+                    This will cost you between 5 - 15 MEDX.
+                    <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
+                  </h5>
+                </div>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
+              <button
+                disabled={this.state.isSubmitting}
+                onClick={this.handleAcceptConfirmSubmissionModal}
+                type="button"
+                className="btn btn-primary">
+                Yes
+              </button>
+            </Modal.Footer>
+          </Modal>
+
+          <Loading loading={this.state.isSubmitting} />
+        </div>
+      )
+    }
 }))))
 
 export const CreateCaseContainer = withRouter(CreateCase)
