@@ -8,6 +8,10 @@
 .dropdown-header {
   margin-top: 15px;
   text-transform: uppercase;
+
+  @media (max-width: 767px) {
+    color: $brand-info;
+  }
 }
 
 .dropdown-header:first-child {

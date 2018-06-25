@@ -24,6 +24,7 @@ a {
 .eth-address {
   font-family: "Space Mono", monospace;
   text-transform: lowercase;
+  word-wrap: break-word;
 }
 
 .valign {
@@ -61,7 +62,7 @@ h6 .small-inverse {
 ul,
 ol {
   @media (max-width: 768px) {
-    padding-left: 0;
+    padding-left: 20px;
   }
 }
 

@@ -8,6 +8,10 @@
 
 .form-wrapper--body__extra-padding {
   padding: 6rem;
+
+  @media (max-width: 768px) {
+    padding: 4rem 2rem;
+  }
 }
 
 .form-wrapper--body > h3:first-child {

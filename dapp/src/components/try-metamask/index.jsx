@@ -12,7 +12,7 @@ export const TryMetamask = class extends Component {
         <MainLayoutContainer>
           <div className='container'>
             <div className='row'>
-              <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
+              <div className='col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
                 <h3 className='text-white text-center'>
                   To use Hippocrates you will need to use an Ethereum wallet
                 </h3>
@@ -36,7 +36,7 @@ export const TryMetamask = class extends Component {
                       target="_blank"
                       rel="noopener noreferrer"
                       title="Download Cipher from Apple App Store">
-                      <img src={AppStoreButtonImg} alt="Apple App Store Button" />
+                      <img src={AppStoreButtonImg} alt="Apple App Store Button" width="100" />
                     </a>
                     &nbsp; &nbsp; &nbsp;
                     <a
@@ -44,7 +44,7 @@ export const TryMetamask = class extends Component {
                       target="_blank"
                       rel="noopener noreferrer"
                       title="Download Cipher from Google Play Store">
-                      <img src={PlayStoreButtonImg} alt="Google Play Store Button" />
+                      <img src={PlayStoreButtonImg} alt="Google Play Store Button" width="100" />
                     </a>
                   </div>
                 </div>
