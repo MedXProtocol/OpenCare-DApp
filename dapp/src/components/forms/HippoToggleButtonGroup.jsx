@@ -9,7 +9,7 @@ import {
 
 export const HippoToggleButtonGroup = class extends Component {
   render() {
-    const { name, error, label, setRef, onChange, values, colClasses } = this.props
+    const { id, name, error, label, setRef, onChange, values, colClasses } = this.props
     let required
     if (this.props.required)
       required = <span className='star'>*</span>
@@ -17,8 +17,7 @@ export const HippoToggleButtonGroup = class extends Component {
     return (
       <div className="row">
         <div className={colClasses}>
-          <div className={classNames('form-group', { 'has-error': error })}>
-
+          <div id={id} className={classNames('form-group', { 'has-error': error })}>
             <ControlLabel>{label} {required}</ControlLabel>
             <div className="hidden-input-mask">
               <input ref={setRef} />

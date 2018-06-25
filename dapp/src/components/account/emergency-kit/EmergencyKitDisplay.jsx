@@ -7,6 +7,7 @@ import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { formatSecretKey } from '~/services/format-secret-key'
 import { currentAccount } from '~/services/sign-in'
+import { EthAddress } from '~/components/EthAddress'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
@@ -57,10 +58,10 @@ export const EmergencyKitDisplay = class extends Component {
                     </div>
                   </div>
                   <p className="small text-center">
-                    <span className="eth-address text-gray">For eth address: {this.props.address}</span>
+                    <span className="eth-address text-gray">ethereum address:&nbsp;
+                      <EthAddress address={this.props.address} showFull={true} />
+                    </span>
                   </p>
-
-                  <br />
 
                   <div className="visible-sm visible-md visible-lg">
                     <div className="text-center">

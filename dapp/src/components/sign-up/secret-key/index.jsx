@@ -6,6 +6,7 @@ import get from 'lodash.get'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import faPrint from '@fortawesome/fontawesome-free-solid/faPrint'
 import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
+import { EthAddress } from '~/components/EthAddress'
 import { BodyClass } from '~/components/BodyClass'
 import { formatSecretKey } from '~/services/format-secret-key'
 import * as routes from '~/config/routes'
@@ -65,7 +66,9 @@ export const SecretKey = class extends Component {
                     </div>
                   </div>
                   <p className="small text-center">
-                    <span className="eth-address text-gray">For eth address: {this.props.address}</span>
+                    <span className="eth-address text-gray">ethereum address:&nbsp;
+                      <EthAddress address={this.props.address} showFull={true} />
+                    </span>
                   </p>
                   <p>
                     You will need this key to access your account from new devices and browsers.

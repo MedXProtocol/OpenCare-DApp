@@ -8,32 +8,33 @@ import faHeartbeat from '@fortawesome/fontawesome-free-solid/faHeartbeat';
 import { cacheCall } from '~/saga-genesis/sagas'
 import { withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
+import { EthAddress } from '~/components/EthAddress'
 import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
-  const account = get(state, 'sagaGenesis.accounts[0]')
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const MedXToken = contractByName(state, 'MedXToken')
-  let balance = '' + cacheCallValue(state, MedXToken, 'balanceOf', account)
+  let balance = '' + cacheCallValue(state, MedXToken, 'balanceOf', address)
   // avoid NaN
   if (balance === 'undefined')
     balance = 0
 
-  const canMint = cacheCallValue(state, MedXToken, 'owner') === account
+  const canMint = cacheCallValue(state, MedXToken, 'owner') === address
   return {
-    account,
+    address,
     MedXToken,
     balance,
     canMint
   }
 }
 
-function* saga({ account, MedXToken }) {
-  if (!account || !MedXToken) { return }
-  yield cacheCall(MedXToken, 'balanceOf', account)
+function* saga({ address, MedXToken }) {
+  if (!address || !MedXToken) { return }
+  yield cacheCall(MedXToken, 'balanceOf', address)
   yield cacheCall(MedXToken, 'owner')
 }
 
-export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(class _Wallet extends Component {
+export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['address', 'MedXToken'] })(class _Wallet extends Component {
   render() {
     return (
       <MainLayoutContainer>
@@ -44,7 +45,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
                 <div className="card-header">
                   <h4 className="card-title">
                     MEDX Balance
-                    <br /><small className="eth-address text-gray">for account: {this.props.account}</small>
+                    <br /><small className="eth-address text-gray">ethereum address: <EthAddress address={this.props.address} /></small>
                   </h4>
                 </div>
                 <div className="card-body">

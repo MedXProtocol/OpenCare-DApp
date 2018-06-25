@@ -5,6 +5,7 @@
 @import './assets/sass/toastr-animations';
 @import './assets/sass/toastr-overrides';
 
+@import "./assets/sass/address";
 @import "./assets/sass/alert";
 @import "./assets/sass/animation";
 @import "./assets/sass/button";
