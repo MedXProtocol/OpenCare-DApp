@@ -5,9 +5,7 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
-import {
-  CaseRowContainer
-} from './CaseRow'
+import { CaseRowContainer } from './CaseRow'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { contractByName } from '~/saga-genesis/state-finders'

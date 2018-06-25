@@ -116,7 +116,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
           <div className="card">
               <div className="card-header">
                 <h3 className="card-title">
-                  Case Overview <LoadingLines visible={this.state.loading} color="#999999" />
+                  Case Overview <LoadingLines visible={this.state.loading} color="#aaaaaa" />
                 </h3>
               </div>
               <div className="card-body">
