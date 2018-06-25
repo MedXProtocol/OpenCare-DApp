@@ -2,16 +2,19 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
-import { genKey } from '~/services/gen-key'
+import Select from 'react-select'
+import * as Animated from 'react-select/lib/animated';
+import { customStyles } from '~/config/react-select-custom-styles'
 import { withRouter } from 'react-router-dom'
 import classNames from 'classnames'
 import { isNotEmptyString } from '~/utils/common-util'
 import { uploadJson, uploadFile } from '~/utils/storage-util'
-import { currentAccount } from '~/services/sign-in'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
+import { genKey } from '~/services/gen-key'
+import { currentAccount } from '~/services/sign-in'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
@@ -19,6 +22,8 @@ import { Loading } from '~/components/Loading'
 import { HippoImageInput } from '~/components/forms/HippoImageInput'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
 import { HippoTextInput } from '~/components/forms/HippoTextInput'
+import { countries } from './countries'
+import { regions } from './regions'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -38,6 +43,22 @@ function* saga({ account, MedXToken }) {
   if (!MedXToken) { return }
   yield cacheCall(MedXToken, 'balanceOf', account)
 }
+
+const requiredFields = [
+  'firstImageHash',
+  'secondImageHash',
+  'howLong',
+  'size',
+  'painful',
+  'bleeding',
+  'itching',
+  'skinCancer',
+  'sexuallyActive',
+  'color',
+  'prevTreatment',
+  'age',
+  'country'
+]
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(withSend(class _CreateCase extends Component {
     constructor(){
@@ -59,6 +80,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         sexuallyActive: null,
         age: null,
         country: null,
+        region: null,
         color: null,
         prevTreatment: null,
         description: null,
@@ -85,6 +107,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setPrevTreatmentRef = element => { this.prevTreatmentInput = element }
       this.setAgeRef = element => { this.ageInput = element }
       this.setCountryRef = element => { this.countryInput = element }
+      this.setRegionRef = element => { this.regionInput = element }
     }
 
     componentWillReceiveProps (props) {
@@ -200,12 +223,23 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setState({ sexuallyActive: event.target.value })
     }
 
+    checkCountry = () => {
+      if (this.state.country === 'US') {
+        requiredFields.push('region')
+      } else {
+        let index = requiredFields.indexOf('region')
+        if (index > -1)
+          requiredFields.splice(index, 1)
+
+        this.setState({ region: '' })
+      }
+    }
+
     runValidation = async () => {
       // reset error states
       await this.setState({ errors: [] })
 
       let errors = []
-      let requiredFields = this.requiredFields()
       let length = requiredFields.length
 
       for (var fieldIndex = 0; fieldIndex < length; fieldIndex++) {
@@ -235,24 +269,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           this.setState({ showConfirmSubmissionModal: true })
         }
       }
-    }
-
-    requiredFields = () => {
-      return [
-        'firstImageHash',
-        'secondImageHash',
-        'howLong',
-        'size',
-        'painful',
-        'bleeding',
-        'itching',
-        'skinCancer',
-        'sexuallyActive',
-        'color',
-        'prevTreatment',
-        'age',
-        'country'
-      ]
     }
 
     handleCloseBalanceTooLowModal = (event) => {
@@ -289,6 +305,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             sexuallyActive: this.state.sexuallyActive,
             age: this.state.age,
             country: this.state.country,
+            region: this.state.region,
             color: this.state.color,
             prevTreatment: this.state.prevTreatment,
             description: this.state.description
@@ -373,7 +390,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         id='firstImageHash'
                         label="Overview Photo:"
                         colClasses='col-xs-12 col-sm-12 col-md-6'
-                        required={true}
                         error={errors['firstImageHash']}
                         fileError={firstFileError}
                         setRef={this.setFirstImageHashRef}
@@ -388,7 +404,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                         id='secondImageHash'
                         label="Close-up Photo:"
                         colClasses='col-xs-12 col-sm-12 col-md-6'
-                        required={true}
                         error={errors['secondImageHash']}
                         fileError={secondFileError}
                         setRef={this.setSecondImageHashRef}
@@ -405,7 +420,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <HippoToggleButtonGroup
                         id='howLong'
                         name="howLong"
-                        required={true}
                         colClasses='col-xs-12 col-md-6'
                         label='How long have you had this problem?'
                         error={errors['howLong']}
@@ -417,7 +431,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <HippoToggleButtonGroup
                         id='size'
                         name="size"
-                        required={true}
                         colClasses='col-xs-12 col-md-6'
                         label='Is it growing, shrinking or staying the same size?'
                         error={errors['size']}
@@ -429,7 +442,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <HippoToggleButtonGroup
                         id='painful'
                         name="painful"
-                        required={true}
                         colClasses='col-xs-12 col-md-6'
                         label='Is it painful?'
                         error={errors['painful']}
@@ -441,7 +453,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <HippoToggleButtonGroup
                         id='bleeding'
                         name="bleeding"
-                        required={true}
                         colClasses='col-xs-12 col-md-6'
                         label='Is it bleeding?'
                         error={errors['bleeding']}
@@ -453,7 +464,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <HippoToggleButtonGroup
                         id='itching'
                         name="itching"
-                        required={true}
                         colClasses='col-xs-12 col-md-6'
                         label='Is it itching?'
                         error={errors['itching']}
@@ -465,7 +475,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <HippoToggleButtonGroup
                         id='skinCancer'
                         name="skinCancer"
-                        required={true}
                         colClasses='col-xs-12 col-md-6'
                         label='Any history of skin cancer?'
                         error={errors['skinCancer']}
@@ -477,7 +486,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <HippoToggleButtonGroup
                         id='sexuallyActive'
                         name="sexuallyActive"
-                        required={true}
                         colClasses='col-xs-12 col-md-6'
                         label='Are you sexually active?'
                         error={errors['sexuallyActive']}
@@ -489,7 +497,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <HippoTextInput
                         id='color'
                         name="color"
-                        required={true}
                         colClasses='col-xs-12 col-sm-12 col-md-6'
                         label='Has it changed in color?'
                         error={errors['color']}
@@ -500,7 +507,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <HippoTextInput
                         id='prevTreatment'
                         name="prevTreatment"
-                        required={true}
                         colClasses='col-xs-12 col-sm-12 col-md-6'
                         label='Have you tried any treatments so far?'
                         error={errors['prevTreatment']}
@@ -514,34 +520,56 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-5 col-sm-4 col-md-2">
+                        <div className="col-xs-6 col-sm-3 col-md-1">
                           <HippoTextInput
                             id='age'
-                            name="age"
-                            required={true}
+                            name='age'
                             label='Age'
                             error={errors['age']}
                             setRef={this.setAgeRef}
                             onChange={(event) => this.setState({ age: event.target.value })}
                           />
                         </div>
-                        <div className="col-xs-12 col-sm-8 col-md-4">
-                          <HippoTextInput
-                            id='country'
-                            name="country"
-                            required={true}
-                            label='Country'
-                            error={errors['country']}
-                            setRef={this.setCountryRef}
-                            onChange={(event) => this.setState({ country: event.target.value })}
-                          />
+                        <div className="col-xs-12 col-sm-6 col-md-3">
+                          <div className={classNames('form-group', { 'has-error': errors['country'] })}>
+                            <label>Country</label>
+                            <Select
+                              placeholder='Please select your Country'
+                              styles={customStyles}
+                              components={Animated}
+                              closeMenuOnSelect={true}
+                              setRef={this.setCountryRef}
+                              options={countries}
+                              onChange={(newValue) => this.setState({ country: newValue.value }, this.checkCountry)}
+                              selected={this.state.country}
+                              required
+                            />
+                            {errors['country']}
+                          </div>
+                        </div>
+                        <div className="col-xs-8 col-sm-3 col-md-2">
+                          <div className={classNames('form-group', { 'has-error': errors['region'] })}>
+                            <label>State</label>
+                            <Select
+                              isDisabled={this.state.country !== 'US'}
+                              placeholder='Please select your State'
+                              styles={customStyles}
+                              components={Animated}
+                              closeMenuOnSelect={true}
+                              setRef={this.setRegionRef}
+                              options={regions}
+                              onChange={(newValue) => this.setState({ region: newValue.value })}
+                              selected={this.state.region}
+                            />
+                            {errors['region']}
+                          </div>
                         </div>
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
+                        <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                           <div className="form-group">
-                            <label>Please include any additional comments below</label>
+                            <label>Please include any additional info below <span className="text-gray">(Optional)</span></label>
                             <textarea
                               onChange={(event) => this.setState({ description: event.target.value })}
                               className="form-control"
@@ -551,7 +579,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
+                        <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6 text-right">
                           <button
                             type="submit"
                             className="btn btn-lg btn-success">

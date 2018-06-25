@@ -1,4 +1,6 @@
 export const countries = [
+  {"value":"CA", "label":"Canada"},
+  {"value":"US", "label":"United States"},
   {"value":"AF", "label":"Afghanistan"},
   {"value":"AX", "label":"Åland Islands"},
   {"value":"AL", "label":"Albania"},
@@ -37,7 +39,7 @@ export const countries = [
   {"value":"BI", "label":"Burundi"},
   {"value":"KH", "label":"Cambodia"},
   {"value":"CM", "label":"Cameroon"},
-  {"value":"CA", "label":"Canada"},
+
   {"value":"CV", "label":"Cape Verde"},
   {"value":"KY", "label":"Cayman Islands"},
   {"value":"CF", "label":"Central African Republic"},
@@ -228,7 +230,6 @@ export const countries = [
   {"value":"UA", "label":"Ukraine"},
   {"value":"AE", "label":"United Arab Emirates"},
   {"value":"GB", "label":"United Kingdom"},
-  {"value":"US", "label":"United States"},
   {"value":"UM", "label":"United States Minor Outlying Islands"},
   {"value":"UY", "label":"Uruguay"},
   {"value":"UZ", "label":"Uzbekistan"},

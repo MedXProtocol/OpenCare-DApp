@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Select from 'react-select'
 import * as Animated from 'react-select/lib/animated';
+import { customStyles } from '~/config/react-select-custom-styles'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
@@ -17,15 +18,6 @@ import { groupedDiagnosisOptions } from './diagnosisOptions'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
-
-// The react-select <Select /> component uses inline CSS, this fixes it for mobile:
-const customStyles = {
-  multiValue: (base, state) => ({
-    ...base,
-    maxWidth: '260px',
-    whiteSpace: 'inherit'
-  })
-}
 
 function mapStateToProps (state, ownProps) {
   return {
