@@ -16,6 +16,24 @@
   transition: all 1s ease-in;
 }
 
+.fade-slow-enter {
+  opacity: 0.01;
+}
+
+.fade-slow-enter-active {
+  opacity: 1;
+  transition: all 1s ease-out;
+}
+
+.fade-slow-exit {
+  opacity: 1;
+}
+
+.fade-slow-exit-active {
+  opacity: 0.01;
+  transition: all 1s ease;
+}
+
 .slide-down-enter {
   animation-name: slideDown;
   animation-duration: 1s;

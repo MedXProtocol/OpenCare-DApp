@@ -100,6 +100,16 @@
   margin-left: 0;
 }
 
+.btn-group .btn {
+  border: 2px solid #ccc;
+}
+
+.btn-group .btn:hover,
+.btn-group .btn:active,
+.btn-group .btn:focus {
+  border: 2px solid $brand-info;
+}
+
 // Below taken from https://gist.github.com/Gurylev/ae78a534d873c9aeb853
 
 .btn-outline {
