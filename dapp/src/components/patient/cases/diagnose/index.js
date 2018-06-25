@@ -28,6 +28,7 @@ function mapStateToProps(state, { match }) {
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
   if (patientPublicKey && encryptedCaseKey) {
     const sharedKey = currentAccount().deriveSharedKey(patientPublicKey.substring(2))
+    // Should this use '~/services/decrypt-case-key` ?
     var caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
   }
   return {
