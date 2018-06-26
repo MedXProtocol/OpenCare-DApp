@@ -76,7 +76,10 @@ export const SignUp = class _SignUp extends Component {
   }
 
   closeOverrideModal = () => {
-    this.setState({ showOverrideModal: false })
+    this.setState({
+      showOverrideModal: false,
+      confirming: false
+    })
     this.props.clearOverrideError()
   }
 
