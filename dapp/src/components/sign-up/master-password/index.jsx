@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
+import ReactTimeout from 'react-timeout'
 import { Alert } from 'react-bootstrap'
-import { BodyClass } from '~/components/BodyClass'
 import masterPasswordInvalid from '~/services/master-password-invalid'
+import { BodyClass } from '~/components/BodyClass'
+import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
 
-export class MasterPassword extends Component {
+export const MasterPassword = class extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -15,16 +17,28 @@ export class MasterPassword extends Component {
 
   onSubmit = (e) => {
     e.preventDefault()
-    let msg = masterPasswordInvalid(this.state.masterPassword)
+
+    this.setState({
+      settingPassword: true
+    }, () => {
+      this.props.setTimeout(() => {
+        this.doSubmit()
+      }, 100)
+    })
+  }
+
+  doSubmit = () => {
+    let error = masterPasswordInvalid(this.state.masterPassword)
     if (this.state.masterPassword !== this.state.confirmMasterPassword) {
-      msg = 'Both passwords must match'
+      error = 'Both passwords must match'
     }
-    if (msg) {
-      this.setState({
-        error: msg
-      })
-    } else {
+    if (!error) {
       this.props.onMasterPassword(this.state.masterPassword)
+    } else {
+      this.setState({
+        error,
+        settingPassword: false
+      })
     }
   }
 
@@ -32,6 +46,7 @@ export class MasterPassword extends Component {
     if (this.state.error) {
       var error = <Alert className='text-center' bsStyle='danger'>{this.state.error}</Alert>
     }
+    const { settingPassword } = this.state
     return (
       <BodyClass isDark={true}>
         <ScrollToTopOnMount />
@@ -72,7 +87,12 @@ export class MasterPassword extends Component {
 
                 <div className="form-wrapper--footer">
                   <div className='text-right'>
-                    <input type='submit' className='btn btn-lg btn-primary' value='Continue' />
+                    <LoadingLines visible={settingPassword} /> &nbsp;
+                    <input
+                      disabled={settingPassword}
+                      type='submit'
+                      value={settingPassword ? 'Setting Password ...' : 'Set Password'}
+                      className='btn btn-lg btn-primary' />
                   </div>
                 </div>
               </div>
@@ -83,3 +103,5 @@ export class MasterPassword extends Component {
     )
   }
 }
+
+export const MasterPasswordContainer = ReactTimeout(MasterPassword)

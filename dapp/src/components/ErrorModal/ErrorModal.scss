@@ -1,4 +1,17 @@
+.error-modal {
+  padding: 0;
+}
+
+.error-modal .modal-header {
+  border-bottom: 0;
+  padding: 0;
+}
+
 .error-modal_alert {
+  border-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-bottom: 0;
   margin-top: 0;
 }
 
