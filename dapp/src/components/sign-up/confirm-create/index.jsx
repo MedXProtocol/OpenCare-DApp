@@ -1,14 +1,15 @@
 import React from 'react'
 import { BodyClass } from '~/components/BodyClass'
+import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
 
-export const ConfirmCreate = ({ onConfirm }) => {
+export const ConfirmCreate = ({ onConfirm, confirming }) => {
   return (
     <BodyClass isDark={true}>
       <ScrollToTopOnMount />
       <div className='container'>
         <div className='row'>
-          <div className='col-sm-8 col-sm-offset-2'>
+          <div className='col-xs-12 col-sm-8 col-sm-offset-2'>
             <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
               <div className="form-wrapper--body">
                 <h3>
@@ -25,7 +26,11 @@ export const ConfirmCreate = ({ onConfirm }) => {
                 </p>
               </div>
               <div className="form-wrapper--footer text-right">
-                <button className='btn btn-success btn-lg' onClick={onConfirm}>Finish Sign Up</button>
+                <LoadingLines visible={confirming} /> &nbsp;
+                <button
+                  disabled={confirming}
+                  className='btn btn-success btn-lg'
+                  onClick={onConfirm}>Finish Sign Up</button>
               </div>
             </div>
           </div>

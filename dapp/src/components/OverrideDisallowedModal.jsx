@@ -12,14 +12,10 @@ export class OverrideDisallowedModal extends Component {
   render () {
     return (
       <ErrorModal show={this.props.show} onHide={this.props.onOk}>
-        <div className="row">
-          <div className="col-xs-12">
-            <p>
-              You already have an account for this address and you cannot override it.
-              Please enter your original secret key and master password on the <Link to={routes.SIGN_IN}>sign in</Link> page.  You should have a copy in your Emergency Kit.
-            </p>
-          </div>
-        </div>
+        <p>
+          You already have an account for this address and you cannot override it.
+          Please enter your original secret key and master password on the <Link to={routes.SIGN_IN}>sign in</Link> page.  You should have a copy in your Emergency Kit.
+        </p>
       </ErrorModal>
     )
   }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactTimeout from 'react-timeout'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -27,19 +28,39 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
+export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      signingIn: false
+    }
+  }
 
   componentDidMount() {
     this.props.signOut()
   }
 
   onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
+    this.setState({
+      signingIn: true
+    }, () => {
+      this.props.setTimeout(() => {
+        this.doSubmit({ secretKey, masterPassword, overrideAccount })
+      }, 100)
+    })
+  }
+
+  doSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
     this.props.signIn({
       secretKey,
       masterPassword,
       account: this.props.account,
       address: this.props.address,
       overrideAccount
+    })
+    this.setState({
+      signingIn: false
     })
   }
 
@@ -73,7 +94,10 @@ export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchTo
                   Sign in to Hippocrates
                 </h3>
                 {warning}
-                <SignInFormContainer onSubmit={this.onSubmit} hasAccount={!!this.props.account} />
+                <SignInFormContainer
+                  signingIn={this.state.signingIn}
+                  onSubmit={this.onSubmit}
+                  hasAccount={!!this.props.account} />
 
                 <div className="account--extras">
                   <p className='text-center text-white'>
@@ -87,4 +111,4 @@ export const SignInContainer = withRouter(connect(mapStateToProps, mapDispatchTo
       </BodyClass>
     )
   }
-}))
+})))

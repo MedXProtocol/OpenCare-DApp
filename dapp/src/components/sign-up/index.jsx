@@ -1,22 +1,17 @@
 import React, { Component } from 'react'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
-import { genKey } from '~/services/gen-key'
+import ReactTimeout from 'react-timeout'
 import { Redirect } from 'react-router-dom'
-import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
-import { mixpanel } from '~/mixpanel'
-import { ConfirmCreate } from './confirm-create'
-import { SecretKeyContainer } from './secret-key'
-import { MasterPassword } from './master-password'
 import { connect } from 'react-redux'
 import { Account } from '~/accounts/Account'
-import {
-  cacheCall,
-  cacheCallValue,
-  withSaga
-} from '~/saga-genesis'
-import {
-  contractByName
-} from '~/saga-genesis/state-finders'
+import { genKey } from '~/services/gen-key'
+import { mixpanel } from '~/mixpanel'
+import { ConfirmCreate } from './confirm-create'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
+import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
+import { MasterPasswordContainer } from './master-password'
+import { SecretKeyContainer } from './secret-key'
+import { cacheCall, cacheCallValue, withSaga } from '~/saga-genesis'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state) {
   const address = state.sagaGenesis.accounts[0]
@@ -81,7 +76,10 @@ export const SignUp = class _SignUp extends Component {
   }
 
   closeOverrideModal = () => {
-    this.setState({ showOverrideModal: false })
+    this.setState({
+      showOverrideModal: false,
+      confirming: false
+    })
     this.props.clearOverrideError()
   }
 
@@ -93,10 +91,16 @@ export const SignUp = class _SignUp extends Component {
   }
 
   onConfirm = () => {
-    this.props.signUp({
-      secretKey: this.state.secretKey,
-      masterPassword: this.state.masterPassword,
-      address: this.props.address
+    this.setState({
+      confirming: true
+    }, () => {
+      this.props.setTimeout(() => {
+        this.props.signUp({
+          secretKey: this.state.secretKey,
+          masterPassword: this.state.masterPassword,
+          address: this.props.address
+        })
+      }, 100)
     })
 
     mixpanel.track("Signup Attempt");
@@ -107,9 +111,9 @@ export const SignUp = class _SignUp extends Component {
     if (this.props.signedIn) {
       content = <Redirect to='/patients/cases' />
     } else if (this.state.showConfirm) {
-      content = <ConfirmCreate onConfirm={this.onConfirm} />
+      content = <ConfirmCreate onConfirm={this.onConfirm} confirming={this.state.confirming} />
     } else if (this.state.showMasterPassword) {
-      content = <MasterPassword onMasterPassword={this.onMasterPassword} />
+      content = <MasterPasswordContainer onMasterPassword={this.onMasterPassword} />
     } else {
       content = <SecretKeyContainer secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
     }
@@ -124,4 +128,4 @@ export const SignUp = class _SignUp extends Component {
   }
 }
 
-export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['address', 'AccountManager'] })(SignUp))
+export const SignUpContainer = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['address', 'AccountManager'] })(SignUp)))

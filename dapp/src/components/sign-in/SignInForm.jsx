@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { Alert, HelpBlock } from 'react-bootstrap'
 import { formatSecretKey } from '~/services/format-secret-key'
 import { connect } from 'react-redux'
+import { LoadingLines } from '~/components/LoadingLines'
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
 
 const HIDDEN_KEY = formatSecretKey(Array(65).join('X'))
@@ -39,7 +40,6 @@ export const SignInForm = class extends Component {
 
   onSubmit = (e) => {
     if (e) e.preventDefault()
-
     this.doSubmit()
   }
 
@@ -53,6 +53,7 @@ export const SignInForm = class extends Component {
   }
 
   render () {
+    const { signingIn } = this.props
     var masterPasswordError
     if (this.props.masterPasswordError) {
       masterPasswordError = <Alert bsStyle='danger'>{this.props.masterPasswordError}</Alert>
@@ -104,7 +105,12 @@ export const SignInForm = class extends Component {
           </div>
           <div className="form-wrapper--footer">
             <div className='text-right'>
-              <input type='submit' value='Sign In' className='btn btn-lg btn-primary' />
+              <LoadingLines visible={signingIn} /> &nbsp;
+              <input
+                disabled={signingIn}
+                type='submit'
+                value={signingIn ? 'Signing In ...' : 'Sign In'}
+                className='btn btn-lg btn-primary' />
             </div>
           </div>
         </form>
