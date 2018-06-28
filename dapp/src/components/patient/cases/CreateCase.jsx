@@ -232,6 +232,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           requiredFields.splice(index, 1)
 
         this.setState({ region: '' })
+        this.regionInput.setValue(null)
       }
     }
 
@@ -255,6 +256,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         window.location.hash = `#${errors[0]}`;
         // this[`${errors[0]}Input`].focus() // this only works on text fields
       }
+
     }
 
     handleSubmit = async (event) => {
@@ -538,7 +540,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               styles={customStyles}
                               components={Animated}
                               closeMenuOnSelect={true}
-                              setRef={this.setCountryRef}
+                              ref={this.setCountryRef}
                               options={countries}
                               onChange={(newValue) => this.setState({ country: newValue.value }, this.checkCountry)}
                               selected={this.state.country}
@@ -556,7 +558,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               styles={customStyles}
                               components={Animated}
                               closeMenuOnSelect={true}
-                              setRef={this.setRegionRef}
+                              ref={this.setRegionRef}
                               options={regions}
                               onChange={(newValue) => this.setState({ region: newValue.value })}
                               selected={this.state.region}
