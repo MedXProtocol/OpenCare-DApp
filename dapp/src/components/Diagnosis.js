@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { downloadJson } from '~/utils/storage-util'
 import { Loading } from '~/components/Loading'
-import { withSaga, cacheCall, cacheCallValue, withSend } from '~/saga-genesis'
+import { withSaga, cacheCall, cacheCallValue, withSend, addContract } from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { mixpanel } from '~/mixpanel'
@@ -28,6 +28,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
 }
 
 function* saga({ caseAddress }) {
+  yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'status')
   yield cacheCall(caseAddress, 'patient')
   yield cacheCall(caseAddress, 'diagnosisALocationHash')
