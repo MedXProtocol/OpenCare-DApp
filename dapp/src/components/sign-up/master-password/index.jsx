@@ -5,8 +5,14 @@ import masterPasswordInvalid from '~/services/master-password-invalid'
 import { BodyClass } from '~/components/BodyClass'
 import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
+import PropTypes from 'prop-types'
 
 export const MasterPassword = class extends Component {
+  static propTypes = {
+    onMasterPassword: PropTypes.func.isRequired,
+    creating: PropTypes.bool.isRequired
+  }
+
   constructor (props) {
     super(props)
     this.state = {
@@ -17,17 +23,6 @@ export const MasterPassword = class extends Component {
 
   onSubmit = (e) => {
     e.preventDefault()
-
-    this.setState({
-      settingPassword: true
-    }, () => {
-      this.props.setTimeout(() => {
-        this.doSubmit()
-      }, 100)
-    })
-  }
-
-  doSubmit = () => {
     let error = masterPasswordInvalid(this.state.masterPassword)
     if (this.state.masterPassword !== this.state.confirmMasterPassword) {
       error = 'Both passwords must match'
@@ -36,8 +31,7 @@ export const MasterPassword = class extends Component {
       this.props.onMasterPassword(this.state.masterPassword)
     } else {
       this.setState({
-        error,
-        settingPassword: false
+        error
       })
     }
   }
@@ -46,7 +40,6 @@ export const MasterPassword = class extends Component {
     if (this.state.error) {
       var error = <Alert className='text-center' bsStyle='danger'>{this.state.error}</Alert>
     }
-    const { settingPassword } = this.state
     return (
       <BodyClass isDark={true}>
         <ScrollToTopOnMount />
@@ -85,15 +78,13 @@ export const MasterPassword = class extends Component {
                   </div>
                 </div>
 
-                <div className="form-wrapper--footer">
-                  <div className='text-right'>
-                    <LoadingLines visible={settingPassword} /> &nbsp;
-                    <input
-                      disabled={settingPassword}
-                      type='submit'
-                      value={settingPassword ? 'Setting Password ...' : 'Set Password'}
-                      className='btn btn-lg btn-primary' />
-                  </div>
+                <div className="form-wrapper--footer text-right">
+                  <LoadingLines visible={this.props.creating} /> &nbsp;
+                  <input
+                    disabled={this.props.creating}
+                    type='submit'
+                    value={this.props.creating ? 'Creating Account ...' : 'Create Account'}
+                    className='btn btn-lg btn-primary' />
                 </div>
               </div>
             </div>
