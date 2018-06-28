@@ -93,7 +93,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
 
   render() {
     let jsx
-    if (!this.props.caseKey) {
+    if (this.props.caseKey === null) {
       jsx = (
         <div className="row">
           <div className="col-xs-12 col-md-6 col-md-offset-3">

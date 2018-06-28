@@ -13,7 +13,9 @@ import { connect } from 'react-redux'
 
 function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
+  console.log(caseAddress)
   const caseKey = decryptCaseKey(state, currentAccount(), caseAddress)
+  console.log(caseKey)
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
 
   return {

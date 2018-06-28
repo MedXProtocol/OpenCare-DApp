@@ -17,14 +17,16 @@ export function* signUpSaga({ address, secretKey, masterPassword, overrideAccoun
   }
 
   let account = Account.get(address)
+  let newAccount = Account.build({ address, secretKey, masterPassword })
+
   let differentAccountExists = false
-  if (account) {
+
+  if (account && (account.hashedSecretKey !== newAccount.hashedSecretKey)) {
     differentAccountExists = true
   } else {
-    account = Account.build({ address, secretKey, masterPassword })
     const AccountManager = yield select(contractByName, 'AccountManager')
     let existingPublicKey = yield web3Call(AccountManager, 'publicKeys', address)
-    let expectedPublicKey = '0x' + account.hexPublicKey()
+    let expectedPublicKey = '0x' + newAccount.hexPublicKey()
     differentAccountExists = existingPublicKey && existingPublicKey !== expectedPublicKey
   }
 

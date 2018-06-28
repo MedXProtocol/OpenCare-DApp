@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { Account, ACCOUNT_VERSION } from '~/accounts/Account'
 import { SignInFormContainer } from './SignInForm'
+import { nextId } from '~/saga-genesis/transaction/transaction-factory'
 import { BodyClass } from '~/components/BodyClass'
 import * as routes from '~/config/routes'
 
@@ -64,9 +65,36 @@ export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, 
     })
   }
 
-  destroyAndSignUp = () => {
-    this.props.account.destroy()
-    this.props.history.push('/')
+  componentWillReceiveProps(nextProps) {
+    if (this.state.resetAccountHandler && this.state.transactionId) {
+      this.state.resetAccountHandler.handle(nextProps.transactions[this.state.transactionId])
+        .onError((error) => {
+          toastr.transactionError(error)
+          this.setState({
+            signingIn: false
+          })
+        })
+        .onTxHash(() => {
+          toastr.success('Your account reset transaction has been sent.')
+        })
+        .onConfirmed(() => {
+          this.props.account.destroy()
+          this.props.history.push('/')
+
+          toastr.success('Your account has been reset.')
+        })
+    }
+  }
+
+  handleReset = () => {
+    dispatchResetAccount()
+
+    let transactionId = nextId()
+    this.setState({
+      resetAccountHandler: new TransactionStateHandler(),
+      signingIn: true,
+      transactionId
+    })
   }
 
   render () {
@@ -78,7 +106,9 @@ export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, 
             <p>
               You have an old account that no longer works.
             </p>
-            <button className='btn btn-danger btn-outline-inverse btn-no-shadow' onClick={this.destroyAndSignUp}>
+            <button
+              className='btn btn-danger btn-outline-inverse btn-no-shadow'
+              onClick={this.handleReset}>
               Reset Account
             </button>
           </div>

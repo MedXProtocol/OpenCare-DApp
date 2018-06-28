@@ -1,5 +1,6 @@
 import decryptSecretKey from './decrypt-secret-key'
 import aes from '~/services/aes'
+import { hashWithSalt } from '~/services/hashWithSalt'
 import { deriveKey, deriveKeyAsync } from '~/utils/derive-key'
 import { deriveKeyPair } from './derive-key-pair'
 import { deriveSharedKey } from './derive-shared-key'
@@ -13,7 +14,7 @@ import isBlank from '~/utils/is-blank'
 // NOTE: DANGEROUS
 // NOTE: DO NOT CHANGE THIS
 // NOTE: NOTE:
-export const ACCOUNT_VERSION = 4
+export const ACCOUNT_VERSION = 5
 
 export class Account {
   constructor (json) {
@@ -122,6 +123,20 @@ export class Account {
 
   getVersion() {
     return this._json.version
+  }
+
+  hashedSecretKey() {
+    return this._json.hashedSecretKey
+  }
+
+  setupSecretKeyHash() {
+    const secretKey = this.secretKey()
+    const [ hashedSecretKey, secretKeySalt ] = hashWithSalt(secretKey)
+    this._json = {
+      ...this._json,
+      hashedSecretKey,
+      secretKeySalt
+    }
   }
 
   destroy () {
