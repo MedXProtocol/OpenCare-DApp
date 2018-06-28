@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Button } from 'react-bootstrap'
+import ReactTooltip from 'react-tooltip'
 import { currentAccount } from '~/services/sign-in'
 import { cacheCallValue, withSend, withSaga, cacheCall } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
@@ -101,6 +102,13 @@ export const PublicKeyCheck = connect(mapStateToProps)(
                 Register Account
               </Button>
             </span>
+            <ReactTooltip
+              id='set-public-key-tooltip'
+              effect='solid'
+              place='bottom'
+              html={true}
+              getContent={() => this.state.isSubmitting ? 'Setting Public Key, please wait ... <br/><small>(You may need to check MetaMask)</small>' : '' }
+            />
           </div>
         </CSSTransition>
       )
