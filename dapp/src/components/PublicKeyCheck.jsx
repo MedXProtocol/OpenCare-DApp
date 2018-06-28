@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Button } from 'react-bootstrap'
-import ReactTooltip from 'react-tooltip'
 import { currentAccount } from '~/services/sign-in'
 import { cacheCallValue, withSend, withSaga, cacheCall } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
