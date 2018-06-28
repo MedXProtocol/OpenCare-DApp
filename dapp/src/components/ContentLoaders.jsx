@@ -17,7 +17,7 @@ export const ImageLoader = props => (
 export const CaseDetailsLoader = props => (
   <ContentLoader
     height={160}
-    width="100%"
+    width={400}
     speed={1}
     primaryColor="#ededed"
     secondaryColor="#ffffff"
