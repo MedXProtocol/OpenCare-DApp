@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
+import ReactTimeout from 'react-timeout'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import faPrint from '@fortawesome/fontawesome-free-solid/faPrint'
 import faCopy from '@fortawesome/fontawesome-free-solid/faCopy'
 import { formatSecretKey } from '~/services/format-secret-key'
 
-export const PrintCopySecretKey = class extends Component {
+export const PrintCopySecretKey = ReactTimeout(class extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -16,6 +17,13 @@ export const PrintCopySecretKey = class extends Component {
   handlePrint = (e) => {
     e.preventDefault()
     window.print()
+  }
+
+  handleCopy = () => {
+    this.setState({ copied: true })
+    this.props.setTimeout(() => {
+      this.setState({ copied: false })
+    }, 5000)
   }
 
   render () {
@@ -32,19 +40,18 @@ export const PrintCopySecretKey = class extends Component {
         </div>
 
         <div className="col-xs-12 col-sm-6 text-center-on-xs">
-          <CopyToClipboard text={formatSecretKey(this.props.secretKey)}
-            onCopy={() => this.setState({ copied: true })}>
+          <CopyToClipboard
+            text={formatSecretKey(this.props.secretKey)}
+            onCopy={this.handleCopy}>
             <a className="btn btn-primary">
               <FontAwesomeIcon
                 icon={faCopy}
               />&nbsp;
-              Copy Key to Clipboard
+              {this.state.copied ? 'Copied!' : 'Copy Key to Clipboard'}
             </a>
           </CopyToClipboard>
-          {this.state.copied ? <span style={{color: 'red'}}>Copied.</span> : null}
         </div>
       </div>
     );
   }
-}
-
+})
