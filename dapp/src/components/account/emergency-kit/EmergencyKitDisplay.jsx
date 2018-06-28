@@ -1,13 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-import faPrint from '@fortawesome/fontawesome-free-solid/faPrint'
-import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { formatSecretKey } from '~/services/format-secret-key'
 import { currentAccount } from '~/services/sign-in'
 import { EthAddress } from '~/components/EthAddress'
+import { PrintCopySecretKey } from '~/components/PrintCopySecretKey'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
@@ -19,20 +17,6 @@ function mapStateToProps(state) {
 }
 
 export const EmergencyKitDisplay = class extends Component {
-  handlePrint = (e) => {
-    e.preventDefault()
-    window.print()
-  }
-
-  handleEmail = (e) => {
-    e.preventDefault()
-
-    let subject = 'Important! Hippocrates Secret Key -- KEEP THIS SAFE!'
-    let body    = `Dear Hippocrates user,%0A%0AYour secret key data is encrypted and stored safe using this secret key:%0A%0A${formatSecretKey(currentAccount().secretKey())}%0A%0AFor ETH address: ${this.props.address}%0A%0A%0AKeep this somewhere safe and secure, and use it to log in to Hippocrates from any other browser.%0A%0AThanks for using Hippocrates!%0A- The MedCredits Team`
-
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank', 'noopener');
-  }
-
   render () {
     const secretKey = currentAccount().secretKey()
 
@@ -63,29 +47,17 @@ export const EmergencyKitDisplay = class extends Component {
                     </span>
                   </p>
 
-                  <div className="visible-sm visible-md visible-lg">
-                    <div className="text-center">
-                      <a onClick={this.handlePrint} className="btn btn-lg btn-success">
-                        <FontAwesomeIcon
-                          icon={faPrint}
-                          size='lg' /> &nbsp;
-                        Print or save as PDF
-                      </a>
-                    </div>
-                  </div>
-                  <div className="visible-xs">
-                    <div className="text-center">
-                      <a onClick={this.handleEmail} className="btn btn-success">
-                        <FontAwesomeIcon
-                          icon={faEnvelope} />&nbsp;
-                        Send Key To Your Email
-                      </a>
-                    </div>
-                  </div>
+                  <br />
 
-                  <hr />
+                  <PrintCopySecretKey
+                    secretKey={secretKey}
+                    address={this.props.address}
+                  />
 
-                  <p className="title">
+                  <br />
+                  <br />
+
+                  <p className="title text-center">
                     To sign in on a new browser:
                   </p>
                   <ol>

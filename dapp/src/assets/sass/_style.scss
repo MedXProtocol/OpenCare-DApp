@@ -169,3 +169,9 @@ small,
 .loader--case-details {
   max-height: 600px;
 }
+
+.text-center-on-xs {
+  @media (max-width: $screen-sm) {
+    text-align: center;
+  }
+}
