@@ -20,10 +20,10 @@ i18next
             challengeDiagnosis: 'Getting Second Opinion',
             diagnoseCase: 'Sending Diagnosis',
             diagnoseChallengedCase: 'Sending Second Opinion',
-            publicKeys: 'Getting Public Key',
+            publicKeys: 'Retrieving Account',
             mint: 'Mint {{mintMedxCount}} MEDX',
             requestNextCase: 'Requesting Case',
-            setPublicKey: 'Setting Public Key'
+            setPublicKey: 'Registering Account'
           },
           transactionErrors: {
             userRevert: 'You rejected the transaction, please submit a valid transaction to proceed',

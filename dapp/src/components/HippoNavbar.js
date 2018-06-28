@@ -149,7 +149,7 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
                 size='sm'
                 className='text-gold'
                 data-tip='This Ethereum account is a Contract Owner' />
-              <ReactTooltip effect='solid' position='bottom' />
+              <ReactTooltip effect='solid' place='bottom' />
             </NavItem>
           ) : null}
           <NavItem>

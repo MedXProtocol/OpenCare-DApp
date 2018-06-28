@@ -93,8 +93,8 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
           <div className='row'>
             <div className='col-sm-12'>
               <p>
-                You're account has not finished setting up.  Please wait until your account's public key has
-                been registered on the blockchain.
+                You're account has not finished setting up.  Please wait until your account has
+                been saved on the blockchain.
               </p>
             </div>
           </div>

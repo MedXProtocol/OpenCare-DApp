@@ -29,7 +29,7 @@ export const EthAddress = class extends Component {
     return (
       <span title={address} className='address' data-tip={!this.state.showFull ? 'Click to Expand' : ''}>
         {displayed}
-        <ReactTooltip effect='solid' position='bottom' wrapper='span' />
+        <ReactTooltip effect='solid' place='top' wrapper='span' />
       </span>
     )
   }
