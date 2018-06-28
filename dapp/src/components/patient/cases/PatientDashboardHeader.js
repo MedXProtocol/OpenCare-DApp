@@ -48,8 +48,8 @@ export const PatientDashboardHeader = connect(mapStateToProps)(withSaga(saga, { 
           <div className='row'>
             <div className='col-sm-12'>
               <p>
-                Your account has not yet been set up.  You must wait until your account's public key has been
-              set in the blockchain.
+                Your account has not yet been set up.  You must wait until your account has been
+              saved to the blockchain.
               </p>
             </div>
           </div>

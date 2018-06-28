@@ -18,11 +18,11 @@ export const ConfirmCreate = ({ onConfirm, confirming }) => {
                 <hr />
 
                 <p className='lead'>
-                  The last thing we need to do is record your public key to the blockchain.  This key allows doctors
-                  to view your cases.
+                  The last thing we need to do is register your account.  This make encryption information
+                  available so that you can share and view cases and diagnoses.
                 </p>
                 <p className='lead'>
-                  Once you complete the sign up, you'll be prompted to set your public key.
+                  Once you complete the sign up, you'll be prompted to register your account.
                 </p>
               </div>
               <div className="form-wrapper--footer text-right">

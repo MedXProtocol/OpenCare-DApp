@@ -65,10 +65,10 @@ export const PublicKeyCheck = connect(mapStateToProps)(
             })
           })
           .onTxHash(() => {
-            toastr.success('Your public key transaction has been sent.')
+            toastr.success('Your account transaction has been sent.')
           })
           .onConfirmed(() => {
-            toastr.success('Your public key was set successfully.')
+            toastr.success('Your account has been registered.')
             mixpanel.track('Public Key Set')
           })
       }
@@ -84,7 +84,10 @@ export const PublicKeyCheck = connect(mapStateToProps)(
         >
           <div className="alert alert-info alert--banner alert--banner__large alert--banner__in-content text-center">
             <p>
-              Your public key needs to be confirmed on the Ethereum network prior to submitting or diagnosing cases.
+              Your account needs to be registered with the Ethereum network prior to submitting or diagnosing cases.
+            </p>
+            <p>
+              Accounts include encryption keys that need to be made publically available to enable communication.
             </p>
             <span
               data-tip=''
@@ -94,7 +97,7 @@ export const PublicKeyCheck = connect(mapStateToProps)(
                 onClick={this.handleSubmit}
                 bsStyle="info"
                 className="btn-sm btn-clear">
-                Set Public Key
+                Register Account
               </Button>
             </span>
             <ReactTooltip
@@ -102,7 +105,7 @@ export const PublicKeyCheck = connect(mapStateToProps)(
               effect='solid'
               place='bottom'
               html={true}
-              getContent={() => this.state.isSubmitting ? 'Setting Public Key, please wait ... <br/><small>(You may need to check MetaMask)</small>' : 'Setting your public key allows us to encrypt your data.' } />
+              getContent={() => this.state.isSubmitting ? 'Registering account, please wait ... <br/><small>(You may need to check MetaMask)</small>' : 'Registering your account allows you to share and view cases and diagnoses.' } />
           </div>
         </CSSTransition>
       )
