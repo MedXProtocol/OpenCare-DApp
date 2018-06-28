@@ -9,6 +9,7 @@ import { mixpanel } from '~/mixpanel'
 import { CSSTransition } from 'react-transition-group'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
+import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 
 function mapStateToProps (state) {
   const account = currentAccount()
@@ -84,10 +85,11 @@ export const PublicKeyCheck = connect(mapStateToProps)(
         >
           <div className="alert alert-info alert--banner alert--banner__large alert--banner__in-content text-center">
             <p>
-              Your account needs to be registered with the Ethereum network prior to submitting or diagnosing cases.
-            </p>
-            <p>
-              Accounts include encryption keys that need to be made publically available to enable communication.
+              Your account needs to be registered with the Ethereum network.
+              &nbsp;<InfoQuestionMark
+                      place="bottom"
+                      tooltipText="This will allow you to share info with Doctors using your public key.<br />It needs to be set prior to submitting or diagnosing cases."
+                    />
             </p>
             <span
               data-tip=''
@@ -100,12 +102,6 @@ export const PublicKeyCheck = connect(mapStateToProps)(
                 Register Account
               </Button>
             </span>
-            <ReactTooltip
-              id='set-public-key-tooltip'
-              effect='solid'
-              place='bottom'
-              html={true}
-              getContent={() => this.state.isSubmitting ? 'Registering account, please wait ... <br/><small>(You may need to check MetaMask)</small>' : 'Registering your account allows you to share and view cases and diagnoses.' } />
           </div>
         </CSSTransition>
       )

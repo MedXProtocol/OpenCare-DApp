@@ -18,7 +18,7 @@ export const ConfirmCreate = ({ onConfirm, confirming }) => {
                 <hr />
 
                 <p className='lead'>
-                  The last thing we need to do is register your account.  This make encryption information
+                  The last thing we need to do is register your account. This makes encryption information
                   available so that you can share and view cases and diagnoses.
                 </p>
                 <p className='lead'>
