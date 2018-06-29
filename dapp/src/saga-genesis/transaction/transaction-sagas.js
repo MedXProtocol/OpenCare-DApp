@@ -1,4 +1,5 @@
 import {
+  call as sagaCall,
   select,
   put,
   getContext,
@@ -39,6 +40,16 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
   })
 }
 
+// function estimateGas(func) {
+//   console.log('estimateGas')
+//   return func.estimateGas().then((error, result) => {
+//     console.log(error)
+//     if (error) { return }
+//     debugger
+//     return result
+//   } )
+// }
+
 export function* web3Send({ transactionId, call, options }) {
   const { address, method, args } = call
   try {
@@ -57,6 +68,11 @@ export function* web3Send({ transactionId, call, options }) {
     }
     const func = contractMethod(...args)
     const send = func.send
+
+    debugger
+    // console.log('here')
+    // const gasEstimated = yield sagaCall(estimateGas, func)
+    // console.log(gasEstimated)
 
     const transactionChannel = createTransactionEventChannel(web3, call, transactionId, send, options)
     try {

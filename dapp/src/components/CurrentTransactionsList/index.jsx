@@ -80,7 +80,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
             name = call.method
           }
 
-          let mintMedxCount = 1000 // these numbers could be pulled from the tx call args
+          let mintMedxCount = 1000 // these numbers could be pulled from the tx's call args
 
           if (error) {
             var code = transactionErrorToCode(error)
