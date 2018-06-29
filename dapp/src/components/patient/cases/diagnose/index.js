@@ -5,7 +5,7 @@ import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import Diagnosis from '~/components/Diagnosis'
 import { currentAccount } from '~/services/sign-in'
-import aes from '~/services/aes'
+import { decryptDoctorCaseKey } from '~/services/decryptDoctorCaseKey'
 import isBlank from '~/utils/is-blank'
 import get from 'lodash.get'
 import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
@@ -27,10 +27,9 @@ function mapStateToProps(state, { match }) {
   const doctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
-  if (patientPublicKey && encryptedCaseKey) {
-    const sharedKey = currentAccount().deriveSharedKey(patientPublicKey.substring(2))
-    caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
-  }
+
+  caseKey = decryptDoctorCaseKey(currentAccount(), patientPublicKey, encryptedCaseKey)
+
   return {
     account,
     caseAddress,
@@ -103,6 +102,21 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             caseAddress={this.props.caseAddress}
             caseKey={this.props.caseKey} />
         </div>
+    }
+
+    if (this.props.caseKey === undefined) {
+      diagnosis = null
+      challenge = null
+    } else if (this.props.caseKey === null) {
+      diagnosis = (
+        <div className="col-xs-12 col-md-6 col-md-offset-3">
+          <h4 className="text-danger">
+            Cannot submit diagnosis
+          </h4>
+          <hr />
+        </div>
+      )
+      challenge = null
     }
 
     return (
