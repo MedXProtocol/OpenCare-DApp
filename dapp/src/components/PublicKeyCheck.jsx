@@ -83,7 +83,7 @@ export const PublicKeyCheck = connect(mapStateToProps)(
           unmountOnExit
           classNames="slide-down"
         >
-          <div className="alert alert-info alert--banner alert--banner__large alert--banner__in-content text-center">
+          <div id="public-key-check-banner" className="alert alert-info alert--banner alert--banner__large alert--banner__in-content text-center">
             <p>
               Your account needs to be registered with the Ethereum network.
               &nbsp;<InfoQuestionMark
