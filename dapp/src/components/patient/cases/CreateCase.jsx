@@ -232,7 +232,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           requiredFields.splice(index, 1)
 
         this.setState({ region: '' })
-        this.regionInput.setValue(null)
+        this.regionInput.select.clearValue()
       }
     }
 
@@ -560,7 +560,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               closeMenuOnSelect={true}
                               ref={this.setRegionRef}
                               options={regions}
-                              onChange={(newValue) => this.setState({ region: newValue.value })}
+                              onChange={(newValue) => {
+                                this.setState({ region: newValue ? newValue.value : '' })
+                              }}
                               selected={this.state.region}
                             />
                             {errors['region']}
