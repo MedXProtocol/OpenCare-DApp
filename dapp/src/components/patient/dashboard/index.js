@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { MainLayoutContainer } from '~/layouts/MainLayout';
-import { PatientDashboardHeaderContainer } from '../cases/PatientDashboardHeader';
+import { PatientDashboardHeader } from '../cases/PatientDashboardHeader';
 import { PatientCasesContainer } from '../cases';
 
 export const PatientDashboard = class extends Component {
@@ -10,7 +10,7 @@ export const PatientDashboard = class extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              <PatientDashboardHeaderContainer />
+              <PatientDashboardHeader />
             </div>
           </div>
           <div className="row">

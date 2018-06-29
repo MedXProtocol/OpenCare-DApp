@@ -30,18 +30,23 @@ function mapStateToProps (state) {
   const MedXToken = contractByName(state, 'MedXToken')
   const CaseManager = contractByName(state, 'CaseManager')
   const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
+  const AccountManager = contractByName(state, 'AccountManager')
+  const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
+
   return {
     account,
     transactions: state.sagaGenesis.transactions,
     MedXToken,
     CaseManager,
+    publicKey,
     balance
   }
 }
 
-function* saga({ account, MedXToken }) {
-  if (!MedXToken) { return }
+function* saga({ account, AccountManager, MedXToken }) {
+  if (!MedXToken || !account || !AccountManager) { return }
   yield cacheCall(MedXToken, 'balanceOf', account)
+  yield cacheCall(AccountManager, 'publicKeys', account)
 }
 
 const requiredFields = [
@@ -60,7 +65,7 @@ const requiredFields = [
   'country'
 ]
 
-export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(withSend(class _CreateCase extends Component {
+export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(withSend(class _CreateCase extends Component {
     constructor(){
       super()
 
@@ -87,6 +92,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         caseEncryptionKey: genKey(32),
         showBalanceTooLowModal: false,
         showConfirmSubmissionModal: false,
+        showPublicKeyModal: false,
         isSubmitting: false,
         errors: []
       }
@@ -265,7 +271,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       await this.runValidation()
 
       if (this.state.errors.length === 0) {
-        if (this.props.balance < 15) {
+        if (!this.props.publicKey) {
+          window.location.hash = '#public-key-check-banner';
+          this.setState({ showPublicKeyModal: true })
+        } else if (this.props.balance < 15) {
           this.setState({ showBalanceTooLowModal: true })
         } else {
           this.setState({ showConfirmSubmissionModal: true })
@@ -345,13 +354,26 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       )
     }
 
+    errorMessage(fieldName) {
+      let msg
+      if (fieldName === 'country' || fieldName === 'region') {
+        msg = 'must be chosen'
+      } else if (fieldName.match(/ImageHash/g)) {
+        msg = 'please upload an image and wait for it to complete uploading'
+      } else {
+        msg = 'must be filled out'
+      }
+      return msg
+    }
+
     render() {
       let errors = {}
       for (var i = 0; i < this.state.errors.length; i++) {
         let fieldName = this.state.errors[i]
+
         errors[fieldName] =
           <p key={`errors-${i}`} className='has-error help-block small'>
-            must be filled out
+            {this.errorMessage(fieldName)}
           </p>
       }
 
@@ -599,6 +621,28 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             </div>
           </div>
 
+          <Modal show={this.state.showPublicKeyModal}>
+            <Modal.Body>
+              <div className="row">
+                <div className="col-xs-12 text-center">
+                  <h4>
+                    Your account has not yet been set up.
+                  </h4>
+                  <p>
+                    You must wait until your account has been saved to the blockchain. Click the <span className="text-blue">blue</span> button labeled <strong><span className="text-blue">Register Account</span></strong>.
+                  </p>
+                </div>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <button
+                onClick={() => { this.setState({ showPublicKeyModal: false }) }}
+                type="button"
+                className="btn btn-danger"
+              >Ok</button>
+            </Modal.Footer>
+          </Modal>
+
           <Modal show={this.state.showBalanceTooLowModal}>
             <Modal.Body>
               <div className="row">
@@ -608,7 +652,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
               </div>
             </Modal.Body>
             <Modal.Footer>
-              <button onClick={this.handleCloseBalanceTooLowModal} type="button" className="btn btn-primary">Close</button>
+              <button
+                onClick={this.handleCloseBalanceTooLowModal}
+                type="button"
+                className="btn btn-primary"
+              >Close</button>
             </Modal.Footer>
           </Modal>
 
