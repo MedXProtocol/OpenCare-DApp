@@ -15,8 +15,9 @@ import { connect } from 'react-redux'
 import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state, { match }) {
-  const caseAddress = match.params.caseAddress
+  let caseKey = undefined // undefined caseKey means it's still loading / state is unknown!
   let account = get(state, 'sagaGenesis.accounts[0]')
+  const caseAddress = match.params.caseAddress
   const AccountManager = contractByName(state, 'AccountManager')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
@@ -28,8 +29,7 @@ function mapStateToProps(state, { match }) {
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
   if (patientPublicKey && encryptedCaseKey) {
     const sharedKey = currentAccount().deriveSharedKey(patientPublicKey.substring(2))
-    // Should this use '~/services/decrypt-case-key` ?
-    var caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
+    caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
   }
   return {
     account,
