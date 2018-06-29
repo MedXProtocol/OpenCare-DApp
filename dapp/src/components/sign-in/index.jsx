@@ -4,16 +4,24 @@ import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
+import { toastr } from '~/toastr'
+import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { Loading } from '~/components/Loading'
 import { Account, ACCOUNT_VERSION } from '~/accounts/Account'
 import { SignInFormContainer } from './SignInForm'
-import { nextId } from '~/saga-genesis/transaction/transaction-factory'
+import { withSend } from '~/saga-genesis'
+import { contractByName } from '~/saga-genesis/state-finders'
 import { BodyClass } from '~/components/BodyClass'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
+  const AccountManager = contractByName(state, 'AccountManager')
+  const transactions = state.sagaGenesis.transactions
   return {
     address,
+    AccountManager,
+    transactions,
     account: Account.get(address)
   }
 }
@@ -29,12 +37,13 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
+export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      signingIn: false
+      signingIn: false,
+      isResetting: false
     }
   }
 
@@ -70,14 +79,13 @@ export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, 
       this.state.resetAccountHandler.handle(nextProps.transactions[this.state.transactionId])
         .onError((error) => {
           toastr.transactionError(error)
-          this.setState({
-            signingIn: false
-          })
+          this.setState({ isResetting: false })
         })
         .onTxHash(() => {
           toastr.success('Your account reset transaction has been sent.')
         })
         .onConfirmed(() => {
+          this.setState({ isResetting: false })
           this.props.account.destroy()
           this.props.history.push('/')
 
@@ -87,12 +95,11 @@ export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, 
   }
 
   handleReset = () => {
-    dispatchResetAccount()
+    let transactionId = this.props.send(this.props.AccountManager, 'setPublicKey', '0x')()
 
-    let transactionId = nextId()
     this.setState({
       resetAccountHandler: new TransactionStateHandler(),
-      signingIn: true,
+      isResetting: true,
       transactionId
     })
   }
@@ -102,15 +109,22 @@ export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, 
       const version = this.props.account.getVersion() || 0
       if (version < ACCOUNT_VERSION) {
         var warning =
-          <div className='alert alert-danger'>
+          <div className='alert alert-danger text-center'>
+            <br />
             <p>
-              You have an old account that no longer works.
+              You have a previous beta account that no longer works.
             </p>
+            <small>
+              Up the Gas Limit to run the reset transaction.
+            </small>
+            <br />
             <button
               className='btn btn-danger btn-outline-inverse btn-no-shadow'
               onClick={this.handleReset}>
               Reset Account
             </button>
+            <br />
+            <br />
           </div>
       }
     }
@@ -137,8 +151,9 @@ export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, 
               </div>
             </div>
           </div>
+          <Loading loading={this.state.isResetting} />
         </MainLayoutContainer>
       </BodyClass>
     )
   }
-})))
+}))))
