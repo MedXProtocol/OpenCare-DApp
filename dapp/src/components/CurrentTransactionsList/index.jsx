@@ -22,8 +22,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    send: (transactionId, call) => {
-      dispatch({ type: 'SEND_TRANSACTION', transactionId, call })
+    send: (transactionId, call, options) => {
+      dispatch({ type: 'SEND_TRANSACTION', transactionId, call, options })
     }
   }
 }
@@ -67,7 +67,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
       } else {
         transactions = this.props.pendingOrErrorTransactions.reverse().map(tx => {
           const key   = tx[0]
-          const { call, error, confirmed } = tx[1]
+          const { call, error, confirmed, gasUsed } = tx[1]
           let name
 
           // This is a patch to prevent the page from crashing, we need to figure out
@@ -82,7 +82,17 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
 
           let mintMedxCount = 1000 // these numbers could be pulled from the tx's call args
 
+
           if (error) {
+            const options = {
+              from: this.props.account
+            }
+            console.log(gasUsed)
+            if (gasUsed)
+              options['gasMultiplier'] = 1.2 * gasUsed
+
+            console.log(options['gasMultiplier'])
+
             var code = transactionErrorToCode(error)
             if (code) {
               var errorMessage =
@@ -92,7 +102,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
             }
             if (call !== undefined) {
               var resendButton =
-                <button onClick={() => this.props.send(key, call)} className='btn btn-sm btn-primary'>
+                <button onClick={() => this.props.send(key, call, options)} className='btn btn-sm btn-primary'>
                   Retry
                 </button>
             }

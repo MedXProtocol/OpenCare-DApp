@@ -1,4 +1,4 @@
-export default function (state, {type, transactionId, call, error, receipt, txHash}) {
+export default function (state, {type, transactionId, call, error, receipt, gasUsed, txHash}) {
   if (typeof state === 'undefined') {
     state = {}
   }
@@ -55,7 +55,8 @@ export default function (state, {type, transactionId, call, error, receipt, txHa
           ...state[transactionId],
           inFlight: false,
           complete: true,
-          error
+          error,
+          gasUsed
         }
       }
       break
