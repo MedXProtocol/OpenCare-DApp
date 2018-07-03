@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Select from 'react-select'
-import * as Animated from 'react-select/lib/animated';
 import { customStyles } from '~/config/react-select-custom-styles'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
@@ -198,7 +197,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
                     <Select
                       placeholder="--- Choose a diagnosis ---"
                       styles={customStyles}
-                      components={Animated}
                       closeMenuOnSelect={true}
                       options={groupedDiagnosisOptions}
                       onChange={this.updateDiagnosis}
@@ -212,7 +210,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
                       <Select
                         placeholder={groupedRecommendationOptions.overTheCounter.label}
                         styles={customStyles}
-                        components={Animated}
                         closeMenuOnSelect={true}
                         options={groupedRecommendationOptions.overTheCounter.options}
                         isMulti={true}
@@ -225,7 +222,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
                       <Select
                         placeholder={groupedRecommendationOptions.topicalMedications.label}
                         styles={customStyles}
-                        components={Animated}
                         closeMenuOnSelect={true}
                         options={groupedRecommendationOptions.topicalMedications.options}
                         isMulti={true}
@@ -238,7 +234,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
                       <Select
                         placeholder={groupedRecommendationOptions.oralMedications.label}
                         styles={customStyles}
-                        components={Animated}
                         closeMenuOnSelect={true}
                         options={groupedRecommendationOptions.oralMedications.options}
                         isMulti={true}
@@ -251,7 +246,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
                       <Select
                         placeholder={groupedRecommendationOptions.procedures.label}
                         styles={customStyles}
-                        components={Animated}
                         closeMenuOnSelect={true}
                         options={groupedRecommendationOptions.procedures.options}
                         isMulti={true}
@@ -264,7 +258,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
                       <Select
                         placeholder={groupedRecommendationOptions.other.label}
                         styles={customStyles}
-                        components={Animated}
                         closeMenuOnSelect={true}
                         options={groupedRecommendationOptions.other.options}
                         isMulti={true}

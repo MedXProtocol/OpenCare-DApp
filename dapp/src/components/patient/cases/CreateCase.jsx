@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import Select from 'react-select'
-import * as Animated from 'react-select/lib/animated';
 import { customStyles } from '~/config/react-select-custom-styles'
 import { withRouter } from 'react-router-dom'
 import classNames from 'classnames'
@@ -560,7 +559,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                             <Select
                               placeholder='Please select your Country'
                               styles={customStyles}
-                              components={Animated}
                               closeMenuOnSelect={true}
                               ref={this.setCountryRef}
                               options={countries}
@@ -578,7 +576,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               isDisabled={this.state.country !== 'US'}
                               placeholder='Please select your State'
                               styles={customStyles}
-                              components={Animated}
                               closeMenuOnSelect={true}
                               ref={this.setRegionRef}
                               options={regions}
