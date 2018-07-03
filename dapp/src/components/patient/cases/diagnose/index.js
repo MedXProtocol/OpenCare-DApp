@@ -5,7 +5,7 @@ import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import Diagnosis from '~/components/Diagnosis'
 import { currentAccount } from '~/services/sign-in'
-import aes from '~/services/aes'
+import { decryptDoctorCaseKey } from '~/services/decryptDoctorCaseKey'
 import isBlank from '~/utils/is-blank'
 import get from 'lodash.get'
 import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
@@ -15,26 +15,23 @@ import { connect } from 'react-redux'
 import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state, { match }) {
-  let caseKey = undefined // undefined caseKey means it's still loading / state is unknown!
-  let account = get(state, 'sagaGenesis.accounts[0]')
+  let address = get(state, 'sagaGenesis.accounts[0]')
   const caseAddress = match.params.caseAddress
   const AccountManager = contractByName(state, 'AccountManager')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
-  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'approvedDoctorKeys', account)
+  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'approvedDoctorKeys', address)
   const status = cacheCallValue(state, caseAddress, 'status')
   const doctorA = cacheCallValue(state, caseAddress, 'diagnosingDoctorA')
   const doctorB = cacheCallValue(state, caseAddress, 'diagnosingDoctorB')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisBLocationHash'))
-  if (patientPublicKey && encryptedCaseKey) {
-    const sharedKey = currentAccount().deriveSharedKey(patientPublicKey.substring(2))
-    caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
-  }
+  const caseKey = decryptDoctorCaseKey(currentAccount(), patientPublicKey, encryptedCaseKey)
+
   return {
-    account,
+    address,
     caseAddress,
-    showDiagnosis: !!account,
+    showDiagnosis: !!address,
     caseKey,
     status,
     doctorA,
@@ -45,13 +42,13 @@ function mapStateToProps(state, { match }) {
   }
 }
 
-function* saga({ match, account, AccountManager }) {
+function* saga({ match, address, AccountManager }) {
   if (!AccountManager) { return }
   const caseAddress = match.params.caseAddress
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield cacheCall(AccountManager, 'publicKeys', patientAddress)
-  yield cacheCall(caseAddress, 'approvedDoctorKeys', account)
+  yield cacheCall(caseAddress, 'approvedDoctorKeys', address)
 
   let status = parseInt(yield cacheCall(caseAddress, 'status'), 10)
 
@@ -61,9 +58,9 @@ function* saga({ match, account, AccountManager }) {
   if (status >= 10) { yield cacheCall(caseAddress, 'diagnosisBLocationHash') }
 }
 
-export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'account', 'AccountManager']})(class _DiagnoseCase extends Component {
+export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'address', 'AccountManager']})(class _DiagnoseCase extends Component {
   render () {
-    var challenging = this.props.doctorB === this.props.account
+    var challenging = this.props.doctorB === this.props.address
     if (this.props.status) {
       var status = parseInt(this.props.status, 10)
     } else {
@@ -79,7 +76,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             title='Diagnosis'
             challengingDoctorAddress={this.props.doctorB} />
         </div>
-    } else if (this.props.doctorB === this.props.account && status === 9) {
+    } else if (this.props.doctorB === this.props.address && status === 9) {
       challenge =
         <div className='col-xs-12'>
           <SubmitDiagnosisContainer
@@ -96,13 +93,28 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             caseAddress={this.props.caseAddress}
             caseKey={this.props.caseKey} />
         </div>
-    } else if (this.props.doctorA === this.props.account && status === 4) {
+    } else if (this.props.doctorA === this.props.address && status === 4) {
       diagnosis =
         <div className='col-xs-12'>
           <SubmitDiagnosisContainer
             caseAddress={this.props.caseAddress}
             caseKey={this.props.caseKey} />
         </div>
+    }
+
+    if (this.props.caseKey === undefined) {
+      diagnosis = null
+      challenge = null
+    } else if (this.props.caseKey === null) {
+      diagnosis = (
+        <div className="col-xs-12 col-md-6 col-md-offset-3">
+          <h4 className="text-danger">
+            Cannot submit diagnosis
+          </h4>
+          <hr />
+        </div>
+      )
+      challenge = null
     }
 
     return (
