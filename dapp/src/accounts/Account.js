@@ -14,7 +14,7 @@ import isBlank from '~/utils/is-blank'
 // NOTE: DANGEROUS
 // NOTE: DO NOT CHANGE THIS
 // NOTE: NOTE:
-export const ACCOUNT_VERSION = 5
+export const ACCOUNT_VERSION = 8
 
 export class Account {
   constructor (json) {

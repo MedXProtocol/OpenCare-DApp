@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Redirect } from 'react-router-dom'
 import ReactTimeout from 'react-timeout'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
@@ -9,17 +10,23 @@ import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
 import { Account, ACCOUNT_VERSION } from '~/accounts/Account'
 import { SignInFormContainer } from './SignInForm'
-import { withSend } from '~/saga-genesis'
-import { contractByName } from '~/saga-genesis/state-finders'
+import {
+  withSend
+} from '~/saga-genesis'
+import {
+  contractByName
+} from '~/saga-genesis/state-finders'
 import { BodyClass } from '~/components/BodyClass'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
+  const signedIn = state.account.signedIn
   const AccountManager = contractByName(state, 'AccountManager')
   const transactions = state.sagaGenesis.transactions
   return {
     address,
+    signedIn,
     AccountManager,
     transactions,
     account: Account.get(address)
@@ -86,7 +93,9 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
         })
         .onConfirmed(() => {
           this.setState({ isResetting: false })
-          this.props.account.destroy()
+          if (this.props.account) {
+            this.props.account.destroy()
+          }
           this.props.history.push('/')
 
           toastr.success('Your account has been reset.')
@@ -105,25 +114,28 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
   }
 
   render () {
-    if (this.props.account) {
-      const version = this.props.account.getVersion() || 0
-      if (version < ACCOUNT_VERSION) {
-        var warning =
-          <div className='alert alert-danger text-center'>
-            <br />
-            <p>
-              You have a previous beta account that no longer works.
-            </p>
-            <br />
-            <button
-              className='btn btn-danger btn-outline-inverse btn-no-shadow'
-              onClick={this.handleReset}>
-              Reset Account
-            </button>
-            <br />
-            <br />
-          </div>
-      }
+    if (this.props.signedIn) {
+      return <Redirect to='/patients/cases' />
+    }
+
+    const shouldResetAccount = this.props.account && ((this.props.account.getVersion() || 0) < ACCOUNT_VERSION)
+
+    if (shouldResetAccount) {
+      var warning =
+        <div className='alert alert-danger text-center'>
+          <br />
+          <p>
+            You have a previous beta account that no longer works.
+          </p>
+          <br />
+          <button
+            className='btn btn-danger btn-outline-inverse btn-no-shadow'
+            onClick={this.handleReset}>
+            Reset Account
+          </button>
+          <br />
+          <br />
+        </div>
     }
     return (
       <BodyClass isDark={true}>

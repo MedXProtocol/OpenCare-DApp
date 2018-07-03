@@ -19,6 +19,7 @@ export function buildAccount(address, secretKey, masterPassword) {
   const encryptedSecretKey = aes.encrypt(secretKey, preimage)
 
   return {
+    address,
     hashedSecretKey,
     secretKeySalt,
     salt,
