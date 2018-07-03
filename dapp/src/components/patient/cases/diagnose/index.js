@@ -55,7 +55,7 @@ function* saga({ match, address, AccountManager }) {
 
 export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'address', 'AccountManager']})(class _DiagnoseCase extends Component {
   render () {
-    var challenging = this.props.challengingDoctor === this.props.account
+    var challenging = this.props.challengingDoctor === this.props.address
 
     if (!isBlank(this.props.challengeHash)) {
       var challenge =
@@ -66,7 +66,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             title='Diagnosis'
             challengingDoctorAddress={this.props.doctorB} />
         </div>
-    } else if (this.props.challengingDoctor === this.props.account && !this.props.challengeHash) {
+    } else if (this.props.challengingDoctor === this.props.address && !this.props.challengeHash) {
       challenge =
         <div className='col-xs-12'>
           <SubmitDiagnosisContainer
@@ -83,7 +83,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             caseAddress={this.props.caseAddress}
             caseKey={this.props.caseKey} />
         </div>
-    } else if (this.props.diagnosingDoctor === this.props.account && !this.props.diagnosisHash) {
+    } else if (this.props.diagnosingDoctor === this.props.address && !this.props.diagnosisHash) {
       diagnosis =
         <div className='col-xs-12'>
           <SubmitDiagnosisContainer
