@@ -560,6 +560,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <div className="row">
                         <div className="col-xs-6 col-sm-3 col-md-1">
                           <HippoTextInput
+                            type='number'
                             id='age'
                             name='age'
                             label='Age'
@@ -627,11 +628,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                               value={this.state.selectedDoctor}
                               isClearable={false}
                               onChange={this.onChangeDoctor} />
-                            {!!errors['selectedDoctor'] &&
-                              <p className='has-error help-block'>
-                                {errors['selectedDoctor']}
-                              </p>
-                            }
+                            {errors['selectedDoctor']}
                           </div>
                         </div>
                       </div>

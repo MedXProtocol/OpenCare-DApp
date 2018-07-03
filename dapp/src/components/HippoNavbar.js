@@ -27,14 +27,20 @@ import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
+  let doctorName
   const account = get(state, 'sagaGenesis.accounts[0]')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account)
   const canRegister = cacheCallValue(state, DoctorManager, 'owner') === account
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const signedIn = state.account.signedIn
+
+  if (isDoctor)
+    doctorName = cacheCallValue(state, DoctorManager, 'name', account)
+
   return {
     account,
+    doctorName,
     isDoctor,
     networkId,
     DoctorManager,
@@ -55,6 +61,7 @@ function* saga({ account, DoctorManager }) {
   if (!account || !DoctorManager) { return }
   yield cacheCall(DoctorManager, 'owner')
   yield cacheCall(DoctorManager, 'isDoctor', account)
+  yield cacheCall(DoctorManager, 'name', account)
 }
 
 export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager', 'MedXToken'] })(class _HippoNavbar extends Component {
@@ -65,10 +72,11 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
 
   render() {
     var isDoctor = this.props.isDoctor
+    const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
 
     if (this.props.signedIn) {
       var profileMenu =
-        <NavDropdown title='Account' id='account-dropdown'>
+        <NavDropdown title={nameOrAccountString} id='account-dropdown'>
           <MenuItem header>Profile</MenuItem>
 
           <LinkContainer to={routes.ACCOUNT_WALLET}>
