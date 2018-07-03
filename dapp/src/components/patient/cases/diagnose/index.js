@@ -5,8 +5,8 @@ import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import Diagnosis from '~/components/Diagnosis'
 import { currentAccount } from '~/services/sign-in'
-import aes from '~/services/aes'
 import { isBlank } from '~/utils/isBlank'
+import { decryptDoctorCaseKey } from '~/services/decryptDoctorCaseKey'
 import get from 'lodash.get'
 import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
@@ -15,25 +15,22 @@ import { connect } from 'react-redux'
 import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state, { match }) {
-  let caseKey = undefined // undefined caseKey means it's still loading / state is unknown!
-  let account = get(state, 'sagaGenesis.accounts[0]')
+  let address = get(state, 'sagaGenesis.accounts[0]')
   const caseAddress = match.params.caseAddress
   const AccountManager = contractByName(state, 'AccountManager')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
-  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'doctorEncryptedCaseKeys', account)
+  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'doctorEncryptedCaseKeys', address)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
-  if (patientPublicKey && encryptedCaseKey) {
-    const sharedKey = currentAccount().deriveSharedKey(patientPublicKey.substring(2))
-    caseKey = aes.decrypt(encryptedCaseKey.substring(2), sharedKey)
-  }
+  const caseKey = decryptDoctorCaseKey(currentAccount(), patientPublicKey, encryptedCaseKey)
+
   return {
-    account,
+    address,
     caseAddress,
-    showDiagnosis: !!account,
+    showDiagnosis: !!address,
     caseKey,
     diagnosingDoctor,
     diagnosisHash,
@@ -43,20 +40,20 @@ function mapStateToProps(state, { match }) {
   }
 }
 
-function* saga({ match, account, AccountManager }) {
+function* saga({ match, address, AccountManager }) {
   if (!AccountManager) { return }
   const caseAddress = match.params.caseAddress
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield cacheCall(AccountManager, 'publicKeys', patientAddress)
-  yield cacheCall(caseAddress, 'doctorEncryptedCaseKeys', account)
+  yield cacheCall(caseAddress, 'doctorEncryptedCaseKeys', address)
   yield cacheCall(caseAddress, 'diagnosingDoctor')
   yield cacheCall(caseAddress, 'diagnosisHash')
   yield cacheCall(caseAddress, 'challengingDoctor')
   yield cacheCall(caseAddress, 'challengeHash')
 }
 
-export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'account', 'AccountManager']})(class _DiagnoseCase extends Component {
+export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'address', 'AccountManager']})(class _DiagnoseCase extends Component {
   render () {
     var challenging = this.props.challengingDoctor === this.props.account
 
@@ -93,6 +90,21 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             caseAddress={this.props.caseAddress}
             caseKey={this.props.caseKey} />
         </div>
+    }
+
+    if (this.props.caseKey === undefined) {
+      diagnosis = null
+      challenge = null
+    } else if (this.props.caseKey === null) {
+      diagnosis = (
+        <div className="col-xs-12 col-md-6 col-md-offset-3">
+          <h4 className="text-danger">
+            Cannot submit diagnosis
+          </h4>
+          <hr />
+        </div>
+      )
+      challenge = null
     }
 
     return (

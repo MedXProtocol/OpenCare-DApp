@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { isBlank } from '~/utils/isBlank'
 import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
 import { downloadJson } from '~/utils/storage-util'
@@ -48,8 +49,7 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
     const diagnosisHash = props.challengeHash
 
     if (
-      diagnosisHash !== null
-      && diagnosisHash !== "0x"
+      !isBlank(diagnosisHash)
       && props.caseKey
       && (props.isPatient || props.isChallengingDoctor)
     ) {
@@ -75,10 +75,18 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
               <label>Diagnosis</label>
               <p>{this.state.diagnosis.diagnosis}</p>
             </div>
-            <div className="col-lg-6 col-md-12">
+            <div className="col-xs-12">
               <label>Recommendation</label>
               <p>{this.state.diagnosis.recommendation}</p>
             </div>
+            {(this.state.diagnosis.additionalRecommendation)
+              ? (
+                  <div className="col-xs-12">
+                    <label>Additional Recommendation:</label>
+                    <p>{this.state.diagnosis.additionalRecommendation}</p>
+                  </div>
+                )
+              : null}
           </div>
         </div>
       </div>

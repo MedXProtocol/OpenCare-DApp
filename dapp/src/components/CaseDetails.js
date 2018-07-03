@@ -104,7 +104,12 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
               </p>
 
               <br />
-              <small>Case address: <span className="eth-address">{this.props.caseAddress}</span></small>
+              <small>
+                Error #1: Unable to decrypt case or ipfs data expired.
+              </small>
+              <small>
+                Case address: <span className="eth-address">{this.props.caseAddress}</span>
+              </small>
             </div>
           </div>
         </div>
