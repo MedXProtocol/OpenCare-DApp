@@ -20,7 +20,6 @@ export { nextId } from './transaction/transaction-factory'
 export {
   addContract,
   CallCountRegistry,
-  addContract,
   cacheCall,
   web3Call,
   withSaga,

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
 import { downloadJson } from '~/utils/storage-util'
 import { cacheCallValue, withSaga, cacheCall, addContract } from '~/saga-genesis'
-import { connect } from 'react-redux'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 
 function mapStateToProps(state, { caseAddress, challengingDoctorAddress }) {

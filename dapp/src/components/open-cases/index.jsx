@@ -5,10 +5,7 @@ import { MainLayoutContainer } from '~/layouts/MainLayout.js'
 import {
   Table
 } from 'react-bootstrap'
-import ReactTooltip from 'react-tooltip'
-import { ErrorModal } from '~/components/ErrorModal'
 import PropTypes from 'prop-types'
-import { isBlank } from '~/utils/isBlank'
 import { connect } from 'react-redux'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'

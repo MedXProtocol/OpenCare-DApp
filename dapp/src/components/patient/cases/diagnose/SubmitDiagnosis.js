@@ -19,15 +19,6 @@ import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 
-// The react-select <Select /> component uses inline CSS, this fixes it for mobile:
-const customStyles = {
-  multiValue: (base, state) => ({
-    ...base,
-    maxWidth: '260px',
-    whiteSpace: 'inherit'
-  })
-}
-
 function mapStateToProps (state, ownProps) {
   return {
     transactions: state.sagaGenesis.transactions
@@ -67,12 +58,8 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
       formIsValid: false,
       showConfirmationModal: false,
 
-<<<<<<< HEAD
-      showThankYou: false
-=======
       showThankYou: false,
       isSubmitting: false
->>>>>>> develop
     }
   }
 
@@ -88,15 +75,12 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
         .onError((error) => {
           toastr.transactionError(error)
           this.setState({
-<<<<<<< HEAD
-            transactionHandler: null
+            transactionHandler: null,
+            isSubmitting: false
           })
         })
         .onReceipt(() => {
           this.setState({
-            transactionHandler: null,
-            showThankYou: true
-=======
             transactionHandler: null,
             isSubmitting: false
           })
@@ -106,7 +90,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
             transactionHandler: null,
             showThankYou: true,
             isSubmitting: false
->>>>>>> develop
           })
         })
     }
@@ -163,21 +146,13 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
 
   handleSubmit = async (event) => {
     event.preventDefault()
-<<<<<<< HEAD
     this.setState({
       showConfirmationModal: true
     })
   }
 
   handleCancelConfirmSubmissionModal = (event) => {
-    this.setState({showConfirmationModal: false})
-=======
-    this.setState({ showConfirmationModal: true })
-  }
-
-  handleCancelConfirmSubmissionModal = (event) => {
     this.setState({ showConfirmationModal: false })
->>>>>>> develop
   }
 
   submitDiagnosis = async () => {
@@ -206,21 +181,13 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
     }
     this.setState({
       transactionId,
-<<<<<<< HEAD
       transactionHandler: new TransactionStateHandler(),
       showConfirmationModal: false
-=======
-      transactionHandler: new TransactionStateHandler()
->>>>>>> develop
     })
   }
 
   render() {
-<<<<<<< HEAD
-    const loading = !!this.state.transactionHandler
-=======
     const loading = this.state.isSubmitting
->>>>>>> develop
 
     return (
       <div>
@@ -360,14 +327,10 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
               </div>
             </div>
             <div className="card-footer text-right">
-<<<<<<< HEAD
-              <button disabled={loading || !this.state.formIsValid} type="submit" className="btn btn-lg btn-success">Submit</button>
-=======
               <button
                 disabled={loading || !this.state.formIsValid}
                 type="submit"
                 className="btn btn-lg btn-success">Submit Diagnosis</button>
->>>>>>> develop
             </div>
           </form>
         </div>
@@ -386,10 +349,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
             </div>
           </Modal.Body>
           <Modal.Footer>
-<<<<<<< HEAD
-            <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
-            <button onClick={this.submitDiagnosis} type="button" className="btn btn-primary">Yes</button>
-=======
             <button
               onClick={this.handleCancelConfirmSubmissionModal}
               type="button"
@@ -403,7 +362,6 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
               disabled={loading}>
               Yes
             </button>
->>>>>>> develop
           </Modal.Footer>
         </Modal>
 

@@ -166,7 +166,22 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     const buttonsHidden = !this.props.isPatient || this.props.status !== '3'
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
 
-    return ( this.state.hidden ?
+    if (!buttonsHidden) {
+      var buttons =
+        <div className="card-footer">
+          <hr/>
+          <div className="row">
+            <div className="col-xs-12 text-right" >
+              <button disabled={transactionRunning} onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
+              &nbsp;
+              <button disabled={transactionRunning} onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
+            </div>
+          </div>
+        </div>
+    }
+
+    return (
+      this.state.hidden ?
       <div /> :
       <div className="card">
         <div className="card-header">
@@ -186,7 +201,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                 {this.state.diagnosis.recommendation}
               </p>
             </div>
-            {(this.state.diagnosis.additionalRecommendation)
+            {this.state.diagnosis.additionalRecommendation
               ? (
                   <div className="col-xs-12">
                     <label>Additional Recommendation:</label>
@@ -199,18 +214,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
           </div>
         </div>
 
-        {
-          buttonsHidden ? null :
-          <div className="card-footer">
-            <hr/>
-            <div className="row">
-              <div className="col-xs-12 text-right" >
-                <button disabled={transactionRunning} onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
-                &nbsp;
-                <button disabled={transactionRunning} onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
-              </div>
-            </div> : null
-        }
+        {buttons}
 
         <Modal show={this.state.showThankYouModal} onHide={this.handleCloseThankYouModal}>
           <Modal.Body>
@@ -280,12 +284,12 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
 })))
 
 Diagnosis.propTypes = {
-    caseAddress: PropTypes.string,
-    caseKey: PropTypes.string
+  caseAddress: PropTypes.string,
+  caseKey: PropTypes.string
 }
 
 Diagnosis.defaultProps = {
-    caseAddress: null
+  caseAddress: null
 }
 
 export default withRouter(Diagnosis)
