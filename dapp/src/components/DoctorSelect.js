@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { isBlank } from '~/utils/isBlank'
 import PropTypes from 'prop-types'
 import Select from 'react-select'
 import { withSaga, cacheCallValue, cacheCall } from '~/saga-genesis'
@@ -48,7 +49,12 @@ export const DoctorSelect =
         }
         render () {
           let options = this.props.doctors.map(doctor => ({ label: doctor.name, value: doctor.address, publicKey: doctor.publicKey }))
-          options = options.filter(option => this.props.excludeDoctorAddresses.indexOf(option.value) === -1)
+          options = options.filter(option => {
+            return (
+              !isBlank(option.publicKey) &&
+              this.props.excludeDoctorAddresses.indexOf(option.value) === -1
+            )
+          })
           return <Select {...this.props} options={options} />
         }
       }
