@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { Account } from '~/accounts/Account'
 import { genKey } from '~/services/gen-key'
 import { mixpanel } from '~/mixpanel'
-import { ConfirmCreate } from './confirm-create'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
 import { MasterPasswordContainer } from './master-password'
@@ -52,9 +51,9 @@ export const SignUp = class _SignUp extends Component {
     this.state = {
       secretKey: genKey(32),
       showMasterPassword: false,
-      showConfirm: false,
       showOverrideModal: false,
-      overrideModalHasBeenShown: false
+      overrideModalHasBeenShown: false,
+      confirming: false
     }
   }
 
@@ -85,13 +84,7 @@ export const SignUp = class _SignUp extends Component {
 
   onMasterPassword = (password) => {
     this.setState({
-      showConfirm: true,
-      masterPassword: password
-    })
-  }
-
-  onConfirm = () => {
-    this.setState({
+      masterPassword: password,
       confirming: true
     }, () => {
       this.props.setTimeout(() => {
@@ -103,17 +96,15 @@ export const SignUp = class _SignUp extends Component {
       }, 100)
     })
 
-    mixpanel.track("Signup Attempt");
+    mixpanel.track("Signup Attempt")
   }
 
   render () {
     var content
     if (this.props.signedIn) {
       content = <Redirect to='/patients/cases' />
-    } else if (this.state.showConfirm) {
-      content = <ConfirmCreate onConfirm={this.onConfirm} confirming={this.state.confirming} />
     } else if (this.state.showMasterPassword) {
-      content = <MasterPasswordContainer onMasterPassword={this.onMasterPassword} />
+      content = <MasterPasswordContainer onMasterPassword={this.onMasterPassword} creating={this.state.confirming} />
     } else {
       content = <SecretKeyContainer secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
     }

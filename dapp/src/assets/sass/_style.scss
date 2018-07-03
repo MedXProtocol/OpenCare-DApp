@@ -72,6 +72,10 @@ not(.nav) li {
   color: $medcredits-text-gray;
 }
 
+.text-blue {
+  color: $brand-info;
+}
+
 .text-gold {
   color: $medcredits-text-gold;
 }
@@ -168,4 +172,10 @@ small,
 
 .loader--case-details {
   max-height: 600px;
+}
+
+.text-center-on-xs {
+  @media (max-width: $screen-sm) {
+    text-align: center;
+  }
 }

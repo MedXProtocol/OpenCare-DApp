@@ -1,15 +1,30 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import { Redirect } from 'react-router-dom'
 import { Alert, HelpBlock } from 'react-bootstrap'
 import { formatSecretKey } from '~/services/format-secret-key'
 import { connect } from 'react-redux'
 import { LoadingLines } from '~/components/LoadingLines'
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
+import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
+import { cacheCall } from '~/saga-genesis/sagas'
+import { withSaga } from '~/saga-genesis/components'
+import * as routes from '~/config/routes'
+import get from 'lodash.get'
 
 const HIDDEN_KEY = formatSecretKey(Array(65).join('X'))
 
 function mapStateToProps(state, ownProps) {
+  const account = get(state, 'sagaGenesis.accounts[0]')
+  const isSignedIn = get(state, 'account.signedIn')
+  const DoctorManager = contractByName(state, 'DoctorManager')
+
+  if (isSignedIn)
+    var isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account)
+
   return {
+    isSignedIn: isSignedIn,
+    isDoctor: isDoctor,
     overrideError: state.account.overrideError,
     secretKeyError: state.account.secretKeyError,
     masterPasswordError: state.account.masterPasswordError
@@ -24,6 +39,11 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+function* saga({ account, DoctorManager }) {
+  if (!account || !DoctorManager) { return }
+  yield cacheCall(DoctorManager, 'isDoctor', account)
+}
+
 export const SignInForm = class extends Component {
   constructor (props) {
     super(props)
@@ -31,6 +51,15 @@ export const SignInForm = class extends Component {
       secretKey: '',
       masterPassword: '',
       showOverrideModal: false
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.isSignedIn && (this.props.isDoctor !== undefined)) {
+      let dynamicNextPath = nextProps.isDoctor
+        ? routes.DOCTORS_CASES_OPEN
+        : routes.PATIENTS_CASES
+      this.setState({ dynamicNextPath })
     }
   }
 
@@ -69,8 +98,12 @@ export const SignInForm = class extends Component {
         <HelpBlock>Leave blank to use your secret key on file</HelpBlock>
     }
 
+    if (this.state.dynamicNextPath)
+      var redirect = <Redirect to={this.state.dynamicNextPath} />
+
     return (
       <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
+        {redirect}
         <form onSubmit={this.onSubmit} autoComplete='off'>
           <div className="form-wrapper--body">
             <OverrideDisallowedModal
@@ -119,7 +152,7 @@ export const SignInForm = class extends Component {
   }
 }
 
-export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(SignInForm)
+export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['signedIn', 'account', 'DoctorManager'] })(SignInForm))
 
 SignInFormContainer.propTypes = {
   onSubmit: PropTypes.func.isRequired,

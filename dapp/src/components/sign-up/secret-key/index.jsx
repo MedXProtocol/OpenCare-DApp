@@ -3,14 +3,12 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Button, Modal } from 'react-bootstrap'
 import get from 'lodash.get'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-import faPrint from '@fortawesome/fontawesome-free-solid/faPrint'
-import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
 import { EthAddress } from '~/components/EthAddress'
 import { BodyClass } from '~/components/BodyClass'
 import { formatSecretKey } from '~/services/format-secret-key'
-import * as routes from '~/config/routes'
+import { PrintCopySecretKey } from '~/components/PrintCopySecretKey'
 import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
   let address = get(state, 'sagaGenesis.accounts[0]')
@@ -27,20 +25,6 @@ export const SecretKey = class extends Component {
     this.state = {
       showTermsModal: false
     }
-  }
-
-  handleEmail = (e) => {
-    e.preventDefault()
-
-    let subject = 'Important! Hippocrates Secret Key -- KEEP THIS SAFE!'
-    let body    = `Dear Hippocrates user,%0A%0AYour secret key data is encrypted and stored safe using this secret key:%0A%0A${formatSecretKey(this.props.secretKey)}%0A%0AFor ETH address: ${this.props.address}%0A%0A%0AKeep this somewhere safe and secure, and use it to log in to Hippocrates from any other browser.%0A%0AThanks for using Hippocrates!%0A- The MedCredits Team`
-
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank', 'noopener');
-  }
-
-  handlePrint = (e) => {
-    e.preventDefault()
-    window.print()
   }
 
   handleCloseTermsModal = (event) => {
@@ -75,25 +59,11 @@ export const SecretKey = class extends Component {
                     Without it you <em>will not</em> be able to view your previous cases. Save
                     it in a password manager, print it or send it to yourself via email:
                   </p>
-                  <div className="visible-sm visible-md visible-lg">
-                    <div className="text-center">
-                      <a onClick={this.handlePrint} className="btn btn-lg btn-success">
-                        <FontAwesomeIcon
-                          icon={faPrint}
-                          size='lg' /> &nbsp;
-                        Print or save as PDF
-                      </a>
-                    </div>
-                  </div>
-                  <div className="visible-xs">
-                    <div className="text-center">
-                      <a onClick={this.handleEmail} className="btn btn-success">
-                        <FontAwesomeIcon
-                          icon={faEnvelope} />&nbsp;
-                        Send Key To Your Email
-                      </a>
-                    </div>
-                  </div>
+
+                  <PrintCopySecretKey
+                    secretKey={this.props.secretKey}
+                    address={this.props.address}
+                  />
 
                   <hr />
                   <p>

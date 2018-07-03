@@ -8,6 +8,12 @@
   transition: all 100ms ease-in-out;
 }
 
+.btn:active,
+.btn:hover,
+.btn:focus {
+  transform: scale(1.02);
+}
+
 .btn-lg {
   font-size: 14px;
   padding: 16px 22px;
@@ -40,6 +46,7 @@
 .btn[disabled]:focus,
 .btn[disabled].focus {
   opacity: 0.5;
+  transform: scale(1);
 }
 
 // This is to be used against a colored / dark background
@@ -111,49 +118,48 @@
 }
 
 // Below taken from https://gist.github.com/Gurylev/ae78a534d873c9aeb853
-
 .btn-outline {
-    background-color: transparent;
+  background-color: transparent;
 }
 
 .btn-primary.btn-outline {
-    color: $btn-primary-bg;
-    &:hover {
-      background-color: $btn-primary-bg;
-          border-color: $btn-primary-border;
-    }
+  color: $btn-primary-bg;
+  &:hover {
+    background-color: $btn-primary-bg;
+    border-color: $btn-primary-border;
+  }
 }
 
 .btn-success.btn-outline {
-    color: $btn-success-bg;
-    &:hover {
-      background-color: $btn-success-bg;
-          border-color: $btn-success-border;
-    }
+  color: $btn-success-bg;
+  &:hover {
+    background-color: $btn-success-bg;
+    border-color: $btn-success-border;
+  }
 }
 
 .btn-info.btn-outline {
-    color: $btn-info-bg;
-    &:hover {
-      background-color: $btn-info-bg;
-          border-color: $btn-info-border;
-    }
+  color: $btn-info-bg;
+  &:hover {
+    background-color: $btn-info-bg;
+    border-color: $btn-info-border;
+  }
 }
 
 .btn-warning.btn-outline {
-    color: $btn-warning-bg;
-    &:hover {
-      background-color: $btn-warning-bg;
-          border-color: $btn-warning-border;
-    }
+  color: $btn-warning-bg;
+  &:hover {
+    background-color: $btn-warning-bg;
+    border-color: $btn-warning-border;
+  }
 }
 
 .btn-danger.btn-outline {
-    color: $btn-danger-bg;
-    &:hover {
-      background-color: $btn-danger-bg;
-          border-color: $btn-danger-border;
-    }
+  color: $btn-danger-bg;
+  &:hover {
+    background-color: $btn-danger-bg;
+    border-color: $btn-danger-border;
+  }
 }
 
 .btn-primary.btn-outline:hover,
@@ -161,36 +167,36 @@
 .btn-info.btn-outline:hover,
 .btn-warning.btn-outline:hover,
 .btn-danger.btn-outline:hover {
-    color: #fff;
+  color: #fff;
 }
 
 // Button outline style on inverse background
 .btn-outline-inverse {
-    background-color: transparent;
-    border-color: #fff;
-    color: #fff;
-    &:hover {
-      background-color: #fff;
-    }
+  background-color: transparent;
+  border-color: #fff;
+  color: #fff;
+  &:hover {
+    background-color: #fff;
+  }
 }
 .btn-primary.btn-outline-inverse:hover {
-    color: $brand-primary;
+  color: $brand-primary;
 }
 
 .btn-success.btn-outline-inverse:hover {
-    color: $brand-success;
+  color: $brand-success;
 }
 
 .btn-info.btn-outline-inverse:hover {
-    color: $brand-info;
+  color: $brand-info;
 }
 
 .btn-warning.btn-outline-inverse:hover {
-    color: $brand-warning;
+  color: $brand-warning;
 }
 
 .btn-danger.btn-outline-inverse:hover {
-    color: $brand-danger;
+  color: $brand-danger;
 }
 
 .btn.btn-no-shadow {

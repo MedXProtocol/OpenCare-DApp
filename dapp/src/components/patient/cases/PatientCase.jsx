@@ -57,12 +57,14 @@ export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps
               <ChallengedDiagnosis
                 caseAddress={this.props.match.params.caseAddress}
                 caseKey={this.props.caseKey}
-                title='Second Diagnosis' />
+                title='Second Diagnosis'
+              />
             </div>
             <div className='col-xs-12'>
               <CaseDetails
                 caseAddress={this.props.match.params.caseAddress}
-                caseKey={this.props.caseKey} />
+                caseKey={this.props.caseKey}
+              />
             </div>
           </div>
         </div>
