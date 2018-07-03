@@ -10,7 +10,7 @@ import { isNotEmptyString } from '~/utils/common-util'
 import { mixpanel } from '~/mixpanel'
 import hashToHex from '~/utils/hash-to-hex'
 import { uploadJson, downloadJson } from '~/utils/storage-util'
-import isBlank from '~/utils/is-blank'
+import { isBlank } from '~/utils/isBlank'
 import { connect } from 'react-redux'
 import { withSend } from '~/saga-genesis'
 import { groupedRecommendationOptions } from './recommendationOptions'
@@ -79,6 +79,12 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
             isSubmitting: false
           })
         })
+        .onReceipt(() => {
+          this.setState({
+            transactionHandler: null,
+            isSubmitting: false
+          })
+        })
         .onTxHash(() => {
           this.setState({
             transactionHandler: null,
@@ -140,7 +146,9 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
 
   handleSubmit = async (event) => {
     event.preventDefault()
-    this.setState({ showConfirmationModal: true })
+    this.setState({
+      showConfirmationModal: true
+    })
   }
 
   handleCancelConfirmSubmissionModal = (event) => {
@@ -173,7 +181,8 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
     }
     this.setState({
       transactionId,
-      transactionHandler: new TransactionStateHandler()
+      transactionHandler: new TransactionStateHandler(),
+      showConfirmationModal: false
     })
   }
 

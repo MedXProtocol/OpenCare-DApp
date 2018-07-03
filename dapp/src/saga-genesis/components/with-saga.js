@@ -8,7 +8,12 @@ export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' 
     function mapDispatchToProps(dispatch, props) {
       return {
         run: (newProps, key) => {
-          dispatch({type: 'RUN_SAGA', saga, props: newProps, key})
+          try {
+            dispatch({type: 'RUN_SAGA', saga, props: newProps, key})
+          } catch (error) {
+            console.error('Saga Genesis: Error in ' + WrappedComponent.name + ' saga with key ' + key)
+            throw error
+          }
         },
         clearCalls: (key) => {
           dispatch({type: 'CACHE_DEREGISTER_KEY', key})

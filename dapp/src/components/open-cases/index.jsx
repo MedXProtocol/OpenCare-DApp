@@ -3,20 +3,15 @@ import React, {
 } from 'react'
 import { MainLayoutContainer } from '~/layouts/MainLayout.js'
 import {
-  Button,
   Table
 } from 'react-bootstrap'
-import ReactTooltip from 'react-tooltip'
-import { ErrorModal } from '~/components/ErrorModal'
 import PropTypes from 'prop-types'
-import isBlank from '~/utils/is-blank'
 import { connect } from 'react-redux'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
-import faNotesMedical from '@fortawesome/fontawesome-free-solid/faNotesMedical';
 import { CaseRow } from './CaseRow'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
@@ -25,80 +20,42 @@ import { contractByName } from '~/saga-genesis/state-finders'
 function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   let CaseManager = contractByName(state, 'CaseManager')
+  let caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', account)
   let AccountManager = contractByName(state, 'AccountManager')
-  const openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
-  let caseCount = cacheCallValue(state, CaseManager, 'doctorAuthorizationRequestCount', account)
+
   let cases = []
   for (let i = 0; i < caseCount; i++) {
-    let c = cacheCallValue(state, CaseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
+    let c = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', account, i)
     if (c) { cases.push(c) }
   }
-  const peekNextCase = cacheCallValue(state, CaseManager, 'peekNextCase')
 
   return {
     publicKey,
     account,
-    openCaseCount,
     caseCount,
     cases,
     CaseManager,
-    AccountManager,
-    peekNextCase
+    AccountManager
   }
 }
 
 function* saga({ account, CaseManager, AccountManager }) {
   if (!account || !CaseManager) { return }
-  yield cacheCall(CaseManager, 'openCaseCount')
   yield cacheCall(AccountManager, 'publicKeys', account)
-  let caseCount = yield cacheCall(CaseManager, 'doctorAuthorizationRequestCount', account)
+  let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', account)
   for (let i = 0; i < caseCount; i++) {
-    yield cacheCall(CaseManager, 'doctorAuthorizationRequestCaseAtIndex', account, i)
+    yield cacheCall(CaseManager, 'doctorCaseAtIndex', account, i)
   }
-  yield cacheCall(CaseManager, 'peekNextCase')
 }
 
-export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager', 'AccountManager'] })(withSend(class _OpenCases extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      showPublicKeyModal: false
-    }
-  }
-
-  handleRequestCase = (e) => {
-    const { send, CaseManager, publicKey } = this.props
-    if (isBlank(publicKey)) {
-      this.setState({
-        showPublicKeyModal: true
-      })
-    } else {
-      send(CaseManager, 'requestNextCase')()
-    }
-  }
-
+export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager'] })(withSend(class _OpenCases extends Component {
   render () {
     let caseKeys = keys(this.props.cases)
     let cases = caseKeys.reverse().map((key) => this.props.cases[key])
-    let noCasesAvailableForDoc = !isBlank(this.props.peekNextCase) ?
-      (parseInt(this.props.peekNextCase, 16) === 0)
-      : true
 
     return (
       <MainLayoutContainer>
-        <ErrorModal
-          show={this.state.showPublicKeyModal}
-          onHide={() => this.setState({showPublicKeyModal: false})}>
-          <div className='row'>
-            <div className='col-sm-12'>
-              <p>
-                Your account has not yet been set up.  You must wait until your account has been
-                saved to the blockchain.
-              </p>
-            </div>
-          </div>
-        </ErrorModal>
         <div className="container">
           <div className='header-card card'>
             <div className='card-body'>
@@ -110,25 +67,6 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                   <span className="sm-block text-gray">
                     <strong>Currently Evaluating &amp; Historical</strong>
                   </span>
-                </div>
-                <div className='col-md-4 col-sm-12 button-container'>
-                  <span
-                    data-tip=''
-                    data-for='button-tooltip'>
-                    <Button
-                      disabled={noCasesAvailableForDoc}
-                      onClick={this.handleRequestCase}
-                      bsStyle="info"
-                      className="btn-lg">
-                      <FontAwesomeIcon
-                        icon={faNotesMedical}
-                        size='lg' /> &nbsp; Request Case
-                    </Button>
-                  </span>
-                  <ReactTooltip
-                    id='button-tooltip'
-                    effect='solid'
-                    getContent={() => noCasesAvailableForDoc ? 'Currently no cases available' : undefined } />
                 </div>
               </div>
             </div>

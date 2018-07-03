@@ -1,6 +1,10 @@
 import { CallCountRegistry } from './call-count-registry'
 import { ContractRegistry } from './contract-registry'
-import rootSagaGenesis, { cacheCall, web3Call, addContract } from './sagas'
+import rootSagaGenesis, {
+  cacheCall,
+  web3Call,
+  addContract
+} from './sagas'
 import {
   cacheCallState,
   cacheCallValue
@@ -14,8 +18,8 @@ import {
 export { nextId } from './transaction/transaction-factory'
 
 export {
-  CallCountRegistry,
   addContract,
+  CallCountRegistry,
   cacheCall,
   web3Call,
   withSaga,

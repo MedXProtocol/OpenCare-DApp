@@ -13,8 +13,8 @@ import { connect } from 'react-redux'
 
 function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
+  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
   const caseKey = decryptCaseKey(state, currentAccount(), caseAddress)
-  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisALocationHash'))
 
   return {
     caseKey,
@@ -24,10 +24,10 @@ function mapStateToProps(state, { match }) {
 
 function* saga({ match }) {
   const caseAddress = match.params.caseAddress
-  addContract({ address: caseAddress, contractKey: 'Case' })
+  yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'encryptedCaseKey')
   yield cacheCall(caseAddress, 'caseKeySalt')
-  yield cacheCall(caseAddress, 'diagnosisALocationHash')
+  yield cacheCall(caseAddress, 'diagnosisHash')
 }
 
 export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match']})(class _PatientCase extends Component {
