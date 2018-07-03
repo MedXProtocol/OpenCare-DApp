@@ -1,18 +1,34 @@
 import React, { Component } from 'react'
+import { Redirect } from 'react-router-dom'
 import ReactTimeout from 'react-timeout'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
+import { toastr } from '~/toastr'
+import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { Loading } from '~/components/Loading'
 import { Account, ACCOUNT_VERSION } from '~/accounts/Account'
 import { SignInFormContainer } from './SignInForm'
+import {
+  withSend
+} from '~/saga-genesis'
+import {
+  contractByName
+} from '~/saga-genesis/state-finders'
 import { BodyClass } from '~/components/BodyClass'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
+  const signedIn = state.account.signedIn
+  const AccountManager = contractByName(state, 'AccountManager')
+  const transactions = state.sagaGenesis.transactions
   return {
     address,
+    signedIn,
+    AccountManager,
+    transactions,
     account: Account.get(address)
   }
 }
@@ -28,12 +44,13 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
+export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      signingIn: false
+      signingIn: false,
+      isResetting: false
     }
   }
 
@@ -64,25 +81,61 @@ export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, 
     })
   }
 
-  destroyAndSignUp = () => {
-    this.props.account.destroy()
-    this.props.history.push('/')
+  componentWillReceiveProps(nextProps) {
+    if (this.state.resetAccountHandler && this.state.transactionId) {
+      this.state.resetAccountHandler.handle(nextProps.transactions[this.state.transactionId])
+        .onError((error) => {
+          toastr.transactionError(error)
+          this.setState({ isResetting: false })
+        })
+        .onTxHash(() => {
+          toastr.success('Your account reset transaction has been sent.')
+        })
+        .onConfirmed(() => {
+          this.setState({ isResetting: false })
+          if (this.props.account) {
+            this.props.account.destroy()
+          }
+          this.props.history.push('/')
+
+          toastr.success('Your account has been reset.')
+        })
+    }
+  }
+
+  handleReset = () => {
+    let transactionId = this.props.send(this.props.AccountManager, 'setPublicKey', '0x')({ gas: 200000 })
+
+    this.setState({
+      resetAccountHandler: new TransactionStateHandler(),
+      isResetting: true,
+      transactionId
+    })
   }
 
   render () {
-    if (this.props.account) {
-      const version = this.props.account.getVersion() || 0
-      if (version < ACCOUNT_VERSION) {
-        var warning =
-          <div className='alert alert-danger'>
-            <p>
-              You have an old account that no longer works.
-            </p>
-            <button className='btn btn-danger btn-outline-inverse btn-no-shadow' onClick={this.destroyAndSignUp}>
-              Reset Account
-            </button>
-          </div>
-      }
+    if (this.props.signedIn) {
+      return <Redirect to='/patients/cases' />
+    }
+
+    const shouldResetAccount = this.props.account && ((this.props.account.getVersion() || 0) < ACCOUNT_VERSION)
+
+    if (shouldResetAccount) {
+      var warning =
+        <div className='alert alert-danger text-center'>
+          <br />
+          <p>
+            You have a previous beta account that no longer works.
+          </p>
+          <br />
+          <button
+            className='btn btn-danger btn-outline-inverse btn-no-shadow'
+            onClick={this.handleReset}>
+            Reset Account
+          </button>
+          <br />
+          <br />
+        </div>
     }
     return (
       <BodyClass isDark={true}>
@@ -107,8 +160,9 @@ export const SignInContainer = ReactTimeout(withRouter(connect(mapStateToProps, 
               </div>
             </div>
           </div>
+          <Loading loading={this.state.isResetting} />
         </MainLayoutContainer>
       </BodyClass>
     )
   }
-})))
+}))))

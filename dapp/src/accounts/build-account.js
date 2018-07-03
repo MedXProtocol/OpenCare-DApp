@@ -1,23 +1,27 @@
-import { deriveKey } from '~/utils/derive-key'
-import { genKey } from '~/services/gen-key'
+import { hashWithSalt } from '~/services/hashWithSalt'
 import aes from '~/services/aes'
 
 export function buildAccount(address, secretKey, masterPassword) {
   secretKey = secretKey.toLowerCase()
 
+  // Hash the secret key so we can compare it on following sign ins
+  let [ hashedSecretKey, secretKeySalt ] = hashWithSalt(secretKey)
+  hashedSecretKey = hashedSecretKey.toString('hex')
+
   // Derive more entropy from the masterPassword
-  var salt = genKey()
-  var preimage = deriveKey(masterPassword, salt)
+  const [ preimage, salt ] = hashWithSalt(masterPassword)
 
   // Store the masterPassword salted
-  var preimageSalt = genKey()
-  var storedMasterPassword = deriveKey(preimage, preimageSalt).toString('hex')
+  let [ storedMasterPassword, preimageSalt ] = hashWithSalt(preimage)
+  storedMasterPassword = storedMasterPassword.toString('hex')
 
   // console.log(secretKey, preimage)
-  var encryptedSecretKey = aes.encrypt(secretKey, preimage)
+  const encryptedSecretKey = aes.encrypt(secretKey, preimage)
 
   return {
     address,
+    hashedSecretKey,
+    secretKeySalt,
     salt,
     preimageSalt,
     storedMasterPassword,
