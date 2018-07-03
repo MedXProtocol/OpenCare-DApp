@@ -8,17 +8,25 @@ import { PublicKeyCheck } from '../components/PublicKeyCheck';
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 import get from 'lodash.get'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
+import { withSaga } from '~/saga-genesis'
+import { cacheCall } from '~/saga-genesis/sagas'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const isOwner = account && (cacheCallValue(state, DoctorManager, 'owner') === account)
   return {
+    DoctorManager,
     isOwner
   }
 }
 
-export const MainLayout = class extends Component {
+function* saga({ DoctorManager }) {
+  if (!DoctorManager) { return }
+  yield cacheCall(DoctorManager, 'owner')
+}
+
+export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(class extends Component {
   static propTypes = {
     doNetworkCheck: PropTypes.bool,
     doPublicKeyCheck: PropTypes.bool
@@ -81,6 +89,6 @@ export const MainLayout = class extends Component {
       </div>
     );
   }
-}
+})
 
 export const MainLayoutContainer = connect(mapStateToProps)(MainLayout)

@@ -36,6 +36,7 @@ function mapStateToProps (state) {
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
 
   return {
+    AccountManager,
     account,
     transactions: state.sagaGenesis.transactions,
     MedXToken,
@@ -272,6 +273,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       event.preventDefault()
 
       await this.runValidation()
+
+      if (!this.props.balance)
+        console.error("The props.balance wasn't set!")
 
       if (this.state.errors.length === 0) {
         if (!this.props.publicKey) {

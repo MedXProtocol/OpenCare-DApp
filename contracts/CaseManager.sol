@@ -72,8 +72,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
      * @param _extraData - unused
      */
     function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external whenNotPaused {
-        require(_value == createCaseCost());
-        require(medXToken.balanceOf(_from) >= _value);
+        require(_value == createCaseCost(), "value of MedX does not match cost to create case");
+        require(medXToken.balanceOf(_from) >= _value, "MedXToken balance too low");
 
         /**
 
