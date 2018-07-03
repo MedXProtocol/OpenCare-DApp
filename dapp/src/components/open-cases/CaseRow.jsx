@@ -15,43 +15,39 @@ function mapStateToProps(state, { address }) {
   let account = get(state, 'sagaGenesis.accounts[0]')
   const status = cacheCallValue(state, address, 'status')
   const caseFee = cacheCallValue(state, address, 'caseFee')
-  const diagnosingDoctorA = cacheCallValue(state, address, 'diagnosingDoctorA')
-  const diagnosingDoctorB = cacheCallValue(state, address, 'diagnosingDoctorB')
+  const diagnosingDoctor = cacheCallValue(state, address, 'diagnosingDoctor')
+  const challengingDoctor = cacheCallValue(state, address, 'challengingDoctor')
   return {
     status,
     caseFee,
-    diagnosingDoctorA,
-    diagnosingDoctorB,
+    diagnosingDoctor,
+    challengingDoctor,
     account
   }
 }
 
 function* propSaga({address}) {
   yield addContract({address, contractKey: 'Case'})
-  let status = parseInt(yield cacheCall(address, 'status'), 10)
+  yield cacheCall(address, 'status')
   yield cacheCall(address, 'caseFee')
-  if (status >= 3) {
-    yield cacheCall(address, 'diagnosingDoctorA')
-  }
-  if (status >= 7) {
-    yield cacheCall(address, 'diagnosingDoctorB')
-  }
+  yield cacheCall(address, 'diagnosingDoctor')
+  yield cacheCall(address, 'challengingDoctor')
 }
 
 export const CaseRow = withContractRegistry(connect(mapStateToProps)(withSaga(propSaga, { propTriggers: ['address'] })(class _CaseRow extends Component {
   render () {
     const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress: this.props.address })
     var status = parseInt(this.props.status || 0, 10)
-    let isApprovedDiagnosingADoctor = this.props.diagnosingDoctorA === this.props.account && status > 3
-    let isApprovedDiagnosingBDoctor = this.props.diagnosingDoctorB === this.props.account && status > 8
-    if (isApprovedDiagnosingADoctor || isApprovedDiagnosingBDoctor) {
+    let isDiagnosingDoctor = this.props.diagnosingDoctor === this.props.account
+    let isChallengingDoctor = this.props.challengingDoctor === this.props.account
+    if (isDiagnosingDoctor || isChallengingDoctor) {
       var address = <Link to={caseRoute}>{this.props.address}</Link>
     } else {
       address = this.props.address
     }
     if (this.props.status) {
-      status = doctorCaseStatusToName(isApprovedDiagnosingADoctor, parseInt(this.props.status, 10))
-      var statusClass = doctorCaseStatusToClass(isApprovedDiagnosingADoctor, parseInt(this.props.status, 10))
+      status = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(this.props.status, 10))
+      var statusClass = doctorCaseStatusToClass(isChallengingDoctor, parseInt(this.props.status, 10))
     }
     return (
       <tr>

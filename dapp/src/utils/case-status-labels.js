@@ -2,16 +2,13 @@ export function caseStatusToName(status) {
   var statuses = {
     0: 'None',
     1: 'Open',
-    2: 'Canceled',
-    3: 'Pending Approval',
-    4: 'Evaluating',
-    5: 'Evaluated',
-    6: 'Closed',
-    7: 'Challenged',
-    8: 'Pending Approval',
-    9: 'Challenging',
-    10: 'Diagnosis Received',
-    11: 'Diagnosis Confirmed'
+    2: 'Evaluating',
+    3: 'Evaluated',
+    4: 'Closed',
+    5: 'Challenged',
+    6: 'Challenging',
+    7: 'Diagnosis Rejected',
+    8: 'Diagnosis Confirmed'
   }
   return statuses[status]
 }
@@ -20,16 +17,13 @@ export function caseStatusToClass(status) {
   var statuses = {
     0: 'default',
     1: 'info',
-    2: 'danger',
-    3: 'warning',
-    4: 'info',
-    5: 'default',
-    6: 'default',
+    2: 'info',
+    3: 'default',
+    4: 'default',
+    5: 'warning',
+    6: 'info',
     7: 'warning',
-    8: 'warning',
-    9: 'info',
-    10: 'warning',
-    11: 'success'
+    8: 'success'
   }
   return statuses[status]
 }

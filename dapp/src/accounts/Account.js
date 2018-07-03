@@ -8,7 +8,7 @@ import { buildAccount } from './build-account'
 import { getAccount } from './get-account'
 import { setAccount } from './set-account'
 import { isAccountMasterPassword } from './is-account-master-password'
-import isBlank from '~/utils/is-blank'
+import { isBlank } from '~/utils/isBlank'
 
 // NOTE: Increment this to destroy old accounts.
 // NOTE: DANGEROUS

@@ -27,14 +27,23 @@ import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
+  let doctorName
   const account = get(state, 'sagaGenesis.accounts[0]')
   const DoctorManager = contractByName(state, 'DoctorManager')
+  const MedXToken = contractByName(state, 'MedXToken')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account)
   const canRegister = cacheCallValue(state, DoctorManager, 'owner') === account
+  const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const signedIn = state.account.signedIn
+
+  if (isDoctor)
+    doctorName = cacheCallValue(state, DoctorManager, 'name', account)
+
   return {
     account,
+    balance,
+    doctorName,
     isDoctor,
     networkId,
     DoctorManager,
@@ -51,10 +60,12 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
-function* saga({ account, DoctorManager }) {
-  if (!account || !DoctorManager) { return }
+function* saga({ account, DoctorManager, MedXToken }) {
+  if (!account || !DoctorManager || !MedXToken) { return }
+  yield cacheCall(MedXToken, 'balanceOf', account)
   yield cacheCall(DoctorManager, 'owner')
   yield cacheCall(DoctorManager, 'isDoctor', account)
+  yield cacheCall(DoctorManager, 'name', account)
 }
 
 export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager', 'MedXToken'] })(class _HippoNavbar extends Component {
@@ -65,10 +76,11 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
 
   render() {
     var isDoctor = this.props.isDoctor
+    const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
 
     if (this.props.signedIn) {
       var profileMenu =
-        <NavDropdown title='Account' id='account-dropdown'>
+        <NavDropdown title={nameOrAccountString} id='account-dropdown'>
           <MenuItem header>Profile</MenuItem>
 
           <LinkContainer to={routes.ACCOUNT_WALLET}>
@@ -94,6 +106,13 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
             Sign Out
           </MenuItem>
         </NavDropdown>
+
+      var medXBalance =
+        <LinkContainer to={routes.ACCOUNT_WALLET}>
+          <NavItem href={routes.ACCOUNT_WALLET}>
+            {this.props.balance ? parseInt(this.props.balance, 10).toLocaleString() : 0} MEDX
+          </NavItem>
+        </LinkContainer>
 
       var myCasesItem =
         <IndexLinkContainer to={routes.PATIENTS_CASES}  activeClassName="active">
@@ -159,6 +178,7 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
         <Navbar.Collapse>
           <Nav pullRight>
             <CurrentTransactionsList />
+            {medXBalance}
             {myCasesItem}
             {openCasesItem}
             {doctorsItem}

@@ -16,6 +16,8 @@ import getWeb3 from '~/get-web3'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
 import { contractByName } from '~/saga-genesis/state-finders'
+import { DoctorSelect } from '~/components/DoctorSelect'
+import { reencryptCaseKey } from '~/services/reencryptCaseKey'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
@@ -34,6 +36,7 @@ function mapStateToProps (state) {
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
 
   return {
+    AccountManager,
     account,
     transactions: state.sagaGenesis.transactions,
     MedXToken,
@@ -62,7 +65,8 @@ const requiredFields = [
   'color',
   'prevTreatment',
   'age',
-  'country'
+  'country',
+  'selectedDoctor'
 ]
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(withSend(class _CreateCase extends Component {
@@ -270,6 +274,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
       await this.runValidation()
 
+      if (!this.props.balance)
+        console.error("The props.balance wasn't set!")
+
       if (this.state.errors.length === 0) {
         if (!this.props.publicKey) {
           window.location.hash = '#public-key-check-banner';
@@ -303,6 +310,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       await this.createNewCase()
     }
 
+    onChangeDoctor = (option) => {
+      this.setState({
+        selectedDoctor: option
+      }, this.validateInputs)
+    }
+
     createNewCase = async () => {
         const caseInformation = {
             firstImageHash: this.state.firstImageHash,
@@ -328,15 +341,20 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         const caseKeySalt = genKey(32)
         const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 
+        const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
+        const doctorEncryptedCaseKey = reencryptCaseKey({account, encryptedCaseKey, doctorPublicKey, caseKeySalt})
+
         const { send, MedXToken, CaseManager } = this.props
         let hashHex = hashToHex(hash)
 
         let CaseManagerContract = this.props.contractRegistry.get(this.props.CaseManager, 'CaseManager', getWeb3())
-        let data = CaseManagerContract.methods.createCase(
+        let data = CaseManagerContract.methods.createAndAssignCase(
           this.props.account,
           '0x' + encryptedCaseKey,
           '0x' + caseKeySalt,
-          '0x' + hashHex
+          '0x' + hashHex,
+          this.state.selectedDoctor.value,
+          '0x' + doctorEncryptedCaseKey
         ).encodeABI()
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
         this.setState({
@@ -546,6 +564,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <div className="row">
                         <div className="col-xs-6 col-sm-3 col-md-1">
                           <HippoTextInput
+                            type='number'
                             id='age'
                             name='age'
                             label='Age'
@@ -605,15 +624,24 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6 text-right">
-                          <button
-                            type="submit"
-                            className="btn btn-lg btn-success">
-                            Submit Case
-                          </button>
+                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
+                          <div className={classNames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
+                            <label>Select a Doctor<span className='star'>*</span></label>
+                            <DoctorSelect
+                              excludeDoctorAddresses={[this.props.account]}
+                              value={this.state.selectedDoctor}
+                              isClearable={false}
+                              onChange={this.onChangeDoctor} />
+                            {errors['selectedDoctor']}
+                          </div>
                         </div>
                       </div>
 
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
+                          <button type="submit" className="btn btn-lg btn-success">Submit Case</button>
+                        </div>
+                      </div>
                     </form>
                   </div>
                 </div>

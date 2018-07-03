@@ -3,12 +3,11 @@ import classNames from 'classnames'
 
 export const HippoTextInput = class extends Component {
   render() {
-    const { name, label, error, setRef, onChange, colClasses } = this.props
+    const { name, label, error, setRef, onChange, colClasses, type } = this.props
 
     let required
     if (this.props.required)
       required = <span className='star'>*</span>
-
 
     return (
       <div className={colClasses ? 'row' : ''}>
@@ -18,7 +17,7 @@ export const HippoTextInput = class extends Component {
             <input
               name={name}
               onChange={onChange}
-              type="text"
+              type={type ? type : "text"}
               ref={setRef}
               className="form-control" />
             {error}

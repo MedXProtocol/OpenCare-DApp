@@ -4,34 +4,38 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Initializable.sol";
 
 contract DoctorManager is Ownable, Initializable {
-  mapping (address => DoctorDetails) public doctors;
+  mapping (address => uint256) public doctorIndices;
+  mapping (uint256 => address) public doctorAddresses;
+  mapping (uint256 => string) public doctorNames;
+
+  uint256 public doctorCount;
 
   event AddDoctor(address indexed doctor);
-
-  struct DoctorDetails {
-    bool isActive;
-    bool isCertified;
-    uint256 fee;
-  }
 
   function initialize () notInitialized {
     setInitialized();
     owner = msg.sender;
   }
 
-  function addDoctor(address _doctor) public onlyOwner {
-    require(doctors[_doctor].isActive == false);
-    doctors[_doctor].isActive = true;
-    doctors[_doctor].isCertified = false;
-    doctors[_doctor].fee = 0;
+  function addDoctor(address _doctor, string _name) public onlyOwner {
+    require(_doctor != address(0));
+    require(!isDoctor(_doctor));
+    doctorIndices[_doctor] = doctorCount;
+    doctorAddresses[doctorCount] = _doctor;
+    doctorNames[doctorCount] = _name;
+    doctorCount += 1;
     emit AddDoctor(_doctor);
   }
 
-  function isDoctor(address _doctor) constant public returns (bool) {
-    return doctors[_doctor].isActive;
+  function isDoctor(address _doctor) public view returns (bool) {
+    require(_doctor != address(0));
+    uint256 index = doctorIndices[_doctor];
+    return doctorAddresses[index] == _doctor;
   }
 
-  function getOwner() public view returns (address) {
-    return owner;
+  function name(address _doctor) public view returns (string) {
+    require(_doctor != address(0));
+    uint256 index = doctorIndices[_doctor];
+    return doctorNames[index];
   }
 }
