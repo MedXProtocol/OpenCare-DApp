@@ -65,7 +65,7 @@ const requiredFields = [
   'prevTreatment',
   'age',
   'country',
-  'doctorAddress'
+  'selectedDoctor'
 ]
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(withSend(class _CreateCase extends Component {
@@ -95,8 +95,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         caseEncryptionKey: genKey(32),
         showBalanceTooLowModal: false,
         showConfirmSubmissionModal: false,
-        doctorAddress: '',
-        doctorPublicKey: '',
         showPublicKeyModal: false,
         isSubmitting: false,
         errors: []
@@ -310,8 +308,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
     onChangeDoctor = (option) => {
       this.setState({
-        doctorAddress: option.value,
-        doctorPublicKey: option.publicKey
+        selectedDoctor: option
       }, this.validateInputs)
     }
 
@@ -340,7 +337,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         const caseKeySalt = genKey(32)
         const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 
-        const doctorPublicKey = this.state.doctorPublicKey.substring(2)
+        const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
         const doctorEncryptedCaseKey = reencryptCaseKey({account, encryptedCaseKey, doctorPublicKey, caseKeySalt})
 
         const { send, MedXToken, CaseManager } = this.props
@@ -352,7 +349,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
           '0x' + encryptedCaseKey,
           '0x' + caseKeySalt,
           '0x' + hashHex,
-          this.state.doctorAddress,
+          this.state.selectedDoctor.value,
           '0x' + doctorEncryptedCaseKey
         ).encodeABI()
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
@@ -622,24 +619,19 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6 text-right">
-                          <button
-                            type="submit"
-                            className="btn btn-lg btn-success">
-                            Submit Case
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
-                          <div className="form-group">
+                          <div className={classNames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
                             <label>Select a Doctor<span className='star'>*</span></label>
                             <DoctorSelect
                               excludeDoctorAddresses={[this.props.account]}
-                              selected={this.state.doctorAddress}
+                              value={this.state.selectedDoctor}
                               isClearable={false}
                               onChange={this.onChangeDoctor} />
+                            {!!errors['selectedDoctor'] &&
+                              <p className='has-error help-block'>
+                                {errors['selectedDoctor']}
+                              </p>
+                            }
                           </div>
                         </div>
                       </div>

@@ -35,7 +35,8 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
     isPatient,
     encryptedCaseKey,
     caseKeySalt,
-    diagnosingDoctor
+    diagnosingDoctor,
+    selectedDoctor: ''
   }
 }
 
@@ -69,6 +70,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     const diagnosis = JSON.parse(diagnosisJson)
     this.setState({
       diagnosis,
+      doctorAddress: '',
       hidden: false
     })
   }
@@ -129,6 +131,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     event.preventDefault()
     this.setState({
       showChallengeModal: false,
+      selectedDoctor: null,
       doctorAddressError: ''
     })
   }
@@ -136,13 +139,13 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   onSubmitChallenge = (e) => {
     e.preventDefault()
     this.setState({ doctorAddressError: '' })
-    if (!this.state.doctorAddress) {
+    if (!this.state.selectedDoctor) {
       this.setState({
         doctorAddressError: 'You must select a doctor to challenge the case'
       })
     } else {
       const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
-      const doctorPublicKey = this.state.doctorPublicKey.substring(2)
+      const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
       const caseKeySalt = this.props.caseKeySalt.substring(2)
       const doctorEncryptedCaseKey = reencryptCaseKey({
         account: currentAccount(),
@@ -151,7 +154,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
         caseKeySalt
       })
       const challengeTransactionId = this.props.send(this.props.caseAddress, 'challengeWithDoctor',
-        this.state.doctorAddress,
+        this.state.selectedDoctor.value,
         '0x' + doctorEncryptedCaseKey)()
 
       this.setState({
@@ -252,11 +255,10 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                     <label className='control-label'>Select Another Doctor</label>
                     <DoctorSelect
                       excludeDoctorAddresses={[this.props.diagnosingDoctor, this.props.account]}
-                      selected={this.state.doctorAddress}
+                      value={this.state.selectedDoctor}
                       onChange={(option) => {
                         this.setState({
-                          doctorAddress: option.value,
-                          doctorPublicKey: option.publicKey,
+                          selectedDoctor: option,
                           doctorAddressError: ''
                         })
                       }}
