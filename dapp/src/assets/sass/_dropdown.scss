@@ -8,6 +8,10 @@
 .dropdown-header {
   margin-top: 15px;
   text-transform: uppercase;
+
+  @media (max-width: 767px) {
+    color: $brand-info;
+  }
 }
 
 .dropdown-header:first-child {
@@ -32,4 +36,8 @@
 .dropdown-menu > .active > a:hover,
 .dropdown-menu > .active > a:focus {
   background-color: $brand-info;
+}
+
+.dropdown-menu a {
+  transition: color 0;
 }

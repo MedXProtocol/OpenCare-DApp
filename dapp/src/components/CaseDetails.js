@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames'
+import { ImageLoader, CaseDetailsLoader } from './ContentLoaders'
+import { LoadingLines } from '~/components/LoadingLines'
 import { downloadJson, downloadImage } from '../utils/storage-util';
 import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
@@ -24,7 +27,8 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     super(props)
     this.state = {
       firstImageUrl: '',
-      secondImageUrl: ''
+      secondImageUrl: '',
+      loading: true
     }
   }
 
@@ -47,6 +51,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     ])
 
     this.setState({
+      loading: false,
       details,
       firstImageUrl,
       secondImageUrl
@@ -85,50 +90,79 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
 
   render() {
     const details = this.state.details || {}
-        return (
-            <div className="card">
-                <div className="card-header">
-                  <h3 className="card-title">
-                    Case Overview
-                  </h3>
-                </div>
-                <div className="card-body">
-                    <div className="row">
-                        <div className="col-xs-12 col-md-6 text-center">
-                          <br />
-                          <label className="label text-gray">Overview Photo:</label>
-                          {this.overviewPhotoHtml()}
-                        </div>
-                        <div className="col-xs-12 col-md-6 text-center">
-                          <br />
-                          <label className="label text-gray">Close-up Photo:</label>
-                          {this.closeupPhotoHtml()}
-                        </div>
+    let jsx
+    if (this.props.caseKey === null) {
+      jsx = (
+        <div className="row">
+          <div className="col-xs-12 col-md-6 col-md-offset-3">
+            <h4 className="text-danger">
+              Unable to decrypt case data
+            </h4>
+            <div className="alert alert-warning">
+              <p>
+                This case data was likely encrypted with a different secret key than the one you are currently using. Please use the secret key in your previous Emergency Kit or email to decrypt this case.
+              </p>
+
+              <br />
+              <small>Case address: <span className="eth-address">{this.props.caseAddress}</span></small>
+            </div>
+          </div>
+        </div>
+      )
+    } else {
+      jsx = (
+          <div className="card">
+              <div className="card-header">
+                <h3 className="card-title">
+                  Case Overview <LoadingLines visible={this.state.loading} color="#aaaaaa" />
+                </h3>
+              </div>
+              <div className="card-body">
+                  <div className="row">
+                      <div className="col-xs-12 col-md-6 text-center">
+                        <br />
+                        <label className="label text-gray">Overview Photo:</label>
+                        <ImageLoader className={classNames({ 'hidden': !this.state.loading })} />
+
+                        {this.overviewPhotoHtml()}
                       </div>
-                      <hr />
-                      <div className="row">
-                        <div className="col-xs-6">
+                      <div className="col-xs-12 col-md-6 text-center">
+                        <br />
+                        <label className="label text-gray">Close-up Photo:</label>
+                        <ImageLoader className={classNames({ 'hidden': !this.state.loading })} />
+
+                        {this.closeupPhotoHtml()}
+                      </div>
+                    </div>
+                    <hr />
+                    <div className="row">
+                      <div className="col-xs-12 col-sm-12 col-md-6">
+                        <CaseDetailsLoader className={classNames('loader--case-details', { 'hidden': !this.state.loading })} />
+                      </div>
+
+                      <div className={classNames({ 'hidden': this.state.loading })}>
+                        <div className="col-xs-12">
                             <label className="label text-gray">How long have you had this problem:</label>
                             <p>{details.howLong}</p>
                         </div>
-                        <div className="col-md-6">
+                        <div className="col-xs-12">
                             <label className="label text-gray">Is it growing, shrinking or staying the same size:</label>
                             <p>{details.size}</p>
                         </div>
-                         <div className="col-md-6">
+                         <div className="col-xs-12">
                             <label className="label text-gray">Is it painful:</label>
                             <p>{details.painful}</p>
                         </div>
-                        <div className="col-md-6">
+                        <div className="col-xs-12">
                             <label className="label text-gray">Is it bleeding:</label>
                             <p>{details.bleeding}</p>
                         </div>
-                        <div className="col-md-6">
+                        <div className="col-xs-12">
                             <label className="label text-gray">Is it itching:</label>
                             <p>{details.itching}</p>
                         </div>
 
-                        <div className="col-md-6">
+                        <div className="col-xs-12">
                             <label className="label text-gray">Any history of skin cancer:</label>
                             <p>{details.skinCancer}</p>
                         </div>
@@ -144,11 +178,11 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                              <label className="label text-gray">Have you tried any treatments so far:</label>
                              <p>{details.prevTreatment}</p>
                          </div>
-                        <div className="col-md-6">
+                        <div className="col-xs-12">
                             <label className="label text-gray">Age:</label>
                             <p>{details.age}</p>
                         </div>
-                        <div className="col-md-6">
+                        <div className="col-xs-12">
                             <label className="label text-gray">Country:</label>
                             <p>{details.country}</p>
                         </div>
@@ -156,11 +190,14 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                             <label className="label text-gray">Additional comments:</label>
                             <p>{details.description}</p>
                         </div>
-                    </div>
-                </div>
-            </div>
-        );
+                      </div>
+                  </div>
+              </div>
+          </div>
+      );
     }
+    return jsx
+  }
 })))
 
 CaseDetails.propTypes = {

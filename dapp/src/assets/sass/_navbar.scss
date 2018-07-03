@@ -1,6 +1,7 @@
 .navbar {
   border: 0;
   margin-bottom: 0;
+  z-index: 100;
 }
 
 .navbar-brand {
@@ -57,4 +58,19 @@
 
 .navbar-inverse .navbar-nav > li > a {
   color: #c4c7d4;
+}
+
+.navbar-inverse .navbar-nav .open .dropdown-menu .divider {
+  @media (max-width: 767px) {
+    background-color: $brand-info;
+    height: 3px;
+    margin: 15px;
+  }
+}
+
+.navbar-nav .open .dropdown-menu > li > a,
+.navbar-nav .open .dropdown-menu .dropdown-header {
+  @media (max-width: 767px) {
+    padding: 5px 15px 5px 15px;
+  }
 }

@@ -4,6 +4,7 @@ import CaseStatus from './CaseStatus'
 import CaseDetails from '~/components/CaseDetails'
 import Diagnosis from '~/components/Diagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
+import { decryptCaseKey } from '~/services/decrypt-case-key'
 import { currentAccount } from '~/services/sign-in'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
@@ -12,13 +13,9 @@ import { connect } from 'react-redux'
 
 function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
-  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
-  const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
-  if (encryptedCaseKey && caseKeySalt) {
-    const account = currentAccount()
-    var caseKey = account.decrypt(encryptedCaseKey.substring(2), caseKeySalt.substring(2))
-  }
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
+  const caseKey = decryptCaseKey(state, currentAccount(), caseAddress)
+
   return {
     caseKey,
     diagnosisHash
@@ -38,22 +35,34 @@ export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps
     if (this.props.diagnosisHash) {
       var diagnosis =
         <div className='col-xs-12'>
-          <Diagnosis caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
+          <Diagnosis
+            caseAddress={this.props.match.params.caseAddress}
+            caseKey={this.props.caseKey} />
         </div>
     }
     return (
       <MainLayoutContainer>
         <div className="container">
           <div className="row">
-            <div className='col-xs-12'>
-              <CaseStatus caseAddress={this.props.match.params.caseAddress}/>
-            </div>
+            {this.props.caseKey ? (
+              <div className='col-xs-12'>
+                <CaseStatus caseAddress={this.props.match.params.caseAddress}/>
+              </div>
+            ) : null}
+
             {diagnosis}
             <div className='col-xs-12'>
-              <ChallengedDiagnosis caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} title='Second Diagnosis' />
+              <ChallengedDiagnosis
+                caseAddress={this.props.match.params.caseAddress}
+                caseKey={this.props.caseKey}
+                title='Second Diagnosis'
+              />
             </div>
             <div className='col-xs-12'>
-              <CaseDetails caseAddress={this.props.match.params.caseAddress} caseKey={this.props.caseKey} />
+              <CaseDetails
+                caseAddress={this.props.match.params.caseAddress}
+                caseKey={this.props.caseKey}
+              />
             </div>
           </div>
         </div>

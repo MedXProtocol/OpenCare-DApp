@@ -1,17 +1,75 @@
+.fade-enter {
+  opacity: 0.01;
+}
+
 .fade-enter-active {
   opacity: 1;
   transition: all 500ms ease-in;
 }
 
-.fade-enter {
-  opacity: 0.01;
+.fade-exit {
+  opacity: 1;
 }
 
 .fade-exit-active {
   opacity: 0.01;
-  transition: all 300ms ease-in;
+  transition: all 1s ease-in;
 }
 
-.fade-exit {
+.fade-slow-enter {
+  opacity: 0.01;
+}
+
+.fade-slow-enter-active {
   opacity: 1;
+  transition: all 1s ease-out;
+}
+
+.fade-slow-exit {
+  opacity: 1;
+}
+
+.fade-slow-exit-active {
+  opacity: 0.01;
+  transition: all 1s ease;
+}
+
+.slide-down-enter {
+  animation-name: slideDown;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+.slide-down-enter-active {
+  animation-name: slideDown;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+.slide-down-exit {
+  animation-name: slideDown;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+.slide-down-exit-active {
+  animation-name: slideUp;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+.slide-down-exit-done {
+  animation-name: slideUp;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideDown {
+  from { margin-top: -155px; }
+  to { margin-top: 0; }
+}
+
+@keyframes slideUp {
+  from { margin-top: 0; }
+  to { margin-top: -155px; }
 }

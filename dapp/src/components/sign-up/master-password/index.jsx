@@ -1,9 +1,18 @@
 import React, { Component } from 'react'
+import ReactTimeout from 'react-timeout'
 import { Alert } from 'react-bootstrap'
-import { BodyClass } from '~/components/BodyClass'
 import masterPasswordInvalid from '~/services/master-password-invalid'
+import { BodyClass } from '~/components/BodyClass'
+import { LoadingLines } from '~/components/LoadingLines'
+import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
+import PropTypes from 'prop-types'
 
-export class MasterPassword extends Component {
+export const MasterPassword = class extends Component {
+  static propTypes = {
+    onMasterPassword: PropTypes.func.isRequired,
+    creating: PropTypes.bool.isRequired
+  }
+
   constructor (props) {
     super(props)
     this.state = {
@@ -14,16 +23,16 @@ export class MasterPassword extends Component {
 
   onSubmit = (e) => {
     e.preventDefault()
-    let msg = masterPasswordInvalid(this.state.masterPassword)
+    let error = masterPasswordInvalid(this.state.masterPassword)
     if (this.state.masterPassword !== this.state.confirmMasterPassword) {
-      msg = 'Both passwords must match'
+      error = 'Both passwords must match'
     }
-    if (msg) {
-      this.setState({
-        error: msg
-      })
-    } else {
+    if (!error) {
       this.props.onMasterPassword(this.state.masterPassword)
+    } else {
+      this.setState({
+        error
+      })
     }
   }
 
@@ -33,6 +42,7 @@ export class MasterPassword extends Component {
     }
     return (
       <BodyClass isDark={true}>
+        <ScrollToTopOnMount />
         <div className='container'>
           <form className='row' onSubmit={this.onSubmit}>
             <div className='col-sm-8 col-sm-offset-2'>
@@ -68,10 +78,13 @@ export class MasterPassword extends Component {
                   </div>
                 </div>
 
-                <div className="form-wrapper--footer">
-                  <div className='text-right'>
-                    <input type='submit' className='btn btn-lg btn-primary' value='Continue' />
-                  </div>
+                <div className="form-wrapper--footer text-right">
+                  <LoadingLines visible={this.props.creating} /> &nbsp;
+                  <input
+                    disabled={this.props.creating}
+                    type='submit'
+                    value={this.props.creating ? 'Creating Account ...' : 'Create Account'}
+                    className='btn btn-lg btn-primary' />
                 </div>
               </div>
             </div>
@@ -81,3 +94,5 @@ export class MasterPassword extends Component {
     )
   }
 }
+
+export const MasterPasswordContainer = ReactTimeout(MasterPassword)

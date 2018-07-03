@@ -17,12 +17,12 @@ export function caseStatusToClass(status) {
   var statuses = {
     0: 'default',
     1: 'info',
-    2: 'warning',
-    3: 'info',
+    2: 'info',
+    3: 'default',
     4: 'default',
     5: 'warning',
     6: 'info',
-    7: 'danger',
+    7: 'warning',
     8: 'success'
   }
   return statuses[status]

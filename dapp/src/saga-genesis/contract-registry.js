@@ -5,16 +5,12 @@ export class ContractRegistry {
   }
 
   has(address) {
-    if (address) {
-      address = address.toLowerCase()
-    }
+    address = this.cleanAddress(address)
     return !!this.contractCache[address]
   }
 
   get(address, contractKey, web3) {
-    if (address) {
-      address = address.toLowerCase()
-    }
+    address = this.cleanAddress(address)
     var contract = this.contractCache[address]
     if (!contract) {
       if (!contractKey) {
@@ -24,5 +20,11 @@ export class ContractRegistry {
       this.contractCache[address] = contract
     }
     return contract
+  }
+
+  cleanAddress (address) {
+    if (address)
+      address = address.toLowerCase()
+    return address
   }
 }

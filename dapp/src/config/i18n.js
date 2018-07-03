@@ -20,13 +20,13 @@ i18next
             challengeDiagnosis: 'Getting Second Opinion',
             diagnoseCase: 'Sending Diagnosis',
             diagnoseChallengedCase: 'Sending Second Opinion',
-            getPublicKey: 'Getting Public Key',
+            publicKeys: 'Retrieving Account',
             mint: 'Mint {{mintMedxCount}} MEDX',
             requestNextCase: 'Requesting Case',
-            setPublicKey: 'Setting Public Key'
+            setPublicKey: 'Registering Account'
           },
           transactionErrors: {
-            userRevert: 'The user reverted the transaction',
+            userRevert: 'You rejected the transaction, please submit a valid transaction to proceed',
             outOfGas: 'The transaction ran out of gas',
             evmRevert: 'There was an error in the contract'
           }

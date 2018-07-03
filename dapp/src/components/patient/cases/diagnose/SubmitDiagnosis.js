@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import Select from 'react-select'
 import * as Animated from 'react-select/lib/animated';
+import { customStyles } from '~/config/react-select-custom-styles'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import Spinner from '~/components/Spinner'
+import { Loading } from '~/components/Loading'
 import { isNotEmptyString } from '~/utils/common-util'
 import { mixpanel } from '~/mixpanel'
 import hashToHex from '~/utils/hash-to-hex'
@@ -16,6 +17,7 @@ import { groupedRecommendationOptions } from './recommendationOptions'
 import { groupedDiagnosisOptions } from './diagnosisOptions'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
+import * as routes from '~/config/routes'
 
 // The react-select <Select /> component uses inline CSS, this fixes it for mobile:
 const customStyles = {
@@ -65,7 +67,12 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
       formIsValid: false,
       showConfirmationModal: false,
 
+<<<<<<< HEAD
       showThankYou: false
+=======
+      showThankYou: false,
+      isSubmitting: false
+>>>>>>> develop
     }
   }
 
@@ -81,6 +88,7 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
         .onError((error) => {
           toastr.transactionError(error)
           this.setState({
+<<<<<<< HEAD
             transactionHandler: null
           })
         })
@@ -88,6 +96,17 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
           this.setState({
             transactionHandler: null,
             showThankYou: true
+=======
+            transactionHandler: null,
+            isSubmitting: false
+          })
+        })
+        .onTxHash(() => {
+          this.setState({
+            transactionHandler: null,
+            showThankYou: true,
+            isSubmitting: false
+>>>>>>> develop
           })
         })
     }
@@ -144,6 +163,7 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
 
   handleSubmit = async (event) => {
     event.preventDefault()
+<<<<<<< HEAD
     this.setState({
       showConfirmationModal: true
     })
@@ -151,9 +171,21 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
 
   handleCancelConfirmSubmissionModal = (event) => {
     this.setState({showConfirmationModal: false})
+=======
+    this.setState({ showConfirmationModal: true })
+  }
+
+  handleCancelConfirmSubmissionModal = (event) => {
+    this.setState({ showConfirmationModal: false })
+>>>>>>> develop
   }
 
   submitDiagnosis = async () => {
+    this.setState({
+      isSubmitting: true,
+      showConfirmationModal: false
+    })
+
     const diagnosisInformation = {
       diagnosis: this.state.diagnosis,
       recommendation: this.state.recommendation,
@@ -174,13 +206,21 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
     }
     this.setState({
       transactionId,
+<<<<<<< HEAD
       transactionHandler: new TransactionStateHandler(),
       showConfirmationModal: false
+=======
+      transactionHandler: new TransactionStateHandler()
+>>>>>>> develop
     })
   }
 
   render() {
+<<<<<<< HEAD
     const loading = !!this.state.transactionHandler
+=======
+    const loading = this.state.isSubmitting
+>>>>>>> develop
 
     return (
       <div>
@@ -320,7 +360,14 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
               </div>
             </div>
             <div className="card-footer text-right">
+<<<<<<< HEAD
               <button disabled={loading || !this.state.formIsValid} type="submit" className="btn btn-lg btn-success">Submit</button>
+=======
+              <button
+                disabled={loading || !this.state.formIsValid}
+                type="submit"
+                className="btn btn-lg btn-success">Submit Diagnosis</button>
+>>>>>>> develop
             </div>
           </form>
         </div>
@@ -329,13 +376,34 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>Are you sure?</h4>
+                <h4>
+                  Are you sure?
+                </h4>
+                <h5>
+                  This will send your diagnosis and recommendation to the patient.
+                </h5>
               </div>
             </div>
           </Modal.Body>
           <Modal.Footer>
+<<<<<<< HEAD
             <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
             <button onClick={this.submitDiagnosis} type="button" className="btn btn-primary">Yes</button>
+=======
+            <button
+              onClick={this.handleCancelConfirmSubmissionModal}
+              type="button"
+              className="btn btn-link">
+              No
+            </button>
+            <button
+              onClick={this.submitDiagnosis}
+              type="button"
+              className="btn btn-primary"
+              disabled={loading}>
+              Yes
+            </button>
+>>>>>>> develop
           </Modal.Footer>
         </Modal>
 
@@ -343,17 +411,18 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>Thank you! Your diagnosis submitted successfully.</h4>
+                <h4>Thank you!</h4>
+                <h5>Your diagnosis submitted successfully.</h5>
               </div>
             </div>
           </Modal.Body>
 
           <Modal.Footer>
-            <Link to='/doctors/cases/open' className="btn btn-primary">OK</Link>
+            <Link to={routes.DOCTORS_CASES_OPEN} className="btn btn-primary">OK</Link>
           </Modal.Footer>
         </Modal>
 
-        <Spinner loading={loading} />
+        <Loading loading={loading} />
       </div>
     )
   }

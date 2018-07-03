@@ -5,6 +5,7 @@
 @import './assets/sass/toastr-animations';
 @import './assets/sass/toastr-overrides';
 
+@import "./assets/sass/address";
 @import "./assets/sass/alert";
 @import "./assets/sass/animation";
 @import "./assets/sass/button";
@@ -13,7 +14,10 @@
 @import "./assets/sass/form";
 @import "./assets/sass/footer";
 @import "./assets/sass/label";
+@import './assets/sass/loading';
+@import "./assets/sass/loading-lines";
 @import "./assets/sass/modal";
+@import "./assets/sass/progress";
 @import "./assets/sass/navbar";
 @import "./assets/sass/star";
 @import "./assets/sass/style";

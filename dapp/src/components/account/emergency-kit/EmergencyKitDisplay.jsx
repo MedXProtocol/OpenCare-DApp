@@ -1,15 +1,22 @@
-import React, { Component } from 'react';
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faPrint from '@fortawesome/fontawesome-free-solid/faPrint';
-import { MainLayoutContainer } from '~/layouts/MainLayout';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import get from 'lodash.get'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { formatSecretKey } from '~/services/format-secret-key'
 import { currentAccount } from '~/services/sign-in'
+import { EthAddress } from '~/components/EthAddress'
+import { PrintCopySecretKey } from '~/components/PrintCopySecretKey'
+import * as routes from '~/config/routes'
 
-const EmergencyKitDisplay = class extends Component {
-  handlePrint = () => {
-    window.print()
+function mapStateToProps(state) {
+  let address = get(state, 'sagaGenesis.accounts[0]')
+
+  return {
+    address
   }
+}
 
+export const EmergencyKitDisplay = class extends Component {
   render () {
     const secretKey = currentAccount().secretKey()
 
@@ -34,31 +41,28 @@ const EmergencyKitDisplay = class extends Component {
                       {formatSecretKey(secretKey)}
                     </div>
                   </div>
+                  <p className="small text-center">
+                    <span className="eth-address text-gray">ethereum address:&nbsp;
+                      <EthAddress address={this.props.address} showFull={true} />
+                    </span>
+                  </p>
 
                   <br />
 
-                  <div className="text-center">
-                    <a onClick={this.handlePrint} className="btn btn-lg btn-success">
-                      <FontAwesomeIcon
-                        icon={faPrint}
-                        size='lg' /> &nbsp;
-                      Print
-                    </a>
-                  </div>
-                  <h3 className='text-center'>
-                    Or save this page for your records.
-                  </h3>
+                  <PrintCopySecretKey
+                    secretKey={secretKey}
+                    address={this.props.address}
+                  />
 
                   <br />
-                  <hr />
                   <br />
 
-                  <p className="title">
+                  <p className="title text-center">
                     To sign in on a new browser:
                   </p>
                   <ol>
                     <li>Ensure you are using a Web3-enabled browser and that the current account is <b>{this.props.account}</b></li>
-                    <li>Go to the Hippocrates sign up page: <a href='/sign-up' target='_blank'>/sign-up</a></li>
+                    <li>Go to the Hippocrates sign up page: <a href={routes.SIGN_UP} target='_blank' rel="noopener noreferrer">/sign-up</a></li>
                     <li>Enter the above secret key</li>
                     <li>Enter a new master password to encrypt your data locally</li>
                     <li>Confirm the master password, then create your account</li>
@@ -79,4 +83,4 @@ const EmergencyKitDisplay = class extends Component {
   }
 }
 
-export { EmergencyKitDisplay };
+export const EmergencyKitDisplayContainer = connect(mapStateToProps)(EmergencyKitDisplay)

@@ -23,8 +23,8 @@ import { connect } from 'react-redux'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { withContractRegistry, withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
-
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
+import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -60,7 +60,7 @@ function* saga({ account, DoctorManager }) {
 export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager', 'MedXToken'] })(class _HippoNavbar extends Component {
   signOut = () => {
     this.props.signOut()
-    this.props.history.push('/sign-in')
+    this.props.history.push(routes.SIGN_IN)
   }
 
   render() {
@@ -71,20 +71,20 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
         <NavDropdown title='Account' id='account-dropdown'>
           <MenuItem header>Profile</MenuItem>
 
-          <LinkContainer to='/account/wallet'>
-            <MenuItem href='/account/wallet'>
+          <LinkContainer to={routes.ACCOUNT_WALLET}>
+            <MenuItem href={routes.ACCOUNT_WALLET}>
               MEDX Balance
             </MenuItem>
           </LinkContainer>
 
           <MenuItem header>Security</MenuItem>
-          <LinkContainer to='/account/emergency-kit'>
-            <MenuItem href='/account/emergency-kit'>
+          <LinkContainer to={routes.ACCOUNT_EMERGENCY_KIT}>
+            <MenuItem href={routes.ACCOUNT_EMERGENCY_KIT}>
               Emergency Kit
             </MenuItem>
           </LinkContainer>
-          <LinkContainer to='/account/change-password'>
-            <MenuItem href='/account/change-password'>
+          <LinkContainer to={routes.ACCOUNT_CHANGE_PASSWORD}>
+            <MenuItem href={routes.ACCOUNT_CHANGE_PASSWORD}>
               Change Password
             </MenuItem>
           </LinkContainer>
@@ -96,16 +96,16 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
         </NavDropdown>
 
       var myCasesItem =
-        <IndexLinkContainer to='/patients/cases'  activeClassName="active">
-          <NavItem href='/patients/cases'>
+        <IndexLinkContainer to={routes.PATIENTS_CASES}  activeClassName="active">
+          <NavItem href={routes.PATIENTS_CASES}>
             My Cases
           </NavItem>
         </IndexLinkContainer>
 
       if (isDoctor) {
         var openCasesItem =
-          <LinkContainer to='/doctors/cases/open'>
-            <NavItem href='/doctors/cases/open'>
+          <LinkContainer to={routes.DOCTORS_CASES_OPEN}>
+            <NavItem href={routes.DOCTORS_CASES_OPEN}>
               Diagnose Cases
             </NavItem>
           </LinkContainer>
@@ -113,8 +113,8 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
 
       if (this.props.canRegister) {
         var doctorsItem =
-          <LinkContainer to='/doctors/new'>
-            <NavItem href='/doctors/new'>
+          <LinkContainer to={routes.DOCTORS_NEW}>
+            <NavItem href={routes.DOCTORS_NEW}>
               Doctors
             </NavItem>
           </LinkContainer>
@@ -127,8 +127,6 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
       'navbar-default': !this.props.transparent
     })
 
-    let dynamicHomePath = this.props.signedIn ? '/patients/cases' : '/'
-
     return (
       <Navbar
         inverse
@@ -137,7 +135,7 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
         className={navbarClassName}>
         <Navbar.Header>
           <Navbar.Brand>
-            <Link to={dynamicHomePath} className="navbar-brand">
+            <Link to={routes.HOME} className="navbar-brand">
               <img src={logo} alt="MedCredits"></img>
             </Link>
           </Navbar.Brand>
@@ -151,7 +149,7 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
                 size='sm'
                 className='text-gold'
                 data-tip='This Ethereum account is a Contract Owner' />
-              <ReactTooltip effect='solid' position='bottom' />
+              <ReactTooltip effect='solid' place='bottom' />
             </NavItem>
           ) : null}
           <NavItem>

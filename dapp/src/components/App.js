@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { withRouter, Route, Switch } from 'react-router-dom'
+import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 import ReduxToastr from 'react-redux-toastr'
+import { hot } from 'react-hot-loader'
 import { SignUpContainer } from './sign-up'
 import { SignInContainer } from './sign-in'
 import { PatientDashboard } from './patient/dashboard/'
@@ -13,40 +14,97 @@ import { WalletContainer } from './account/wallet'
 import { EmergencyKit } from './account/emergency-kit'
 import { ChangePasswordContainer } from './account/change-password'
 import { OpenCasesContainer } from './open-cases'
-import { SignInRedirectContainer } from './sign-in-redirect'
 import { Welcome } from '~/components/welcome'
 import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
-import { hot } from 'react-hot-loader'
+import * as routes from '~/config/routes'
+import { SignedInRoute } from '~/components/SignedInRoute'
+import { connect } from 'react-redux'
+import get from 'lodash.get'
+import { getRequestedPathname } from '~/services/getRequestedPathname'
+import { setRequestedPathname } from '~/services/setRequestedPathname'
 
-const App = class extends Component {
+function mapStateToProps (state, ownProps) {
+  const address = get(state, 'sagaGenesis.accounts[0]')
+  const isSignedIn = get(state, 'account.signedIn')
+  return {
+    address,
+    isSignedIn
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    signOut: () => {
+      dispatch({ type: 'SIGN_OUT' })
+    }
+  }
+}
+
+const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Component {
+  componentDidMount () {
+    window.addEventListener("beforeunload", this.unload)
+    window.addEventListener("focus", this.refocus)
+    this.onAccountChangeSignOut(this.props)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener("beforeunload", this.unload)
+    window.removeEventListener("focus", this.refocus)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.onAccountChangeSignOut(nextProps)
+  }
+
+  onAccountChangeSignOut (nextProps) {
+    if (this.props.address && this.props.address !== nextProps.address) {
+      this.props.signOut()
+    }
+  }
+
+  unload = () => {
+    if (process.env.NODE_ENV !== 'development') {
+      this.props.signOut()
+    }
+  }
+
   render () {
+    const requestedPathname = getRequestedPathname()
+    if (this.props.isSignedIn && requestedPathname) {
+      var redirect = <Redirect to={requestedPathname} />
+      setRequestedPathname('')
+    }
+
     return (
       <div>
-        <SignInRedirectContainer />
         <Switch>
-          <Route path='/welcome' component={Welcome} />
-          <Route path='/login-metamask' component={LoginToMetaMask} />
-          <Route path='/try-metamask' component={TryMetamask} />
+          {redirect}
 
-          <Route path='/account/emergency-kit' component={EmergencyKit} />
-          <Route path='/account/change-password' component={ChangePasswordContainer} />
-          <Route path='/account/mint' component={Mint} />
-          <Route path='/account/wallet' component={WalletContainer} />
+          <Route path={routes.WELCOME} component={Welcome} />
+          <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
+          <Route path={routes.TRY_METAMASK} component={TryMetamask} />
 
-          <Route path='/sign-in' component={SignInContainer} />
-          <Route path='/sign-up' component={SignUpContainer} />
+          <SignedInRoute path={routes.ACCOUNT_EMERGENCY_KIT} component={EmergencyKit} />
+          <SignedInRoute path={routes.ACCOUNT_CHANGE_PASSWORD} component={ChangePasswordContainer} />
+          <SignedInRoute path={routes.ACCOUNT_MINT} component={Mint} />
+          <SignedInRoute path={routes.ACCOUNT_WALLET} component={WalletContainer} />
 
-          <Route path='/doctors/cases/open' component={OpenCasesContainer} />
-          <Route path='/doctors/cases/diagnose/:caseAddress' component={DiagnoseCaseContainer} />
-          <Route path='/doctors/new' component={AddDoctor} />
+          <Route path={routes.SIGN_IN} component={SignInContainer} />
+          <Route path={routes.SIGN_UP} component={SignUpContainer} />
 
-          <Route exact path='/patients/cases/new' component={NewCase} />
-          <Route exact path='/patients/cases' component={PatientDashboard} />
-          <Route path='/patients/cases/:caseAddress' component={PatientCaseContainer} />
+          <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
+          <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={DiagnoseCaseContainer} />
+          <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 
-          <Route path='/' component={FourOhFour} />
+          <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
+          <SignedInRoute exact path={routes.PATIENTS_CASES} component={PatientDashboard} />
+          <SignedInRoute path={routes.PATIENTS_CASE} component={PatientCaseContainer} />
+
+          <Redirect from={routes.HOME} exact to={routes.WELCOME} />
+
+          <Route path={routes.HOME} component={FourOhFour} />
         </Switch>
         <ReduxToastr
           timeOut={7000}
@@ -58,10 +116,6 @@ const App = class extends Component {
       </div>
     )
   }
-}
-
-App.defaultProps = {
-  accounts: []
-}
+})
 
 export default hot(module)(withRouter(App))

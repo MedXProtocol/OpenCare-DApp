@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faFileMedical from '@fortawesome/fontawesome-free-solid/faFileMedical';
+import * as routes from '~/config/routes'
 
 export const PatientDashboardHeader = class extends Component {
-  navigateToNewCase = () => {
-    this.props.history.push('/patients/cases/new');
-  }
-
   render() {
     return (
       <div className="header-card card">
@@ -18,20 +15,17 @@ export const PatientDashboardHeader = class extends Component {
                 My Cases
               </h3>
               <span className="sm-block text-gray">
-                <strong>Current &amp; Previously Evaluated</strong>
+                <strong>Current &amp; Historical</strong>
               </span>
             </div>
             <div className='col-md-4 col-sm-12 button-container'>
-              <button
-                type="button"
-                className="btn btn-lg btn-success"
-                onClick={() => this.navigateToNewCase()}>
+              <Link className="btn btn-lg btn-success" to={routes.PATIENTS_CASES_NEW}>
                 <FontAwesomeIcon
                   icon={faFileMedical}
-                  size='lg' />
-                <i className="fa fa-file-medical" aria-hidden="true"></i>
+                  size='lg'
+                />
                 &nbsp; Start New Case
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -39,5 +33,3 @@ export const PatientDashboardHeader = class extends Component {
     );
   }
 }
-
-export const PatientDashboardHeaderContainer = withRouter(PatientDashboardHeader)

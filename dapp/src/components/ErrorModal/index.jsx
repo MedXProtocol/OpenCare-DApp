@@ -38,22 +38,20 @@ export class ErrorModal extends Component {
 
   render () {
     return (
-      <Modal show={this.props.show} onHide={this.props.onHide}>
+      <Modal show={this.props.show} onHide={this.props.onHide} className="error-modal">
+        <Modal.Header>
+          <Alert bsStyle={this.props.bsStyle} className='error-modal_alert'>
+            <h3 className='error-modal_alert_title'>
+              <FontAwesomeIcon
+                className='error-modal_alert_title_icon'
+                icon={this.props.icon}
+                size='2x' />
+              &nbsp;
+              {this.props.title}
+            </h3>
+          </Alert>
+        </Modal.Header>
         <Modal.Body>
-          <div className="row">
-            <div className="col-xs-12">
-              <Alert bsStyle={this.props.bsStyle} className='error-modal_alert'>
-                <h3 className='error-modal_alert_title'>
-                  <FontAwesomeIcon
-                    className='error-modal_alert_title_icon'
-                    icon={this.props.icon}
-                    size='2x' />
-                  &nbsp;
-                  {this.props.title}
-                </h3>
-              </Alert>
-            </div>
-          </div>
           {this.props.children}
         </Modal.Body>
         {this.renderModalFooter()}

@@ -45,7 +45,7 @@ const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['cas
         case 1:
           alert =
             <div className="alert alert-info">
-                Your case is waiting to be assigned to a doctor.
+              Your case is waiting to be assigned to a doctor.
             </div>
           break
         case 2:
@@ -62,7 +62,7 @@ const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['cas
           break
         case 4:
           alert =
-            <div className="alert alert-warning">
+            <div className="alert alert-success">
                 Your case has been successfully diagnosed and closed.
             </div>
           break
@@ -80,18 +80,18 @@ const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['cas
           break
         case 7:
           alert =
-            <div className="alert alert-danger">
+            <div className="alert alert-warning">
                 You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded 10 MEDX and may consider re-submitting your case to the network or visiting your local dermatologist.
             </div>
           break
         case 8:
           alert =
-            <div className="alert alert-danger">
+            <div className="alert alert-warning">
                 You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of 15 MEDX was charged for your first opinion and discounted second opinion.
             </div>
           break
         default:
-          alert = <div className="alert alert-info">Open</div>
+          alert = <div />
       }
       return alert
     }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Alert, Button } from 'react-bootstrap'
 import { currentAccount } from '~/services/sign-in'
 import { MainLayoutContainer } from '~/layouts/MainLayout';
-import { EmergencyKitDisplay } from './EmergencyKitDisplay'
+import { EmergencyKitDisplayContainer } from './EmergencyKitDisplay'
 
 export const EmergencyKit = (
   class _EmergencyKit extends Component {
@@ -46,7 +46,7 @@ export const EmergencyKit = (
       const { isChecking, masterPasswordOk, masterPassword } = this.state
 
       if (masterPasswordOk) {
-        emergencyKit = <EmergencyKitDisplay />
+        emergencyKit = <EmergencyKitDisplayContainer />
       }
       else {
         if (masterPasswordError) {
@@ -73,6 +73,7 @@ export const EmergencyKit = (
                             Master Password
                           </label>
                           <input
+                            autoFocus={true}
                             value={masterPassword}
                             onChange={(e) => this.setState({ masterPassword: e.target.value })}
                             type="password"

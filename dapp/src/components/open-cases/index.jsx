@@ -5,7 +5,10 @@ import { MainLayoutContainer } from '~/layouts/MainLayout.js'
 import {
   Table
 } from 'react-bootstrap'
+import ReactTooltip from 'react-tooltip'
+import { ErrorModal } from '~/components/ErrorModal'
 import PropTypes from 'prop-types'
+import { isBlank } from '~/utils/isBlank'
 import { connect } from 'react-redux'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
@@ -21,6 +24,9 @@ function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   let CaseManager = contractByName(state, 'CaseManager')
   let caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', account)
+  let AccountManager = contractByName(state, 'AccountManager')
+  const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
+
   let cases = []
   for (let i = 0; i < caseCount; i++) {
     let c = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', account, i)
@@ -28,15 +34,18 @@ function mapStateToProps(state) {
   }
 
   return {
+    publicKey,
     account,
     caseCount,
     cases,
-    CaseManager
+    CaseManager,
+    AccountManager
   }
 }
 
-function* saga({ account, CaseManager }) {
+function* saga({ account, CaseManager, AccountManager }) {
   if (!account || !CaseManager) { return }
+  yield cacheCall(AccountManager, 'publicKeys', account)
   let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', account)
   for (let i = 0; i < caseCount; i++) {
     yield cacheCall(CaseManager, 'doctorCaseAtIndex', account, i)
@@ -59,7 +68,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                     Diagnose Cases
                   </h3>
                   <span className="sm-block text-gray">
-                    Cases you are currently evaluating &amp; have diagnosed
+                    <strong>Currently Evaluating &amp; Historical</strong>
                   </span>
                 </div>
               </div>

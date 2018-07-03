@@ -3,9 +3,9 @@ import { Alert, Modal } from 'react-bootstrap'
 import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import Spinner from '~/components/Spinner'
 import { currentAccount } from '~/services/sign-in'
 import { downloadJson } from '~/utils/storage-util'
+import { Loading } from '~/components/Loading'
 import { withSaga, cacheCall, cacheCallValue, withSend, addContract } from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
@@ -15,6 +15,7 @@ import { reencryptCaseKey } from '~/services/reencryptCaseKey'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -54,9 +55,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
 
     this.state = {
       diagnosis: {},
-      status: '',
       hidden: true,
-      buttonsHidden: true,
       showThankYouModal: false,
       showChallengeModal: false,
       doctorAddress: '',
@@ -77,8 +76,11 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   componentWillReceiveProps (props) {
     if (this.state.challengeHandler) {
       this.state.challengeHandler.handle(props.transactions[this.state.challengeTransactionId])
-        .onError(toastr.transactionError)
-        .onReceipt(() => {
+        .onError((error) => {
+          toastr.transactionError(error)
+          this.setState({challengeHandler: null})
+        })
+        .onTxHash(() => {
           toastr.success('Your case is being challenged')
           mixpanel.track('Challenge Diagnosis Submitted')
           this.setState({
@@ -88,8 +90,11 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     }
     if (this.state.acceptHandler) {
       this.state.acceptHandler.handle(props.transactions[this.state.acceptTransactionId])
-        .onError(toastr.transactionError)
-        .onReceipt(() => {
+        .onError((error) => {
+          toastr.transactionError(error)
+          this.setState({acceptHandler: null})
+        })
+        .onTxHash(() => {
           toastr.success('Your case has been accepted')
           mixpanel.track('Accept Diagnosis Submitted')
           this.setState({
@@ -117,7 +122,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   handleCloseThankYouModal = (event) => {
     event.preventDefault()
     this.setState({showThankYouModal: false})
-    this.props.history.push('/patients/cases')
+    this.props.history.push(routes.PATIENTS_CASES)
   }
 
   handleCloseChallengeModal = (event) => {
@@ -165,7 +170,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       <div /> :
       <div className="card">
         <div className="card-header">
-          <h2 className="card-title">Diagnosis</h2>
+          <h3 className="card-title">Diagnosis</h3>
         </div>
         <div className="card-body">
           <div className="row">
@@ -204,8 +209,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                 &nbsp;
                 <button disabled={transactionRunning} onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
               </div>
-            </div>
-          </div>
+            </div> : null
         }
 
         <Modal show={this.state.showThankYouModal} onHide={this.handleCloseThankYouModal}>
@@ -268,7 +272,8 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
             </Modal.Footer>
           </form>
         </Modal>
-        <Spinner loading={transactionRunning} />
+
+        <Loading loading={transactionRunning} />
       </div>
     )
   }

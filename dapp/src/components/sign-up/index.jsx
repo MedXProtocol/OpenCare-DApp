@@ -1,23 +1,31 @@
 import React, { Component } from 'react'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
-import { genKey } from '~/services/gen-key'
+import ReactTimeout from 'react-timeout'
 import { Redirect } from 'react-router-dom'
-
-import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
-import { mixpanel } from '~/mixpanel'
-import { ConfirmCreate } from './confirm-create'
-import { SecretKey } from './secret-key'
-import { MasterPassword } from './master-password'
 import { connect } from 'react-redux'
+import { Account } from '~/accounts/Account'
+import { genKey } from '~/services/gen-key'
+import { mixpanel } from '~/mixpanel'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
+import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
+import { MasterPasswordContainer } from './master-password'
+import { SecretKeyContainer } from './secret-key'
+import { cacheCall, cacheCallValue, withSaga } from '~/saga-genesis'
+import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state) {
   const address = state.sagaGenesis.accounts[0]
+  const account = Account.get(address)
   const signedIn = state.account.signedIn
   const overrideError = state.account.overrideError
+  const AccountManager = contractByName(state, 'AccountManager')
+  const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
   return {
     address,
     signedIn,
-    overrideError
+    overrideError,
+    account,
+    publicKey,
+    AccountManager
   }
 }
 
@@ -32,53 +40,83 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignUp = class extends Component {
+function* saga({ address, AccountManager }) {
+  if (!address || !AccountManager) { return }
+  yield cacheCall(AccountManager, 'publicKeys', address)
+}
+
+export const SignUp = class _SignUp extends Component {
   constructor (props) {
     super(props)
     this.state = {
       secretKey: genKey(32),
       showMasterPassword: false,
-      showConfirm: false
+      showOverrideModal: false,
+      overrideModalHasBeenShown: false,
+      confirming: false
     }
+  }
+
+  componentDidMount () {
+    this.init(this.props)
+  }
+
+  componentWillReceiveProps (props) {
+    this.init(props)
+  }
+
+  init(props) {
+    if (!this.state.overrideModalHasBeenShown && (props.account || props.publicKey)) {
+      this.setState({
+        showOverrideModal: true,
+        overrideModalHasBeenShown: true
+      })
+    }
+  }
+
+  closeOverrideModal = () => {
+    this.setState({
+      showOverrideModal: false,
+      confirming: false
+    })
+    this.props.clearOverrideError()
   }
 
   onMasterPassword = (password) => {
     this.setState({
-      showConfirm: true,
-      masterPassword: password
+      masterPassword: password,
+      confirming: true
+    }, () => {
+      this.props.setTimeout(() => {
+        this.props.signUp({
+          secretKey: this.state.secretKey,
+          masterPassword: this.state.masterPassword,
+          address: this.props.address
+        })
+      }, 100)
     })
-  }
 
-  onConfirm = () => {
-    this.props.signUp({
-      secretKey: this.state.secretKey,
-      masterPassword: this.state.masterPassword,
-      address: this.props.address
-    })
-
-    mixpanel.track("Signup Attempt");
+    mixpanel.track("Signup Attempt")
   }
 
   render () {
     var content
     if (this.props.signedIn) {
       content = <Redirect to='/patients/cases' />
-    } else if (this.state.showConfirm) {
-      content = <ConfirmCreate onConfirm={this.onConfirm} />
     } else if (this.state.showMasterPassword) {
-      content = <MasterPassword onMasterPassword={this.onMasterPassword} />
+      content = <MasterPasswordContainer onMasterPassword={this.onMasterPassword} creating={this.state.confirming} />
     } else {
-      content = <SecretKey secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
+      content = <SecretKeyContainer secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
     }
     return (
       <MainLayoutContainer>
         {content}
         <OverrideDisallowedModal
-          show={!!this.props.overrideError}
-          onOk={this.props.clearOverrideError} />
+          show={this.state.showOverrideModal || !!this.props.overrideError}
+          onOk={this.closeOverrideModal} />
       </MainLayoutContainer>
     )
   }
 }
 
-export const SignUpContainer = connect(mapStateToProps, mapDispatchToProps)(SignUp)
+export const SignUpContainer = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['address', 'AccountManager'] })(SignUp)))

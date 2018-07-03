@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
-import Spinner from '~/components/Spinner'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { withContractRegistry, withSend } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
-
 
 function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -17,17 +15,17 @@ function mapStateToProps(state) {
 
 export const RegisterDoctorContainer = withContractRegistry(connect(mapStateToProps)(withSend(class _RegisterDoctor extends Component {
     constructor(props){
-        super(props)
-        this.state = {
-            address: this.props.account || '',
-            name: '',
-            submitInProgress: false
-        }
+      super(props)
+      this.state = {
+        address: this.props.account || '',
+        name: '',
+        submitInProgress: false
+      }
     }
 
     handleSubmit = (event) => {
-        event.preventDefault()
-        this.registerDoctor()
+      event.preventDefault()
+      this.registerDoctor()
     }
 
     registerDoctor = () => {
@@ -39,15 +37,6 @@ export const RegisterDoctorContainer = withContractRegistry(connect(mapStateToPr
       if (!this.props.account && props.account) {
         this.setState({address: props.account})
       }
-    }
-
-    onSuccess = () => {
-        this.setState({submitInProgress: false})
-    }
-
-    onError = (error) => {
-        this.setState({error: error})
-        this.setState({submitInProgress: false})
     }
 
     render() {
@@ -84,11 +73,10 @@ export const RegisterDoctorContainer = withContractRegistry(connect(mapStateToPr
                           />
                         </div>
                         <div className="text-right">
-                          <button type="submit" className="btn btn-success btn-default" disabled={this.state.submitInProgress}>Register</button>
+                          <button type="submit" className="btn btn-success btn-default">Register</button>
                         </div>
                       </form>
                     </div>
-                    <Spinner loading={this.state.submitInProgress}/>
                   </div>
                 </div>
               </div>

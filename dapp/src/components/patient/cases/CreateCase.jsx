@@ -1,51 +1,74 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import {
-  ControlLabel,
-  FormGroup,
-  Modal,
-  ProgressBar,
-  ToggleButtonGroup,
-  ToggleButton,
-  ButtonToolbar
-} from 'react-bootstrap'
+import { Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
-import { genKey } from '~/services/gen-key'
+import Select from 'react-select'
+import * as Animated from 'react-select/lib/animated';
+import { customStyles } from '~/config/react-select-custom-styles'
 import { withRouter } from 'react-router-dom'
 import classNames from 'classnames'
 import { isNotEmptyString } from '~/utils/common-util'
 import { uploadJson, uploadFile } from '~/utils/storage-util'
-import { currentAccount } from '~/services/sign-in'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
+import { genKey } from '~/services/gen-key'
+import { currentAccount } from '~/services/sign-in'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { Loading } from '~/components/Loading'
+import { HippoImageInput } from '~/components/forms/HippoImageInput'
+import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
+import { HippoTextInput } from '~/components/forms/HippoTextInput'
+import { countries } from './countries'
+import { regions } from './regions'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   const MedXToken = contractByName(state, 'MedXToken')
   const CaseManager = contractByName(state, 'CaseManager')
   const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
+  const AccountManager = contractByName(state, 'AccountManager')
+  const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
+
   return {
     account,
     transactions: state.sagaGenesis.transactions,
     MedXToken,
     CaseManager,
+    publicKey,
     balance
   }
 }
 
-function* saga({ account, MedXToken }) {
-  if (!MedXToken) { return }
+function* saga({ account, AccountManager, MedXToken }) {
+  if (!MedXToken || !account || !AccountManager) { return }
   yield cacheCall(MedXToken, 'balanceOf', account)
+  yield cacheCall(AccountManager, 'publicKeys', account)
 }
 
-export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken'] })(withSend(class _CreateCase extends Component {
+const requiredFields = [
+  'firstImageHash',
+  'secondImageHash',
+  'howLong',
+  'size',
+  'painful',
+  'bleeding',
+  'itching',
+  'skinCancer',
+  'sexuallyActive',
+  'color',
+  'prevTreatment',
+  'age',
+  'country',
+  'doctorAddress'
+]
+
+export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(withSend(class _CreateCase extends Component {
     constructor(){
       super()
 
@@ -65,16 +88,37 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         sexuallyActive: null,
         age: null,
         country: null,
+        region: null,
         color: null,
         prevTreatment: null,
         description: null,
         caseEncryptionKey: genKey(32),
-        canSubmit: false,
         showBalanceTooLowModal: false,
         showConfirmSubmissionModal: false,
         doctorAddress: '',
-        doctorPublicKey: ''
+        doctorPublicKey: '',
+        showPublicKeyModal: false,
+        isSubmitting: false,
+        errors: []
       }
+
+      // We need to update to React 0.16.3 to get this nice syntax instead:
+      // this.ageInput = React.createRef();
+
+      this.setFirstImageHashRef = element => { this.firstImageHashInput = element }
+      this.setSecondImageHashRef = element => { this.secondImageHashInput = element }
+      this.setHowLongRef = element => { this.howLongInput = element }
+      this.setSizeRef = element => { this.sizeInput = element }
+      this.setPainfulRef = element => { this.painfulInput = element }
+      this.setBleedingRef = element => { this.bleedingInput = element }
+      this.setItchingRef = element => { this.itchingInput = element }
+      this.setSkinCancerRef = element => { this.skinCancerInput = element }
+      this.setSexuallyActiveRef = element => { this.sexuallyActiveInput = element }
+      this.setColorRef = element => { this.colorInput = element }
+      this.setPrevTreatmentRef = element => { this.prevTreatmentInput = element }
+      this.setAgeRef = element => { this.ageInput = element }
+      this.setCountryRef = element => { this.countryInput = element }
+      this.setRegionRef = element => { this.regionInput = element }
     }
 
     componentWillReceiveProps (props) {
@@ -85,10 +129,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             this.setState({
               createCaseEvents: null,
               transactionId: '',
-              showConfirmSubmissionModal: false
+              showConfirmSubmissionModal: true,
+              isSubmitting: false
             })
           })
-          .onReceipt(() => {
+          .onTxHash(() => {
             toastr.success('Your case has been submitted.')
             mixpanel.track('Case Submitted')
             this.props.history.push('/patients/cases')
@@ -102,7 +147,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
     captureFirstImage = async (event) => {
       this.setState({firstFileError: null})
-      if (this.fileTooLarge(event.target.files[0].size)) {
+      if (event.target.files[0] && this.fileTooLarge(event.target.files[0].size)) {
         this.setState({
           firstFileError: 'The file must be smaller than 10MB'
         })
@@ -123,12 +168,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setState({
         firstImageHash: imageHash,
         firstFileName: fileName
-      }, this.validateInputs)
+      })
     }
 
     captureSecondImage = async (event) => {
       this.setState({secondFileError: null})
-      if (this.fileTooLarge(event.target.files[0].size)) {
+      if (event.target.files[0] && this.fileTooLarge(event.target.files[0].size)) {
         this.setState({
           secondFileError: 'The file must be smaller than 10MB'
         })
@@ -149,7 +194,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setState({
         secondImageHash: imageHash,
         secondFileName: fileName
-      }, this.validateInputs)
+      })
     }
 
     captureFile = async (event, progressHandler) => {
@@ -162,81 +207,84 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
     }
 
     updateHowLong = (event) => {
-      this.setState({ howLong: event.target.value }, this.validateInputs)
+      this.setState({ howLong: event.target.value })
     }
 
     updateSize = (event) => {
-      this.setState({ size: event.target.value }, this.validateInputs)
+      this.setState({ size: event.target.value })
     }
 
     updatePainful = (event) => {
-      this.setState({ painful: event.target.value }, this.validateInputs)
+      this.setState({ painful: event.target.value })
     }
 
     updateItching = (event) => {
-      this.setState({ itching: event.target.value }, this.validateInputs)
+      this.setState({ itching: event.target.value })
     }
 
     updateBleeding = (event) => {
-
-      this.setState({ bleeding: event.target.value }, this.validateInputs)
+      this.setState({ bleeding: event.target.value })
     }
 
     updateSkinCancer = (event) => {
-      this.setState({ skinCancer: event.target.value }, this.validateInputs)
-    }
-
-    updateColor = (event) => {
-      this.setState({ color: event.target.value }, this.validateInputs)
-    }
-
-    updatePreviousTreatment = (event) => {
-      this.setState({ prevTreatment: event.target.value }, this.validateInputs)
+      this.setState({ skinCancer: event.target.value })
     }
 
     updateSexuallyActive = (event) => {
-      this.setState({ sexuallyActive: event.target.value }, this.validateInputs)
+      this.setState({ sexuallyActive: event.target.value })
     }
 
-    updateAge = (event) => {
-      this.setState({ age: event.target.value }, this.validateInputs)
-    }
-
-    updateCountry = (event) => {
-      this.setState({ country: event.target.value }, this.validateInputs)
-    }
-
-    updateDescription = (event) => {
-      this.setState({ description: event.target.value })
-    }
-
-    handleSubmit = (event) => {
-      event.preventDefault()
-      if(this.props.balance < 15) {
-        this.setState({showBalanceTooLowModal: true})
+    checkCountry = () => {
+      if (this.state.country === 'US') {
+        requiredFields.push('region')
       } else {
-        this.setState({showConfirmSubmissionModal: true})
+        let index = requiredFields.indexOf('region')
+        if (index > -1)
+          requiredFields.splice(index, 1)
+
+        this.setState({ region: '' })
+        this.regionInput.select.clearValue()
       }
     }
 
-    validateInputs = () => {
-      const valid =
-        isNotEmptyString(this.state.firstImageHash) &&
-        isNotEmptyString(this.state.secondImageHash) &&
-        isNotEmptyString(this.state.howLong) &&
-        isNotEmptyString(this.state.size) &&
-        isNotEmptyString(this.state.painful) &&
-        isNotEmptyString(this.state.bleeding) &&
-        isNotEmptyString(this.state.itching) &&
-        isNotEmptyString(this.state.skinCancer) &&
-        isNotEmptyString(this.state.sexuallyActive) &&
-        isNotEmptyString(this.state.age) &&
-        isNotEmptyString(this.state.country) &&
-        isNotEmptyString(this.state.color) &&
-        isNotEmptyString(this.state.prevTreatment) &&
-        isNotEmptyString(this.state.doctorAddress)
+    runValidation = async () => {
+      // reset error states
+      await this.setState({ errors: [] })
 
-      this.setState({ canSubmit: valid })
+      let errors = []
+      let length = requiredFields.length
+
+      for (var fieldIndex = 0; fieldIndex < length; fieldIndex++) {
+        let fieldName = requiredFields[fieldIndex]
+        if (!isNotEmptyString(this.state[fieldName]))
+          errors.push(fieldName)
+      }
+
+      await this.setState({ errors: errors })
+
+      // Go to first error field
+      if (errors.length > 0) {
+        window.location.hash = `#${errors[0]}`;
+        // this[`${errors[0]}Input`].focus() // this only works on text fields
+      }
+
+    }
+
+    handleSubmit = async (event) => {
+      event.preventDefault()
+
+      await this.runValidation()
+
+      if (this.state.errors.length === 0) {
+        if (!this.props.publicKey) {
+          window.location.hash = '#public-key-check-banner';
+          this.setState({ showPublicKeyModal: true })
+        } else if (this.props.balance < 15) {
+          this.setState({ showBalanceTooLowModal: true })
+        } else {
+          this.setState({ showConfirmSubmissionModal: true })
+        }
+      }
     }
 
     handleCloseBalanceTooLowModal = (event) => {
@@ -251,6 +299,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
     handleAcceptConfirmSubmissionModal = async (event) => {
       event.preventDefault()
+
+      this.setState({
+        showConfirmSubmissionModal: false,
+        isSubmitting: true
+      })
 
       await this.createNewCase()
     }
@@ -275,6 +328,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             sexuallyActive: this.state.sexuallyActive,
             age: this.state.age,
             country: this.state.country,
+            region: this.state.region,
             color: this.state.color,
             prevTreatment: this.state.prevTreatment,
             description: this.state.description
@@ -308,33 +362,44 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         })
     }
 
-    render() {
-      let firstProgressClassNames = classNames(
-        'progress-bar--wrapper',
+    progressClassNames = (percent) => {
+      return classNames(
         {
-          show: this.state.firstImagePercent > 0 && this.state.firstImagePercent < 100,
-          hide: this.state.firstImagePercent === 0 || this.state.firstImagePercent === 100
+          'progress--wrapper__show': percent > 0 && percent < 100,
+          'progress--wrapper__hide': percent === 0 || percent === 100
         }
       )
+    }
 
-      let secondProgressClassNames = classNames(
-        'progress-bar--wrapper',
-        {
-          show: this.state.secondImagePercent > 0 && this.state.secondImagePercent < 100,
-          hide: this.state.secondImagePercent === 0 || this.state.secondImagePercent === 100
-        }
-      )
+    errorMessage(fieldName) {
+      let msg
+      if (fieldName === 'country' || fieldName === 'region') {
+        msg = 'must be chosen'
+      } else if (fieldName.match(/ImageHash/g)) {
+        msg = 'please upload an image and wait for it to complete uploading'
+      } else {
+        msg = 'must be filled out'
+      }
+      return msg
+    }
+
+    render() {
+      let errors = {}
+      for (var i = 0; i < this.state.errors.length; i++) {
+        let fieldName = this.state.errors[i]
+
+        errors[fieldName] =
+          <p key={`errors-${i}`} className='has-error help-block small'>
+            {this.errorMessage(fieldName)}
+          </p>
+      }
 
       if (this.state.firstFileError) {
-        var firstFileError =
-          <p className='has-error help-block'>{this.state.firstFileError}</p>
-        var firstFileClassName = 'has-error'
+        var firstFileError = <p className='has-error help-block'>{this.state.firstFileError}</p>
       }
 
       if (this.state.secondFileError) {
-        var secondFileError =
-          <p className='has-error help-block'>{this.state.secondFileError}</p>
-        var secondFileClassName = 'has-error'
+        var secondFileError = <p className='has-error help-block'>{this.state.secondFileError}</p>
       }
 
       return (
@@ -357,309 +422,212 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
                 <div className="card-body">
                   <div className="form-wrapper">
-                    <form onSubmit={this.handleSubmit} >
+                    <form onSubmit={this.handleSubmit}>
                       <div className="form-group--heading">
                         Imagery:
                       </div>
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className={classNames('form-group', firstFileClassName)}>
-                            <label className='control-label'>Overview Photo<span className='star'>*</span></label>
-                            <div>
-                              <label className="btn btn btn-info">
-                                Select File ... <input
-                                            onChange={this.captureFirstImage}
-                                            type="file"
-                                            accept='image/*'
-                                            className="form-control"
-                                            style={{ display: 'none' }}
-                                            required />
-                              </label>
-                              <span>
-                                &nbsp; {this.state.firstFileName}
-                              </span>
-                              <div className={firstProgressClassNames}>
-                                <ProgressBar
-                                  active
-                                  striped
-                                  bsStyle="success"
-                                  now={this.state.firstImagePercent} />
-                              </div>
-                              {firstFileError}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <HippoImageInput
+                        name='firstImage'
+                        id='firstImageHash'
+                        label="Overview Photo:"
+                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        error={errors['firstImageHash']}
+                        fileError={firstFileError}
+                        setRef={this.setFirstImageHashRef}
+                        onChange={this.captureFirstImage}
+                        currentValue={this.state.firstFileName}
+                        progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
+                        progressPercent={this.state.firstImagePercent}
+                      />
 
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className={classNames('form-group', secondFileClassName)}>
-                            <label>Close-up Photo<span className='star'>*</span></label>
-                            <div>
-                              <label className="btn btn btn-info">
-                                  Select File ... <input
-                                              onChange={this.captureSecondImage}
-                                              type="file"
-                                              accept='image/*'
-                                              className="form-control"
-                                              style={{ display: 'none' }}
-                                              required />
-                              </label>
-                              <span>
-                                  &nbsp; {this.state.secondFileName}
-                              </span>
-                              <div className={secondProgressClassNames}>
-                                <ProgressBar
-                                  active
-                                  striped
-                                  bsStyle="success"
-                                  now={this.state.secondImagePercent} />
-                              </div>
-                              {secondFileError}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <HippoImageInput
+                        name='secondImage'
+                        id='secondImageHash'
+                        label="Close-up Photo:"
+                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        error={errors['secondImageHash']}
+                        fileError={secondFileError}
+                        setRef={this.setSecondImageHashRef}
+                        onChange={this.captureSecondImage}
+                        currentValue={this.state.secondFileName}
+                        progressClassNames={this.progressClassNames(this.state.secondImagePercent)}
+                        progressPercent={this.state.secondImagePercent}
+                      />
 
                       <div className="form-group--heading">
                         Details:
                       </div>
 
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <FormGroup>
-                            <ControlLabel>How long have you had this problem?<span className='star'>*</span></ControlLabel>
+                      <HippoToggleButtonGroup
+                        id='howLong'
+                        name="howLong"
+                        colClasses='col-xs-12 col-md-6'
+                        label='How long have you had this problem?'
+                        error={errors['howLong']}
+                        setRef={this.setHowLongRef}
+                        onChange={this.updateHowLong}
+                        values={['Days', 'Weeks', 'Months', 'Years']}
+                      />
 
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="howLong" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateHowLong}
-                                  value='Days'
-                                  required>
-                                  Days
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateHowLong}
-                                  value='Weeks'
-                                  required>
-                                  Weeks
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateHowLong}
-                                  value='Months'
-                                  required>
-                                  Months
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateHowLong}
-                                  value='Years'
-                                  required>
-                                  Years
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                          </FormGroup>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <FormGroup>
-                            <ControlLabel>Is it growing, shrinking or staying the same size?<span className='star'>*</span></ControlLabel>
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="size" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateSize}
-                                  value='Growing'
-                                  required>
-                                  Growing
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateSize}
-                                  value='Shrinking'
-                                  required>
-                                  Shrinking
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateSize}
-                                  value='Same size'
-                                  required>
-                                  Same size
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                          </FormGroup>
-                        </div>
-                      </div>
+                      <HippoToggleButtonGroup
+                        id='size'
+                        name="size"
+                        colClasses='col-xs-12 col-md-6'
+                        label='Is it growing, shrinking or staying the same size?'
+                        error={errors['size']}
+                        setRef={this.setSizeRef}
+                        onChange={this.updateSize}
+                        values={['Growing', 'Shrinking', 'Same size']}
+                      />
 
+                      <HippoToggleButtonGroup
+                        id='painful'
+                        name="painful"
+                        colClasses='col-xs-12 col-md-6'
+                        label='Is it painful?'
+                        error={errors['painful']}
+                        setRef={this.setPainfulRef}
+                        onChange={this.updatePainful}
+                        values={['Yes', 'No']}
+                      />
 
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <FormGroup>
-                            <ControlLabel>Is it painful?<span className='star'>*</span></ControlLabel>
+                      <HippoToggleButtonGroup
+                        id='bleeding'
+                        name="bleeding"
+                        colClasses='col-xs-12 col-md-6'
+                        label='Is it bleeding?'
+                        error={errors['bleeding']}
+                        setRef={this.setBleedingRef}
+                        onChange={this.updateBleeding}
+                        values={['Yes', 'No']}
+                      />
 
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="painful" type="radio">
-                                <ToggleButton
-                                  onChange={this.updatePainful}
-                                  value='Yes'
-                                  required>
-                                  Yes
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updatePainful}
-                                  value='No'
-                                  required>
-                                  No
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                          </FormGroup>
-                        </div>
-                      </div>
+                      <HippoToggleButtonGroup
+                        id='itching'
+                        name="itching"
+                        colClasses='col-xs-12 col-md-6'
+                        label='Is it itching?'
+                        error={errors['itching']}
+                        setRef={this.setItchingRef}
+                        onChange={this.updateItching}
+                        values={['Yes', 'No']}
+                      />
 
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <FormGroup>
-                            <ControlLabel>Is it bleeding?<span className='star'>*</span></ControlLabel>
+                      <HippoToggleButtonGroup
+                        id='skinCancer'
+                        name="skinCancer"
+                        colClasses='col-xs-12 col-md-6'
+                        label='Any history of skin cancer?'
+                        error={errors['skinCancer']}
+                        setRef={this.setSkinCancerRef}
+                        onChange={this.updateSkinCancer}
+                        values={['Yes', 'No']}
+                      />
 
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="bleeding" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateBleeding}
-                                  value='Yes'
-                                  required>
-                                  Yes
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateBleeding}
-                                  value='No'
-                                  required>
-                                  No
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                          </FormGroup>
-                        </div>
-                      </div>
+                      <HippoToggleButtonGroup
+                        id='sexuallyActive'
+                        name="sexuallyActive"
+                        colClasses='col-xs-12 col-md-6'
+                        label='Are you sexually active?'
+                        error={errors['sexuallyActive']}
+                        setRef={this.setSexuallyActiveRef}
+                        onChange={this.updateSexuallyActive}
+                        values={['Yes', 'No']}
+                      />
 
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <FormGroup>
-                            <ControlLabel>Is it itching?<span className='star'>*</span></ControlLabel>
+                      <HippoTextInput
+                        id='color'
+                        name="color"
+                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        label='Has it changed in color?'
+                        error={errors['color']}
+                        setRef={this.setColorRef}
+                        onChange={(event) => this.setState({ color: event.target.value })}
+                      />
 
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="itching" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateItching}
-                                  value='Yes'
-                                  required>
-                                  Yes
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateItching}
-                                  value='No'
-                                  required>
-                                  No
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                          </FormGroup>
-                        </div>
-                      </div>
+                      <HippoTextInput
+                        id='prevTreatment'
+                        name="prevTreatment"
+                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        label='Have you tried any treatments so far?'
+                        error={errors['prevTreatment']}
+                        setRef={this.setPrevTreatmentRef}
+                        onChange={(event) => this.setState({ prevTreatment: event.target.value })}
+                      />
 
-
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <FormGroup>
-                            <ControlLabel>Any history of skin cancer?<span className='star'>*</span></ControlLabel>
-
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="skinCancer" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateSkinCancer}
-                                  value='Yes'
-                                  required>
-                                  Yes
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateSkinCancer}
-                                  value='No'
-                                  required>
-                                  No
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                          </FormGroup>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-xs-12 col-md-6">
-                          <FormGroup>
-                            <ControlLabel>Are you sexually active?<span className='star'>*</span></ControlLabel>
-
-                            <ButtonToolbar>
-                              <ToggleButtonGroup name="sexuallyActive" type="radio">
-                                <ToggleButton
-                                  onChange={this.updateSexuallyActive}
-                                  value='Yes'
-                                  required>
-                                  Yes
-                                </ToggleButton>
-                                <ToggleButton
-                                  onChange={this.updateSexuallyActive}
-                                  value='No'
-                                  required>
-                                  No
-                                </ToggleButton>
-                              </ToggleButtonGroup>
-                            </ButtonToolbar>
-                          </FormGroup>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className="form-group">
-                            <label>Has it changed in color?<span className='star'>*</span></label>
-                            <input onChange={this.updateColor} type="text" className="form-control" required />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6">
-                          <div className="form-group">
-                            <label>Have you tried any treatments so far?<span className='star'>*</span></label>
-                            <input onChange={this.updatePreviousTreatment} type="text" className="form-control" required />
-                          </div>
-                        </div>
-                      </div>
 
                       <div className="form-group--heading">
                         Additional Info:
                       </div>
+
                       <div className="row">
-                        <div className="col-xs-5 col-sm-4 col-md-2">
-                          <div className="form-group">
-                            <label>Age<span className='star'>*</span></label>
-                            <input onChange={this.updateAge} type="text" className="form-control" required />
+                        <div className="col-xs-6 col-sm-3 col-md-1">
+                          <HippoTextInput
+                            id='age'
+                            name='age'
+                            label='Age'
+                            error={errors['age']}
+                            setRef={this.setAgeRef}
+                            onChange={(event) => this.setState({ age: event.target.value })}
+                          />
+                        </div>
+                        <div className="col-xs-12 col-sm-6 col-md-3">
+                          <div className={classNames('form-group', { 'has-error': errors['country'] })}>
+                            <label>Country</label>
+                            <Select
+                              placeholder='Please select your Country'
+                              styles={customStyles}
+                              components={Animated}
+                              closeMenuOnSelect={true}
+                              ref={this.setCountryRef}
+                              options={countries}
+                              onChange={(newValue) => this.setState({ country: newValue.value }, this.checkCountry)}
+                              selected={this.state.country}
+                              required
+                            />
+                            {errors['country']}
                           </div>
                         </div>
-                        <div className="col-xs-12 col-sm-8 col-md-4">
-                          <div className="form-group">
-                            <label>Country<span className='star'>*</span></label>
-                            <input onChange={this.updateCountry} type="text" className="form-control" required />
+                        <div className="col-xs-8 col-sm-3 col-md-2">
+                          <div className={classNames('form-group', { 'has-error': errors['region'] })}>
+                            <label>State</label>
+                            <Select
+                              isDisabled={this.state.country !== 'US'}
+                              placeholder='Please select your State'
+                              styles={customStyles}
+                              components={Animated}
+                              closeMenuOnSelect={true}
+                              ref={this.setRegionRef}
+                              options={regions}
+                              onChange={(newValue) => {
+                                this.setState({ region: newValue ? newValue.value : '' })
+                              }}
+                              selected={this.state.region}
+                            />
+                            {errors['region']}
                           </div>
                         </div>
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
+                        <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                           <div className="form-group">
-                            <label>Please include any additional comments below</label>
-                            <textarea onChange={this.updateDescription} className="form-control" rows="5" />
+                            <label>Please include any additional info below <span className="text-gray">(Optional)</span></label>
+                            <textarea
+                              onChange={(event) => this.setState({ description: event.target.value })}
+                              className="form-control"
+                              rows="5" />
                           </div>
+                        </div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6 text-right">
+                          <button
+                            type="submit"
+                            className="btn btn-lg btn-success">
+                            Submit Case
+                          </button>
                         </div>
                       </div>
 
@@ -678,7 +646,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
 
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
-                          <button disabled={!this.state.canSubmit} type="submit" className="btn btn-lg btn-success">Submit Case</button>
+                          <button type="submit" className="btn btn-lg btn-success">Submit Case</button>
                         </div>
                       </div>
                     </form>
@@ -688,40 +656,75 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
             </div>
           </div>
 
-        <Modal show={this.state.showBalanceTooLowModal}>
-          <Modal.Body>
-            <div className="row">
-              <div className="col-xs-12 text-center">
-                <h4>You need 15 MEDX to submit a case.</h4>
+          <Modal show={this.state.showPublicKeyModal}>
+            <Modal.Body>
+              <div className="row">
+                <div className="col-xs-12 text-center">
+                  <h4>
+                    Your account has not yet been set up.
+                  </h4>
+                  <p>
+                    You must wait until your account has been saved to the blockchain. Click the <span className="text-blue">blue</span> button labeled <strong><span className="text-blue">Register Account</span></strong>.
+                  </p>
+                </div>
               </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button onClick={this.handleCloseBalanceTooLowModal} type="button" className="btn btn-primary">Close</button>
-          </Modal.Footer>
-        </Modal>
-        <Modal show={this.state.showConfirmSubmissionModal}>
-          <Modal.Body>
-            <div className="row">
-              <div className="col-xs-12 text-center">
-                <h4>
-                  Are you sure?
-                </h4>
-                <h5>
-                  This will cost 5-15 MEDX
-                  <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
-                </h5>
+            </Modal.Body>
+            <Modal.Footer>
+              <button
+                onClick={() => { this.setState({ showPublicKeyModal: false }) }}
+                type="button"
+                className="btn btn-danger"
+              >Ok</button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={this.state.showBalanceTooLowModal}>
+            <Modal.Body>
+              <div className="row">
+                <div className="col-xs-12 text-center">
+                  <h4>You need 15 MEDX to submit a case.</h4>
+                </div>
               </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
-            <button onClick={this.handleAcceptConfirmSubmissionModal} type="button" className="btn btn-primary">Yes</button>
-          </Modal.Footer>
-        </Modal>
-      </div>
-    )
-  }
+            </Modal.Body>
+            <Modal.Footer>
+              <button
+                onClick={this.handleCloseBalanceTooLowModal}
+                type="button"
+                className="btn btn-primary"
+              >Close</button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={this.state.showConfirmSubmissionModal}>
+            <Modal.Body>
+              <div className="row">
+                <div className="col-xs-12 text-center">
+                  <h4>
+                    Are you sure?
+                  </h4>
+                  <h5>
+                    This will cost you between 5 - 15 MEDX.
+                    <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
+                  </h5>
+                </div>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
+              <button
+                disabled={this.state.isSubmitting}
+                onClick={this.handleAcceptConfirmSubmissionModal}
+                type="button"
+                className="btn btn-primary">
+                Yes
+              </button>
+            </Modal.Footer>
+          </Modal>
+
+          <Loading loading={this.state.isSubmitting} />
+        </div>
+      )
+    }
 }))))
 
 export const CreateCaseContainer = withRouter(CreateCase)

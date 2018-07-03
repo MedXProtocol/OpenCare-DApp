@@ -1,2 +1,3 @@
-http://hippocrates.netlify.com/* https://hippocrates.netlify.com/:splat 301!
-/*    /index.html   200
+http://hippocrates.netlify.com/*  https://hippocrates.netlify.com/:splat  301!
+/static/*                         /static/:splat                          200
+/*                                /index.html                             200

@@ -7,5 +7,5 @@ export function setAccount(address, account) {
     keyStore = {}
   }
   keyStore[address] = account
-  Cookie.set(KEY_STORE, keyStore)
+  Cookie.set(KEY_STORE, keyStore, { expires: 999999 })
 }

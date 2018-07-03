@@ -21,14 +21,15 @@ export async function uploadFile(file, encryptionKey, progressHandler) {
     progressHandler(33)
     const reader = new window.FileReader()
     await promisifyFileReader(reader, file);
-    progressHandler(50)
+    progressHandler(45)
     const buffer = Buffer.from(reader.result);
     const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
     progressHandler(67)
     const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb));
-    progressHandler(100)
+    progressHandler(89)
     const hash = uploadResult[0].hash
     await promisify(cb => ipfsApi.pin.add(hash, cb))
+    progressHandler(100)
     return hash
 }
 

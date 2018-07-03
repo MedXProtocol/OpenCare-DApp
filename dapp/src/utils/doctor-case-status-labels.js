@@ -1,29 +1,55 @@
-export function doctorCaseStatusToName(status) {
-  var statuses = {
-    0: 'None',
-    1: 'Open',
-    2: 'Evaluating',
-    3: 'Evaluated',
-    4: 'Closed',
-    5: 'Evaluated',
-    6: 'Evaluating',
-    7: 'Diagnosis Rejected',
-    8: 'Diagnosis Confirmed'
-  }
-  return statuses[status]
+const statusNames = {
+  0: 'None',
+  1: 'Open',
+  2: 'Evaluating',
+  3: 'Evaluated',
+  4: 'Closed',
+  5: 'Evaluated',
+  6: 'Evaluating',
+  7: 'Diagnosis Sent',
+  8: 'Diagnosis Confirmed'
 }
 
-export function doctorCaseStatusToClass(status) {
-  var statuses = {
-    0: 'default',
-    1: 'info',
-    2: 'warning',
-    3: 'warning',
-    4: 'default',
-    5: 'default',
-    6: 'default',
-    7: 'warning',
-    8: 'danger'
-  }
-  return statuses[status]
+var statusClasses = {
+  0: 'default',
+  1: 'info',
+  2: 'warning',
+  3: 'default',
+  4: 'default',
+  5: 'default',
+  6: 'warning',
+  7: 'default',
+  8: 'success'
+}
+
+// This is context specific, and will say what state the case is in depending on
+// which doc is viewing the case
+export function doctorCaseStatusToName(isFirstDoc, status) {
+  let statusName
+  let evaluatedState = statusNames[3]
+
+  if (isFirstDoc && status > 2)
+    statusName = evaluatedState
+  else if (!isFirstDoc && status > 6)
+    statusName = evaluatedState
+  else
+    statusName = statusNames[status]
+
+  return statusName
+}
+
+// This is context specific, and will provide a different result depending on
+// which doc is viewing the case
+export function doctorCaseStatusToClass(isFirstDoc, status) {
+  let statusClass
+  let evaluatedState = statusClasses[3]
+
+  if (isFirstDoc && status > 2)
+    statusClass = evaluatedState
+  else if (!isFirstDoc && status > 6)
+    statusClass = evaluatedState
+  else
+    statusClass = statusClasses[status]
+
+  return statusClass
 }
