@@ -22,6 +22,7 @@ import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
+import { currentAccount } from '~/services/sign-in'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 
@@ -72,7 +73,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
 
   render () {
     const requestedPathname = getRequestedPathname()
-    if (this.props.isSignedIn && requestedPathname) {
+    if (this.props.isSignedIn && currentAccount() && requestedPathname) {
       var redirect = <Redirect to={requestedPathname} />
       setRequestedPathname('')
     }
