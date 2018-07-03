@@ -43,9 +43,9 @@ export function* web3Send({ transactionId, call, options }) {
   const { address, method, args } = call
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
-    options = options || {
+    options = Object.assign({
       from: account
-    }
+    }, options || {})
     const contractRegistry = yield getContext('contractRegistry')
     const web3 = yield getContext('web3')
     const contractKey = yield select(contractKeyByAddress, address)

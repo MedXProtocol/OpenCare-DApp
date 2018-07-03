@@ -95,7 +95,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
   }
 
   handleReset = () => {
-    let transactionId = this.props.send(this.props.AccountManager, 'setPublicKey', '0x')()
+    let transactionId = this.props.send(this.props.AccountManager, 'setPublicKey', '0x')({ gas: 200000 })
 
     this.setState({
       resetAccountHandler: new TransactionStateHandler(),
@@ -114,9 +114,6 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
             <p>
               You have a previous beta account that no longer works.
             </p>
-            <small>
-              Up the Gas Limit to run the reset transaction.
-            </small>
             <br />
             <button
               className='btn btn-danger btn-outline-inverse btn-no-shadow'
