@@ -18,6 +18,7 @@ import {
 } from '~/saga-genesis/state-finders'
 import { BodyClass } from '~/components/BodyClass'
 import * as routes from '~/config/routes'
+import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
@@ -122,7 +123,10 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
         <div className='alert alert-danger text-center'>
           <br />
           <p>
-            You have a previous beta account that no longer works.
+            You have a previous beta account that no longer works. &nbsp;
+            <InfoQuestionMark
+              place="bottom"
+              tooltipText="We have made changes that break compatibility with old cases.<br />Your account needs to be reset before submitting or diagnosing new cases." />
           </p>
           <br />
           <button
