@@ -64,7 +64,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             caseAddress={this.props.match.params.caseAddress}
             caseKey={this.props.caseKey}
             title='Diagnosis'
-            challengingDoctorAddress={this.props.doctorB} />
+            challengingDoctorAddress={this.props.challengingDoctor} />
         </div>
     } else if (this.props.challengingDoctor === this.props.address && !this.props.challengeHash) {
       challenge =
