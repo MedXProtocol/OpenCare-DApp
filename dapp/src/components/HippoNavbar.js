@@ -28,20 +28,20 @@ import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
   let doctorName
-  const account = get(state, 'sagaGenesis.accounts[0]')
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const MedXToken = contractByName(state, 'MedXToken')
-  const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account)
-  const canRegister = cacheCallValue(state, DoctorManager, 'owner') === account
-  const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
+  const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const canRegister = cacheCallValue(state, DoctorManager, 'owner') === address
+  const balance = cacheCallValue(state, MedXToken, 'balanceOf', address)
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const signedIn = state.account.signedIn
 
   if (isDoctor)
-    doctorName = cacheCallValue(state, DoctorManager, 'name', account)
+    doctorName = cacheCallValue(state, DoctorManager, 'name', address)
 
   return {
-    account,
+    address,
     balance,
     doctorName,
     isDoctor,
@@ -61,15 +61,15 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
-function* saga({ account, DoctorManager, MedXToken }) {
-  if (!account || !DoctorManager || !MedXToken) { return }
-  yield cacheCall(MedXToken, 'balanceOf', account)
+function* saga({ address, DoctorManager, MedXToken }) {
+  if (!address || !DoctorManager || !MedXToken) { return }
+  yield cacheCall(MedXToken, 'balanceOf', address)
   yield cacheCall(DoctorManager, 'owner')
-  yield cacheCall(DoctorManager, 'isDoctor', account)
-  yield cacheCall(DoctorManager, 'name', account)
+  yield cacheCall(DoctorManager, 'isDoctor', address)
+  yield cacheCall(DoctorManager, 'name', address)
 }
 
-export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'DoctorManager', 'MedXToken'] })(class _HippoNavbar extends Component {
+export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['address', 'DoctorManager', 'MedXToken'] })(class _HippoNavbar extends Component {
   signOut = () => {
     this.props.signOut()
     this.props.history.push(routes.SIGN_IN)
