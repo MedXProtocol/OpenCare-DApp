@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { EthAddress } from '~/components/EthAddress'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
+import get from 'lodash.get'
+import sortBy from 'lodash.sortby'
 import { withSend, withSaga, cacheCallValue, cacheCall } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 
@@ -16,6 +17,7 @@ function mapStateToProps(state) {
   for (var i = 0; i < doctorCount; i++) {
     const address = cacheCallValue(state, DoctorManager, 'doctorAddresses', i)
     doctors.push({
+      doctorIndex: i,
       name: cacheCallValue(state, DoctorManager, 'doctorNames', i),
       isActive: cacheCallValue(state, DoctorManager, 'isActive', address),
       address
@@ -49,7 +51,7 @@ export const RegisterDoctorContainer =
           constructor(props){
             super(props)
             this.state = {
-              address: this.props.account || '',
+              address: '',
               name: '',
               submitInProgress: false
             }
@@ -60,9 +62,18 @@ export const RegisterDoctorContainer =
             this.registerDoctor()
           }
 
-          handleDeactivate = (event) => {
-            event.preventDefault()
-            this.deactivateDoctor()
+          handleActivate = (name, address) => {
+            this.setState({
+              name: name,
+              address: address
+            }, this.registerDoctor)
+          }
+
+          handleDeactivate = (name, address) => {
+            this.setState({
+              name: name,
+              address: address
+            }, this.deactivateDoctor)
           }
 
           registerDoctor = () => {
@@ -75,13 +86,8 @@ export const RegisterDoctorContainer =
             send(DoctorManager, 'deactivateDoctor', this.state.address)()
           }
 
-          componentWillReceiveProps (props) {
-            if (!this.props.account && props.account) {
-              this.setState({address: props.account})
-            }
-          }
-
           render() {
+            const doctors = sortBy(this.props.doctors, ['isActive']).reverse()
             return (
               <div className="container">
                 <div className="row">
@@ -130,7 +136,6 @@ export const RegisterDoctorContainer =
                   <div className="col-xs-12 col-sm-10 col-sm-offset-1">
                     <div className="card">
                       <div className="card-body table-responsive">
-
                         <table className="table table-striped">
                           <thead>
                             <tr>
@@ -143,7 +148,7 @@ export const RegisterDoctorContainer =
                           </thead>
                           <tbody>
                             <TransitionGroup component={null}>
-                              {this.props.doctors.map(({isActive, address, name, doctorIndex}) => {
+                              {doctors.map(({isActive, address, name, doctorIndex}) => {
                                 return (
                                   <CSSTransition
                                     key={`doctor-row-transition-${doctorIndex}`}
@@ -162,20 +167,14 @@ export const RegisterDoctorContainer =
                                         <td width="20%" className="td-actions text-right">
                                           { isActive ? (
                                               <a
-                                                onClick={this.handleDeactivate}
+                                                onClick={() => { this.handleDeactivate(name, address) }}
                                                 className="btn btn-xs btn-info"
                                               >
                                                 Deactivate
                                               </a>
                                             ) : (
                                               <a
-                                                onClick={(event) => {
-                                                  event.preventDefault()
-                                                  this.setState({
-                                                    name: name,
-                                                    address: address
-                                                  }, this.handleAdd)
-                                                }}
+                                                onClick={() => { this.handleActivate(name, address) }}
                                                 className="btn btn-xs btn-default"
                                               >
                                                 Reactivate
