@@ -20,6 +20,7 @@ import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
 import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
+import { Web3Route } from '~/components/Web3Route'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
@@ -91,8 +92,8 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
           <SignedInRoute path={routes.ACCOUNT_MINT} component={Mint} />
           <SignedInRoute path={routes.ACCOUNT_WALLET} component={WalletContainer} />
 
-          <Route path={routes.SIGN_IN} component={SignInContainer} />
-          <Route path={routes.SIGN_UP} component={SignUpContainer} />
+          <Web3Route path={routes.SIGN_IN} component={SignInContainer} />
+          <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
 
           <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
           <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={DiagnoseCaseContainer} />
