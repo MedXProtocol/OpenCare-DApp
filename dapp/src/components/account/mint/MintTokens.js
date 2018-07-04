@@ -68,7 +68,7 @@ export const MintTokensContainer = withContractRegistry(connect(mapStateToProps)
                         <FormControl
                           className="form-control"
                           id="hash"
-                          value={this.state.address}
+                          placeholder="0x00000000000000000000000"
                           onChange={this.updateAddress}
                           required />
                       </FormGroup>
