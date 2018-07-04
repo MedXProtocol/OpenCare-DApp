@@ -28,7 +28,6 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
         emit({type: 'TRANSACTION_RECEIPT', transactionId, receipt})
       })
       .on('error', error => {
-        console.error(error)
         const txObject = { type: 'TRANSACTION_ERROR', transactionId, error }
         const gasUsed = error.message.match(/"gasUsed": ([0-9]*)/)
 
@@ -45,28 +44,14 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
   })
 }
 
-// function estimateGas(func) {
-//   console.log('estimateGas')
-//   return func.estimateGas().then((error, result) => {
-//     console.log(error)
-//     if (error) { return }
-//     debugger
-//     return result
-//   } )
-// }
-
 export function* web3Send({ transactionId, call, options }) {
   const { address, method, args } = call
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
-<<<<<<< HEAD
     options = Object.assign({
-=======
-    console.log(options)
-    options = options || {
->>>>>>> * up the gasLimit when retrying transactions
       from: account
     }, options || {})
+
     const contractRegistry = yield getContext('contractRegistry')
     const web3 = yield getContext('web3')
     const contractKey = yield select(contractKeyByAddress, address)

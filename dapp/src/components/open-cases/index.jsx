@@ -49,32 +49,7 @@ function* saga({ account, CaseManager, AccountManager }) {
   }
 }
 
-<<<<<<< HEAD
 export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager'] })(withSend(class _OpenCases extends Component {
-=======
-export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager', 'AccountManager'] })(withSend(class _OpenCases extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      showPublicKeyModal: false
-    }
-  }
-
-  handleRequestCase = (e) => {
-    const { send, CaseManager, publicKey } = this.props
-    if (isBlank(publicKey)) {
-      this.setState({
-        showPublicKeyModal: true
-      })
-    } else {
-      send(CaseManager, 'requestNextCase')({
-        from: this.props.account,
-        gasMultiplier: 1.2
-      })
-    }
-  }
-
->>>>>>> * parking this here for now
   render () {
     let caseKeys = keys(this.props.cases)
     let cases = caseKeys.reverse().map((key) => this.props.cases[key])

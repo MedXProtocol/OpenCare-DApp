@@ -84,14 +84,9 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
 
 
           if (error) {
-            const options = {
-              from: this.props.account
-            }
-            console.log(gasUsed)
+            const options = {}
             if (gasUsed)
-              options['gasMultiplier'] = 1.2 * gasUsed
-
-            console.log(options['gasMultiplier'])
+              options['gas'] = parseInt(1.2 * gasUsed, 10)
 
             var code = transactionErrorToCode(error)
             if (code) {
