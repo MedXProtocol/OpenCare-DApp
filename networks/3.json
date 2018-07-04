@@ -3,47 +3,47 @@
   "contracts": [
     {
       "contractName": "Migrations",
-      "address": "0xfe5fe8f741bc10b5bd3238b499520cb05b7d26b3"
+      "address": "0x348ba4db6360d57e82f0e195ef3edb477cdc9fe4"
     },
     {
       "contractName": "Registry",
-      "address": "0x99afd1e36f0dffb1a53568feb62d9503e98cd7f7"
+      "address": "0xde6a11f06a392e5548da1fe9ef45f3af23b2ee35"
     },
     {
       "contractName": "MedXToken",
-      "address": "0x785b6ad2d7a77323970345448dce6e9f60b915de"
+      "address": "0xacb8368f96807e10a7407517b066d0919ad9150e"
     },
     {
       "contractName": "AccountManager",
-      "address": "0x25016c2b457a93d13bbfcf21d2b204749200cf1b"
+      "address": "0x13d5828bb8478f9cb48520a86436f9ad37a2f044"
     },
     {
       "contractName": "Delegate",
-      "address": "0x0f853ee6edfcb2463026a2ab4206af1fcdce139c"
+      "address": "0xe82c7dde85e1a1cafa0e3852b06c3e2b9dd39bf7"
     },
     {
       "contractName": "SkipList",
-      "address": "0x07de78c3f32235788b916165970e2d0b3eca400f"
+      "address": "0x4d94b8eb07622e62ed4368feaa9ddbcbb1662752"
     },
     {
       "contractName": "CaseManager",
-      "address": "0x5a5f5cd1be5e2f23c10904f5fa3243711b297f1d"
+      "address": "0xf0ac3836e856cc0544a3d31032658cd218ee64d3"
     },
     {
       "contractName": "Delegate",
-      "address": "0x53e28762310b10118640f9692fe4bbb367f44005"
+      "address": "0x4ff424c64ed649889ef99988429bbdd1c1320033"
     },
     {
       "contractName": "DoctorManager",
-      "address": "0x896c3f0ebdce63f66c0eeaf3f905ff3a66fff13f"
+      "address": "0x211218be8fa7af82c54ecf206d75675112d3fe15"
     },
     {
       "contractName": "Delegate",
-      "address": "0x1ab63776670aa950c23917f4daabc3067009f425"
+      "address": "0x5eb98fd28ec003cb27b42daae5aecdec6e696886"
     },
     {
       "contractName": "Case",
-      "address": "0xa911ac2618478056ca7092cfb66e3aa2bbcd178f"
+      "address": "0xa221c304298451c4ba63ec8d499f128b4f243639"
     }
   ]
 }
