@@ -121,14 +121,12 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     })
   }
 
-  handleCloseThankYouModal = (event) => {
-    event.preventDefault()
+  handleCloseThankYouModal = () => {
     this.setState({showThankYouModal: false})
     this.props.history.push(routes.PATIENTS_CASES)
   }
 
-  handleCloseChallengeModal = (event) => {
-    event.preventDefault()
+  handleCloseChallengeModal = () => {
     this.setState({
       showChallengeModal: false,
       selectedDoctor: null,
