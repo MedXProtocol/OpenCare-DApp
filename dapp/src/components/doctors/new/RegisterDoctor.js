@@ -6,11 +6,13 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
 import get from 'lodash.get'
 import sortBy from 'lodash.sortby'
+import { isBlank } from '~/utils/isBlank'
 import { withSend, withSaga, cacheCallValue, cacheCall } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
+  const AccountManager = contractByName(state, 'AccountManager')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const doctorCount = cacheCallValue(state, DoctorManager, 'doctorCount')
   const doctors = []
@@ -20,11 +22,13 @@ function mapStateToProps(state) {
       doctorIndex: i,
       name: cacheCallValue(state, DoctorManager, 'doctorNames', i),
       isActive: cacheCallValue(state, DoctorManager, 'isActive', address),
+      publicKey: cacheCallValue(state, AccountManager, 'publicKeys', address),
       address
     })
   }
 
   return {
+    AccountManager,
     account,
     DoctorManager,
     doctorCount,
@@ -32,20 +36,21 @@ function mapStateToProps(state) {
   }
 }
 
-function* saga({ DoctorManager }) {
-  if (!DoctorManager) { return }
+function* saga({ DoctorManager, AccountManager }) {
+  if (!DoctorManager || !AccountManager) { return }
   const doctorCount = yield cacheCall(DoctorManager, 'doctorCount')
   for (var i = 0; i < doctorCount; i++) {
     const address = yield cacheCall(DoctorManager, 'doctorAddresses', i)
     yield cacheCall(DoctorManager, 'doctorNames', i)
     yield cacheCall(DoctorManager, 'isActive', address)
+    yield cacheCall(AccountManager, 'publicKeys', address)
   }
 }
 
 export const RegisterDoctorContainer =
   withSend(
     connect(mapStateToProps)(
-      withSaga(saga, { propTriggers: ['doctorCount', 'DoctorManager', 'isActive']})(
+      withSaga(saga, { propTriggers: ['doctorCount', 'DoctorManager', 'AccountManager', 'isActive']})(
         class _DoctorSelect extends Component {
 
           constructor(props){
@@ -133,7 +138,7 @@ export const RegisterDoctorContainer =
                 </div>
 
                 <div className="row">
-                  <div className="col-xs-12 col-sm-10 col-sm-offset-1">
+                  <div className="col-xs-12">
                     <div className="card">
                       <div className="card-body table-responsive">
                         <table className="table table-striped">
@@ -141,6 +146,7 @@ export const RegisterDoctorContainer =
                             <tr>
                               <th>Doctor Address</th>
                               <th>Doctor Name</th>
+                              <th>Public Key Set?</th>
                               <th className="text-right">
                                 <FontAwesomeIcon icon={faEdit} />
                               </th>
@@ -148,7 +154,7 @@ export const RegisterDoctorContainer =
                           </thead>
                           <tbody>
                             <TransitionGroup component={null}>
-                              {doctors.map(({isActive, address, name, doctorIndex}) => {
+                              {doctors.map(({publicKey, isActive, address, name, doctorIndex}) => {
                                 return (
                                   <CSSTransition
                                     key={`doctor-row-transition-${doctorIndex}`}
@@ -163,6 +169,9 @@ export const RegisterDoctorContainer =
                                         </td>
                                         <td width="30%" className="td--status">
                                           {name}
+                                        </td>
+                                        <td>
+                                          {isBlank(publicKey) ? 'No' : 'Yes'}
                                         </td>
                                         <td width="20%" className="td-actions text-right">
                                           { isActive ? (

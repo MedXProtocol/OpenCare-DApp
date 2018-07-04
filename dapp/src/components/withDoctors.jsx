@@ -15,6 +15,7 @@ function mapStateToProps(state, ownProps) {
     if (address) {
       doctors.push({
         name: cacheCallValue(state, DoctorManager, 'doctorNames', i),
+        isActive: cacheCallValue(state, DoctorManager, 'isActive', address),
         address,
         publicKey: cacheCallValue(state, AccountManager, 'publicKeys', address)
       })
@@ -34,6 +35,7 @@ function* saga({ DoctorManager, AccountManager }) {
   for (var i = 0; i < doctorCount; i++) {
     const address = yield cacheCall(DoctorManager, 'doctorAddresses', i)
     yield cacheCall(DoctorManager, 'doctorNames', i)
+    yield cacheCall(DoctorManager, 'isActive', address)
     yield cacheCall(AccountManager, 'publicKeys', address)
   }
 }
@@ -50,8 +52,11 @@ export function withDoctors(WrappedComponent) {
             const includedDoctors = []
             const excludedDoctors = []
             this.props.doctors.forEach(doctor => {
-              if (!isBlank(doctor.publicKey) &&
-                  this.props.excludeAddresses.indexOf(doctor.address) === -1) {
+              if (
+                doctor.isActive &&
+                !isBlank(doctor.publicKey) &&
+                this.props.excludeAddresses.indexOf(doctor.address) === -1
+              ) {
                 includedDoctors.push(doctor)
               } else {
                 excludedDoctors.push(doctor)

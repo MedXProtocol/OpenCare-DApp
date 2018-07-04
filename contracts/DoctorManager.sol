@@ -60,7 +60,7 @@ contract DoctorManager is Ownable, Initializable {
   function isDoctor(address _doctor) public view returns (bool) {
     require(_doctor != address(0));
     uint256 index = doctorIndices[_doctor];
-    return doctorAddresses[index] == _doctor;
+    return (doctorAddresses[index] == _doctor) && isActive(_doctor);
   }
 
   function isActive(address _doctor) public view returns (bool) {

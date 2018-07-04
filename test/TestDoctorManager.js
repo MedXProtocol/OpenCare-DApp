@@ -47,9 +47,11 @@ contract('DoctorManager', function (accounts) {
     it('should work', async () => {
       await doctorManager.addOrReactivateDoctor(doctor3, 'Howser')
       assert.equal(await doctorManager.isActive(doctor3), true)
+      assert.equal(await doctorManager.isDoctor(doctor3), true)
 
       await doctorManager.deactivateDoctor(doctor3)
       assert.equal(await doctorManager.isActive(doctor3), false)
+      assert.equal(await doctorManager.isDoctor(doctor3), false)
     })
 
     it('should not work on non-doctor', async () => {
