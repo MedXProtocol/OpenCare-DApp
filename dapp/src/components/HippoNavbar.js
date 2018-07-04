@@ -47,6 +47,7 @@ function mapStateToProps (state) {
     isDoctor,
     networkId,
     DoctorManager,
+    MedXToken,
     signedIn,
     canRegister
   }
