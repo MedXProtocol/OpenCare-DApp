@@ -71,7 +71,6 @@ export const RegisterDoctorContainer = withContractRegistry(connect(mapStateToPr
                             placeholder='Dr. Wexler'
                             onChange={(e) => this.setState({name: e.target.value})}
                             id="name"
-                            onChange={this.updateAddress}
                             required
                           />
                         </div>
