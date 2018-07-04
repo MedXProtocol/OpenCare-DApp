@@ -72,7 +72,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
   }
 
   signOut () {
-    setRequestedPathname(routes.PATIENTS_CASES)
+    this.skipRequestedPathname = true
     this.props.signOut()
   }
 
@@ -80,7 +80,11 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
     const requestedPathname = getRequestedPathname()
     if (this.props.isSignedIn &&
         requestedPathname) {
-      var redirect = <Redirect to={requestedPathname} />
+      if (this.skipRequestedPathname) {
+        this.skipRequestedPathname = false
+      } else {
+        var redirect = <Redirect to={requestedPathname} />
+      }
       setRequestedPathname('')
     }
 
