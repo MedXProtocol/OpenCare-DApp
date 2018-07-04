@@ -21,8 +21,8 @@ contract('CaseManager', function (accounts) {
   before(async () => {
     env = await createEnvironment(artifacts)
     await env.medXToken.mint(patient, 1000000000000)
-    await env.doctorManager.addDoctor(doctor, 'Dr. Octagon')
-    await env.doctorManager.addDoctor(doctor2, 'Dr. Zaius')
+    await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr. Octagon')
+    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Zaius')
   })
 
   beforeEach(async () => {

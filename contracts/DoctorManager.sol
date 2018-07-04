@@ -10,15 +10,30 @@ contract DoctorManager is Ownable, Initializable {
 
   uint256 public doctorCount;
 
+  mapping (uint256 => bool) public doctorDeactivated;
+
   event AddDoctor(address indexed doctor);
+  event DoctorDeactivated(address indexed doctor);
+  event DoctorReactivated(address indexed doctor);
 
   function initialize () notInitialized {
     setInitialized();
     owner = msg.sender;
   }
 
-  function addDoctor(address _doctor, string _name) public onlyOwner {
+  function addOrReactivateDoctor(address _doctor, string _name) public onlyOwner {
     require(_doctor != address(0));
+    uint256 index = doctorIndices[_doctor];
+    address doctorAddress = doctorAddresses[index];
+
+    if (doctorAddress != 0) {
+      reactivateDoctor(_doctor, _name);
+    } else {
+      addDoctor(_doctor, _name);
+    }
+  }
+
+  function addDoctor(address _doctor, string _name) private onlyOwner {
     require(!isDoctor(_doctor));
     doctorIndices[_doctor] = doctorCount;
     doctorAddresses[doctorCount] = _doctor;
@@ -27,10 +42,32 @@ contract DoctorManager is Ownable, Initializable {
     emit AddDoctor(_doctor);
   }
 
+  function reactivateDoctor(address _doctor, string _name) private onlyOwner {
+    require(!isActive(_doctor));
+    uint256 index = doctorIndices[_doctor];
+    doctorDeactivated[index] = false;
+    doctorNames[index] = _name;
+    emit DoctorReactivated(_doctor);
+  }
+
+  function deactivateDoctor(address _doctor) public onlyOwner {
+    require(_doctor != address(0));
+    require(isActive(_doctor));
+    uint256 index = doctorIndices[_doctor];
+    doctorDeactivated[index] = true;
+    emit DoctorDeactivated(_doctor);
+  }
+
   function isDoctor(address _doctor) public view returns (bool) {
     require(_doctor != address(0));
     uint256 index = doctorIndices[_doctor];
     return doctorAddresses[index] == _doctor;
+  }
+
+  function isActive(address _doctor) public view returns (bool) {
+    require(_doctor != address(0));
+    uint256 index = doctorIndices[_doctor];
+    return !doctorDeactivated[index];
   }
 
   function name(address _doctor) public view returns (string) {
