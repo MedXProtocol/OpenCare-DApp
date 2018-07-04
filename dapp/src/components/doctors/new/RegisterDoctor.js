@@ -5,7 +5,7 @@ import { EthAddress } from '~/components/EthAddress'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
-import { withSaga, cacheCallValue, cacheCall } from '~/saga-genesis'
+import { withSend, withSaga, cacheCallValue, cacheCall } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 
 function mapStateToProps(state) {
@@ -17,6 +17,7 @@ function mapStateToProps(state) {
     const address = cacheCallValue(state, DoctorManager, 'doctorAddresses', i)
     doctors.push({
       name: cacheCallValue(state, DoctorManager, 'doctorNames', i),
+      isActive: cacheCallValue(state, DoctorManager, 'isActive', address),
       address
     })
   }
@@ -33,152 +34,171 @@ function* saga({ DoctorManager }) {
   if (!DoctorManager) { return }
   const doctorCount = yield cacheCall(DoctorManager, 'doctorCount')
   for (var i = 0; i < doctorCount; i++) {
-    yield cacheCall(DoctorManager, 'doctorAddresses', i)
+    const address = yield cacheCall(DoctorManager, 'doctorAddresses', i)
     yield cacheCall(DoctorManager, 'doctorNames', i)
+    yield cacheCall(DoctorManager, 'isActive', address)
   }
 }
 
 export const RegisterDoctorContainer =
-  connect(mapStateToProps)(
-    withSaga(saga, { propTriggers: ['doctorCount', 'DoctorManager']})(
-      class _DoctorSelect extends Component {
+  withSend(
+    connect(mapStateToProps)(
+      withSaga(saga, { propTriggers: ['doctorCount', 'DoctorManager', 'isActive']})(
+        class _DoctorSelect extends Component {
 
-        constructor(props){
-          super(props)
-          this.state = {
-            address: this.props.account || '',
-            name: '',
-            submitInProgress: false
+          constructor(props){
+            super(props)
+            this.state = {
+              address: this.props.account || '',
+              name: '',
+              submitInProgress: false
+            }
           }
-        }
 
-        handleSubmit = (event) => {
-          event.preventDefault()
-          this.registerDoctor()
-        }
-
-        handleRemove = (event) => {
-          event.preventDefault()
-          this.deactivateDoctor()
-        }
-
-        registerDoctor = () => {
-          const { DoctorManager, send } = this.props
-          send(DoctorManager, 'addOrReactivateDoctor', this.state.address, this.state.name)()
-        }
-
-        deactivateDoctor = () => {
-          const { DoctorManager, send } = this.props
-          send(DoctorManager, 'deactivateDoctor', this.state.address)()
-        }
-
-        componentWillReceiveProps (props) {
-          if (!this.props.account && props.account) {
-            this.setState({address: props.account})
+          handleAdd = (event) => {
+            event.preventDefault()
+            this.registerDoctor()
           }
-        }
 
-        render() {
-          return (
-            <div className="container">
-              <div className="row">
-                <div className="col-xs-12 col-sm-6 col-sm-offset-3">
-                  <div className="card">
-                    <div className="card-header">
-                      <h4 className="title card-title">
-                        Register a new Doctor
-                      </h4>
-                    </div>
-                    <div className="card-body">
-                      <div className="form-wrapper">
-                        <form onSubmit={this.handleSubmit}>
-                          <div className="form-group">
-                            <label htmlFor="address">Address</label>
-                            <input
-                              id="address"
-                              className="form-control"
-                              placeholder="0x000000000000000000000000000"
-                              onChange={(e) => this.setState({address: e.target.value})}
-                              required
-                            />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="name">Name</label>
-                            <input
-                              className="form-control"
-                              value={this.state.name}
-                              placeholder='Dr. Wexler'
-                              onChange={(e) => this.setState({name: e.target.value})}
-                              id="name"
-                              required
-                            />
-                          </div>
-                          <div className="text-right">
-                            <button type="submit" className="btn btn-success btn-default">Register</button>
-                          </div>
-                        </form>
+          handleDeactivate = (event) => {
+            event.preventDefault()
+            this.deactivateDoctor()
+          }
+
+          registerDoctor = () => {
+            const { DoctorManager, send } = this.props
+            send(DoctorManager, 'addOrReactivateDoctor', this.state.address, this.state.name)()
+          }
+
+          deactivateDoctor = () => {
+            const { DoctorManager, send } = this.props
+            send(DoctorManager, 'deactivateDoctor', this.state.address)()
+          }
+
+          componentWillReceiveProps (props) {
+            if (!this.props.account && props.account) {
+              this.setState({address: props.account})
+            }
+          }
+
+          render() {
+            return (
+              <div className="container">
+                <div className="row">
+                  <div className="col-xs-12 col-sm-6 col-sm-offset-3">
+                    <div className="card">
+                      <div className="card-header">
+                        <h4 className="title card-title">
+                          Register a new Doctor
+                        </h4>
+                      </div>
+                      <div className="card-body">
+                        <div className="form-wrapper">
+                          <form onSubmit={this.handleAdd}>
+                            <div className="form-group">
+                              <label htmlFor="address">Address</label>
+                              <input
+                                id="address"
+                                className="form-control"
+                                placeholder="0x000000000000000000000000000"
+                                onChange={(e) => this.setState({address: e.target.value})}
+                                required
+                              />
+                            </div>
+                            <div className="form-group">
+                              <label htmlFor="name">Name</label>
+                              <input
+                                className="form-control"
+                                value={this.state.name}
+                                placeholder='Dr. Wexler'
+                                onChange={(e) => this.setState({name: e.target.value})}
+                                id="name"
+                                required
+                              />
+                            </div>
+                            <div className="text-right">
+                              <button type="submit" className="btn btn-success btn-default">Register</button>
+                            </div>
+                          </form>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="row">
-                <div className="col-xs-12 col-sm-10 col-sm-offset-1">
-                  <div className="card">
-                    <div className="card-body table-responsive">
+                <div className="row">
+                  <div className="col-xs-12 col-sm-10 col-sm-offset-1">
+                    <div className="card">
+                      <div className="card-body table-responsive">
 
-                      <table className="table table-striped">
-                        <thead>
-                          <tr>
-                            <th>Doctor Address</th>
-                            <th>Doctor Name</th>
-                            <th className="text-right">
-                              <FontAwesomeIcon icon={faEdit} />
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <TransitionGroup component={null}>
-                            {this.props.doctors.map(({address, name, doctorIndex}) => {
-                              return (
-                                <CSSTransition
-                                  key={doctorIndex}
-                                  timeout={100}
-                                  appear={true}
-                                  classNames="fade">
-                                    <tr key={doctorIndex}>
-                                      <td className="eth-address text">
-                                        <span>
-                                          <EthAddress address={address}  />
-                                        </span>
-                                      </td>
-                                      <td width="15%" className="td--status">
-                                        {name}
-                                      </td>
-                                      <td width="15%" className="td-actions text-right">
-                                        <a
-                                          onClick={this.handleRemove}
-                                          className="btn btn-sm btn-info"
-                                        >
-                                          Remove
-                                        </a>
-                                      </td>
-                                    </tr>
-                                </CSSTransition>
-                              )
-                            })}
-                          </TransitionGroup>
-                        </tbody>
-                      </table>
+                        <table className="table table-striped">
+                          <thead>
+                            <tr>
+                              <th>Doctor Address</th>
+                              <th>Doctor Name</th>
+                              <th className="text-right">
+                                <FontAwesomeIcon icon={faEdit} />
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <TransitionGroup component={null}>
+                              {this.props.doctors.map(({isActive, address, name, doctorIndex}) => {
+                                return (
+                                  <CSSTransition
+                                    key={`doctor-row-transition-${doctorIndex}`}
+                                    timeout={100}
+                                    appear={true}
+                                    classNames="fade">
+                                      <tr key={`doctor-row-${doctorIndex}`} className={!isActive ? 'deactivated' : ''}>
+                                        <td width="50%" className="eth-address text">
+                                          <span>
+                                            <EthAddress address={address} showFull={true} />
+                                          </span>
+                                        </td>
+                                        <td width="30%" className="td--status">
+                                          {name}
+                                        </td>
+                                        <td width="20%" className="td-actions text-right">
+                                          { isActive ? (
+                                              <a
+                                                onClick={this.handleDeactivate}
+                                                className="btn btn-xs btn-info"
+                                              >
+                                                Deactivate
+                                              </a>
+                                            ) : (
+                                              <a
+                                                onClick={(event) => {
+                                                  event.preventDefault()
+                                                  this.setState({
+                                                    name: name,
+                                                    address: address
+                                                  }, this.handleAdd)
+                                                }}
+                                                className="btn btn-xs btn-default"
+                                              >
+                                                Reactivate
+                                              </a>
+                                            )
+                                          }
+                                        </td>
+                                      </tr>
+                                  </CSSTransition>
+                                )
+                              })}
+                            </TransitionGroup>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
 
+                  </div>
                 </div>
               </div>
-            </div>
-        )
-      }
-    }
+            )
+          }
+        }
+      )
+    )
   )
-)

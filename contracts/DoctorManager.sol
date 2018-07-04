@@ -22,11 +22,10 @@ contract DoctorManager is Ownable, Initializable {
   }
 
   function addOrReactivateDoctor(address _doctor, string _name) public onlyOwner {
-    require(_doctor != address(0));
+    require(_doctor != address(0), 'Doctor address provided is blank');
     uint256 index = doctorIndices[_doctor];
     address doctorAddress = doctorAddresses[index];
-
-    if (doctorAddress != 0) {
+    if (_doctor == doctorAddress) {
       reactivateDoctor(_doctor, _name);
     } else {
       addDoctor(_doctor, _name);
@@ -34,7 +33,7 @@ contract DoctorManager is Ownable, Initializable {
   }
 
   function addDoctor(address _doctor, string _name) private onlyOwner {
-    require(!isDoctor(_doctor));
+    require(!isDoctor(_doctor), "Address provided is already a doctor");
     doctorIndices[_doctor] = doctorCount;
     doctorAddresses[doctorCount] = _doctor;
     doctorNames[doctorCount] = _name;
@@ -43,7 +42,7 @@ contract DoctorManager is Ownable, Initializable {
   }
 
   function reactivateDoctor(address _doctor, string _name) private onlyOwner {
-    require(!isActive(_doctor));
+    require(!isActive(_doctor), "Address provided is already activated, cannot reactivate");
     uint256 index = doctorIndices[_doctor];
     doctorDeactivated[index] = false;
     doctorNames[index] = _name;

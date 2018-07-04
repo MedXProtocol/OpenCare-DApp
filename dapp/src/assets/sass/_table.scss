@@ -40,3 +40,12 @@
 .td--status {
   min-width: 150px;
 }
+
+.deactivated {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.deactivated .address__full {
+  text-decoration: line-through;
+}
