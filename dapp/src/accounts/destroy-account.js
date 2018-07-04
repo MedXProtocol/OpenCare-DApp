@@ -1,8 +1,8 @@
-import Cookie from 'js-cookie'
 import { KEY_STORE } from '~/accounts/constants'
+import { setCookie } from '~/services/setCookie'
 
 export function destroyAccount(address) {
   const keyStore = Cookie.getJSON(KEY_STORE) || {}
   delete keyStore[address]
-  Cookie.set(KEY_STORE, keyStore)
+  setCookie(KEY_STORE, keyStore)
 }

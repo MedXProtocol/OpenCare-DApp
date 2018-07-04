@@ -61,19 +61,25 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
 
   onAccountChangeSignOut (nextProps) {
     if (this.props.address && this.props.address !== nextProps.address) {
-      this.props.signOut()
+      this.signOut()
     }
   }
 
   unload = () => {
     if (process.env.NODE_ENV !== 'development') {
-      this.props.signOut()
+      this.signOut()
     }
+  }
+
+  signOut () {
+    setRequestedPathname(routes.PATIENTS_CASES)
+    this.props.signOut()
   }
 
   render () {
     const requestedPathname = getRequestedPathname()
-    if (this.props.isSignedIn && requestedPathname) {
+    if (this.props.isSignedIn &&
+        requestedPathname) {
       var redirect = <Redirect to={requestedPathname} />
       setRequestedPathname('')
     }
