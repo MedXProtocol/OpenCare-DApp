@@ -76,9 +76,6 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
       address: this.props.address,
       overrideAccount
     })
-    this.setState({
-      signingIn: false
-    })
   }
 
   componentWillReceiveProps(nextProps) {
