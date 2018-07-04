@@ -64,10 +64,6 @@ export async function downloadImage(hash, encryptionKey) {
   });
 }
 
-export function getFileUrl(hash) {
-    return 'https://ipfs.infura.io/ipfs/' + hash;
-}
-
 function promisifyFileReader(fileReader, file){
     return new Promise((resolve, reject) => {
         fileReader.onloadend = resolve;  // CHANGE to whatever function you want which would eventually call resolve
