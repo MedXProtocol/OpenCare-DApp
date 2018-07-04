@@ -54,21 +54,23 @@ export const RegisterDoctorContainer = withContractRegistry(connect(mapStateToPr
                     <div className="form-wrapper">
                       <form onSubmit={this.handleSubmit}>
                         <div className="form-group">
-                          <label htmlFor="hash">Address</label>
+                          <label htmlFor="address">Address</label>
                           <input
+                            id="address"
                             className="form-control"
-                            value={this.state.address}
+                            placeholder="0x000000000000000000000000000"
                             onChange={(e) => this.setState({address: e.target.value})}
                             required
                           />
                         </div>
                         <div className="form-group">
-                          <label htmlFor="hash">Name</label>
+                          <label htmlFor="name">Name</label>
                           <input
                             className="form-control"
                             value={this.state.name}
                             placeholder='Dr. Wexler'
                             onChange={(e) => this.setState({name: e.target.value})}
+                            id="name"
                             required
                           />
                         </div>
