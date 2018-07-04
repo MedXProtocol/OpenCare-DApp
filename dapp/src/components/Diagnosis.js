@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
+import { isTrue } from '~/utils/isTrue'
 import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -16,6 +17,7 @@ import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
+import { DoctorRandomizer } from '~/components/DoctorRandomizer'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -105,6 +107,13 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
           })
         })
     }
+  }
+
+  onChangeDoctor = (option) => {
+    this.setState({
+      selectedDoctor: option,
+      doctorAddressError: ''
+    })
   }
 
   handleAcceptDiagnosis = () => {
@@ -250,22 +259,27 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                     If the diagnosis is the same, you will be charged 15 MEDX.  If the diagnosis is different than the original then you'll be charged 5 MEDX and refunded the remainder.
                   </p>
                   <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>
-                    <label className='control-label'>Select Another Doctor</label>
-                    <DoctorSelect
-                      excludeDoctorAddresses={[this.props.diagnosingDoctor, this.props.account]}
-                      value={this.state.selectedDoctor}
-                      onChange={(option) => {
-                        this.setState({
-                          selectedDoctor: option,
-                          doctorAddressError: ''
-                        })
-                      }}
-                      required />
-                    {!this.state.doctorAddressError ||
-                      <p className='help-block has-error'>
-                        {this.state.doctorAddressError}
-                      </p>
-                    }
+                    {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
+                      ?
+                      <div>
+                        <label className='control-label'>Select Another Doctor</label>
+                        <DoctorSelect
+                          excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
+                          value={this.state.selectedDoctor}
+                          isClearable={false}
+                          onChange={this.onChangeDoctor} />
+                        {!this.state.doctorAddressError ||
+                          <p className='help-block has-error'>
+                            {this.state.doctorAddressError}
+                          </p>
+                        }
+                      </div>
+                      :
+                      <DoctorRandomizer
+                        excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
+                        value={this.state.selectedDoctor}
+                        onChange={this.onChangeDoctor} />
+                     }
                   </div>
                 </div>
               </div>
