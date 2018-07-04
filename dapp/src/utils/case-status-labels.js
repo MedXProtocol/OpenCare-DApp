@@ -7,7 +7,7 @@ export function caseStatusToName(status) {
     4: 'Closed',
     5: 'Challenged',
     6: 'Challenging',
-    7: 'Diagnosis Rejected',
+    7: 'Diagnosis Received',
     8: 'Diagnosis Confirmed'
   }
   return statuses[status]
@@ -22,7 +22,7 @@ export function caseStatusToClass(status) {
     4: 'default',
     5: 'warning',
     6: 'info',
-    7: 'warning',
+    7: 'success',
     8: 'success'
   }
   return statuses[status]
