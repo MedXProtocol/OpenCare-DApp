@@ -17,7 +17,7 @@ export const FourOhFour = connect(mapStateToProps)(
       let dynamicHomePath = this.props.signedIn ? routes.PATIENTS_CASES : routes.HOME
 
       return (
-        <MainLayoutContainer>
+        <MainLayoutContainer doBetaFaucetModal={false}>
           <div className='container'>
             <div className="card">
               <div className="row">

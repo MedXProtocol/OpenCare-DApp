@@ -109,7 +109,7 @@ export const SignUp = class _SignUp extends Component {
       content = <SecretKeyContainer secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
     }
     return (
-      <MainLayoutContainer>
+      <MainLayoutContainer doBetaFaucetModal={false}>
         {content}
         <OverrideDisallowedModal
           show={this.state.showOverrideModal || !!this.props.overrideError}

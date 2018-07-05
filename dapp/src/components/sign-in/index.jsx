@@ -140,7 +140,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
     }
     return (
       <BodyClass isDark={true}>
-        <MainLayoutContainer>
+        <MainLayoutContainer doBetaFaucetModal={false}>
           <div className='container'>
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>

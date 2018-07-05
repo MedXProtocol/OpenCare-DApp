@@ -4,6 +4,7 @@ import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { withSaga } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { Modal } from 'react-bootstrap'
+import { currentAccount } from '~/services/sign-in'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { isBlank } from '~/utils/isBlank'
@@ -38,20 +39,21 @@ export const BetaFaucetModal = connect(mapStateToProps)(
         }
       }
 
-      async componentWillReceiveProps(nextProps) {
-        if (!isBlank(nextProps.address)) {
-          await getWeb3().eth.getBalance(nextProps.address).then(balance => {
-            this.setState({
-              ethBalance: parseFloat(getWeb3().utils.fromWei(balance, 'ether'))
-            })
+      async componentDidMount() {
+        const address = currentAccount().address()
+        await getWeb3().eth.getBalance(address).then(balance => {
+          this.setState({
+            ethBalance: parseFloat(getWeb3().utils.fromWei(balance, 'ether'))
           })
-        }
+        })
       }
 
       render() {
         let content
         let showBetaFaucetModal = false
         const { ethBalance } = this.state
+
+        console.log(ethBalance)
 
         if (this.props.isOwner) {
           return
