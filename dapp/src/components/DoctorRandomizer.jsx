@@ -23,7 +23,7 @@ export const DoctorRandomizer =
         // if the doctor hasn't been set and if we have all the doctors
         if (!props.value &&
             props.includedDoctors.length > 0 &&
-            props.includedDoctors.length + props.excludedDoctors.length === +props.doctorCount) {
+            props.includedDoctors.length + props.excludedDoctors.length === +(props.doctorCount - 1)) {
           // pick a random one
           const doctorIndex = parseInt(Math.random() * props.includedDoctors.length, 10)
           const doctor = props.includedDoctors[doctorIndex]

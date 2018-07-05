@@ -10,7 +10,8 @@ function mapStateToProps(state, ownProps) {
   const AccountManager = contractByName(state, 'AccountManager')
   const doctorCount = cacheCallValue(state, DoctorManager, 'doctorCount')
   const doctors = []
-  for (var i = 0; i < doctorCount; i++) {
+  // doctorCount at 0 is empty records because Solidity, start at 1
+  for (var i = 1; i < doctorCount; i++) {
     const address = cacheCallValue(state, DoctorManager, 'doctorAddresses', i)
     if (address) {
       doctors.push({
@@ -33,7 +34,8 @@ function mapStateToProps(state, ownProps) {
 function* saga({ DoctorManager, AccountManager }) {
   if (!DoctorManager || !AccountManager) { return }
   const doctorCount = yield cacheCall(DoctorManager, 'doctorCount')
-  for (var i = 0; i < doctorCount; i++) {
+  // doctorCount at 0 is empty records because Solidity, start at 1
+  for (var i = 1; i < doctorCount; i++) {
     const address = yield cacheCall(DoctorManager, 'doctorAddresses', i)
     yield cacheCall(DoctorManager, 'doctorNames', i)
     yield cacheCall(DoctorManager, 'isActive', address)
