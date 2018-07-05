@@ -50,27 +50,27 @@ contract DoctorManager is Ownable, Initializable {
   }
 
   function deactivateDoctor(address _doctor) public onlyOwner {
-    require(_doctor != address(0));
-    require(isActive(_doctor));
+    require(_doctor != address(0), 'Doctor address provided is blank');
+    require(isActive(_doctor), 'Doctor is not active');
     uint256 index = doctorIndices[_doctor];
     doctorDeactivated[index] = true;
     emit DoctorDeactivated(_doctor);
   }
 
   function isDoctor(address _doctor) public view returns (bool) {
-    require(_doctor != address(0));
+    require(_doctor != address(0), 'Doctor address provided is blank');
     uint256 index = doctorIndices[_doctor];
-    return (doctorAddresses[index] == _doctor) && isActive(_doctor);
+    return isActive(_doctor);
   }
 
   function isActive(address _doctor) public view returns (bool) {
-    require(_doctor != address(0));
+    require(_doctor != address(0), 'Doctor address provided is blank');
     uint256 index = doctorIndices[_doctor];
-    return !doctorDeactivated[index];
+    return (doctorAddresses[index] == _doctor) && !doctorDeactivated[index];
   }
 
   function name(address _doctor) public view returns (string) {
-    require(_doctor != address(0));
+    require(_doctor != address(0), 'Doctor address provided is blank');
     uint256 index = doctorIndices[_doctor];
     return doctorNames[index];
   }
