@@ -7,7 +7,6 @@ import { Modal } from 'react-bootstrap'
 import { currentAccount } from '~/services/sign-in'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
-import { isBlank } from '~/utils/isBlank'
 import { EthFaucetAPI } from '~/components/welcome/EthFaucetAPI'
 
 function mapStateToProps (state) {
@@ -39,13 +38,17 @@ export const BetaFaucetModal = connect(mapStateToProps)(
         }
       }
 
-      async componentDidMount() {
+      getEtherBalance = () => {
         const address = currentAccount().address()
-        await getWeb3().eth.getBalance(address).then(balance => {
+        getWeb3().eth.getBalance(address).then(balance => {
           this.setState({
             ethBalance: parseFloat(getWeb3().utils.fromWei(balance, 'ether'))
           })
         })
+      }
+
+      componentDidMount() {
+        this.getEtherBalance()
       }
 
       render() {
@@ -59,7 +62,12 @@ export const BetaFaucetModal = connect(mapStateToProps)(
           return
         } else if (ethBalance !== undefined && ethBalance < 0.1) {
           showBetaFaucetModal = true
-          content = <EthFaucetAPI address={this.props.address} ethBalance={ethBalance} />
+          content = <EthFaucetAPI
+            onSuccess={this.getEtherBalance}
+            address={this.props.address}
+            ethBalance={ethBalance} />
+        } else {
+          showBetaFaucetModal = false
         }
 
         return (
