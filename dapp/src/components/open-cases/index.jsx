@@ -1,7 +1,7 @@
 import React, {
   Component
 } from 'react'
-import { MainLayoutContainer } from '~/layouts/MainLayout.js'
+import { MainLayoutContainer } from '~/layouts/MainLayout'
 import {
   Table
 } from 'react-bootstrap'
