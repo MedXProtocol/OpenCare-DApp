@@ -1,5 +1,5 @@
-import Cookie from 'js-cookie'
+import { setCookie } from '~/services/setCookie'
 
 export function setRequestedPathname(pathname) {
-  Cookie.set('last-requested-pathname', pathname, { expires: 999999 })
+  setCookie('last-requested-pathname', pathname)
 }
