@@ -10,6 +10,7 @@ contract('DoctorManager', function (accounts) {
 
   beforeEach(async () => {
     doctorManager = await DoctorManager.new()
+    await doctorManager.initialize()
   })
 
   describe('initialize()', () => {
@@ -18,25 +19,28 @@ contract('DoctorManager', function (accounts) {
         await doctorManager.initialize()
       })
     })
+
+    it('should set the values at 0', async () => {
+      assert.equal(await doctorManager.doctorCount.call(), 1)
+    })
   })
 
   describe('addOrReactivateDoctor()', () => {
     it('should work', async () => {
       await doctorManager.addOrReactivateDoctor(doctor, 'Doogie')
-      assert.equal(await doctorManager.doctorCount.call(), 1)
+      assert.equal(await doctorManager.doctorCount.call(), 2)
       assert.equal(await doctorManager.isDoctor(doctor), true)
-      assert.equal(await doctorManager.doctorNames.call(0), 'Doogie')
+      assert.equal(await doctorManager.doctorNames.call(1), 'Doogie')
       assert.equal(await doctorManager.name.call(doctor), 'Doogie')
 
       await doctorManager.addOrReactivateDoctor(doctor2, 'General Major')
-      assert.equal(await doctorManager.doctorCount.call(), 2)
+      assert.equal(await doctorManager.doctorCount.call(), 3)
       assert.equal(await doctorManager.isDoctor(doctor2), true)
-      assert.equal(await doctorManager.doctorNames.call(1), 'General Major')
+      assert.equal(await doctorManager.doctorNames.call(2), 'General Major')
       assert.equal(await doctorManager.name.call(doctor2), 'General Major')
     })
 
     it('should not allow double adds', async () => {
-      await doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Hibbert')
       expectThrow(async () => {
         await doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Hibbert')
       })
@@ -62,13 +66,13 @@ contract('DoctorManager', function (accounts) {
 
     it('should reactivate instead of add and update name', async () => {
       await doctorManager.addOrReactivateDoctor(doctor3, 'Howser')
-      assert.equal(await doctorManager.doctorCount.call(), 1)
+      assert.equal(await doctorManager.doctorCount.call(), 2)
 
       await doctorManager.deactivateDoctor(doctor3)
       assert.equal(await doctorManager.isActive(doctor3), false)
 
       await doctorManager.addOrReactivateDoctor(doctor3, 'Newby')
-      assert.equal(await doctorManager.doctorNames.call(0), 'Newby')
+      assert.equal(await doctorManager.doctorNames.call(1), 'Newby')
       assert.equal(await doctorManager.name.call(doctor3), 'Newby')
     })
   })
