@@ -23,9 +23,12 @@ export const EthFaucetAPI = class extends Component {
         </p>
         <hr />
         <p>
-          Looks like you're low on ether, which is necessary to use Hippocrates. Press the button below to have some sent to your account:
+          You're low on ether, which is necessary to use Hippocrates.
+          <br />Not to worry! We can have some sent to your account:
         </p>
-        <a onClick={this.handleSendEther} className="btn btn-primary">Send Me Ether</a>
+        <p>
+          <a onClick={this.handleSendEther} className="btn btn-lg btn-primary">Send Me Ether</a>
+        </p>
       </div>
     )
   }

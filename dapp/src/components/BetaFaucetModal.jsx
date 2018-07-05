@@ -77,7 +77,6 @@ export const BetaFaucetModal = connect(mapStateToProps)(
               </div>
             </Modal.Body>
             <Modal.Footer>
-              <button type="button" className="btn btn-primary">OK</button>
             </Modal.Footer>
           </Modal>
         );
