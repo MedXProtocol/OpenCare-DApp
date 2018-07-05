@@ -72,6 +72,7 @@ export const RegisterDoctorContainer =
                             <input
                               id="address"
                               className="form-control"
+                              value={this.state.address}
                               placeholder="0x000000000000000000000000000"
                               onChange={(e) => this.setState({address: e.target.value})}
                               required
