@@ -14,10 +14,11 @@ function mapStateToProps(state, ownProps) {
     const address = cacheCallValue(state, DoctorManager, 'doctorAddresses', i)
     if (address) {
       doctors.push({
+        doctorIndex: i,
         name: cacheCallValue(state, DoctorManager, 'doctorNames', i),
         isActive: cacheCallValue(state, DoctorManager, 'isActive', address),
-        address,
-        publicKey: cacheCallValue(state, AccountManager, 'publicKeys', address)
+        publicKey: cacheCallValue(state, AccountManager, 'publicKeys', address),
+        address
       })
     }
   }
@@ -43,7 +44,7 @@ function* saga({ DoctorManager, AccountManager }) {
 export function withDoctors(WrappedComponent) {
   return (
     connect(mapStateToProps)(
-      withSaga(saga, { propTriggers: ['doctorCount', 'DoctorManager', 'AccountManager'] })(
+      withSaga(saga, { propTriggers: ['doctorCount', 'DoctorManager', 'AccountManager', 'isActive'] })(
         class _withDoctors extends Component {
           static propTypes = {
             excludeAddresses: PropTypes.array
