@@ -12,25 +12,36 @@ import { EthFaucetAPI } from '~/components/welcome/EthFaucetAPI'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const MedXToken = contractByName(state, 'MedXToken')
   const DoctorManager = contractByName(state, 'DoctorManager')
+  const medXBalance = cacheCallValue(state, MedXToken, 'balanceOf', address)
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
   const ropsten = (state.sagaGenesis.network.networkId === 3)
 
+  const CaseManager = contractByName(state, 'CaseManager')
+  const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
+  const previousCase = (caseListCount > 0)
+
   return {
     address,
+    medXBalance,
     DoctorManager,
+    MedXToken,
     isOwner,
+    previousCase,
     ropsten
   }
 }
 
-function* saga({ DoctorManager, address }) {
-  if (!DoctorManager || !address) { return }
+function* saga({ CaseManager, MedXToken, DoctorManager, address }) {
+  if (!CaseManager || !MedXToken || !DoctorManager || !address) { return }
+  yield cacheCall(CaseManager, 'getPatientCaseListCount', address)
+  yield cacheCall(MedXToken, 'balanceOf', address)
   yield cacheCall(DoctorManager, 'owner')
 }
 
 export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['DoctorManager', 'address'] })(
+  withSaga(saga, { propTriggers: ['CaseManager', 'DoctorManager', 'MedXToken', 'address'] })(
     class extends Component {
 
       constructor(props) {
@@ -68,11 +79,15 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
         let content
         let showBetaFaucetModal = false
         const { ethBalance } = this.state
-        const { ropsten, isOwner, address } = this.props
+        const { medXBalance, previousCase, ropsten, isOwner, address } = this.props
 
         // console.log(ethBalance)
-
         if (isOwner) { return }
+
+        // Don't show this if they've already been onboarded
+      console.log('medXBalance', medXBalance)
+      console.log('previousCase', previousCase)
+        if (medXBalance > 0 || previousCase) { return }
 
         // console.log(ropsten)
         if (ropsten && (ethBalance !== undefined)) {

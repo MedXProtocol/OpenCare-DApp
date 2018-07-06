@@ -43,11 +43,15 @@ exports.handler = (event, context, callback) => {
     console.log('headers: ', headers);
     console.log('headers stringified: ', JSON.stringify(headers));
 
-    let error;
     if (statusCode !== 200) {
-      error = new Error('Request Failed.\nStatus Code: ' + statusCode);
-    }
-    if (error) {
+      let error = new Error('Request Failed.\nStatus Code: ' + statusCode);
+
+      callback(null, {
+        statusCode: statusCode,
+        body: error.message,
+        headers: responseHeaders
+      })
+
       console.error(error.message);
       // consume response data to free up memory
       res.resume();
