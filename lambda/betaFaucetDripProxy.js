@@ -1,5 +1,3 @@
-// Parking this here to gain visibility into how the lambda code works
-
 const http = require('http')
 
 /**

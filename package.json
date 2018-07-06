@@ -27,5 +27,7 @@
     "web3": "^0.20.6",
     "zeppelin-solidity": "^1.4.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "netlify-lambda": "^0.4.0"
+  }
 }
