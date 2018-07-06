@@ -8,6 +8,7 @@ export GENERATE_SOURCEMAP=true
 
 # Below are variables for the dapp.  They must be prefixed with `REACT_APP_` to be included.
 
+export REACT_APP_WEBRTC_MULTIADDR_BASE=/ip4/127.0.0.1/tcp/9090/wss/p2p-webrtc-star/ipfs
 export REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT=false
 export REACT_APP_REQUIRED_NETWORK_ID=1234
 export REACT_APP_IPFS_HOSTNAME=ipfs.medcredits.io

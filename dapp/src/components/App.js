@@ -72,21 +72,22 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
   }
 
   signOut () {
-    this.skipRequestedPathname = true
+    // this.skipRequestedPathname = true
     this.props.signOut()
   }
 
   render () {
-    const requestedPathname = getRequestedPathname()
-    if (this.props.isSignedIn &&
-        requestedPathname) {
-      if (this.skipRequestedPathname) {
-        this.skipRequestedPathname = false
-      } else {
-        var redirect = <Redirect to={requestedPathname} />
-      }
-      setRequestedPathname('')
-    }
+    var redirect
+    // const requestedPathname = getRequestedPathname()
+    // if (this.props.isSignedIn &&
+    //     requestedPathname) {
+    //   if (this.skipRequestedPathname) {
+    //     this.skipRequestedPathname = false
+    //   } else {
+    //     var redirect = <Redirect to={requestedPathname} />
+    //   }
+    //   setRequestedPathname('')
+    // }
 
     return (
       <div>
