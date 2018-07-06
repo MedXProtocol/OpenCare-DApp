@@ -1,9 +1,9 @@
 var deploy = require('./support/deploy')
 
-let DoctorManager = artifacts.require("./DoctorManager.sol");
+let BetaFaucet = artifacts.require("./BetaFaucet.sol");
 
 module.exports = function(deployer) {
-  deploy(artifacts, deployer, DoctorManager).then((doctorManager) => {
-    return doctorManager.initialize()
+  deploy(artifacts, deployer, BetaFaucet).then((betaFaucet) => {
+    return betaFaucet.initialize()
   })
 };

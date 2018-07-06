@@ -1,3 +1,15 @@
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config({ path: '../.envrc' })
+}
+
+import 'idempotent-babel-polyfill';
+const Web3 = require('web3')
+const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/emO8rPnBiGuzIJx5vMzk'))
+import * as selfSignedFunctions from './selfSignedFunctions'
+
+// requires leading '0x' ! The key metamask exports is wrong!
+const CONTRACT_OWNER_ADDRESS = '0x09c0048e162455b981a6caa2815469dfea18759d';
+
 /**
  * Pass the data to send as `event.data`, and the request options as
  * `event.options`.
@@ -18,13 +30,23 @@ exports.handler = (event, context, callback) => {
 
   let responseHeaders = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': process.env.LAMBDA_CONFIG_CORS_ORIGINS
+    'Access-Control-Allow-Origin': process.env.LAMBDA_CONFIG_CORS_ORIGIN
   }
 
   try {
-    // sign transaction
+    const functionName = 'sendEther'
+    const functionInputs = [{
+      type: 'address',
+      name: '_to'
+    }]
 
-    // send ether
+    // sign transaction
+    selfSignedFunctions.sendSignedContractTransaction(
+      CONTRACT_OWNER_ADDRESS,
+      functionName,
+      functionInputs,
+      ethAddress
+    )
 
     callback(null, {
       statusCode: '200',

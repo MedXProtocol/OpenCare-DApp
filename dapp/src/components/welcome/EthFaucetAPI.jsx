@@ -44,7 +44,7 @@ export const EthFaucetAPI = class extends Component {
   //  ...
   //}
   doSendEther = async () => {
-    const faucetLambdaURI = process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI
+    const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetDripProxy`
 
     try {
       const response = await axios.get(`${faucetLambdaURI}?ethAddress=${this.props.address}`)

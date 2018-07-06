@@ -28,6 +28,7 @@
     "zeppelin-solidity": "^1.4.0"
   },
   "dependencies": {
+    "idempotent-babel-polyfill": "^6.26.0",
     "netlify-lambda": "^0.4.0"
   }
 }
