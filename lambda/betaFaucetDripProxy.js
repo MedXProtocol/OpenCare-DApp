@@ -29,7 +29,7 @@ exports.handler = (event, context, callback) => {
 
   let responseHeaders = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
+    'Access-Control-Allow-Origin': process.env.LAMBDA_CONFIG_CORS_ORIGINS
   }
 
   const req = http.get({
