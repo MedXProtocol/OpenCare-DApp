@@ -5,6 +5,7 @@ import axios from 'axios';
 import { LoadingLines } from '~/components/LoadingLines'
 
 const faucetLambdaUrl = 'https://i17ipca6ub.execute-api.us-east-1.amazonaws.com/staging/betaFaucetRopstenAPIRequest'
+const faucetLambdaPath = '/betaFaucetDripProxy'
 
 export const EthFaucetAPI = class extends Component {
 
@@ -47,7 +48,7 @@ export const EthFaucetAPI = class extends Component {
   //}
   doSendEther = async () => {
     try {
-      const response = await axios.get(faucetLambdaUrl + `?ethAddress=${this.props.address}`)
+      const response = await axios.get(faucetLambdaPath + `?ethAddress=${this.props.address}`)
 
       if (response.status === 200 && response.data.paydate > 0) {
         this.setState({
