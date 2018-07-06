@@ -1,50 +1,80 @@
 const expectThrow = require('./helpers/expectThrow')
-const toRegistryKey = require('../migrations/support/to-registry-key')
-const Registry = artifacts.require("./Registry.sol")
-const Delegate = artifacts.require("./Delegate.sol")
-const CaseManager = artifacts.require("./CaseManager.sol")
-const MedXToken = artifacts.require("./MedXToken.sol")
-const Case = artifacts.require("./Case.sol")
-const generateBytes = require('./helpers/generate-bytes')
-const createEnvironment = require('./helpers/create-environment')
-const createCase = require('./helpers/create-case')
-const caseStatus = require('./helpers/case-status')
-const resetCaseManager = require('./helpers/reset-case-factory')
+const DoctorManager = artifacts.require("./DoctorManager.sol")
 
 contract('DoctorManager', function (accounts) {
   let doctor = accounts[1]
   let doctor2 = accounts[2]
+  let doctor3 = accounts[3]
 
-  let env
   let doctorManager
 
-  before(async () => {
-    env = await createEnvironment(artifacts)
-    doctorManager = env.doctorManager
+  beforeEach(async () => {
+    doctorManager = await DoctorManager.new()
+    await doctorManager.initialize()
   })
 
   describe('initialize()', () => {
     it('should not be called again', () => {
       expectThrow(async () => {
-        await env.doctorManager.initialize()
+        await doctorManager.initialize()
       })
+    })
+
+    it('should set the values at 0', async () => {
+      assert.equal(await doctorManager.doctorCount.call(), 1)
     })
   })
 
-  describe('addDoctor()', () => {
+  describe('addOrReactivateDoctor()', () => {
     it('should work', async () => {
-      await doctorManager.addDoctor(doctor, 'Doogie')
-      assert.equal(await doctorManager.doctorCount.call(), 1)
+      await doctorManager.addOrReactivateDoctor(doctor, 'Doogie')
+      assert.equal(await doctorManager.doctorCount.call(), 2)
       assert.equal(await doctorManager.isDoctor(doctor), true)
-      assert.equal(await doctorManager.doctorNames.call(0), 'Doogie')
+      assert.equal(await doctorManager.doctorNames.call(1), 'Doogie')
       assert.equal(await doctorManager.name.call(doctor), 'Doogie')
+
+      await doctorManager.addOrReactivateDoctor(doctor2, 'General Major')
+      assert.equal(await doctorManager.doctorCount.call(), 3)
+      assert.equal(await doctorManager.isDoctor(doctor2), true)
+      assert.equal(await doctorManager.doctorNames.call(2), 'General Major')
+      assert.equal(await doctorManager.name.call(doctor2), 'General Major')
     })
 
     it('should not allow double adds', async () => {
-      await doctorManager.addDoctor(doctor2, 'Dr. Hibbert')
       expectThrow(async () => {
-        await doctorManager.addDoctor(doctor2, 'Dr. Hibbert')
+        await doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Hibbert')
       })
     })
   })
+
+  describe('deactivateDoctor()', () => {
+    it('should work', async () => {
+      await doctorManager.addOrReactivateDoctor(doctor3, 'Howser')
+      assert.equal(await doctorManager.isActive(doctor3), true)
+      assert.equal(await doctorManager.isDoctor(doctor3), true)
+
+      await doctorManager.deactivateDoctor(doctor3)
+      assert.equal(await doctorManager.isActive(doctor3), false)
+      assert.equal(await doctorManager.isDoctor(doctor3), false)
+    })
+
+    it('should not work on non-doctor', async () => {
+      expectThrow(async () => {
+        await doctorManager.deactivateDoctor(doctor3, 'Dr. Hibbert')
+      })
+    })
+
+    it('should reactivate instead of add and update name', async () => {
+      await doctorManager.addOrReactivateDoctor(doctor3, 'Howser')
+      assert.equal(await doctorManager.doctorCount.call(), 2)
+
+      await doctorManager.deactivateDoctor(doctor3)
+      assert.equal(await doctorManager.isActive(doctor3), false)
+
+      await doctorManager.addOrReactivateDoctor(doctor3, 'Newby')
+      assert.equal(await doctorManager.doctorNames.call(1), 'Newby')
+      assert.equal(await doctorManager.name.call(doctor3), 'Newby')
+    })
+  })
+
 })

@@ -10,13 +10,16 @@ function mapStateToProps(state, ownProps) {
   const AccountManager = contractByName(state, 'AccountManager')
   const doctorCount = cacheCallValue(state, DoctorManager, 'doctorCount')
   const doctors = []
-  for (var i = 0; i < doctorCount; i++) {
+  // doctorCount at 0 is empty records because Solidity, start at 1
+  for (var i = 1; i < doctorCount; i++) {
     const address = cacheCallValue(state, DoctorManager, 'doctorAddresses', i)
     if (address) {
       doctors.push({
+        doctorIndex: i,
         name: cacheCallValue(state, DoctorManager, 'doctorNames', i),
-        address,
-        publicKey: cacheCallValue(state, AccountManager, 'publicKeys', address)
+        isActive: cacheCallValue(state, DoctorManager, 'isActive', address),
+        publicKey: cacheCallValue(state, AccountManager, 'publicKeys', address),
+        address
       })
     }
   }
@@ -31,9 +34,11 @@ function mapStateToProps(state, ownProps) {
 function* saga({ DoctorManager, AccountManager }) {
   if (!DoctorManager || !AccountManager) { return }
   const doctorCount = yield cacheCall(DoctorManager, 'doctorCount')
-  for (var i = 0; i < doctorCount; i++) {
+  // doctorCount at 0 is empty records because Solidity, start at 1
+  for (var i = 1; i < doctorCount; i++) {
     const address = yield cacheCall(DoctorManager, 'doctorAddresses', i)
     yield cacheCall(DoctorManager, 'doctorNames', i)
+    yield cacheCall(DoctorManager, 'isActive', address)
     yield cacheCall(AccountManager, 'publicKeys', address)
   }
 }
@@ -41,7 +46,7 @@ function* saga({ DoctorManager, AccountManager }) {
 export function withDoctors(WrappedComponent) {
   return (
     connect(mapStateToProps)(
-      withSaga(saga, { propTriggers: ['doctorCount', 'DoctorManager', 'AccountManager'] })(
+      withSaga(saga, { propTriggers: ['doctorCount', 'DoctorManager', 'AccountManager', 'isActive'] })(
         class _withDoctors extends Component {
           static propTypes = {
             excludeAddresses: PropTypes.array
@@ -50,8 +55,11 @@ export function withDoctors(WrappedComponent) {
             const includedDoctors = []
             const excludedDoctors = []
             this.props.doctors.forEach(doctor => {
-              if (!isBlank(doctor.publicKey) &&
-                  this.props.excludeAddresses.indexOf(doctor.address) === -1) {
+              if (
+                doctor.isActive &&
+                !isBlank(doctor.publicKey) &&
+                this.props.excludeAddresses.indexOf(doctor.address) === -1
+              ) {
                 includedDoctors.push(doctor)
               } else {
                 excludedDoctors.push(doctor)
