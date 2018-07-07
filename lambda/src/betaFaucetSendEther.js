@@ -1,10 +1,11 @@
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config({ path: '../.envrc' })
-}
+// if (process.env.NODE_ENV !== 'production') {
+//   require('dotenv').config({ path: '../.envrc' })
+// }
+
+import Web3 from 'web3';
+const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/emO8rPnBiGuzIJx5vMzk'));
 
 import 'idempotent-babel-polyfill';
-const Web3 = require('web3')
-const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/emO8rPnBiGuzIJx5vMzk'))
 import * as selfSignedFunctions from './selfSignedFunctions'
 
 // requires leading '0x' ! The key metamask exports is wrong!

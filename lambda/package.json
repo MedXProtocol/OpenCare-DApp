@@ -1,7 +1,7 @@
 {
-  "name": "medcreditsapp",
-  "version": "0.1.0",
-  "private": true,
+  "name": "HippocratesLambda",
+  "version": "0.0.1",
+  "scripts": {},
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
     "@fortawesome/fontawesome-free-brands": "^5.0.13",
@@ -17,6 +17,7 @@
     "babel-loader": "7.1.2",
     "babel-preset-react-app": "^3.1.0",
     "babel-runtime": "6.26.0",
+    "babel-plugin-module-alias": "^1.5.0",
     "bootstrap-sass": "^3.3.7",
     "bugsnag-js": "^4.6.0",
     "bugsnag-react": "^1.1.1",
@@ -78,9 +79,7 @@
     "web3": "^1.0.0-beta.34",
     "webpack-dev-server": "2.9.4",
     "webpack-manifest-plugin": "1.3.2",
-    "whatwg-fetch": "2.0.3"
-  },
-  "devDependencies": {
+    "whatwg-fetch": "2.0.3",
     "aes-js": "^3.1.1",
     "babel-cli": "^6.26.0",
     "babel-plugin-root-import": "^5.1.0",
@@ -106,69 +105,5 @@
     "uglifyjs-webpack-plugin": "^1.1.2",
     "webpack": "^3.8.1",
     "webpack-bugsnag-plugin": "^0.1.4"
-  },
-  "scripts": {
-    "build-css": "node-sass-chokidar src/ -o src/",
-    "watch-css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive",
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom",
-    "console": "NODE_ENV=development babel-node"
-  },
-  "jest": {
-    "verbose": true,
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx,mjs}"
-    ],
-    "snapshotSerializers": [
-      "enzyme-to-json/serializer"
-    ],
-    "setupFiles": [
-      "<rootDir>/jest-setup.js",
-      "<rootDir>/config/polyfills.js"
-    ],
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.{js,jsx,mjs}",
-      "<rootDir>/src/**/?(*.)(spec|test).{js,jsx,mjs}",
-      "<rootDir>/spec/**/(.*|\\.(spec|test))\\.(js)$"
-    ],
-    "testEnvironment": "node",
-    "testURL": "http://localhost",
-    "transform": {
-      "^.+\\.(js|jsx|mjs)$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
-      "^(?!.*\\.(js|jsx|mjs|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
-    },
-    "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
-    ],
-    "moduleDirectories": [
-      "node_modules"
-    ],
-    "moduleNameMapper": {
-      "^react-native$": "react-native-web",
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
-      "\\.(css|scss|sass)$": "<rootDir>/__mocks__/styleMock.js"
-    },
-    "moduleFileExtensions": [
-      "web.js",
-      "mjs",
-      "js",
-      "json",
-      "web.jsx",
-      "jsx",
-      "node"
-    ]
-  },
-  "babel": {
-    "presets": [
-      "react-app"
-    ]
-  },
-  "eslintConfig": {
-    "extends": "react-app",
-    "settings": {
-      "import/resolver": "babel-plugin-root-import"
-    }
   }
 }
