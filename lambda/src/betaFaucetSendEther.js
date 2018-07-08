@@ -41,6 +41,9 @@ exports.handler = (event, context, callback) => {
       name: '_to'
     }]
 
+    console.log("CONTRACT_OWNER_ADDRESS: " + CONTRACT_OWNER_ADDRESS)
+    console.log("ethAddress: " + ethAddress)
+
     // sign transaction
     selfSignedFunctions.sendSignedContractTransaction(
       CONTRACT_OWNER_ADDRESS,

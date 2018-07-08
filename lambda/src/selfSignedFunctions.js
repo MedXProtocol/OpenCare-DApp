@@ -26,7 +26,7 @@ export const validateAddresses = function(privateKey, contractOwnerAddress, ethA
 //   }, args);
 // }
 
-export const getContractFromRegistry = async function(contractName) {
+export const getContractAddressFromRegistry = async function(contractName) {
   const contractKey = web3.utils.sha3(contractName)
 
   const registryAddress = contractAddresses.contracts
@@ -38,8 +38,7 @@ export const getContractFromRegistry = async function(contractName) {
   Registry.setProvider(web3.currentProvider)
 
   const betaFaucetContractAddress = await Registry.methods.lookup(contractKey).call();
-
-  return new web3.eth.Contract(betaFaucetArtifact.abi, betaFaucetContractAddress)
+  return betaFaucetContractAddress
 }
 
 // export const nextNonce = async function(contractOwnerAddress) {
@@ -115,17 +114,62 @@ export const sendSignedContractTransaction = async function(
   // console.log(privateKey, contractOwnerAddress, ethAddress)
   validateAddresses(privateKey, contractOwnerAddress, ethAddress)
 
-  const contractOwnerAccount = web3.eth.accounts.wallet.add(privateKey);
+  // const contractOwnerAccount = web3.eth.accounts.wallet.add(privateKey);
 
-  const betaFaucetContract = await getContractFromRegistry("BetaFaucet")
+  console.log("contractOwnerAddress: " + contractOwnerAddress)
+  console.log("ethAddress: " + ethAddress)
+
+  const betaFaucetContractAddress = await getContractAddressFromRegistry("BetaFaucet")
+
+  console.log('betaFaucetContractAddress: ', betaFaucetContractAddress)
+
+  const betaFaucetContract = new web3.eth.Contract(betaFaucetArtifact.abi, betaFaucetContractAddress)
+
+  // const betaFaucetContract = await getContractFromRegistry("BetaFaucet")
+  console.log('betaFaucetContract: ', betaFaucetContract)
+
   // console.log(betaFaucetContract)
   // console.log(betaFaucetContract.address)
 
-  betaFaucetContract.methods.sendEther(ethAddress).send({
+  var encodedABI = betaFaucetContract.methods.sendEther(ethAddress).encodeABI();
+  console.log(encodedABI)
+  // {
+
+  //     gas: web3.utils.toHex(1132114),
+  //     gasLimit: web3.utils.toHex(1132114),
+  //     gasPrice: web3.utils.toHex(web3.utils.toWei('92', 'gwei'))
+  //   }
+  var tx = {
     from: contractOwnerAddress,
-    gas: web3.utils.toHex(132114),
-    gasPrice: web3.utils.toHex(web3.utils.toWei('92', 'gwei'))
-  })
+    to: betaFaucetContractAddress,
+    gas: 2000000,
+    data: encodedABI
+  };
+
+  console.table(tx)
+
+
+  web3.eth.accounts.signTransaction(tx, privateKey).then(signed => {
+    console.log('signed: ' + signed)
+    var tran = web3.eth.sendSignedTransaction(signed.rawTransaction);
+    console.log('tran: ' + tran)
+
+    tran.on('confirmation', (confirmationNumber, receipt) => {
+      console.log('confirmation: ' + confirmationNumber);
+    });
+
+    tran.on('transactionHash', hash => {
+      console.log('hash');
+      console.log(hash);
+    });
+
+    tran.on('receipt', receipt => {
+      console.log('reciept');
+      console.log(receipt);
+    });
+
+    tran.on('error', console.error);
+  });
 
   // const txObject = await buildContractTxObject(
   //   contractOwnerAddress,
