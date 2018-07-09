@@ -34,7 +34,7 @@ export const getContractAddressFromRegistry = async function(contractName) {
 }
 
 // Sending data to a contract's function
-export const sendSignedContractTransaction = async function(
+export const signTransaction = async function(
   contractOwnerAddress,
   functionName,
   functionInputs,
@@ -47,33 +47,16 @@ export const sendSignedContractTransaction = async function(
 
   const betaFaucetContract = new web3.eth.Contract(betaFaucetArtifact.abi, betaFaucetContractAddress)
 
-  var encodedABI = betaFaucetContract.methods.sendEther(ethAddress).encodeABI()
+  const encodedABI = betaFaucetContract.methods.sendEther(ethAddress).encodeABI()
 
-  var tx = {
+  const tx = {
     from: contractOwnerAddress,
     to: betaFaucetContractAddress,
     gas: 2000000,
     data: encodedABI
   }
 
-  web3.eth.accounts.signTransaction(tx, privateKey).then(signed => {
-    var transaction = web3.eth.sendSignedTransaction(signed.rawTransaction)
+  const signed = await web3.eth.accounts.signTransaction(tx, privateKey)
 
-    transaction.on('confirmation', (confirmationNumber, receipt) => {
-      console.log('confirmation: ' + confirmationNumber)
-    })
-
-    transaction.on('transactionHash', hash => {
-      console.log('hash')
-      console.log(hash)
-    })
-
-    transaction.on('receipt', receipt => {
-      console.log('receipt')
-      console.log(receipt)
-    })
-
-    transaction.on('error', console.error)
-  })
-
+  return signed
 }

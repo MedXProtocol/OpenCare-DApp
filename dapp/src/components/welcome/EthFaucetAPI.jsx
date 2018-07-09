@@ -12,10 +12,7 @@ export const EthFaucetAPI = class extends Component {
     this.state = {
       isSending: false,
       errorMessage: '',
-      response: {},
-      paydate: 0,
-      successDate: 0,
-      blacklisted: false
+      response: {}
     }
   }
 
@@ -24,48 +21,30 @@ export const EthFaucetAPI = class extends Component {
     this.setState({
       isSending: true,
       errorMessage: '',
-      response: {},
-      paydate: 0,
-      successDate: 0,
-      blacklisted: false
+      response: {}
     }, this.doSendEther)
   }
 
-  // will return:
-  // {
-  //   "paydate": 0,
-  //   "message": "you are greylisted",
-  //   ...
-  // }
-  // or 200:
-  // {
-  //  "paydate":1530796071,
-  //  "amount":1000000000000000000,
-  //  ...
-  //}
   doSendEther = async () => {
-    const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetDripProxy`
+    const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetSendEther`
 
     try {
       const response = await axios.get(`${faucetLambdaURI}?ethAddress=${this.props.address}`)
 
-      if (response.status === 200 && response.data.paydate > 0) {
+      if (response.status === 200) {
         this.setState({
-          responseMessage: "1 Ether is on it's way!",
-          successDate: Date.now(),
-          payDate: response.data.paydate,
+          responseMessage: "We're sending you Ether",
+          txHash: response.data.txHash,
           isSending: false
         })
-      } else if (response.data.message === 'you are greylisted' || response.data.message === 'you are blacklisted') {
+      } else {
         this.setState({
           responseMessage: '',
-          errorMessage: '1 Ether has already been sent to your address. It may take a couple of minutes to arrive.',
-          blacklisted: true,
+          errorMessage: `There was an error: ${response.data}`,
           isSending: false
         })
       }
     } catch (error) {
-      console.error(error);
       this.setState({
         responseMessage: '',
         errorMessage: error.message,
@@ -75,28 +54,24 @@ export const EthFaucetAPI = class extends Component {
   }
 
   render () {
-    const { isSending, responseMessage, payDate, successDate, errorMessage, blacklisted } = this.state
+    const { isSending, responseMessage, errorMessage } = this.state
 
-    if (payDate > 0)
-      var payDateMessage = `Transaction will be sent in ${new Date((payDate - successDate)).getSeconds()} seconds, and may take a minute or two to confirm`
-
-    if (errorMessage && !blacklisted) {
-      var queueFullMessage = (
+    if (errorMessage) {
+      var englishErrorMessage = (
         <small>
           <br />
-          The queue may be full, please wait a minute and try again. If the problem persists please contact MedCredits on Telegram and we can send you Ropsten Testnet Ether:
+          There was an error while sending you Ether, you may have already received it or it's on the way. If the problem persists please contact MedCredits on Telegram and we can send you Ropsten Testnet Ether:
           &nbsp; <a
             target="_blank"
             href="https://t.me/MedCredits"
             rel="noopener noreferrer">Contact Support</a>
         </small>
       )
-    }
-    if (errorMessage) {
+
       var errorParagraph = (
         <p className="text-danger">
           {errorMessage}
-          {queueFullMessage}
+          {englishErrorMessage}
           <br />
           <br />
         </p>
@@ -109,7 +84,7 @@ export const EthFaucetAPI = class extends Component {
           <strong>{responseMessage}</strong>
           <small>
             <br/>
-            {payDateMessage}
+            Please wait, this may take up to a couple of minutes ...
           </small>
         </p>
       )
@@ -117,7 +92,7 @@ export const EthFaucetAPI = class extends Component {
 
     const responseWell = (
       <div className="well">
-        <LoadingLines visible={isSending || payDate} /> &nbsp;
+        <LoadingLines visible={isSending} /> &nbsp;
         {successParagraph}
         {errorParagraph}
       </div>
@@ -141,10 +116,10 @@ export const EthFaucetAPI = class extends Component {
         </p>
         <p>
           <a
-            disabled={isSending || payDate}
+            disabled={isSending}
             onClick={this.handleSendEther}
             className="btn btn-lg btn-primary"
-          >{isSending || payDate ? 'Sending ...' : 'Send Me Ether'}</a>
+          >{isSending ? 'Sending ...' : 'Send Me Ether'}</a>
         </p>
         <br />
         {isSending || responseMessage || errorMessage ? responseWell : ''}

@@ -54,7 +54,6 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
 
       getEtherBalance = () => {
         const address = currentAccount().address()
-        // console.log('checking ethBalance ...')
 
         getWeb3().eth.getBalance(address).then(balance => {
           this.setState({
@@ -67,7 +66,6 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
         this.getEtherBalance()
 
         // start a check Eth loop
-        // console.log('mounting interval')
         this.etherBalanceInterval = this.props.setInterval(this.getEtherBalance, 3000)
       }
 
@@ -81,15 +79,11 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
         const { ethBalance } = this.state
         const { medXBalance, previousCase, ropsten, isOwner, address } = this.props
 
-        // console.log(ethBalance)
         if (isOwner) { return }
 
         // Don't show this if they've already been onboarded
-      console.log('medXBalance', medXBalance)
-      console.log('previousCase', previousCase)
         if (medXBalance > 0 || previousCase) { return }
 
-        // console.log(ropsten)
         if (ropsten && (ethBalance !== undefined)) {
           if (ethBalance < 0.1) {
             showBetaFaucetModal = true
@@ -98,7 +92,6 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
               address={address}
               ethBalance={ethBalance} />
           } else {
-            // console.log('killing etherBalanceInterval')
             this.props.clearInterval(this.etherBalanceInterval)
             showBetaFaucetModal = false
           }

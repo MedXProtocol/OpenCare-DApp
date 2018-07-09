@@ -29,7 +29,7 @@ contract BetaFaucet is Ownable, Initializable {
     sentAddresses[_recipient] = true;
     emit EtherSent(_recipient);
 
-    // 1 ether in wei
-    _recipient.transfer(1000000000000000000);
+    // 0.1 ether in wei
+    _recipient.transfer(100000000000000000);
   }
 }
