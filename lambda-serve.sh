@@ -1,4 +1,3 @@
 #! /bin/sh
 
-cd lambda && \
-netlify-lambda -c webpack.netlify.js serve src
+netlify-lambda -c lambda/webpack.netlify.js serve lambda/src

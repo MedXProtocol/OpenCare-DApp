@@ -1,4 +1,3 @@
 #! /bin/sh
 
-cd lambda && \
-netlify-lambda -c webpack.netlify.js build .
+netlify-lambda -c lambda/webpack.netlify.js build lambda
