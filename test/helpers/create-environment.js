@@ -34,7 +34,7 @@ module.exports = async function createEnvironment(artifacts) {
   let betaFaucetDelegate = await Delegate.new(registry.address, toRegistryKey('BetaFaucetTarget'))
   await registry.register(toRegistryKey('BetaFaucet'), betaFaucetDelegate.address)
   let betaFaucet = await BetaFaucet.at(betaFaucetDelegate.address)
-  await betaFaucet.initialize()
+  await betaFaucet.initialize(medXToken.address, registry.address)
 
   return {
     betaFaucet,

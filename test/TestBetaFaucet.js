@@ -7,29 +7,29 @@ contract('BetaFaucet', function (accounts) {
   let recipient2 = accounts[2]
 
   let env
-  let betaFaucet
+  let betaFaucetInstance
 
   before(async () => {
     env = await createEnvironment(artifacts)
-    betaFaucet = env.betaFaucet
+    betaFaucetInstance = env.betaFaucet
   })
 
   describe('initialize()', () => {
     it('should not be called again', () => {
       expectThrow(async () => {
-        await env.betaFaucet.initialize()
+        await env.betaFaucetInstance.initialize(env.medXToken.address)
       })
     })
   })
 
   describe('sendEther()', () => {
     it('should work', async () => {
-      await betaFaucet.send(web3.toWei(50, "ether"));
+      await betaFaucetInstance.send(web3.toWei(50, "ether"));
 
-      let contractBalance = await promisify(cb => web3.eth.getBalance(betaFaucet.address, cb));
+      let contractBalance = await promisify(cb => web3.eth.getBalance(betaFaucetInstance.address, cb));
       let startingBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
 
-      await betaFaucet.sendEther(recipient)
+      await betaFaucetInstance.sendEther(recipient)
 
       let newBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
 
@@ -40,10 +40,28 @@ contract('BetaFaucet', function (accounts) {
     })
 
     it('should not allow double sends', async () => {
-      await betaFaucet.sendEther(recipient2)
-      // expectThrow(async () => {
-        // await betaFaucet.sendEther(recipient)
-      // })
+      await betaFaucetInstance.sendEther(recipient2)
+      expectThrow(async () => {
+        await betaFaucetInstance.sendEther(recipient)
+      })
+    })
+  })
+
+  describe('sendMedX()', () => {
+    it('should work', async () => {
+      let medXBalance = await env.medXToken.balanceOf(recipient)
+      assert.equal(medXBalance, 0)
+
+      await betaFaucetInstance.sendMedX(recipient)
+      let newMedXBalance = await env.medXToken.balanceOf(recipient)
+      assert.equal(newMedXBalance, 15000000000)
+    })
+
+    it('should not allow double sends', async () => {
+      await betaFaucetInstance.sendMedX(recipient2)
+      expectThrow(async () => {
+        await betaFaucetInstance.sendMedX(recipient)
+      })
     })
   })
 })
