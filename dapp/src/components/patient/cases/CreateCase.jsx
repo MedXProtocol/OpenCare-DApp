@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { isTrue } from '~/utils/isTrue'
 import { Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import Select from 'react-select'
@@ -26,6 +27,7 @@ import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGrou
 import { HippoTextInput } from '~/components/forms/HippoTextInput'
 import { countries } from './countries'
 import { regions } from './regions'
+import { DoctorRandomizer } from '~/components/DoctorRandomizer'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -626,12 +628,23 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
                           <div className={classNames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
-                            <label>Select a Doctor<span className='star'>*</span></label>
-                            <DoctorSelect
-                              excludeDoctorAddresses={[this.props.account]}
-                              value={this.state.selectedDoctor}
-                              isClearable={false}
-                              onChange={this.onChangeDoctor} />
+                            {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
+                              ?
+                              <div>
+                                <label>Select a Doctor<span className='star'>*</span></label>
+                                  <DoctorSelect
+                                    excludeAddresses={[this.props.account]}
+                                    value={this.state.selectedDoctor}
+                                    isClearable={false}
+                                    onChange={this.onChangeDoctor} />
+                              </div>
+                              :
+                              <DoctorRandomizer
+                                excludeAddresses={[this.props.account]}
+                                value={this.state.selectedDoctor}
+                                onChange={this.onChangeDoctor} />
+                             }
+                            
                             {errors['selectedDoctor']}
                           </div>
                         </div>

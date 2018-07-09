@@ -1,4 +1,5 @@
 import Cookie from 'js-cookie'
+import { setCookie } from '~/services/setCookie'
 import { KEY_STORE } from '~/accounts/constants'
 
 export function setAccount(address, account) {
@@ -7,5 +8,5 @@ export function setAccount(address, account) {
     keyStore = {}
   }
   keyStore[address] = account
-  Cookie.set(KEY_STORE, keyStore, { expires: 999999 })
+  setCookie(KEY_STORE, keyStore)
 }
