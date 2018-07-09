@@ -9,6 +9,7 @@
 
 networks/1234.json
 functions
+lambda/functions
 
 .ganache
 
