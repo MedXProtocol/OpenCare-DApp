@@ -1,4 +1,4 @@
-# MedCredits Smart Contracts & Dev Blockchain Server
+# MedCredits Smart Contracts & Dev Blockchain Server 
 
 [![Logo](assets/medcredwhitecropped.png)](https://medcredits.io/)
 
