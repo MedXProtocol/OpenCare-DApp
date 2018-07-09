@@ -29,7 +29,7 @@ export const DoctorRandomizer =
         // if the doctor hasn't been set and if we have all the doctors
         if (!props.value &&
             props.includedDoctors.length > 0 &&
-            props.includedDoctors.length + props.excludedDoctors.length === +props.doctorCount) {
+            props.includedDoctors.length + props.excludedDoctors.length === +(props.doctorCount - 1)) {
 
           let selectOption = null
           const onlineDoctors = props.includedDoctors.filter((doctor) => doctor.online)

@@ -48,6 +48,9 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
     window.addEventListener("beforeunload", this.unload)
     window.addEventListener("focus", this.refocus)
     this.onAccountChangeSignOut(this.props)
+    if (!this.props.address && this.props.isSignedIn) {
+      this.signOut()
+    }
   }
 
   componentWillUnmount () {
@@ -72,22 +75,22 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
   }
 
   signOut () {
-    // this.skipRequestedPathname = true
+    this.skipRequestedPathname = true
     this.props.signOut()
   }
 
   render () {
-    var redirect
-    // const requestedPathname = getRequestedPathname()
-    // if (this.props.isSignedIn &&
-    //     requestedPathname) {
-    //   if (this.skipRequestedPathname) {
-    //     this.skipRequestedPathname = false
-    //   } else {
-    //     var redirect = <Redirect to={requestedPathname} />
-    //   }
-    //   setRequestedPathname('')
-    // }
+    const requestedPathname = getRequestedPathname()
+    if (this.props.address &&
+        this.props.isSignedIn &&
+        requestedPathname) {
+      if (this.skipRequestedPathname) {
+        this.skipRequestedPathname = false
+      } else {
+        var redirect = <Redirect to={requestedPathname} />
+      }
+      setRequestedPathname('')
+    }
 
     return (
       <div>

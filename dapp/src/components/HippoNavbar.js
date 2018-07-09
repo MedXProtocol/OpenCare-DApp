@@ -79,7 +79,7 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
     var isDoctor = this.props.isDoctor
     const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
 
-    if (this.props.signedIn) {
+    if (this.props.signedIn && this.props.address) {
       var profileMenu =
         <NavDropdown title={nameOrAccountString} id='account-dropdown'>
           <MenuItem header>Profile</MenuItem>

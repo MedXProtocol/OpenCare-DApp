@@ -6,7 +6,7 @@ export const AddDoctor = class extends Component {
   render() {
     return (
       <MainLayoutContainer>
-        <RegisterDoctorContainer />
+        <RegisterDoctorContainer excludeAddresses={[]} />
       </MainLayoutContainer>
     );
   }
