@@ -27,7 +27,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: npm install && cd dapp && npm install
+      - run: npm ci && cd dapp && npm ci
 
       - save_cache:
           paths:
