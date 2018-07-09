@@ -30,10 +30,13 @@ To run the truffle tests:
 
 `$ npm run test`
 
-
 ### To run the Ganache server:
 
 `$ npm run start`
+
+### To run the beta faucet lambda endpoint:
+
+`$ ./lambda-serve.sh` (lambda compute endpoints)
 
 ### Running Webpack Dev server
 
