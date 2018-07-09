@@ -1,7 +1,3 @@
-// if (process.env.NODE_ENV !== 'production') {
-//   require('dotenv').config({ path: '../.envrc' })
-// }
-
 import Web3 from 'web3';
 const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/emO8rPnBiGuzIJx5vMzk'));
 
@@ -11,12 +7,6 @@ import * as selfSignedFunctions from './selfSignedFunctions'
 // requires leading '0x' ! The key metamask exports is wrong!
 const CONTRACT_OWNER_ADDRESS = '0x09c0048e162455b981a6caa2815469dfea18759d';
 
-/**
- * Pass the data to send as `event.data`, and the request options as
- * `event.options`.
- *
- */
-
 exports.handler = (event, context, callback) => {
   let ethAddress
 
@@ -24,7 +14,6 @@ exports.handler = (event, context, callback) => {
     if (event.queryStringParameters.ethAddress !== undefined &&
       event.queryStringParameters.ethAddress !== null &&
       event.queryStringParameters.ethAddress !== "") {
-      console.log("Received ethAddress: " + event.queryStringParameters.ethAddress);
       ethAddress = event.queryStringParameters.ethAddress;
     }
   }
@@ -41,8 +30,6 @@ exports.handler = (event, context, callback) => {
       name: '_to'
     }]
 
-    console.log("CONTRACT_OWNER_ADDRESS: " + CONTRACT_OWNER_ADDRESS)
-    console.log("ethAddress: " + ethAddress)
 
     // sign transaction
     selfSignedFunctions.sendSignedContractTransaction(

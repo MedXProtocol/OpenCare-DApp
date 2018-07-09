@@ -3,20 +3,8 @@
   "version": "0.0.1",
   "scripts": {},
   "dependencies": {
-    "babel-core": "6.26.0",
-    "babel-eslint": "7.2.3",
-    "babel-jest": "20.0.3",
-    "babel-loader": "7.1.2",
-    "babel-preset-react-app": "^3.1.0",
-    "babel-runtime": "6.26.0",
-    "babel-plugin-module-alias": "^1.5.0",
-    "case-sensitive-paths-webpack-plugin": "2.1.1",
-    "dotenv": "4.0.0",
     "idempotent-babel-polyfill": "^6.26.0",
     "netlify-lambda": "^0.4.0",
-    "web3": "^1.0.0-beta.34",
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "webpack": "^3.8.1"
+    "web3": "^1.0.0-beta.34"
   }
 }

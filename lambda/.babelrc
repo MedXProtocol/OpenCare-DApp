@@ -1,14 +1,4 @@
 
 {
-  "presets": ["env"],
-  "plugins": ["transform-runtime"],
-  "env": {
-    "development": {
-      "plugins": [
-        ["babel-plugin-module-alias", [
-          { "src": "node_modules/electron-prebuilt" , "expose": "electron" }
-        ]]
-      ]
-    }
-  }
+  "presets": ["env"]
 }
