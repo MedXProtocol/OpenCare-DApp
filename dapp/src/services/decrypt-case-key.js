@@ -1,10 +1,5 @@
-import { cacheCallValue } from '~/saga-genesis'
-
-export const decryptCaseKey = function (state, account, caseAddress) {
+export const decryptCaseKey = function (account, encryptedCaseKey, caseKeySalt) {
   let caseKey = undefined // undefined caseKey means it's still loading / state is unknown!
-
-  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
-  const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
 
   if (encryptedCaseKey && caseKeySalt) {
     caseKey = account.decrypt(encryptedCaseKey.substring(2), caseKeySalt.substring(2))

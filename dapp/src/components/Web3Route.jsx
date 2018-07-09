@@ -4,9 +4,8 @@ import React, {
 import { Route, Redirect } from 'react-router-dom'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
-import { setRequestedPathname } from '~/services/setRequestedPathname'
 import * as routes from '~/config/routes'
-import PropTypes from 'prop-types'
+import { setRequestedPathname } from '~/services/setRequestedPathname'
 
 function mapStateToProps (state, ownProps) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -18,33 +17,34 @@ function mapStateToProps (state, ownProps) {
 }
 
 export const Web3Route = connect(mapStateToProps)(class _Web3Route extends Component {
-  static propTypes = {
-    signedIn: PropTypes.bool,
-    hasAccount: PropTypes.bool
+  renderComponent (props) {
+    const Component = this.props.component
+    return <Component {...props} />
   }
 
-  render () {
-    const Component = this.props.component
-    const otherProps = {
-      ...this.props,
-      component: undefined
-    }
-
+  redirect () {
     if (!this.props.web3Initialized) {
       var redirect = routes.TRY_METAMASK
     } else if (!this.props.address) {
       redirect = routes.LOGIN_METAMASK
     }
+    return redirect
+  }
 
+  render () {
+    const redirect = this.redirect()
     if (redirect) {
       var component = <Redirect to={redirect} />
       setRequestedPathname(this.props.location.pathname)
     } else {
+      const otherProps = {
+        ...this.props,
+        component: undefined
+      }
       component = (
-        <Route {...otherProps} render={props => <Component {...props} />} />
+        <Route {...otherProps} render={props => this.renderComponent(props)} />
       )
     }
-
     return component
   }
 })

@@ -52,6 +52,9 @@
     {
       "contractName": "Delegate",
       "address": "0x8a3da0b9a944b7051093b4b50c00256864f5e9a9"
+    },
+      "contractName": "DoctorManager",
+      "address": "0x1e48881d3940f24d73361f71baf7c675e0297ecc"
     }
   ]
 }

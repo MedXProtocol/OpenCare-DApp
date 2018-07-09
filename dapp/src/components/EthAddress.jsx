@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
 
 export const EthAddress = class extends Component {
@@ -27,9 +26,8 @@ export const EthAddress = class extends Component {
     }
 
     return (
-      <span title={address} className='address' data-tip={!this.state.showFull ? 'Click to Expand' : ''}>
+      <span title={address} className='address' data-tip={!this.state.showFull ? 'Show Full Address' : ''}>
         {displayed}
-        <ReactTooltip effect='solid' place='top' wrapper='span' />
       </span>
     )
   }

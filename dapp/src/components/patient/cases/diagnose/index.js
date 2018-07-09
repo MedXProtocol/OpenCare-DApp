@@ -25,18 +25,18 @@ function mapStateToProps(state, { match }) {
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
-  const caseKey = decryptDoctorCaseKey(currentAccount(), patientPublicKey, encryptedCaseKey)
 
   return {
     address,
     caseAddress,
     showDiagnosis: !!address,
-    caseKey,
     diagnosingDoctor,
     diagnosisHash,
     challengingDoctor,
     challengeHash,
-    AccountManager
+    AccountManager,
+    patientPublicKey,
+    encryptedCaseKey
   }
 }
 
@@ -56,13 +56,14 @@ function* saga({ match, address, AccountManager }) {
 export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'address', 'AccountManager']})(class _DiagnoseCase extends Component {
   render () {
     var challenging = this.props.challengingDoctor === this.props.address
+    const caseKey = decryptDoctorCaseKey(currentAccount(), this.props.patientPublicKey, this.props.encryptedCaseKey)
 
     if (!isBlank(this.props.challengeHash)) {
       var challenge =
         <div className='col-xs-12'>
           <ChallengedDiagnosis
             caseAddress={this.props.match.params.caseAddress}
-            caseKey={this.props.caseKey}
+            caseKey={caseKey}
             title='Diagnosis'
             challengingDoctorAddress={this.props.challengingDoctor} />
         </div>
@@ -71,7 +72,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
         <div className='col-xs-12'>
           <SubmitDiagnosisContainer
             caseAddress={this.props.caseAddress}
-            caseKey={this.props.caseKey}
+            caseKey={caseKey}
             diagnosisHash={this.props.diagnosisHash} />
         </div>
     }
@@ -81,21 +82,21 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
         <div className='col-xs-12'>
           <Diagnosis
             caseAddress={this.props.caseAddress}
-            caseKey={this.props.caseKey} />
+            caseKey={caseKey} />
         </div>
     } else if (this.props.diagnosingDoctor === this.props.address && !this.props.diagnosisHash) {
       diagnosis =
         <div className='col-xs-12'>
           <SubmitDiagnosisContainer
             caseAddress={this.props.caseAddress}
-            caseKey={this.props.caseKey} />
+            caseKey={caseKey} />
         </div>
     }
 
-    if (this.props.caseKey === undefined) {
+    if (caseKey === undefined) {
       diagnosis = null
       challenge = null
-    } else if (this.props.caseKey === null) {
+    } else if (caseKey === null) {
       diagnosis = (
         <div className="col-xs-12 col-md-6 col-md-offset-3">
           <h4 className="text-danger">
@@ -116,7 +117,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             <div id="view-case-details" className='col-xs-12'>
               <CaseDetails
                 caseAddress={this.props.match.params.caseAddress}
-                caseKey={this.props.caseKey} />
+                caseKey={caseKey} />
             </div>
           </div>
         </div>

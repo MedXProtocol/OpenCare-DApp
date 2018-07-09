@@ -10,16 +10,33 @@ contract DoctorManager is Ownable, Initializable {
 
   uint256 public doctorCount;
 
-  event AddDoctor(address indexed doctor);
+  mapping (uint256 => bool) public doctorDeactivated;
 
-  function initialize () notInitialized {
+  event AddDoctor(address indexed doctor);
+  event DoctorDeactivated(address indexed doctor);
+  event DoctorReactivated(address indexed doctor);
+
+  function initialize() public notInitialized {
     setInitialized();
     owner = msg.sender;
+
+    doctorIndices[address(0)] = doctorCount;
+    doctorAddresses[doctorCount] = address(0);
+    doctorNames[doctorCount] = '';
+    doctorCount += 1;
   }
 
-  function addDoctor(address _doctor, string _name) public onlyOwner {
-    require(_doctor != address(0));
-    require(!isDoctor(_doctor));
+  function addOrReactivateDoctor(address _doctor, string _name) public onlyOwner {
+    address doctorAddress = doctorAddresses[doctorIndex(_doctor)];
+    if (_doctor == doctorAddress) {
+      reactivateDoctor(_doctor, _name);
+    } else {
+      addDoctor(_doctor, _name);
+    }
+  }
+
+  function addDoctor(address _doctor, string _name) private onlyOwner {
+    require(!isDoctor(_doctor), "Address provided is already a doctor");
     doctorIndices[_doctor] = doctorCount;
     doctorAddresses[doctorCount] = _doctor;
     doctorNames[doctorCount] = _name;
@@ -27,15 +44,41 @@ contract DoctorManager is Ownable, Initializable {
     emit AddDoctor(_doctor);
   }
 
-  function isDoctor(address _doctor) public view returns (bool) {
-    require(_doctor != address(0));
+  function reactivateDoctor(address _doctor, string _name) private onlyOwner {
+    require(!isActive(_doctor), "Address provided is already activated, cannot reactivate");
+    uint256 index = doctorIndex(_doctor);
+    doctorDeactivated[index] = false;
+    doctorNames[index] = _name;
+    emit DoctorReactivated(_doctor);
+  }
+
+  function deactivateDoctor(address _doctor) public onlyOwner {
+    uint256 index = doctorIndex(_doctor);
+    require(isActive(_doctor), 'Doctor is not active');
+    doctorDeactivated[index] = true;
+    emit DoctorDeactivated(_doctor);
+  }
+
+  function doctorIndex(address _doctor) private view returns (uint256) {
+    require(_doctor != address(0), "Doctor address provided is blank");
     uint256 index = doctorIndices[_doctor];
-    return doctorAddresses[index] == _doctor;
+    if (doctorAddresses[index] == _doctor) {
+      return index;
+    } else {
+      return 0;
+    }
+  }
+
+  function isDoctor(address _doctor) public view returns (bool) {
+    return isActive(_doctor);
+  }
+
+  function isActive(address _doctor) public view returns (bool) {
+    uint256 index = doctorIndex(_doctor);
+    return index != 0 && !doctorDeactivated[index];
   }
 
   function name(address _doctor) public view returns (string) {
-    require(_doctor != address(0));
-    uint256 index = doctorIndices[_doctor];
-    return doctorNames[index];
+    return doctorNames[doctorIndex(_doctor)];
   }
 }
