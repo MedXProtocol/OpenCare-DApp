@@ -25,7 +25,6 @@ const libp2p = require('libp2p')
 
 export function newNode(_options) {
   const wrtcStar = new WebRTCStar({ id: _options.peerInfo.id })
-  // const wsstar = new WebSocketStar({id: _options.peerInfo.id})
 
   const defaults = {
     modules: {

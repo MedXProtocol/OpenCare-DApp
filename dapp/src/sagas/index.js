@@ -5,7 +5,7 @@ import addRegistryContracts from './add-registry-contracts-saga'
 import signInSaga from './sign-in-saga'
 import signOutSaga from './sign-out-saga'
 import signUpSaga from './sign-up-saga'
-import p2pSaga from './p2p-saga'
+import heartbeatSaga from './heartbeat-saga'
 
 export default function* () {
   yield fork(takeOnceAndRun, 'WEB3_INITIALIZED', addTopLevelContracts)
@@ -16,6 +16,6 @@ export default function* () {
     signInSaga(),
     signOutSaga(),
     signUpSaga(),
-    p2pSaga()
+    heartbeatSaga()
   ])
 }

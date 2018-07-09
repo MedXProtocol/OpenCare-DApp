@@ -4,6 +4,7 @@ import { isBlank } from '~/utils/isBlank'
 import PropTypes from 'prop-types'
 import { withSaga, cacheCallValue, cacheCall } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
+import get from 'lodash.get'
 
 function mapStateToProps(state, ownProps) {
   const DoctorManager = contractByName(state, 'DoctorManager')
@@ -16,7 +17,8 @@ function mapStateToProps(state, ownProps) {
       doctors.push({
         name: cacheCallValue(state, DoctorManager, 'doctorNames', i),
         address,
-        publicKey: cacheCallValue(state, AccountManager, 'publicKeys', address)
+        publicKey: cacheCallValue(state, AccountManager, 'publicKeys', address),
+        online: get(state, `heartbeat[${address}].online`, false)
       })
     }
   }
