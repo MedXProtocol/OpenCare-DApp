@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faTelegramPlane from '@fortawesome/fontawesome-free-brands/faTelegramPlane';
-import { HippoNavbarContainer } from '../components/HippoNavbar';
-import { PublicKeyCheck } from '../components/PublicKeyCheck';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import faTelegramPlane from '@fortawesome/fontawesome-free-brands/faTelegramPlane'
+import { HippoNavbarContainer } from '~/components/HippoNavbar'
+import { PublicKeyCheck } from '~/components/PublicKeyCheck'
+import { BetaFaucetModal } from '~/components/BetaFaucetModal'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 import get from 'lodash.get'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
@@ -12,9 +13,9 @@ import { withSaga } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 
 function mapStateToProps (state) {
-  const account = get(state, 'sagaGenesis.accounts[0]')
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const DoctorManager = contractByName(state, 'DoctorManager')
-  const isOwner = account && (cacheCallValue(state, DoctorManager, 'owner') === account)
+  const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
   return {
     DoctorManager,
     isOwner
@@ -29,12 +30,14 @@ function* saga({ DoctorManager }) {
 export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(class extends Component {
   static propTypes = {
     doNetworkCheck: PropTypes.bool,
-    doPublicKeyCheck: PropTypes.bool
+    doPublicKeyCheck: PropTypes.bool,
+    doBetaFaucetModal: PropTypes.bool
   }
 
   static defaultProps = {
     doNetworkCheck: true,
-    doPublicKeyCheck: true
+    doPublicKeyCheck: true,
+    doBetaFaucetModal: true
   }
 
   render() {
@@ -43,6 +46,9 @@ export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(cl
     }
     if (this.props.doPublicKeyCheck) {
       var publicKeyCheck = <PublicKeyCheck />
+    }
+    if (this.props.doBetaFaucetModal) {
+      var betaFaucetModal = <BetaFaucetModal />
     }
     if (this.props.isOwner) {
       var ownerWarning =
@@ -58,6 +64,7 @@ export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(cl
           {networkCheckmodal}
           <div className="content">
             {publicKeyCheck}
+            {betaFaucetModal}
 
             {this.props.children}
           </div>

@@ -16,3 +16,7 @@ export REACT_APP_IPFS_PROTOCOL=https
 # export REACT_APP_BUGSNAG_API_KEY=<your bug snag key>
 # export REACT_APP_ENV=<your env ie staging or production>
 # export REACT_APP_MIXPANEL_KEY=<your_dev_key>
+# export REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI="http://localhost:9000/betaFaucetDrip"
+
+# export LAMBDA_CONFIG_CORS_ORIGIN="*"
+# export LAMBDA_CONFIG_PRIVKEY="<contractOwnerPrivKey>"

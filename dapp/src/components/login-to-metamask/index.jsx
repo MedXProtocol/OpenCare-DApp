@@ -19,7 +19,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class extends Component 
     return (
       <BodyClass isDark={true}>
         {redirect}
-        <MainLayoutContainer>
+        <MainLayoutContainer doBetaFaucetModal={false}>
           <div className='container'>
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
