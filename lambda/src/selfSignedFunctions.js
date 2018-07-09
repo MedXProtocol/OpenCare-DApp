@@ -18,7 +18,7 @@ const validateAddresses = function(privateKey, contractOwnerAddress, ethAddress)
   ethAddress = ethAddress.toLowerCase()
 }
 
-export const getContractAddressFromRegistry = async function(contractName) {
+const getContractAddressFromRegistry = async function(contractName) {
   const contractKey = web3.utils.sha3(contractName)
 
   const registryAddress = contractAddresses.contracts
@@ -34,12 +34,7 @@ export const getContractAddressFromRegistry = async function(contractName) {
 }
 
 // Sending data to a contract's function
-export const signTransaction = async function(
-  contractOwnerAddress,
-  functionName,
-  functionInputs,
-  ethAddress
-) {
+export const signTransaction = async function(contractOwnerAddress, ethAddress) {
   const privateKey = process.env.LAMBDA_CONFIG_PRIVKEY
   validateAddresses(privateKey, contractOwnerAddress, ethAddress)
 

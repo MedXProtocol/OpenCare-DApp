@@ -7,21 +7,6 @@ import { signTransaction } from './selfSignedFunctions'
 // requires leading '0x' ! The key metamask exports is wrong!
 const CONTRACT_OWNER_ADDRESS = '0x09c0048e162455b981a6caa2815469dfea18759d'
 
-async function processTransaction(ethAddress) {
-  const functionName = 'sendEther'
-  const functionInputs = [{
-    type: 'address',
-    name: '_to'
-  }]
-
-  return await signTransaction(
-    CONTRACT_OWNER_ADDRESS,
-    functionName,
-    functionInputs,
-    ethAddress
-  )
-}
-
 exports.handler = async (event, context, callback) => {
   const responseHeaders = {
     'Content-Type': 'application/json',
@@ -39,7 +24,10 @@ exports.handler = async (event, context, callback) => {
       }
     }
 
-    const signed = await processTransaction(ethAddress)
+    const signed = await signTransaction(
+      CONTRACT_OWNER_ADDRESS,
+      ethAddress
+    )
 
     const transaction = web3.eth.sendSignedTransaction(signed.rawTransaction)
 
