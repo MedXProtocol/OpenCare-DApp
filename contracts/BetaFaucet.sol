@@ -45,15 +45,12 @@ contract BetaFaucet is Ownable, Initializable {
   }
 
   function sendMedX(address _recipient) public onlyOwner {
-    // require(_recipient != address(0), "recipient address is empty");
-    // require(!sentMedXAddresses[_recipient], "recipient has already received MedX");
+    require(_recipient != address(0), "recipient address is empty");
+    require(!sentMedXAddresses[_recipient], "recipient has already received MedX");
 
-    // sentMedXAddresses[_recipient] = true;
-    // emit MedXSent(_recipient, 15000000000);
+    sentMedXAddresses[_recipient] = true;
+    emit MedXSent(_recipient, 15000000000);
 
-    medXToken.mint(_recipient, 15000000000); // 15 MedX
-
-    // medXToken.transfer(_recipient, 15000000000);
-    // MedXToken.transferFrom(betaFaucetContractAddress, _recipient, 15000000000); // 15 MedX
+    medXToken.transfer(_recipient, 15000000000);
   }
 }
