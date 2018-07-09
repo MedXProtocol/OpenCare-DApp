@@ -4,9 +4,12 @@ let BetaFaucet = artifacts.require("./BetaFaucet.sol");
 
 const MedXToken = artifacts.require("./MedXToken.sol");
 
-module.exports = async function(deployer) {
-  let medXTokenInstance = await MedXToken.deployed()
-  return deploy(artifacts, deployer, BetaFaucet).then((betaFaucet) => {
-    return betaFaucet.initialize(medXTokenInstance.address)
+module.exports = function(deployer) {
+  deployer.then(() => {
+    return MedXToken.deployed().then(medXTokenInstance => {
+      return deploy(artifacts, deployer, BetaFaucet).then((betaFaucet) => {
+        return betaFaucet.initialize(medXTokenInstance.address)
+      })
+    })
   })
 };
