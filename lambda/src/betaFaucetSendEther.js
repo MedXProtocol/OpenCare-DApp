@@ -1,7 +1,8 @@
+require('idempotent-babel-polyfill')
+
 import Web3 from 'web3'
 const web3 = new Web3(new Web3.providers.HttpProvider(process.env.LAMBDA_CONFIG_PROVIDER_URL))
 
-import 'idempotent-babel-polyfill'
 import { signTransaction } from './selfSignedFunctions'
 
 // requires leading '0x' ! The key metamask exports is wrong!
