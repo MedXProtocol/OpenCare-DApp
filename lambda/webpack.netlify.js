@@ -1,7 +1,5 @@
 'use strict';
 
-var path = require('path')
-
 module.exports = {
   module: {
     rules: [
@@ -12,12 +10,10 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.node', '.json'],
-    modules: ["node_modules"],
+    extensions: ['.js', '.jsx', '.node', '.json', ''],
+    modules: ["node_modules", "src"]
   },
   externals: [
     'electron'
-  ],
-  plugins: [
   ]
 }
