@@ -36,7 +36,9 @@ exports.handler = async (event, context, callback) => {
         console.log('hash: ' + hash)
         console.log('await promise.then(hash): ' + hash)
         console.log('responseHeaders: ')
-        console.table(responseHeaders)
+        console.log('responseHeaders: '+ responseHeaders['Content-Type'])
+        console.log('responseHeaders: '+ responseHeaders['Access-Control-Allow-Origin'])
+
         console.log('JSON.stringify({ txHash: hash }): ' + JSON.stringify({ txHash: hash }))
         callback(null, {
           statusCode: '200',
