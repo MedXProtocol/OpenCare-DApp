@@ -17,6 +17,7 @@ function mapStateToProps (state) {
   const medXBalance = cacheCallValue(state, MedXToken, 'balanceOf', address)
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
   const ropsten = (state.sagaGenesis.network.networkId === 3)
+  const localhost = (state.sagaGenesis.network.networkId === 1234)
 
   const CaseManager = contractByName(state, 'CaseManager')
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
@@ -29,7 +30,8 @@ function mapStateToProps (state) {
     MedXToken,
     isOwner,
     previousCase,
-    ropsten
+    ropsten,
+    localhost
   }
 }
 
@@ -77,14 +79,14 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
         let content
         let showBetaFaucetModal = false
         const { ethBalance } = this.state
-        const { medXBalance, previousCase, ropsten, isOwner, address } = this.props
+        const { medXBalance, previousCase, ropsten, localhost, isOwner, address } = this.props
 
         if (isOwner) { return }
 
         // Don't show this if they've already been onboarded
         if (medXBalance > 0 || previousCase) { return }
 
-        if (ropsten && (ethBalance !== undefined)) {
+        if ((ropsten || localhost) && (ethBalance !== undefined)) {
           if (ethBalance < 0.1) {
             showBetaFaucetModal = true
             content = <EthFaucetAPI

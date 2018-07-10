@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/emO8rPnBiGuzIJx5vMzk'))
+const web3 = new Web3(new Web3.providers.HttpProvider(process.env.LAMBDA_CONFIG_PROVIDER_URL))
 
 import 'idempotent-babel-polyfill'
 import { signTransaction } from './selfSignedFunctions'

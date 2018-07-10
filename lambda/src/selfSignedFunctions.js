@@ -1,7 +1,7 @@
 import Web3 from 'web3'
-const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/emO8rPnBiGuzIJx5vMzk'))
+const web3 = new Web3(new Web3.providers.HttpProvider(process.env.LAMBDA_CONFIG_PROVIDER_URL))
 
-const contractAddresses = require('../../networks/3.json')
+const contractAddresses = require(`../../networks/${process.env.LAMBDA_CONFIG_NETWORK_ID}.json`)
 const betaFaucetArtifact = require("../../build/contracts/BetaFaucet.json")
 const registryArtifact = require("../../build/contracts/Registry.json")
 
@@ -30,6 +30,8 @@ const getContractAddressFromRegistry = async function(contractName) {
   Registry.setProvider(web3.currentProvider)
 
   const betaFaucetContractAddress = await Registry.methods.lookup(contractKey).call()
+  console.log(`BetaFaucet Delegate from the Registry is: ${betaFaucetContractAddress}`)
+
   return betaFaucetContractAddress
 }
 

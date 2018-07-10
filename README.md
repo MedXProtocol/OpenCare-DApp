@@ -1,4 +1,4 @@
-# MedCredits Smart Contracts & Dev Blockchain Server 
+# MedCredits Smart Contracts & Dev Blockchain Server
 
 [![Logo](assets/medcredwhitecropped.png)](https://medcredits.io/)
 
@@ -36,7 +36,12 @@ To run the truffle tests:
 
 ### To run the beta faucet lambda endpoint:
 
-`$ ./lambda-serve.sh` (lambda compute endpoints)
+Install the npm packages in the `lambda` dir, then run `lambda-serve.sh`:
+
+`$ cd lambda`
+`$ npm i`
+`$ cd ..`
+`$ ./lambda-serve.sh` (boots up lambda compute endpoints)
 
 ### Running Webpack Dev server
 

@@ -34,8 +34,7 @@ export const EthFaucetAPI = class extends Component {
       if (response.status === 200) {
         this.setState({
           responseMessage: "We're sending you Ether",
-          txHash: response.data.txHash,
-          isSending: false
+          txHash: response.data.txHash
         })
       } else {
         this.setState({
@@ -86,6 +85,8 @@ export const EthFaucetAPI = class extends Component {
             <br/>
             Please wait, this may take up to a couple of minutes ...
           </small>
+          <br/>
+          <br/>
         </p>
       )
     }
