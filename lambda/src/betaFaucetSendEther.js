@@ -1,4 +1,5 @@
-require('idempotent-babel-polyfill')
+import { idempotentBabelPolyfill } from 'idempotent-babel-polyfill';
+idempotentBabelPolyfill();
 
 import Web3 from 'web3'
 const web3 = new Web3(new Web3.providers.HttpProvider(process.env.LAMBDA_CONFIG_PROVIDER_URL))
