@@ -7,5 +7,8 @@
     "netlify-lambda": "^0.4.0",
     "regenerator-runtime": "^0.12.0",
     "web3": "^1.0.0-beta.34"
+  },
+  "devDependencies": {
+    "node-loader": "^0.6.0"
   }
 }
