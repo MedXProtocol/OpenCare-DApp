@@ -3,7 +3,6 @@ import {
   select,
   take,
   put,
-  getContext,
   fork,
   spawn,
   call
@@ -15,9 +14,6 @@ import {
 } from 'redux-saga'
 import { createNode } from '~/services/createNode'
 import { promisify } from '~/utils/common-util'
-import multihashes from 'multihashes'
-import { toastr } from '~/toastr'
-import get from 'lodash.get'
 
 const HEARTBEAT_SUBSCRIPTION_CHANNEL = '/MedCredits/Heartbeat'
 const HEARTBEAT_INTERVAL = 2000
@@ -42,7 +38,7 @@ function* startNode() {
   })
 
   node.on('peer:disconnect', (peerInfo) => {
-    const idStr = peerInfo.id.toB58String()
+    // const idStr = peerInfo.id.toB58String()
     // console.log('Lost connection to: ' + idStr)
   })
 
@@ -100,7 +96,7 @@ function heartbeatBody(address) {
   ))
 }
 
-function isVeryOld(lastHeartbeatTime, address) {
+function skippedABeat(lastHeartbeatTime, address) {
   const lastTime = lastHeartbeatTime[address]
   return !lastTime || ((new Date() - lastTime) >= MAX_LIFETIME)
 }
@@ -109,8 +105,7 @@ function* heartbeatMessage(lastHeartbeatTime, { message, dataJson, date }) {
   const { address } = dataJson
   if (!address) { return console.error('Missing address: ', dataJson) }
 
-  const isNew = isVeryOld(lastHeartbeatTime, address)
-  if (isNew) {
+  if (skippedABeat(lastHeartbeatTime, address)) {
     yield put({ type: 'USER_ONLINE', address, date })
   }
 
@@ -119,8 +114,7 @@ function* heartbeatMessage(lastHeartbeatTime, { message, dataJson, date }) {
   yield spawn(function* () {
     // If we haven't received a heartbeat within two intervals, we can assume death
     yield call(delay, MAX_LIFETIME)
-    const isOld = isVeryOld(lastHeartbeatTime, address)
-    if (isOld) {
+    if (skippedABeat(lastHeartbeatTime, address)) {
       yield put({ type: 'USER_OFFLINE', address, date: new Date() })
     }
   })

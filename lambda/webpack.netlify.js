@@ -3,17 +3,6 @@
 var path = require('path')
 
 module.exports = {
-  // module: {
-    // rules: [
-    //   {
-    //     test: /\.node$/,
-    //     exclude: /(node_modules|bower_components)/,
-    //     use: {
-    //       loader: "babel-loader"
-    //     }
-    //   }
-    // ]
-  // },
   module: {
     rules: [
       {

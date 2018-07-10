@@ -61,8 +61,6 @@
     "lodash.sortby": "^4.7.0",
     "lodash.values": "^4.3.0",
     "mixpanel-browser": "^2.22.4",
-    "multiaddr": "^5.0.0",
-    "multihashes": "^0.4.13",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.8",

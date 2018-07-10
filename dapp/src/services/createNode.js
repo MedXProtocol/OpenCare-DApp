@@ -1,6 +1,5 @@
 import PeerInfo from 'peer-info'
 import { newNode } from '~/services/newNode'
-import multiaddr from 'multiaddr'
 
 export function createNode(callback) {
   PeerInfo.create((err, peerInfo) => {
