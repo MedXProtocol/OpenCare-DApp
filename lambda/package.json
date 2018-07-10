@@ -5,10 +5,11 @@
   "dependencies": {
     "idempotent-babel-polyfill": "^6.26.0",
     "netlify-lambda": "^0.4.0",
+    "node-loader": "^0.6.0",
     "node-scrypt": "chuckbergeron/node-scrypt",
     "regenerator-runtime": "^0.12.0",
+    "scrypt": "^6.0.3",
     "web3": "^1.0.0-beta.34",
-    "websocket": "^1.0.26",
-    "node-loader": "^0.6.0"
+    "websocket": "^1.0.26"
   }
 }
