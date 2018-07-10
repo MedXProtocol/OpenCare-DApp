@@ -1,3 +1,3 @@
 #! /bin/sh
 
-netlify-lambda -c webpack.netlify.js serve src
+NODE_ENV=development netlify-lambda -c webpack.netlify.js serve src

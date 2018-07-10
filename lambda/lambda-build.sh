@@ -1,4 +1,4 @@
 #! /bin/sh
 
-npm i && \
-netlify-lambda -c webpack.netlify.js build src
+NODE_ENV=production npm i && \
+NODE_ENV=production netlify-lambda -c webpack.netlify.js build src
