@@ -38,12 +38,18 @@ exports.handler = async (event, context, callback) => {
         console.log('responseHeaders: '+ responseHeaders['Access-Control-Allow-Origin'])
 
         console.log('JSON.stringify({ txHash: hash }): ' + JSON.stringify({ txHash: hash }))
-        callback(null, {
+        // resolve({
+        //   statusCode: 200,
+        //   body: JSON.stringify({ txHash: hash }),
+        //   headers: responseHeaders
+        // });
+        resolve()
+
+        return callback(null, {
           statusCode: '200',
           body: JSON.stringify({ txHash: hash }),
           headers: responseHeaders
         })
-        resolve()
       })
       transaction.on('error', error => {
         callback(error)
