@@ -1,3 +1,3 @@
 #! /bin/sh
 
-$(npm bin)/netlify-lambda -c lambda/webpack.netlify.js serve lambda/src
+netlify-lambda -c webpack.netlify.js serve src

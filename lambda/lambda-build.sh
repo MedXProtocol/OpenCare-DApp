@@ -1,3 +1,3 @@
 #! /bin/sh
 
-$(npm bin)/netlify-lambda -c webpack.netlify.js build src
+netlify-lambda -c webpack.netlify.js build src
