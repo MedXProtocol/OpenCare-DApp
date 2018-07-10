@@ -31,32 +31,41 @@ exports.handler = async (event, context, callback) => {
 
     const transaction = web3.eth.sendSignedTransaction(signed.rawTransaction)
 
-    const promise = new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       transaction.on('transactionHash', hash => {
         console.log('hash: ' + hash)
+        console.log('await promise.then(hash): ' + hash)
+        console.log('responseHeaders: ')
+        console.table(responseHeaders)
+        console.log('JSON.stringify({ txHash: hash }): ' + JSON.stringify({ txHash: hash }))
+        callback(null, {
+          statusCode: '200',
+          body: JSON.stringify({ txHash: hash }),
+          headers: responseHeaders
+        })
         resolve(hash)
       })
       transaction.on('error', error => {
         console.error(error.message)
+        callback(error)
         reject(error.message)
       })
     })
 
-
-    await promise.then((hash) => {
-      console.log('await promise.then(hash): ' + hash)
-      console.log('responseHeaders: ')
-      console.table(responseHeaders)
-      console.log('JSON.stringify({ txHash: hash }): ' + JSON.stringify({ txHash: hash }))
-      callback(null, {
-        statusCode: '200',
-        body: JSON.stringify({ txHash: hash }),
-        headers: responseHeaders
-      })
-    }).catch((error) => {
-      console.log('that catch ...')
-      callback(error)
-    })
+    // await promise.then((hash) => {
+    //   console.log('await promise.then(hash): ' + hash)
+    //   console.log('responseHeaders: ')
+    //   console.table(responseHeaders)
+    //   console.log('JSON.stringify({ txHash: hash }): ' + JSON.stringify({ txHash: hash }))
+    //   callback(null, {
+    //     statusCode: '200',
+    //     body: JSON.stringify({ txHash: hash }),
+    //     headers: responseHeaders
+    //   })
+    // }).catch((error) => {
+    //   console.log('that catch ...')
+    //   callback(error)
+    // })
 
   } catch (error) {
     console.log(error)
