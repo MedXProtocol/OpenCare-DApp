@@ -1,3 +1,3 @@
 export function isTrue(value) {
-  return value || value === 'True' || value === 'true'
+  return value === true || value === 'True' || value === 'true'
 }
