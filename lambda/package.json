@@ -6,7 +6,6 @@
     "idempotent-babel-polyfill": "^6.26.0",
     "netlify-lambda": "^0.4.0",
     "regenerator-runtime": "^0.12.0",
-    "web3": "^1.0.0-beta.34",
-    "node-scrypt": "chuckbergeron/node-scrypt#master"
+    "web3": "^1.0.0-beta.34"
   }
 }
