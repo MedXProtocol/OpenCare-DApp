@@ -87,7 +87,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
         if (medXBalance > 0 || previousCase) { return }
 
         if ((ropsten || localhost) && (ethBalance !== undefined)) {
-          if (ethBalance < 0.1) {
+          if (ethBalance < 0.03) {
             showBetaFaucetModal = true
             content = <EthFaucetAPI
               onSuccess={this.getEtherBalance}
