@@ -6,6 +6,7 @@ module.exports = async function createEnvironment(artifacts) {
   const DoctorManager = artifacts.require('./DoctorManager.sol')
   const Delegate = artifacts.require('./Delegate.sol')
   const CaseManager = artifacts.require('./CaseManager.sol')
+  const BetaFaucet = artifacts.require('./BetaFaucet.sol')
   const Registry = artifacts.require("./Registry.sol")
 
   let registry = await Registry.new()
@@ -28,7 +29,15 @@ module.exports = async function createEnvironment(artifacts) {
   let doctorManager = await DoctorManager.at(doctorManagerDelegate.address)
   await doctorManager.initialize()
 
+  let betaFaucetInstance = await BetaFaucet.new()
+  await registry.register(toRegistryKey('BetaFaucetTarget'), betaFaucetInstance.address)
+  let betaFaucetDelegate = await Delegate.new(registry.address, toRegistryKey('BetaFaucetTarget'))
+  await registry.register(toRegistryKey('BetaFaucet'), betaFaucetDelegate.address)
+  let betaFaucet = await BetaFaucet.at(betaFaucetDelegate.address)
+  await betaFaucet.initialize()
+
   return {
+    betaFaucet,
     registry,
     medXToken,
     caseManager,

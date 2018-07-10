@@ -53,7 +53,7 @@ export const SignUp = class _SignUp extends Component {
       showMasterPassword: false,
       showOverrideModal: false,
       overrideModalHasBeenShown: false,
-      confirming: false
+      creating: false
     }
   }
 
@@ -77,7 +77,7 @@ export const SignUp = class _SignUp extends Component {
   closeOverrideModal = () => {
     this.setState({
       showOverrideModal: false,
-      confirming: false
+      creating: false
     })
     this.props.clearOverrideError()
   }
@@ -85,7 +85,7 @@ export const SignUp = class _SignUp extends Component {
   onMasterPassword = (password) => {
     this.setState({
       masterPassword: password,
-      confirming: true
+      creating: true
     }, () => {
       this.props.setTimeout(() => {
         this.props.signUp({
@@ -104,12 +104,12 @@ export const SignUp = class _SignUp extends Component {
     if (this.props.signedIn) {
       content = <Redirect to='/patients/cases' />
     } else if (this.state.showMasterPassword) {
-      content = <MasterPasswordContainer onMasterPassword={this.onMasterPassword} creating={this.state.confirming} />
+      content = <MasterPasswordContainer onMasterPassword={this.onMasterPassword} creating={this.state.creating} />
     } else {
       content = <SecretKeyContainer secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
     }
     return (
-      <MainLayoutContainer>
+      <MainLayoutContainer doBetaFaucetModal={false}>
         {content}
         <OverrideDisallowedModal
           show={this.state.showOverrideModal || !!this.props.overrideError}

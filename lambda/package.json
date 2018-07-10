@@ -1,0 +1,11 @@
+{
+  "name": "HippocratesLambda",
+  "version": "0.0.1",
+  "scripts": {},
+  "dependencies": {
+    "idempotent-babel-polyfill": "^6.26.0",
+    "netlify-lambda": "^0.4.0",
+    "regenerator-runtime": "^0.12.0",
+    "web3": "^1.0.0-beta.34"
+  }
+}

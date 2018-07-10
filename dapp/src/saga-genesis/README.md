@@ -1,7 +1,6 @@
 # Introduction
 
-This module separates asynchronous calls from your components using sagas.  When certain properties on a
-component change, the saga is run.  
+This module separates asynchronous calls from your components using sagas.  When certain properties on a component change, the saga is run.
 
 This module offers additional sagas and reducers to provide Web3 caching functionality.
 
@@ -95,4 +94,4 @@ function* saga({ caseAddress }) {
 - The browser still has to build the objects in order to find them.  Oh well.  It will only do that once (or
   at least every cookie reset)
 
-- Bandwidth.  Now the browser is writing out as well as reading in.  
+- Bandwidth.  Now the browser is writing out as well as reading in.

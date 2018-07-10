@@ -9,7 +9,7 @@ export const TryMetamask = class extends Component {
   render () {
     return (
       <BodyClass isDark={true}>
-        <MainLayoutContainer>
+        <MainLayoutContainer doBetaFaucetModal={false}>
           <div className='container'>
             <div className='row'>
               <div className='col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>

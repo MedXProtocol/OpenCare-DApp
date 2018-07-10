@@ -1,5 +1,23 @@
+.modal-dialog {
+  @media (max-width: $screen-sm) {
+    margin: 0;
+  }
+}
+
+.modal-header {
+  background: rgba(250, 250, 250, 1);
+  border: 0;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+
 .modal-body {
   padding: 20px 30px;
+
+  @media (max-width: $screen-sm) {
+    font-size: 90%;
+    padding: 20px;
+  }
 }
 
 .modal-footer {
@@ -18,9 +36,19 @@
   @media (min-width: 768px) {
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
   }
+  @media (max-width: $screen-sm) {
+    border-radius: 0;
+    border: 0;
+  }
 }
 
 .modal-footer {
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
+  border-top: 0;
+  min-height: 60px;
+
+  @media (max-width: $screen-sm) {
+    border-radius: 0;
+  }
 }

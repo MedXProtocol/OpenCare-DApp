@@ -53,6 +53,10 @@ h6 .small-inverse {
   color: #4aa8f7;
 }
 
+.header--no-top-margin {
+  margin-top: 0;
+}
+
 ul,
 ol {
   @media (max-width: 768px) {

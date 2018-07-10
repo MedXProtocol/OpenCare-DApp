@@ -1,4 +1,4 @@
-# MedCredits Smart Contracts & Dev Blockchain Server
+# MedCredits Smart Contracts & Dev Blockchain Server 
 
 [![Logo](assets/medcredwhitecropped.png)](https://medcredits.io/)
 
@@ -24,18 +24,26 @@ Prior to running the ganache-cli server, you will need to set up your environmen
 
 4. Use `direnv allow` to export the env vars into your current terminal shell.
 
-#### To run the Ganache server:
+### Testing Contracts
+
+To run the truffle tests:
+
+`$ npm run test`
+
+### To run the Ganache server:
 
 `$ npm run start`
+
+### To run the beta faucet lambda endpoint:
+
+`$ ./lambda-serve.sh` (lambda compute endpoints)
+
+### Running Webpack Dev server
+
+See README.md in ./dapp directory
 
 ### Migration
 
 To deploy/migrate the contracts:
 
 `$ npm run migrate`
-
-### Testing
-
-To run the truffle tests:
-
-`$ npm run test`
