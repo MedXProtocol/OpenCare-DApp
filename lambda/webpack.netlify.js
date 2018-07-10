@@ -1,5 +1,9 @@
 'use strict';
 
+const webpack = require('webpack')
+const getClientEnvironment = require('./config/env')
+const env = getClientEnvironment()
+
 module.exports = {
   target: 'node',
   module: {
