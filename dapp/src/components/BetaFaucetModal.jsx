@@ -81,10 +81,10 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
         const { ethBalance } = this.state
         const { medXBalance, previousCase, ropsten, localhost, isOwner, address } = this.props
 
-        if (isOwner) { return }
+        if (isOwner) { return null }
 
         // Don't show this if they've already been onboarded
-        if (medXBalance > 0 || previousCase) { return }
+        if (medXBalance > 0 || previousCase) { return null }
 
         if ((ropsten || localhost) && (ethBalance !== undefined)) {
           if (ethBalance < 0.03) {
@@ -123,4 +123,3 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
     }
   )
 ))
-
