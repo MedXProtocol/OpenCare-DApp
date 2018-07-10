@@ -20,7 +20,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "babel-register": "^6.26.0",
     "netlify-lambda": "^0.4.0",
-    "ganache-cli": "6.1.2",
+    "ganache-cli": "6.1.6",
     "dotenv": "^4.0.0",
     "swarm-js": "^0.1.37",
     "truffle": "^4.1.11",
