@@ -52,3 +52,4 @@ See README.md in ./dapp directory
 To deploy/migrate the contracts:
 
 `$ npm run migrate`
+
