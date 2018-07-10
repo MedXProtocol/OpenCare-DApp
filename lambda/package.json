@@ -8,9 +8,7 @@
     "node-scrypt": "chuckbergeron/node-scrypt",
     "regenerator-runtime": "^0.12.0",
     "web3": "^1.0.0-beta.34",
-    "websocket": "^1.0.26"
-  },
-  "devDependencies": {
+    "websocket": "^1.0.26",
     "node-loader": "^0.6.0"
   }
 }
