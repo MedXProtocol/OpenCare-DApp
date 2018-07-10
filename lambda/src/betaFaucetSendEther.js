@@ -33,8 +33,7 @@ exports.handler = async (event, context, callback) => {
 
     const promise = new Promise((resolve, reject) => {
       transaction.on('transactionHash', hash => {
-        console.log('hash')
-        console.log(hash)
+        console.log('hash: ' + hash)
         resolve(hash)
       })
       transaction.on('error', error => {
@@ -45,24 +44,23 @@ exports.handler = async (event, context, callback) => {
 
 
     await promise.then((hash) => {
+      console.log('await promise.then(hash): ' + hash)
+      console.log('responseHeaders: ')
+      console.table(responseHeaders)
+      console.log('JSON.stringify({ txHash: hash }): ' + JSON.stringify({ txHash: hash }))
       callback(null, {
         statusCode: '200',
         body: JSON.stringify({ txHash: hash }),
         headers: responseHeaders
       })
     }).catch((error) => {
-      callback(null, {
-        statusCode: '500',
-        body: error.message,
-        headers: responseHeaders
-      })
+      console.log('that catch ...')
+      callback(error)
     })
 
   } catch (error) {
-    callback(null, {
-      statusCode: '500',
-      body: error.message,
-      headers: responseHeaders
-    })
+    console.log(error)
+    console.log('this catch!')
+    callback(error)
   }
 }

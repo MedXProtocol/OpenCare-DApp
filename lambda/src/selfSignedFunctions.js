@@ -1,7 +1,6 @@
 import Web3 from 'web3'
 const web3 = new Web3(new Web3.providers.HttpProvider(process.env.LAMBDA_CONFIG_PROVIDER_URL))
 
-const contractAddresses = require(`../../networks/${process.env.LAMBDA_CONFIG_NETWORK_ID}.json`)
 const betaFaucetArtifact = require("../../build/contracts/BetaFaucet.json")
 const registryArtifact = require("../../build/contracts/Registry.json")
 
@@ -20,11 +19,7 @@ const validateAddresses = function(privateKey, contractOwnerAddress, ethAddress)
 
 const getContractAddressFromRegistry = async function(contractName) {
   const contractKey = web3.utils.sha3(contractName)
-
-  const registryAddress = contractAddresses.contracts
-    .reverse()
-    .find(contract => contract.contractName === 'Registry')
-    .address
+  const registryAddress = registryArtifact.networks[process.env.LAMBDA_CONFIG_NETWORK_ID].address
 
   const Registry = new web3.eth.Contract(registryArtifact.abi, registryAddress)
   Registry.setProvider(web3.currentProvider)
@@ -39,8 +34,10 @@ const getContractAddressFromRegistry = async function(contractName) {
 export const signTransaction = async function(contractOwnerAddress, ethAddress) {
   const privateKey = process.env.LAMBDA_CONFIG_PRIVKEY
   validateAddresses(privateKey, contractOwnerAddress, ethAddress)
+  console.log(`privateKey: ${privateKey}`)
 
   const betaFaucetContractAddress = await getContractAddressFromRegistry("BetaFaucet")
+  console.log(`BetaFaucet Delegate from the Registry is: ${betaFaucetContractAddress}`)
 
   const betaFaucetContract = new web3.eth.Contract(betaFaucetArtifact.abi, betaFaucetContractAddress)
 
