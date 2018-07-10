@@ -33,9 +33,7 @@ exports.handler = async (event, context, callback) => {
 
     await new Promise((resolve, reject) => {
       transaction.on('transactionHash', hash => {
-        console.log('hash: ' + hash)
-        console.log('await promise.then(hash): ' + hash)
-        console.log('responseHeaders: ')
+        console.log('await new Promise: ' + hash)
         console.log('responseHeaders: '+ responseHeaders['Content-Type'])
         console.log('responseHeaders: '+ responseHeaders['Access-Control-Allow-Origin'])
 
@@ -45,10 +43,9 @@ exports.handler = async (event, context, callback) => {
           body: JSON.stringify({ txHash: hash }),
           headers: responseHeaders
         })
-        resolve(hash)
+        resolve()
       })
       transaction.on('error', error => {
-        console.error(error.message)
         callback(error)
         reject(error.message)
       })
@@ -70,7 +67,6 @@ exports.handler = async (event, context, callback) => {
     // })
 
   } catch (error) {
-    console.log(error)
     console.log('this catch!')
     callback(error)
   }

@@ -34,10 +34,8 @@ const getContractAddressFromRegistry = async function(contractName) {
 export const signTransaction = async function(contractOwnerAddress, ethAddress) {
   const privateKey = process.env.LAMBDA_CONFIG_PRIVKEY
   validateAddresses(privateKey, contractOwnerAddress, ethAddress)
-  console.log(`privateKey: ${privateKey}`)
 
   const betaFaucetContractAddress = await getContractAddressFromRegistry("BetaFaucet")
-  console.log(`BetaFaucet Delegate from the Registry is: ${betaFaucetContractAddress}`)
 
   const betaFaucetContract = new web3.eth.Contract(betaFaucetArtifact.abi, betaFaucetContractAddress)
 
