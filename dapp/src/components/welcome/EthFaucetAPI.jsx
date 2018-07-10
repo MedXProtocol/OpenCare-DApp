@@ -121,6 +121,9 @@ export const EthFaucetAPI = class extends Component {
             onClick={this.handleSendEther}
             className="btn btn-lg btn-primary"
           >{isSending ? 'Sending ...' : 'Send Me Ether'}</a>
+          <br />
+          <br />
+          <a onClick={this.props.moveToNextStep}>skip this for now</a>
         </p>
         <br />
         {isSending || responseMessage || errorMessage ? responseWell : ''}
