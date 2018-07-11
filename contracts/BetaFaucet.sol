@@ -14,7 +14,7 @@ contract BetaFaucet is Ownable, Initializable {
   MedXToken public medXToken;
 
   // Constructor which allows us to fund contract on creation
-  function BetaFaucet() public payable {
+  constructor() public payable {
   }
 
   // `fallback` function called when eth is sent to this contract
@@ -23,13 +23,20 @@ contract BetaFaucet is Ownable, Initializable {
 
   /**
    * @dev - Creates a new BetaFaucet contract with the given parameters
-   * @param _medXToken - the MedX token contract
    */
-  function initialize (MedXToken _medXToken) external notInitialized {
+  function initialize() external notInitialized {
     setInitialized();
     owner = msg.sender;
+  }
 
-    medXToken = _medXToken;
+  /**
+   * @dev - Updates the MedXToken contract address once
+   * @param _medXToken - the MedX token contract
+   */
+  function updateMedXTokenAddress(MedXToken _medXToken) external {
+    if (medXToken == address(0)) {
+      medXToken = _medXToken;
+    }
   }
 
   function sendEther(address _recipient) public onlyOwner {
