@@ -13,6 +13,12 @@ contract BetaFaucet is Ownable, Initializable {
 
   MedXToken public medXToken;
 
+  using SafeMath for uint128;
+  using SafeMath for uint32;
+
+  uint128 public constant etherToTransfer = 100000000000000000;
+  uint32 public constant gasAmount = 1000000;
+
   // Constructor which allows us to fund contract on creation
   constructor() public payable {
   }
@@ -33,7 +39,7 @@ contract BetaFaucet is Ownable, Initializable {
    * @dev - Updates the MedXToken contract address once
    * @param _medXToken - the MedX token contract
    */
-  function updateMedXTokenAddress(MedXToken _medXToken) external {
+  function updateMedXTokenAddress(MedXToken _medXToken) external onlyOwner {
     if (medXToken == address(0)) {
       medXToken = _medXToken;
     }
@@ -42,13 +48,13 @@ contract BetaFaucet is Ownable, Initializable {
   function sendEther(address _recipient) public onlyOwner {
     require(_recipient != address(0), "recipient address is empty");
     require(!sentAddresses[_recipient], "recipient has already received ether");
-    require(address(this).balance >= 100000000000000000, "contract is out of ether!");
+    require(address(this).balance >= etherToTransfer.add(gasAmount), "contract is out of ether!");
 
     sentAddresses[_recipient] = true;
     emit EtherSent(_recipient);
 
     // 0.1 ether in wei
-    _recipient.transfer(100000000000000000);
+    _recipient.transfer(etherToTransfer);
   }
 
   function sendMedX(address _recipient) public onlyOwner {

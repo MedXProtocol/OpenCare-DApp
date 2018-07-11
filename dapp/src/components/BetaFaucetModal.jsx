@@ -17,7 +17,6 @@ function mapStateToProps (state) {
   const DoctorManager = contractByName(state, 'DoctorManager')
   const medXBalance = cacheCallValue(state, MedXToken, 'balanceOf', address)
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
-  const networkId = state.sagaGenesis.network.networkId
   const CaseManager = contractByName(state, 'CaseManager')
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const previousCase = (caseListCount > 0)
@@ -30,8 +29,7 @@ function mapStateToProps (state) {
     DoctorManager,
     MedXToken,
     isOwner,
-    previousCase,
-    networkId
+    previousCase
   }
 }
 
@@ -111,28 +109,25 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
 
         let content
         const { showBetaFaucetModal, step } = this.state
-        const { medXBalance, previousCase, ethBalance, networkId, isOwner, address } = this.props
-        const showOnThisNetwork = (networkId === 3 || networkId === 1234)
+        const { medXBalance, previousCase, ethBalance, isOwner, address } = this.props
 
         if (isOwner) { return null }
 
         // Don't show this if they've already been onboarded
         if (medXBalance > 0 || previousCase) { return null }
 
-        if (showOnThisNetwork) {
-          if (step === 1) {
-            content = <EthFaucetAPI
-              key="ethFaucet"
-              address={address}
-              ethBalance={ethBalance}
-              moveToNextStep={this.moveToNextStep} />
-          } else if (step === 2) {
-            content = <MedXFaucetAPI
-              key="medXFaucet"
-              address={address}
-              medXBalance={medXBalance}
-              moveToNextStep={this.moveToNextStep} />
-          }
+        if (step === 1) {
+          content = <EthFaucetAPI
+            key="ethFaucet"
+            address={address}
+            ethBalance={ethBalance}
+            moveToNextStep={this.moveToNextStep} />
+        } else if (step === 2) {
+          content = <MedXFaucetAPI
+            key="medXFaucet"
+            address={address}
+            medXBalance={medXBalance}
+            moveToNextStep={this.moveToNextStep} />
         }
 
         return (
