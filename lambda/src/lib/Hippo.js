@@ -39,6 +39,7 @@ export class Hippo {
       .then((address) => {
         return address
       })
+      .catch(error => { throw error })
   }
 
   lookupBetaFaucet () {
@@ -46,9 +47,10 @@ export class Hippo {
       .then((address) => {
         return new this._web3.eth.Contract(betaFaucetArtifact.abi, address)
       })
+      .catch(error => { throw error })
   }
 
-  sendTransaction (tx) {
-    return this._web3.eth.sendTransaction(tx)
+  sendTransaction (tx, callback) {
+    return this._web3.eth.sendTransaction(tx, callback)
   }
 }

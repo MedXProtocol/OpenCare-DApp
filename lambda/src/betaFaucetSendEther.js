@@ -8,7 +8,9 @@ const hippo = new Hippo({
   networkId: process.env.LAMBDA_CONFIG_NETWORK_ID
 })
 
-exports.handler = (event, context, callback) => {
+exports.handler = function (event, context, callback) {
+  context.callbackWaitsForEmptyEventLoop = false
+
   const responseHeaders = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': process.env.LAMBDA_CONFIG_CORS_ORIGIN
@@ -25,18 +27,20 @@ exports.handler = (event, context, callback) => {
       }
     }
 
-    const transaction = sendEther(hippo, ethAddress, (error, transaction) => {
-      transaction.on('transactionHash', hash => {
+    sendEther(hippo, ethAddress, (error, transactionHash) => {
+      if (error) {
+        callback(error)
+      } else {
         callback(null, {
           statusCode: '200',
-          body: JSON.stringify({ txHash: hash }),
+          body: JSON.stringify({ txHash: transactionHash }),
           headers: responseHeaders
         })
-      })
+      }
     })
 
   } catch (error) {
-    console.log(error)
+    console.error('MASSIVE ERROR: ', error)
     callback(error)
   }
 }
