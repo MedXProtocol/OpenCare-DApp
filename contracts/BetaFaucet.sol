@@ -56,8 +56,8 @@ contract BetaFaucet is Ownable, Initializable {
     require(!sentMedXAddresses[_recipient], "recipient has already received MedX");
 
     sentMedXAddresses[_recipient] = true;
-    emit MedXSent(_recipient, 15000000000);
+    emit MedXSent(_recipient, 15);
 
-    medXToken.transfer(_recipient, 15000000000);
+    medXToken.transfer(_recipient, 15);
   }
 }

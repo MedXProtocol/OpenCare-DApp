@@ -98,8 +98,8 @@
 
 .page-enter, .page-leave {
   position: absolute;
-  -webkit-transition: transform 2500ms ease-in-out, opacity 2500ms ease-in-out;
-  transition: transform 2500ms ease-in-out, opacity 2500ms ease-in-out;
+  -webkit-transition: transform 400ms ease-in-out, opacity 400ms ease-in-out;
+  transition: transform 400ms ease-in-out, opacity 400ms ease-in-out;
 }
 
 .page-enter {

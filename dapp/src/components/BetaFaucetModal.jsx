@@ -147,8 +147,8 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             <Modal.Body>
               <div className="row">
                 <ReactCSSTransitionReplace transitionName="page"
-                                           transitionEnterTimeout={2500}
-                                           transitionLeaveTimeout={2500}>
+                                           transitionEnterTimeout={400}
+                                           transitionLeaveTimeout={400}>
                   {content}
                 </ReactCSSTransitionReplace>
               </div>
