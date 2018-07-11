@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import ReactCSSTransitionReplace from 'react-css-transition-replace';
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { withSaga } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
@@ -101,6 +102,10 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         }
       }
 
+      handleClose() {
+        this.setState({ showBetaFaucetModal: false });
+      }
+
       render() {
         if (this.props.betaFaucetModalDismissed) { return null }
 
@@ -117,11 +122,13 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         if (showOnThisNetwork) {
           if (step === 1) {
             content = <EthFaucetAPI
+              key="ethFaucet"
               address={address}
               ethBalance={ethBalance}
               moveToNextStep={this.moveToNextStep} />
           } else if (step === 2) {
             content = <MedXFaucetAPI
+              key="medXFaucet"
               address={address}
               medXBalance={medXBalance}
               moveToNextStep={this.moveToNextStep} />
@@ -140,7 +147,11 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             <Modal.Body>
               <div className="row">
                 <div className="col-xs-12 text-center">
-                  {content}
+                  <ReactCSSTransitionReplace transitionName="cross-fade"
+                                             transitionEnterTimeout={300}
+                                             transitionLeaveTimeout={300}>
+                    {content}
+                  </ReactCSSTransitionReplace>
                 </div>
               </div>
             </Modal.Body>

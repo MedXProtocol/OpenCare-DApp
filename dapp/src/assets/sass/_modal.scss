@@ -58,3 +58,9 @@
     border-radius: 0;
   }
 }
+
+.modal-dialog {
+  .modal.fade & {
+    transition: transform .3s ease-out;
+  }
+}
