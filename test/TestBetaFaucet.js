@@ -12,12 +12,21 @@ contract('BetaFaucet', function (accounts) {
   before(async () => {
     env = await createEnvironment(artifacts)
     betaFaucetInstance = env.betaFaucet
+    betaFaucetInstance.updateMedXTokenAddress(env.medXToken.address)
   })
 
   describe('initialize()', () => {
     it('should not be called again', () => {
       expectThrow(async () => {
-        await env.betaFaucetInstance.initialize(env.medXToken.address)
+        await env.betaFaucetInstance.initialize()
+      })
+    })
+  })
+
+  describe('updateMedXTokenAddress()', () => {
+    it('should not be called again', () => {
+      expectThrow(async () => {
+        await env.betaFaucetInstance.updateMedXTokenAddress(env.medXToken.address)
       })
     })
   })
@@ -50,11 +59,15 @@ contract('BetaFaucet', function (accounts) {
 
   describe('sendMedX()', () => {
     it('should work', async () => {
-      let medXBalance = await env.medXToken.balanceOf(recipient)
+      env.medXToken.mint(betaFaucetInstance.address, 3000000)
+      const betaFaucetDelegateMedXBalance = await env.medXToken.balanceOf(betaFaucetInstance.address)
+      assert.equal(betaFaucetDelegateMedXBalance, 3000000)
+
+      const medXBalance = await env.medXToken.balanceOf(recipient)
       assert.equal(medXBalance, 0)
 
       await betaFaucetInstance.sendMedX(recipient)
-      let newMedXBalance = await env.medXToken.balanceOf(recipient)
+      const newMedXBalance = await env.medXToken.balanceOf(recipient)
       assert.equal(newMedXBalance, 15)
     })
 
