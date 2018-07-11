@@ -1,6 +1,6 @@
 import 'idempotent-babel-polyfill'
+import Eth from 'ethjs'
 import { Hippo } from './lib/Hippo'
-import { sendEther } from './lib/sendEther'
 
 const hippo = new Hippo({
   privateKey: process.env.LAMBDA_CONFIG_PRIVKEY,
@@ -9,8 +9,6 @@ const hippo = new Hippo({
 })
 
 exports.handler = function (event, context, callback) {
-  context.callbackWaitsForEmptyEventLoop = false
-
   const responseHeaders = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': process.env.LAMBDA_CONFIG_CORS_ORIGIN
@@ -28,19 +26,24 @@ exports.handler = function (event, context, callback) {
     }
 
     console.log('Sending Ether to ', ethAddress)
-    sendEther(hippo, ethAddress, (error, transactionHash) => {
-      if (error) {
-        console.error('Web3Error: ', error)
-        callback(error)
-      } else {
-        console.log('Successfully sent transaction with hash: ', transactionHash)
-        callback(null, {
-          statusCode: '200',
-          body: JSON.stringify({ txHash: transactionHash }),
-          headers: responseHeaders
+
+    if (!Eth.isAddress(ethAddress)) {
+      callback(`ethAddress is not a valid address: ${ethAddress}`)
+    } else {
+      hippo.sendEther(ethAddress)
+        .then((transactionHash) => {
+          console.log('Successfully sent transaction with hash: ', transactionHash)
+          callback(null, {
+            statusCode: 200,
+            body: JSON.stringify({ txHash: transactionHash }),
+            headers: responseHeaders
+          })
         })
-      }
-    })
+        .catch(error => {
+          console.error('ERROR: ', error)
+          callback(error)
+        })
+    }
 
   } catch (error) {
     console.error('MASSIVE ERROR: ', error)

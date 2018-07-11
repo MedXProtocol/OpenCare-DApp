@@ -1,4 +1,8 @@
-import Web3 from 'web3'
+const Eth = require('ethjs')
+const abi = require('ethjs-abi')
+const SignerProvider = require('ethjs-provider-signer')
+const sign = require('ethjs-signer').sign
+const privateToAccount = require('ethjs-account').privateToAccount
 
 const betaFaucetArtifact = require("../../../build/contracts/BetaFaucet.json")
 const registryArtifact = require("../../../build/contracts/Registry.json")
@@ -14,12 +18,12 @@ export class Hippo {
       fail('privateKey is not the correct length (Could need leading "0x")')
     this._providerUrl = config.providerUrl || fail('You must pass a provider URL')
     this._networkId = config.networkId || fail('You must pass a network id')
-    this._web3 = new Web3(new Web3.providers.HttpProvider(this._providerUrl))
-    this._account = this._web3.eth.accounts.wallet.add(this.privateKey)
-  }
-
-  web3() {
-    return this._web3
+    this._account = privateToAccount(this.privateKey)
+    // this._eth = new Eth(new SignerProvider(this._providerUrl, {
+    //   signTransaction: (rawTx, cb) => cb(null, sign(rawTx, this._account.privateKey)),
+    //   accounts: (cb) => cb(null, [this._account.address]),
+    // }))
+    this._eth = new Eth(new Eth.HttpProvider(this._providerUrl))
   }
 
   ownerAddress() {
@@ -28,29 +32,44 @@ export class Hippo {
 
   getRegistryContract () {
     const registryAddress = registryArtifact.networks[this._networkId].address
-    const Registry = new this._web3.eth.Contract(registryArtifact.abi, registryAddress)
-    Registry.setProvider(this._web3.currentProvider)
+    const Registry = new this._eth.contract(registryArtifact.abi).at(registryAddress)
     return Registry
   }
 
-  lookupContract (contractName) {
-    const contractKey = this._web3.utils.sha3(contractName)
-    return this.getRegistryContract().methods.lookup(contractKey).call()
-      .then((address) => {
-        return address
-      })
-      .catch(error => { throw error })
+  lookupContractAddress (contractName) {
+    return this.getRegistryContract().lookup(Eth.keccak256(contractName))
   }
 
   lookupBetaFaucet () {
-    return this.lookupContract('BetaFaucet')
+    return this.lookupContractAddress('BetaFaucet')
       .then((address) => {
-        return new this._web3.eth.Contract(betaFaucetArtifact.abi, address)
+        return new this._eth.contract(betaFaucetArtifact.abi).at(address)
       })
-      .catch(error => { throw error })
+      .catch(error => fail(error))
   }
 
-  sendTransaction (tx, callback) {
-    return this._web3.eth.sendTransaction(tx, callback)
+  sendTransaction (tx) {
+    // return this._eth.sendTransaction(tx)
+    return this._eth.getTransactionCount(this._account.address)
+      .then((nonce) => {
+        tx.nonce = nonce.toString()
+        return this._eth.sendRawTransaction(sign(tx, this._account.privateKey))
+      })
+      .catch(error => fail(error))
+  }
+
+  sendEther (ethAddress) {
+    return this.lookupContractAddress('BetaFaucet').then((betaFaucetAddress) => {
+      const method = betaFaucetArtifact.abi.find((obj) => obj.name === 'sendEther')
+      var data = abi.encodeMethod(method, [ethAddress])
+      const tx = {
+        from: this.ownerAddress(),
+        to: betaFaucetAddress[0],
+        gas: 4612388,
+        gasPrice: Eth.toWei(20, 'gwei').toString(),
+        data
+      }
+      return this.sendTransaction(tx)
+    })
   }
 }
