@@ -37,16 +37,18 @@ contract('BetaFaucet', function (accounts) {
 
       let contractBalance = await promisify(cb => web3.eth.getBalance(betaFaucetInstance.address, cb));
       let startingBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
+      startingBalance = web3.fromWei(startingBalance, "ether")
 
       await betaFaucetInstance.sendEther(recipient)
 
       let newBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
+      newBalance = web3.fromWei(newBalance, "ether")
 
-      startingBalance = startingBalance.add(100000000000000000) // 0.1 ether
+      startingBalance = startingBalance.add(0.1)
 
       assert.equal(
-        newBalance.toFormat(2, 1).toString(),
-        startingBalance.toFormat(2, 1).toString()
+        newBalance.toFormat(2, 1),
+        startingBalance.toFormat(2, 1)
       )
     })
 
