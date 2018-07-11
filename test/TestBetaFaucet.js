@@ -1,10 +1,11 @@
-import { promisify } from './helpers/promisify';
+import { promisify } from './helpers/promisify'
 const expectThrow = require('./helpers/expectThrow')
 const createEnvironment = require('./helpers/create-environment')
 
 contract('BetaFaucet', function (accounts) {
   let recipient = accounts[1]
   let recipient2 = accounts[2]
+  let recipient3 = accounts[3]
 
   let env
   let betaFaucet
@@ -15,8 +16,8 @@ contract('BetaFaucet', function (accounts) {
   })
 
   describe('initialize()', () => {
-    it('should not be called again', () => {
-      expectThrow(async () => {
+    it('should not be called again', async () => {
+      await expectThrow(async () => {
         await env.betaFaucet.initialize()
       })
     })
@@ -24,26 +25,21 @@ contract('BetaFaucet', function (accounts) {
 
   describe('sendEther()', () => {
     it('should work', async () => {
-      await betaFaucet.send(web3.toWei(50, "ether"));
-
-      let contractBalance = await promisify(cb => web3.eth.getBalance(betaFaucet.address, cb));
-      let startingBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
-
+      await betaFaucet.send(web3.toWei(0.2, "ether"))
+      let recipientBalance = await promisify(cb => web3.eth.getBalance(recipient, cb))
       await betaFaucet.sendEther(recipient)
-
-      let newBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
-
+      let newRecipientBalance = await promisify(cb => web3.eth.getBalance(recipient, cb))
       assert.equal(
-        newBalance,
-        startingBalance.add(1)
+        newRecipientBalance.toString(),
+        recipientBalance.add(web3.toWei(0.1, "ether")).toString()
       )
     })
 
     it('should not allow double sends', async () => {
       await betaFaucet.sendEther(recipient2)
-      // expectThrow(async () => {
-        // await betaFaucet.sendEther(recipient)
-      // })
+      await expectThrow(async () => {
+        await betaFaucet.sendEther(recipient2)
+      })
     })
   })
 })
