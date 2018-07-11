@@ -27,8 +27,10 @@ exports.handler = function (event, context, callback) {
       }
     }
 
+    console.log('Sending Ether to ', ethAddress)
     sendEther(hippo, ethAddress, (error, transactionHash) => {
       if (error) {
+        console.error('Web3Error: ', error)
         callback(error)
       } else {
         callback(null, {
