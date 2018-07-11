@@ -17,7 +17,8 @@ export REACT_APP_P2P_WEBRTC_STAR_PORT=9090
 # export REACT_APP_BUGSNAG_API_KEY=<your bug snag key>
 # export REACT_APP_ENV=<your env ie staging or production>
 # export REACT_APP_MIXPANEL_KEY=<your_dev_key>
-# export REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI="http://localhost:9000/betaFaucetDrip"
 
 # export LAMBDA_CONFIG_CORS_ORIGIN="*"
 # export LAMBDA_CONFIG_PRIVKEY="<contractOwnerPrivKey>"
+# export LAMBDA_CONFIG_PROVIDER_URL=https://ropsten.infura.io/To0546l6M9AapR2JxoHN
+# export LAMBDA_CONFIG_NETWORK_ID=3
