@@ -73,3 +73,53 @@
   from { margin-top: 0; }
   to { margin-top: -155px; }
 }
+
+.cross-fade-leave {
+  opacity: 1;
+}
+
+.cross-fade-leave.cross-fade-leave-active {
+  opacity: 0;
+  transition: opacity 300ms ease-in;
+}
+
+.cross-fade-enter {
+  opacity: 0;
+}
+
+.cross-fade-enter.cross-fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+
+.cross-fade-height {
+  transition: height 300ms ease-in-out;
+}
+
+.page-enter, .page-leave {
+  position: absolute;
+  -webkit-transition: transform 400ms ease-in-out, opacity 400ms ease-in-out;
+  transition: transform 400ms ease-in-out, opacity 400ms ease-in-out;
+}
+
+.page-enter {
+  left: 100vw;
+}
+
+.page-enter.page-enter-active {
+  -webkit-transform: translate3d(-100vw, 0, 0);
+  transform: translate3d(-100vw, 0, 0);
+}
+
+.page-leave {
+  left: 0;
+}
+
+.page-leave.page-leave-active {
+  -webkit-transform: translate3d(-100vw, 0, 0);
+  transform: translate3d(-100vw, 0, 0);
+}
+
+.page-height {
+  height: 330px !important;
+}

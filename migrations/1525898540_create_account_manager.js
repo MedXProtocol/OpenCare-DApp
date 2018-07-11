@@ -1,6 +1,6 @@
 const AccountManager = artifacts.require("AccountManager.sol");
-const deploy = require('./support/deploy')
+const deployWithDelegate = require('./support/deployWithDelegate')
 
 module.exports = function(deployer) {
-  deploy(artifacts, deployer, AccountManager)
+  deployWithDelegate(artifacts, deployer, AccountManager)
 };

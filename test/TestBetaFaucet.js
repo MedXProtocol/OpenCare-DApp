@@ -7,43 +7,78 @@ contract('BetaFaucet', function (accounts) {
   let recipient2 = accounts[2]
 
   let env
-  let betaFaucet
+  let betaFaucetInstance
 
   before(async () => {
     env = await createEnvironment(artifacts)
-    betaFaucet = env.betaFaucet
+    betaFaucetInstance = env.betaFaucet
+    betaFaucetInstance.updateMedXTokenAddress(env.medXToken.address)
   })
 
   describe('initialize()', () => {
     it('should not be called again', () => {
       expectThrow(async () => {
-        await env.betaFaucet.initialize()
+        await env.betaFaucetInstance.initialize()
+      })
+    })
+  })
+
+  describe('updateMedXTokenAddress()', () => {
+    it('should not be called again', () => {
+      expectThrow(async () => {
+        await env.betaFaucetInstance.updateMedXTokenAddress(env.medXToken.address)
       })
     })
   })
 
   describe('sendEther()', () => {
     it('should work', async () => {
-      await betaFaucet.send(web3.toWei(50, "ether"));
+      await betaFaucetInstance.send(web3.toWei(50, "ether"));
 
-      let contractBalance = await promisify(cb => web3.eth.getBalance(betaFaucet.address, cb));
+      let contractBalance = await promisify(cb => web3.eth.getBalance(betaFaucetInstance.address, cb));
       let startingBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
+      startingBalance = web3.fromWei(startingBalance, "ether")
 
-      await betaFaucet.sendEther(recipient)
+      await betaFaucetInstance.sendEther(recipient)
 
       let newBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
+      newBalance = web3.fromWei(newBalance, "ether")
+
+      startingBalance = startingBalance.add(0.1)
 
       assert.equal(
-        newBalance,
-        startingBalance.add(1)
+        newBalance.toFormat(2, 1),
+        startingBalance.toFormat(2, 1)
       )
     })
 
     it('should not allow double sends', async () => {
-      await betaFaucet.sendEther(recipient2)
-      // expectThrow(async () => {
-        // await betaFaucet.sendEther(recipient)
-      // })
+      await betaFaucetInstance.sendEther(recipient2)
+      expectThrow(async () => {
+        await betaFaucetInstance.sendEther(recipient2)
+      })
+    })
+  })
+
+  describe('sendMedX()', () => {
+    it('should work', async () => {
+      env.medXToken.mint(betaFaucetInstance.address, 3000000)
+      const betaFaucetDelegateMedXBalance = await env.medXToken.balanceOf(betaFaucetInstance.address)
+      assert.equal(betaFaucetDelegateMedXBalance, 3000000)
+
+      const medXBalance = await env.medXToken.balanceOf(recipient)
+      assert.equal(medXBalance, 0)
+
+      await betaFaucetInstance.sendMedX(recipient)
+      const newMedXBalance = await env.medXToken.balanceOf(recipient)
+      assert.equal(newMedXBalance, 15)
+    })
+
+    it('should not allow double sends', async () => {
+      await betaFaucetInstance.sendMedX(recipient2)
+      expectThrow(async () => {
+        await betaFaucetInstance.sendMedX(recipient2)
+      })
     })
   })
 })

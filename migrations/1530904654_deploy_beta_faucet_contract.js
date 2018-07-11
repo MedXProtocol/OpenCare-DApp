@@ -1,9 +1,8 @@
-var deploy = require('./support/deploy')
-
-let BetaFaucet = artifacts.require("./BetaFaucet.sol");
+const deployWithDelegate = require('./support/deployWithDelegate')
+const BetaFaucet = artifacts.require("./BetaFaucet.sol");
 
 module.exports = function(deployer) {
-  deploy(artifacts, deployer, BetaFaucet).then((betaFaucet) => {
+  deployWithDelegate(artifacts, deployer, BetaFaucet).then((betaFaucet) => {
     return betaFaucet.initialize()
   })
 };

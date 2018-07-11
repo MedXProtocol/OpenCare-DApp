@@ -13,7 +13,10 @@ function* getEthBalance() {
     return parseFloat(web3.utils.fromWei(weiBalance, 'ether'))
   })
 
-  yield put({type: 'ETH_BALANCE', balance})
+  const oldBalance = yield select((state) => state.ethBalance.balance)
+  if (oldBalance !== balance) {
+    yield put({type: 'ETH_BALANCE', balance})
+  }
 }
 
 function* startEthBalancePolling() {

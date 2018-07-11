@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import ReactCSSTransitionReplace from 'react-css-transition-replace';
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { withSaga } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { Modal } from 'react-bootstrap'
 import get from 'lodash.get'
-import { EthFaucetAPI } from '~/components/welcome/EthFaucetAPI'
+import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
+import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -15,7 +17,6 @@ function mapStateToProps (state) {
   const DoctorManager = contractByName(state, 'DoctorManager')
   const medXBalance = cacheCallValue(state, MedXToken, 'balanceOf', address)
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
-  const networkId = state.sagaGenesis.network.networkId
   const CaseManager = contractByName(state, 'CaseManager')
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const previousCase = (caseListCount > 0)
@@ -28,8 +29,7 @@ function mapStateToProps (state) {
     DoctorManager,
     MedXToken,
     isOwner,
-    previousCase,
-    networkId
+    previousCase
   }
 }
 
@@ -84,13 +84,24 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       }
 
       moveToNextStep = (e) => {
-        e.preventDefault()
+        if (e !== undefined) {
+          e.preventDefault()
+        }
 
-        this.props.dismissModal()
+        if (this.state.step === 1) {
+          this.setState({
+            step: 2
+          })
+        } else if (this.state.step === 2) {
+          this.props.dismissModal()
+          this.setState({
+            showBetaFaucetModal: false
+          })
+        }
+      }
 
-        this.setState({
-          showBetaFaucetModal: false
-        })
+      handleClose() {
+        this.setState({ showBetaFaucetModal: false });
       }
 
       render() {
@@ -98,22 +109,25 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
 
         let content
         const { showBetaFaucetModal, step } = this.state
-        const { medXBalance, previousCase, ethBalance, networkId, isOwner, address } = this.props
-        const showOnThisNetwork = (networkId === 3 || networkId === 1234)
+        const { medXBalance, previousCase, ethBalance, isOwner, address } = this.props
 
         if (isOwner) { return null }
 
         // Don't show this if they've already been onboarded
         if (medXBalance > 0 || previousCase) { return null }
 
-        if (showOnThisNetwork) {
-          if (step === 1) {
-            content = <EthFaucetAPI
-              onSuccess={this.getEtherBalance}
-              address={address}
-              ethBalance={ethBalance}
-              moveToNextStep={this.moveToNextStep} />
-          }
+        if (step === 1) {
+          content = <EthFaucetAPI
+            key="ethFaucet"
+            address={address}
+            ethBalance={ethBalance}
+            moveToNextStep={this.moveToNextStep} />
+        } else if (step === 2) {
+          content = <MedXFaucetAPI
+            key="medXFaucet"
+            address={address}
+            medXBalance={medXBalance}
+            moveToNextStep={this.moveToNextStep} />
         }
 
         return (
@@ -121,15 +135,17 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             <Modal.Header>
               <div className="row">
                 <div className="col-xs-12 text-center">
-                  <h4>Welcome to the Hippocrates Beta</h4>
+                  <h4>Welcome to the Hippocrates Beta <small>(Step {step} of 3)</small></h4>
                 </div>
               </div>
             </Modal.Header>
             <Modal.Body>
               <div className="row">
-                <div className="col-xs-12 text-center">
+                <ReactCSSTransitionReplace transitionName="page"
+                                           transitionEnterTimeout={400}
+                                           transitionLeaveTimeout={400}>
                   {content}
-                </div>
+                </ReactCSSTransitionReplace>
               </div>
             </Modal.Body>
             <Modal.Footer>
