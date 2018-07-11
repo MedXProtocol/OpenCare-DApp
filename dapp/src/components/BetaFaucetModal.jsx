@@ -1,37 +1,35 @@
 import React, { Component } from 'react'
-import ReactTimeout from 'react-timeout'
 import { connect } from 'react-redux'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { withSaga } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { Modal } from 'react-bootstrap'
-import { currentAccount } from '~/services/sign-in'
 import get from 'lodash.get'
-import getWeb3 from '~/get-web3'
 import { EthFaucetAPI } from '~/components/welcome/EthFaucetAPI'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
+  const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
   const MedXToken = contractByName(state, 'MedXToken')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const medXBalance = cacheCallValue(state, MedXToken, 'balanceOf', address)
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
-  const ropsten = (state.sagaGenesis.network.networkId === 3)
-  const localhost = (state.sagaGenesis.network.networkId === 1234)
-
+  const networkId = state.sagaGenesis.network.networkId
   const CaseManager = contractByName(state, 'CaseManager')
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const previousCase = (caseListCount > 0)
 
   return {
     address,
+    betaFaucetModalDismissed,
+    ethBalance,
     medXBalance,
     DoctorManager,
     MedXToken,
     isOwner,
     previousCase,
-    ropsten,
-    localhost
+    networkId
   }
 }
 
@@ -42,60 +40,79 @@ function* saga({ CaseManager, MedXToken, DoctorManager, address }) {
   yield cacheCall(DoctorManager, 'owner')
 }
 
-export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['CaseManager', 'DoctorManager', 'MedXToken', 'address'] })(
+function mapDispatchToProps(dispatch) {
+  return {
+    dismissModal: () => {
+      dispatch({ type: 'BETA_FAUCET_MODAL_DISMISSED' })
+    }
+  }
+}
+
+export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
+  withSaga(saga, { propTriggers: ['ethBalance', 'medXBalance', 'CaseManager', 'DoctorManager', 'MedXToken', 'address'] })(
     class extends Component {
 
       constructor(props) {
         super(props)
 
         this.state = {
-          ethBalance: undefined
+          step: 1,
+          showBetaFaucetModal: false
         }
       }
 
-      getEtherBalance = () => {
-        const address = currentAccount().address()
+      componentDidMount() {
+        this.determineModalState(this.props)
+      }
 
-        getWeb3().eth.getBalance(address).then(balance => {
-          this.setState({
-            ethBalance: parseFloat(getWeb3().utils.fromWei(balance, 'ether'))
-          })
+      componentWillReceiveProps(nextProps) {
+        this.determineModalState(nextProps)
+      }
+
+      determineModalState(props) {
+        let showBetaFaucetModal
+
+        if (props.ethBalance !== undefined && props.ethBalance < 0.03) {
+          showBetaFaucetModal = true
+        } else if (props.ethBalance !== undefined && props.ethBalance >= 0.03) {
+          showBetaFaucetModal = false
+        }
+
+        this.setState({
+          showBetaFaucetModal
         })
       }
 
-      componentDidMount() {
-        this.getEtherBalance()
+      moveToNextStep = (e) => {
+        e.preventDefault()
 
-        // start a check Eth loop
-        this.etherBalanceInterval = this.props.setInterval(this.getEtherBalance, 3000)
-      }
+        this.props.dismissModal()
 
-      componentWillUnmount() {
-        this.props.clearInterval(this.etherBalanceInterval)
+        this.setState({
+          showBetaFaucetModal: false
+        })
       }
 
       render() {
+        if (this.props.betaFaucetModalDismissed) { return null }
+
         let content
-        let showBetaFaucetModal = false
-        const { ethBalance } = this.state
-        const { medXBalance, previousCase, ropsten, localhost, isOwner, address } = this.props
+        const { showBetaFaucetModal, step } = this.state
+        const { medXBalance, previousCase, ethBalance, networkId, isOwner, address } = this.props
+        const showOnThisNetwork = (networkId === 3 || networkId === 1234)
 
         if (isOwner) { return null }
 
         // Don't show this if they've already been onboarded
         if (medXBalance > 0 || previousCase) { return null }
 
-        if ((ropsten || localhost) && (ethBalance !== undefined)) {
-          if (ethBalance < 0.03) {
-            showBetaFaucetModal = true
+        if (showOnThisNetwork) {
+          if (step === 1) {
             content = <EthFaucetAPI
               onSuccess={this.getEtherBalance}
               address={address}
-              ethBalance={ethBalance} />
-          } else {
-            this.props.clearInterval(this.etherBalanceInterval)
-            showBetaFaucetModal = false
+              ethBalance={ethBalance}
+              moveToNextStep={this.moveToNextStep} />
           }
         }
 
@@ -122,4 +139,4 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
       }
     }
   )
-))
+)
