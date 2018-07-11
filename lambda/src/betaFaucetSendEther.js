@@ -33,6 +33,7 @@ exports.handler = function (event, context, callback) {
         console.error('Web3Error: ', error)
         callback(error)
       } else {
+        console.log('Successfully sent transaction with hash: ', transactionHash)
         callback(null, {
           statusCode: '200',
           body: JSON.stringify({ txHash: transactionHash }),
