@@ -36,6 +36,8 @@ export const EthFaucetAPI = class extends Component {
           responseMessage: "We're sending you Ether",
           txHash: response.data.txHash
         })
+
+        this.props.moveToNextStep()
       } else {
         this.setState({
           responseMessage: '',
@@ -100,7 +102,7 @@ export const EthFaucetAPI = class extends Component {
     )
 
     return (
-      <div>
+      <div className="col-xs-12 text-center">
         <strong>Current Balance:</strong>
         <h2 className="header--no-top-margin">
           {this.props.ethBalance} Ξ
@@ -121,6 +123,9 @@ export const EthFaucetAPI = class extends Component {
             onClick={this.handleSendEther}
             className="btn btn-lg btn-primary"
           >{isSending ? 'Sending ...' : 'Send Me Ether'}</a>
+          <br />
+          <br />
+          <a onClick={this.props.moveToNextStep}>skip this for now</a>
         </p>
         <br />
         {isSending || responseMessage || errorMessage ? responseWell : ''}

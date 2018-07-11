@@ -1,37 +1,35 @@
 import React, { Component } from 'react'
-import ReactTimeout from 'react-timeout'
 import { connect } from 'react-redux'
+import ReactCSSTransitionReplace from 'react-css-transition-replace';
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { withSaga } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { Modal } from 'react-bootstrap'
-import { currentAccount } from '~/services/sign-in'
 import get from 'lodash.get'
-import getWeb3 from '~/get-web3'
-import { EthFaucetAPI } from '~/components/welcome/EthFaucetAPI'
+import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
+import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
+  const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
   const MedXToken = contractByName(state, 'MedXToken')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const medXBalance = cacheCallValue(state, MedXToken, 'balanceOf', address)
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
-  const ropsten = (state.sagaGenesis.network.networkId === 3)
-  const localhost = (state.sagaGenesis.network.networkId === 1234)
-
   const CaseManager = contractByName(state, 'CaseManager')
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const previousCase = (caseListCount > 0)
 
   return {
     address,
+    betaFaucetModalDismissed,
+    ethBalance,
     medXBalance,
     DoctorManager,
     MedXToken,
     isOwner,
-    previousCase,
-    ropsten,
-    localhost
+    previousCase
   }
 }
 
@@ -42,61 +40,94 @@ function* saga({ CaseManager, MedXToken, DoctorManager, address }) {
   yield cacheCall(DoctorManager, 'owner')
 }
 
-export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['CaseManager', 'DoctorManager', 'MedXToken', 'address'] })(
+function mapDispatchToProps(dispatch) {
+  return {
+    dismissModal: () => {
+      dispatch({ type: 'BETA_FAUCET_MODAL_DISMISSED' })
+    }
+  }
+}
+
+export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
+  withSaga(saga, { propTriggers: ['ethBalance', 'medXBalance', 'CaseManager', 'DoctorManager', 'MedXToken', 'address'] })(
     class extends Component {
 
       constructor(props) {
         super(props)
 
         this.state = {
-          ethBalance: undefined
+          step: 1,
+          showBetaFaucetModal: false
         }
       }
 
-      getEtherBalance = () => {
-        const address = currentAccount().address()
+      componentDidMount() {
+        this.determineModalState(this.props)
+      }
 
-        getWeb3().eth.getBalance(address).then(balance => {
-          this.setState({
-            ethBalance: parseFloat(getWeb3().utils.fromWei(balance, 'ether'))
-          })
+      componentWillReceiveProps(nextProps) {
+        this.determineModalState(nextProps)
+      }
+
+      determineModalState(props) {
+        let showBetaFaucetModal
+
+        if (props.ethBalance !== undefined && props.ethBalance < 0.03) {
+          showBetaFaucetModal = true
+        } else if (props.ethBalance !== undefined && props.ethBalance >= 0.03) {
+          showBetaFaucetModal = false
+        }
+
+        this.setState({
+          showBetaFaucetModal
         })
       }
 
-      componentDidMount() {
-        this.getEtherBalance()
+      moveToNextStep = (e) => {
+        if (e !== undefined) {
+          e.preventDefault()
+        }
 
-        // start a check Eth loop
-        this.etherBalanceInterval = this.props.setInterval(this.getEtherBalance, 3000)
+        if (this.state.step === 1) {
+          this.setState({
+            step: 2
+          })
+        } else if (this.state.step === 2) {
+          this.props.dismissModal()
+          this.setState({
+            showBetaFaucetModal: false
+          })
+        }
       }
 
-      componentWillUnmount() {
-        this.props.clearInterval(this.etherBalanceInterval)
+      handleClose() {
+        this.setState({ showBetaFaucetModal: false });
       }
 
       render() {
+        if (this.props.betaFaucetModalDismissed) { return null }
+
         let content
-        let showBetaFaucetModal = false
-        const { ethBalance } = this.state
-        const { medXBalance, previousCase, ropsten, localhost, isOwner, address } = this.props
+        const { showBetaFaucetModal, step } = this.state
+        const { medXBalance, previousCase, ethBalance, isOwner, address } = this.props
 
         if (isOwner) { return null }
 
         // Don't show this if they've already been onboarded
         if (medXBalance > 0 || previousCase) { return null }
 
-        if ((ropsten || localhost) && (ethBalance !== undefined)) {
-          if (ethBalance < 0.03) {
-            showBetaFaucetModal = true
-            content = <EthFaucetAPI
-              onSuccess={this.getEtherBalance}
-              address={address}
-              ethBalance={ethBalance} />
-          } else {
-            this.props.clearInterval(this.etherBalanceInterval)
-            showBetaFaucetModal = false
-          }
+        if (step === 1) {
+          content = <EthFaucetAPI
+            key="ethFaucet"
+            address={address}
+            ethBalance={ethBalance}
+            moveToNextStep={this.moveToNextStep} />
+        } else if (step === 2) {
+          content = <MedXFaucetAPI
+            key="medXFaucet"
+            address={address}
+            medXBalance={medXBalance}
+            moveToNextStep={this.moveToNextStep} />
         }
 
         return (
@@ -104,15 +135,17 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
             <Modal.Header>
               <div className="row">
                 <div className="col-xs-12 text-center">
-                  <h4>Welcome to the Hippocrates Beta</h4>
+                  <h4>Welcome to the Hippocrates Beta <small>(Step {step} of 3)</small></h4>
                 </div>
               </div>
             </Modal.Header>
             <Modal.Body>
               <div className="row">
-                <div className="col-xs-12 text-center">
+                <ReactCSSTransitionReplace transitionName="page"
+                                           transitionEnterTimeout={400}
+                                           transitionLeaveTimeout={400}>
                   {content}
-                </div>
+                </ReactCSSTransitionReplace>
               </div>
             </Modal.Body>
             <Modal.Footer>
@@ -122,4 +155,4 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps)(
       }
     }
   )
-))
+)

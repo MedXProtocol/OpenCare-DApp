@@ -8,26 +8,27 @@ contract('BetaFaucet', function (accounts) {
   let recipient3 = accounts[3]
 
   let env
-  let betaFaucet
+  let betaFaucetInstance
 
   before(async () => {
     env = await createEnvironment(artifacts)
-    betaFaucet = env.betaFaucet
+    betaFaucetInstance = env.betaFaucet
+    betaFaucetInstance.updateMedXTokenAddress(env.medXToken.address)
   })
 
   describe('initialize()', () => {
     it('should not be called again', async () => {
       await expectThrow(async () => {
-        await env.betaFaucet.initialize()
+        await betaFaucetInstance.initialize()
       })
     })
   })
 
   describe('sendEther()', () => {
     it('should work', async () => {
-      await betaFaucet.send(web3.toWei(0.2, "ether"))
+      await betaFaucetInstance.send(web3.toWei(0.2, "ether"))
       let recipientBalance = await promisify(cb => web3.eth.getBalance(recipient, cb))
-      await betaFaucet.sendEther(recipient)
+      await betaFaucetInstance.sendEther(recipient)
       let newRecipientBalance = await promisify(cb => web3.eth.getBalance(recipient, cb))
       assert.equal(
         newRecipientBalance.toString(),
@@ -36,9 +37,8 @@ contract('BetaFaucet', function (accounts) {
     })
 
     it('should not allow double sends', async () => {
-      await betaFaucet.sendEther(recipient2)
       await expectThrow(async () => {
-        await betaFaucet.sendEther(recipient2)
+        await betaFaucetInstance.sendEther(recipient2)
       })
     })
   })

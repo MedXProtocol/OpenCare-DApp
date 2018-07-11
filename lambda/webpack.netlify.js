@@ -20,5 +20,8 @@ module.exports = {
   },
   externals: [
     'electron'
+  ],
+  plugins: [
+    new webpack.DefinePlugin(env.stringified)
   ]
 }

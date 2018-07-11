@@ -72,4 +72,19 @@ export class Hippo {
       return this.sendTransaction(tx)
     })
   }
+
+  sendMedX (ethAddress) {
+    return this.lookupContractAddress('BetaFaucet').then((betaFaucetAddress) => {
+      const method = betaFaucetArtifact.abi.find((obj) => obj.name === 'sendMedX')
+      var data = abi.encodeMethod(method, [ethAddress])
+      const tx = {
+        from: this.ownerAddress(),
+        to: betaFaucetAddress[0],
+        gas: 4612388,
+        gasPrice: Eth.toWei(20, 'gwei').toString(),
+        data
+      }
+      return this.sendTransaction(tx)
+    })
+  }
 }

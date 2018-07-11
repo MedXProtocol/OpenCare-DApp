@@ -1,9 +1,8 @@
-var deploy = require('./support/deploy')
-
-let DoctorManager = artifacts.require("./DoctorManager.sol");
+const deployWithDelegate = require('./support/deployWithDelegate')
+const DoctorManager = artifacts.require("./DoctorManager.sol");
 
 module.exports = function(deployer) {
-  deploy(artifacts, deployer, DoctorManager).then((doctorManager) => {
+  deployWithDelegate(artifacts, deployer, DoctorManager).then((doctorManager) => {
     return doctorManager.initialize()
   })
 };
