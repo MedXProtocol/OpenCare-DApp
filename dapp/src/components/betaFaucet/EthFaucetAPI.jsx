@@ -36,6 +36,8 @@ export const EthFaucetAPI = class extends Component {
           responseMessage: "We're sending you Ether",
           txHash: response.data.txHash
         })
+
+        this.props.moveToNextStep()
       } else {
         this.setState({
           responseMessage: '',

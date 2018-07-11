@@ -5,7 +5,8 @@ import { withSaga } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { Modal } from 'react-bootstrap'
 import get from 'lodash.get'
-import { EthFaucetAPI } from '~/components/welcome/EthFaucetAPI'
+import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
+import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -84,13 +85,20 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       }
 
       moveToNextStep = (e) => {
-        e.preventDefault()
+        if (e !== undefined) {
+          e.preventDefault()
+        }
 
-        this.props.dismissModal()
-
-        this.setState({
-          showBetaFaucetModal: false
-        })
+        if (this.state.step === 1) {
+          this.setState({
+            step: 2
+          })
+        } else if (this.state.step === 2) {
+          this.props.dismissModal()
+          this.setState({
+            showBetaFaucetModal: false
+          })
+        }
       }
 
       render() {
@@ -109,9 +117,13 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         if (showOnThisNetwork) {
           if (step === 1) {
             content = <EthFaucetAPI
-              onSuccess={this.getEtherBalance}
               address={address}
               ethBalance={ethBalance}
+              moveToNextStep={this.moveToNextStep} />
+          } else if (step === 2) {
+            content = <MedXFaucetAPI
+              address={address}
+              medXBalance={medXBalance}
               moveToNextStep={this.moveToNextStep} />
           }
         }
@@ -121,7 +133,7 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             <Modal.Header>
               <div className="row">
                 <div className="col-xs-12 text-center">
-                  <h4>Welcome to the Hippocrates Beta</h4>
+                  <h4>Welcome to the Hippocrates Beta <small>(Step {step} of 3)</small></h4>
                 </div>
               </div>
             </Modal.Header>
