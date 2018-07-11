@@ -1,5 +1,5 @@
 {
-  "migrationVersion": 1530904654,
+  "migrationVersion": 1531348801,
   "contracts": [
     {
       "contractName": "Migrations",
@@ -56,6 +56,18 @@
     {
       "contractName": "DoctorManager",
       "address": "0x1e48881d3940f24d73361f71baf7c675e0297ecc"
+    },
+    {
+      "contractName": "BetaFaucet",
+      "address": "0x0b9d32bc02176f165cc33a96149c2bf469f2dc10"
+    },
+    {
+      "contractName": "BetaFaucet",
+      "address": "0x3717be6db7f0bcd463e54b3f5733a5489df46442"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0xe3e97014bd9c6ae63077a875dbe0a44082b83912"
     }
   ]
 }
