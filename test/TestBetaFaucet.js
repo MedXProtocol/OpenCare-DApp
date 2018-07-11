@@ -42,11 +42,12 @@ contract('BetaFaucet', function (accounts) {
 
       let newBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
 
-      // How get two BigNumbers to equal each other with floating point errors?
-      // assert.equal(
-      //   newBalance,
-      //   startingBalance.add(1)
-      // )
+      startingBalance = startingBalance.add(100000000000000000) // 0.1 ether
+
+      assert.equal(
+        newBalance.toFormat(2, 1).toString(),
+        startingBalance.toFormat(2, 1).toString()
+      )
     })
 
     it('should not allow double sends', async () => {
