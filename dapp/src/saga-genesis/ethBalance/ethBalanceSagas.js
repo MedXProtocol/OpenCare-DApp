@@ -13,7 +13,8 @@ function* getEthBalance() {
     return parseFloat(web3.utils.fromWei(weiBalance, 'ether'))
   })
 
-  const oldBalance = yield select((state) => state.ethBalance.balance)
+  const oldBalance = yield select(state => state.sagaGenesis.ethBalance.balance)
+
   if (oldBalance !== balance) {
     yield put({type: 'ETH_BALANCE', balance})
   }
