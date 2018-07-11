@@ -102,7 +102,7 @@ export const EthFaucetAPI = class extends Component {
     )
 
     return (
-      <div>
+      <div className="col-xs-12 text-center">
         <strong>Current Balance:</strong>
         <h2 className="header--no-top-margin">
           {this.props.ethBalance} Ξ

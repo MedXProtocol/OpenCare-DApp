@@ -95,3 +95,31 @@
 .cross-fade-height {
   transition: height 300ms ease-in-out;
 }
+
+.page-enter, .page-leave {
+  position: absolute;
+  -webkit-transition: transform 2500ms ease-in-out, opacity 2500ms ease-in-out;
+  transition: transform 2500ms ease-in-out, opacity 2500ms ease-in-out;
+}
+
+.page-enter {
+  left: 100vw;
+}
+
+.page-enter.page-enter-active {
+  -webkit-transform: translate3d(-100vw, 0, 0);
+  transform: translate3d(-100vw, 0, 0);
+}
+
+.page-leave {
+  left: 0;
+}
+
+.page-leave.page-leave-active {
+  -webkit-transform: translate3d(-100vw, 0, 0);
+  transform: translate3d(-100vw, 0, 0);
+}
+
+.page-height {
+  height: 330px !important;
+}

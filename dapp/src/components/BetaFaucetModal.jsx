@@ -146,13 +146,11 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             </Modal.Header>
             <Modal.Body>
               <div className="row">
-                <div className="col-xs-12 text-center">
-                  <ReactCSSTransitionReplace transitionName="cross-fade"
-                                             transitionEnterTimeout={300}
-                                             transitionLeaveTimeout={300}>
-                    {content}
-                  </ReactCSSTransitionReplace>
-                </div>
+                <ReactCSSTransitionReplace transitionName="page"
+                                           transitionEnterTimeout={2500}
+                                           transitionLeaveTimeout={2500}>
+                  {content}
+                </ReactCSSTransitionReplace>
               </div>
             </Modal.Body>
             <Modal.Footer>
