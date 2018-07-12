@@ -21,12 +21,15 @@ import * as routes from '~/config/routes'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 
 function mapStateToProps(state, ownProps) {
-  let address = get(state, 'sagaGenesis.accounts[0]')
+  const address = get(state, 'sagaGenesis.accounts[0]')
+  const signingIn = get(state, 'account.signingIn')
+  console.log(signingIn)
   const signedIn = state.account.signedIn
   const AccountManager = contractByName(state, 'AccountManager')
   const transactions = state.sagaGenesis.transactions
   return {
     address,
+    signingIn,
     signedIn,
     AccountManager,
     transactions,
@@ -36,6 +39,9 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    setSigningIn: () => {
+      dispatch({ type: 'SIGNING_IN' })
+    },
     signIn: ({ secretKey, masterPassword, account, address, overrideAccount }) => {
       dispatch({ type: 'SIGN_IN', secretKey, masterPassword, account, address, overrideAccount })
     },
@@ -50,7 +56,6 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
     super(props)
 
     this.state = {
-      signingIn: false,
       isResetting: false
     }
   }
@@ -60,13 +65,12 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
   }
 
   onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
-    this.setState({
-      signingIn: true
-    }, () => {
-      this.props.setTimeout(() => {
-        this.doSubmit({ secretKey, masterPassword, overrideAccount })
-      }, 100)
-    })
+    // this is solely to update the UI prior to running the decrypt code
+    this.props.setSigningIn()
+
+    this.props.setTimeout(() => {
+      this.doSubmit({ secretKey, masterPassword, overrideAccount })
+    }, 100)
   }
 
   doSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
@@ -149,7 +153,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
                 </h3>
                 {warning}
                 <SignInFormContainer
-                  signingIn={this.state.signingIn}
+                  signingIn={this.props.signingIn}
                   onSubmit={this.onSubmit}
                   hasAccount={!!this.props.account} />
 

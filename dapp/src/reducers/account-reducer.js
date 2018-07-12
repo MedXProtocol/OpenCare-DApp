@@ -11,7 +11,7 @@ export default function (state, {
   }
 
   switch(type) {
-    case 'SIGN_IN':
+    case 'SIGNING_IN':
       state = {
         signingIn: true
       }
