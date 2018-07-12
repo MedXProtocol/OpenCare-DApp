@@ -17,7 +17,7 @@ export const Loading = class extends Component {
             <p>
               Working on your request ...
               <br />
-              <span className="small">(You may need to check MetaMask)</span>
+              <span className="small visible-sm visible-md visible-lg">(You may need to check MetaMask)</span>
             </p>
           </div>
         </div>
