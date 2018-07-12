@@ -49,9 +49,9 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
 }
 
 export function* signInOkSaga({ account, masterPassword, address }) {
+  yield put({type: 'SIGNED_IN'})
   signIn(account)
   mixpanel.identify(account.address())
-  yield put({type: 'SIGNED_IN'})
 }
 
 export default function* rootSaga() {

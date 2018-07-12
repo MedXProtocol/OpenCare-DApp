@@ -48,7 +48,7 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
     window.addEventListener("beforeunload", this.unload)
     window.addEventListener("focus", this.refocus)
     this.onAccountChangeSignOut(this.props)
-    if (!this.props.address && this.props.isSignedIn) {
+    if (process.env.NODE_ENV !== 'development' && !this.props.address && this.props.isSignedIn) {
       this.signOut()
     }
   }
