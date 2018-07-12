@@ -4,6 +4,6 @@ contract AccountManager {
   mapping(address => bytes) public publicKeys;
 
   function setPublicKey(bytes _publicKey) external {
-    publicKeys[msg.sender] = _publicKey;
+    publicKeys[tx.origin] = _publicKey;
   }
 }
