@@ -24,6 +24,14 @@ contract('BetaFaucet', function (accounts) {
     })
   })
 
+  describe('updateMedXTokenAddress()', () => {
+    it('should not be called again', () => {
+      expectThrow(async () => {
+        await env.betaFaucetInstance.updateMedXTokenAddress(env.medXToken.address)
+      })
+    })
+  })
+
   describe('sendEther()', () => {
     it('should work', async () => {
       await betaFaucetInstance.send(web3.toWei(0.2, "ether"))
@@ -39,6 +47,28 @@ contract('BetaFaucet', function (accounts) {
     it('should not allow double sends', async () => {
       await expectThrow(async () => {
         await betaFaucetInstance.sendEther(recipient2)
+      })
+    })
+  })
+
+  describe('sendMedX()', () => {
+    it('should work', async () => {
+      env.medXToken.mint(betaFaucetInstance.address, 3000000)
+      const betaFaucetDelegateMedXBalance = await env.medXToken.balanceOf(betaFaucetInstance.address)
+      assert.equal(betaFaucetDelegateMedXBalance, 3000000)
+
+      const medXBalance = await env.medXToken.balanceOf(recipient)
+      assert.equal(medXBalance, 0)
+
+      await betaFaucetInstance.sendMedX(recipient)
+      const newMedXBalance = await env.medXToken.balanceOf(recipient)
+      assert.equal(newMedXBalance, 15)
+    })
+
+    it('should not allow double sends', async () => {
+      await betaFaucetInstance.sendMedX(recipient2)
+      expectThrow(async () => {
+        await betaFaucetInstance.sendMedX(recipient2)
       })
     })
   })
