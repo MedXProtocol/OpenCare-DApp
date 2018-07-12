@@ -58,6 +58,7 @@
     "lodash.sortby": "^4.7.0",
     "lodash.values": "^4.3.0",
     "mixpanel-browser": "^2.22.4",
+    "multiaddr": "^5.0.0",
     "node-sass": "^4.9.2",
     "object-assign": "4.1.1",
     "pbkdf2": "^3.0.16",

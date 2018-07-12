@@ -1,10 +1,10 @@
-const WebRTCStar = require('libp2p-webrtc-star')
-const Mplex = require('libp2p-mplex')
-const SECIO = require('libp2p-secio')
-const defaultsDeep = require('@nodeutils/defaults-deep')
-const libp2p = require('libp2p')
+export async function newNode(_options) {
+  const WebRTCStar = await import(/* webpackChunkName: 'p2p' */ 'libp2p-webrtc-star')
+  const Mplex = await import(/* webpackChunkName: 'p2p' */ 'libp2p-mplex')
+  const SECIO = await import(/* webpackChunkName: 'p2p' */ 'libp2p-secio')
+  const defaultsDeep = await import(/* webpackChunkName: 'p2p' */ '@nodeutils/defaults-deep')
+  const libp2p = await import(/* webpackChunkName: 'p2p' */ 'libp2p')
 
-export function newNode(_options) {
   const wrtcStar = new WebRTCStar({ id: _options.peerInfo.id })
 
   const defaults = {
