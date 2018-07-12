@@ -2,7 +2,7 @@ import Cookie from 'js-cookie'
 import { setCookie } from '~/services/setCookie'
 import { KEY_STORE } from '~/accounts/constants'
 
-export function setAccount(address, account) {
+export function setAccountCookie(address, account) {
   let keyStore = Cookie.getJSON(KEY_STORE)
   if (typeof keyStore !== 'object') {
     keyStore = {}
