@@ -50,7 +50,7 @@ export class Hippo {
 
   sendTransaction (tx) {
     // return this._eth.sendTransaction(tx)
-    return this._eth.getTransactionCount(this._account.address)
+    return this._eth.getTransactionCount(this._account.address, 'pending')
       .then((nonce) => {
         tx.nonce = nonce.toString()
         return this._eth.sendRawTransaction(sign(tx, this._account.privateKey))
