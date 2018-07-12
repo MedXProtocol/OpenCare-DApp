@@ -18,13 +18,15 @@ function mapStateToProps(state, ownProps) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
+  const signingIn = get(state, 'account.signingIn')
 
   if (isSignedIn)
     var isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account)
 
   return {
-    isSignedIn: isSignedIn,
-    isDoctor: isDoctor,
+    signingIn,
+    isSignedIn,
+    isDoctor,
     overrideError: state.account.overrideError,
     secretKeyError: state.account.secretKeyError,
     masterPasswordError: state.account.masterPasswordError

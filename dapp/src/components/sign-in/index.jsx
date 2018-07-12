@@ -22,14 +22,11 @@ import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 
 function mapStateToProps(state, ownProps) {
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const signingIn = get(state, 'account.signingIn')
-  console.log(signingIn)
   const signedIn = state.account.signedIn
   const AccountManager = contractByName(state, 'AccountManager')
   const transactions = state.sagaGenesis.transactions
   return {
     address,
-    signingIn,
     signedIn,
     AccountManager,
     transactions,
@@ -153,7 +150,6 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
                 </h3>
                 {warning}
                 <SignInFormContainer
-                  signingIn={this.props.signingIn}
                   onSubmit={this.onSubmit}
                   hasAccount={!!this.props.account} />
 
