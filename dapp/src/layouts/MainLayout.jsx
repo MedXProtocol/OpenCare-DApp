@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
@@ -30,7 +29,7 @@ function* saga({ DoctorManager }) {
   yield cacheCall(DoctorManager, 'owner')
 }
 
-export const MainLayout = withRouter(withSaga(saga, { propTriggers: ['DoctorManager'] })(class extends Component {
+export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(class extends Component {
   static propTypes = {
     doNetworkCheck: PropTypes.bool,
     doPublicKeyCheck: PropTypes.bool,
@@ -103,6 +102,6 @@ export const MainLayout = withRouter(withSaga(saga, { propTriggers: ['DoctorMana
       </div>
     );
   }
-}))
+})
 
 export const MainLayoutContainer = connect(mapStateToProps)(MainLayout)
