@@ -1,5 +1,6 @@
 import PeerInfo from 'peer-info'
 import { newNode } from '~/services/newNode'
+import multiaddr from 'multiaddr'
 
 export function createNode(callback) {
   PeerInfo.create((err, peerInfo) => {
@@ -9,10 +10,8 @@ export function createNode(callback) {
 
     const peerIdStr = peerInfo.id.toB58String()
 
-    const ma = `/dns4/${process.env.REACT_APP_IPFS_HOSTNAME}/tcp/${process.env.REACT_APP_P2P_WEBRTC_STAR_PORT}/wss/p2p-webrtc-star/ipfs/${peerIdStr}`
-
+    const ma = multiaddr(`${process.env.REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL}/${peerIdStr}`)
     peerInfo.multiaddrs.add(ma)
-
     const node = newNode({
       peerInfo
     })
