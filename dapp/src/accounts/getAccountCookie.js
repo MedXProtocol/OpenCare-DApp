@@ -1,7 +1,7 @@
 import Cookie from 'js-cookie'
 import { KEY_STORE } from '~/accounts/constants'
 
-export function getAccount(address) {
+export function getAccountCookie(address) {
   const keyStore = Cookie.getJSON(KEY_STORE) || {}
 
   // We had a problem where we were setting the address key to 'undefined'
