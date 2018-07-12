@@ -10,6 +10,7 @@ import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
@@ -46,6 +47,7 @@ export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps
     }
     return (
       <MainLayoutContainer>
+        <PageTitle renderTitle={(t) => t('pageTitles.patientCase', { caseId: ('' + this.props.match.params.caseAddress).substring(0, 6)})} />
         <div className="container">
           <div className="row">
             {caseKey ? (

@@ -19,6 +19,7 @@ import {
 import { BodyClass } from '~/components/BodyClass'
 import * as routes from '~/config/routes'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state, ownProps) {
   let address = get(state, 'sagaGenesis.accounts[0]')
@@ -141,6 +142,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
     return (
       <BodyClass isDark={true}>
         <MainLayoutContainer doBetaFaucetModal={false}>
+          <PageTitle renderTitle={(t) => t('pageTitles.signIn')} />
           <div className='container'>
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>

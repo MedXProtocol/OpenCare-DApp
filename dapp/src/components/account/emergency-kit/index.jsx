@@ -3,6 +3,7 @@ import { Alert, Button } from 'react-bootstrap'
 import { currentAccount } from '~/services/sign-in'
 import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { EmergencyKitDisplayContainer } from './EmergencyKitDisplay'
+import { PageTitle } from '~/components/PageTitle'
 
 export const EmergencyKit = (
   class _EmergencyKit extends Component {
@@ -54,6 +55,7 @@ export const EmergencyKit = (
         }
         emergencyKit = (
           <MainLayoutContainer>
+            <PageTitle renderTitle={(t) => t('pageTitles.emergencyKit')} />
             <div className="container">
               <div className='row'>
                 <div className='col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2'>

@@ -11,6 +11,7 @@ import { MasterPasswordContainer } from './master-password'
 import { SecretKeyContainer } from './secret-key'
 import { cacheCall, cacheCallValue, withSaga } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state) {
   const address = state.sagaGenesis.accounts[0]
@@ -110,6 +111,7 @@ export const SignUp = class _SignUp extends Component {
     }
     return (
       <MainLayoutContainer doBetaFaucetModal={false}>
+        <PageTitle renderTitle={(t) => t('pageTitles.signUp')} />
         {content}
         <OverrideDisallowedModal
           show={this.state.showOverrideModal || !!this.props.overrideError}
