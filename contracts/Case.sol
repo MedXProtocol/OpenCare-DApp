@@ -124,6 +124,7 @@ contract Case is Ownable, Initializable {
   function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyCaseManager isDoctor(_doctor) {
     require(status == CaseStatus.Open);
     require(diagnosingDoctor == address(0));
+    require(_doctor != patient);
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
@@ -154,7 +155,7 @@ contract Case is Ownable, Initializable {
   }
 
   function challengeWithDoctor(address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
-    require(status == CaseStatus.Evaluated);
+    require(status == CaseStatus.Evaluated, 'Status must match');
     status = CaseStatus.Challenging;
     setChallengingDoctor(_doctor, _doctorEncryptedKey);
     caseManager().addChallengeDoctor(_doctor);
@@ -162,6 +163,7 @@ contract Case is Ownable, Initializable {
   }
 
   function setChallengingDoctor (address _doctor, bytes _doctorEncryptedKey) internal isDoctor(_doctor) {
+    require(_doctor != patient);
     require(_doctor != diagnosingDoctor);
     challengingDoctor = _doctor;
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;

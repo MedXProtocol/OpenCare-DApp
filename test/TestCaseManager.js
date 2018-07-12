@@ -30,8 +30,8 @@ contract('CaseManager', function (accounts) {
   })
 
   describe('initialize()', () => {
-    it('should not be called again', () => {
-      expectThrow(async () => {
+    it('should not be called again', async () => {
+      await expectThrow(async () => {
         await env.caseManager.initialize(10, env.medXToken.address, env.registry.address)
       })
     })

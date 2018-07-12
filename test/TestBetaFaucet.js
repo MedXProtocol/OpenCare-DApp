@@ -1,10 +1,11 @@
-import { promisify } from './helpers/promisify';
+import { promisify } from './helpers/promisify'
 const expectThrow = require('./helpers/expectThrow')
 const createEnvironment = require('./helpers/create-environment')
 
 contract('BetaFaucet', function (accounts) {
   let recipient = accounts[1]
   let recipient2 = accounts[2]
+  let recipient3 = accounts[3]
 
   let env
   let betaFaucetInstance
@@ -16,9 +17,9 @@ contract('BetaFaucet', function (accounts) {
   })
 
   describe('initialize()', () => {
-    it('should not be called again', () => {
-      expectThrow(async () => {
-        await env.betaFaucetInstance.initialize()
+    it('should not be called again', async () => {
+      await expectThrow(async () => {
+        await betaFaucetInstance.initialize()
       })
     })
   })
@@ -33,28 +34,18 @@ contract('BetaFaucet', function (accounts) {
 
   describe('sendEther()', () => {
     it('should work', async () => {
-      await betaFaucetInstance.send(web3.toWei(50, "ether"));
-
-      let contractBalance = await promisify(cb => web3.eth.getBalance(betaFaucetInstance.address, cb));
-      let startingBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
-      startingBalance = web3.fromWei(startingBalance, "ether")
-
+      await betaFaucetInstance.send(web3.toWei(0.2, "ether"))
+      let recipientBalance = await promisify(cb => web3.eth.getBalance(recipient, cb))
       await betaFaucetInstance.sendEther(recipient)
-
-      let newBalance = await promisify(cb => web3.eth.getBalance(recipient, cb));
-      newBalance = web3.fromWei(newBalance, "ether")
-
-      startingBalance = startingBalance.add(0.1)
-
+      let newRecipientBalance = await promisify(cb => web3.eth.getBalance(recipient, cb))
       assert.equal(
-        newBalance.toFormat(2, 1),
-        startingBalance.toFormat(2, 1)
+        newRecipientBalance.toString(),
+        recipientBalance.add(web3.toWei(0.1, "ether")).toString()
       )
     })
 
     it('should not allow double sends', async () => {
-      await betaFaucetInstance.sendEther(recipient2)
-      expectThrow(async () => {
+      await expectThrow(async () => {
         await betaFaucetInstance.sendEther(recipient2)
       })
     })
