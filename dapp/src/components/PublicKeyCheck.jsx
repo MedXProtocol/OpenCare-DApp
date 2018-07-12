@@ -85,7 +85,9 @@ export const PublicKeyCheck = connect(mapStateToProps)(
         >
           <div id="public-key-check-banner" className="alert alert-info alert--banner alert--banner__large alert--banner__in-content text-center">
             <p>
-              Your account needs to be registered with the Ethereum network.
+              Your account needs to be registered
+              <br className="visible-xs hidden-sm hidden-md hidden-lg" />
+              &nbsp;with the Ethereum network.
               &nbsp;<InfoQuestionMark
                       place="bottom"
                       tooltipText="This will allow you to share info with Doctors using your public key.<br />It needs to be set prior to submitting or diagnosing cases."
