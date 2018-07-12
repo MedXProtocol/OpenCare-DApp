@@ -10,6 +10,12 @@ export GENERATE_SOURCEMAP=true
 
 export REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT=false
 export REACT_APP_REQUIRED_NETWORK_ID=1234
+export REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI=http://localhost:9000
+
+# export REACT_APP_MIXPANEL_KEY=<your_dev_key>
+# export REACT_APP_BUGSNAG_API_KEY=<your bug snag key>
+# export REACT_APP_ENV=<your env ie staging or production>
+
 export REACT_APP_IPFS_HOSTNAME=ipfs.medcredits.io
 export REACT_APP_IPFS_PORT=5001
 export REACT_APP_IPFS_PROTOCOL=https
@@ -17,11 +23,7 @@ export REACT_APP_IPFS_PROTOCOL=https
 export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/dns4/localhost/tcp/9090/ws/p2p-webrtc-star/ipfs
 # export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/dns4/ipfs.medcredits.io/tcp/443/wss/p2p-webrtc-star/ipfs
 
-# export REACT_APP_BUGSNAG_API_KEY=<your bug snag key>
-# export REACT_APP_ENV=<your env ie staging or production>
-# export REACT_APP_MIXPANEL_KEY=<your_dev_key>
-
-# export LAMBDA_CONFIG_CORS_ORIGIN="*"
-# export LAMBDA_CONFIG_PRIVKEY="<contractOwnerPrivKey>"
-# export LAMBDA_CONFIG_PROVIDER_URL=https://ropsten.infura.io/To0546l6M9AapR2JxoHN
-# export LAMBDA_CONFIG_NETWORK_ID=3
+export LAMBDA_CONFIG_CORS_ORIGIN="*"
+export LAMBDA_CONFIG_PRIVKEY="<contractOwnerPrivKey>"
+export LAMBDA_CONFIG_PROVIDER_URL=http://localhost:8545
+export LAMBDA_CONFIG_NETWORK_ID=1234
