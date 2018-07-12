@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
@@ -16,9 +17,11 @@ function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
+  const isSignedIn = get(state, 'account.signedIn')
   return {
     DoctorManager,
-    isOwner
+    isOwner,
+    isSignedIn
   }
 }
 
@@ -27,7 +30,7 @@ function* saga({ DoctorManager }) {
   yield cacheCall(DoctorManager, 'owner')
 }
 
-export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(class extends Component {
+export const MainLayout = withRouter(withSaga(saga, { propTriggers: ['DoctorManager'] })(class extends Component {
   static propTypes = {
     doNetworkCheck: PropTypes.bool,
     doPublicKeyCheck: PropTypes.bool,
@@ -56,6 +59,21 @@ export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(cl
           <small>NOTE: You are currently using the contract owner's Ethereum address, please do not submit or diagnose cases with this account for encryption reasons.</small>
         </div>
     }
+    if (this.props.isSignedIn) {
+      var feedbackLink =
+        <a
+          target="_blank"
+          href="https://t.me/MedCredits"
+          className="floating-feedback-link text-center"
+          rel="noopener noreferrer">
+          <FontAwesomeIcon
+            icon={faTelegramPlane}
+            size='sm' />
+          <span>
+            Give Feedback
+          </span>
+        </a>
+    }
     return (
       <div className="wrapper">
         <div className="main-panel">
@@ -69,18 +87,7 @@ export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(cl
             {this.props.children}
           </div>
 
-          <a
-            target="_blank"
-            href="https://t.me/MedCredits"
-            className="floating-feedback-link text-center"
-            rel="noopener noreferrer">
-            <FontAwesomeIcon
-              icon={faTelegramPlane}
-              size='sm' />
-            <span>
-              Give Feedback
-            </span>
-          </a>
+          {feedbackLink}
         </div>
         <footer className="footer">
           <div className="container">
@@ -96,6 +103,6 @@ export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(cl
       </div>
     );
   }
-})
+}))
 
 export const MainLayoutContainer = connect(mapStateToProps)(MainLayout)
