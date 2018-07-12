@@ -1,8 +1,9 @@
-import PeerInfo from 'peer-info'
 import { newNode } from '~/services/newNode'
-import multiaddr from 'multiaddr'
 
-export function createNode(callback) {
+export async function createNode(callback) {
+  const PeerInfo = await import(/* webpackChunkName: 'p2p' */ 'peer-info')
+  const multiaddr = await import(/* webpackChunkName: 'p2p' */ 'multiaddr')
+
   PeerInfo.create((err, peerInfo) => {
     if (err) {
       return callback(err)
@@ -12,11 +13,10 @@ export function createNode(callback) {
 
     const ma = multiaddr(`${process.env.REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL}/${peerIdStr}`)
     peerInfo.multiaddrs.add(ma)
-    const node = newNode({
-      peerInfo
-    })
 
-    node.idStr = peerIdStr
-    callback(null, node)
+    newNode({ peerInfo }).then((node) => {
+      node.idStr = peerIdStr
+      callback(null, node)
+    })
   })
 }
