@@ -8,8 +8,8 @@
   border-radius: 8px;
   border: 1px solid #dadce0;
   box-sizing: border-box;
-  height: 90px;
-  padding: 22px 10px 20px;
+  height: 70px;
+  padding: 24px 10px 22px;
   position: relative;
   margin: 0 0 24px;
   opacity: 1;
@@ -24,6 +24,7 @@
     border: 1px solid white;
     border-bottom-color: rgba(200, 205, 210, 0.2);
     box-shadow: none;
+    height: 60px;
     padding: 6px 0;
     transition: none;
   }
@@ -36,6 +37,7 @@
   opacity: 1;
 
   @media (max-width: 768px) {
+    border-bottom-color: rgba(200, 205, 210, 0.2);
     box-shadow: none;
   }
 }
@@ -67,7 +69,7 @@
 
   @media (max-width: 768px) {
     padding: 0 6px;
-    width: 50%;
+    width: 66%;
   }
 }
 
@@ -93,14 +95,20 @@
   color: lighten($brand-info, 50%);
   float: right;
   font-weight: 700;
-  margin-right: 20px;
+  padding-right: 20px;
   transition: color 200ms ease-in;
   min-width: 20%;
 
   @media (max-width: 768px) {
-    margin-right: 0;
-    text-align: left;
-    width: 35%;
+    color: $brand-info;
+    min-width: 13%;
+    width: 13%;
+  }
+}
+
+.case-list--item__view__text {
+  @media (max-width: 768px) {
+    display: none;
   }
 }
 

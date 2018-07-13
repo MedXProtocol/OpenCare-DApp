@@ -28,7 +28,7 @@ export const CaseRow = class extends Component {
         </span>
 
         <span className="case-list--item__view text-right">
-          View Case&nbsp;
+          <span className="case-list--item__view__text">View Case&nbsp;</span>
           <FontAwesomeIcon
             icon={faChevronCircleRight} />
         </span>
