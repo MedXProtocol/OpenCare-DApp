@@ -3,22 +3,20 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
-import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { cacheCall } from '~/saga-genesis/sagas'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
 import { CaseRowContainer } from './CaseRow'
 import get from 'lodash.get'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
 
+
 function mapStateToProps(state, { accounts }) {
+  const cases = []
   const account = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
   const AccountManager = contractByName(state, 'AccountManager')
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
 
-  const cases = []
   for (let caseIndex = caseListCount; caseIndex >= 0; --caseIndex) {
     let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
     if (caseAddress) {
@@ -57,15 +55,52 @@ function* saga({ account, CaseManager, AccountManager }) {
 }
 
 export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager', 'caseListCount']})(class _PatientCases extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      cases: []
+    }
+  }
   componentDidMount () {
     this.props.invalidate(this.props.CaseManager)
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      cases: nextProps.cases
+    })
+  }
+
+  handleAddCase = () => {
+    const cases = this.state.cases
+    const statuses = [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      8,
+      10,
+      11
+    ]
+    cases.splice(0, 0, {
+      caseAddress: '0xn3wC4s3',
+      status: statuses[parseInt(Math.random() * statuses.length, 10)],
+      caseIndex: this.state.cases.length
+    });
+    this.setState({
+      cases: cases
+    })
+  }
+
   render() {
-    let modalHasBeenShown = false
     return (
-        <div className="card">
-          <div className="card-body table-responsive">
+      <div className="card">
+        <div className="card-body table-responsive">
+          <a onClick={this.handleAddCase} className="btn btn-primary btn-lg">Add Case</a>
+          <br />
+          <br />
           {
             !this.props.caseListCount || this.props.caseListCount === '0' ?
             <div className="blank-state">
@@ -75,19 +110,13 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
             </div> :
             <div>
               <FlipMove enterAnimation="accordionVertical" className="case-list">
-                {this.props.cases.map(({caseAddress, status, caseIndex}) => {
-                  let showModal = false
-                  if (/3|8/.test(status) && !modalHasBeenShown) {
-                    modalHasBeenShown = true
-                    showModal = true
-                  }
+                {this.state.cases.map(({caseAddress, status, caseIndex}) => {
                   return (
                     <CaseRowContainer
                       caseAddress={caseAddress}
                       caseIndex={caseIndex}
                       status={status}
-                      key={caseIndex}
-                      showModal={showModal} />
+                      key={caseIndex} />
                   )
                 })}
               </FlipMove>

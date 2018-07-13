@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight';
 import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
 import { formatRoute } from 'react-router-named-routes'
 import { EthAddress } from '~/components/EthAddress'
@@ -31,7 +33,9 @@ export const CaseRowContainer = class _CaseRow extends Component {
         </span>
 
         <span className="case-list--item__view text-right">
-          View Case
+          View Case&nbsp;
+          <FontAwesomeIcon
+            icon={faChevronCircleRight} />
         </span>
       </Link>
     )
