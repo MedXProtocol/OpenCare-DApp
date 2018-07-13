@@ -2,17 +2,20 @@ import 'idempotent-babel-polyfill'
 import Eth from 'ethjs'
 import { Hippo } from './lib/Hippo'
 
-const hippo = new Hippo({
+const config = {
   privateKey: process.env.LAMBDA_CONFIG_PRIVKEY,
   providerUrl: process.env.LAMBDA_CONFIG_PROVIDER_URL,
   networkId: process.env.LAMBDA_CONFIG_NETWORK_ID
-})
+}
+const hippo = new Hippo(config)
 
 exports.handler = function (event, context, callback) {
   const responseHeaders = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': process.env.LAMBDA_CONFIG_CORS_ORIGIN
   }
+
+  console.log('Using: ', config)
 
   try {
     let ethAddress

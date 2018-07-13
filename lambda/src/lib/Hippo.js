@@ -69,6 +69,7 @@ export class Hippo {
         gasPrice: Eth.toWei(20, 'gwei').toString(),
         data
       }
+      console.info('sendEther tx: ', tx)
       return this.sendTransaction(tx)
     })
   }
@@ -84,6 +85,7 @@ export class Hippo {
         gasPrice: Eth.toWei(20, 'gwei').toString(),
         data
       }
+      console.info('sendMedX tx: ', tx)
       return this.sendTransaction(tx)
     })
   }

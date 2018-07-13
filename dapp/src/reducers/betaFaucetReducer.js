@@ -11,6 +11,13 @@ export const betaFaucet = function (state, { type }) {
       }
       break
 
+    case 'BETA_FAUCET_MODAL_SMISSED':
+      state = {
+        ...state,
+        betaFaucetModalDismissed: false
+      }
+      break
+
     // no default
   }
 
