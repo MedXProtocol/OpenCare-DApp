@@ -46,7 +46,7 @@ contract('CaseManager', function (accounts) {
   describe('createAndAssignCase()', () => {
     it('should work', async () => {
       var hexData = env.caseManager.contract.createAndAssignCase.getData(
-        patient,
+        '42',
         encryptedCaseKey,
         caseKeySalt,
         ipfsHash,
@@ -55,7 +55,7 @@ contract('CaseManager', function (accounts) {
       )
 
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
-      await env.medXToken.approveAndCall(env.caseManager.address, 15, hexData)
+      await env.medXToken.approveAndCall(env.caseManager.address, 15, hexData, { from: patient })
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
       assert.equal(await env.caseManager.getPatientCaseListCount(patient), 1)
       assert.equal(await env.caseManager.doctorCasesCount(doctor), 1)
@@ -73,7 +73,7 @@ contract('CaseManager', function (accounts) {
   describe('createAndAssignCaseWithPublicKey()', () => {
     it('should work', async () => {
       var hexData = env.caseManager.contract.createAndAssignCaseWithPublicKey.getData(
-        patient2,
+        '46',
         encryptedCaseKey,
         caseKeySalt,
         ipfsHash,

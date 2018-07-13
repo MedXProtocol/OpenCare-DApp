@@ -110,7 +110,9 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
         assembly {
           let ptr := mload(0x40)
-          calldatacopy(ptr, 164, inputSize)
+          calldatacopy(ptr, 164, inputSize) // copy extraData
+          let ptrAtPatient := add(ptr, 4) // skip signature
+          calldatacopy(ptrAtPatient, 4, 32) // overwrite _from onto patient
           let result := call(gas, _this, 0, ptr, inputSize, 0, 0)
           let size := returndatasize
           returndatacopy(ptr, 0, size)
@@ -154,7 +156,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
     ) public onlyThis {
       AccountManager am = accountManager();
       require(am.publicKeys(_patient).length == 0);
-      am.setPublicKey(_patientPublicKey);
+      am.setPublicKey(_patient, _patientPublicKey);
       createAndAssignCase(
         _patient,
         _encryptedCaseKey,
@@ -172,7 +174,6 @@ contract CaseManager is Ownable, Pausable, Initializable {
       address _doctor,
       bytes _doctorEncryptedKey
     ) public onlyThis {
-      require(tx.origin == _patient); // Only patients can create cases for themselves
       Case newCase = Case(new Delegate(registry, keccak256("Case")));
       newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
       newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);

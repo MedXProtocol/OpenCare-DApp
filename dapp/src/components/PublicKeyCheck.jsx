@@ -54,6 +54,7 @@ export const PublicKeyCheck = connect(mapStateToProps)(
       const transactionId = this.props.send(
         this.props.AccountManager,
         'setPublicKey',
+        this.props.account.address(),
         '0x' + currentAccount().hexPublicKey()
       )()
       this.setState({

@@ -42,6 +42,7 @@ module.exports = async function createEnvironment(artifacts) {
   let accountManagerDelegate = await Delegate.new(registry.address, toRegistryKey('AccountManagerTarget'))
   await registry.register(toRegistryKey('AccountManager'), accountManagerDelegate.address)
   let accountManager = await AccountManager.at(accountManagerDelegate.address)
+  accountManager.setRegistry(registry.address)
 
   return {
     betaFaucet,
