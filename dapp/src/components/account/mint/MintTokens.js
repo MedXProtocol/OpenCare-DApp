@@ -45,7 +45,7 @@ export const MintTokensContainer = withContractRegistry(connect(mapStateToProps)
 
     mintTokens = () => {
       const { send, MedXToken } = this.props
-      const transactionId = send(MedXToken, 'mint', this.state.address, 1000)()
+      const transactionId = send(MedXToken, 'mint', this.state.address, 100000)()
       this.setState({transactionId})
     }
 
@@ -87,4 +87,3 @@ export const MintTokensContainer = withContractRegistry(connect(mapStateToProps)
       );
     }
 })))
-
