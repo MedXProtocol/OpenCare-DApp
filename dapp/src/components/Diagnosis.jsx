@@ -242,11 +242,11 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
           <form onSubmit={this.onSubmitChallenge}>
             <Modal.Body>
               <div className="row">
-                <div className="col-xs-12 text-center">
+                <div className="col-xs-12">
                   <Alert bsStyle='info'>
-                    <h3>
+                    <p>
                       Challenge Case
-                    </h3>
+                    </p>
                   </Alert>
                 </div>
               </div>

@@ -22,6 +22,8 @@
   @media (max-width: 768px) {
     border-radius: 0;
     border: 1px solid white;
+    border-bottom-color: rgba(200, 205, 210, 0.2);
+    box-shadow: none;
     padding: 6px 0;
     transition: none;
   }
@@ -65,12 +67,16 @@
 
   @media (max-width: 768px) {
     padding: 0 6px;
-    width: 30%;
+    width: 50%;
   }
 }
 
 .case-list--item__eth-address {
   min-width: 20%;
+
+  @media (max-width: 768px) {
+    display: none !important;
+  }
 }
 
 .case-list--item__eth-address .address__short {
@@ -90,6 +96,12 @@
   margin-right: 20px;
   transition: color 200ms ease-in;
   min-width: 20%;
+
+  @media (max-width: 768px) {
+    margin-right: 0;
+    text-align: left;
+    width: 35%;
+  }
 }
 
 .case-list--item:hover .case-list--item__view {

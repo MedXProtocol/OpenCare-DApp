@@ -12,6 +12,7 @@ import { addContract } from '~/saga-genesis/sagas'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
+import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
@@ -25,6 +26,7 @@ function mapStateToProps(state) {
     if (caseAddress) {
       const status = cacheCallValue(state, caseAddress, 'status')
       const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
+      console.log(status, diagnosingDoctor)
       if (status && diagnosingDoctor) {
         const isDiagnosingDoctor = diagnosingDoctor === address
         cases.push({
@@ -63,13 +65,8 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
     withSend(class _OpenCases extends Component {
 
   render () {
-    const openCases       = this.props.cases.filter(c => {
-      return (c.status.match(/2/) && c.isDiagnosingDoctor) || (c.status.match(/6/) && !c.isDiagnosingDoctor)
-    })
-
-    const historicalCases = this.props.cases.filter(c => {
-      return (!c.status.match(/2/) && c.isDiagnosingDoctor) || (!c.status.match(/6/) && !c.isDiagnosingDoctor)
-    })
+    const openCases       = this.props.cases.filter(c => openCase(c))
+    const historicalCases = this.props.cases.filter(c => historicalCase(c))
 
     return (
       <MainLayoutContainer>
@@ -141,8 +138,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                       </div>
                     </div> :
                     <FlipMove enterAnimation="accordionVertical" className="case-list">
-                      {historicalCases.map(({caseAddress, status, caseIndex, diagnosingDoctor}) => {
-                        const isDiagnosingDoctor = diagnosingDoctor === this.props.address
+                      {historicalCases.map(({caseAddress, status, caseIndex, isDiagnosingDoctor}) => {
                         const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
                         const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
                         return (
