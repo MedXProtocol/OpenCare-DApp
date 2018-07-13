@@ -5,26 +5,15 @@ import { formatSecretKey } from '~/services/format-secret-key'
 import { connect } from 'react-redux'
 import { LoadingLines } from '~/components/LoadingLines'
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
-import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
-import { cacheCall } from '~/saga-genesis/sagas'
-import { withSaga } from '~/saga-genesis/components'
 import get from 'lodash.get'
 
 const HIDDEN_KEY = formatSecretKey(Array(65).join('X'))
 
 function mapStateToProps(state, ownProps) {
-  const account = get(state, 'sagaGenesis.accounts[0]')
-  const isSignedIn = get(state, 'account.signedIn')
-  const DoctorManager = contractByName(state, 'DoctorManager')
   const signingIn = get(state, 'account.signingIn')
-
-  if (isSignedIn)
-    var isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account)
 
   return {
     signingIn,
-    isSignedIn,
-    isDoctor,
     overrideError: state.account.overrideError,
     secretKeyError: state.account.secretKeyError,
     masterPasswordError: state.account.masterPasswordError
@@ -37,11 +26,6 @@ function mapDispatchToProps(dispatch) {
       dispatch({ type: 'SIGN_IN_RESET_OVERRIDE' })
     }
   }
-}
-
-function* saga({ account, DoctorManager }) {
-  if (!account || !DoctorManager) { return }
-  yield cacheCall(DoctorManager, 'isDoctor', account)
 }
 
 export const SignInForm = class extends Component {
@@ -139,7 +123,7 @@ export const SignInForm = class extends Component {
   }
 }
 
-export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['signedIn', 'account', 'DoctorManager'] })(SignInForm))
+export const SignInFormContainer = connect(mapStateToProps, mapDispatchToProps)(SignInForm)
 
 SignInFormContainer.propTypes = {
   onSubmit: PropTypes.func.isRequired,
