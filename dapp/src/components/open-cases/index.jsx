@@ -16,6 +16,7 @@ import { CaseRow } from './CaseRow'
 import keys from 'lodash.keys'
 import get from 'lodash.get'
 import { contractByName } from '~/saga-genesis/state-finders'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -54,6 +55,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
 
     return (
       <MainLayoutContainer>
+        <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCases')} />
         <div className="container">
           <div className='header-card card'>
             <div className='card-body'>

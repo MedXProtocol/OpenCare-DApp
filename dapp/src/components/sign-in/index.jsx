@@ -19,9 +19,10 @@ import {
 import { BodyClass } from '~/components/BodyClass'
 import * as routes from '~/config/routes'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state, ownProps) {
-  let address = get(state, 'sagaGenesis.accounts[0]')
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const signedIn = state.account.signedIn
   const AccountManager = contractByName(state, 'AccountManager')
   const transactions = state.sagaGenesis.transactions
@@ -36,6 +37,9 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    setSigningIn: () => {
+      dispatch({ type: 'SIGNING_IN' })
+    },
     signIn: ({ secretKey, masterPassword, account, address, overrideAccount }) => {
       dispatch({ type: 'SIGN_IN', secretKey, masterPassword, account, address, overrideAccount })
     },
@@ -50,7 +54,6 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
     super(props)
 
     this.state = {
-      signingIn: false,
       isResetting: false
     }
   }
@@ -60,13 +63,12 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
   }
 
   onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
-    this.setState({
-      signingIn: true
-    }, () => {
-      this.props.setTimeout(() => {
-        this.doSubmit({ secretKey, masterPassword, overrideAccount })
-      }, 100)
-    })
+    // this is solely to update the UI prior to running the decrypt code
+    this.props.setSigningIn()
+
+    this.props.setTimeout(() => {
+      this.doSubmit({ secretKey, masterPassword, overrideAccount })
+    }, 100)
   }
 
   doSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
@@ -102,7 +104,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
   }
 
   handleReset = () => {
-    let transactionId = this.props.send(this.props.AccountManager, 'setPublicKey', '0x')({ gas: 200000 })
+    let transactionId = this.props.send(this.props.AccountManager, 'setPublicKey', this.props.address, '0x')({ gas: 200000 })
 
     this.setState({
       resetAccountHandler: new TransactionStateHandler(),
@@ -141,6 +143,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
     return (
       <BodyClass isDark={true}>
         <MainLayoutContainer doBetaFaucetModal={false}>
+          <PageTitle renderTitle={(t) => t('pageTitles.signIn')} />
           <div className='container'>
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
@@ -149,7 +152,6 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
                 </h3>
                 {warning}
                 <SignInFormContainer
-                  signingIn={this.state.signingIn}
                   onSubmit={this.onSubmit}
                   hasAccount={!!this.props.account} />
 

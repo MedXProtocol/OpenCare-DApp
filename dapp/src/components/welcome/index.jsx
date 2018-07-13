@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { Account } from '~/accounts/Account'
 import * as routes from '~/config/routes'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps (state) {
   let address = get(state, 'sagaGenesis.accounts[0]')
@@ -19,10 +20,10 @@ function mapStateToProps (state) {
 
 export const Welcome = connect(mapStateToProps)(class _Welcome extends Component {
   render () {
+    let launchLink
     if (this.props.signedIn) {
-      var launchLink = routes.PATIENTS_CASES
-    } else
-    if (this.props.account) {
+      launchLink = routes.PATIENTS_CASES
+    } else if (this.props.account) {
       launchLink = routes.SIGN_IN
     } else {
       launchLink = routes.SIGN_UP
@@ -31,6 +32,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
     return (
       <BodyClass isDark={true}>
         <MainLayoutContainer doNetworkCheck={false} doPublicKeyCheck={false} doBetaFaucetModal={false}>
+          <PageTitle renderTitle={(t) => t('pageTitles.welcome')} />
           <div className='container'>
             <div className='row'>
               <div className='col-xs-12 col-md-10 col-md-offset-1'>

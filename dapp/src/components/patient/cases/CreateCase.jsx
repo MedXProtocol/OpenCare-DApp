@@ -280,10 +280,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         console.error("The props.balance wasn't set!")
 
       if (this.state.errors.length === 0) {
-        if (!this.props.publicKey) {
-          window.location.hash = '#public-key-check-banner';
-          this.setState({ showPublicKeyModal: true })
-        } else if (this.props.balance < 15) {
+        if (this.props.balance < 15) {
           this.setState({ showBalanceTooLowModal: true })
         } else {
           this.setState({ showConfirmSubmissionModal: true })
@@ -350,14 +347,29 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         let hashHex = hashToHex(hash)
 
         let CaseManagerContract = this.props.contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
-        let data = CaseManagerContract.methods.createAndAssignCase(
-          this.props.account,
-          '0x' + encryptedCaseKey,
-          '0x' + caseKeySalt,
-          '0x' + hashHex,
-          this.state.selectedDoctor.value,
-          '0x' + doctorEncryptedCaseKey
-        ).encodeABI()
+
+        let data = null
+        if (!this.props.publicKey) {
+          data = CaseManagerContract.methods.createAndAssignCaseWithPublicKey(
+            this.props.account,
+            '0x' + encryptedCaseKey,
+            '0x' + caseKeySalt,
+            '0x' + hashHex,
+            this.state.selectedDoctor.value,
+            '0x' + doctorEncryptedCaseKey,
+            '0x' + account.hexPublicKey()
+          ).encodeABI()
+        } else {
+          data = CaseManagerContract.methods.createAndAssignCase(
+            this.props.account,
+            '0x' + encryptedCaseKey,
+            '0x' + caseKeySalt,
+            '0x' + hashHex,
+            this.state.selectedDoctor.value,
+            '0x' + doctorEncryptedCaseKey
+          ).encodeABI()
+        }
+
         let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
         this.setState({
           transactionId,

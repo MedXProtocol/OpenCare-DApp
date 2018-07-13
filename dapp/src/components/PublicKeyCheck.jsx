@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { all } from 'redux-saga/effects'
 import { Button } from 'react-bootstrap'
 import ReactTooltip from 'react-tooltip'
 import { currentAccount } from '~/services/sign-in'
@@ -16,23 +17,29 @@ function mapStateToProps (state) {
   if (account === null)
     return {}
   const AccountManager = contractByName(state, 'AccountManager')
+  const DoctorManager = contractByName(state, 'DoctorManager')
   const transactions = state.sagaGenesis.transactions
+  const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account.address())
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account.address())
   const publicKeyIsDefined = publicKey !== undefined
   const publicKeyMatches = publicKey === '0x' + account.hexPublicKey()
-  const isVisible = publicKeyIsDefined && !publicKeyMatches
+  const isVisible = publicKeyIsDefined && !publicKeyMatches && isDoctor
 
   return {
     account,
     AccountManager,
+    DoctorManager,
     isVisible,
     transactions
   }
 }
 
-function* saga({ account, AccountManager }) {
-  if (!account || !AccountManager) { return }
-  yield cacheCall(AccountManager, 'publicKeys', account.address())
+function* saga({ account, AccountManager, DoctorManager }) {
+  if (!account || !AccountManager || !DoctorManager) { return }
+  yield all([
+    cacheCall(AccountManager, 'publicKeys', account.address()),
+    cacheCall(DoctorManager, 'isDoctor', account.address())
+  ])
 }
 
 export const PublicKeyCheck = connect(mapStateToProps)(
@@ -47,6 +54,7 @@ export const PublicKeyCheck = connect(mapStateToProps)(
       const transactionId = this.props.send(
         this.props.AccountManager,
         'setPublicKey',
+        this.props.account.address(),
         '0x' + currentAccount().hexPublicKey()
       )()
       this.setState({
@@ -85,7 +93,9 @@ export const PublicKeyCheck = connect(mapStateToProps)(
         >
           <div id="public-key-check-banner" className="alert alert-info alert--banner alert--banner__large alert--banner__in-content text-center">
             <p>
-              Your account needs to be registered with the Ethereum network.
+              Your account needs to be registered
+              <br className="visible-xs hidden-sm hidden-md hidden-lg" />
+              &nbsp;with the Ethereum network.
               &nbsp;<InfoQuestionMark
                       place="bottom"
                       tooltipText="This will allow you to share info with Doctors using your public key.<br />It needs to be set prior to submitting or diagnosing cases."

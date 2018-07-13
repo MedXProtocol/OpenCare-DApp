@@ -13,6 +13,7 @@ import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
 import { contractByName } from '~/saga-genesis/state-finders'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state, { match }) {
   let address = get(state, 'sagaGenesis.accounts[0]')
@@ -110,6 +111,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
 
     return (
       <MainLayoutContainer>
+        <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCase', { caseId: ('' + this.props.caseAddress).substring(0, 6) } )} />
         <div className='container'>
           <div className='row'>
             {diagnosis}

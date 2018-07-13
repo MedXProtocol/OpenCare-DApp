@@ -4,6 +4,7 @@ import { BodyClass } from '~/components/BodyClass'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import metaMaskFoxAndWordmarkImg from '~/assets/img/metamask-fox-and-wordmark.svg'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state, ownProps) {
   return {
@@ -20,6 +21,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class extends Component 
       <BodyClass isDark={true}>
         {redirect}
         <MainLayoutContainer doBetaFaucetModal={false}>
+          <PageTitle renderTitle={(t) => t('pageTitles.loginToMetaMask')} />
           <div className='container'>
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
