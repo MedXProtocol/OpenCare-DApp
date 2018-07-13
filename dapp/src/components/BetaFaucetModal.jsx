@@ -131,7 +131,7 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         }
 
         return (
-          <Modal show={true}>
+          <Modal show={showBetaFaucetModal}>
             <Modal.Header>
               <div className="row">
                 <div className="col-xs-12 text-center">
