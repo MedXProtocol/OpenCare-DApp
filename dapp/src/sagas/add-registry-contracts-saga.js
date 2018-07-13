@@ -1,5 +1,6 @@
 import {
-  select
+  select,
+  all
 } from 'redux-saga/effects'
 import {
   contractByName
@@ -16,7 +17,10 @@ function* lookupAndAddContract(web3, name) {
 }
 
 export default function* ({ web3 }) {
-  yield lookupAndAddContract(web3, 'CaseManager')
-  yield lookupAndAddContract(web3, 'DoctorManager')
-  yield lookupAndAddContract(web3, 'AccountManager')
+  yield all([
+    lookupAndAddContract(web3, 'CaseManager'),
+    lookupAndAddContract(web3, 'DoctorManager'),
+    lookupAndAddContract(web3, 'AccountManager'),
+    lookupAndAddContract(web3, 'BetaFaucet')
+  ])
 }
