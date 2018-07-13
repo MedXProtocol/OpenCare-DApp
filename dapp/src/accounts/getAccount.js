@@ -4,11 +4,9 @@ import { getAccountCookie } from './getAccountCookie'
 
 export function getAccount(address) {
   if (!address) { return null }
-  let account = null;
+  let account = getAccountCookie(address)
   if (storageAvailable('localStorage')) {
-    account = getAccountLocalStorage(address)
-  } else {
-    account = getAccountCookie(address)
+    account = getAccountLocalStorage(address) || account
   }
   return account
 }
