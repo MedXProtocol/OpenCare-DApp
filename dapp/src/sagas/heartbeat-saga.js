@@ -20,33 +20,38 @@ const HEARTBEAT_INTERVAL = 2000
 const MAX_LIFETIME = HEARTBEAT_INTERVAL * 2
 
 function* startNode() {
-  const node = yield promisify(cb => createNode(cb))
-  yield promisify(cb => node.start(cb))
+  try {
+    const node = yield promisify(cb => createNode(cb))
+    yield promisify(cb => node.start(cb))
 
-  node.on('peer:discovery', (peerInfo) => {
-    // const idStr = peerInfo.id.toB58String()
-    // console.log('Discovered: ' + idStr)
-    node.dial(peerInfo, (err, conn) => {
-      if (err) { console.error(err) }
-      else {
-        // return console.log('Dialled:', idStr, conn)
-      }
+    node.on('peer:discovery', (peerInfo) => {
+      // const idStr = peerInfo.id.toB58String()
+      // console.log('Discovered: ' + idStr)
+      node.dial(peerInfo, (err, conn) => {
+        if (err) { console.error(err) }
+        else {
+          // return console.log('Dialled:', idStr, conn)
+        }
+      })
     })
-  })
 
-  node.on('peer:connect', (peerInfo) => {
-    // const idStr = peerInfo.id.toB58String()
-    // console.log('Got connection to: ' + idStr)
-  })
+    node.on('peer:connect', (peerInfo) => {
+      // const idStr = peerInfo.id.toB58String()
+      // console.log('Got connection to: ' + idStr)
+    })
 
-  node.on('peer:disconnect', (peerInfo) => {
-    // const idStr = peerInfo.id.toB58String()
-    // console.log('Lost connection to: ' + idStr)
-  })
+    node.on('peer:disconnect', (peerInfo) => {
+      // const idStr = peerInfo.id.toB58String()
+      // console.log('Lost connection to: ' + idStr)
+    })
 
-  // const idStr = node.peerInfo.id.toB58String()
-  // console.log('Node is listening on', idStr)
-  return node
+    // const idStr = node.peerInfo.id.toB58String()
+    // console.log('Node is listening on', idStr)
+    return node
+  } catch (error) {
+    console.error(error)
+    return null
+  }
 }
 
 function createPubsubChannel (node) {
@@ -141,9 +146,17 @@ function* startHeartbeat(node) {
 }
 
 export default function* () {
-  const node = yield startNode()
-  const lastHeartbeatTime = {}
-  yield fork(startHeartbeat, node)
-  yield fork(startPubsub, node, lastHeartbeatTime)
-  yield takeEvery('SEND_HEARTBEAT', sendHeartbeat, node)
+  let node = null
+  while (!node) {
+    node = yield startNode()
+    if (node) {
+      const lastHeartbeatTime = {}
+      yield fork(startHeartbeat, node)
+      yield fork(startPubsub, node, lastHeartbeatTime)
+      yield takeEvery('SEND_HEARTBEAT', sendHeartbeat, node)
+      return
+    }
+    console.warn('Unable to start p2p node....retrying in four seconds.')
+    yield call(delay, 4000)
+  }
 }
