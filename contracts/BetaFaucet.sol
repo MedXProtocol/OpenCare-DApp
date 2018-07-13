@@ -57,13 +57,13 @@ contract BetaFaucet is Ownable, Initializable {
     _recipient.transfer(etherToTransfer);
   }
 
-  function sendMedX(address _recipient) public onlyOwner {
+  function sendMedX(address _recipient, uint256 amount) public onlyOwner {
     require(_recipient != address(0), "recipient address is empty");
     require(!sentMedXAddresses[_recipient], "recipient has already received MedX");
 
     sentMedXAddresses[_recipient] = true;
-    emit MedXSent(_recipient, 15);
+    emit MedXSent(_recipient, amount);
 
-    medXToken.transfer(_recipient, 15);
+    medXToken.transfer(_recipient, amount);
   }
 }

@@ -60,15 +60,15 @@ contract('BetaFaucet', function (accounts) {
       const medXBalance = await env.medXToken.balanceOf(recipient)
       assert.equal(medXBalance, 0)
 
-      await betaFaucetInstance.sendMedX(recipient)
+      await betaFaucetInstance.sendMedX(recipient, 15)
       const newMedXBalance = await env.medXToken.balanceOf(recipient)
       assert.equal(newMedXBalance, 15)
     })
 
     it('should not allow double sends', async () => {
-      await betaFaucetInstance.sendMedX(recipient2)
+      await betaFaucetInstance.sendMedX(recipient2, 15)
       expectThrow(async () => {
-        await betaFaucetInstance.sendMedX(recipient2)
+        await betaFaucetInstance.sendMedX(recipient2, 15)
       })
     })
   })

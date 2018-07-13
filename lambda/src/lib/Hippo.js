@@ -76,7 +76,7 @@ export class Hippo {
   sendMedX (ethAddress) {
     return this.lookupContractAddress('BetaFaucet').then((betaFaucetAddress) => {
       const method = betaFaucetArtifact.abi.find((obj) => obj.name === 'sendMedX')
-      var data = abi.encodeMethod(method, [ethAddress])
+      var data = abi.encodeMethod(method, [ethAddress, 500])
       const tx = {
         from: this.ownerAddress(),
         to: betaFaucetAddress[0],
