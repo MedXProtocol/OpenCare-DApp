@@ -50,7 +50,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    clearModal: () => {
+    clearModalDismissedFlag: () => {
       dispatch({ type: 'BETA_FAUCET_MODAL_SMISSED' })
     }
   }
@@ -131,7 +131,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     componentDidMount () {
-      this.props.clearModal()
+      this.props.clearModalDismissedFlag()
     }
 
     componentWillReceiveProps (props) {
