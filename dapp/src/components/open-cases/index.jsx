@@ -1,48 +1,76 @@
-import React, {
-  Component
-} from 'react'
+import React, { Component } from 'react'
+import { all } from 'redux-saga/effects'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
-import {
-  Table
-} from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { TransitionGroup, CSSTransition } from 'react-transition-group'
-import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
-import { cacheCall } from '~/saga-genesis/sagas'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
-import { CaseRow } from './CaseRow'
-import keys from 'lodash.keys'
+import FlipMove from 'react-flip-move'
+import { CaseRow } from '~/components/CaseRow'
 import get from 'lodash.get'
+import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctor-case-status-labels'
+import { cacheCall } from '~/saga-genesis/sagas'
+import { addContract } from '~/saga-genesis/sagas'
 import { contractByName } from '~/saga-genesis/state-finders'
+import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
+import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
-  const account = get(state, 'sagaGenesis.accounts[0]')
+  const address = get(state, 'sagaGenesis.accounts[0]')
   let CaseManager = contractByName(state, 'CaseManager')
-  let caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', account)
+  let caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
 
   let cases = []
-  for (let i = 0; i < caseCount; i++) {
-    let c = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', account, i)
-    if (c) { cases.push(c) }
+  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
+    let caseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, caseIndex)
+    if (caseAddress) {
+      const status = cacheCallValue(state, caseAddress, 'status')
+      const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
+      if (status && diagnosingDoctor) {
+        const isDiagnosingDoctor = diagnosingDoctor === address
+        cases.push({
+          caseAddress,
+          status,
+          caseIndex,
+          isDiagnosingDoctor
+        })
+      }
+    }
   }
 
   return {
-    account,
+    address,
     caseCount,
     cases,
     CaseManager
   }
 }
 
-function* saga({ account, CaseManager }) {
-  if (!account || !CaseManager) { return }
-  let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', account)
-  for (let i = 0; i < caseCount; i++) {
-    yield cacheCall(CaseManager, 'doctorCaseAtIndex', account, i)
+function* saga({ address, CaseManager }) {
+  if (!address || !CaseManager) { return }
+  let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', address)
+  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
+    let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
+    yield addContract({ address: caseAddress, contractKey: 'Case' })
+    yield all([
+      cacheCall(caseAddress, 'status'),
+      cacheCall(caseAddress, 'diagnosingDoctor')
+    ])
   }
+}
+
+function renderCase({ caseAddress, status, caseIndex, isDiagnosingDoctor }) {
+  const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
+  const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
+  return (
+    <CaseRow
+      route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
+      caseAddress={caseAddress}
+      caseIndex={caseIndex}
+      statusLabel={statusLabel}
+      statusClass={statusClass}
+      key={caseIndex} />
+  )
 }
 
 export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
@@ -50,13 +78,14 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
     withSend(class _OpenCases extends Component {
 
   render () {
-    let caseKeys = keys(this.props.cases)
-    let cases = caseKeys.reverse().map((key) => this.props.cases[key])
+    const openCases       = this.props.cases.filter(c => openCase(c))
+    const historicalCases = this.props.cases.filter(c => historicalCase(c))
 
     return (
       <MainLayoutContainer>
         <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCases')} />
         <div className="container">
+
           <div className='header-card card'>
             <div className='card-body'>
               <div className='row'>
@@ -76,36 +105,48 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
             <div className='col-xs-12'>
               <div className="card">
                 <div className='card-body'>
-                  <Table className="table table-striped">
-                    <thead>
-                      <tr>
-                        <th>Address</th>
-                        <th>Status</th>
-                        <th className="text-right">
-                          <FontAwesomeIcon icon={faEdit} />
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <TransitionGroup component={null}>
-                        {
-                          cases.map(address => (
-                            <CSSTransition
-                              key={address}
-                              timeout={100}
-                              appear={true}
-                              classNames="fade">
-                              <CaseRow address={address} key={address} />
-                            </CSSTransition>
-                          ))
-                        }
-                      </TransitionGroup>
-                    </tbody>
-                  </Table>
+                  <h5 className="title subtitle">
+                    Open Cases:
+                  </h5>
+                  {
+                    !openCases.length ?
+                    <div className="blank-state">
+                      <div className="blank-state--inner text-center text-gray">
+                        <span>You do not have any cases assigned to you yet.</span>
+                      </div>
+                    </div> :
+                    <FlipMove enterAnimation="accordionVertical" className="case-list">
+                      {openCases.map(c => renderCase(c))}
+                    </FlipMove>
+                  }
                 </div>
               </div>
             </div>
           </div>
+
+          <div className="row">
+            <div className='col-xs-12'>
+              <div className="card">
+                <div className='card-body'>
+                  <h5 className="title subtitle">
+                    Historical Cases:
+                  </h5>
+                  {
+                    !historicalCases.length ?
+                    <div className="blank-state">
+                      <div className="blank-state--inner text-center text-gray">
+                        <span>You have not evaluated any cases yet.</span>
+                      </div>
+                    </div> :
+                    <FlipMove enterAnimation="accordionVertical" className="case-list">
+                      {historicalCases.map(c => renderCase(c))}
+                    </FlipMove>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </MainLayoutContainer>
     )

@@ -19,6 +19,7 @@ export const PatientDashboardHeader = class extends Component {
               </span>
             </div>
             <div className='col-md-4 col-sm-12 button-container'>
+              <br className="visible-xs hidden-sm hidden-md hidden-lg" />
               <Link className="btn btn-lg btn-success" to={routes.PATIENTS_CASES_NEW}>
                 <FontAwesomeIcon
                   icon={faFileMedical}
