@@ -8,6 +8,8 @@ import { isBlank } from '~/utils/isBlank'
 import { withDoctors } from '~/components/withDoctors'
 import { withSend } from '~/saga-genesis'
 
+require('./style.css')
+
 export const RegisterDoctorContainer =
   withDoctors(
     withSend(
@@ -106,6 +108,7 @@ export const RegisterDoctorContainer =
                       <table className="table table-striped">
                         <thead>
                           <tr>
+                            <th>Online</th>
                             <th>Doctor Address</th>
                             <th>Doctor Name</th>
                             <th>Public Key Set?</th>
@@ -116,7 +119,7 @@ export const RegisterDoctorContainer =
                         </thead>
                         <tbody>
                           <TransitionGroup component={null}>
-                            {doctors.map(({publicKey, isActive, address, name, doctorIndex}) => {
+                            {doctors.map(({publicKey, isActive, address, name, doctorIndex, online}) => {
                               return (
                                 <CSSTransition
                                   key={`doctor-row-transition-${doctorIndex}`}
@@ -124,6 +127,15 @@ export const RegisterDoctorContainer =
                                   appear={true}
                                   classNames="fade">
                                     <tr key={`doctor-row-${doctorIndex}`} className={!isActive ? 'deactivated' : ''}>
+                                      <td className='text-center'>
+                                        {
+                                          online
+                                            ?
+                                            <div className='register-doctor__online-circle' />
+                                            :
+                                            <div className='register-doctor__offline-circle' />
+                                         }
+                                      </td>
                                       <td width="50%" className="eth-address text">
                                         <span>
                                           <EthAddress address={address} showFull={true} />

@@ -21,7 +21,7 @@ function mapStateToProps(state, ownProps) {
         address,
         isActive: cacheCallValue(state, DoctorManager, 'isActive', address),
         publicKey: cacheCallValue(state, AccountManager, 'publicKeys', address),
-        online: get(state, `heartbeat[${address}].online`, false)
+        online: get(state, `heartbeat[${address.toLowerCase()}].online`, false)
       })
     }
   }

@@ -1,0 +1,21 @@
+.register-doctor__online-circle:before {
+  background-color: #44ce46;
+}
+
+.register-doctor__offline-circle:before {
+  background-color: #f9434f;
+}
+
+.register-doctor__online-circle:before,
+.register-doctor__offline-circle:before
+{
+  border-radius: 100%;
+  content: "";
+  height: 1rem;
+  width: 1rem;
+  margin-right: 3px;
+  top: -1px;
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
