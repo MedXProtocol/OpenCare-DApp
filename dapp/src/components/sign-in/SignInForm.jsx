@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { Redirect } from 'react-router-dom'
 import { Alert, HelpBlock } from 'react-bootstrap'
 import { formatSecretKey } from '~/services/format-secret-key'
 import { connect } from 'react-redux'
@@ -9,7 +8,6 @@ import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { withSaga } from '~/saga-genesis/components'
-import * as routes from '~/config/routes'
 import get from 'lodash.get'
 
 const HIDDEN_KEY = formatSecretKey(Array(65).join('X'))
@@ -56,14 +54,6 @@ export const SignInForm = class extends Component {
     }
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   if (nextProps.isDoctor !== undefined) {
-  //     let dynamicNextPath = nextProps.isDoctor
-  //       ? routes.DOCTORS_CASES_OPEN
-  //       : routes.PATIENTS_CASES
-  //   }
-  // }
-
   onChangeSecretKey = (e) => {
     this.setState({secretKey: formatSecretKey(e.target.value)})
   }
@@ -99,12 +89,8 @@ export const SignInForm = class extends Component {
         <HelpBlock>Leave blank to use your secret key on file</HelpBlock>
     }
 
-    // if (this.state.dynamicNextPath)
-    //   var redirect = <Redirect to={this.state.dynamicNextPath} />
-
     return (
       <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
-        {redirect}
         <form onSubmit={this.onSubmit} autoComplete='off'>
           <div className="form-wrapper--body">
             <OverrideDisallowedModal
