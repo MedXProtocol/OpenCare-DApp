@@ -10,6 +10,7 @@ import { withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { EthAddress } from '~/components/EthAddress'
 import * as routes from '~/config/routes'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -38,6 +39,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
   render() {
     return (
       <MainLayoutContainer>
+        <PageTitle renderTitle={(t) => t('pageTitles.balance')} />
         <div className="container">
           <div className="row">
             <div className="col-sm-6 col-sm-offset-3">

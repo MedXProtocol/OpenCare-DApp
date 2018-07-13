@@ -30,6 +30,24 @@ i18next
             userRevert: 'You rejected the transaction, please submit a valid transaction to proceed',
             outOfGas: 'The transaction ran out of gas',
             evmRevert: 'There was an error in the contract'
+          },
+          pageTitles: {
+            welcome: 'Welcome | Hippocrates',
+            loginToMetaMask: 'Login to MetaMask | Hippocrates',
+            tryMetaMask: 'Try MetaMask | Hippocrates',
+            emergencyKit: 'Emergency Kit | Hippocrates',
+            changePassword: 'Change Password | Hippocrates',
+            mint: 'Mint | Hippocrates',
+            balance: 'Balance | Hippocrates',
+            signIn: 'Sign In | Hippocrates',
+            signUp: 'Sign Up | Hippocrates',
+            diagnoseCases: 'Diagnose Cases | Hippocrates',
+            diagnoseCase: 'Diagnose Case {{caseId}} | Hippocrates',
+            addDoctor: 'Doctors | Hippocrates',
+            newCase: 'New Case | Hippocrates',
+            patientCases: 'My Cases | Hippocrates',
+            patientCase: 'Case {{caseId}} | Hippocrates',
+            fourOhFour: '404 | Hippocrates'
           }
         }
       }

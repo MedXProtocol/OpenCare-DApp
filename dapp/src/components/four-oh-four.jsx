@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import * as routes from '~/config/routes'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps (state) {
   const signedIn = state.account.signedIn
@@ -18,6 +19,7 @@ export const FourOhFour = connect(mapStateToProps)(
 
       return (
         <MainLayoutContainer doBetaFaucetModal={false}>
+          <PageTitle renderTitle={(t) => t('pageTitles.fourOhFour')} />
           <div className='container'>
             <div className="card">
               <div className="row">

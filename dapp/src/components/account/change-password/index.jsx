@@ -11,6 +11,7 @@ import { currentAccount, signIn } from '~/services/sign-in'
 import { Account } from '~/accounts/Account'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import * as routes from '~/config/routes'
+import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -100,6 +101,7 @@ export const ChangePassword = class extends Component {
 
     return (
       <MainLayoutContainer>
+        <PageTitle renderTitle={(t) => t('pageTitles.changePassword')} />
         <div className="container">
           <div className="row">
             <div className="col-sm-6 col-sm-offset-3">
