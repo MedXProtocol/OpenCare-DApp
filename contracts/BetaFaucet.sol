@@ -60,6 +60,8 @@ contract BetaFaucet is Ownable, Initializable {
   function sendMedX(address _recipient, uint256 amount) public onlyOwner {
     require(_recipient != address(0), "recipient address is empty");
     require(!sentMedXAddresses[_recipient], "recipient has already received MedX");
+    require(amount > 0, "amount must be positive");
+    require(medXToken.balanceOf(address(this)) >= amount, "contract is out of MedX!");
 
     sentMedXAddresses[_recipient] = true;
     emit MedXSent(_recipient, amount);

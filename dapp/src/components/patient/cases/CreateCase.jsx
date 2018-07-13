@@ -48,6 +48,14 @@ function mapStateToProps (state) {
   }
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    clearModalDismissedFlag: () => {
+      dispatch({ type: 'BETA_FAUCET_MODAL_SMISSED' })
+    }
+  }
+}
+
 function* saga({ account, AccountManager, MedXToken }) {
   if (!MedXToken || !account || !AccountManager) { return }
   yield cacheCall(MedXToken, 'balanceOf', account)
@@ -71,7 +79,7 @@ const requiredFields = [
   'selectedDoctor'
 ]
 
-export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(withSend(class _CreateCase extends Component {
+export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(withSend(class _CreateCase extends Component {
     constructor(){
       super()
 
@@ -120,6 +128,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
       this.setAgeRef = element => { this.ageInput = element }
       this.setCountryRef = element => { this.countryInput = element }
       this.setRegionRef = element => { this.regionInput = element }
+    }
+
+    componentDidMount () {
+      this.props.clearModalDismissedFlag()
     }
 
     componentWillReceiveProps (props) {

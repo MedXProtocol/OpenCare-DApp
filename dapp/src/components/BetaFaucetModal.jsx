@@ -71,7 +71,7 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
 
       determineModalState(props) {
         // If they've already seen the faucet or they're currently viewing, skip
-        if (this.props.betaFaucetModalDismissed || this.state.showBetaFaucetModal) {
+        if (props.betaFaucetModalDismissed || this.state.showBetaFaucetModal) {
           return
         }
 
@@ -112,10 +112,6 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         }
       }
 
-      handleClose() {
-        this.setState({ showBetaFaucetModal: false });
-      }
-
       render() {
         if (this.props.betaFaucetModalDismissed) { return null }
 
@@ -143,7 +139,7 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         }
 
         return (
-          <Modal show={showBetaFaucetModal}>
+          <Modal show={showBetaFaucetModal} onHide={this.props.dismissModal}>
             <Modal.Header>
               <div className="row">
                 <div className="col-xs-12 text-center">
