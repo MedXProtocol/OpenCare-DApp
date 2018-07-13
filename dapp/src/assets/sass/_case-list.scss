@@ -1,0 +1,117 @@
+.case-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.case-list--item {
+  box-shadow: 1px 1px 2px 0 rgba(200, 205, 210, 0.2);
+  border-radius: 8px;
+  border: 1px solid #dadce0;
+  box-sizing: border-box;
+  height: 70px;
+  padding: 24px 10px 22px;
+  position: relative;
+  margin: 0 0 24px;
+  opacity: 1;
+  list-style-type: none;
+  width: 100%;
+  transition: opacity .15s cubic-bezier(0.4,0.0,0.2,1),
+              border .15s cubic-bezier(0.4,0.0,0.2,1),
+              box-shadow .15s cubic-bezier(0.4,0.0,0.2,1);
+
+  @media (max-width: 768px) {
+    border-radius: 0;
+    border: 1px solid white;
+    border-bottom-color: rgba(200, 205, 210, 0.2);
+    box-shadow: none;
+    height: 60px;
+    padding: 6px 0;
+    transition: none;
+  }
+}
+
+.case-list--item:hover {
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.302),
+              0 1px 4px 1px rgba(60,64,67,0.149);
+  border: 1px solid transparent;
+  opacity: 1;
+
+  @media (max-width: 768px) {
+    border-bottom-color: rgba(200, 205, 210, 0.2);
+    box-shadow: none;
+  }
+}
+
+.case-list--item > span {
+  display: inline-block;
+}
+
+.case-list--item.list,
+.case-list--item:hover button {
+  display: block;
+}
+
+.case-list--item__case-number {
+  color: $brand-info;
+  font-size: 16px;
+  font-weight: 700;
+  min-width: 4%;
+  transition: color 200ms ease-in;
+
+  @media (max-width: 768px) {
+    padding: 0 6px;
+    width: 15%;
+  }
+}
+
+.case-list--item__status {
+  min-width: 30%;
+
+  @media (max-width: 768px) {
+    padding: 0 6px;
+    width: 66%;
+  }
+}
+
+.case-list--item__eth-address {
+  min-width: 20%;
+
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.case-list--item__eth-address .address__short {
+  color: #ccc;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.case-list--item:hover .case-list--item__eth-address .address__short {
+  color: #aaa;
+}
+
+.case-list--item__view {
+  color: lighten($brand-info, 50%);
+  float: right;
+  font-weight: 700;
+  padding-right: 20px;
+  transition: color 200ms ease-in;
+  min-width: 20%;
+
+  @media (max-width: 768px) {
+    color: $brand-info;
+    min-width: 13%;
+    width: 13%;
+  }
+}
+
+.case-list--item__view__text {
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.case-list--item:hover .case-list--item__view {
+  color: $brand-info;
+}

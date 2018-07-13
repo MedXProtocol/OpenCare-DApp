@@ -97,7 +97,11 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
     const oldCaseCount = this.props.caseCount
 
     // Moving from 0 to 1, or 1 to 2, but not undefined/NaN (initial state) to a number
-    if ((oldCaseCount === undefined) || (oldCaseCount === nextProps.caseCount)) {
+    if (
+      (oldCaseCount === undefined)
+      || isNaN(nextProps.caseCount)
+      || (oldCaseCount === nextProps.caseCount)
+    ) {
       return
     }
 
@@ -105,7 +109,7 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
     CaseManagerInstance.methods
       .doctorCaseAtIndex(address, nextProps.caseCount - 1)
       .call().then(caseAddress => {
-        console.log(caseAddress)
+        // console.log(caseAddress)
         const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress })
 
         toastr.success('You have been assigned a new case.', { path: caseRoute, text: 'View Case' })

@@ -17,6 +17,15 @@ a {
   font-weight: 700;
 }
 
+.subtitle {
+  background-color: white;
+  border-bottom: 3px solid #fafafa;
+  color: #ccc;
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding: 6px 0;
+}
+
 .no-margin {
   margin: 0;
 }
@@ -96,16 +105,17 @@ not(.nav) li {
   display: grid;
   grid-template-columns: none;
   grid-gap: 0;
-  grid-auto-rows: 120px;
+  grid-auto-rows: 80px;
   grid-template-areas:
     ". a a ."
     ". a a .";
 }
 
 .blank-state--inner {
-  grid-area: a;
   align-self: center;
+  grid-area: a;
   justify-self: center;
+  margin-top: -10px;
 }
 
 .secret-key__key {
@@ -155,7 +165,7 @@ small,
   position: fixed;
   right: 20px;
   width: 130px;
-  z-index: 11;
+  z-index: 1001;
 }
 
 .floating-feedback-link:hover,

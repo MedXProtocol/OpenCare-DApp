@@ -56,14 +56,13 @@ export const SignInForm = class extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.isSignedIn && (this.props.isDoctor !== undefined)) {
-      let dynamicNextPath = nextProps.isDoctor
-        ? routes.DOCTORS_CASES_OPEN
-        : routes.PATIENTS_CASES
-      this.setState({ dynamicNextPath })
-    }
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   if (nextProps.isDoctor !== undefined) {
+  //     let dynamicNextPath = nextProps.isDoctor
+  //       ? routes.DOCTORS_CASES_OPEN
+  //       : routes.PATIENTS_CASES
+  //   }
+  // }
 
   onChangeSecretKey = (e) => {
     this.setState({secretKey: formatSecretKey(e.target.value)})
@@ -100,8 +99,8 @@ export const SignInForm = class extends Component {
         <HelpBlock>Leave blank to use your secret key on file</HelpBlock>
     }
 
-    if (this.state.dynamicNextPath)
-      var redirect = <Redirect to={this.state.dynamicNextPath} />
+    // if (this.state.dynamicNextPath)
+    //   var redirect = <Redirect to={this.state.dynamicNextPath} />
 
     return (
       <div className="form-wrapper form-wrapper--inverse form-wrapper--account">

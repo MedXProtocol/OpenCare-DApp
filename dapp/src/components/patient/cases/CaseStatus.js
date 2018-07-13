@@ -51,13 +51,21 @@ const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['cas
         case 2:
           alert =
             <div className="alert alert-info">
-              {this.props.diagnosingDoctorName} is currently diagnosing your case.
+              {
+                this.props.diagnosingDoctorName
+                ? `${this.props.diagnosingDoctorName} is currently diagnosing your case.`
+                : `Loading ...`
+              }
             </div>
           break
         case 3:
           alert =
             <div className="alert alert-warning">
-              Your case has been evaluated by {this.props.diagnosingDoctorName}.  Please review it.
+              {
+                this.props.diagnosingDoctorName
+                ? `Your case has been evaluated by ${this.props.diagnosingDoctorName}, please review it:`
+                : `Loading ...`
+              }
             </div>
           break
         case 4:
@@ -69,13 +77,21 @@ const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['cas
         case 5:
           alert =
             <div className="alert alert-info">
-              You challenged the case. The case has been submitted for review to {this.props.challengingDoctorName}.
+              {
+                this.props.challengingDoctorName
+                ? `You challenged the case. The case has been submitted for review to ${this.props.challengingDoctorName}.`
+                : `Loading ...`
+              }
             </div>
           break
         case 6:
           alert =
             <div className="alert alert-info">
-              Your case is under challenge review by {this.props.challengingDoctorName}.
+              {
+                this.props.challengingDoctorName
+                ? `Your case is under challenge review by ${this.props.challengingDoctorName}.`
+                : `Loading ...`
+              }
             </div>
           break
         case 7:
