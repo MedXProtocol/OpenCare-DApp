@@ -70,16 +70,28 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       }
 
       determineModalState(props) {
-        let showBetaFaucetModal
+        // If they've already seen the faucet or they're currently viewing, skip
+        if (this.props.betaFaucetModalDismissed || this.state.showBetaFaucetModal) {
+          return
+        }
 
-        if (props.ethBalance !== undefined && props.ethBalance < 0.03) {
+        let showBetaFaucetModal
+        let step
+
+        const needEth = props.ethBalance !== undefined && props.ethBalance < 0.03
+        const needMedX = props.medXBalance !== undefined && props.medXBalance < 15
+
+        if (needEth) {
           showBetaFaucetModal = true
-        } else if (props.ethBalance !== undefined && props.ethBalance >= 0.03) {
-          showBetaFaucetModal = false
+          step = 1
+        } else if (needMedX) {
+          showBetaFaucetModal = true
+          step = 2
         }
 
         this.setState({
-          showBetaFaucetModal
+          showBetaFaucetModal,
+          step
         })
       }
 
