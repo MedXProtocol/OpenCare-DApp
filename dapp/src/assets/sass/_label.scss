@@ -1,5 +1,8 @@
 .label {
+  background-color: white;
   color: $medcredits-text-gray;
+  cursor: inherit;
+  pointer-events: none;
   padding: 0.2rem 0;
   font-size: 100%;
   font-weight: 400;
@@ -15,8 +18,9 @@
 .label-info,
 .label-warning,
 .label-danger {
-  color: white;
-  font-size: 13px;
+  background-color: white;
+  font-size: 16px;
+  font-weight: 700;
   padding: 0.2rem 0.7rem;
 }
 
@@ -26,50 +30,50 @@
 
 .label-default[href]:hover,
 .label-default[href]:focus {
-  background-color: #5e5e5e;
+  color: #5e5e5e;
 }
 
 .label-primary {
-  background-color: #337ab7;
+  color: #337ab7;
 }
 
 .label-primary[href]:hover,
 .label-primary[href]:focus {
-  background-color: #286090;
+  color: #286090;
 }
 
 .label-success {
-  background-color: #5cb85c;
+  color: #5cb85c;
 }
 
 .label-success[href]:hover,
 .label-success[href]:focus {
-  background-color: #449d44;
+  color: #449d44;
 }
 
 .label-info {
-  background-color: #5bc0de;
+  color: #5bc0de;
 }
 
 .label-info[href]:hover,
 .label-info[href]:focus {
-  background-color: #31b0d5;
+  color: #31b0d5;
 }
 
 .label-warning {
-  background-color: #f0ad4e;
+  color: #f0ad4e;
 }
 
 .label-warning[href]:hover,
 .label-warning[href]:focus {
-  background-color: #ec971f;
+  color: #ec971f;
 }
 
 .label-danger {
-  background-color: #d9534f;
+  color: #d9534f;
 }
 
 .label-danger[href]:hover,
 .label-danger[href]:focus {
-  background-color: #c9302c;
+  color: #c9302c;
 }

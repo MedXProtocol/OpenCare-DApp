@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
+import FlipMove from 'react-flip-move'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { cacheCall } from '~/saga-genesis/sagas'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
 import { CaseRowContainer } from './CaseRow'
-import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
@@ -72,43 +73,25 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
                 <span>You do not have any historical or pending cases.</span>
               </div>
             </div> :
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th className="text-center">#</th>
-                  <th>Case Address</th>
-                  <th>Status</th>
-                  <th className="text-right">
-                    <FontAwesomeIcon icon={faEdit} />
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <TransitionGroup component={null}>
-                  {this.props.cases.map(({caseAddress, status, caseIndex}) => {
-                    let showModal = false
-                    if (/3|8/.test(status) && !modalHasBeenShown) {
-                      modalHasBeenShown = true
-                      showModal = true
-                    }
-                    return (
-                      <CSSTransition
-                        key={caseIndex}
-                        timeout={100}
-                        appear={true}
-                        classNames="fade">
-                          <CaseRowContainer
-                            caseAddress={caseAddress}
-                            caseIndex={caseIndex}
-                            status={status}
-                            key={caseIndex}
-                            showModal={showModal} />
-                      </CSSTransition>
-                    )
-                  })}
-                </TransitionGroup>
-              </tbody>
-            </table>
+            <div>
+              <FlipMove enterAnimation="accordionVertical" className="case-list">
+                {this.props.cases.map(({caseAddress, status, caseIndex}) => {
+                  let showModal = false
+                  if (/3|8/.test(status) && !modalHasBeenShown) {
+                    modalHasBeenShown = true
+                    showModal = true
+                  }
+                  return (
+                    <CaseRowContainer
+                      caseAddress={caseAddress}
+                      caseIndex={caseIndex}
+                      status={status}
+                      key={caseIndex}
+                      showModal={showModal} />
+                  )
+                })}
+              </FlipMove>
+            </div>
           }
         </div>
       </div>
