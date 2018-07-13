@@ -9,6 +9,7 @@ import { Modal } from 'react-bootstrap'
 import get from 'lodash.get'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
+import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -21,6 +22,7 @@ function mapStateToProps (state) {
   const CaseManager = contractByName(state, 'CaseManager')
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const previousCase = (caseListCount > 0)
+  const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
 
   return {
     address,
@@ -30,7 +32,8 @@ function mapStateToProps (state) {
     DoctorManager,
     MedXToken,
     isOwner,
-    previousCase
+    previousCase,
+    isDoctor
   }
 }
 
@@ -39,14 +42,16 @@ function* saga({ CaseManager, MedXToken, DoctorManager, address }) {
   yield all([
     cacheCall(CaseManager, 'getPatientCaseListCount', address),
     cacheCall(MedXToken, 'balanceOf', address),
-    cacheCall(DoctorManager, 'owner')
+    cacheCall(DoctorManager, 'owner'),
+    yield cacheCall(DoctorManager, 'isDoctor', address)
   ])
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dismissModal: () => {
-      dispatch({ type: 'BETA_FAUCET_MODAL_DISMISSED' })
+    hideModal: () => {
+      console.log('running dispatch hideModal')
+      dispatch({ type: 'HIDE_BETA_FAUCET_MODAL' })
     }
   }
 }
@@ -90,6 +95,9 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         } else if (needMedX) {
           showBetaFaucetModal = true
           step = 2
+        } else if (!props.isDoctor) {
+          showBetaFaucetModal = true
+          step = 3
         }
 
         this.setState({
@@ -108,7 +116,11 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             step: 2
           })
         } else if (this.state.step === 2) {
-          this.props.dismissModal()
+          this.setState({
+            step: 3
+          })
+        } else if (this.state.step === 3) {
+          this.props.hideModal()
           this.setState({
             showBetaFaucetModal: false
           })
@@ -120,12 +132,20 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
 
         let content
         const { showBetaFaucetModal, step } = this.state
-        const { medXBalance, previousCase, ethBalance, isOwner, address } = this.props
+        const { isDoctor, medXBalance, previousCase, ethBalance, isOwner, address } = this.props
 
         if (isOwner) { return null }
 
-        // Don't show this if they've already been onboarded
-        if (medXBalance > 0 || previousCase) { return null }
+        if (step === 3) {
+          if (isDoctor) {
+            return null
+          }
+        } else {
+          if (medXBalance > 0 || previousCase) {
+            // Don't show this if they've already been onboarded
+            return null
+          }
+        }
 
         if (step === 1) {
           content = <EthFaucetAPI
@@ -139,14 +159,21 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
             address={address}
             medXBalance={medXBalance}
             moveToNextStep={this.moveToNextStep} />
+        } else if (step === 3) {
+          content = <AddDoctorAPI
+            key="addDoctorAPI"
+            address={address}
+            moveToNextStep={this.moveToNextStep} />
         }
 
         return (
-          <Modal show={showBetaFaucetModal} onHide={this.props.dismissModal}>
+          <Modal show={showBetaFaucetModal} onHide={this.props.hideModal}>
             <Modal.Header>
               <div className="row">
                 <div className="col-xs-12 text-center">
-                  <h4>Welcome to the Hippocrates Beta <small>(Step {step} of 3)</small></h4>
+                  <h4>Welcome to the Hippocrates Beta
+                    <br className="visible-xs hidden-sm hidden-md hidden-lg" />
+                    &nbsp;<small>(Step {step} of 3)</small></h4>
                 </div>
               </div>
             </Modal.Header>

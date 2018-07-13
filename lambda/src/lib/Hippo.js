@@ -5,6 +5,7 @@ const sign = require('ethjs-signer').sign
 const privateToAccount = require('ethjs-account').privateToAccount
 
 const betaFaucetArtifact = require("../../../build/contracts/BetaFaucet.json")
+const doctorManagerArtifact = require("../../../build/contracts/DoctorManager.json")
 const registryArtifact = require("../../../build/contracts/Registry.json")
 
 function fail(msg) {
@@ -107,6 +108,22 @@ export class Hippo {
     }).catch(error => {
       console.log(error.message)
       fail(error.message)
+    })
+  }
+
+  addOrReactivateDoctor (ethAddress, name) {
+    return this.lookupContractAddress('DoctorManager').then((doctorManagerAddress) => {
+      const method = doctorManagerArtifact.abi.find((obj) => obj.name === 'addOrReactivateDoctor')
+      var data = abi.encodeMethod(method, [ethAddress, name])
+      const tx = {
+        from: this.ownerAddress(),
+        to: doctorManagerAddress[0],
+        gas: 4612388,
+        gasPrice: Eth.toWei(20, 'gwei').toString(),
+        data
+      }
+      console.info('addOrReactivateDoctor tx: ', tx)
+      return this.sendTransaction(tx)
     })
   }
 }
