@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
+import { all } from 'redux-saga/effects'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { CaseRow } from '~/components/CaseRow'
@@ -50,8 +51,10 @@ function* saga({ account, CaseManager, AccountManager }) {
   let caseCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', account)
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
     let caseAddress = yield cacheCall(CaseManager, 'patientCases', account, caseIndex)
-    yield addContract({ address: caseAddress, contractKey: 'Case' })
-    yield cacheCall(caseAddress, 'status')
+    yield all([
+      addContract({ address: caseAddress, contractKey: 'Case' }),
+      cacheCall(caseAddress, 'status')
+    ])
   }
 }
 
