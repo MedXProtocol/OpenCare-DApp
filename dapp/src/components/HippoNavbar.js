@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
+import { all } from 'redux-saga/effects'
 import {
   Nav,
   Navbar,
@@ -63,10 +64,12 @@ function mapDispatchToProps (dispatch) {
 
 function* saga({ address, DoctorManager, MedXToken }) {
   if (!address || !DoctorManager || !MedXToken) { return }
-  yield cacheCall(MedXToken, 'balanceOf', address)
-  yield cacheCall(DoctorManager, 'owner')
-  yield cacheCall(DoctorManager, 'isDoctor', address)
-  yield cacheCall(DoctorManager, 'name', address)
+  yield all([
+    cacheCall(MedXToken, 'balanceOf', address),
+    cacheCall(DoctorManager, 'owner'),
+    cacheCall(DoctorManager, 'isDoctor', address),
+    cacheCall(DoctorManager, 'name', address)
+  ])
 }
 
 export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['address', 'DoctorManager', 'MedXToken'] })(class _HippoNavbar extends Component {

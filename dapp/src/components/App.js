@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
+import { all } from 'redux-saga/effects'
 import ReduxToastr from 'react-redux-toastr'
 import { hot } from 'react-hot-loader'
 import { formatRoute } from 'react-router-named-routes'
@@ -64,8 +65,10 @@ function mapDispatchToProps(dispatch) {
 
 function* saga({ address, CaseManager, DoctorManager }) {
   if (!address || !CaseManager || !DoctorManager) { return }
-  yield cacheCall(CaseManager, 'doctorCasesCount', address)
-  yield cacheCall(DoctorManager, 'isDoctor', address)
+  yield all([
+    cacheCall(CaseManager, 'doctorCasesCount', address),
+    cacheCall(DoctorManager, 'isDoctor', address)
+  ])
 }
 
 const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(

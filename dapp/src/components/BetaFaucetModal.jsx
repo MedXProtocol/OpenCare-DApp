@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import ReactCSSTransitionReplace from 'react-css-transition-replace';
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
@@ -35,9 +36,11 @@ function mapStateToProps (state) {
 
 function* saga({ CaseManager, MedXToken, DoctorManager, address }) {
   if (!CaseManager || !MedXToken || !DoctorManager || !address) { return }
-  yield cacheCall(CaseManager, 'getPatientCaseListCount', address)
-  yield cacheCall(MedXToken, 'balanceOf', address)
-  yield cacheCall(DoctorManager, 'owner')
+  yield all([
+    cacheCall(CaseManager, 'getPatientCaseListCount', address),
+    cacheCall(MedXToken, 'balanceOf', address),
+    cacheCall(DoctorManager, 'owner')
+  ])
 }
 
 function mapDispatchToProps(dispatch) {
