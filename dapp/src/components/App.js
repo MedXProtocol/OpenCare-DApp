@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 import ReduxToastr from 'react-redux-toastr'
 import { hot } from 'react-hot-loader'
+import { formatRoute } from 'react-router-named-routes'
+import getWeb3 from '~/get-web3'
 import { SignUpContainer } from './sign-up'
 import { SignInContainer } from './sign-in'
 import { PatientDashboard } from './patient/dashboard/'
@@ -23,15 +25,32 @@ import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
+import { withSaga, cacheCallValue, withContractRegistry } from '~/saga-genesis'
+import { contractByName } from '~/saga-genesis/state-finders'
+import { cacheCall } from '~/saga-genesis/sagas'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
+import { toastr } from '~/toastr'
 
 function mapStateToProps (state, ownProps) {
+  let caseCount
+  const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const isSignedIn = get(state, 'account.signedIn')
+  const DoctorManager = contractByName(state, 'DoctorManager')
+  const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+
+  if (isSignedIn && isDoctor) {
+    caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
+  }
+
   return {
     address,
-    isSignedIn
+    isDoctor,
+    DoctorManager,
+    isSignedIn,
+    caseCount,
+    CaseManager
   }
 }
 
@@ -43,7 +62,16 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Component {
+function* saga({ address, CaseManager, DoctorManager }) {
+  if (!address || !CaseManager || !DoctorManager) { return }
+  yield cacheCall(CaseManager, 'doctorCasesCount', address)
+  yield cacheCall(DoctorManager, 'isDoctor', address)
+}
+
+const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
+  withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager', 'DoctorManager', 'isDoctor'] })(
+    class _App extends Component {
+
   componentDidMount () {
     window.addEventListener("beforeunload", this.unload)
     window.addEventListener("focus", this.refocus)
@@ -60,6 +88,30 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
 
   componentWillReceiveProps (nextProps) {
     this.onAccountChangeSignOut(nextProps)
+
+    this.showNewCaseAssignedToast(nextProps)
+  }
+
+  showNewCaseAssignedToast = (nextProps) => {
+    const { contractRegistry, CaseManager, address } = this.props
+    const oldCaseCount = this.props.caseCount
+
+    // Moving from 0 to 1, or 1 to 2, but not undefined/NaN (initial state) to a number
+    if ((oldCaseCount === undefined) || (oldCaseCount === nextProps.caseCount)) {
+      return
+    }
+
+    const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
+    CaseManagerInstance.methods
+      .doctorCaseAtIndex(address, nextProps.caseCount - 1)
+      .call().then(caseAddress => {
+        console.log(caseAddress)
+        const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress })
+
+        toastr.success('You have been assigned a new case.', { path: caseRoute, text: 'View Case' })
+      }).catch(err => {
+        console.log(err.message);
+      });
   }
 
   onAccountChangeSignOut (nextProps) {
@@ -131,6 +183,6 @@ const App = connect(mapStateToProps, mapDispatchToProps)(class _App extends Comp
       </div>
     )
   }
-})
+})))
 
 export default hot(module)(withRouter(App))

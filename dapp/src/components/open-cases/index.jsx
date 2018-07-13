@@ -22,8 +22,6 @@ function mapStateToProps(state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   let CaseManager = contractByName(state, 'CaseManager')
   let caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', account)
-  let AccountManager = contractByName(state, 'AccountManager')
-  const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
 
   let cases = []
   for (let i = 0; i < caseCount; i++) {
@@ -32,25 +30,25 @@ function mapStateToProps(state) {
   }
 
   return {
-    publicKey,
     account,
     caseCount,
     cases,
-    CaseManager,
-    AccountManager
+    CaseManager
   }
 }
 
-function* saga({ account, CaseManager, AccountManager }) {
+function* saga({ account, CaseManager }) {
   if (!account || !CaseManager) { return }
-  yield cacheCall(AccountManager, 'publicKeys', account)
   let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', account)
   for (let i = 0; i < caseCount; i++) {
     yield cacheCall(CaseManager, 'doctorCaseAtIndex', account, i)
   }
 }
 
-export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager'] })(withSend(class _OpenCases extends Component {
+export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
+  withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager'] })(
+    withSend(class _OpenCases extends Component {
+
   render () {
     let caseKeys = keys(this.props.cases)
     let cases = caseKeys.reverse().map((key) => this.props.cases[key])

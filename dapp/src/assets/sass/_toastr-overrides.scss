@@ -110,3 +110,7 @@
 .redux-toastr .toastr .toastr-status.warning {
   background-color: $brand-warning;
 }
+
+.redux-toastr .toastr a {
+  color: $brand-info;
+}

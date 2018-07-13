@@ -346,7 +346,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps)(withSaga
         const { send, MedXToken, CaseManager } = this.props
         let hashHex = hashToHex(hash)
 
-        let CaseManagerContract = this.props.contractRegistry.get(this.props.CaseManager, 'CaseManager', getWeb3())
+        let CaseManagerContract = this.props.contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
 
         let data = null
         if (!this.props.publicKey) {
