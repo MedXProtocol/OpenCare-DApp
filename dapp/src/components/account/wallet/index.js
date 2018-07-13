@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
+import { all } from 'redux-saga/effects'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -31,8 +32,10 @@ function mapStateToProps (state) {
 
 function* saga({ address, MedXToken }) {
   if (!address || !MedXToken) { return }
-  yield cacheCall(MedXToken, 'balanceOf', address)
-  yield cacheCall(MedXToken, 'owner')
+  yield all([
+    cacheCall(MedXToken, 'balanceOf', address),
+    cacheCall(MedXToken, 'owner')
+  ])
 }
 
 export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['address', 'MedXToken'] })(class _Wallet extends Component {

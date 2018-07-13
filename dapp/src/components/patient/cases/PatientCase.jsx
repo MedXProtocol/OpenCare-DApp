@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { all } from 'redux-saga/effects'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import CaseStatus from './CaseStatus'
 import CaseDetails from '~/components/CaseDetails'
@@ -28,9 +29,11 @@ function mapStateToProps(state, { match }) {
 function* saga({ match }) {
   const caseAddress = match.params.caseAddress
   yield addContract({ address: caseAddress, contractKey: 'Case' })
-  yield cacheCall(caseAddress, 'encryptedCaseKey')
-  yield cacheCall(caseAddress, 'caseKeySalt')
-  yield cacheCall(caseAddress, 'diagnosisHash')
+  yield all([
+    cacheCall(caseAddress, 'encryptedCaseKey'),
+    cacheCall(caseAddress, 'caseKeySalt'),
+    cacheCall(caseAddress, 'diagnosisHash')
+  ])
 }
 
 export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match']})(class _PatientCase extends Component {

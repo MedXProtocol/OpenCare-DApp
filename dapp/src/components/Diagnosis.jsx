@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
+import { all } from 'redux-saga/effects'
 import { isTrue } from '~/utils/isTrue'
 import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
@@ -44,12 +45,14 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
 
 function* saga({ caseAddress }) {
   yield addContract({ address: caseAddress, contractKey: 'Case' })
-  yield cacheCall(caseAddress, 'status')
-  yield cacheCall(caseAddress, 'patient')
-  yield cacheCall(caseAddress, 'diagnosisHash')
-  yield cacheCall(caseAddress, 'encryptedCaseKey')
-  yield cacheCall(caseAddress, 'caseKeySalt')
-  yield cacheCall(caseAddress, 'diagnosingDoctor')
+  yield all([
+    cacheCall(caseAddress, 'status'),
+    cacheCall(caseAddress, 'patient'),
+    cacheCall(caseAddress, 'diagnosisHash'),
+    cacheCall(caseAddress, 'encryptedCaseKey'),
+    cacheCall(caseAddress, 'caseKeySalt'),
+    cacheCall(caseAddress, 'diagnosingDoctor')
+  ])
 }
 
 const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(withSend(class _Diagnosis extends Component {

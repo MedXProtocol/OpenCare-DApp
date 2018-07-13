@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { all } from 'redux-saga/effects'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import CaseDetails from '~/components/CaseDetails'
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
@@ -46,12 +47,14 @@ function* saga({ match, address, AccountManager }) {
   const caseAddress = match.params.caseAddress
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
-  yield cacheCall(AccountManager, 'publicKeys', patientAddress)
-  yield cacheCall(caseAddress, 'doctorEncryptedCaseKeys', address)
-  yield cacheCall(caseAddress, 'diagnosingDoctor')
-  yield cacheCall(caseAddress, 'diagnosisHash')
-  yield cacheCall(caseAddress, 'challengingDoctor')
-  yield cacheCall(caseAddress, 'challengeHash')
+  yield all([
+    cacheCall(AccountManager, 'publicKeys', patientAddress),
+    cacheCall(caseAddress, 'doctorEncryptedCaseKeys', address),
+    cacheCall(caseAddress, 'diagnosingDoctor'),
+    cacheCall(caseAddress, 'diagnosisHash'),
+    cacheCall(caseAddress, 'challengingDoctor'),
+    cacheCall(caseAddress, 'challengeHash')
+  ])
 }
 
 export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'address', 'AccountManager']})(class _DiagnoseCase extends Component {
