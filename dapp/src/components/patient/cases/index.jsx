@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
-import { CaseRowContainer } from '~/components/CaseRow'
+import { CaseRow } from '~/components/CaseRow'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
 import get from 'lodash.get'
@@ -56,53 +56,14 @@ function* saga({ account, CaseManager, AccountManager }) {
 }
 
 export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager', 'caseCount']})(class _PatientCases extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      cases: []
-    }
-  }
-
   componentDidMount () {
     this.props.invalidate(this.props.CaseManager)
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      cases: [...nextProps.cases]
-    })
-  }
-
-  handleAddCase = () => {
-    const cases = [...this.state.cases]
-    const statuses = [
-      0,
-      1,
-      3,
-      4,
-      5,
-      6,
-      8,
-      10,
-      11
-    ]
-    cases.splice(0, 0, {
-      caseAddress: '0xn3wC4s3',
-      status: statuses[parseInt(Math.random() * statuses.length, 10)],
-      caseIndex: this.state.cases.length
-    });
-    this.setState({
-      cases: cases
-    })
   }
 
   render() {
     return (
       <div className="card">
         <div className="card-body table-responsive">
-          <a onClick={this.handleAddCase} className="btn btn-primary btn-lg">Add Case</a>
-          <br />
-          <br />
           {
             !this.props.caseCount || this.props.caseCount === '0' ?
             <div className="blank-state">
@@ -112,11 +73,12 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
             </div> :
             <div>
               <FlipMove enterAnimation="accordionVertical" className="case-list">
-                {this.state.cases.map(({caseAddress, status, caseIndex}) => {
+                {this.props.cases.map(({caseAddress, status, caseIndex}) => {
                   const statusLabel = caseStatusToName(status)
                   const statusClass = caseStatusToClass(status)
+                  console.log(caseAddress, status, caseIndex, statusLabel, statusClass)
                   return (
-                    <CaseRowContainer
+                    <CaseRow
                       route={routes.PATIENTS_CASE}
                       statusLabel={statusLabel}
                       statusClass={statusClass}

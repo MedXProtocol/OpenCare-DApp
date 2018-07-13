@@ -2,7 +2,7 @@ export function caseStatusToName(status) {
   var statuses = {
     0: 'None',
     1: 'Open',
-    2: 'Evaluating',
+    2: 'Under Review',
     3: 'Evaluated',
     4: 'Closed',
     5: 'Challenged',

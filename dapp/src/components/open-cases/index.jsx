@@ -3,7 +3,7 @@ import { MainLayoutContainer } from '~/layouts/MainLayout'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
-import { CaseRowContainer } from '~/components/CaseRow'
+import { CaseRow } from '~/components/CaseRow'
 import get from 'lodash.get'
 import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctor-case-status-labels'
 import { cacheCall } from '~/saga-genesis/sagas'
@@ -45,6 +45,7 @@ function* saga({ address, CaseManager }) {
   if (!address || !CaseManager) { return }
   let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', address)
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
+    console.log(caseIndex)
     let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
     yield addContract({ address: caseAddress, contractKey: 'Case' })
     yield cacheCall(caseAddress, 'status')
@@ -57,8 +58,6 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
     withSend(class _OpenCases extends Component {
 
   render () {
-    let cases = this.props.cases.reverse()
-
     return (
       <MainLayoutContainer>
         <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCases')} />
@@ -83,12 +82,13 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
               <div className="card">
                 <div className='card-body'>
                   <FlipMove enterAnimation="accordionVertical" className="case-list">
-                    {cases.map(({caseAddress, status, caseIndex, diagnosingDoctor}) => {
+                    {this.props.cases.map(({caseAddress, status, caseIndex, diagnosingDoctor}) => {
                       const isDiagnosingDoctor = diagnosingDoctor === this.props.address
-                      const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(this.props.status, 10))
-                      const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(this.props.status, 10))
+                      const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
+                      const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
+                      console.log(caseAddress, status, caseIndex, statusLabel, statusClass, diagnosingDoctor)
                       return (
-                        <CaseRowContainer
+                        <CaseRow
                           route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
                           caseAddress={caseAddress}
                           caseIndex={caseIndex}
