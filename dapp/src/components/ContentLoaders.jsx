@@ -20,7 +20,7 @@ export const CaseDetailsLoader = props => (
     width={400}
     speed={1}
     primaryColor="#ededed"
-    secondaryColor="#ffffff"
+    secondaryColor="#f2f2f2"
     {...props}
   >
     <circle cx="10" cy="25" r="8" />
