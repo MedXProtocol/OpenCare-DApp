@@ -26,7 +26,6 @@ function mapStateToProps(state) {
     if (caseAddress) {
       const status = cacheCallValue(state, caseAddress, 'status')
       const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
-      console.log(status, diagnosingDoctor)
       if (status && diagnosingDoctor) {
         const isDiagnosingDoctor = diagnosingDoctor === address
         cases.push({
@@ -58,6 +57,20 @@ function* saga({ address, CaseManager }) {
       cacheCall(caseAddress, 'diagnosingDoctor')
     ])
   }
+}
+
+function renderCase({ caseAddress, status, caseIndex, isDiagnosingDoctor }) {
+  const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
+  const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
+  return (
+    <CaseRow
+      route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
+      caseAddress={caseAddress}
+      caseIndex={caseIndex}
+      statusLabel={statusLabel}
+      statusClass={statusClass}
+      key={caseIndex} />
+  )
 }
 
 export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
@@ -103,19 +116,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                       </div>
                     </div> :
                     <FlipMove enterAnimation="accordionVertical" className="case-list">
-                      {openCases.map(({caseAddress, status, caseIndex, isDiagnosingDoctor}) => {
-                        const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
-                        const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
-                        return (
-                          <CaseRow
-                            route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
-                            caseAddress={caseAddress}
-                            caseIndex={caseIndex}
-                            statusLabel={statusLabel}
-                            statusClass={statusClass}
-                            key={caseIndex} />
-                        )
-                      })}
+                      {openCases.map(c => renderCase(c))}
                     </FlipMove>
                   }
                 </div>
@@ -138,19 +139,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                       </div>
                     </div> :
                     <FlipMove enterAnimation="accordionVertical" className="case-list">
-                      {historicalCases.map(({caseAddress, status, caseIndex, isDiagnosingDoctor}) => {
-                        const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
-                        const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
-                        return (
-                          <CaseRow
-                            route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
-                            caseAddress={caseAddress}
-                            caseIndex={caseIndex}
-                            statusLabel={statusLabel}
-                            statusClass={statusClass}
-                            key={caseIndex} />
-                        )
-                      })}
+                      {historicalCases.map(c => renderCase(c))}
                     </FlipMove>
                   }
                 </div>
