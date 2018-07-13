@@ -1,6 +1,6 @@
 import Cookie from 'js-cookie'
 import { setCookie } from '~/services/setCookie'
-import { getAccount } from '~/accounts/get-account'
+import { getAccount } from '~/accounts/getAccount'
 import { KEY_STORE } from '~/accounts/constants'
 
 export function setAccountCookie(address, account) {
