@@ -65,7 +65,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
       <div className="card">
         <div className="card-body table-responsive">
           {
-            !this.props.caseCount || this.props.caseCount === '0' ?
+            !this.props.cases.length ?
             <div className="blank-state">
               <div className="blank-state--inner text-center text-gray">
                 <span>You do not have any historical or pending cases.</span>
@@ -76,7 +76,6 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
                 {this.props.cases.map(({caseAddress, status, caseIndex}) => {
                   const statusLabel = caseStatusToName(status)
                   const statusClass = caseStatusToClass(status)
-                  console.log(caseAddress, status, caseIndex, statusLabel, statusClass)
                   return (
                     <CaseRow
                       route={routes.PATIENTS_CASE}

@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { all } from 'redux-saga/effects'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -23,13 +24,16 @@ function mapStateToProps(state) {
     let caseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, caseIndex)
     if (caseAddress) {
       const status = cacheCallValue(state, caseAddress, 'status')
-      const diagnosingDoctor = cacheCallValue(state, address, 'diagnosingDoctor')
-      cases.push({
-        caseAddress,
-        status,
-        caseIndex,
-        diagnosingDoctor
-      })
+      const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
+      if (status && diagnosingDoctor) {
+        const isDiagnosingDoctor = diagnosingDoctor === address
+        cases.push({
+          caseAddress,
+          status,
+          caseIndex,
+          isDiagnosingDoctor
+        })
+      }
     }
   }
 
@@ -45,11 +49,12 @@ function* saga({ address, CaseManager }) {
   if (!address || !CaseManager) { return }
   let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', address)
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
-    console.log(caseIndex)
     let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
     yield addContract({ address: caseAddress, contractKey: 'Case' })
-    yield cacheCall(caseAddress, 'status')
-    yield cacheCall(caseAddress, 'diagnosingDoctor')
+    yield all([
+      cacheCall(caseAddress, 'status'),
+      cacheCall(caseAddress, 'diagnosingDoctor')
+    ])
   }
 }
 
@@ -58,10 +63,19 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
     withSend(class _OpenCases extends Component {
 
   render () {
+    const openCases       = this.props.cases.filter(c => {
+      return (c.status.match(/2/) && c.isDiagnosingDoctor) || (c.status.match(/6/) && !c.isDiagnosingDoctor)
+    })
+
+    const historicalCases = this.props.cases.filter(c => {
+      return (!c.status.match(/2/) && c.isDiagnosingDoctor) || (!c.status.match(/6/) && !c.isDiagnosingDoctor)
+    })
+
     return (
       <MainLayoutContainer>
         <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCases')} />
         <div className="container">
+
           <div className='header-card card'>
             <div className='card-body'>
               <div className='row'>
@@ -81,27 +95,73 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
             <div className='col-xs-12'>
               <div className="card">
                 <div className='card-body'>
-                  <FlipMove enterAnimation="accordionVertical" className="case-list">
-                    {this.props.cases.map(({caseAddress, status, caseIndex, diagnosingDoctor}) => {
-                      const isDiagnosingDoctor = diagnosingDoctor === this.props.address
-                      const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
-                      const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
-                      console.log(caseAddress, status, caseIndex, statusLabel, statusClass, diagnosingDoctor)
-                      return (
-                        <CaseRow
-                          route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
-                          caseAddress={caseAddress}
-                          caseIndex={caseIndex}
-                          statusLabel={statusLabel}
-                          statusClass={statusClass}
-                          key={caseIndex} />
-                      )
-                    })}
-                  </FlipMove>
+                  <h5 className="title subtitle">
+                    Open Cases:
+                  </h5>
+                  {
+                    !openCases.length ?
+                    <div className="blank-state">
+                      <div className="blank-state--inner text-center text-gray">
+                        <span>You do not have any cases assigned to you yet.</span>
+                      </div>
+                    </div> :
+                    <FlipMove enterAnimation="accordionVertical" className="case-list">
+                      {openCases.map(({caseAddress, status, caseIndex, isDiagnosingDoctor}) => {
+                        const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
+                        const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
+                        return (
+                          <CaseRow
+                            route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
+                            caseAddress={caseAddress}
+                            caseIndex={caseIndex}
+                            statusLabel={statusLabel}
+                            statusClass={statusClass}
+                            key={caseIndex} />
+                        )
+                      })}
+                    </FlipMove>
+                  }
                 </div>
               </div>
             </div>
           </div>
+
+          <div className="row">
+            <div className='col-xs-12'>
+              <div className="card">
+                <div className='card-body'>
+                  <h5 className="title subtitle">
+                    Historical Cases:
+                  </h5>
+                  {
+                    !historicalCases.length ?
+                    <div className="blank-state">
+                      <div className="blank-state--inner text-center text-gray">
+                        <span>You have not evaluated any cases yet.</span>
+                      </div>
+                    </div> :
+                    <FlipMove enterAnimation="accordionVertical" className="case-list">
+                      {historicalCases.map(({caseAddress, status, caseIndex, diagnosingDoctor}) => {
+                        const isDiagnosingDoctor = diagnosingDoctor === this.props.address
+                        const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
+                        const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
+                        return (
+                          <CaseRow
+                            route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
+                            caseAddress={caseAddress}
+                            caseIndex={caseIndex}
+                            statusLabel={statusLabel}
+                            statusClass={statusClass}
+                            key={caseIndex} />
+                        )
+                      })}
+                    </FlipMove>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </MainLayoutContainer>
     )
