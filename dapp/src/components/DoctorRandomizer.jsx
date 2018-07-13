@@ -44,7 +44,7 @@ export const DoctorRandomizer =
       }
 
       render () {
-        return <p>Your doctor will be {get(this.props.value, 'label')}</p>
+        return this.props.value ? <p>Your doctor will be {get(this.props.value, 'label')}</p> : null
       }
     }
   )
