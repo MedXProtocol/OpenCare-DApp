@@ -4,20 +4,21 @@ import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
-import { CaseRowContainer } from './CaseRow'
-import get from 'lodash.get'
+import { CaseRowContainer } from '~/components/CaseRow'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
-
+import get from 'lodash.get'
+import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { accounts }) {
   const cases = []
   const account = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
   const AccountManager = contractByName(state, 'AccountManager')
-  const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
+  const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
 
-  for (let caseIndex = caseListCount; caseIndex >= 0; --caseIndex) {
+  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
     let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
     if (caseAddress) {
       let status = cacheCallValue(state, caseAddress, 'status')
@@ -31,7 +32,7 @@ function mapStateToProps(state, { accounts }) {
 
   return {
     account,
-    caseListCount,
+    caseCount,
     cases,
     CaseManager,
     AccountManager
@@ -46,33 +47,34 @@ function mapDispatchToProps (dispatch) {
 
 function* saga({ account, CaseManager, AccountManager }) {
   if (!account || !CaseManager) { return }
-  let patientCaseListCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', account)
-  for (let i = 0; i < patientCaseListCount; i++) {
-    let caseAddress = yield cacheCall(CaseManager, 'patientCases', account, i)
+  let caseCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', account)
+  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
+    let caseAddress = yield cacheCall(CaseManager, 'patientCases', account, caseIndex)
     yield addContract({ address: caseAddress, contractKey: 'Case' })
     yield cacheCall(caseAddress, 'status')
   }
 }
 
-export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager', 'caseListCount']})(class _PatientCases extends Component {
+export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager', 'caseCount']})(class _PatientCases extends Component {
   constructor(props) {
     super(props)
     this.state = {
       cases: []
     }
   }
+
   componentDidMount () {
     this.props.invalidate(this.props.CaseManager)
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      cases: nextProps.cases
+      cases: [...nextProps.cases]
     })
   }
 
   handleAddCase = () => {
-    const cases = this.state.cases
+    const cases = [...this.state.cases]
     const statuses = [
       0,
       1,
@@ -102,7 +104,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
           <br />
           <br />
           {
-            !this.props.caseListCount || this.props.caseListCount === '0' ?
+            !this.props.caseCount || this.props.caseCount === '0' ?
             <div className="blank-state">
               <div className="blank-state--inner text-center text-gray">
                 <span>You do not have any historical or pending cases.</span>
@@ -111,11 +113,15 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
             <div>
               <FlipMove enterAnimation="accordionVertical" className="case-list">
                 {this.state.cases.map(({caseAddress, status, caseIndex}) => {
+                  const statusLabel = caseStatusToName(status)
+                  const statusClass = caseStatusToClass(status)
                   return (
                     <CaseRowContainer
+                      route={routes.PATIENTS_CASE}
+                      statusLabel={statusLabel}
+                      statusClass={statusClass}
                       caseAddress={caseAddress}
                       caseIndex={caseIndex}
-                      status={status}
                       key={caseIndex} />
                   )
                 })}

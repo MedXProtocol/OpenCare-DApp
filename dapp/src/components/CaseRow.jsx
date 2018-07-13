@@ -1,19 +1,14 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
+import { formatRoute } from 'react-router-named-routes'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight';
-import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
-import { formatRoute } from 'react-router-named-routes'
 import { EthAddress } from '~/components/EthAddress'
-import * as routes from '~/config/routes'
 
 export const CaseRowContainer = class _CaseRow extends Component {
   render () {
-    if (!this.props.status) { return <li></li> }
-
-    const status = +(this.props.status || '0')
-    const caseRoute = formatRoute(routes.PATIENTS_CASE, { caseAddress: this.props.caseAddress })
+    const caseRoute = formatRoute(this.props.route, { caseAddress: this.props.caseAddress })
     const style = { zIndex: 998 - this.props.caseIndex }
 
     return (
@@ -23,8 +18,8 @@ export const CaseRowContainer = class _CaseRow extends Component {
         </span>
 
         <span className="case-list--item__status text-center">
-          <label className={`label label-${caseStatusToClass(status)}`}>
-            {caseStatusToName(status)}
+          <label className={`label label-${this.props.statusClass}`}>
+            {this.props.statusLabel}
           </label>
         </span>
 

@@ -1,47 +1,54 @@
-import React, {
-  Component
-} from 'react'
+import React, { Component } from 'react'
 import { MainLayoutContainer } from '~/layouts/MainLayout'
-import {
-  Table
-} from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { TransitionGroup, CSSTransition } from 'react-transition-group'
-import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
-import { cacheCall } from '~/saga-genesis/sagas'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
-import { CaseRow } from './CaseRow'
-import keys from 'lodash.keys'
+import FlipMove from 'react-flip-move'
+import { CaseRowContainer } from '~/components/CaseRow'
 import get from 'lodash.get'
+import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctor-case-status-labels'
+import { cacheCall } from '~/saga-genesis/sagas'
+import { addContract } from '~/saga-genesis/sagas'
 import { contractByName } from '~/saga-genesis/state-finders'
+import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
-  const account = get(state, 'sagaGenesis.accounts[0]')
+  const address = get(state, 'sagaGenesis.accounts[0]')
   let CaseManager = contractByName(state, 'CaseManager')
-  let caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', account)
+  let caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
 
   let cases = []
-  for (let i = 0; i < caseCount; i++) {
-    let c = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', account, i)
-    if (c) { cases.push(c) }
+  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
+    let caseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, caseIndex)
+    if (caseAddress) {
+      const status = cacheCallValue(state, caseAddress, 'status')
+      const diagnosingDoctor = cacheCallValue(state, address, 'diagnosingDoctor')
+      cases.push({
+        caseAddress,
+        status,
+        caseIndex,
+        diagnosingDoctor
+      })
+    }
   }
 
   return {
-    account,
+    address,
     caseCount,
     cases,
     CaseManager
   }
 }
 
-function* saga({ account, CaseManager }) {
-  if (!account || !CaseManager) { return }
-  let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', account)
-  for (let i = 0; i < caseCount; i++) {
-    yield cacheCall(CaseManager, 'doctorCaseAtIndex', account, i)
+function* saga({ address, CaseManager }) {
+  if (!address || !CaseManager) { return }
+  let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', address)
+  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
+    let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
+    yield addContract({ address: caseAddress, contractKey: 'Case' })
+    yield cacheCall(caseAddress, 'status')
+    yield cacheCall(caseAddress, 'diagnosingDoctor')
   }
 }
 
@@ -50,8 +57,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
     withSend(class _OpenCases extends Component {
 
   render () {
-    let caseKeys = keys(this.props.cases)
-    let cases = caseKeys.reverse().map((key) => this.props.cases[key])
+    let cases = this.props.cases.reverse()
 
     return (
       <MainLayoutContainer>
@@ -76,32 +82,22 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
             <div className='col-xs-12'>
               <div className="card">
                 <div className='card-body'>
-                  <Table className="table table-striped">
-                    <thead>
-                      <tr>
-                        <th>Address</th>
-                        <th>Status</th>
-                        <th className="text-right">
-                          <FontAwesomeIcon icon={faEdit} />
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <TransitionGroup component={null}>
-                        {
-                          cases.map(address => (
-                            <CSSTransition
-                              key={address}
-                              timeout={100}
-                              appear={true}
-                              classNames="fade">
-                              <CaseRow address={address} key={address} />
-                            </CSSTransition>
-                          ))
-                        }
-                      </TransitionGroup>
-                    </tbody>
-                  </Table>
+                  <FlipMove enterAnimation="accordionVertical" className="case-list">
+                    {cases.map(({caseAddress, status, caseIndex, diagnosingDoctor}) => {
+                      const isDiagnosingDoctor = diagnosingDoctor === this.props.address
+                      const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(this.props.status, 10))
+                      const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(this.props.status, 10))
+                      return (
+                        <CaseRowContainer
+                          route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
+                          caseAddress={caseAddress}
+                          caseIndex={caseIndex}
+                          statusLabel={statusLabel}
+                          statusClass={statusClass}
+                          key={caseIndex} />
+                      )
+                    })}
+                  </FlipMove>
                 </div>
               </div>
             </div>
