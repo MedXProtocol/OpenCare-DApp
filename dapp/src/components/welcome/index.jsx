@@ -20,10 +20,10 @@ function mapStateToProps (state) {
 
 export const Welcome = connect(mapStateToProps)(class _Welcome extends Component {
   render () {
+    let launchLink
     if (this.props.signedIn) {
-      var launchLink = routes.PATIENTS_CASES
-    } else
-    if (this.props.account) {
+      launchLink = routes.PATIENTS_CASES
+    } else if (this.props.account) {
       launchLink = routes.SIGN_IN
     } else {
       launchLink = routes.SIGN_UP
