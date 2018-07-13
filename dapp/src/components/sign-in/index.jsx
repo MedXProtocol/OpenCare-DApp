@@ -6,29 +6,31 @@ import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { toastr } from '~/toastr'
-import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
-import { Loading } from '~/components/Loading'
 import { Account, ACCOUNT_VERSION } from '~/accounts/Account'
 import { SignInFormContainer } from './SignInForm'
-import {
-  withSend
-} from '~/saga-genesis'
-import {
-  contractByName
-} from '~/saga-genesis/state-finders'
+import { withSend } from '~/saga-genesis'
+import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { withSaga } from '~/saga-genesis/components'
+import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
+import { cacheCall } from '~/saga-genesis/sagas'
 import { BodyClass } from '~/components/BodyClass'
-import * as routes from '~/config/routes'
+import { Loading } from '~/components/Loading'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 import { PageTitle } from '~/components/PageTitle'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state, ownProps) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const signedIn = state.account.signedIn
   const AccountManager = contractByName(state, 'AccountManager')
+  const DoctorManager = contractByName(state, 'DoctorManager')
   const transactions = state.sagaGenesis.transactions
+  const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
   return {
     address,
     signedIn,
+    isDoctor,
+    DoctorManager,
     AccountManager,
     transactions,
     account: Account.get(address)
@@ -49,7 +51,16 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapStateToProps, mapDispatchToProps)(class _SignIn extends Component {
+function* saga({ account, DoctorManager }) {
+  if (!account || !DoctorManager) { return }
+  yield cacheCall(DoctorManager, 'isDoctor', account)
+}
+
+export const SignInContainer = ReactTimeout(withSend(withRouter(
+  withSaga(saga, { propTriggers: ['account', 'DoctorManager'] })(
+    connect(mapStateToProps, mapDispatchToProps)(
+      class _SignIn extends Component {
+
   constructor(props) {
     super(props)
 
@@ -114,11 +125,13 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
   }
 
   render () {
-    if (this.props.signedIn) {
-      return <Redirect to='/patients/cases' />
+    const { signedIn, account, isDoctor } = this.props
+    if (signedIn) {
+      let path = isDoctor ? routes.DOCTORS_CASES_OPEN : routes.PATIENTS_CASES
+      return <Redirect to={path} />
     }
 
-    const shouldResetAccount = this.props.account && ((this.props.account.getVersion() || 0) < ACCOUNT_VERSION)
+    const shouldResetAccount = account && ((account.getVersion() || 0) < ACCOUNT_VERSION)
 
     if (shouldResetAccount) {
       var warning =
@@ -153,7 +166,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
                 {warning}
                 <SignInFormContainer
                   onSubmit={this.onSubmit}
-                  hasAccount={!!this.props.account} />
+                  hasAccount={!!account} />
 
                 <div className="account--extras">
                   <p className='text-center text-white'>
@@ -168,4 +181,4 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
       </BodyClass>
     )
   }
-}))))
+})))))
