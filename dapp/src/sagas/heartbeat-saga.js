@@ -113,7 +113,7 @@ function* heartbeatMessage(lastHeartbeatTime, { message, dataJson, date }) {
   if (!address) { return console.error('Missing address: ', dataJson) }
 
   if (skippedABeat(lastHeartbeatTime, address)) {
-    yield put({ type: 'USER_ONLINE', address, date })
+    yield put({ type: 'USER_ONLINE', address: address.toLowerCase(), date })
   }
 
   lastHeartbeatTime[address] = date
@@ -122,7 +122,7 @@ function* heartbeatMessage(lastHeartbeatTime, { message, dataJson, date }) {
     // If we haven't received a heartbeat within two intervals, we can assume death
     yield call(delay, MAX_LIFETIME)
     if (skippedABeat(lastHeartbeatTime, address)) {
-      yield put({ type: 'USER_OFFLINE', address, date: new Date() })
+      yield put({ type: 'USER_OFFLINE', address: address.toLowerCase(), date: new Date() })
     }
   })
 }
