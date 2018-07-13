@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
+import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
 import PropTypes from 'prop-types'
 import { withSaga, cacheCallValue, cacheCall } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import get from 'lodash.get'
+import range from 'lodash.range'
 
 function mapStateToProps(state, ownProps) {
   const DoctorManager = contractByName(state, 'DoctorManager')
@@ -37,12 +39,19 @@ function* saga({ DoctorManager, AccountManager }) {
   if (!DoctorManager || !AccountManager) { return }
   const doctorCount = yield cacheCall(DoctorManager, 'doctorCount')
   // doctorCount at 0 is empty records because Solidity, start at 1
-  for (var i = 1; i < doctorCount; i++) {
-    const address = yield cacheCall(DoctorManager, 'doctorAddresses', i)
-    yield cacheCall(DoctorManager, 'doctorNames', i)
-    yield cacheCall(DoctorManager, 'isActive', address)
-    yield cacheCall(AccountManager, 'publicKeys', address)
-  }
+
+  const indices = range(1, doctorCount)
+
+  yield all(
+    indices.map(function* (i) {
+      const address = yield cacheCall(DoctorManager, 'doctorAddresses', i)
+      yield all([
+        cacheCall(DoctorManager, 'doctorNames', i),
+        cacheCall(DoctorManager, 'isActive', address),
+        cacheCall(AccountManager, 'publicKeys', address)
+      ])
+    })
+  )
 }
 
 export function withDoctors(WrappedComponent) {
