@@ -4,10 +4,11 @@ import { getAccountCookie } from './getAccountCookie'
 
 export function getAccount(address) {
   if (!address) { return null }
-  let account = getAccountCookie(address)
+  let account = null;
   if (storageAvailable('localStorage')) {
-    // local storage takes priority, otherwise use the cookie account
-    account = getAccountLocalStorage(address) || account
+    account = getAccountLocalStorage(address)
+  } else {
+    account = getAccountCookie(address)
   }
   return account
 }

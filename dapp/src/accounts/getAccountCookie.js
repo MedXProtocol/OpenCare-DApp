@@ -7,6 +7,7 @@ export function getAccountCookie(address) {
   // We had a problem where we were setting the address key to 'undefined'
   // This clears those incorrect cookies:
   delete keyStore[undefined]
+  delete keyStore[null] // just in case ;)
 
   return keyStore[address]
 }
