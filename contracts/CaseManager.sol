@@ -3,6 +3,7 @@ pragma solidity ^0.4.23;
 import "./Case.sol";
 import "./MedXToken.sol";
 import "./Registry.sol";
+import "./AccountManager.sol";
 import "./Delegate.sol";
 import "./Initializable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -97,14 +98,21 @@ contract CaseManager is Ownable, Pausable, Initializable {
           sig |= bytes4(_extraData[i]) >> 8*i;
         }
 
-        require(sig == bytes4(keccak256('createAndAssignCase(address,bytes,bytes,bytes,address,bytes)')));
+        bool sig1matches =
+          sig == bytes4(keccak256('createAndAssignCase(address,bytes,bytes,bytes,address,bytes)'));
+        bool sig2matches =
+          sig == bytes4(keccak256('createAndAssignCaseWithPublicKey(address,bytes,bytes,bytes,address,bytes,bytes)'));
+
+        require(sig1matches || sig2matches);
 
         address _this = address(this);
         uint256 inputSize = _extraData.length;
 
         assembly {
           let ptr := mload(0x40)
-          calldatacopy(ptr, 164, inputSize)
+          calldatacopy(ptr, 164, inputSize) // copy extraData
+          let ptrAtPatient := add(ptr, 4) // skip signature
+          calldatacopy(ptrAtPatient, 4, 32) // overwrite _from onto patient
           let result := call(gas, _this, 0, ptr, inputSize, 0, 0)
           let size := returndatasize
           returndatacopy(ptr, 0, size)
@@ -137,14 +145,35 @@ contract CaseManager is Ownable, Pausable, Initializable {
         return patientCases[_patient].length;
     }
 
+    function createAndAssignCaseWithPublicKey(
+      address _patient,
+      bytes _encryptedCaseKey,
+      bytes _caseKeySalt,
+      bytes _ipfsHash,
+      address _doctor,
+      bytes _doctorEncryptedKey,
+      bytes _patientPublicKey
+    ) public onlyThis {
+      AccountManager am = accountManager();
+      require(am.publicKeys(_patient).length == 0);
+      am.setPublicKey(_patient, _patientPublicKey);
+      createAndAssignCase(
+        _patient,
+        _encryptedCaseKey,
+        _caseKeySalt,
+        _ipfsHash,
+        _doctor,
+        _doctorEncryptedKey);
+    }
+
     function createAndAssignCase(
       address _patient,
       bytes _encryptedCaseKey,
       bytes _caseKeySalt,
       bytes _ipfsHash,
       address _doctor,
-      bytes _doctorEncryptedKey) public onlyThis {
-      require(tx.origin == _patient); // Only patients can create cases for themselves
+      bytes _doctorEncryptedKey
+    ) public onlyThis {
       Case newCase = Case(new Delegate(registry, keccak256("Case")));
       newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
       newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
@@ -167,5 +196,9 @@ contract CaseManager is Ownable, Pausable, Initializable {
     function doctorCaseAtIndex(address _doctor, uint256 _doctorAuthIndex) external view returns (address) {
       require(_doctorAuthIndex < doctorCases[_doctor].length);
       return doctorCases[_doctor][_doctorAuthIndex];
+    }
+
+    function accountManager() internal view returns (AccountManager) {
+      return AccountManager(registry.lookup(keccak256('AccountManager')));
     }
 }

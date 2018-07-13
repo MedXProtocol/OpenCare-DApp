@@ -104,7 +104,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(connect(mapState
   }
 
   handleReset = () => {
-    let transactionId = this.props.send(this.props.AccountManager, 'setPublicKey', '0x')({ gas: 200000 })
+    let transactionId = this.props.send(this.props.AccountManager, 'setPublicKey', this.props.address, '0x')({ gas: 200000 })
 
     this.setState({
       resetAccountHandler: new TransactionStateHandler(),
