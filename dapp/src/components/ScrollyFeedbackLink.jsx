@@ -50,7 +50,6 @@ export const ScrollyFeedbackLink = class extends Component {
 
   update = () => {
     let currentScrollY = this.getScrollY()
-    let newPreviousScrollY = this.state.previousScrollY
     let hidden = this.state.hidden
 
     if (currentScrollY >= this.state.previousScrollY) {
