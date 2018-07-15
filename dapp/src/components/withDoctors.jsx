@@ -37,6 +37,7 @@ function mapStateToProps(state, ownProps) {
 
 function* saga({ DoctorManager, AccountManager }) {
   if (!DoctorManager || !AccountManager) { return }
+
   const doctorCount = yield cacheCall(DoctorManager, 'doctorCount')
   // doctorCount at 0 is empty records because Solidity, start at 1
 

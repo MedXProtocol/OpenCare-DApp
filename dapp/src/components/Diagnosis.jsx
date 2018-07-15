@@ -18,7 +18,7 @@ import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
-import { DoctorRandomizer } from '~/components/DoctorRandomizer'
+import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -278,7 +278,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                         }
                       </div>
                       :
-                      <DoctorRandomizer
+                      <AvailableDoctorSelect
                         excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
                         value={this.state.selectedDoctor}
                         onChange={this.onChangeDoctor} />

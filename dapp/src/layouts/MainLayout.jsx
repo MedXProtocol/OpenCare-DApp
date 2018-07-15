@@ -29,7 +29,7 @@ function* saga({ DoctorManager }) {
   yield cacheCall(DoctorManager, 'owner')
 }
 
-export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(class extends Component {
+export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(class _MainLayout extends Component {
   static propTypes = {
     doNetworkCheck: PropTypes.bool,
     doPublicKeyCheck: PropTypes.bool,
