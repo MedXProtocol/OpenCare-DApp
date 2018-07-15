@@ -104,8 +104,10 @@ export const EthFaucetAPI = ReactTimeout(class extends Component {
     }
 
     const responseWell = (
-      <div className="well">
+      <div className="well beta-faucet--well">
+        <br />
         <LoadingLines visible={isSending} /> &nbsp;
+        <br />
         {successParagraph}
         {errorParagraph}
       </div>
@@ -133,12 +135,12 @@ export const EthFaucetAPI = ReactTimeout(class extends Component {
             onClick={this.handleSendEther}
             className="btn btn-lg btn-primary"
           >{isSending ? 'Sending ...' : 'Send Me Ether'}</a>
-          <br />
+        </p>
+        {isSending || responseMessage || errorMessage ? responseWell : ''}
+        <p>
           <br />
           <a onClick={this.props.handleMoveToNextStep}>skip this for now</a>
         </p>
-        <br />
-        {isSending || responseMessage || errorMessage ? responseWell : ''}
       </div>
     )
   }

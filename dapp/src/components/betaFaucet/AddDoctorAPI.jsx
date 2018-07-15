@@ -101,8 +101,10 @@ export const AddDoctorAPI = ReactTimeout(class extends Component {
     }
 
     const responseWell = (
-      <div className="well">
+      <div className="well beta-faucet--well">
+        <br />
         <LoadingLines visible={isSending} /> &nbsp;
+        <br />
         {successParagraph}
         {errorParagraph}
       </div>
@@ -138,14 +140,13 @@ export const AddDoctorAPI = ReactTimeout(class extends Component {
             >
               {isSending ? 'Registering ...' : 'Register As Doctor'}
             </button>
-            <br />
+          </p>
+          {isSending || responseMessage || errorMessage ? responseWell : ''}
+          <p>
             <br />
             <a onClick={this.props.handleMoveToNextStep}>skip this for now</a>
           </p>
         </form>
-
-        <br />
-        {isSending || responseMessage || errorMessage ? responseWell : ''}
       </div>
     )
   }

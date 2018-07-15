@@ -7,6 +7,7 @@ import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { withSaga } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { Modal } from 'react-bootstrap'
+import { isTrue } from '~/utils/isTrue'
 import get from 'lodash.get'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
@@ -51,7 +52,6 @@ function* saga({ CaseManager, MedXToken, DoctorManager, address }) {
 function mapDispatchToProps(dispatch) {
   return {
     hideModal: () => {
-      console.log('running dispatch hideModal')
       dispatch({ type: 'HIDE_BETA_FAUCET_MODAL' })
     }
   }
@@ -71,14 +71,14 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
       }
 
       componentDidMount() {
-        this.determineModalState(this.props)
+        this.init(this.props)
       }
 
       componentWillReceiveProps(nextProps) {
-        this.determineModalState(nextProps)
+        this.init(nextProps)
       }
 
-      determineModalState(props) {
+      init(props) {
         // If they've already seen the faucet or they're currently viewing, skip
         if (props.betaFaucetModalDismissed || this.state.showBetaFaucetModal) {
           return
@@ -89,6 +89,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
 
         const needEth = props.ethBalance !== undefined && props.ethBalance < 0.03
         const needMedX = props.medXBalance !== undefined && props.medXBalance < 15
+        const canBeDoctor = !props.isDoctor && isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR)
 
         if (needEth) {
           showBetaFaucetModal = true
@@ -96,7 +97,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         } else if (needMedX) {
           showBetaFaucetModal = true
           step = 2
-        } else if (!props.isDoctor) {
+        } else if (canBeDoctor) {
           showBetaFaucetModal = true
           step = 3
         }
@@ -107,21 +108,23 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         })
       }
 
-      nextState = () => {
+      determineNextStep = () => {
         if (this.state.step === 1) {
-          this.setState({
-            step: 2
-          })
+          this.setState({ step: 2 })
         } else if (this.state.step === 2) {
-          this.setState({
-            step: 3
-          })
-        } else if (this.state.step === 3) {
-          this.props.hideModal()
-          this.setState({
-            showBetaFaucetModal: false
-          })
+          this.setState({ step: 3 })
         }
+
+        if (this.state.step === 3 && !isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR)) {
+          this.closeModal()
+        }
+      }
+
+      closeModal = () => {
+        this.props.hideModal()
+        this.setState({
+          showBetaFaucetModal: false
+        })
       }
 
       handleMoveToNextStep = (e) => {
@@ -132,31 +135,27 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
 
       moveToNextStep = ({ withDelay = false } = {}) => {
         if (withDelay) {
-          this.props.setTimeout(this.nextState, 2000)
+          this.props.setTimeout(this.determineNextStep, 2000)
         } else {
-          this.nextState()
+          this.determineNextStep()
         }
       }
 
       render() {
-        if (this.props.betaFaucetModalDismissed) { return null }
-
         let content
         const { showBetaFaucetModal, step } = this.state
         const { isDoctor, medXBalance, previousCase, ethBalance, isOwner, address } = this.props
 
+        let totalSteps = isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR) ? '3' : '2'
+
+        if (this.props.betaFaucetModalDismissed) { return null }
+
         if (isOwner) { return null }
 
-        if (step === 3) {
-          if (isDoctor) {
-            return null
-          }
-        } else {
-          if (medXBalance > 0 || previousCase) {
-            // Don't show this if they've already been onboarded
-            return null
-          }
-        }
+        // Don't show this if they've already been onboarded
+        if (step === 2 && (medXBalance > 0 || previousCase)) { return null }
+        if (step === 3 && isDoctor) { return null }
+
 
         if (step === 1) {
           content = <EthFaucetAPI
@@ -187,7 +186,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
                 <div className="col-xs-12 text-center">
                   <h4>Welcome to the Hippocrates Beta
                     <br className="visible-xs hidden-sm hidden-md hidden-lg" />
-                    &nbsp;<small>(Step {step} of 3)</small></h4>
+                    &nbsp;<small>(Step {step} of {totalSteps})</small></h4>
                 </div>
               </div>
             </Modal.Header>
