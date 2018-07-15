@@ -47,7 +47,6 @@ function* fetchDoctorCredentials(address) {
 }
 
 function* fetchDoctorByAddress(address) {
-  // console.log('fetchDoctorByAddress ', address)
   let doctor = null
   const credentials = yield fetchDoctorCredentials(address)
   if (credentials) {
@@ -64,12 +63,9 @@ function* fetchDoctorByAddress(address) {
 function* fetchDoctorByIndex(index) {
   let doctor = null
 
-  // console.log('fetchDoctorByIndex ', index)
   const DoctorManager = yield doctorManager()
   const address = yield web3Call(DoctorManager, 'doctorAddresses', index)
-  // console.log('address: ', address)
   const credentials = yield fetchDoctorCredentials(address)
-  // console.log('fetchDoctorByIndex2')
 
   if (credentials) {
     const name = yield web3Call(DoctorManager, 'doctorNames', index)
@@ -81,8 +77,6 @@ function* fetchDoctorByIndex(index) {
 }
 
 function* setNextAvailableDoctor() {
-  // console.log('setNextAvailableDoctor')
-
   let doctor = yield findNextAvailableOnlineDoctor()
   if (!doctor) {
     doctor = yield findNextAvailableOfflineDoctor()
@@ -97,7 +91,6 @@ function* setNextAvailableDoctor() {
 function* findNextAvailableOnlineDoctor () {
   const onlineAddresses = Object.keys(yield select(state => state.heartbeat))
   let doctor = null
-  // console.log('findNextAvailableOnlineDoctor')
   for (var i = 0; i < onlineAddresses.length; i++) {
     doctor = yield fetchDoctorByAddress(onlineAddresses[i])
     if (doctor) { break }
@@ -110,17 +103,12 @@ function* findNextAvailableOfflineDoctor() {
   const doctorCount = yield web3Call(DoctorManager, 'doctorCount')
   let retries = 0
   let doctor = null
-  // console.log('findNextAvailableOfflineDoctor')
   while (retries < doctorCount) { //not exactly right because it may repeat doctor indices
-    // debugger
     const doctorIndex = parseInt(Math.random() * (doctorCount - 1), 10) + 1
-    // debugger
     doctor = yield fetchDoctorByIndex(doctorIndex)
-    // debugger
     if (doctor) {
       break
     }
-    // debugger
     retries++
   }
   return doctor
@@ -145,16 +133,13 @@ function* checkDoctorOffline({ address }) {
 
 function* checkExcludedDoctors({ addresses }) {
   const nextDoctor = yield nextAvailableDoctor()
-  console.log('checkExcludedDoctors')
   if (!nextDoctor || addresses.indexOf(nextDoctor.address) !== -1) {
-    // console.log('set next available doctor')
     yield setNextAvailableDoctor() // find another one
   }
 }
 
 function* checkNextAvailableDoctor() {
   const nextDoctor = yield nextAvailableDoctor()
-  // console.log('checkNextAvailableDoctor')
   if (!nextDoctor) {
     yield setNextAvailableDoctor()
   }
