@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-import faTelegramPlane from '@fortawesome/fontawesome-free-brands/faTelegramPlane'
 import { HippoNavbarContainer } from '~/components/HippoNavbar'
 import { PublicKeyCheck } from '~/components/PublicKeyCheck'
 import { BetaFaucetModal } from '~/components/BetaFaucetModal'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
+import { ScrollyFeedbackLink } from '~/components/ScrollyFeedbackLink'
 import get from 'lodash.get'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { withSaga } from '~/saga-genesis'
@@ -59,19 +58,9 @@ export const MainLayout = withSaga(saga, { propTriggers: ['DoctorManager'] })(cl
         </div>
     }
     if (this.props.isSignedIn) {
-      var feedbackLink =
-        <a
-          target="_blank"
-          href="https://t.me/MedCredits"
-          className="floating-feedback-link text-center"
-          rel="noopener noreferrer">
-          <FontAwesomeIcon
-            icon={faTelegramPlane}
-            size='sm' />
-          <span>
-            Give Feedback
-          </span>
-        </a>
+      var feedbackLink = (
+        <ScrollyFeedbackLink scrollDiffAmount={50} />
+      )
     }
     return (
       <div className="wrapper">
