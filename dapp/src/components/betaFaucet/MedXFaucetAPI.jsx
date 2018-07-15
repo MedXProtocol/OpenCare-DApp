@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactTimeout from 'react-timeout'
 import { EthAddress } from '~/components/EthAddress'
 import PropTypes from 'prop-types'
 import axios from 'axios';
@@ -6,7 +7,7 @@ import { LoadingLines } from '~/components/LoadingLines'
 import medXLogoImg from '~/assets/img/medx-logo.png'
 import medXLogoImg2x from '~/assets/img/medx-logo@2x.png'
 
-export const MedXFaucetAPI = class extends Component {
+export const MedXFaucetAPI = ReactTimeout(class extends Component {
 
   constructor(props) {
     super(props)
@@ -18,8 +19,8 @@ export const MedXFaucetAPI = class extends Component {
     }
   }
 
-  handleSendMedX = (event) => {
-    event.preventDefault()
+  handleSendMedX = (e) => {
+    e.preventDefault()
     this.setState({
       isSending: true,
       errorMessage: '',
@@ -36,24 +37,31 @@ export const MedXFaucetAPI = class extends Component {
       if (response.status === 200) {
         this.setState({
           responseMessage: "15 MedX is on the way",
-          txHash: response.data.txHash,
-          isSending: false
+          txHash: response.data.txHash
         })
 
         this.props.moveToNextStep({ withDelay: true })
       } else {
         this.setState({
           responseMessage: '',
-          errorMessage: `There was an error: ${response.data}`,
-          isSending: false
+          errorMessage: `There was an error: ${response.data}`
         })
+        this.props.setTimeout(() => {
+          this.setState({
+            isSending: false
+          })
+        }, 1000)
       }
     } catch (error) {
       this.setState({
         responseMessage: '',
-        errorMessage: error.message,
-        isSending: false
+        errorMessage: error.message
       })
+      this.props.setTimeout(() => {
+        this.setState({
+          isSending: false
+        })
+      }, 1000)
     }
   }
 
@@ -131,14 +139,14 @@ export const MedXFaucetAPI = class extends Component {
           >{isSending ? 'Sending ...' : 'Send Me MedX'}</a>
           <br />
           <br />
-          <a onClick={this.props.moveToNextStep}>skip this for now</a>
+          <a onClick={this.props.handleMoveToNextStep}>skip this for now</a>
         </p>
         <br />
         {isSending || responseMessage || errorMessage ? responseWell : ''}
       </div>
     )
   }
-}
+})
 
 MedXFaucetAPI.propTypes = {
   medXBalance: PropTypes.string,

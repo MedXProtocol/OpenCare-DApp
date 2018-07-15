@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
+import ReactTimeout from 'react-timeout'
 import { EthAddress } from '~/components/EthAddress'
 import PropTypes from 'prop-types'
 import axios from 'axios';
 import { LoadingLines } from '~/components/LoadingLines'
 
-export const EthFaucetAPI = class extends Component {
+export const EthFaucetAPI = ReactTimeout(class extends Component {
 
   constructor(props) {
     super(props)
@@ -41,16 +42,25 @@ export const EthFaucetAPI = class extends Component {
       } else {
         this.setState({
           responseMessage: '',
-          errorMessage: `There was an error: ${response.data}`,
-          isSending: false
+          errorMessage: `There was an error: ${response.data}`
         })
+
+        this.props.setTimeout(() => {
+          this.setState({
+            isSending: false
+          })
+        }, 1000)
       }
     } catch (error) {
       this.setState({
         responseMessage: '',
-        errorMessage: error.message,
-        isSending: false
+        errorMessage: error.message
       })
+      this.props.setTimeout(() => {
+        this.setState({
+          isSending: false
+        })
+      }, 1000)
     }
   }
 
@@ -125,14 +135,14 @@ export const EthFaucetAPI = class extends Component {
           >{isSending ? 'Sending ...' : 'Send Me Ether'}</a>
           <br />
           <br />
-          <a onClick={this.props.moveToNextStep}>skip this for now</a>
+          <a onClick={this.props.handleMoveToNextStep}>skip this for now</a>
         </p>
         <br />
         {isSending || responseMessage || errorMessage ? responseWell : ''}
       </div>
     )
   }
-}
+})
 
 EthFaucetAPI.propTypes = {
   ethBalance: PropTypes.number,

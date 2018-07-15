@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
+import ReactTimeout from 'react-timeout'
 import PropTypes from 'prop-types'
 import axios from 'axios';
 import { LoadingLines } from '~/components/LoadingLines'
 
-export const AddDoctorAPI = class extends Component {
+export const AddDoctorAPI = ReactTimeout(class extends Component {
 
   constructor(props) {
     super(props)
@@ -16,7 +17,7 @@ export const AddDoctorAPI = class extends Component {
     }
   }
 
-  handleRegisterDoctor = (event) => {
+  handleSubmit = (event) => {
     event.preventDefault()
     this.setState({
       isSending: true,
@@ -34,25 +35,31 @@ export const AddDoctorAPI = class extends Component {
       if (response.status === 200) {
         this.setState({
           responseMessage: "You will soon be registered as a Doctor",
-          txHash: response.data.txHash,
-          isSending: false,
-          name: ''
+          txHash: response.data.txHash
         })
 
         this.props.moveToNextStep({ withDelay: true })
       } else {
         this.setState({
           responseMessage: '',
-          errorMessage: `There was an error: ${response.data}`,
-          isSending: false
+          errorMessage: `There was an error: ${response.data}`
         })
+        this.props.setTimeout(() => {
+          this.setState({
+            isSending: false
+          })
+        }, 1000)
       }
     } catch (error) {
       this.setState({
         responseMessage: '',
-        errorMessage: error.message,
-        isSending: false
+        errorMessage: error.message
       })
+      this.props.setTimeout(() => {
+        this.setState({
+          isSending: false
+        })
+      }, 1000)
     }
   }
 
@@ -103,41 +110,46 @@ export const AddDoctorAPI = class extends Component {
 
     return (
       <div className="col-xs-12 text-center">
-        <strong>Become a Doctor:</strong>
+        <strong>Would you like to Diagnose Cases?</strong>
         <p>
           During the beta you can opt to become a
           <br />Doctor and diagnose patient cases.
         </p>
         <br />
-        <div className="col-xs-12 col-sm-8 col-sm-offset-2">
-          <div className="form-group">
-            <label htmlFor="name">Your Doctor Name:</label>
-            <input
-              className="form-control"
-              value={this.state.name}
-              placeholder='Dr. Kim Wexler'
-              onChange={(e) => this.setState({name: e.target.value})}
-              id="name"
-              required
-            />
+        <form onSubmit={this.handleSubmit}>
+          <div className="col-xs-12 col-sm-8 col-sm-offset-2">
+              <div className="form-group">
+                <label htmlFor="name">Your Doctor Name:</label>
+                <input
+                  className="form-control"
+                  value={this.state.name}
+                  placeholder='Dr. Kim Wexler'
+                  onChange={(e) => this.setState({name: e.target.value})}
+                  id="name"
+                  required
+                />
+              </div>
           </div>
-        </div>
-        <p>
-          <a
-            disabled={isSending}
-            onClick={this.handleRegisterDoctor}
-            className="btn btn-lg btn-primary"
-          >{isSending ? 'Registering ...' : 'Register As Doctor'}</a>
-          <br />
-          <br />
-          <a onClick={this.props.moveToNextStep}>skip this for now</a>
-        </p>
+          <p>
+            <button
+              type="input"
+              disabled={isSending}
+              className="btn btn-lg btn-primary"
+            >
+              {isSending ? 'Registering ...' : 'Register As Doctor'}
+            </button>
+            <br />
+            <br />
+            <a onClick={this.props.handleMoveToNextStep}>skip this for now</a>
+          </p>
+        </form>
+
         <br />
         {isSending || responseMessage || errorMessage ? responseWell : ''}
       </div>
     )
   }
-}
+})
 
 AddDoctorAPI.propTypes = {
   address: PropTypes.string

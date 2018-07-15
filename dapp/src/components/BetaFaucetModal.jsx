@@ -124,13 +124,15 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         }
       }
 
-      moveToNextStep = (e, { withDelay = false } = {}) => {
-        if (e !== undefined) {
-          e.preventDefault()
-        }
+      handleMoveToNextStep = (e) => {
+        e.preventDefault()
 
+        this.moveToNextStep()
+      }
+
+      moveToNextStep = ({ withDelay = false } = {}) => {
         if (withDelay) {
-          this.props.setTimeout(this.nextState, 1000)
+          this.props.setTimeout(this.nextState, 2000)
         } else {
           this.nextState()
         }
@@ -161,22 +163,25 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
             key="ethFaucet"
             address={address}
             ethBalance={ethBalance}
-            moveToNextStep={this.moveToNextStep} />
+            moveToNextStep={this.moveToNextStep}
+            handleMoveToNextStep={this.handleMoveToNextStep} />
         } else if (step === 2) {
           content = <MedXFaucetAPI
             key="medXFaucet"
             address={address}
             medXBalance={medXBalance}
-            moveToNextStep={this.moveToNextStep} />
+            moveToNextStep={this.moveToNextStep}
+            handleMoveToNextStep={this.handleMoveToNextStep} />
         } else if (step === 3) {
           content = <AddDoctorAPI
             key="addDoctorAPI"
             address={address}
-            moveToNextStep={this.moveToNextStep} />
+            moveToNextStep={this.moveToNextStep}
+            handleMoveToNextStep={this.handleMoveToNextStep} />
         }
 
         return (
-          <Modal show={showBetaFaucetModal} onHide={this.props.hideModal}>
+          <Modal show={showBetaFaucetModal}>
             <Modal.Header>
               <div className="row">
                 <div className="col-xs-12 text-center">
