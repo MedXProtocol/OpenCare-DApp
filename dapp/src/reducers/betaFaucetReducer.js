@@ -4,14 +4,14 @@ export const betaFaucet = function (state, { type }) {
   }
 
   switch(type) {
-    case 'BETA_FAUCET_MODAL_DISMISSED':
+    case 'HIDE_BETA_FAUCET_MODAL':
       state = {
         ...state,
         betaFaucetModalDismissed: true
       }
       break
 
-    case 'BETA_FAUCET_MODAL_SMISSED':
+    case 'SHOW_BETA_FAUCET_MODAL':
       state = {
         ...state,
         betaFaucetModalDismissed: false
