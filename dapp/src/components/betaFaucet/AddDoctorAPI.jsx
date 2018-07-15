@@ -39,7 +39,7 @@ export const AddDoctorAPI = class extends Component {
           name: ''
         })
 
-        this.props.moveToNextStep()
+        this.props.moveToNextStep({ withDelay: true })
       } else {
         this.setState({
           responseMessage: '',

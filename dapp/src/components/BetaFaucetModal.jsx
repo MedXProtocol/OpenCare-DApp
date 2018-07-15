@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import ReactCSSTransitionReplace from 'react-css-transition-replace';
+import ReactTimeout from 'react-timeout'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { withSaga } from '~/saga-genesis'
 import { cacheCall } from '~/saga-genesis/sagas'
@@ -56,7 +57,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
+export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga, { propTriggers: ['ethBalance', 'medXBalance', 'CaseManager', 'DoctorManager', 'MedXToken', 'address'] })(
     class extends Component {
 
@@ -106,11 +107,7 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
         })
       }
 
-      moveToNextStep = (e) => {
-        if (e !== undefined) {
-          e.preventDefault()
-        }
-
+      nextState = () => {
         if (this.state.step === 1) {
           this.setState({
             step: 2
@@ -124,6 +121,18 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
           this.setState({
             showBetaFaucetModal: false
           })
+        }
+      }
+
+      moveToNextStep = (e, { withDelay = false } = {}) => {
+        if (e !== undefined) {
+          e.preventDefault()
+        }
+
+        if (withDelay) {
+          this.props.setTimeout(this.nextState, 1000)
+        } else {
+          this.nextState()
         }
       }
 
@@ -193,4 +202,4 @@ export const BetaFaucetModal = connect(mapStateToProps, mapDispatchToProps)(
       }
     }
   )
-)
+))

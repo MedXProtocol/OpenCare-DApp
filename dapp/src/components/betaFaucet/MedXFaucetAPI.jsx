@@ -40,7 +40,7 @@ export const MedXFaucetAPI = class extends Component {
           isSending: false
         })
 
-        this.props.moveToNextStep()
+        this.props.moveToNextStep({ withDelay: true })
       } else {
         this.setState({
           responseMessage: '',

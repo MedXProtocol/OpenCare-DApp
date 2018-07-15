@@ -37,7 +37,7 @@ export const EthFaucetAPI = class extends Component {
           txHash: response.data.txHash
         })
 
-        this.props.moveToNextStep()
+        this.props.moveToNextStep({ withDelay: true })
       } else {
         this.setState({
           responseMessage: '',
