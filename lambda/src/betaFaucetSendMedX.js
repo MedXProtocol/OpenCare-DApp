@@ -15,7 +15,9 @@ exports.handler = function (event, context, callback) {
     'Access-Control-Allow-Origin': process.env.LAMBDA_CONFIG_CORS_ORIGIN
   }
 
-  console.log('Using: ', config)
+  // Avoid printing the privateKey to the Netlify logs:
+  console.log('Using: ', config.providerUrl)
+  console.log('Using: ', config.networkId)
 
   try {
     let ethAddress

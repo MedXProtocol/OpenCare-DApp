@@ -45,17 +45,31 @@ export class Hippo {
       .then((address) => {
         return new this._eth.contract(betaFaucetArtifact.abi).at(address)
       })
-      .catch(error => fail(error))
+      .catch(error => fail(error.message))
   }
 
-  sendTransaction (tx) {
-    // return this._eth.sendTransaction(tx)
-    return this._eth.getTransactionCount(this._account.address, 'pending')
-      .then((nonce) => {
-        tx.nonce = nonce.toString()
-        return this._eth.sendRawTransaction(sign(tx, this._account.privateKey))
-      })
-      .catch(error => fail(error))
+  async sendTransaction (tx) {
+    let nonce = tx.nonce
+    if (!nonce) {
+      nonce = await this._eth.getTransactionCount(this._account.address, 'pending')
+      tx.nonce = nonce.toString()
+    }
+
+    for (let i = 0; i < 20; i++) {
+      console.log('running sendTransaction')
+
+      try {
+        return await this._eth.sendRawTransaction(sign(tx, this._account.privateKey))
+      } catch (error) {
+        if (error.message.match(/known transaction|transaction underpriced/)) {
+          tx.nonce++
+          console.log(`retry: ${i+1}`)
+        } else {
+          console.error(error)
+          throw error
+        }
+      }
+    }
   }
 
   sendEther (ethAddress) {
@@ -71,6 +85,9 @@ export class Hippo {
       }
       console.info('sendEther tx: ', tx)
       return this.sendTransaction(tx)
+    }).catch(error => {
+      console.log(error.message)
+      fail(error.message)
     })
   }
 
@@ -87,6 +104,9 @@ export class Hippo {
       }
       console.info('sendMedX tx: ', tx)
       return this.sendTransaction(tx)
+    }).catch(error => {
+      console.log(error.message)
+      fail(error.message)
     })
   }
 }
