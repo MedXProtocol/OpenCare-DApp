@@ -37,7 +37,7 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
 
       if (response.status === 200) {
         this.setState({
-          responseMessage: "15 MedX is on the way",
+          responseMessage: "500 MedX is on the way",
           txHash: response.data.txHash
         })
         this.props.addExternalTransaction('sendMedX', response.data.txHash)
@@ -132,7 +132,7 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
         <hr />
         <p>
           To submit a case to a doctor you will need MedX.
-          <br />We can send you 15 MedX to get started:
+          <br />We can send you 500 MedX to get started:
         </p>
         <p>
           <a
