@@ -7,7 +7,8 @@ import rootSagaGenesis, {
 } from './sagas'
 import {
   cacheCallState,
-  cacheCallValue
+  cacheCallValue,
+  contractByName
 } from './state-finders'
 import {
   ContractRegistryProvider,
@@ -28,6 +29,7 @@ export {
   rootSagaGenesis,
   cacheCallState,
   cacheCallValue,
+  contractByName,
   ContractRegistry,
   ContractRegistryProvider
 }
