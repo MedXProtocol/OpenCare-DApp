@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { PatientDashboardHeader } from '../cases/PatientDashboardHeader'
 import { PatientCasesContainer } from '../cases'
 import { PageTitle } from '~/components/PageTitle'
 
-export const PatientDashboard = class extends Component {
+export const PatientDashboard = class _PatientDashboard extends Component {
   render() {
     return (
-      <MainLayoutContainer>
+      <div>
         <PageTitle renderTitle={(t) => t('pageTitles.patientCases')} />
         <div className="container">
           <div className="row">
@@ -21,7 +20,7 @@ export const PatientDashboard = class extends Component {
             </div>
           </div>
         </div>
-      </MainLayoutContainer>
+      </div>
     )
   }
 }

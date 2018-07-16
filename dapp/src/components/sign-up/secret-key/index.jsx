@@ -18,7 +18,7 @@ function mapStateToProps(state) {
   }
 }
 
-export const SecretKey = class extends Component {
+export const SecretKey = class _SecretKey extends Component {
   constructor(props) {
     super(props)
 

@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { BodyClass } from '~/components/BodyClass'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -12,7 +11,7 @@ function mapStateToProps(state, ownProps) {
   }
 }
 
-export const LoginToMetaMask = connect(mapStateToProps)(class extends Component {
+export const LoginToMetaMask = connect(mapStateToProps)(class _LoginToMetaMask extends Component {
   render () {
     if (this.props.account) {
       var redirect = <Redirect to='/' />
@@ -20,7 +19,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class extends Component 
     return (
       <BodyClass isDark={true}>
         {redirect}
-        <MainLayoutContainer doBetaFaucetModal={false}>
+        <div doBetaFaucetModal={false}>
           <PageTitle renderTitle={(t) => t('pageTitles.loginToMetaMask')} />
           <div className='container'>
             <div className='row'>
@@ -41,7 +40,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class extends Component 
               </div>
             </div>
           </div>
-        </MainLayoutContainer>
+        </div>
       </BodyClass>
     )
   }

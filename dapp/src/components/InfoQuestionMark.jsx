@@ -4,7 +4,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faQuestionCircle from '@fortawesome/fontawesome-free-solid/faQuestionCircle';
 import PropTypes from 'prop-types'
 
-export const InfoQuestionMark = class extends Component {
+export const InfoQuestionMark = class _InfoQuestionMark extends Component {
   render () {
     return (
       <span className='info-question-mark' data-tip={this.props.tooltipText}>

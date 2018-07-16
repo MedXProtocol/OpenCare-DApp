@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
+import ReactTimeout from 'react-timeout'
 import { EthAddress } from '~/components/EthAddress'
 import PropTypes from 'prop-types'
 import axios from 'axios';
 import { LoadingLines } from '~/components/LoadingLines'
 
-export const EthFaucetAPI = class extends Component {
+export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
 
   constructor(props) {
     super(props)
@@ -37,20 +38,29 @@ export const EthFaucetAPI = class extends Component {
           txHash: response.data.txHash
         })
 
-        this.props.moveToNextStep()
+        this.props.moveToNextStep({ withDelay: true })
       } else {
         this.setState({
           responseMessage: '',
-          errorMessage: `There was an error: ${response.data}`,
-          isSending: false
+          errorMessage: `There was an error: ${response.data}`
         })
+
+        this.props.setTimeout(() => {
+          this.setState({
+            isSending: false
+          })
+        }, 1000)
       }
     } catch (error) {
       this.setState({
         responseMessage: '',
-        errorMessage: error.message,
-        isSending: false
+        errorMessage: error.message
       })
+      this.props.setTimeout(() => {
+        this.setState({
+          isSending: false
+        })
+      }, 1000)
     }
   }
 
@@ -94,8 +104,10 @@ export const EthFaucetAPI = class extends Component {
     }
 
     const responseWell = (
-      <div className="well">
+      <div className="well beta-faucet--well">
+        <br />
         <LoadingLines visible={isSending} /> &nbsp;
+        <br />
         {successParagraph}
         {errorParagraph}
       </div>
@@ -123,16 +135,16 @@ export const EthFaucetAPI = class extends Component {
             onClick={this.handleSendEther}
             className="btn btn-lg btn-primary"
           >{isSending ? 'Sending ...' : 'Send Me Ether'}</a>
-          <br />
-          <br />
-          <a onClick={this.props.moveToNextStep}>skip this for now</a>
         </p>
-        <br />
         {isSending || responseMessage || errorMessage ? responseWell : ''}
+        <p>
+          <br />
+          <a onClick={this.props.handleMoveToNextStep}>skip this for now</a>
+        </p>
       </div>
     )
   }
-}
+})
 
 EthFaucetAPI.propTypes = {
   ethBalance: PropTypes.number,

@@ -50,8 +50,8 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    clearModalDismissedFlag: () => {
-      dispatch({ type: 'BETA_FAUCET_MODAL_SMISSED' })
+    showBetaFaucetModal: () => {
+      dispatch({ type: 'SHOW_BETA_FAUCET_MODAL' })
     }
   }
 }
@@ -131,7 +131,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     componentDidMount () {
-      this.props.clearModalDismissedFlag()
+      this.props.showBetaFaucetModal()
     }
 
     componentWillReceiveProps (props) {

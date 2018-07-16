@@ -1,13 +1,10 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
-import { EthAddress } from '~/components/EthAddress'
 import PropTypes from 'prop-types'
 import axios from 'axios';
 import { LoadingLines } from '~/components/LoadingLines'
-import medXLogoImg from '~/assets/img/medx-logo.png'
-import medXLogoImg2x from '~/assets/img/medx-logo@2x.png'
 
-export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component {
+export const AddDoctorAPI = ReactTimeout(class _AddDoctorAPI extends Component {
 
   constructor(props) {
     super(props)
@@ -15,28 +12,29 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
     this.state = {
       isSending: false,
       errorMessage: '',
-      response: {}
+      response: {},
+      name: ''
     }
   }
 
-  handleSendMedX = (e) => {
-    e.preventDefault()
+  handleSubmit = (event) => {
+    event.preventDefault()
     this.setState({
       isSending: true,
       errorMessage: '',
       response: {}
-    }, this.doSendMedX)
+    }, this.doAddDoctor)
   }
 
-  doSendMedX = async () => {
-    const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetSendMedX`
+  doAddDoctor = async () => {
+    const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/addOrReactivateDoctor`
 
     try {
-      const response = await axios.get(`${faucetLambdaURI}?ethAddress=${this.props.address}`)
+      const response = await axios.get(`${faucetLambdaURI}?ethAddress=${this.props.address}&name=${this.state.name}`)
 
       if (response.status === 200) {
         this.setState({
-          responseMessage: "15 MedX is on the way",
+          responseMessage: "You will soon be registered as a Doctor",
           txHash: response.data.txHash
         })
 
@@ -72,7 +70,7 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
       var englishErrorMessage = (
         <small>
           <br />
-          There was an error while sending you MedX, you may have already received it or it's on the way. If the problem persists please contact MedCredits on Telegram and we can send you Ropsten Testnet MedX:
+          There was an error while upgrading your account to be a Doctor, you may already be registered as a Doctor. If the problem persists please contact MedCredits on Telegram and we can send you Ropsten Testnet MedX:
           &nbsp; <a
             target="_blank"
             href="https://t.me/MedCredits"
@@ -114,43 +112,46 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
 
     return (
       <div className="col-xs-12 text-center">
-        <strong>Current MedX Balance:</strong>
-        <h2 className="header--no-top-margin">
-          {this.props.medXBalance}
-          <img
-            src={medXLogoImg}
-            alt="MedX Logo"
-            srcSet={`${medXLogoImg} 1x, ${medXLogoImg2x} 2x`}
-          />
-        </h2>
-        <p className="small text-center">
-          <span className="eth-address text-gray">For address:&nbsp;
-            <EthAddress address={this.props.address} />
-          </span>
-        </p>
-        <hr />
+        <strong>Would you like to Diagnose Cases?</strong>
         <p>
-          To submit a case to a doctor you will need MedX.
-          <br />We can send you 15 MedX to get started:
+          During the beta you can opt to become a
+          <br />Doctor and diagnose patient cases.
         </p>
-        <p>
-          <a
-            disabled={isSending}
-            onClick={this.handleSendMedX}
-            className="btn btn-lg btn-primary"
-          >{isSending ? 'Sending ...' : 'Send Me MedX'}</a>
-        </p>
-        {isSending || responseMessage || errorMessage ? responseWell : ''}
-        <p>
-          <br />
-          <a onClick={this.props.handleMoveToNextStep}>skip this for now</a>
-        </p>
+        <br />
+        <form onSubmit={this.handleSubmit}>
+          <div className="col-xs-12 col-sm-8 col-sm-offset-2">
+              <div className="form-group">
+                <label htmlFor="name">Your Doctor Name:</label>
+                <input
+                  className="form-control"
+                  value={this.state.name}
+                  placeholder='Dr. Kim Wexler'
+                  onChange={(e) => this.setState({name: e.target.value})}
+                  id="name"
+                  required
+                />
+              </div>
+          </div>
+          <p>
+            <button
+              type="input"
+              disabled={isSending}
+              className="btn btn-lg btn-primary"
+            >
+              {isSending ? 'Registering ...' : 'Register As Doctor'}
+            </button>
+          </p>
+          {isSending || responseMessage || errorMessage ? responseWell : ''}
+          <p>
+            <br />
+            <a onClick={this.props.handleMoveToNextStep}>skip this for now</a>
+          </p>
+        </form>
       </div>
     )
   }
 })
 
-MedXFaucetAPI.propTypes = {
-  medXBalance: PropTypes.string,
+AddDoctorAPI.propTypes = {
   address: PropTypes.string
 }

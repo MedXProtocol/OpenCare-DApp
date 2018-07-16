@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Alert, Button } from 'react-bootstrap'
 import { currentAccount } from '~/services/sign-in'
-import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { EmergencyKitDisplayContainer } from './EmergencyKitDisplay'
 import { PageTitle } from '~/components/PageTitle'
 
@@ -54,7 +53,7 @@ export const EmergencyKit = (
           masterPasswordError = <Alert bsStyle='danger'>{masterPasswordError}</Alert>
         }
         emergencyKit = (
-          <MainLayoutContainer>
+          <div>
             <PageTitle renderTitle={(t) => t('pageTitles.emergencyKit')} />
             <div className="container">
               <div className='row'>
@@ -101,7 +100,7 @@ export const EmergencyKit = (
                 </div>
               </div>
             </div>
-          </MainLayoutContainer>
+          </div>
         )
       }
 

@@ -1,15 +1,14 @@
 import React, { Component } from 'react'
 import { RegisterDoctorContainer } from './RegisterDoctor'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { PageTitle } from '~/components/PageTitle'
 
-export const AddDoctor = class extends Component {
+export const AddDoctor = class _AddDoctor extends Component {
   render() {
     return (
-      <MainLayoutContainer>
+      <div>
         <PageTitle renderTitle={(t) => t('pageTitles.addDoctor')} />
         <RegisterDoctorContainer excludeAddresses={[]} />
-      </MainLayoutContainer>
+      </div>
     )
   }
 }

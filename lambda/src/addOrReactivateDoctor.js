@@ -2,12 +2,11 @@ import 'idempotent-babel-polyfill'
 import Eth from 'ethjs'
 import { Hippo } from './lib/Hippo'
 
-const config = {
+const hippo = new Hippo({
   privateKey: process.env.LAMBDA_CONFIG_PRIVKEY,
   providerUrl: process.env.LAMBDA_CONFIG_PROVIDER_URL,
   networkId: process.env.LAMBDA_CONFIG_NETWORK_ID
-}
-const hippo = new Hippo(config)
+})
 
 exports.handler = function (event, context, callback) {
   const responseHeaders = {
@@ -15,12 +14,8 @@ exports.handler = function (event, context, callback) {
     'Access-Control-Allow-Origin': process.env.LAMBDA_CONFIG_CORS_ORIGIN
   }
 
-  // Avoid printing the privateKey to the Netlify logs:
-  console.log('Using: ', config.providerUrl)
-  console.log('Using: ', config.networkId)
-
   try {
-    let ethAddress
+    let ethAddress, name
 
     if (event.queryStringParameters !== null && event.queryStringParameters !== undefined) {
       if (event.queryStringParameters.ethAddress !== undefined &&
@@ -28,14 +23,21 @@ exports.handler = function (event, context, callback) {
         event.queryStringParameters.ethAddress !== "") {
         ethAddress = event.queryStringParameters.ethAddress;
       }
+      if (event.queryStringParameters.name !== undefined &&
+        event.queryStringParameters.name !== null &&
+        event.queryStringParameters.name !== "") {
+        name = event.queryStringParameters.name;
+      }
     }
 
-    console.log('Sending MedX to ', ethAddress)
+    console.log('Upgrading ' + ethAddress + 'to be a doctor named ' + name)
 
     if (!Eth.isAddress(ethAddress)) {
       callback(`ethAddress is not a valid address: ${ethAddress}`)
+    } else if (!name) {
+      callback(`name is not valid, please enter a name`)
     } else {
-      hippo.sendMedX(ethAddress)
+      hippo.addOrReactivateDoctor(ethAddress, name)
         .then((transactionHash) => {
           console.log('Successfully sent transaction with hash: ', transactionHash)
           callback(null, {

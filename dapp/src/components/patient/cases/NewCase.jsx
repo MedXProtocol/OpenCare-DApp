@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { CreateCaseContainer } from './CreateCase';
 import { PageTitle } from '~/components/PageTitle'
 
-export const NewCase = class extends Component {
+export const NewCase = class _NewCase extends Component {
   render() {
     return (
-      <MainLayoutContainer>
+      <div>
         <PageTitle renderTitle={(t) => t('pageTitles.newCase')} />
         <div className="container">
           <div className="row">
@@ -15,7 +14,7 @@ export const NewCase = class extends Component {
             </div>
           </div>
         </div>
-      </MainLayoutContainer>
+      </div>
     );
   }
 }

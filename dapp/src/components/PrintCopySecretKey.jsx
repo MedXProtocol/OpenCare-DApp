@@ -6,7 +6,7 @@ import faPrint from '@fortawesome/fontawesome-free-solid/faPrint'
 import faCopy from '@fortawesome/fontawesome-free-solid/faCopy'
 import { formatSecretKey } from '~/services/format-secret-key'
 
-export const PrintCopySecretKey = ReactTimeout(class extends Component {
+export const PrintCopySecretKey = ReactTimeout(class _PrintCopySecretKey extends Component {
   constructor(props) {
     super(props)
     this.state = {
