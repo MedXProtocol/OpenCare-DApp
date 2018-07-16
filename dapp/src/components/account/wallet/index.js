@@ -43,7 +43,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
     return (
       <div>
         <PageTitle renderTitle={(t) => t('pageTitles.balance')} />
-        <div className="container">
+        <div className='container'>
           <div className="row">
             <div className="col-sm-6 col-sm-offset-3">
               <div className="card">

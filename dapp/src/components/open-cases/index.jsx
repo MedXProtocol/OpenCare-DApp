@@ -83,7 +83,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
     return (
       <div>
         <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCases')} />
-        <div className="container">
+        <div className='container'>
 
           <div className='header-card card'>
             <div className='card-body'>

@@ -55,7 +55,7 @@ export const EmergencyKit = (
         emergencyKit = (
           <div>
             <PageTitle renderTitle={(t) => t('pageTitles.emergencyKit')} />
-            <div className="container">
+            <div className='container'>
               <div className='row'>
                 <div className='col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2'>
                   <div className="card">

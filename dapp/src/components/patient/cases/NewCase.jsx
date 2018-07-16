@@ -7,7 +7,7 @@ export const NewCase = class _NewCase extends Component {
     return (
       <div>
         <PageTitle renderTitle={(t) => t('pageTitles.newCase')} />
-        <div className="container">
+        <div className='container'>
           <div className="row">
             <div className="col-xs-12">
               <CreateCaseContainer />

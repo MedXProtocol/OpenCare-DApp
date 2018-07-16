@@ -8,7 +8,7 @@ export const PatientDashboard = class _PatientDashboard extends Component {
     return (
       <div>
         <PageTitle renderTitle={(t) => t('pageTitles.patientCases')} />
-        <div className="container">
+        <div className='container'>
           <div className="row">
             <div className="col-md-12">
               <PatientDashboardHeader />

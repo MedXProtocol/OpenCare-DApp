@@ -101,7 +101,7 @@ export const ChangePassword = class _ChangePassword extends Component {
     return (
       <div>
         <PageTitle renderTitle={(t) => t('pageTitles.changePassword')} />
-        <div className="container">
+        <div className='container'>
           <div className="row">
             <div className="col-sm-6 col-sm-offset-3">
               <div className="card">
