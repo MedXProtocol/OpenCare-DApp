@@ -22,7 +22,7 @@ export default function* () {
       signInSaga(),
       signOutSaga(),
       signUpSaga(),
-      nextAvailableDoctorSaga()
+      nextAvailableDoctorSaga(),
       // heartbeatSaga(),
       nextAvailableDoctorSaga(),
       pollExternalTransactionsSaga()
