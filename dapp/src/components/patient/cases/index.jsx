@@ -75,6 +75,9 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDis
               </div>
             </div> :
             <div>
+              <h5 className="title subtitle">
+                Current Cases:
+              </h5>
               <FlipMove enterAnimation="accordionVertical" className="case-list">
                 {this.props.cases.map(({caseAddress, status, caseIndex}) => {
                   const statusLabel = caseStatusToName(status)

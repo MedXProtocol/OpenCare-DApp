@@ -1,5 +1,5 @@
 $card-spacer-y:                     2rem;
-$card-spacer-x:                     1rem;
+$card-spacer-x:                     2rem;
 $card-border-width:                 0;
 $card-border-radius:                0;
 $card-border-color:                 rgba(black, .125);
@@ -57,7 +57,7 @@ $card-columns-margin:               $card-spacer-y;
 //
 
 .card {
-  box-shadow: 2px 3px 4px 0 rgba(50, 70, 100, 0.02);
+  box-shadow: 6px 6px 40px 0 rgba(50, 70, 100, 0.06);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -127,11 +127,11 @@ $card-columns-margin:               $card-spacer-y;
 //
 
 .card-header {
-  padding: $card-spacer-x $card-spacer-y;
+  padding: 2rem 3rem;
   margin-bottom: 0; // Removes the default margin-bottom of <hN>
-  background-color: $card-cap-bg;
-  border-top: 6px solid lighten($brand-info, 45%);
+  background-color: white;
   border-bottom: $card-border-width solid $card-border-color;
+  border-bottom: 3px solid lighten($brand-info, 30%);
 
   &:first-child {
     border-radius: $card-inner-border-radius $card-inner-border-radius 0 0
