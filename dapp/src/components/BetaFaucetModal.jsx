@@ -13,6 +13,7 @@ import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
 import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
 import { weiToMedX } from '~/utils/weiToMedX'
+import { nextId } from '~/saga-genesis/transaction/transaction-factory'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -26,6 +27,7 @@ function mapStateToProps (state) {
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const previousCase = (caseListCount > 0)
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const pendingSendEtherTransactions = get(state, 'sagaGenesis.externalTransactions.transactions')
 
   return {
     address,
@@ -54,6 +56,9 @@ function mapDispatchToProps(dispatch) {
   return {
     hideModal: () => {
       dispatch({ type: 'HIDE_BETA_FAUCET_MODAL' })
+    },
+    dispatchAddExternalTransaction: (transactionId, txType, txHash) => {
+      dispatch({ type: 'ADD_EXTERNAL_TRANSACTION', transactionId, txType, txHash })
     }
   }
 }
@@ -88,9 +93,21 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         let showBetaFaucetModal
         let step
 
-        const needEth = props.ethBalance !== undefined && props.ethBalance < 0.03
-        const needMedX = props.medXBalance !== undefined && weiToMedX(props.medXBalance) < 15
-        const canBeDoctor = !props.isDoctor && isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR)
+        const needEth = (
+          props.ethBalance !== undefined
+          && props.ethBalance < 0.03
+          && noPendingSendEtherTransactions
+        )
+        const needMedX = (
+          props.medXBalance !== undefined
+          && weiToMedX(props.medXBalance) < 15
+          && noPendingSendMedXTransactions
+        )
+        const canBeDoctor = (
+          !props.isDoctor
+          && isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR)
+          && noPendingAddDoctorTransactions
+        )
 
         if (needEth) {
           showBetaFaucetModal = true
@@ -121,6 +138,10 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         }
       }
 
+      addExternalTransaction = (txType, txHash) => {
+        this.props.dispatchAddExternalTransaction(nextId(), txType, txHash)
+      }
+
       closeModal = () => {
         this.props.hideModal()
         this.setState({
@@ -145,7 +166,14 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
       render() {
         let content
         const { showBetaFaucetModal, step } = this.state
-        const { isDoctor, medXBalance, previousCase, ethBalance, isOwner, address } = this.props
+        const {
+          isDoctor,
+          medXBalance,
+          previousCase,
+          ethBalance,
+          isOwner,
+          address
+        } = this.props
 
         let totalSteps = isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR) ? '3' : '2'
 
@@ -164,6 +192,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
             address={address}
             ethBalance={ethBalance}
             moveToNextStep={this.moveToNextStep}
+            addExternalTransaction={this.addExternalTransaction}
             handleMoveToNextStep={this.handleMoveToNextStep} />
         } else if (step === 2) {
           content = <MedXFaucetAPI
@@ -171,12 +200,14 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
             address={address}
             medXBalance={medXBalance}
             moveToNextStep={this.moveToNextStep}
+            addExternalTransaction={this.addExternalTransaction}
             handleMoveToNextStep={this.handleMoveToNextStep} />
         } else if (step === 3) {
           content = <AddDoctorAPI
             key="addDoctorAPI"
             address={address}
             moveToNextStep={this.moveToNextStep}
+            addExternalTransaction={this.addExternalTransaction}
             handleMoveToNextStep={this.handleMoveToNextStep} />
         }
 

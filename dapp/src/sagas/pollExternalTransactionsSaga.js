@@ -1,0 +1,46 @@
+import {
+  call,
+  fork,
+  put,
+  select,
+  getContext
+} from 'redux-saga/effects'
+import {
+  delay
+} from 'redux-saga'
+
+export function* checkExternalTransactionReceipts(web3) {
+  try {
+    const transactions = yield select((state) => state.externalTransactions.transactions)
+
+    for (let i = 0; i < transactions.length; i++) {
+      const { transactionId, txHash, txType } = transactions[i]
+      const receipt = yield web3.eth.getTransactionReceipt(txHash)
+
+      if (receipt) {
+        if (receipt.status) {
+          yield put({ type: 'EXTERNAL_TRANSACTION_SUCCESS', transactionId, txType })
+        } else {
+          yield put({ type: 'EXTERNAL_TRANSACTION_ERROR', transactionId, txType })
+        }
+      } else {
+        // console.log('ignoring as not yet mined')
+      }
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export function* pollTransactions(web3) {
+  while (true) {
+    yield call(checkExternalTransactionReceipts, web3)
+    yield call(delay, 2000)
+  }
+}
+
+export function* pollExternalTransactionsSaga() {
+  const web3 = yield getContext('web3')
+
+  yield fork(pollTransactions, web3)
+}
