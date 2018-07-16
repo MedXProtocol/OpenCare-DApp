@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { ImageLoader, CaseDetailsLoader } from './ContentLoaders'
 import { LoadingLines } from '~/components/LoadingLines'
-import { downloadJson, downloadImage } from '../utils/storage-util';
+import { downloadJson, downloadImage } from '../utils/storage-util'
 import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
@@ -42,20 +42,25 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
 
   async init (props) {
     if (this.state.details || !(props.caseDetailsHash && props.caseKey)) { return }
-    const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
-    const details = JSON.parse(detailsJson);
 
-    const [firstImageUrl, secondImageUrl] = await Promise.all([
-      downloadImage(details.firstImageHash, props.caseKey),
-      downloadImage(details.secondImageHash, props.caseKey)
-    ])
+    try {
+      const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
+      const details = JSON.parse(detailsJson)
 
-    this.setState({
-      loading: false,
-      details,
-      firstImageUrl,
-      secondImageUrl
-    })
+      const [firstImageUrl, secondImageUrl] = await Promise.all([
+        downloadImage(details.firstImageHash, props.caseKey),
+        downloadImage(details.secondImageHash, props.caseKey)
+      ])
+
+      this.setState({
+        loading: false,
+        details,
+        firstImageUrl,
+        secondImageUrl
+      })
+    } catch (error) {
+      console.warn('Error while downloading JSON from IPFS')
+    }
   }
 
   overviewPhotoHtml = () => {
@@ -199,7 +204,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                   </div>
               </div>
           </div>
-      );
+      )
     }
     return jsx
   }
@@ -217,4 +222,4 @@ CaseDetails.defaultProps = {
   details: {}
 }
 
-export default CaseDetails;
+export default CaseDetails
