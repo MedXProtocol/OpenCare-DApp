@@ -326,7 +326,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     onChangeDoctor = (option) => {
       this.setState({
         selectedDoctor: option
-      }, this.validateInputs)
+      })
     }
 
     createNewCase = async () => {
