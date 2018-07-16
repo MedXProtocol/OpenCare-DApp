@@ -1,10 +1,11 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { toastr as toastrLib } from 'react-redux-toastr'
 import { transactionErrorToCode } from '~/services/transaction-error-to-code'
 import i18next from 'i18next'
 
 const ToastrLinkComponent = ({link, remove}) => (
-  <a href={link.path}>{link.text}</a>
+  <Link to={link.path}>{link.text}</Link>
 )
 
 function success(message, link = {}) {
