@@ -12,7 +12,7 @@ import get from 'lodash.get'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
 import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
-import { toMedX } from '~/utils/toMedX'
+import { weiToMedX } from '~/utils/weiToMedX'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
