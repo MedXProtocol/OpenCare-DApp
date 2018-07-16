@@ -11,7 +11,7 @@ module.exports = function(deployer, network, accounts) {
     let registryInstance = await Registry.deployed()
     let medXTokenInstance = await MedXToken.deployed()
     return deployWithDelegate(artifacts, deployer, CaseManager).then((caseManager) => {
-      return caseManager.initialize(web3.utils.toWei('10', 'ether'), medXTokenInstance.address, registryInstance.address)
+      return caseManager.initialize(web3.toWei('10', 'ether'), medXTokenInstance.address, registryInstance.address)
     })
   })
 };
