@@ -26,7 +26,7 @@ import { withContractRegistry, withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import * as routes from '~/config/routes'
-import { toMedX } from '~/utils/toMedX'
+import { weiToMedX } from '~/utils/weiToMedX'
 
 function mapStateToProps (state) {
   let doctorName
@@ -115,7 +115,7 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
       var medXBalance =
         <LinkContainer to={routes.ACCOUNT_WALLET}>
           <NavItem href={routes.ACCOUNT_WALLET}>
-            {this.props.balance ? toMedX(this.props.balance) : 0} MEDX
+            {this.props.balance ? weiToMedX(this.props.balance) : 0} MEDX
           </NavItem>
         </LinkContainer>
 

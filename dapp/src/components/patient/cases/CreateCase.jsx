@@ -27,7 +27,8 @@ import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGrou
 import { HippoTextInput } from '~/components/forms/HippoTextInput'
 import { countries } from './countries'
 import { regions } from './regions'
-import { toMedX } from '~/utils/toMedX'
+import { weiToMedX } from '~/utils/weiToMedX'
+import { medXToWei } from '~/utils/medXToWei'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 
 function mapStateToProps (state) {
@@ -383,7 +384,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           ).encodeABI()
         }
 
-        let transactionId = send(MedXToken, 'approveAndCall', CaseManager, 15, data)()
+        let transactionId = send(MedXToken, 'approveAndCall', CaseManager, medXToWei('15'), data)()
         this.setState({
           transactionId,
           createCaseEvents: new TransactionStateHandler()
