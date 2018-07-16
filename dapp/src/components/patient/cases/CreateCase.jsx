@@ -438,11 +438,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                 <div className="card-header">
                   <div className="row">
                     <div className="col-xs-12 col-md-6">
-                      <h3 className="title">
-                        Submit New Case
-                      </h3>
-                      <p className="lead">
-                        <small>Provide the physician with details about your problem. This will be encrypted so only you and your physician will be able to read it.</small>
+                      <p className="lead lead--card-title">
+                        Provide your physician(s) info about your problem.
+                      </p>
+                      <p className="text-gray">
+                        This will be encrypted. Only you and your physician will be able to read it.
                       </p>
                     </div>
                   </div>
@@ -451,62 +451,85 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                 <div className="card-body">
                   <div className="form-wrapper">
                     <form onSubmit={this.handleSubmit}>
-                      <div className="form-group--heading">
-                        Imagery:
+                      <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                          <div className="form-group--heading">
+                            Imagery:
+                          </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                          <HippoImageInput
+                            name='firstImage'
+                            id='firstImageHash'
+                            label="Overview Photo:"
+                            colClasses='col-xs-12'
+                            error={errors['firstImageHash']}
+                            fileError={firstFileError}
+                            setRef={this.setFirstImageHashRef}
+                            onChange={this.captureFirstImage}
+                            currentValue={this.state.firstFileName}
+                            progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
+                            progressPercent={this.state.firstImagePercent}
+                          />
+                        </div>
                       </div>
-                      <HippoImageInput
-                        name='firstImage'
-                        id='firstImageHash'
-                        label="Overview Photo:"
-                        colClasses='col-xs-12 col-sm-12 col-md-6'
-                        error={errors['firstImageHash']}
-                        fileError={firstFileError}
-                        setRef={this.setFirstImageHashRef}
-                        onChange={this.captureFirstImage}
-                        currentValue={this.state.firstFileName}
-                        progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
-                        progressPercent={this.state.firstImagePercent}
-                      />
-
-                      <HippoImageInput
-                        name='secondImage'
-                        id='secondImageHash'
-                        label="Close-up Photo:"
-                        colClasses='col-xs-12 col-sm-12 col-md-6'
-                        error={errors['secondImageHash']}
-                        fileError={secondFileError}
-                        setRef={this.setSecondImageHashRef}
-                        onChange={this.captureSecondImage}
-                        currentValue={this.state.secondFileName}
-                        progressClassNames={this.progressClassNames(this.state.secondImagePercent)}
-                        progressPercent={this.state.secondImagePercent}
-                      />
-
-                      <div className="form-group--heading">
-                        Details:
+                      <div class="row">
+                        <div class="col-xs-12 col-sm-6 col-sm-offset-6">
+                          <HippoImageInput
+                            name='secondImage'
+                            id='secondImageHash'
+                            label="Close-up Photo:"
+                            colClasses='col-xs-12'
+                            error={errors['secondImageHash']}
+                            fileError={secondFileError}
+                            setRef={this.setSecondImageHashRef}
+                            onChange={this.captureSecondImage}
+                            currentValue={this.state.secondFileName}
+                            progressClassNames={this.progressClassNames(this.state.secondImagePercent)}
+                            progressPercent={this.state.secondImagePercent}
+                          />
+                        </div>
                       </div>
 
-                      <HippoToggleButtonGroup
-                        id='howLong'
-                        name="howLong"
-                        colClasses='col-xs-12 col-md-6'
-                        label='How long have you had this problem?'
-                        error={errors['howLong']}
-                        setRef={this.setHowLongRef}
-                        onChange={this.updateHowLong}
-                        values={['Days', 'Weeks', 'Months', 'Years']}
-                      />
+                      <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                          <div className="form-group--heading form-group--heading__not-first">
+                            Details:
+                          </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                          <HippoToggleButtonGroup
+                            id='howLong'
+                            name="howLong"
+                            colClasses='col-xs-12'
+                            label='How long have you had this problem?'
+                            error={errors['howLong']}
+                            setRef={this.setHowLongRef}
+                            onChange={this.updateHowLong}
+                            values={['Days', 'Weeks', 'Months', 'Years']}
+                          />
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-xs-12 col-sm-6 col-sm-offset-6">
+                          <HippoToggleButtonGroup
+                            id='size'
+                            name="size"
+                            colClasses='col-xs-12'
+                            label='Is it growing, shrinking or staying the same size?'
+                            error={errors['size']}
+                            setRef={this.setSizeRef}
+                            onChange={this.updateSize}
+                            values={['Growing', 'Shrinking', 'Same size']}
+                          />
+                        </div>
+                      </div>
 
-                      <HippoToggleButtonGroup
-                        id='size'
-                        name="size"
-                        colClasses='col-xs-12 col-md-6'
-                        label='Is it growing, shrinking or staying the same size?'
-                        error={errors['size']}
-                        setRef={this.setSizeRef}
-                        onChange={this.updateSize}
-                        values={['Growing', 'Shrinking', 'Same size']}
-                      />
+
+
+
+{/*
+
 
                       <HippoToggleButtonGroup
                         id='painful'
@@ -584,7 +607,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       />
 
 
-                      <div className="form-group--heading">
+                      <div className="form-group--heading form-group--heading__not-first">
                         Additional Info:
                       </div>
 
@@ -679,7 +702,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
                           <button type="submit" className="btn btn-lg btn-success">Submit Case</button>
                         </div>
-                      </div>
+                      </div>*/}
                     </form>
                   </div>
                 </div>

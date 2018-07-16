@@ -145,7 +145,12 @@ not(.nav) li {
 }
 
 p.lead {
+  font-size: 20px;
   line-height: 1.4;
+}
+
+.lead--card-title {
+  margin: 16px 0 0 0;
 }
 
 small,
