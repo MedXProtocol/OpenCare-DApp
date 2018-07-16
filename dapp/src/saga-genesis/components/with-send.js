@@ -12,7 +12,7 @@ export function withSend(WrappedComponent) {
     }
   }
 
-  const SendWrapper = connect(() => { return {} }, mapDispatchToProps)(class extends Component {
+  const SendWrapper = connect(() => { return {} }, mapDispatchToProps)(class _SendWrapper extends Component {
     send = (address, method, ...args) => {
       return (options) => {
         let call = createCall(address, method, ...args)

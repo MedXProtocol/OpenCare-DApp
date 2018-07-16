@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { all } from 'redux-saga/effects'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
@@ -41,7 +40,7 @@ function* saga({ address, MedXToken }) {
 export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['address', 'MedXToken'] })(class _Wallet extends Component {
   render() {
     return (
-      <MainLayoutContainer>
+      <div>
         <PageTitle renderTitle={(t) => t('pageTitles.balance')} />
         <div className="container">
           <div className="row">
@@ -74,7 +73,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
             </div>
           </div>
         </div>
-      </MainLayoutContainer>
+      </div>
     )
   }
 }))

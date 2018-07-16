@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { Account } from '~/accounts/Account'
 import { genKey } from '~/services/gen-key'
 import { mixpanel } from '~/mixpanel'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
 import { MasterPasswordContainer } from './master-password'
 import { SecretKeyContainer } from './secret-key'
@@ -110,13 +109,13 @@ export const SignUp = class _SignUp extends Component {
       content = <SecretKeyContainer secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
     }
     return (
-      <MainLayoutContainer doBetaFaucetModal={false}>
+      <div doBetaFaucetModal={false}>
         <PageTitle renderTitle={(t) => t('pageTitles.signUp')} />
         {content}
         <OverrideDisallowedModal
           show={this.state.showOverrideModal || !!this.props.overrideError}
           onOk={this.closeOverrideModal} />
-      </MainLayoutContainer>
+      </div>
     )
   }
 }

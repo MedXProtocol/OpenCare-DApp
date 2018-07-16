@@ -9,7 +9,6 @@ import { toastr } from '~/toastr'
 import masterPasswordInvalid from '~/services/master-password-invalid'
 import { currentAccount, signIn } from '~/services/sign-in'
 import { Account } from '~/accounts/Account'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
 import * as routes from '~/config/routes'
 import { PageTitle } from '~/components/PageTitle'
 
@@ -22,7 +21,7 @@ function mapStateToProps (state) {
   }
 }
 
-export const ChangePassword = class extends Component {
+export const ChangePassword = class _ChangePassword extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -100,7 +99,7 @@ export const ChangePassword = class extends Component {
     }
 
     return (
-      <MainLayoutContainer>
+      <div>
         <PageTitle renderTitle={(t) => t('pageTitles.changePassword')} />
         <div className="container">
           <div className="row">
@@ -172,7 +171,7 @@ export const ChangePassword = class extends Component {
             </div>
           </div>
         </div>
-      </MainLayoutContainer>
+      </div>
     )
   }
 }

@@ -31,7 +31,7 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
-export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToProps)(withSend(class extends Component {
+export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToProps)(withSend(class _SubmitDiagnosisContainer extends Component {
   static propTypes = {
     caseAddress: PropTypes.string,
     caseKey: PropTypes.any,

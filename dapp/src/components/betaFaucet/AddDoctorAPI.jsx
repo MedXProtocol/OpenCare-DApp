@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios';
 import { LoadingLines } from '~/components/LoadingLines'
 
-export const AddDoctorAPI = ReactTimeout(class extends Component {
+export const AddDoctorAPI = ReactTimeout(class _AddDoctorAPI extends Component {
 
   constructor(props) {
     super(props)
