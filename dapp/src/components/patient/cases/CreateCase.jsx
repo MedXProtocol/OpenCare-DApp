@@ -28,6 +28,7 @@ import { HippoTextInput } from '~/components/forms/HippoTextInput'
 import { countries } from './countries'
 import { regions } from './regions'
 import { DoctorRandomizer } from '~/components/DoctorRandomizer'
+import { toMedX } from '~/utils/toMedX'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -292,7 +293,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         console.error("The props.balance wasn't set!")
 
       if (this.state.errors.length === 0) {
-        if (this.props.balance < 15) {
+        if (toMedX(this.props.balance) < 15) {
           this.setState({ showBalanceTooLowModal: true })
         } else {
           this.setState({ showConfirmSubmissionModal: true })

@@ -6,6 +6,7 @@ import axios from 'axios';
 import { LoadingLines } from '~/components/LoadingLines'
 import medXLogoImg from '~/assets/img/medx-logo.png'
 import medXLogoImg2x from '~/assets/img/medx-logo@2x.png'
+import { toMedX } from '~/utils/toMedX'
 
 export const MedXFaucetAPI = ReactTimeout(class extends Component {
 
@@ -116,7 +117,7 @@ export const MedXFaucetAPI = ReactTimeout(class extends Component {
       <div className="col-xs-12 text-center">
         <strong>Current MedX Balance:</strong>
         <h2 className="header--no-top-margin">
-          {this.props.medXBalance}
+          {toMedX(this.props.medXBalance)}
           <img
             src={medXLogoImg}
             alt="MedX Logo"

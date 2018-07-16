@@ -38,7 +38,7 @@ contract('CaseManager', function (accounts) {
   describe('initialize()', () => {
     it('should not be called again', async () => {
       await expectThrow(async () => {
-        await env.caseManager.initialize(10, env.medXToken.address, env.registry.address)
+        await env.caseManager.initialize(web3.utils.toWei('10'), env.medXToken.address, env.registry.address)
       })
     })
   })
