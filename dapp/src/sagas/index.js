@@ -12,6 +12,7 @@ import signUpSaga from './sign-up-saga'
 // import heartbeatSaga from './heartbeat-saga'
 import { pollExternalTransactionsSaga } from './pollExternalTransactionsSaga'
 import { nextAvailableDoctorSaga } from './next-available-doctor-saga'
+import { pollExternalTransactionsSaga } from './pollExternalTransactionsSaga'
 
 export default function* () {
   yield fork(takeOnceAndRun, 'WEB3_NETWORK_ID', function* ({ web3, networkId }) {
