@@ -25,8 +25,8 @@ function* startNode() {
     yield promisify(cb => node.start(cb))
 
     node.on('peer:discovery', (peerInfo) => {
-      // const idStr = peerInfo.id.toB58String()
-      // console.log('Discovered: ' + idStr)
+      const idStr = peerInfo.id.toB58String()
+      console.log('Discovered: ' + idStr)
       node.dial(peerInfo, (err, conn) => {
         if (err) { console.error(err) }
         else {
@@ -36,17 +36,17 @@ function* startNode() {
     })
 
     node.on('peer:connect', (peerInfo) => {
-      // const idStr = peerInfo.id.toB58String()
-      // console.log('Got connection to: ' + idStr)
+      const idStr = peerInfo.id.toB58String()
+      console.log('Got connection to: ' + idStr)
     })
 
     node.on('peer:disconnect', (peerInfo) => {
-      // const idStr = peerInfo.id.toB58String()
-      // console.log('Lost connection to: ' + idStr)
+      const idStr = peerInfo.id.toB58String()
+      console.log('Lost connection to: ' + idStr)
     })
 
-    // const idStr = node.peerInfo.id.toB58String()
-    // console.log('Node is listening on', idStr)
+    const idStr = node.peerInfo.id.toB58String()
+    console.log('Node is listening on', idStr)
     return node
   } catch (error) {
     console.error(error)
