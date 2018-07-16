@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
 import * as routes from '~/config/routes'
 import { PageTitle } from '~/components/PageTitle'
 
@@ -13,12 +12,12 @@ function mapStateToProps (state) {
 }
 
 export const FourOhFour = connect(mapStateToProps)(
-  class extends Component {
+  class _FourOhFour extends Component {
     render() {
       let dynamicHomePath = this.props.signedIn ? routes.PATIENTS_CASES : routes.HOME
 
       return (
-        <MainLayoutContainer doBetaFaucetModal={false}>
+        <div>
           <PageTitle renderTitle={(t) => t('pageTitles.fourOhFour')} />
           <div className='container'>
             <div className="card">
@@ -47,7 +46,7 @@ export const FourOhFour = connect(mapStateToProps)(
 
             </div>
           </div>
-        </MainLayoutContainer>
+        </div>
       )
     }
   }

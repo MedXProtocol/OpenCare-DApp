@@ -3,7 +3,7 @@ import raf from 'raf'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import faTelegramPlane from '@fortawesome/fontawesome-free-brands/faTelegramPlane'
 
-export const ScrollyFeedbackLink = class extends Component {
+export const ScrollyFeedbackLink = class _ScrollyFeedbackLink extends Component {
   fixedStyle = {
     position: 'fixed',
     transition: 'all .2s ease-in-out',

@@ -7,7 +7,7 @@ import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
 import PropTypes from 'prop-types'
 
-export const MasterPassword = class extends Component {
+export const MasterPassword = class _MasterPassword extends Component {
   static propTypes = {
     onMasterPassword: PropTypes.func.isRequired,
     creating: PropTypes.bool.isRequired

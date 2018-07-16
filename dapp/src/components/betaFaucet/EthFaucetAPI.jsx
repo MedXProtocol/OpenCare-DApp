@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios';
 import { LoadingLines } from '~/components/LoadingLines'
 
-export const EthFaucetAPI = ReactTimeout(class extends Component {
+export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
 
   constructor(props) {
     super(props)

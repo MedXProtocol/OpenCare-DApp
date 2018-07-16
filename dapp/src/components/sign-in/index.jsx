@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import ReactTimeout from 'react-timeout'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
@@ -155,7 +154,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
     }
     return (
       <BodyClass isDark={true}>
-        <MainLayoutContainer doBetaFaucetModal={false}>
+        <div doBetaFaucetModal={false}>
           <PageTitle renderTitle={(t) => t('pageTitles.signIn')} />
           <div className='container'>
             <div className='row'>
@@ -177,7 +176,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
             </div>
           </div>
           <Loading loading={this.state.isResetting} />
-        </MainLayoutContainer>
+        </div>
       </BodyClass>
     )
   }

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
 import CaseDetails from '~/components/CaseDetails'
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
@@ -113,7 +112,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
     }
 
     return (
-      <MainLayoutContainer>
+      <div>
         <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCase', { caseId: ('' + this.props.caseAddress).substring(0, 6) } )} />
         <div className='container'>
           <div className='row'>
@@ -126,7 +125,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             </div>
           </div>
         </div>
-      </MainLayoutContainer>
+      </div>
     )
   }
 })))

@@ -21,6 +21,11 @@ import { Welcome } from '~/components/welcome'
 import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
+import { HippoNavbarContainer } from '~/components/HippoNavbar'
+import { PublicKeyCheck } from '~/components/PublicKeyCheck'
+import { BetaFaucetModal } from '~/components/BetaFaucetModal'
+import { NetworkCheckModal } from '~/components/NetworkCheckModal'
+import { ScrollyFeedbackLink } from '~/components/ScrollyFeedbackLink'
 import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
@@ -40,6 +45,7 @@ function mapStateToProps (state, ownProps) {
   const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
 
   if (isSignedIn && isDoctor) {
     caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
@@ -51,7 +57,8 @@ function mapStateToProps (state, ownProps) {
     DoctorManager,
     isSignedIn,
     caseCount,
-    CaseManager
+    CaseManager,
+    isOwner
   }
 }
 
@@ -151,42 +158,86 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
       setRequestedPathname('')
     }
 
+    if (this.props.isSignedIn) {
+      var publicKeyCheck = <PublicKeyCheck />
+      var betaFaucetModal = <BetaFaucetModal />
+      var feedbackLink = <ScrollyFeedbackLink scrollDiffAmount={50} />
+    }
+
+    if (this.props.isOwner) {
+      var ownerWarning =
+        <div className="alert alert-warning alert--banner text-center">
+          <small>NOTE: You are currently using the contract owner's Ethereum address, please do not submit or diagnose cases with this account for encryption reasons.</small>
+        </div>
+    }
+
     return (
       <div>
-        <Switch>
-          {redirect}
+        <div className="wrapper">
+          <div className="main-panel">
+            <HippoNavbarContainer />
+            {ownerWarning}
+            <div className="content">
+              {publicKeyCheck}
+              {betaFaucetModal}
 
-          <Route path={routes.WELCOME} component={Welcome} />
-          <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
-          <Route path={routes.TRY_METAMASK} component={TryMetamask} />
+              <Switch>
+                <Route path={routes.WELCOME} component={null} />
+                <Route path='/' component={NetworkCheckModal} />
+              </Switch>
 
-          <SignedInRoute path={routes.ACCOUNT_EMERGENCY_KIT} component={EmergencyKit} />
-          <SignedInRoute path={routes.ACCOUNT_CHANGE_PASSWORD} component={ChangePasswordContainer} />
-          <SignedInRoute path={routes.ACCOUNT_MINT} component={Mint} />
-          <SignedInRoute path={routes.ACCOUNT_WALLET} component={WalletContainer} />
+              <Switch>
+                {redirect}
 
-          <Web3Route path={routes.SIGN_IN} component={SignInContainer} />
-          <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
+                <Route path={routes.WELCOME} component={Welcome} />
+                <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
+                <Route path={routes.TRY_METAMASK} component={TryMetamask} />
 
-          <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
-          <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={DiagnoseCaseContainer} />
-          <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
+                <SignedInRoute path={routes.ACCOUNT_EMERGENCY_KIT} component={EmergencyKit} />
+                <SignedInRoute path={routes.ACCOUNT_CHANGE_PASSWORD} component={ChangePasswordContainer} />
+                <SignedInRoute path={routes.ACCOUNT_MINT} component={Mint} />
+                <SignedInRoute path={routes.ACCOUNT_WALLET} component={WalletContainer} />
 
-          <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
-          <SignedInRoute exact path={routes.PATIENTS_CASES} component={PatientDashboard} />
-          <SignedInRoute path={routes.PATIENTS_CASE} component={PatientCaseContainer} />
+                <Web3Route path={routes.SIGN_IN} component={SignInContainer} />
+                <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
 
-          <Redirect from={routes.HOME} exact to={routes.WELCOME} />
+                <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
+                <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={DiagnoseCaseContainer} />
+                <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 
-          <Route path={routes.HOME} component={FourOhFour} />
-        </Switch>
+                <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
+                <SignedInRoute exact path={routes.PATIENTS_CASES} component={PatientDashboard} />
+                <SignedInRoute path={routes.PATIENTS_CASE} component={PatientCaseContainer} />
+
+                <Redirect from={routes.HOME} exact to={routes.WELCOME} />
+
+                <Route path={routes.HOME} component={FourOhFour} />
+              </Switch>
+            </div>
+          </div>
+
+          <footer className="footer">
+            <div className="container">
+              <div className="row">
+                <div className="col-sm-12 text-center">
+                  <p className="text-footer">
+                    &copy; 2018 MedCredits Inc. - All Rights Reserved.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </footer>
+        </div>
+
         <ReduxToastr
           timeOut={7000}
           newestOnTop={true}
           tapToDismiss={false}
           position="bottom-left"
           transitionIn="bounceIn"
-          transitionOut="bounceOut" />
+          transitionOut="bounceOut"
+        />
+        {feedbackLink}
       </div>
     )
   }

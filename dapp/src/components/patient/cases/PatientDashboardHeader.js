@@ -4,7 +4,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faFileMedical from '@fortawesome/fontawesome-free-solid/faFileMedical';
 import * as routes from '~/config/routes'
 
-export const PatientDashboardHeader = class extends Component {
+export const PatientDashboardHeader = class _PatientDashboardHeader extends Component {
   render() {
     return (
       <div className="header-card card">

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
-import { MainLayoutContainer } from '~/layouts/MainLayout'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
@@ -82,7 +81,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
     const historicalCases = this.props.cases.filter(c => historicalCase(c))
 
     return (
-      <MainLayoutContainer>
+      <div>
         <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCases')} />
         <div className="container">
 
@@ -148,7 +147,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
           </div>
 
         </div>
-      </MainLayoutContainer>
+      </div>
     )
   }
 }))))

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { CSSTransition } from 'react-transition-group'
 import medCreditsLoadingImg from '~/assets/img/medcredits-logo--animated.svg';
 
-export const Loading = class extends Component {
+export const Loading = class _Loading extends Component {
   render() {
     return <CSSTransition
         in={this.props.loading}
