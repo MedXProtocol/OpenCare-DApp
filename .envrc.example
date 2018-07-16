@@ -20,9 +20,10 @@ export REACT_APP_IPFS_HOSTNAME=ipfs.medcredits.io
 export REACT_APP_IPFS_PORT=5001
 export REACT_APP_IPFS_PROTOCOL=https
 
-export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/dns4/localhost/tcp/9090/ws/p2p-webrtc-star/ipfs
-export REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL=/dns4/localhost/tcp/9091/ws/p2p-websocket-star/ipfs
-# export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/dns4/ipfs.medcredits.io/tcp/443/wss/p2p-webrtc-star/ipfs
+# export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/dns4/localhost/tcp/9090/ws/p2p-webrtc-star/ipfs
+# export REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL=/dns4/localhost/tcp/9091/ws/p2p-websocket-star/ipfs
+export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/dns4/ipfs.medcredits.io/tcp/443/wss/p2p-webrtc-star/ipfs
+export REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL=/dns4/ipfs.medcredits.io/tcp/9091/wss/p2p-websocket-star/ipfs
 
 export LAMBDA_CONFIG_CORS_ORIGIN="*"
 export LAMBDA_CONFIG_PRIVKEY="<contractOwnerPrivKey>"

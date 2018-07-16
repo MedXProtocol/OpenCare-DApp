@@ -8,7 +8,7 @@ import addRegistryContracts from './add-registry-contracts-saga'
 import signInSaga from './sign-in-saga'
 import signOutSaga from './sign-out-saga'
 import signUpSaga from './sign-up-saga'
-import heartbeatSaga from './heartbeat-saga'
+// import heartbeatSaga from './heartbeat-saga'
 import { nextAvailableDoctorSaga } from './next-available-doctor-saga'
 
 export default function* () {
@@ -19,7 +19,6 @@ export default function* () {
       signInSaga(),
       signOutSaga(),
       signUpSaga(),
-      heartbeatSaga(),
       nextAvailableDoctorSaga()
     ])
   })
