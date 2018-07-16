@@ -6,7 +6,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight';
 import { EthAddress } from '~/components/EthAddress'
 
-export const CaseRow = class extends Component {
+export const CaseRow = class _CaseRow extends Component {
   render () {
     const caseRoute = formatRoute(this.props.route, { caseAddress: this.props.caseAddress })
     const style = { zIndex: 998 - this.props.caseIndex }

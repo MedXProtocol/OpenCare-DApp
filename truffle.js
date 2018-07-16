@@ -14,7 +14,7 @@ module.exports = {
       provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.ROPSTEN_PROVIDER_URL),
       network_id: 3,
       gas: 4683623,
-      gasPrice: 20 * 1000000000
+      gasPrice: 60 * 1000000000
     },
     rinkeby: {
       provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.RINKEBY_PROVIDER_URL),

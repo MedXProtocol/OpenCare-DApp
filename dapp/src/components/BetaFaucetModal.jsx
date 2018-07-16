@@ -60,7 +60,7 @@ function mapDispatchToProps(dispatch) {
 
 export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga, { propTriggers: ['ethBalance', 'medXBalance', 'CaseManager', 'DoctorManager', 'MedXToken', 'address'] })(
-    class extends Component {
+    class _BetaFaucetModal extends Component {
 
       constructor(props) {
         super(props)

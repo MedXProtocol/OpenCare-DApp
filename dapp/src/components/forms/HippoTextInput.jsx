@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import classNames from 'classnames'
 
-export const HippoTextInput = class extends Component {
+export const HippoTextInput = class _HippoTextInput extends Component {
   render() {
     const { name, label, error, setRef, onChange, colClasses, type } = this.props
 

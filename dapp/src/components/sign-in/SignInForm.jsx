@@ -28,7 +28,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export const SignInForm = class extends Component {
+export const SignInForm = class _SignInForm extends Component {
   constructor (props) {
     super(props)
     this.state = {

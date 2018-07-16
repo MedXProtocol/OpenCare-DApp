@@ -7,7 +7,7 @@ import {
   ButtonToolbar
 } from 'react-bootstrap'
 
-export const HippoToggleButtonGroup = class extends Component {
+export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Component {
   render() {
     const { id, name, error, label, setRef, onChange, values, colClasses } = this.props
     let required

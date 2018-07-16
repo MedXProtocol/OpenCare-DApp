@@ -8,7 +8,7 @@ import medXLogoImg from '~/assets/img/medx-logo.png'
 import medXLogoImg2x from '~/assets/img/medx-logo@2x.png'
 import { toMedX } from '~/utils/toMedX'
 
-export const MedXFaucetAPI = ReactTimeout(class extends Component {
+export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component {
 
   constructor(props) {
     super(props)

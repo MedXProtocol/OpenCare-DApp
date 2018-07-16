@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import { MainLayoutContainer } from '~/layouts/MainLayout';
 import { MintTokensContainer } from './MintTokens';
 import { PageTitle } from '~/components/PageTitle'
 
-export const Mint = class extends Component {
+export const Mint = class _Mint extends Component {
   render() {
     return (
-      <MainLayoutContainer>
+      <div>
         <PageTitle renderTitle={(t) => t('pageTitles.mint')} />
         <MintTokensContainer />
-      </MainLayoutContainer>
+      </div>
     );
   }
 }

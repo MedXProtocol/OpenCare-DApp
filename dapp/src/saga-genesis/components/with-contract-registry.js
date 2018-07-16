@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 export function withContractRegistry(WrappedComponent) {
-  const ContractRegistryWrapper = class extends Component {
+  const ContractRegistryWrapper = class _ContractRegistryWrapper extends Component {
     static contextTypes = {
       contractRegistry: PropTypes.object
     }

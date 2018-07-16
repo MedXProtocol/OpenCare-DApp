@@ -1,7 +1,7 @@
 #! /bin/sh
 
 truffle compile && \
-npm run migrate -- --network rinkeby && \
+npm run migrate -- --network ropsten && \
 cd lambda && \
 ./lambda-build.sh && \
 cd .. && \

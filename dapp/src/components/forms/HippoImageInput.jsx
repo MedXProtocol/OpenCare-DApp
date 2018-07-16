@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { ProgressBar } from 'react-bootstrap'
 import classNames from 'classnames'
 
-export const HippoImageInput = class extends Component {
+export const HippoImageInput = class _HippoImageInput extends Component {
   render() {
     const { name, id, label, error, fileError, setRef, onChange,
       currentValue, progressClassNames, progressPercent, colClasses } = this.props

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-export const EthAddress = class extends Component {
+export const EthAddress = class _EthAddress extends Component {
   constructor (props) {
     super(props)
     this.state = {
