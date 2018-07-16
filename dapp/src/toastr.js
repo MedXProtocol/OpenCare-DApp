@@ -4,14 +4,15 @@ import { toastr as toastrLib } from 'react-redux-toastr'
 import { transactionErrorToCode } from '~/services/transaction-error-to-code'
 import i18next from 'i18next'
 
-const ToastrLinkComponent = ({ link, remove }) => (
+const ToastrLinkComponent = ({ link, remove }) => {
   if (!link.path) {
     throw new Error('link.path was not passed to a toastr msg')
   } else if (!link.text) {
     throw new Error('link.text was not passed to a toastr msg')
   }
+
   return <Link to={link.path}>{link.text}</Link>
-)
+}
 
 function success(message, link) {
   const options = { icon: 'success', status: 'success' }
