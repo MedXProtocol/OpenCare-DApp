@@ -142,14 +142,17 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
       }
 
       determineNextStep = () => {
+        let nextStep = 1
         if (this.state.step === 1) {
-          this.setState({ step: 2 })
+          nextStep = 2
         } else if (this.state.step === 2) {
-          this.setState({ step: 3 })
+          nextStep = 3
         }
 
-        if (this.state.step === 3 && !isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR)) {
+        if (nextStep === 3 && !isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR)) {
           this.closeModal()
+        } else {
+          this.setState({ step: nextStep })
         }
       }
 
