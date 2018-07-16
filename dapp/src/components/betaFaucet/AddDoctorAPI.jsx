@@ -37,7 +37,7 @@ export const AddDoctorAPI = ReactTimeout(class _AddDoctorAPI extends Component {
           responseMessage: "You will soon be registered as a Doctor",
           txHash: response.data.txHash
         })
-
+        this.props.addExternalTransaction('addDoctor', response.data.txHash)
         this.props.moveToNextStep({ withDelay: true })
       } else {
         this.setState({
