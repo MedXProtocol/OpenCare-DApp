@@ -145,11 +145,15 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
       }
     }
 
-    let navbarClassName = classnames('navbar', {
-      'navbar-transparent': this.props.transparent,
-      'navbar-absolute': this.props.transparent,
-      'navbar-default': !this.props.transparent
-    })
+    let navbarClassName = classnames(
+      'navbar',
+      'container--nav',
+      {
+        'navbar-transparent': this.props.transparent,
+        'navbar-absolute': this.props.transparent,
+        'navbar-default': !this.props.transparent
+      }
+    )
 
     return (
       <Navbar

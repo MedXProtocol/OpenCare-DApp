@@ -438,11 +438,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                 <div className="card-header">
                   <div className="row">
                     <div className="col-xs-12 col-md-6">
-                      <h3 className="title">
-                        Submit New Case
-                      </h3>
-                      <p className="lead">
-                        <small>Provide the physician with details about your problem. This will be encrypted so only you and your physician will be able to read it.</small>
+                      <p className="lead lead--card-title">
+                        Provide your physician(s) info about your problem.
+                      </p>
+                      <p className="text-gray">
+                        This will be encrypted. Only you and your physician will be able to read it.
                       </p>
                     </div>
                   </div>
@@ -458,7 +458,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         name='firstImage'
                         id='firstImageHash'
                         label="Overview Photo:"
-                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-12 col-md-8'
                         error={errors['firstImageHash']}
                         fileError={firstFileError}
                         setRef={this.setFirstImageHashRef}
@@ -472,7 +472,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         name='secondImage'
                         id='secondImageHash'
                         label="Close-up Photo:"
-                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-12 col-md-8'
                         error={errors['secondImageHash']}
                         fileError={secondFileError}
                         setRef={this.setSecondImageHashRef}
@@ -489,7 +489,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='howLong'
                         name="howLong"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-md-8'
                         label='How long have you had this problem?'
                         error={errors['howLong']}
                         setRef={this.setHowLongRef}
@@ -500,7 +500,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='size'
                         name="size"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-md-8'
                         label='Is it growing, shrinking or staying the same size?'
                         error={errors['size']}
                         setRef={this.setSizeRef}
@@ -511,7 +511,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='painful'
                         name="painful"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-md-8'
                         label='Is it painful?'
                         error={errors['painful']}
                         setRef={this.setPainfulRef}
@@ -522,7 +522,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='bleeding'
                         name="bleeding"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-md-8'
                         label='Is it bleeding?'
                         error={errors['bleeding']}
                         setRef={this.setBleedingRef}
@@ -533,7 +533,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='itching'
                         name="itching"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-md-8'
                         label='Is it itching?'
                         error={errors['itching']}
                         setRef={this.setItchingRef}
@@ -544,7 +544,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='skinCancer'
                         name="skinCancer"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-md-8'
                         label='Any history of skin cancer?'
                         error={errors['skinCancer']}
                         setRef={this.setSkinCancerRef}
@@ -555,7 +555,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='sexuallyActive'
                         name="sexuallyActive"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-md-8'
                         label='Are you sexually active?'
                         error={errors['sexuallyActive']}
                         setRef={this.setSexuallyActiveRef}
@@ -566,7 +566,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoTextInput
                         id='color'
                         name="color"
-                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-12 col-md-8'
                         label='Has it changed in color?'
                         error={errors['color']}
                         setRef={this.setColorRef}
@@ -576,7 +576,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoTextInput
                         id='prevTreatment'
                         name="prevTreatment"
-                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-12 col-md-8'
                         label='Have you tried any treatments so far?'
                         error={errors['prevTreatment']}
                         setRef={this.setPrevTreatmentRef}
@@ -589,7 +589,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-6 col-sm-3 col-md-1">
+                        <div className="col-xs-6 col-sm-3 col-md-2">
                           <HippoTextInput
                             type='number'
                             id='age'
@@ -617,7 +617,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                             {errors['country']}
                           </div>
                         </div>
-                        <div className="col-xs-8 col-sm-3 col-md-2">
+                        <div className="col-xs-8 col-sm-3 col-md-3">
                           <div className={classNames('form-group', { 'has-error': errors['region'] })}>
                             <label>State</label>
                             <Select
@@ -639,7 +639,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <div className="col-xs-12 col-sm-12 col-md-8">
                           <div className="form-group">
                             <label>Please include any additional info below <span className="text-gray">(Optional)</span></label>
                             <textarea
@@ -651,7 +651,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
+                        <div className="col-xs-12 col-sm-12 col-md-8">
                           <div className={classNames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
                             {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
                               ?
@@ -676,8 +676,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
+                        <div className="col-xs-12 col-sm-12 col-md-8 text-right">
                           <button type="submit" className="btn btn-lg btn-success">Submit Case</button>
+                          <br />
+                          <br />
+                          <br />
                         </div>
                       </div>
                     </form>

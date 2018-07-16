@@ -69,7 +69,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                 <div className="form-wrapper--footer">
                   <div className='text-right'>
                     <Link
-                      className="btn btn-success"
+                      className="btn btn-lg btn-success"
                       to={launchLink}>
                         Launch Hippocrates
                     </Link>
