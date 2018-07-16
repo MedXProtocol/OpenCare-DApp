@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import getWeb3 from '~/get-web3'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { withContractRegistry, withSend } from '~/saga-genesis'
@@ -45,7 +46,7 @@ export const MintTokensContainer = withContractRegistry(connect(mapStateToProps)
 
     mintTokens = () => {
       const { send, MedXToken } = this.props
-      const transactionId = send(MedXToken, 'mint', this.state.address, 100000)()
+      const transactionId = send(MedXToken, 'mint', this.state.address, getWeb3().utils.toWei('100000', 'ether'))()
       this.setState({transactionId})
     }
 

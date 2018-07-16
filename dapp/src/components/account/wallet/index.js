@@ -11,6 +11,7 @@ import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { EthAddress } from '~/components/EthAddress'
 import * as routes from '~/config/routes'
 import { PageTitle } from '~/components/PageTitle'
+import { toMedX } from '~/utils/toMedX'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -57,7 +58,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
                     <p className='lead text-center'>
                       <FontAwesomeIcon
                         icon={faHeartbeat} />
-                      &nbsp; {parseInt(this.props.balance, 10).toLocaleString()} MEDX
+                      &nbsp; {toMedX(this.props.balance)} MEDX
                     </p>
 
                     {this.props.canMint &&

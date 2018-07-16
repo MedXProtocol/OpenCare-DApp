@@ -12,6 +12,7 @@ import get from 'lodash.get'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
 import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
+import { toMedX } from '~/utils/toMedX'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -88,7 +89,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         let step
 
         const needEth = props.ethBalance !== undefined && props.ethBalance < 0.03
-        const needMedX = props.medXBalance !== undefined && props.medXBalance < 15
+        const needMedX = props.medXBalance !== undefined && toMedX(props.medXBalance) < 15
         const canBeDoctor = !props.isDoctor && isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR)
 
         if (needEth) {

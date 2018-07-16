@@ -27,6 +27,7 @@ import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGrou
 import { HippoTextInput } from '~/components/forms/HippoTextInput'
 import { countries } from './countries'
 import { regions } from './regions'
+import { toMedX } from '~/utils/toMedX'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 
 function mapStateToProps (state) {
@@ -292,7 +293,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         console.error("The props.balance wasn't set!")
 
       if (this.state.errors.length === 0) {
-        if (this.props.balance < 15) {
+        if (toMedX(this.props.balance) < 15) {
           this.setState({ showBalanceTooLowModal: true })
         } else {
           this.setState({ showConfirmSubmissionModal: true })
