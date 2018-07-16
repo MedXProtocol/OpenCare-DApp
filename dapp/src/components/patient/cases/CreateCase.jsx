@@ -4,6 +4,7 @@ import { isTrue } from '~/utils/isTrue'
 import { Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import Select from 'react-select'
+import ReactTooltip from 'react-tooltip'
 import * as Animated from 'react-select/lib/animated';
 import { customStyles } from '~/config/react-select-custom-styles'
 import { withRouter } from 'react-router-dom'
@@ -32,12 +33,23 @@ import { medXToWei } from '~/utils/medXToWei'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 
 function mapStateToProps (state) {
+  let medXBeingSent
   const account = get(state, 'sagaGenesis.accounts[0]')
   const MedXToken = contractByName(state, 'MedXToken')
   const CaseManager = contractByName(state, 'CaseManager')
   const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
+  const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
+  const previousCase = (caseListCount > 0)
+
+  const externalTransactions = get(state, 'externalTransactions.transactions')
+  for (let i = 0; i < externalTransactions.length; i++) {
+    const { inFlight, txType } = externalTransactions[i]
+    if (txType === 'sendMedX' && inFlight) {
+      medXBeingSent = true
+    }
+  }
 
   return {
     AccountManager,
@@ -46,7 +58,9 @@ function mapStateToProps (state) {
     MedXToken,
     CaseManager,
     publicKey,
-    balance
+    balance,
+    previousCase,
+    medXBeingSent
   }
 }
 
@@ -130,10 +144,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       this.setAgeRef = element => { this.ageInput = element }
       this.setCountryRef = element => { this.countryInput = element }
       this.setRegionRef = element => { this.regionInput = element }
-    }
-
-    componentDidMount () {
-      this.props.showBetaFaucetModal()
     }
 
     componentWillReceiveProps (props) {
@@ -294,8 +304,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         console.error("The props.balance wasn't set!")
 
       if (this.state.errors.length === 0) {
-        if (weiToMedX(this.props.balance) < 15) {
+        if (weiToMedX(this.props.balance) < 15 && this.props.previousCase) {
           this.setState({ showBalanceTooLowModal: true })
+        } else if (weiToMedX(this.props.balance) < 15) {
+          this.props.showBetaFaucetModal()
         } else {
           this.setState({ showConfirmSubmissionModal: true })
         }
@@ -678,7 +690,14 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8 text-right">
-                          <button type="submit" className="btn btn-lg btn-success">Submit Case</button>
+                          <button
+                            type="submit"
+                            className="btn btn-lg btn-success"
+                            data-tip={this.props.medXBeingSent ? "Your MedX transaction needs to complete, please wait ..." : ''}
+                          >
+                            Submit Case
+                          </button>
+                          <ReactTooltip effect='solid' place='left' />
                           <br />
                           <br />
                           <br />
