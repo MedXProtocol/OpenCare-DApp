@@ -24,7 +24,6 @@ export default function* () {
       signUpSaga(),
       nextAvailableDoctorSaga(),
       // heartbeatSaga(),
-      nextAvailableDoctorSaga(),
       pollExternalTransactionsSaga()
     ])
   })
