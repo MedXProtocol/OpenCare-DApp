@@ -170,16 +170,25 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       return size > 10485760 // 10 megabytes
     }
 
+    validateFile (file) {
+      let error = null
+      if (file && this.fileTooLarge(file.size)) {
+        error = 'The file must be smaller than 10MB'
+      }
+      return error
+    }
+
     captureFirstImage = async (event) => {
+      const file = event.target.files[0]
+      if (!file) { return }
       this.setState({firstFileError: null})
-      if (event.target.files[0] && this.fileTooLarge(event.target.files[0].size)) {
-        this.setState({
-          firstFileError: 'The file must be smaller than 10MB'
-        })
+      const error = this.validateFile(file)
+      if (error) {
+        this.setState({ firstFileError: error })
         return
       }
 
-      const fileName = event.target.files[0].name
+      const fileName = file.name
       const progressHandler = (percent) => {
         this.setState({ firstImagePercent: percent })
       }
@@ -197,15 +206,16 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     captureSecondImage = async (event) => {
+      const file = event.target.files[0]
+      if (!file) { return }
       this.setState({secondFileError: null})
-      if (event.target.files[0] && this.fileTooLarge(event.target.files[0].size)) {
-        this.setState({
-          secondFileError: 'The file must be smaller than 10MB'
-        })
+      const error = this.validateFile(file)
+      if (error) {
+        this.setState({ secondFileError: error })
         return
       }
 
-      const fileName = event.target.files[0].name
+      const fileName = file.name
       const progressHandler = (percent) => {
         this.setState({ secondImagePercent: percent })
       }
