@@ -44,6 +44,10 @@ $card-columns-margin:               $card-spacer-y;
 
   .card-body {
     padding: 2rem;
+
+    @media screen and (max-width: 767px) {
+      padding: 3rem;
+    }
   }
 
   .title {

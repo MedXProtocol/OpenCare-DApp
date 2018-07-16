@@ -1,5 +1,9 @@
 .form-wrapper {
   border-radius: 3px;
+
+  @media (max-width: 768px) {
+    border-radius: 0;
+  }
 }
 
 .form-wrapper--body {

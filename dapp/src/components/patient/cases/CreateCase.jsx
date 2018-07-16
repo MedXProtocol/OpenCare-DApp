@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { isTrue } from '~/utils/isTrue'
-import { Modal } from 'react-bootstrap'
+import { ControlLabel, Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import Select from 'react-select'
 import * as Animated from 'react-select/lib/animated';
@@ -510,31 +510,32 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                           />
                         </div>
                       </div>
-                      <div class="row">
-                        <div class="col-xs-12 col-sm-6 col-sm-offset-6">
-                          <HippoToggleButtonGroup
-                            id='size'
-                            name="size"
-                            colClasses='col-xs-12'
-                            label='Is it growing, shrinking or staying the same size?'
-                            error={errors['size']}
-                            setRef={this.setSizeRef}
-                            onChange={this.updateSize}
-                            values={['Growing', 'Shrinking', 'Same size']}
-                          />
-                        </div>
-                      </div>
+                      <HippoToggleButtonGroup
+                        id='size'
+                        name="size"
+                        colClasses='col-xs-12 col-sm-6 col-sm-offset-6'
+                        label='Is it growing, shrinking or staying the same size?'
+                        error={errors['size']}
+                        setRef={this.setSizeRef}
+                        onChange={this.updateSize}
+                        values={['Growing', 'Shrinking', 'Same size']}
+                      />
 
-
-
-
-{/*
-
+                      <HippoToggleButtonGroup
+                        id='size'
+                        name="size"
+                        colClasses='col-xs-12 col-sm-6 col-sm-offset-6'
+                        label='Is it growing, shrinking or staying the same size?'
+                        error={errors['size']}
+                        setRef={this.setSizeRef}
+                        onChange={this.updateSize}
+                        values={['Growing', 'Shrinking', 'Same size']}
+                      />
 
                       <HippoToggleButtonGroup
                         id='painful'
                         name="painful"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-6 col-sm-offset-6'
                         label='Is it painful?'
                         error={errors['painful']}
                         setRef={this.setPainfulRef}
@@ -545,7 +546,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='bleeding'
                         name="bleeding"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-6 col-sm-offset-6'
                         label='Is it bleeding?'
                         error={errors['bleeding']}
                         setRef={this.setBleedingRef}
@@ -556,7 +557,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='itching'
                         name="itching"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-6 col-sm-offset-6'
                         label='Is it itching?'
                         error={errors['itching']}
                         setRef={this.setItchingRef}
@@ -567,7 +568,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='skinCancer'
                         name="skinCancer"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-6 col-sm-offset-6'
                         label='Any history of skin cancer?'
                         error={errors['skinCancer']}
                         setRef={this.setSkinCancerRef}
@@ -578,7 +579,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoToggleButtonGroup
                         id='sexuallyActive'
                         name="sexuallyActive"
-                        colClasses='col-xs-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-6 col-sm-offset-6'
                         label='Are you sexually active?'
                         error={errors['sexuallyActive']}
                         setRef={this.setSexuallyActiveRef}
@@ -589,7 +590,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoTextInput
                         id='color'
                         name="color"
-                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-6 col-sm-offset-6'
                         label='Has it changed in color?'
                         error={errors['color']}
                         setRef={this.setColorRef}
@@ -599,7 +600,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoTextInput
                         id='prevTreatment'
                         name="prevTreatment"
-                        colClasses='col-xs-12 col-sm-12 col-md-6'
+                        colClasses='col-xs-12 col-sm-6 col-sm-offset-6'
                         label='Have you tried any treatments so far?'
                         error={errors['prevTreatment']}
                         setRef={this.setPrevTreatmentRef}
@@ -607,12 +608,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       />
 
 
-                      <div className="form-group--heading form-group--heading__not-first">
-                        Additional Info:
-                      </div>
-
-                      <div className="row">
-                        <div className="col-xs-6 col-sm-3 col-md-1">
+                      <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                          <div className="form-group--heading form-group--heading__not-first">
+                            Additional Info:
+                          </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-3 col-md-1">
                           <HippoTextInput
                             type='number'
                             id='age'
@@ -623,6 +625,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                             onChange={(event) => this.setState({ age: event.target.value })}
                           />
                         </div>
+
                         <div className="col-xs-12 col-sm-6 col-md-3">
                           <div className={classNames('form-group', { 'has-error': errors['country'] })}>
                             <label>Country</label>
@@ -640,6 +643,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                             {errors['country']}
                           </div>
                         </div>
+
                         <div className="col-xs-8 col-sm-3 col-md-2">
                           <div className={classNames('form-group', { 'has-error': errors['region'] })}>
                             <label>State</label>
@@ -662,9 +666,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <div className="col-xs-12 col-sm-6 col-sm-offset-6">
                           <div className="form-group">
-                            <label>Please include any additional info below <span className="text-gray">(Optional)</span></label>
+                            <label>Please include any further details below <span className="text-gray">(Optional)</span></label>
                             <textarea
                               onChange={(event) => this.setState({ description: event.target.value })}
                               className="form-control"
@@ -674,7 +678,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6">
+                        <div className="col-xs-12 col-sm-6 col-sm-offset-6">
                           <div className={classNames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
                             {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
                               ?
@@ -684,7 +688,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                                     excludeAddresses={[this.props.account]}
                                     value={this.state.selectedDoctor}
                                     isClearable={false}
-                                    onChange={this.onChangeDoctor} />
+                                    onChange={this.onChangeDoctor}
+                                  />
                               </div>
                               :
                               <AvailableDoctorSelect
@@ -699,10 +704,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 text-right">
+                        <div className="col-xs-12 col-sm-6 col-sm-offset-6 text-right">
                           <button type="submit" className="btn btn-lg btn-success">Submit Case</button>
+                          <br />
+                          <br />
                         </div>
-                      </div>*/}
+                      </div>
                     </form>
                   </div>
                 </div>
