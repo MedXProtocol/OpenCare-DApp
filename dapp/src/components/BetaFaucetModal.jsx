@@ -16,6 +16,7 @@ import { weiToMedX } from '~/utils/weiToMedX'
 import { nextId } from '~/saga-genesis/transaction/transaction-factory'
 
 function mapStateToProps (state) {
+  let dontShowEther, dontShowMedX, dontShowAddDoctor
   const address = get(state, 'sagaGenesis.accounts[0]')
   const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
@@ -27,7 +28,18 @@ function mapStateToProps (state) {
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const previousCase = (caseListCount > 0)
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
-  const pendingSendEtherTransactions = get(state, 'sagaGenesis.externalTransactions.transactions')
+
+  const externalTransactions = get(state, 'externalTransactions.transactions')
+  for (let i = 0; i < externalTransactions.length; i++) {
+    const { inFlight, txType, success } = externalTransactions[i]
+    if (txType === 'sendEther' && (inFlight || (!inFlight && success))) {
+      dontShowEther = true
+    } else if (txType === 'sendMedX' && (inFlight || (!inFlight && success))) {
+      dontShowMedX = true
+    } else if (txType === 'addDoctor' && (inFlight || (!inFlight && success))) {
+      dontShowAddDoctor = true
+    }
+  }
 
   return {
     address,
@@ -38,7 +50,10 @@ function mapStateToProps (state) {
     MedXToken,
     isOwner,
     previousCase,
-    isDoctor
+    isDoctor,
+    dontShowEther,
+    dontShowMedX,
+    dontShowAddDoctor
   }
 }
 
@@ -96,17 +111,17 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         const needEth = (
           props.ethBalance !== undefined
           && props.ethBalance < 0.03
-          && noPendingSendEtherTransactions
+          && !props.dontShowEther
         )
         const needMedX = (
           props.medXBalance !== undefined
           && weiToMedX(props.medXBalance) < 15
-          && noPendingSendMedXTransactions
+          && !props.dontShowMedX
         )
         const canBeDoctor = (
           !props.isDoctor
           && isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR)
-          && noPendingAddDoctorTransactions
+          && !props.dontShowAddDoctor
         )
 
         if (needEth) {

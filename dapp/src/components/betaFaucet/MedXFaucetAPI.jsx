@@ -40,7 +40,7 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
           responseMessage: "15 MedX is on the way",
           txHash: response.data.txHash
         })
-        this.props.addExternalTransaction('sendEth', response.data.txHash)
+        this.props.addExternalTransaction('sendMedX', response.data.txHash)
         this.props.moveToNextStep({ withDelay: true })
       } else {
         this.setState({

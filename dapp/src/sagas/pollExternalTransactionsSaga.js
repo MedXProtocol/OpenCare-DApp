@@ -14,7 +14,11 @@ export function* checkExternalTransactionReceipts(web3) {
     const transactions = yield select((state) => state.externalTransactions.transactions)
 
     for (let i = 0; i < transactions.length; i++) {
-      const { transactionId, txHash, txType } = transactions[i]
+      const { transactionId, txHash, txType, inFlight } = transactions[i]
+      if (!inFlight) {
+        continue
+      }
+
       const receipt = yield web3.eth.getTransactionReceipt(txHash)
 
       if (receipt) {
