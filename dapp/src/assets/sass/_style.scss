@@ -6,6 +6,17 @@ body {
 
 .content {
   padding-top: 30px;
+
+  @media (max-width: 768px) {
+    padding-top: 0;
+  }
+}
+
+.container {
+  @media (max-width: 768px) {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 a {
@@ -145,7 +156,12 @@ not(.nav) li {
 }
 
 p.lead {
+  font-size: 20px;
   line-height: 1.4;
+}
+
+.lead--card-title {
+  margin: 16px 0 0 0;
 }
 
 small,

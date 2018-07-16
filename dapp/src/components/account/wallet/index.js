@@ -48,10 +48,10 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
             <div className="col-sm-6 col-sm-offset-3">
               <div className="card">
                 <div className="card-header">
-                  <h4 className="card-title">
+                  <h3 className="title">
                     MEDX Balance
                     <br /><small className="eth-address text-gray">ethereum address: <EthAddress address={this.props.address} /></small>
-                  </h4>
+                  </h3>
                 </div>
                 <div className="card-body">
                   <div className="form-wrapper">

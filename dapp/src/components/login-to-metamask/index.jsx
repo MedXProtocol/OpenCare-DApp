@@ -19,7 +19,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class _LoginToMetaMask e
     return (
       <BodyClass isDark={true}>
         {redirect}
-        <div doBetaFaucetModal={false}>
+        <div>
           <PageTitle renderTitle={(t) => t('pageTitles.loginToMetaMask')} />
           <div className='container'>
             <div className='row'>

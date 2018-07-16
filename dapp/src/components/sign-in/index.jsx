@@ -154,7 +154,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
     }
     return (
       <BodyClass isDark={true}>
-        <div doBetaFaucetModal={false}>
+        <div>
           <PageTitle renderTitle={(t) => t('pageTitles.signIn')} />
           <div className='container'>
             <div className='row'>

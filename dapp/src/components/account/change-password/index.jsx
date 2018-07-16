@@ -106,9 +106,9 @@ export const ChangePassword = class _ChangePassword extends Component {
             <div className="col-sm-6 col-sm-offset-3">
               <div className="card">
                 <div className="card-header">
-                  <h4 className="card-title">
+                  <h3 className="title card-title">
                     <span className="title">Change Your Master Password</span>
-                  </h4>
+                  </h3>
                 </div>
                 <div className="card-body">
                   <p className='text-gray'>
