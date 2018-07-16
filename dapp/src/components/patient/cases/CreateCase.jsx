@@ -294,7 +294,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         console.error("The props.balance wasn't set!")
 
       if (this.state.errors.length === 0) {
-        if (toMedX(this.props.balance) < 15) {
+        if (weiToMedX(this.props.balance) < 15) {
           this.setState({ showBalanceTooLowModal: true })
         } else {
           this.setState({ showConfirmSubmissionModal: true })

@@ -89,7 +89,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         let step
 
         const needEth = props.ethBalance !== undefined && props.ethBalance < 0.03
-        const needMedX = props.medXBalance !== undefined && toMedX(props.medXBalance) < 15
+        const needMedX = props.medXBalance !== undefined && weiToMedX(props.medXBalance) < 15
         const canBeDoctor = !props.isDoctor && isTrue(process.env.REACT_APP_FEATURE_UPGRADE_TO_DOCTOR)
 
         if (needEth) {

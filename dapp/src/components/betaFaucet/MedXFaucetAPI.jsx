@@ -117,7 +117,7 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
       <div className="col-xs-12 text-center">
         <strong>Current MedX Balance:</strong>
         <h2 className="header--no-top-margin">
-          {toMedX(this.props.medXBalance)}
+          {weiToMedX(this.props.medXBalance)}
           <img
             src={medXLogoImg}
             alt="MedX Logo"
