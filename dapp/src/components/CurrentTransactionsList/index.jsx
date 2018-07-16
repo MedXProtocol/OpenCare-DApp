@@ -96,10 +96,19 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                 </p>
             }
             if (call !== undefined) {
-              var resendButton =
-                <button onClick={() => this.props.send(key, call, options)} className='btn btn-sm btn-primary'>
-                  Retry
-                </button>
+              var resendButton = (
+                <span>
+                  <br />
+                  <a
+                    onClick={(e) => {
+                      e.preventDefault()
+                      this.props.send(key, call, options)
+                    }}
+                  >
+                    Retry
+                  </a>
+                </span>
+              )
             }
           }
 
