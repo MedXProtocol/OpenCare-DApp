@@ -109,7 +109,7 @@ export const SignUp = class _SignUp extends Component {
       content = <SecretKeyContainer secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
     }
     return (
-      <div doBetaFaucetModal={false}>
+      <div>
         <PageTitle renderTitle={(t) => t('pageTitles.signUp')} />
         {content}
         <OverrideDisallowedModal
