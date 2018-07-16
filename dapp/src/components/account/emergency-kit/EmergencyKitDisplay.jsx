@@ -20,7 +20,7 @@ export const EmergencyKitDisplay = class _EmergencyKitDisplay extends Component 
     const secretKey = currentAccount().secretKey()
 
     return (
-      <div className="container">
+      <div className='container'>
         <div className='row'>
           <div className='col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2'>
             <div className="card">

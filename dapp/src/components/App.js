@@ -177,8 +177,8 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
           <div className="main-panel">
             <HippoNavbarContainer />
             {ownerWarning}
+            {publicKeyCheck}
             <div className="content">
-              {publicKeyCheck}
               {betaFaucetModal}
 
               <Switch>
@@ -217,7 +217,7 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
           </div>
 
           <footer className="footer">
-            <div className="container">
+            <div className='container'>
               <div className="row">
                 <div className="col-sm-12 text-center">
                   <p className="text-footer">

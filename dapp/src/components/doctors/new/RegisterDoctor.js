@@ -57,7 +57,7 @@ export const RegisterDoctorContainer =
           const doctors = sortBy(this.props.doctors, ['isActive']).reverse()
 
           return (
-            <div className="container">
+            <div className='container'>
               <div className="row">
                 <div className="col-xs-12 col-sm-6 col-sm-offset-3">
                   <div className="card">
