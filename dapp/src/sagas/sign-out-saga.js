@@ -5,7 +5,7 @@ import {
 
 export function* signOutSaga() {
   signOut()
-  yield put({ type: 'TRANSACTIONS_CLEAR' })
+  yield put({ type: 'SIGNED_OUT' })
 }
 
 export default function* rootSaga() {
