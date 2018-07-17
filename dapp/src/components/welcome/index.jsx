@@ -53,7 +53,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                       Sign up and submit your skin ailment
                     </li>
                     <li>
-                      Earn <strong>0.5 MEDX</strong> for every case submitted during our trial period (<a href="https://medium.com/medcredits/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
+                      Earn <strong>0.5 MEDX</strong> for every case submitted during our trial period (<a target='_blank' rel="noopener noreferrer"  href="https://medium.com/medcredits/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
                     </li>
                   </ol>
                   <hr />
