@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { ImageLoader, CaseDetailsLoader } from './ContentLoaders'
@@ -6,8 +7,8 @@ import { LoadingLines } from '~/components/LoadingLines'
 import { downloadJson, downloadImage } from '../utils/storage-util'
 import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
-import { connect } from 'react-redux'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
+import { toastr } from '~/toastr'
 
 function mapStateToProps(state, { caseAddress }) {
   let caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
@@ -59,7 +60,8 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
         secondImageUrl
       })
     } catch (error) {
-      console.warn('Error while downloading JSON from IPFS')
+      toastr.error('There was an error while downloading your case details from IPFS.')
+      console.error(error)
     }
   }
 

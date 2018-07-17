@@ -2,7 +2,30 @@ import { ipfsApi } from '~/ipfsApi'
 import { promisify } from './common-util'
 import aes from '~/services/aes'
 
+const ipfsMethodWithRetry = async (func, ...args) => {
+  let result
+  let retries = 0
+  const maxRetries = 3
+
+  while(result === undefined) {
+    try {
+      result = await func(...args)
+    } catch (error) {
+      if (++retries === maxRetries) {
+        console.error(error)
+        return null
+      }
+    }
+  }
+
+  return result
+}
+
 export async function uploadJson(rawJson, encryptionKey) {
+  return await ipfsMethodWithRetry(doUploadJson, rawJson, encryptionKey)
+}
+
+export async function doUploadJson(rawJson, encryptionKey) {
   const buffer = Buffer.from(rawJson)
   const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
   const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb))
@@ -12,6 +35,10 @@ export async function uploadJson(rawJson, encryptionKey) {
 }
 
 export async function uploadFile(file, encryptionKey, progressHandler) {
+  return await ipfsMethodWithRetry(doUploadFile, file, encryptionKey, progressHandler)
+}
+
+export async function doUploadFile(file, encryptionKey, progressHandler) {
   progressHandler(33)
   const reader = new window.FileReader()
   await promisifyFileReader(reader, file)
@@ -28,6 +55,10 @@ export async function uploadFile(file, encryptionKey, progressHandler) {
 }
 
 export async function downloadJson(hash, encryptionKey) {
+  return await ipfsMethodWithRetry(doDownloadJson, hash, encryptionKey)
+}
+
+export async function doDownloadJson(hash, encryptionKey) {
   return await promisify(cb => {
     ipfsApi.cat(hash, (error, result) => {
       if (error) {
@@ -42,6 +73,10 @@ export async function downloadJson(hash, encryptionKey) {
 }
 
 export async function downloadImage(hash, encryptionKey) {
+  return await ipfsMethodWithRetry(doDownloadImage, hash, encryptionKey)
+}
+
+export async function doDownloadImage(hash, encryptionKey) {
   return await promisify(cb => {
     ipfsApi.cat(hash, (error, result) => {
       if (error) {

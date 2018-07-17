@@ -147,6 +147,7 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
 
   render () {
     const requestedPathname = getRequestedPathname()
+    console.log(requestedPathname)
     if (this.props.address &&
         this.props.isSignedIn &&
         requestedPathname) {
