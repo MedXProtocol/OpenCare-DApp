@@ -3,42 +3,42 @@ import { promisify } from './common-util'
 import aes from '~/services/aes'
 
 export async function uploadJson(rawJson, encryptionKey) {
-    const buffer = Buffer.from(rawJson);
-    const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
-    const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb));
-    const hash = uploadResult[0].hash;
-    await promisify(cb => ipfsApi.pin.add(hash, cb))
-    return hash
+  const buffer = Buffer.from(rawJson)
+  const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
+  const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb))
+  const hash = uploadResult[0].hash
+  await promisify(cb => ipfsApi.pin.add(hash, cb))
+  return hash
 }
 
 export async function uploadFile(file, encryptionKey, progressHandler) {
-    progressHandler(33)
-    const reader = new window.FileReader()
-    await promisifyFileReader(reader, file);
-    progressHandler(45)
-    const buffer = Buffer.from(reader.result);
-    const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
-    progressHandler(67)
-    const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb));
-    progressHandler(89)
-    const hash = uploadResult[0].hash
-    await promisify(cb => ipfsApi.pin.add(hash, cb))
-    progressHandler(100)
-    return hash
+  progressHandler(33)
+  const reader = new window.FileReader()
+  await promisifyFileReader(reader, file)
+  progressHandler(45)
+  const buffer = Buffer.from(reader.result)
+  const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
+  progressHandler(67)
+  const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb))
+  progressHandler(89)
+  const hash = uploadResult[0].hash
+  await promisify(cb => ipfsApi.pin.add(hash, cb))
+  progressHandler(100)
+  return hash
 }
 
 export async function downloadJson(hash, encryptionKey) {
-    return await promisify(cb => {
-      ipfsApi.cat(hash, (error, result) => {
-        if (error) {
-          cb(error, result)
-        } else {
-          result = aes.decryptBytes(result || '', encryptionKey)
-          const buffer = Buffer.from(result)
-          cb(error, buffer.toString('utf8'))
-        }
-      })
-    });
+  return await promisify(cb => {
+    ipfsApi.cat(hash, (error, result) => {
+      if (error) {
+        cb(error, result)
+      } else {
+        result = aes.decryptBytes(result || '', encryptionKey)
+        const buffer = Buffer.from(result)
+        cb(error, buffer.toString('utf8'))
+      }
+    })
+  })
 }
 
 export async function downloadImage(hash, encryptionKey) {
@@ -51,16 +51,16 @@ export async function downloadImage(hash, encryptionKey) {
         var reader = new window.FileReader()
         reader.onloadend = () => {
           cb(error, reader.result)
-        };
-        reader.readAsDataURL(new Blob([result]));
+        }
+        reader.readAsDataURL(new Blob([result]))
       }
     })
-  });
+  })
 }
 
 function promisifyFileReader(fileReader, file){
-    return new Promise((resolve, reject) => {
-        fileReader.onloadend = resolve;  // CHANGE to whatever function you want which would eventually call resolve
-        fileReader.readAsArrayBuffer(file);
-    });
+  return new Promise((resolve, reject) => {
+    fileReader.onloadend = resolve  // CHANGE to whatever function you want which would eventually call resolve
+    fileReader.readAsArrayBuffer(file)
+  })
 }
