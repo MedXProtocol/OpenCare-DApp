@@ -10,9 +10,10 @@ import './CurrentTransactionsList.scss'
 
 function mapStateToProps(state) {
   let transactions = Object.entries(state.sagaGenesis.transactions)
-  let pendingOrErrorTransactions = transactions.filter(tx => {
-    return (!tx[1].confirmed && !tx[1].error) ||
-      (tx[1].error && transactionErrorToCode(tx[1].error) !== 'userRevert')
+  let pendingOrErrorTransactions = transactions.filter(transaction => {
+    const { confirmed, error } = transaction[1]
+    return (!confirmed && !error) ||
+      (error && transactionErrorToCode(error) !== 'userRevert')
   })
 
   return {
@@ -80,7 +81,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
             name = call.method
           }
 
-          let mintMedxCount = 1000 // these numbers could be pulled from the tx's call args
+          let mintMedxCount = 500 // these numbers could be pulled from the tx's call args
 
 
           if (error) {
@@ -95,10 +96,16 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                   {t(`transactionErrors.${code}`)}
                 </p>
             }
-            if (call !== undefined) {
+            if (error && !errorMessage) {
+              errorMessage =
+                <p className="small">
+                  {error}
+                </p>
+            }
+            if (call !== undefined && call.args) {
               var resendButton = (
                 <span>
-                  <br />
+                  {errorMessage ? null : <br />}
                   <a
                     onClick={(e) => {
                       e.preventDefault()
@@ -115,13 +122,14 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
           return (
             <CSSTransition
               key={`transaction-${key}`}
-              timeout={100}
+              timeout={500}
               classNames="fade">
               <li className="nav-transactions--item">
                 <span className={classnames('nav-transactions--circle', this.getClassName(error, confirmed))} /> &nbsp;
                 {t(`transactions.${name}`, {
                   mintMedxCount: mintMedxCount
                 })}
+                {confirmed}
                 {errorMessage}
                 {resendButton}
               </li>

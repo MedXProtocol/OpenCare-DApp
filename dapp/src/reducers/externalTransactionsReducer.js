@@ -1,4 +1,4 @@
-export default function (state, { type, transactionId, txType, txHash }) {
+export default function (state, { type, transactionId, txType, txHash, call }) {
   if (typeof state === 'undefined') {
     state = {
       transactions: []
@@ -11,6 +11,7 @@ export default function (state, { type, transactionId, txType, txHash }) {
         transactionId,
         txType,
         txHash,
+        call,
         inFlight: true
       }
       state = {

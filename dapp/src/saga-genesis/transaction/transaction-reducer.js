@@ -19,6 +19,7 @@ export default function (state, {type, transactionId, call, error, receipt, gasU
         ...state,
         [transactionId]: {
           ...state[transactionId],
+          call,
           inFlight: false,
           submitted: true,
           txHash
@@ -43,7 +44,8 @@ export default function (state, {type, transactionId, call, error, receipt, gasU
         ...state,
         [transactionId]: {
           ...state[transactionId],
-          confirmed: true
+          confirmed: true,
+          receipt
         }
       }
       break
