@@ -97,7 +97,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                 </p>
             }
             if (error && !errorMessage) {
-              var errorMessage =
+              errorMessage =
                 <p className="small">
                   {error}
                 </p>
