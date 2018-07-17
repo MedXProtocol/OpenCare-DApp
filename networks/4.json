@@ -1,5 +1,5 @@
 {
-  "migrationVersion": 1531701455,
+  "migrationVersion": 1531785373,
   "contracts": [
     {
       "contractName": "Migrations",
@@ -152,6 +152,26 @@
     {
       "contractName": "Delegate",
       "address": "0xbd9303b8b0be56f2c9ac1e6c387ed22cfae48580"
+    },
+    {
+      "contractName": "MedXToken",
+      "address": "0x09b8528c10f3dd3ccdba8a793b56d1960293919d"
+    },
+    {
+      "contractName": "BetaFaucet",
+      "address": "0x8245c4f785524dda8e83162bdf1b07dee0aa8eb8"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0x0f38f66f9cd79fa70fabb48094d3f694e58108b0"
+    },
+    {
+      "contractName": "CaseManager",
+      "address": "0x2551fbff86dac9eb1b337bbba29dcc8d15a6a9ad"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0xc8774f41734d98eddb15411b52d1399b3dcaed40"
     }
   ]
 }

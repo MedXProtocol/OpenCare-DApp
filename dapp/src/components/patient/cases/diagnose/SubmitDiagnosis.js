@@ -97,11 +97,16 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
 
   init (props) {
     if (this.state.originalDiagnosis || !props.diagnosisHash || !props.caseKey) { return }
-    downloadJson(props.diagnosisHash, props.caseKey).then((originalDiagnosis) => {
-      this.setState({
-        originalDiagnosis: JSON.parse(originalDiagnosis)
+
+    try {
+      downloadJson(props.diagnosisHash, props.caseKey).then((originalDiagnosis) => {
+        this.setState({
+          originalDiagnosis: JSON.parse(originalDiagnosis)
+        })
       })
-    })
+    } catch (error) {
+      console.warn('Error while downloading JSON from IPFS')
+    }
   }
 
   recommendationSelectUpdated = (key) => {

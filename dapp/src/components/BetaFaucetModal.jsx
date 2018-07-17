@@ -181,7 +181,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
 
       moveToNextStep = ({ withDelay = false } = {}) => {
         if (withDelay) {
-          this.props.setTimeout(this.determineNextStep, 2000)
+          this.props.setTimeout(this.determineNextStep, 3000)
         } else {
           this.determineNextStep()
         }

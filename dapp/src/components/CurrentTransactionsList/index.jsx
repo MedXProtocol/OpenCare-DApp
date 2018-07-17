@@ -103,7 +103,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                 </p>
             }
             if (call !== undefined && call.args) {
-              var resendButton =
+              var resendButton = (
                 <span>
                   {errorMessage ? null : <br />}
                   <a
@@ -115,6 +115,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                     Retry
                   </a>
                 </span>
+              )
             }
           }
 
