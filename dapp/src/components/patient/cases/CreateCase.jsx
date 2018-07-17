@@ -314,10 +314,14 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         console.error("The props.balance wasn't set!")
 
       if (this.state.errors.length === 0) {
-        if (weiToMedX(this.props.balance) < 15 && this.props.previousCase) {
-          this.setState({ showBalanceTooLowModal: true })
-        } else if (weiToMedX(this.props.balance) < 15) {
-          this.props.showBetaFaucetModal()
+        if (weiToMedX(this.props.balance) < 15) {
+          if (this.props.previousCase) {
+            this.setState({ showBalanceTooLowModal: true })
+          } else if (this.props.medXBeingSent) {
+            toastr.warning('Your MEDX is on the way. Please wait for the transaction to finish prior to submitting your case.')
+          } else {
+            this.props.showBetaFaucetModal()
+          }
         } else {
           this.setState({ showConfirmSubmissionModal: true })
         }

@@ -28,6 +28,13 @@ function error(message, link) {
   toastrLib.light('Error', message, options)
 }
 
+function warning(message, link) {
+  const options = { icon: 'warning', status: 'warning' }
+  options['component'] = link ? <ToastrLinkComponent link={link} /> : null
+
+  toastrLib.light('Warning', message, options)
+}
+
 function transactionError(transactionError) {
   const code = transactionErrorToCode(transactionError)
   let message = 'There was a transaction error'
@@ -40,5 +47,6 @@ function transactionError(transactionError) {
 export const toastr = {
   success,
   error,
+  warning,
   transactionError
 }
