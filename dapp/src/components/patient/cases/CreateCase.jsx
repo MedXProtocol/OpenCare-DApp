@@ -406,7 +406,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           ).encodeABI()
         }
 
-        let transactionId = send(MedXToken, 'approveAndCall', CaseManager, medXToWei('15'), data)()
+        let transactionId = send(MedXToken, 'approveAndCall', CaseManager, medXToWei('15'), data)({ gas: 1600000 })
         this.setState({
           transactionId,
           createCaseEvents: new TransactionStateHandler()
