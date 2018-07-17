@@ -10,9 +10,10 @@ import './CurrentTransactionsList.scss'
 
 function mapStateToProps(state) {
   let transactions = Object.entries(state.sagaGenesis.transactions)
-  let pendingOrErrorTransactions = transactions.filter(tx => {
-    return (!tx[1].confirmed && !tx[1].error) ||
-      (tx[1].error && transactionErrorToCode(tx[1].error) !== 'userRevert')
+  let pendingOrErrorTransactions = transactions.filter(transaction => {
+    const { confirmed, error } = transaction[1]
+    return (!confirmed && !error) ||
+      (error && transactionErrorToCode(error) !== 'userRevert')
   })
 
   return {
@@ -80,7 +81,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
             name = call.method
           }
 
-          let mintMedxCount = 1000 // these numbers could be pulled from the tx's call args
+          let mintMedxCount = 500 // these numbers could be pulled from the tx's call args
 
 
           if (error) {

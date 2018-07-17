@@ -24,7 +24,10 @@ i18next
             publicKeys: 'Retrieving Account',
             mint: 'Mint {{mintMedxCount}} MEDX',
             requestNextCase: 'Requesting Case',
-            setPublicKey: 'Registering Account'
+            setPublicKey: 'Registering Account',
+            sendMedX: 'Sending {{mintMedxCount}} MEDX',
+            sendEther: 'Sending 1 ETH',
+            addDoctor: 'Upgrading to Doctor'
           },
           transactionErrors: {
             userRevert: 'You rejected the transaction, please submit a valid transaction to proceed',

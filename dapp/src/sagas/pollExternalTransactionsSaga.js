@@ -14,7 +14,7 @@ export function* checkExternalTransactionReceipts(web3) {
     const transactions = yield select((state) => state.externalTransactions.transactions)
 
     for (let i = 0; i < transactions.length; i++) {
-      const { transactionId, txHash, txType, inFlight } = transactions[i]
+      const { transactionId, txHash, txType, inFlight, call } = transactions[i]
       if (!inFlight) {
         continue
       }
@@ -24,8 +24,10 @@ export function* checkExternalTransactionReceipts(web3) {
       if (receipt) {
         if (receipt.status) {
           yield put({ type: 'EXTERNAL_TRANSACTION_SUCCESS', transactionId, txType })
+          yield put({ type: 'TRANSACTION_CONFIRMED', transactionId, receipt, call })
         } else {
           yield put({ type: 'EXTERNAL_TRANSACTION_ERROR', transactionId, txType })
+          yield put({ type: 'TRANSACTION_ERROR', transactionId, error: null })
         }
       } else {
         // console.log('ignoring as not yet mined')

@@ -72,8 +72,11 @@ function mapDispatchToProps(dispatch) {
     hideModal: () => {
       dispatch({ type: 'HIDE_BETA_FAUCET_MODAL' })
     },
-    dispatchAddExternalTransaction: (transactionId, txType, txHash) => {
-      dispatch({ type: 'ADD_EXTERNAL_TRANSACTION', transactionId, txType, txHash })
+    dispatchAddExternalTransaction: (transactionId, txType, txHash, call) => {
+      dispatch({ type: 'ADD_EXTERNAL_TRANSACTION', transactionId, txType, txHash, call })
+    },
+    dispatchSagaGenesisTransaction: (transactionId, txType, txHash, call) => {
+      dispatch({ type: 'TRANSACTION_HASH', transactionId, txHash, call })
     }
   }
 }
@@ -157,7 +160,10 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
       }
 
       addExternalTransaction = (txType, txHash) => {
-        this.props.dispatchAddExternalTransaction(nextId(), txType, txHash)
+        const id = nextId()
+        const call = { method: txType, address: '0x0444d61FE60A855d6f40C21f167B643fD5F17aF3' } // junk address for cache invalidator to be happy
+        this.props.dispatchAddExternalTransaction(id, txType, txHash, call)
+        this.props.dispatchSagaGenesisTransaction(id, txType, txHash, call)
       }
 
       closeModal = () => {
