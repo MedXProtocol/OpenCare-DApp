@@ -56,6 +56,12 @@ export default function (state, { type, transactionId, txType, txHash }) {
       }
       break
 
+    case 'SIGNED_OUT':
+      state = {
+        transactions: []
+      }
+      break
+
     // no default
   }
 

@@ -61,7 +61,7 @@ export default function (state, {type, transactionId, call, error, receipt, gasU
       }
       break
 
-    case 'TRANSACTIONS_CLEAR':
+    case 'SIGNED_OUT':
       state = {}
       break
 

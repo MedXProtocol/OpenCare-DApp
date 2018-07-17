@@ -18,6 +18,10 @@ export const betaFaucet = function (state, { type }) {
       }
       break
 
+    case 'SIGNED_OUT':
+      state = {}
+      break
+
     // no default
   }
 
