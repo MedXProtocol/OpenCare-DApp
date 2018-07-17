@@ -7,7 +7,7 @@ function mapStateToProps(state, ownProps) {
   return {
     doctor: state.nextAvailableDoctor.doctor,
     initialized: state.nextAvailableDoctor.initialized,
-    excludedDoctors: state.nextAvailableDoctor.excludedAddresses
+    currentlyExcludedDoctors: state.nextAvailableDoctor.excludedAddresses
   }
 }
 
@@ -34,7 +34,7 @@ export function withAvailableDoctor(WrappedComponent) {
         componentWillReceiveProps (props) {
           if (props.initialized &&
               props.excludeAddresses.length &&
-              !isEqual(props.excludeAddresses, props.excludedDoctors)) {
+              !isEqual(props.excludeAddresses, props.currentlyExcludedDoctors)) {
             this.props.excludedDoctors(props.excludeAddresses)
           }
         }
