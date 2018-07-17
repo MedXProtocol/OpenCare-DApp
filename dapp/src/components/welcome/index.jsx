@@ -36,34 +36,30 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
             <div className='col-xs-12 col-md-10 col-md-offset-1'>
               <div className="form-wrapper form-wrapper--inverse">
                 <div className="form-wrapper--body">
-                  <h3>
+                  <h3 className="text-center">
                     Welcome to Hippocrates!
-                    <br /><small>The first DApp in the MedCredits Health System</small>
+                    <br /><small>The first dApp in the MedCredits Health System</small>
+                    <br /><small className="text-gray">Ask a board-certified specialist about your skin ailment today</small>
                   </h3>
-
-                  <hr />
-                  <p className="text-danger">
-                    NOTE: This is the private beta v1 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. In this version, submitted cases <strong><em>will not</em></strong> be diagnosed by licensed medical doctors. The goal for this release is to obtain user feedback in preparation for the public beta launch of Hippocrates in July 2018.
-                  </p>
-
                   <hr />
                   <p>
-                    Use Hippocrates to obtain a rapid medical recommendation from a global network of dermatologists.
-                  </p>
-                  <p>
-                    Beta testing is on the Ropsten Testnet. To get started:
+                    It takes under <strong>2 minutes</strong> to submit your case. Seriously, <em>it’s that easy</em>.
                   </p>
                   <ol>
                     <li>
                       Download the MetaMask Extension (<a target='_blank' rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">Chrome</a> / <a target='_blank' rel="noopener noreferrer" href="https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/">Firefox</a>) or the Cipher mobile browser (<a target='_blank' rel="noopener noreferrer" href="https://itunes.apple.com/app/cipher-browser-for-ethereum/id1294572970">iOS</a> / <a target='_blank' rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.cipherbrowser.cipher">Android</a>)
                     </li>
                     <li>
-                      Sign in, submit your skin problem, and visit our <a
-                        target="_blank"
-                        href="https://t.me/MedCredits"
-                        rel="noopener noreferrer">Telegram</a> to provide us with helpful feedback
+                      Sign in and submit your skin ailment
+                    </li>
+                    <li>
+                      Earn <strong>0.5 MEDX</strong> for every case submitted during our trial period (<a href="https://medium.com/medcredits">see blog post for additional details</a>)
                     </li>
                   </ol>
+                  <hr />
+                  <p className="text-danger small">
+                    NOTE: This is the private beta v1 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. In this version, submitted cases <strong><em>will not</em></strong> be diagnosed by licensed medical doctors. The goal for this release is to obtain user feedback in preparation for the public beta launch of Hippocrates in July 2018.
+                  </p>
                 </div>
 
                 <div className="form-wrapper--footer">
