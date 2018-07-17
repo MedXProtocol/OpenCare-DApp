@@ -32,7 +32,8 @@ i18next
           transactionErrors: {
             userRevert: 'You rejected the transaction, please submit a valid transaction to proceed',
             outOfGas: 'The transaction ran out of gas',
-            evmRevert: 'There was an error in the contract'
+            evmRevert: 'There was an error in the contract',
+            incorrectNonce: 'The nonce was incorrect (reset the account in MetaMask)'
           },
           pageTitles: {
             welcome: 'Welcome | Hippocrates',

@@ -15,17 +15,17 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
   return eventChannel(emit => {
     let promiEvent = send(options)
       .on('transactionHash', (txHash) => {
-        emit({type: 'TRANSACTION_HASH', transactionId, txHash})
+        emit({ type: 'TRANSACTION_HASH', transactionId, txHash, call })
       })
       .on('confirmation', (confirmationNumber, receipt) => {
-        emit({type: 'TRANSACTION_CONFIRMATION', transactionId, confirmationNumber, receipt})
+        emit({ type: 'TRANSACTION_CONFIRMATION', transactionId, confirmationNumber, receipt })
         if (confirmationNumber > 2) {
-          emit({type: 'TRANSACTION_CONFIRMED', transactionId, call, confirmationNumber, receipt})
+          emit({ type: 'TRANSACTION_CONFIRMED', transactionId, call, confirmationNumber, receipt })
           emit(END)
         }
       })
       .on('receipt', (receipt) => {
-        emit({type: 'TRANSACTION_RECEIPT', transactionId, receipt})
+        emit({ type: 'TRANSACTION_RECEIPT', transactionId, receipt })
       })
       .on('error', error => {
         const txObject = { type: 'TRANSACTION_ERROR', transactionId, error }

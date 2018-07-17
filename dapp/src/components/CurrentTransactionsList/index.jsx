@@ -96,24 +96,39 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                   {t(`transactionErrors.${code}`)}
                 </p>
             }
-            if (call !== undefined) {
+            if (error && !errorMessage) {
+              var errorMessage =
+                <p className="small">
+                  {error}
+                </p>
+            }
+            if (call !== undefined && call.args) {
               var resendButton =
-                <button onClick={() => this.props.send(key, call, options)} className='btn btn-sm btn-primary'>
-                  Retry
-                </button>
+                <span>
+                  {errorMessage ? null : <br />}
+                  <a
+                    onClick={(e) => {
+                      e.preventDefault()
+                      this.props.send(key, call, options)
+                    }}
+                  >
+                    Retry
+                  </a>
+                </span>
             }
           }
 
           return (
             <CSSTransition
               key={`transaction-${key}`}
-              timeout={100}
+              timeout={500}
               classNames="fade">
               <li className="nav-transactions--item">
                 <span className={classnames('nav-transactions--circle', this.getClassName(error, confirmed))} /> &nbsp;
                 {t(`transactions.${name}`, {
                   mintMedxCount: mintMedxCount
                 })}
+                {confirmed}
                 {errorMessage}
                 {resendButton}
               </li>
