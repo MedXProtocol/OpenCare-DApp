@@ -50,15 +50,15 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                       Download the MetaMask Extension (<a target='_blank' rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">Chrome</a> / <a target='_blank' rel="noopener noreferrer" href="https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/">Firefox</a>) or the Cipher mobile browser (<a target='_blank' rel="noopener noreferrer" href="https://itunes.apple.com/app/cipher-browser-for-ethereum/id1294572970">iOS</a> / <a target='_blank' rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.cipherbrowser.cipher">Android</a>)
                     </li>
                     <li>
-                      Sign in and submit your skin ailment
+                      Sign up and submit your skin ailment
                     </li>
                     <li>
-                      Earn <strong>0.5 MEDX</strong> for every case submitted during our trial period (<a href="https://medium.com/medcredits">see blog post for additional details</a>)
+                      Earn <strong>0.5 MEDX</strong> for every case submitted during our trial period (<a href="https://medium.com/medcredits/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
                     </li>
                   </ol>
                   <hr />
                   <p className="text-danger small">
-                    NOTE: This is the private beta v1 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. In this version, submitted cases <strong><em>will not</em></strong> be diagnosed by licensed medical doctors. The goal for this release is to obtain user feedback in preparation for the public beta launch of Hippocrates in July 2018.
+                    NOTE: This is the public Beta 2.0 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for October 2018.
                   </p>
                 </div>
 
