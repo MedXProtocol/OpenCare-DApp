@@ -12,6 +12,7 @@ import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall } from '~/saga-genesis/sagas'
+import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
 import { BodyClass } from '~/components/BodyClass'
 import { Loading } from '~/components/Loading'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
@@ -43,9 +44,6 @@ function mapDispatchToProps(dispatch) {
     },
     signIn: ({ secretKey, masterPassword, account, address, overrideAccount }) => {
       dispatch({ type: 'SIGN_IN', secretKey, masterPassword, account, address, overrideAccount })
-    },
-    signOut: () => {
-      dispatch({ type: 'SIGN_OUT' })
     }
   }
 }
@@ -66,10 +64,6 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
     this.state = {
       isResetting: false
     }
-  }
-
-  componentDidMount() {
-    this.props.signOut()
   }
 
   onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
@@ -154,6 +148,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
     }
     return (
       <BodyClass isDark={true}>
+        <ScrollToTopOnMount />
         <div>
           <PageTitle renderTitle={(t) => t('pageTitles.signIn')} />
           <div className='container'>

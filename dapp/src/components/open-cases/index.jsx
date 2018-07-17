@@ -11,6 +11,7 @@ import { addContract } from '~/saga-genesis/sagas'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
+import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
 import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
 import * as routes from '~/config/routes'
 
@@ -82,6 +83,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
 
     return (
       <div>
+        <ScrollToTopOnMount />
         <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCases')} />
         <div className='container'>
 
