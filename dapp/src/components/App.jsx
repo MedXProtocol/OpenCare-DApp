@@ -171,6 +171,8 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
         </div>
     }
 
+    const WelcomeWrapped = <Welcome isDoctor={this.props.isDoctor} />
+
     return (
       <div>
         <div className="wrapper">
@@ -189,7 +191,7 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
               <Switch>
                 {redirect}
 
-                <Route path={routes.WELCOME} component={Welcome} />
+                <Route path={routes.WELCOME}  render={ () => WelcomeWrapped } />
                 <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
                 <Route path={routes.TRY_METAMASK} component={TryMetamask} />
 
