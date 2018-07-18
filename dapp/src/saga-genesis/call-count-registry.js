@@ -19,14 +19,18 @@ export class CallCountRegistry {
   }
 
   deregister (key) {
-    let deletedCalls = this._getKeyCalls(key).reduce((accumulator, call) => {
+    let deletedCalls = this.decrementCalls(this._getKeyCalls(key))
+    delete this.keyCalls[key]
+    return deletedCalls
+  }
+
+  decrementCalls (calls) {
+    return calls.reduce((accumulator, call) => {
       if (!this._decrement(call)) {
         accumulator.push(call)
       }
       return accumulator
     }, [])
-    delete this.keyCalls[key]
-    return deletedCalls
   }
 
   getContractCalls (address) {
@@ -38,6 +42,12 @@ export class CallCountRegistry {
       this.contractCalls[address] = contractCalls
     }
     return contractCalls
+  }
+
+  resetKeyCalls (key) {
+    let keyCalls = this._getKeyCalls(key)
+    this.keyCalls[key] = []
+    return keyCalls
   }
 
   _getKeyCalls (key) {

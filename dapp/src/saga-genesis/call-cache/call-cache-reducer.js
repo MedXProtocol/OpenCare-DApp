@@ -44,6 +44,16 @@ export default function (state, {type, call, response, error, calls}) {
       }
       break
 
+    case 'WEB3_CALL_CANCELLED':
+      state = {
+        ...state,
+        [call.hash]: {
+          ...state[call.hash],
+          inFlight: false
+        }
+      }
+      break
+
     // no default
   }
 

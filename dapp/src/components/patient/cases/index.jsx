@@ -12,6 +12,7 @@ import get from 'lodash.get'
 import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
 import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
 import * as routes from '~/config/routes'
+import rangeRight from 'lodash.rangeright'
 
 function mapStateToProps(state, { accounts }) {
   const cases = []
@@ -41,29 +42,20 @@ function mapStateToProps(state, { accounts }) {
   }
 }
 
-function mapDispatchToProps (dispatch) {
-  return {
-    invalidate: (address) => dispatch({type: 'CACHE_INVALIDATE_ADDRESS', address})
-  }
-}
-
 function* saga({ account, CaseManager, AccountManager }) {
   if (!account || !CaseManager) { return }
   let caseCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', account)
-  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
+  let indices = rangeRight(caseCount)
+  yield all(indices.map(function* (caseIndex) {
     let caseAddress = yield cacheCall(CaseManager, 'patientCases', account, caseIndex)
     yield all([
       addContract({ address: caseAddress, contractKey: 'Case' }),
       cacheCall(caseAddress, 'status')
     ])
-  }
+  }))
 }
 
-export const PatientCases = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager', 'caseCount']})(class _PatientCases extends Component {
-  componentDidMount () {
-    this.props.invalidate(this.props.CaseManager)
-  }
-
+export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager', 'caseCount']})(class _PatientCases extends Component {
   render() {
     return (
       <div className="card">

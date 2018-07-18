@@ -18,10 +18,16 @@ import PollingBlockTracker from 'eth-block-tracker'
 
 function createBlockTrackerEmitter (web3) {
   return eventChannel(emit => {
+    let isFirst = true
+
     const blockTracker = new PollingBlockTracker({provider: web3.currentProvider})
 
     blockTracker.on('latest', (block) => {
-      emit({type: 'BLOCK_LATEST', block})
+      if (isFirst) {
+        isFirst = false
+      } else {
+        emit({type: 'BLOCK_LATEST', block})
+      }
     })
 
     blockTracker.start().catch((error) => {
@@ -45,6 +51,7 @@ function* startBlockTracker () {
 
 function* addAddressIfExists(addressSet, address) {
   if (!address) { return false }
+  address = address.toLowerCase()
   const contractKey = yield select(contractKeyByAddress, address)
   if (contractKey) {
     addressSet.add(address)
@@ -76,6 +83,7 @@ export function* collectAllTransactionAddresses(transactions) {
 export function* latestBlock({block}) {
   const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
   yield* Array.from(addressSet).map(function* (address) {
+    console.log('LATEST BLOCK: ', address)
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   })
 }
