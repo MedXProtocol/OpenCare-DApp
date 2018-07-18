@@ -29,7 +29,6 @@ function* findResponse(call) {
 }
 
 function* waitForResponse(call) {
-  // wait for call to return
   while (true) {
     let action = yield take(['WEB3_CALL_RETURN', 'WEB3_CALL_ERROR'])
     if (action.call.hash === call.hash) {
@@ -48,18 +47,12 @@ function* runCall(call, cacheActive) {
   const inFlight = isInFlight(call)
   if (cacheActive && !inFlight) {
     response = yield findResponse(call)
-    // console.log('runCall: Returning cached response: ', call.method, call.hash, response)
   } else {
     if (!inFlight) {
       callsInFlight.add(call.hash)
-      // console.log('runCall WEB3_CALL: ', call.method, call.hash)
       yield put({ type: 'WEB3_CALL', call })
-    } else {
-      // console.log('runCall SKIP WEB3_CALL: ', call.method, call.hash)
     }
-    // console.log('runCall WEB3_CALL waiting for response: ', call.method, call.hash)
     response = yield waitForResponse(call)
-    // console.log('runCall RECEIVED: ', call.method, call.hash, response)
   }
   return response
 }
@@ -69,7 +62,6 @@ function* runCall(call, cacheActive) {
 */
 export function* cacheCall(address, method, ...args) {
   const call = createCall(address, method, ...args)
-  // console.log('cacheCall: ', call.method, call.hash)
   const cacheActive = yield isCacheActive(call)
   yield registerCall(call)
   return yield runCall(call, cacheActive)
@@ -99,20 +91,15 @@ function* findCallMethod(call) {
 Triggers the web3 call.
 */
 function* web3CallExecute({call}) {
-  // console.log('web3CallExecute: ', call.method, call.hash)
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
     const options = { from: account }
     const callMethod = yield findCallMethod(call)
-    // console.log('web3CallExecute: ', address, method, ...args, options)
     yield spawn(function* () {
       try {
-        // console.log('web3CallExecute: ', call.method, call.hash)
         let response = yield reduxSagaCall(callMethod, options, 'pending')
-        // console.log('web3CallReturn: ', call.method, call.hash, response)
         yield put({ type: 'WEB3_CALL_RETURN', call, response })
       } catch (error) {
-        // console.error('web3CallExecute: ERROR: ', call.method, call.hash)
         yield put({ type: 'WEB3_CALL_ERROR', call, error })
       } finally {
         callsInFlight.delete(call.hash)
@@ -120,7 +107,6 @@ function* web3CallExecute({call}) {
     })
   } catch (error) {
     if (yield cancelled()) {
-      // console.log('web3CallExecute: CANCELLED: ', call.method, call.hash)
       yield put({ type: 'WEB3_CALL_CANCELLED', call })
     } else {
       console.error(error)

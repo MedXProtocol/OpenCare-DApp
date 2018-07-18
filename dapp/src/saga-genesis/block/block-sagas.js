@@ -83,7 +83,6 @@ export function* collectAllTransactionAddresses(transactions) {
 export function* latestBlock({block}) {
   const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
   yield* Array.from(addressSet).map(function* (address) {
-    console.log('LATEST BLOCK: ', address)
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   })
 }
