@@ -2,37 +2,33 @@ import {
   put,
   select,
   getContext,
-  spawn,
-  fork,
   take,
   takeEvery,
-  call as sagaCall
+  cancelled,
+  spawn,
+  call as reduxSagaCall
 } from 'redux-saga/effects'
-import { registerCall } from '../cache-scope/cache-scope-sagas'
+import { registerCall, callCount } from '../cache-scope/cache-scope-sagas'
 import { createCall } from '../utils/create-call'
 import { contractKeyByAddress } from '../state-finders'
 
-export function* cacheCall(address, method, ...args) {
-  let call = createCall(address, method, ...args)
-  let callState = yield select(state => state.sagaGenesis.callCache[call.hash])
-  const isHot = callState && !callState.stale && callState.response
-  // the registerCall could be pulled up into a different function that wraps this one
-  yield registerCall(call)
-  // If the callState has a response and it's hot and fresh then return it
-  if (isHot) {
-    return callState.response
-  } else { // Retrieve or wait for the new state
-    return yield web3Call(address, method, ...args)
-  }
+const callsInFlight = new Set()
+
+function* isCacheActive(call) {
+  const count = yield callCount(call)
+  return count > 0
 }
 
-export function* web3Call(address, method, ...args) {
-  let call = createCall(address, method, ...args)
-  let callState = yield select(state => state.sagaGenesis.callCache[call.hash])
-  if (!callState || !callState.inFlight) {
-    yield spawn(put, {type: 'WEB3_CALL', call})
-  }
-  // wait for call to return
+function isInFlight(call) {
+  return callsInFlight.has(call.hash)
+}
+
+function* findResponse(call) {
+  const callState = yield select(state => state.sagaGenesis.callCache[call.hash])
+  return !callState || callState.response
+}
+
+function* waitForResponse(call) {
   while (true) {
     let action = yield take(['WEB3_CALL_RETURN', 'WEB3_CALL_ERROR'])
     if (action.call.hash === call.hash) {
@@ -46,36 +42,76 @@ export function* web3Call(address, method, ...args) {
   }
 }
 
+function* runCall(call, cacheActive) {
+  let response = null
+  const inFlight = isInFlight(call)
+  if (cacheActive && !inFlight) {
+    response = yield findResponse(call)
+  } else {
+    if (!inFlight) {
+      callsInFlight.add(call.hash)
+      yield put({ type: 'WEB3_CALL', call })
+    }
+    response = yield waitForResponse(call)
+  }
+  return response
+}
+
+/**
+  Calls web3Call and increments the call count
+*/
+export function* cacheCall(address, method, ...args) {
+  const call = createCall(address, method, ...args)
+  const cacheActive = yield isCacheActive(call)
+  yield registerCall(call)
+  return yield runCall(call, cacheActive)
+}
+
+export function* web3Call(address, method, ...args) {
+  const call = createCall(address, method, ...args)
+  const cacheActive = yield isCacheActive(call)
+  return yield runCall(call, cacheActive)
+}
+
+function* findCallMethod(call) {
+  const { address, method, args } = call
+  const contractRegistry = yield getContext('contractRegistry')
+  const web3 = yield getContext('web3')
+  const contractKey = yield select(contractKeyByAddress, address)
+  const contract = contractRegistry.get(address, contractKey, web3)
+  const contractMethod = contract.methods[method]
+  if (!contractMethod) {
+    yield put({ type: 'WEB3_CALL_ERROR', call, error: `Address ${address} does not have method '${method}'` })
+    return
+  }
+  return contractMethod(...args).call
+}
+
 /*
 Triggers the web3 call.
 */
 function* web3CallExecute({call}) {
-  const { address, method, args } = call
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
     const options = { from: account }
-    const contractRegistry = yield getContext('contractRegistry')
-    const web3 = yield getContext('web3')
-    const contractKey = yield select(contractKeyByAddress, address)
-    const contract = contractRegistry.get(address, contractKey, web3)
-    const contractMethod = contract.methods[method]
-    if (!contractMethod) {
-      yield fork(put, {type: 'WEB3_CALL_ERROR', call, error: `Address ${address} does not have method '${method}'`})
-      return
-    }
-    const callMethod = contractMethod(...args).call
-    // console.log('web3CallExecute: ', address, method, ...args, options)
+    const callMethod = yield findCallMethod(call)
     yield spawn(function* () {
       try {
-        let response = yield sagaCall(callMethod, options, 'pending')
-        yield fork(put, {type: 'WEB3_CALL_RETURN', call, response})
+        let response = yield reduxSagaCall(callMethod, options, 'pending')
+        yield put({ type: 'WEB3_CALL_RETURN', call, response })
       } catch (error) {
-        yield fork(put, {type: 'WEB3_CALL_ERROR', call, error})
+        yield put({ type: 'WEB3_CALL_ERROR', call, error })
+      } finally {
+        callsInFlight.delete(call.hash)
       }
     })
   } catch (error) {
-    console.error(error)
-    yield put({type: 'WEB3_CALL_ERROR', call, error})
+    if (yield cancelled()) {
+      yield put({ type: 'WEB3_CALL_CANCELLED', call })
+    } else {
+      console.error(error)
+      yield put({ type: 'WEB3_CALL_ERROR', call, error })
+    }
   }
 }
 

@@ -7,16 +7,16 @@ export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' 
   return function (WrappedComponent) {
     function mapDispatchToProps(dispatch, props) {
       return {
-        run: (newProps, key) => {
-          try {
-            dispatch({type: 'RUN_SAGA', saga, props: newProps, key})
-          } catch (error) {
-            console.error('Saga Genesis: Error in ' + WrappedComponent.name + ' saga with key ' + key)
-            throw error
-          }
+        dispatchPrepareSaga: (props, key) => {
+          dispatch({ type: 'PREPARE_SAGA', saga, key, props })
         },
-        clearCalls: (key) => {
-          dispatch({type: 'CACHE_DEREGISTER_KEY', key})
+
+        dispatchRunSaga: (props, key) => {
+          dispatch({ type: `RUN_SAGA_${key}`, saga, props, key })
+        },
+
+        dispatchEndSaga: (key) => {
+          dispatch({ type: `END_SAGA_${key}` })
         }
       }
     }
@@ -28,13 +28,11 @@ export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' 
       }
 
       componentDidMount() {
-        // console.log('+++Mounting ', WrappedComponent.name)
-        this.runSaga(this.props)
+        this.props.dispatchPrepareSaga(this.props, this.sagaKey)
       }
 
       componentWillUnmount() {
-        // console.log('---Unmounting ', WrappedComponent.name)
-        this.props.clearCalls(this.sagaKey)
+        this.props.dispatchEndSaga(this.sagaKey)
       }
 
       componentWillReceiveProps (props) {
@@ -47,12 +45,8 @@ export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' 
           }, false)
         }
         if (propsChanged) {
-          this.runSaga(props, this.sagaKey)
+          this.props.dispatchRunSaga(props, this.sagaKey)
         }
-      }
-
-      runSaga = (props) => {
-        props.run(props, this.sagaKey)
       }
 
       render () {

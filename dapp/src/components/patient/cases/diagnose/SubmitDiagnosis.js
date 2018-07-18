@@ -25,13 +25,7 @@ function mapStateToProps (state, ownProps) {
   }
 }
 
-function mapDispatchToProps (dispatch) {
-  return {
-    refreshCase: (address) => dispatch({type: 'CACHE_INVALIDATE_ADDRESS', address})
-  }
-}
-
-export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToProps)(withSend(class _SubmitDiagnosisContainer extends Component {
+export const SubmitDiagnosisContainer = connect(mapStateToProps)(withSend(class _SubmitDiagnosisContainer extends Component {
   static propTypes = {
     caseAddress: PropTypes.string,
     caseKey: PropTypes.any,
