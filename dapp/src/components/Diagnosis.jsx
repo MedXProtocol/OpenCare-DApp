@@ -88,7 +88,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
           this.setState({challengeHandler: null})
         })
         .onTxHash(() => {
-          toastr.success('Your case is being challenged')
+          toastr.success('Working on getting you a second opinion.')
           mixpanel.track('Challenge Diagnosis Submitted')
           this.setState({
             challengeHandler: null
@@ -102,7 +102,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
           this.setState({acceptHandler: null})
         })
         .onTxHash(() => {
-          toastr.success('Your case has been accepted')
+          toastr.success('You have accepted the diagnosis for this case.')
           mixpanel.track('Accept Diagnosis Submitted')
           this.setState({
             acceptHandler: null,
@@ -176,13 +176,12 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   }
 
   render() {
-    const buttonsHidden = !this.props.isPatient || this.props.status !== '3'
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
+    const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== '3'
 
     if (!buttonsHidden) {
       var buttons =
         <div className="card-footer">
-          <hr/>
           <div className="row">
             <div className="col-xs-12 text-right" >
               <button disabled={transactionRunning} onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
@@ -233,7 +232,12 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>Thank you for using MedCredits!</h4>
+                <h4>
+                  You have accepted the case diagnosis.
+                </h4>
+                <h5>
+                  Thank you for using MedCredits!
+                </h5>
               </div>
             </div>
           </Modal.Body>

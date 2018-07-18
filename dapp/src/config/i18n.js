@@ -18,7 +18,7 @@ i18next
             setChallengingDoctor: 'Authorizing Second Opinion',
             setDiagnosingDoctor: 'Authorizing Physician',
             blankState: 'Currently there are no pending transactions',
-            challengeDiagnosis: 'Getting Second Opinion',
+            challengeWithDoctor: 'Getting Second Opinion',
             diagnoseCase: 'Sending Diagnosis',
             diagnoseChallengedCase: 'Sending Second Opinion',
             publicKeys: 'Retrieving Account',
