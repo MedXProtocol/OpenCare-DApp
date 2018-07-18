@@ -16,9 +16,7 @@ import {
 } from '../state-finders'
 
 export function* deregisterKey(key) {
-  // console.log('DEREGISTER ', key)
   const callCountRegistry = yield getContext('callCountRegistry')
-  // console.log('deregisterKey: ', key)
   const calls = callCountRegistry.deregister(key)
   if (calls.length) {
     yield put({type: 'WEB3_STALE_CALLS', calls})
@@ -26,7 +24,6 @@ export function* deregisterKey(key) {
 }
 
 export function* registerCall(call) {
-  // console.log('registerCall: ', call.method, call.hash)
   let key = yield getContext('key')
   if (!key) {
     throw new Error(`registerCall called without a key scope: ${JSON.stringify(call)}`)
@@ -47,7 +44,6 @@ export function* invalidateAddress({ address }) {
   yield* contractCalls.map(function* (callState) {
     if (callState.count > 0) {
       const { call } = callState
-      // console.log('invalidate address: ', call.method, call.hash)
       yield put({type: 'WEB3_CALL', call })
     }
   })
@@ -69,7 +65,6 @@ export function* invalidateTransaction({transactionId, call, receipt}) {
 }
 
 export function* runSaga({saga, props, key}) {
-  // console.log(`RUN SAGA ${key} ${typeof key}____________`)
   try {
     yield setContext({ key })
     const callCountRegistry = yield getContext('callCountRegistry')
@@ -80,10 +75,7 @@ export function* runSaga({saga, props, key}) {
       yield put({ type: 'WEB3_STALE_CALLS', emptyCalls })
     }
   } catch (error) {
-    // console.log(`ERRRRRROR Saga ${key} !!!!!!!!!!!!!!!!!!`)
-    if (yield cancelled()) {
-      // console.log(`KILLED Saga ${key} !!!!!!!!!!!!!!!!!!`)
-    } else {
+    if (!(yield cancelled())) {
       throw error
     }
   }
@@ -91,7 +83,6 @@ export function* runSaga({saga, props, key}) {
 
 function* prepareSaga({ saga, props, key }) {
   const action = `RUN_SAGA_${key}`
-  // console.log(`PREPARE SAGA ${key}`)
   yield runSaga({ saga, props, key })
   const task = yield takeLatest(action, runSaga)
   yield take(`END_SAGA_${key}`)
