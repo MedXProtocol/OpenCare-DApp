@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import { EthAddress } from '~/components/EthAddress'
 import PropTypes from 'prop-types'
-import axios from 'axios';
+import { axiosInstance } from '~/config/hippoAxios'
 import { LoadingLines } from '~/components/LoadingLines'
 import medXLogoImg from '~/assets/img/medx-logo.png'
 import medXLogoImg2x from '~/assets/img/medx-logo@2x.png'
@@ -33,7 +33,7 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
     const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetSendMedX`
 
     try {
-      const response = await axios.get(`${faucetLambdaURI}?ethAddress=${this.props.address}`)
+      const response = await axiosInstance.get(`${faucetLambdaURI}?ethAddress=${this.props.address}`)
 
       if (response.status === 200) {
         this.setState({
