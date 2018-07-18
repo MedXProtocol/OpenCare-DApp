@@ -106,3 +106,10 @@
   opacity: 0;
   pointer-events: none;
 }
+
+.form-wrapper--footer .loader {
+  @media (max-width: 768px) {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
