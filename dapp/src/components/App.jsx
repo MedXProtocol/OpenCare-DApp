@@ -148,8 +148,9 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
   render () {
     const requestedPathname = getRequestedPathname()
     if (this.props.address &&
-        this.props.isSignedIn &&
-        requestedPathname) {
+      this.props.isSignedIn &&
+      requestedPathname
+    ) {
       if (this.skipRequestedPathname) {
         this.skipRequestedPathname = false
       } else {
