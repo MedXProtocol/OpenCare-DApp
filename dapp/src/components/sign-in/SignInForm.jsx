@@ -105,7 +105,6 @@ export const SignInForm = class _SignInForm extends Component {
                 autoFocus={true} />
               {masterPasswordError}
             </div>
-            {this.props.children}
           </div>
           <div className="form-wrapper--footer">
             <div className='text-right'>
