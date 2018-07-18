@@ -28,7 +28,6 @@ function mapStateToProps(state, { caseAddress }) {
 function* saga({ caseAddress, DoctorManager }) {
   if (!caseAddress || !DoctorManager) { return }
   yield addContract({ address: caseAddress, contractKey: 'Case' })
-  console.log('Retrieving CaseStatus for: ', caseAddress)
   yield cacheCall(caseAddress, 'status')
   let diagnosingDoctor = yield cacheCall(caseAddress, 'diagnosingDoctor')
   let challengingDoctor = yield cacheCall(caseAddress, 'challengingDoctor')
