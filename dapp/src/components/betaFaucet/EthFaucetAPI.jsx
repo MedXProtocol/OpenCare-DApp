@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import { EthAddress } from '~/components/EthAddress'
 import PropTypes from 'prop-types'
-import axios from 'axios';
+import { axiosInstance } from '~/config/hippoAxios'
 import { LoadingLines } from '~/components/LoadingLines'
 
 export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
@@ -30,7 +30,7 @@ export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
     const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetSendEther`
 
     try {
-      const response = await axios.get(`${faucetLambdaURI}?ethAddress=${this.props.address}`)
+      const response = await axiosInstance.get(`${faucetLambdaURI}?ethAddress=${this.props.address}`)
 
       if (response.status === 200) {
         this.setState({

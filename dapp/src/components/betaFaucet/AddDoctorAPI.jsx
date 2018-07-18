@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import PropTypes from 'prop-types'
-import axios from 'axios';
+import { axiosInstance } from '~/config/hippoAxios'
 import { LoadingLines } from '~/components/LoadingLines'
 
 export const AddDoctorAPI = ReactTimeout(class _AddDoctorAPI extends Component {
@@ -30,7 +30,7 @@ export const AddDoctorAPI = ReactTimeout(class _AddDoctorAPI extends Component {
     const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/addOrReactivateDoctor`
 
     try {
-      const response = await axios.get(`${faucetLambdaURI}?ethAddress=${this.props.address}&name=${this.state.name}`)
+      const response = await axiosInstance.get(`${faucetLambdaURI}?ethAddress=${this.props.address}&name=${this.state.name}`)
 
       if (response.status === 200) {
         this.setState({
