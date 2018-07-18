@@ -98,6 +98,15 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
   render() {
     const details = this.state.details || {}
     let jsx
+    if (this.props.isDoctor) {
+      var submitDiagnosisLink = (
+        <span>
+          <br />
+          <small><a className="link--internal" href="#submit-diagnosis">Submit Your Diagnosis</a></small>
+        </span>
+      )
+    }
+
     if (this.props.caseKey === null) {
       jsx = (
         <div className="row">
@@ -123,89 +132,90 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
       )
     } else {
       jsx = (
-          <div className="card">
-              <div className="card-header">
-                <h3 className="card-title">
-                  Case Overview <LoadingLines visible={this.state.loading} color="#aaaaaa" />
-                </h3>
-              </div>
-              <div className="card-body">
-                  <div className="row">
-                      <div className="col-xs-12 col-md-6 text-center">
-                        <br />
-                        <label className="label text-gray">Overview Photo:</label>
-                        <ImageLoader className={classNames({ 'hidden': !this.state.loading })} />
-
-                        {this.overviewPhotoHtml()}
-                      </div>
-                      <div className="col-xs-12 col-md-6 text-center">
-                        <br />
-                        <label className="label text-gray">Close-up Photo:</label>
-                        <ImageLoader className={classNames({ 'hidden': !this.state.loading })} />
-
-                        {this.closeupPhotoHtml()}
-                      </div>
-                    </div>
-                    <hr />
-                    <div className="row">
-                      <div className="col-xs-12 col-sm-12 col-md-6">
-                        <CaseDetailsLoader className={classNames('loader--case-details', { 'hidden': !this.state.loading })} />
-                      </div>
-
-                      <div className={classNames({ 'hidden': this.state.loading })}>
-                        <div className="col-xs-12">
-                            <label className="label text-gray">How long have you had this problem:</label>
-                            <p>{details.howLong}</p>
-                        </div>
-                        <div className="col-xs-12">
-                            <label className="label text-gray">Is it growing, shrinking or staying the same size:</label>
-                            <p>{details.size}</p>
-                        </div>
-                         <div className="col-xs-12">
-                            <label className="label text-gray">Is it painful:</label>
-                            <p>{details.painful}</p>
-                        </div>
-                        <div className="col-xs-12">
-                            <label className="label text-gray">Is it bleeding:</label>
-                            <p>{details.bleeding}</p>
-                        </div>
-                        <div className="col-xs-12">
-                            <label className="label text-gray">Is it itching:</label>
-                            <p>{details.itching}</p>
-                        </div>
-
-                        <div className="col-xs-12">
-                            <label className="label text-gray">Any history of skin cancer:</label>
-                            <p>{details.skinCancer}</p>
-                        </div>
-                        <div className="col-md-6">
-                            <label className="label text-gray">Are you sexually active:</label>
-                            <p>{details.sexuallyActive}</p>
-                        </div>
-                        <div className="col-xs-12">
-                             <label className="label text-gray">Has it changed in color:</label>
-                             <p>{details.color}</p>
-                         </div>
-                         <div className="col-xs-12">
-                             <label className="label text-gray">Have you tried any treatments so far:</label>
-                             <p>{details.prevTreatment}</p>
-                         </div>
-                        <div className="col-xs-12">
-                            <label className="label text-gray">Age:</label>
-                            <p>{details.age}</p>
-                        </div>
-                        <div className="col-xs-12">
-                            <label className="label text-gray">Country:</label>
-                            <p>{details.country}</p>
-                        </div>
-                        <div className="col-xs-12">
-                            <label className="label text-gray">Additional comments:</label>
-                            <p>{details.description}</p>
-                        </div>
-                      </div>
-                  </div>
-              </div>
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">
+              Case Overview <LoadingLines visible={this.state.loading} color="#aaaaaa" />
+              {submitDiagnosisLink}
+            </h3>
           </div>
+          <div className="card-body">
+            <div className="row">
+              <div className="col-xs-12 col-md-6 text-center">
+                <br />
+                <label className="label text-gray">Overview Photo:</label>
+                <ImageLoader className={classNames({ 'hidden': !this.state.loading })} />
+
+                {this.overviewPhotoHtml()}
+              </div>
+              <div className="col-xs-12 col-md-6 text-center">
+                <br />
+                <label className="label text-gray">Close-up Photo:</label>
+                <ImageLoader className={classNames({ 'hidden': !this.state.loading })} />
+
+                {this.closeupPhotoHtml()}
+              </div>
+            </div>
+            <hr />
+            <div className="row">
+              <div className="col-xs-12 col-sm-12 col-md-6">
+                <CaseDetailsLoader className={classNames('loader--case-details', { 'hidden': !this.state.loading })} />
+              </div>
+
+              <div className={classNames({ 'hidden': this.state.loading })}>
+                <div className="col-xs-12">
+                    <label className="label text-gray">How long have you had this problem:</label>
+                    <p>{details.howLong}</p>
+                </div>
+                <div className="col-xs-12">
+                    <label className="label text-gray">Is it growing, shrinking or staying the same size:</label>
+                    <p>{details.size}</p>
+                </div>
+                 <div className="col-xs-12">
+                    <label className="label text-gray">Is it painful:</label>
+                    <p>{details.painful}</p>
+                </div>
+                <div className="col-xs-12">
+                    <label className="label text-gray">Is it bleeding:</label>
+                    <p>{details.bleeding}</p>
+                </div>
+                <div className="col-xs-12">
+                    <label className="label text-gray">Is it itching:</label>
+                    <p>{details.itching}</p>
+                </div>
+
+                <div className="col-xs-12">
+                    <label className="label text-gray">Any history of skin cancer:</label>
+                    <p>{details.skinCancer}</p>
+                </div>
+                <div className="col-md-6">
+                    <label className="label text-gray">Are you sexually active:</label>
+                    <p>{details.sexuallyActive}</p>
+                </div>
+                <div className="col-xs-12">
+                     <label className="label text-gray">Has it changed in color:</label>
+                     <p>{details.color}</p>
+                 </div>
+                 <div className="col-xs-12">
+                     <label className="label text-gray">Have you tried any treatments so far:</label>
+                     <p>{details.prevTreatment}</p>
+                 </div>
+                <div className="col-xs-12">
+                    <label className="label text-gray">Age:</label>
+                    <p>{details.age}</p>
+                </div>
+                <div className="col-xs-12">
+                    <label className="label text-gray">Country:</label>
+                    <p>{details.country}</p>
+                </div>
+                <div className="col-xs-12">
+                    <label className="label text-gray">Additional comments:</label>
+                    <p>{details.description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )
     }
     return jsx

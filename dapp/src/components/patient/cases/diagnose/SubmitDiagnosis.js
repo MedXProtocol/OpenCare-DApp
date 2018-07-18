@@ -199,7 +199,7 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
       <div>
         <div className="card">
           <form onSubmit={this.handleSubmit} >
-            <div className="card-header">
+            <div id="submit-diagnosis" className="card-header">
               <h3 className="card-title">
                 Submit Diagnosis
                 <br /><small><a className="link--internal" href="#view-case-details">View Case Details</a></small>
@@ -375,8 +375,12 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>Thank you!</h4>
-                <h5>Your diagnosis submitted successfully.</h5>
+                <h4>
+                  Thank you!
+                </h4>
+                <h5>
+                  Your diagnosis was received successfully, and we're sending your diagnosis to the patient.
+                </h5>
               </div>
             </div>
           </Modal.Body>

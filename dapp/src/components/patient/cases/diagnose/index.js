@@ -116,13 +116,14 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
         <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCase', { caseId: ('' + this.props.caseAddress).substring(0, 6) } )} />
         <div className='container'>
           <div className='row'>
-            {diagnosis}
-            {challenge}
             <div id="view-case-details" className='col-xs-12'>
               <CaseDetails
                 caseAddress={this.props.match.params.caseAddress}
-                caseKey={caseKey} />
+                caseKey={caseKey}
+                isDoctor={true} />
             </div>
+            {diagnosis}
+            {challenge}
           </div>
         </div>
       </div>
