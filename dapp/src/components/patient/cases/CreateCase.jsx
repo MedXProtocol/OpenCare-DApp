@@ -338,15 +338,42 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       this.setState({ showConfirmSubmissionModal: false })
     }
 
-    handleAcceptConfirmSubmissionModal = async (event) => {
+    handleAcceptConfirmSubmissionModal = (event) => {
       event.preventDefault()
 
       this.setState({
         showConfirmSubmissionModal: false,
         isSubmitting: true
-      })
+      }, this.doCreateCase)
+    }
 
-      await this.createNewCase()
+    doCreateCase = async () => {
+      let retries = 0
+      const maxRetries = 3
+      let transactionId
+
+      while(transactionId === undefined) {
+        try {
+          transactionId = await this.createNewCase()
+
+          if (transactionId) {
+            this.setState({
+              transactionId,
+              createCaseEvents: new TransactionStateHandler()
+            })
+          }
+        } catch (error) {
+          if (++retries === maxRetries) {
+            toastr.error('There was an issue creating your case, please try again.')
+            this.setState({
+              showConfirmSubmissionModal: true,
+              isSubmitting: false
+            })
+            console.error(error)
+            return
+          }
+        }
+      }
     }
 
     onChangeDoctor = (option) => {
@@ -356,65 +383,61 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     createNewCase = async () => {
-        const caseInformation = {
-            firstImageHash: this.state.firstImageHash,
-            secondImageHash: this.state.secondImageHash,
-            howLong: this.state.howLong,
-            size: this.state.size,
-            painful: this.state.painful,
-            bleeding: this.state.bleeding,
-            itching: this.state.itching,
-            skinCancer: this.state.skinCancer,
-            sexuallyActive: this.state.sexuallyActive,
-            age: this.state.age,
-            country: this.state.country,
-            region: this.state.region,
-            color: this.state.color,
-            prevTreatment: this.state.prevTreatment,
-            description: this.state.description
-        }
+      const { send, MedXToken, CaseManager } = this.props
+      const caseInformation = {
+        firstImageHash: this.state.firstImageHash,
+        secondImageHash: this.state.secondImageHash,
+        howLong: this.state.howLong,
+        size: this.state.size,
+        painful: this.state.painful,
+        bleeding: this.state.bleeding,
+        itching: this.state.itching,
+        skinCancer: this.state.skinCancer,
+        sexuallyActive: this.state.sexuallyActive,
+        age: this.state.age,
+        country: this.state.country,
+        region: this.state.region,
+        color: this.state.color,
+        prevTreatment: this.state.prevTreatment,
+        description: this.state.description
+      }
 
-        const caseJson = JSON.stringify(caseInformation)
-        const hash = await uploadJson(caseJson, this.state.caseEncryptionKey)
-        const account = currentAccount()
-        const caseKeySalt = genKey(32)
-        const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
+      const caseJson = JSON.stringify(caseInformation)
+      const hash = await uploadJson(caseJson, this.state.caseEncryptionKey)
+      const account = currentAccount()
+      const caseKeySalt = genKey(32)
+      const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 
-        const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
-        const doctorEncryptedCaseKey = reencryptCaseKey({account, encryptedCaseKey, doctorPublicKey, caseKeySalt})
+      const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
+      const doctorEncryptedCaseKey = reencryptCaseKey({ account, encryptedCaseKey, doctorPublicKey, caseKeySalt })
 
-        const { send, MedXToken, CaseManager } = this.props
-        let hashHex = hashToHex(hash)
+      let hashHex = hashToHex(hash)
 
-        let CaseManagerContract = this.props.contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
+      let CaseManagerContract = this.props.contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
 
-        let data = null
-        if (!this.props.publicKey) {
-          data = CaseManagerContract.methods.createAndAssignCaseWithPublicKey(
-            this.props.account,
-            '0x' + encryptedCaseKey,
-            '0x' + caseKeySalt,
-            '0x' + hashHex,
-            this.state.selectedDoctor.value,
-            '0x' + doctorEncryptedCaseKey,
-            '0x' + account.hexPublicKey()
-          ).encodeABI()
-        } else {
-          data = CaseManagerContract.methods.createAndAssignCase(
-            this.props.account,
-            '0x' + encryptedCaseKey,
-            '0x' + caseKeySalt,
-            '0x' + hashHex,
-            this.state.selectedDoctor.value,
-            '0x' + doctorEncryptedCaseKey
-          ).encodeABI()
-        }
+      let data = null
+      if (!this.props.publicKey) {
+        data = CaseManagerContract.methods.createAndAssignCaseWithPublicKey(
+          this.props.account,
+          '0x' + encryptedCaseKey,
+          '0x' + caseKeySalt,
+          '0x' + hashHex,
+          this.state.selectedDoctor.value,
+          '0x' + doctorEncryptedCaseKey,
+          '0x' + account.hexPublicKey()
+        ).encodeABI()
+      } else {
+        data = CaseManagerContract.methods.createAndAssignCase(
+          this.props.account,
+          '0x' + encryptedCaseKey,
+          '0x' + caseKeySalt,
+          '0x' + hashHex,
+          this.state.selectedDoctor.value,
+          '0x' + doctorEncryptedCaseKey
+        ).encodeABI()
+      }
 
-        let transactionId = send(MedXToken, 'approveAndCall', CaseManager, medXToWei('15'), data)({ gas: 1600000 })
-        this.setState({
-          transactionId,
-          createCaseEvents: new TransactionStateHandler()
-        })
+      return await send(MedXToken, 'approveAndCall', CaseManager, medXToWei('15'), data)({ gas: 1600000 })
     }
 
     progressClassNames = (percent) => {

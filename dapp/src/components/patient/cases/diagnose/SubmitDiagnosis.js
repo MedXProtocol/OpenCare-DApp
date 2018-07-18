@@ -105,7 +105,8 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps, mapDispatchToPr
         })
       })
     } catch (error) {
-      console.warn('Error while downloading JSON from IPFS')
+      toastr.error('There was an error while downloading your case details from IPFS.')
+      console.error(error)
     }
   }
 

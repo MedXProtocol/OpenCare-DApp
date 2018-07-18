@@ -334,3 +334,10 @@ $card-columns-margin:               $card-spacer-y;
   //   }
   // }
 }
+
+.card-title .loader {
+  @media (max-width: 768px) {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
