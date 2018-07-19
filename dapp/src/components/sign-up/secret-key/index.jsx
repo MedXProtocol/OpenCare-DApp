@@ -39,7 +39,7 @@ export const SecretKey = class _SecretKey extends Component {
         <div className='container'>
           <div className='row'>
             <div className='col-sm-8 col-sm-offset-2'>
-              <h3 className='text-center text-white'>
+              <h3 className='text-center text-white title--inverse'>
                 This is your <b>Secret Key</b>:
               </h3>
               <div className="form-wrapper form-wrapper--inverse form-wrapper--account">

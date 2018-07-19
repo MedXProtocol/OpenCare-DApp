@@ -46,7 +46,7 @@ export const MasterPassword = class _MasterPassword extends Component {
         <div className='container'>
           <form className='row' onSubmit={this.onSubmit}>
             <div className='col-sm-8 col-sm-offset-2'>
-              <h3 className='text-center text-white'>
+              <h3 className='text-center text-white title--inverse'>
                 Create your <b>Master Password</b>
               </h3>
               <div className="form-wrapper form-wrapper--inverse form-wrapper--account">

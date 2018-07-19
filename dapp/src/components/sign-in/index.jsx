@@ -154,7 +154,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
           <div className='container'>
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
-                <h3 className='text-white text-center'>
+                <h3 className='text-center text-white title--inverse'>
                   Sign in to Hippocrates
                 </h3>
                 {warning}

@@ -1,5 +1,11 @@
 .alert {
   margin-top: 10px;
+
+  @media (max-width: 768px) {
+    border-radius: 0;
+    margin: 0;
+    padding: 2rem;
+  }
 }
 
 .alert-danger {
