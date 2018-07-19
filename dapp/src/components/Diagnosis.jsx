@@ -197,7 +197,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       <div /> :
       <div className="card">
         <div className="card-header">
-          <h3 className="card-title">Diagnosis</h3>
+          <h3 className="card-title">{this.props.title}</h3>
         </div>
         <div className="card-body">
           <div className="row">
@@ -293,7 +293,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
             </Modal.Body>
             <Modal.Footer>
               <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-link">Cancel</button>
-              <input type='submit' className="btn btn-primary" value='OK' />
+              <input type='submit' className="btn btn-success" value='OK' />
             </Modal.Footer>
           </form>
         </Modal>

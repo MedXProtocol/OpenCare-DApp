@@ -1,3 +1,3 @@
-export default function(val) {
+export const defined = function(val) {
   return val !== null && val !== undefined
 }

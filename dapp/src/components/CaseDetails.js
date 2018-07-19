@@ -18,6 +18,7 @@ function mapStateToProps(state, { caseAddress }) {
 }
 
 function* saga({ caseAddress, networkId }) {
+  if (!caseAddress) { return }
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'caseDataHash')
 }
@@ -96,9 +97,10 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
   }
 
   render() {
+    const { caseKey, caseAddress, caseIsOpenForDoctor } = this.props
     const details = this.state.details || {}
     let jsx
-    if (this.props.isDoctor) {
+    if (caseIsOpenForDoctor) {
       var submitDiagnosisLink = (
         <span>
           <br />
@@ -107,7 +109,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
       )
     }
 
-    if (this.props.caseKey === null) {
+    if (caseKey === null) {
       jsx = (
         <div className="row">
           <div className="col-xs-12 col-md-6 col-md-offset-3">
@@ -124,7 +126,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                 Error #1: Unable to decrypt case or ipfs data expired.
               </small>
               <small>
-                Case address: <span className="eth-address">{this.props.caseAddress}</span>
+                Case address: <span className="eth-address">{caseAddress}</span>
               </small>
             </div>
           </div>
