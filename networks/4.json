@@ -1,5 +1,5 @@
 {
-  "migrationVersion": 1531785373,
+  "migrationVersion": 1532021655,
   "contracts": [
     {
       "contractName": "Migrations",
@@ -172,6 +172,10 @@
     {
       "contractName": "Delegate",
       "address": "0xc8774f41734d98eddb15411b52d1399b3dcaed40"
+    },
+    {
+      "contractName": "BetaFaucet",
+      "address": "0xe617838e13ccf3dc6cfaec85a629d6c1c521708f"
     }
   ]
 }
