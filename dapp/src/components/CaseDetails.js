@@ -111,10 +111,10 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
       jsx = (
         <div className="row">
           <div className="col-xs-12 col-md-6 col-md-offset-3">
-            <h4 className="text-danger">
-              Unable to decrypt case data
-            </h4>
             <div className="alert alert-warning">
+              <h3>
+                Unable to decrypt case data
+              </h3>
               <p>
                 This case data was likely encrypted with a different secret key than the one you are currently using. Please use the secret key in your previous Emergency Kit or email to decrypt this case.
               </p>

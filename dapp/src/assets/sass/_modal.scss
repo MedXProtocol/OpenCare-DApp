@@ -15,6 +15,9 @@
   border: 0;
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
+  @media (max-width: $screen-sm) {
+    padding: 3rem 4rem 2rem 2rem
+  }
 }
 
 .modal-body {
@@ -22,17 +25,16 @@
 
   @media (max-width: $screen-sm) {
     font-size: 90%;
-    padding: 20px;
+    padding: 2rem 4rem 2rem 2rem;
   }
 }
 
 .modal-footer {
   background: rgba(245, 245, 245, 1);
-}
 
-.modal-header {
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+  @media (max-width: $screen-sm) {
+    padding: 2rem 4rem 2rem 2rem;
+  }
 }
 
 .modal-content {

@@ -2,13 +2,17 @@ body {
   padding-bottom: 10rem;
   letter-spacing: 0.025rem;
   font-feature-settings: "liga1" on;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .content {
   padding-top: 30px;
 
   @media (max-width: 768px) {
-    padding-top: 15px;
+    padding-top: 0;
+    margin-left: -2rem;
+    margin-right: -2rem;
   }
 }
 
@@ -19,6 +23,14 @@ a {
 
 .title {
   font-weight: 700;
+}
+
+.title--inverse {
+  margin: 2rem;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 }
 
 .subtitle {
@@ -200,5 +212,11 @@ small,
 .text-center-on-xs {
   @media (max-width: $screen-sm) {
     text-align: center;
+  }
+}
+
+.container {
+  @media (max-width: 768px) {
+    padding: 0 2rem;
   }
 }

@@ -46,7 +46,7 @@ $card-columns-margin:               $card-spacer-y;
     padding: 2rem;
 
     @media screen and (max-width: 767px) {
-      padding: 3rem;
+      padding: 3rem 2rem;
     }
   }
 
@@ -100,6 +100,10 @@ $card-columns-margin:               $card-spacer-y;
 
 .card-body > .form-wrapper {
   padding: 1rem;
+
+  @media (max-width: 768px) {
+    padding: 2rem 0;
+  }
 }
 
 .card-title {
@@ -138,13 +142,19 @@ $card-columns-margin:               $card-spacer-y;
   border-bottom: 3px solid lighten($brand-info, 30%);
 
   &:first-child {
-    border-radius: $card-inner-border-radius $card-inner-border-radius 0 0
+    // border-radius: $card-inner-border-radius $card-inner-border-radius 0 0
+    border-radius: 0;
   }
 
   + .list-group {
     .list-group-item:first-child {
       border-top: 0;
     }
+  }
+
+  @media (max-width: 768px) {
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 
