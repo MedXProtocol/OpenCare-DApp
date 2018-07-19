@@ -62,8 +62,17 @@ contract('BetaFaucet', function (accounts) {
     })
 
     it('should not allow double sends', async () => {
+      await betaFaucetInstance.send(web3.toWei(200, "ether"))
+      await betaFaucetInstance.sendEther(recipient2, web3.toWei(1, "ether"))
       await expectThrow(async () => {
-        await betaFaucetInstance.sendEther(recipient2, 0.2)
+        await betaFaucetInstance.sendEther(recipient2, web3.toWei(1, "ether"))
+      })
+    })
+
+    it('should prevent an amount above the limit', async () => {
+      await betaFaucetInstance.send(web3.toWei(200, "ether"))
+      await expectThrow(async () => {
+        await betaFaucetInstance.sendEther(recipient3, web3.toWei(30, "ether"))
       })
     })
   })

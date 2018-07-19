@@ -55,6 +55,7 @@ contract BetaFaucet is Ownable, Initializable {
     require(_recipient != address(0), "recipient address is empty");
     require(!sentAddresses[_recipient], "recipient has already received ether");
     require(_amount > 0, "amount must be positive");
+    require(_amount < 1.01 ether, "amount must be below the upper limit");
     require(address(this).balance >= _amount.add(gasAmount), "contract is out of ether!");
 
     sentAddresses[_recipient] = true;
@@ -68,6 +69,7 @@ contract BetaFaucet is Ownable, Initializable {
     require(_recipient != address(0), "recipient address is empty");
     require(!sentMedXAddresses[_recipient], "recipient has already received MedX");
     require(_amount > 0, "amount must be positive");
+    require(_amount < 501 ether, "amount must be below the upper limit");
     require(medXToken.balanceOf(address(this)) >= _amount, "contract is out of MedX!");
 
     sentMedXAddresses[_recipient] = true;

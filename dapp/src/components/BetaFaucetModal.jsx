@@ -113,7 +113,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
 
         const needEth = (
           props.ethBalance !== undefined
-          && props.ethBalance < 0.03
+          && props.ethBalance < 0.7
           && !props.dontShowEther
         )
         const needMedX = (
