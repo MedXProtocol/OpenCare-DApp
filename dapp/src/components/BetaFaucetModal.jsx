@@ -28,6 +28,8 @@ function mapStateToProps (state) {
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const previousCase = (caseListCount > 0)
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const BetaFaucet = contractByName(state, 'BetaFaucet')
+  const hasBeenSentEther = cacheCallValue(state, BetaFaucet, 'sentAddresses', address)
 
   const externalTransactions = get(state, 'externalTransactions.transactions')
   for (let i = 0; i < externalTransactions.length; i++) {
@@ -43,9 +45,12 @@ function mapStateToProps (state) {
 
   return {
     address,
+    BetaFaucet,
     betaFaucetModalDismissed,
+    CaseManager,
     ethBalance,
     medXBalance,
+    hasBeenSentEther,
     DoctorManager,
     MedXToken,
     isOwner,
@@ -57,12 +62,14 @@ function mapStateToProps (state) {
   }
 }
 
-function* saga({ CaseManager, MedXToken, DoctorManager, address }) {
-  if (!CaseManager || !MedXToken || !DoctorManager || !address) { return }
+function* saga({ BetaFaucet, CaseManager, MedXToken, DoctorManager, address }) {
+  if (!BetaFaucet || !CaseManager || !MedXToken || !DoctorManager || !address) { return }
+
   yield all([
     cacheCall(CaseManager, 'getPatientCaseListCount', address),
     cacheCall(MedXToken, 'balanceOf', address),
     cacheCall(DoctorManager, 'owner'),
+    cacheCall(BetaFaucet, 'sentAddresses', address),
     yield cacheCall(DoctorManager, 'isDoctor', address)
   ])
 }
@@ -82,7 +89,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['ethBalance', 'medXBalance', 'CaseManager', 'DoctorManager', 'MedXToken', 'address'] })(
+  withSaga(saga, { propTriggers: ['BetaFaucet', 'ethBalance', 'medXBalance', 'CaseManager', 'DoctorManager', 'MedXToken', 'address'] })(
     class _BetaFaucetModal extends Component {
 
       constructor(props) {
@@ -103,6 +110,14 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
       }
 
       init(props) {
+        if (
+          props.ethBalance === undefined
+          || props.hasBeenSentEther === undefined
+          || props.medXBalance === undefined
+        ) {
+          return
+        }
+
         // If they've already seen the faucet or they're currently viewing, skip
         if (props.betaFaucetModalDismissed || this.state.showBetaFaucetModal) {
           return
@@ -110,15 +125,14 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
 
         let showBetaFaucetModal
         let step
-
         const needEth = (
-          props.ethBalance !== undefined
+          !props.hasBeenSentEther
           && props.ethBalance < 0.7
           && !props.dontShowEther
         )
+
         const needMedX = (
-          props.medXBalance !== undefined
-          && weiToMedX(props.medXBalance) < 15
+          weiToMedX(props.medXBalance) < 15
           && !props.dontShowMedX
         )
         const canBeDoctor = (
