@@ -21,7 +21,7 @@ module.exports = async function createEnvironment(artifacts) {
   let caseManagerDelegate = await Delegate.new(registry.address, toRegistryKey('CaseManagerTarget'))
   await registry.register(toRegistryKey('CaseManager'), caseManagerDelegate.address)
   let caseManager = await CaseManager.at(caseManagerDelegate.address)
-  await caseManager.initialize(web3.utils.toWei('10', 'ether'), medXToken.address, registry.address)
+  await caseManager.initialize(web3.toWei('10', 'ether'), medXToken.address, registry.address)
 
   let doctorManagerInstance = await DoctorManager.new()
   await registry.register(toRegistryKey('DoctorManagerTarget'), doctorManagerInstance.address)

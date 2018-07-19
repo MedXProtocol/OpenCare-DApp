@@ -8,7 +8,7 @@ contract BetaFaucet is Ownable, Initializable {
   mapping (address => bool) public sentAddresses;
   mapping (address => bool) public sentMedXAddresses;
 
-  event EtherSent(address indexed recipient);
+  event EtherSent(address indexed recipient, uint256 value);
   event MedXSent(address indexed recipient, uint256 value);
 
   MedXToken public medXToken;
@@ -18,6 +18,8 @@ contract BetaFaucet is Ownable, Initializable {
 
   uint128 public constant etherToTransfer = 100000000000000000;
   uint32 public constant gasAmount = 1000000;
+
+  using SafeMath for uint256;
 
   // Constructor which allows us to fund contract on creation
   constructor() public payable {
@@ -45,27 +47,32 @@ contract BetaFaucet is Ownable, Initializable {
     }
   }
 
-  function sendEther(address _recipient) public onlyOwner {
-    require(_recipient != address(0), "recipient address is empty");
-    require(!sentAddresses[_recipient], "recipient has already received ether");
-    require(address(this).balance >= etherToTransfer.add(gasAmount), "contract is out of ether!");
-
-    sentAddresses[_recipient] = true;
-    emit EtherSent(_recipient);
-
-    // 0.1 ether in wei
-    _recipient.transfer(etherToTransfer);
+  function withdrawEther() external onlyOwner {
+    owner.transfer(address(this).balance.sub(gasAmount));
   }
 
-  function sendMedX(address _recipient, uint256 amount) public onlyOwner {
+  function sendEther(address _recipient, uint256 _amount) public onlyOwner {
+    require(_recipient != address(0), "recipient address is empty");
+    require(!sentAddresses[_recipient], "recipient has already received ether");
+    require(_amount > 0, "amount must be positive");
+    require(address(this).balance >= _amount.add(gasAmount), "contract is out of ether!");
+
+    sentAddresses[_recipient] = true;
+    emit EtherSent(_recipient, _amount);
+
+    // 0.1 ether in wei
+    _recipient.transfer(_amount);
+  }
+
+  function sendMedX(address _recipient, uint256 _amount) public onlyOwner {
     require(_recipient != address(0), "recipient address is empty");
     require(!sentMedXAddresses[_recipient], "recipient has already received MedX");
-    require(amount > 0, "amount must be positive");
-    require(medXToken.balanceOf(address(this)) >= amount, "contract is out of MedX!");
+    require(_amount > 0, "amount must be positive");
+    require(medXToken.balanceOf(address(this)) >= _amount, "contract is out of MedX!");
 
     sentMedXAddresses[_recipient] = true;
-    emit MedXSent(_recipient, amount);
+    emit MedXSent(_recipient, _amount);
 
-    medXToken.transfer(_recipient, amount);
+    medXToken.transfer(_recipient, _amount);
   }
 }

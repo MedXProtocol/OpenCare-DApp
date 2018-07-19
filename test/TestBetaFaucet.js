@@ -32,21 +32,38 @@ contract('BetaFaucet', function (accounts) {
     })
   })
 
+  describe('withdrawEther()', () => {
+    it('should work', async () => {
+      await betaFaucetInstance.send(web3.toWei(20, "ether"))
+
+      const ownerAddress = await betaFaucetInstance.owner.call()
+
+      assert(await web3.eth.getBalance(betaFaucetInstance.address), web3.toWei(20, "ether"))
+      assert(await web3.eth.getBalance(ownerAddress), 0)
+
+      await betaFaucetInstance.withdrawEther()
+      const ownerBalance = await web3.eth.getBalance(ownerAddress)
+
+      // 1000000 is gas amount in wei
+      assert(ownerBalance, web3.toWei(20, "ether") - 1000000)
+    })
+  })
+
   describe('sendEther()', () => {
     it('should work', async () => {
-      await betaFaucetInstance.send(web3.toWei(0.2, "ether"))
-      let recipientBalance = await promisify(cb => web3.eth.getBalance(recipient, cb))
-      await betaFaucetInstance.sendEther(recipient)
-      let newRecipientBalance = await promisify(cb => web3.eth.getBalance(recipient, cb))
+      await betaFaucetInstance.send(web3.toWei(20, "ether"))
+      const recipientBalance = await web3.eth.getBalance(recipient)
+      await betaFaucetInstance.sendEther(recipient, web3.toWei(0.2, "ether"))
+      const newRecipientBalance = await web3.eth.getBalance(recipient)
       assert.equal(
         newRecipientBalance.toString(),
-        recipientBalance.add(web3.toWei(0.1, "ether")).toString()
+        recipientBalance.add(web3.toWei(0.2, "ether")).toString()
       )
     })
 
     it('should not allow double sends', async () => {
       await expectThrow(async () => {
-        await betaFaucetInstance.sendEther(recipient2)
+        await betaFaucetInstance.sendEther(recipient2, 0.2)
       })
     })
   })
