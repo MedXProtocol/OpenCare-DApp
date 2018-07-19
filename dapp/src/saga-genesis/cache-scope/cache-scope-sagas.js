@@ -72,7 +72,7 @@ export function* runSaga({saga, props, key}) {
     yield callSaga(saga, props)
     const emptyCalls = callCountRegistry.decrementCalls(oldCalls)
     if (emptyCalls.length) {
-      yield put({ type: 'WEB3_STALE_CALLS', emptyCalls })
+      yield put({ type: 'WEB3_STALE_CALLS', calls: emptyCalls })
     }
   } catch (error) {
     if (!(yield cancelled())) {
