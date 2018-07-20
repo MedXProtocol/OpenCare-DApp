@@ -152,10 +152,14 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
           step = 3
         }
 
-        this.setState({
-          showBetaFaucetModal,
-          step
-        })
+        // Wait for other components to mount and load so the animation doesn't
+        // jaggedy jagger
+        this.props.setTimeout(() => {
+          this.setState({
+            showBetaFaucetModal,
+            step
+          })
+        }, 1200)
       }
 
       determineNextStep = () => {
