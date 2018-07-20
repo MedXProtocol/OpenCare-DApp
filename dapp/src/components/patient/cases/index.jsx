@@ -14,15 +14,14 @@ import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
 import * as routes from '~/config/routes'
 import rangeRight from 'lodash.rangeright'
 
-function mapStateToProps(state, { accounts }) {
+function mapStateToProps(state) {
   const cases = []
-  const account = get(state, 'sagaGenesis.accounts[0]')
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-  const AccountManager = contractByName(state, 'AccountManager')
-  const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
+  const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
 
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
-    let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', account, caseIndex)
+    let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, caseIndex)
     if (caseAddress) {
       let status = cacheCallValue(state, caseAddress, 'status')
       cases.push({
@@ -34,20 +33,19 @@ function mapStateToProps(state, { accounts }) {
   }
 
   return {
-    account,
+    address,
     caseCount,
     cases,
-    CaseManager,
-    AccountManager
+    CaseManager
   }
 }
 
-function* saga({ account, CaseManager, AccountManager }) {
-  if (!account || !CaseManager) { return }
-  let caseCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', account)
-  let indices = rangeRight(caseCount)
+function* saga({ address, CaseManager }) {
+  if (!address || !CaseManager) { return }
+  const caseCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', address)
+  const indices = rangeRight(caseCount)
   yield all(indices.map(function* (caseIndex) {
-    let caseAddress = yield cacheCall(CaseManager, 'patientCases', account, caseIndex)
+    const caseAddress = yield cacheCall(CaseManager, 'patientCases', address, caseIndex)
     yield all([
       addContract({ address: caseAddress, contractKey: 'Case' }),
       cacheCall(caseAddress, 'status')
@@ -55,7 +53,7 @@ function* saga({ account, CaseManager, AccountManager }) {
   }))
 }
 
-export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'AccountManager', 'caseCount']})(class _PatientCases extends Component {
+export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount']})(class _PatientCases extends Component {
   render() {
     return (
       <div className="card">

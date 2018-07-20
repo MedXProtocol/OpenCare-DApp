@@ -55,6 +55,10 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
     ) {
       const diagnosisJson = await downloadJson(diagnosisHash, props.caseKey)
       const diagnosis = JSON.parse(diagnosisJson)
+      if (diagnosis === undefined) {
+        console.error('The challenged diagnosis came back undefined!')
+        return
+      }
       this.setState({
         diagnosis: diagnosis,
         hidden: false
@@ -64,32 +68,32 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
 
   render () {
     return this.state.hidden ?
-      <div/> :
-      <div className="card">
-        <div className="card-header">
-          <h3 className="card-title">{this.props.title}</h3>
-        </div>
-        <div className="card-body">
-          <div className="row">
-            <div className="col-xs-12">
-              <label>Diagnosis</label>
-              <p>{this.state.diagnosis.diagnosis}</p>
-            </div>
-            <div className="col-xs-12">
-              <label>Recommendation</label>
-              <p>{this.state.diagnosis.recommendation}</p>
-            </div>
-            {(this.state.diagnosis.additionalRecommendation)
-              ? (
-                  <div className="col-xs-12">
-                    <label>Additional Recommendation:</label>
-                    <p>{this.state.diagnosis.additionalRecommendation}</p>
-                  </div>
-                )
-              : null}
+    <div/> :
+    <div className="card">
+      <div className="card-header">
+        <h3 className="card-title">{this.props.title}</h3>
+      </div>
+      <div className="card-body">
+        <div className="row">
+          <div className="col-xs-12">
+            <label>Diagnosis</label>
+            <p>{this.state.diagnosis.diagnosis}</p>
           </div>
+          <div className="col-xs-12">
+            <label>Recommendation</label>
+            <p>{this.state.diagnosis.recommendation}</p>
+          </div>
+          {(this.state.diagnosis.additionalRecommendation)
+            ? (
+                <div className="col-xs-12">
+                  <label>Additional Recommendation:</label>
+                  <p>{this.state.diagnosis.additionalRecommendation}</p>
+                </div>
+              )
+            : null}
         </div>
       </div>
+    </div>
   }
 }))
 

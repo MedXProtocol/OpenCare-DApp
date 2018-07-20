@@ -63,6 +63,7 @@ function* runCall(call, cacheActive) {
 export function* cacheCall(address, method, ...args) {
   const call = createCall(address, method, ...args)
   const cacheActive = yield isCacheActive(call)
+  console.log('cacheCall', call, cacheActive)
   yield registerCall(call)
   return yield runCall(call, cacheActive)
 }
@@ -95,18 +96,22 @@ function* web3CallExecute({call}) {
     const account = yield select(state => state.sagaGenesis.accounts[0])
     const options = { from: account }
     const callMethod = yield findCallMethod(call)
+    console.log('web3CallExecute', call)
     yield spawn(function* () {
       try {
         let response = yield reduxSagaCall(callMethod, options, 'pending')
+        console.log(response)
         yield put({ type: 'WEB3_CALL_RETURN', call, response })
       } catch (error) {
         yield put({ type: 'WEB3_CALL_ERROR', call, error })
+        console.error(error)
       } finally {
         callsInFlight.delete(call.hash)
       }
     })
   } catch (error) {
     if (yield cancelled()) {
+      console.warn(error)
       yield put({ type: 'WEB3_CALL_CANCELLED', call })
     } else {
       console.error(error)

@@ -17,8 +17,10 @@ import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
-  let CaseManager = contractByName(state, 'CaseManager')
-  let caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
+  const CaseManager = contractByName(state, 'CaseManager')
+  const caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
+
+  console.log(caseCount)
 
   let cases = []
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
@@ -26,7 +28,8 @@ function mapStateToProps(state) {
     if (caseAddress) {
       const status = cacheCallValue(state, caseAddress, 'status')
       const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
-      if (status && diagnosingDoctor) {
+      const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
+      if (status && (diagnosingDoctor || challengingDoctor)) {
         const isDiagnosingDoctor = diagnosingDoctor === address
         cases.push({
           caseAddress,
@@ -47,8 +50,10 @@ function mapStateToProps(state) {
 }
 
 function* saga({ address, CaseManager }) {
+console.log(address, CaseManager)
   if (!address || !CaseManager) { return }
-  let caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', address)
+  const caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', address)
+console.log(caseCount)
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
     let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
     yield addContract({ address: caseAddress, contractKey: 'Case' })
@@ -74,8 +79,7 @@ function renderCase({ caseAddress, status, caseIndex, isDiagnosingDoctor }) {
 }
 
 export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['account', 'caseCount', 'CaseManager'] })(
-    withSend(class _OpenCases extends Component {
+  withSend(withSaga(saga, { propTriggers: ['doctorCasesCount', 'address', 'caseCount', 'CaseManager'] })(class _OpenCasesContainer extends Component {
 
   render () {
     const openCases       = this.props.cases.filter(c => openCase(c))
@@ -113,7 +117,7 @@ export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
                     !openCases.length ?
                     <div className="blank-state">
                       <div className="blank-state--inner text-center text-gray">
-                        <span>You do not have any cases assigned to you yet.</span>
+                        <span>You do not have any cases assigned to you right now.</span>
                       </div>
                     </div> :
                     <FlipMove enterAnimation="accordionVertical" className="case-list">
