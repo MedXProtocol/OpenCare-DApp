@@ -257,7 +257,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
         </Modal>
         <Modal show={this.state.showChallengeModal} onHide={this.handleCloseChallengeModal}>
           <form onSubmit={this.onSubmitChallenge}>
-            <Modal.Body>
+            <Modal.Header>
               <div className="row">
                 <div className="col-xs-12">
                   <Alert bsStyle='info'>
@@ -267,6 +267,8 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                   </Alert>
                 </div>
               </div>
+            </Modal.Header>
+            <Modal.Body>
               <div className='row'>
                 <div className='col-xs-12'>
                   <p>

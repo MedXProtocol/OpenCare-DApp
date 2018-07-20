@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 import { all } from 'redux-saga/effects'
 import ReduxToastr from 'react-redux-toastr'
+import ReactTimeout from 'react-timeout'
 import { hot } from 'react-hot-loader'
 import { formatRoute } from 'react-router-named-routes'
 import getWeb3 from '~/get-web3'
@@ -48,8 +49,8 @@ function mapStateToProps (state) {
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
 
   if (isSignedIn && isDoctor) {
-    caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
-    // console.log('app.js caseCount! ', caseCount)
+    caseCount = get(state, 'userStats.caseCount')
+    // caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
   }
 
   return {
@@ -67,6 +68,9 @@ function mapDispatchToProps(dispatch) {
   return {
     signOut: () => {
       dispatch({ type: 'SIGN_OUT' })
+    },
+    dispatchNewCaseCount: (caseCount) => {
+      dispatch({ type: 'UPDATE_CASE_COUNT', caseCount })
     }
   }
 }
@@ -80,7 +84,7 @@ function* saga({ address, CaseManager, DoctorManager }) {
   ])
 }
 
-const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
+const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager', 'DoctorManager', 'isDoctor'] })(
     class _App extends Component {
 
@@ -91,11 +95,35 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
     if (process.env.NODE_ENV !== 'development' && !this.props.address && this.props.isSignedIn) {
       this.signOut()
     }
+
+    // Remove this when we figure out how to update the Challenged Doctor's cases list
+    // automatically from the block listener!
+    this.pollNewCaseID = this.props.setInterval(this.pollForNewCase, 2000)
+  }
+
+  // Remove this when we figure out how to update the Challenged Doctor's cases list
+  // automatically from the block listener!
+  pollForNewCase = async () => {
+    const { contractRegistry, CaseManager, address, isDoctor, isSignedIn } = this.props
+
+    if (!CaseManager || !address || !isDoctor || !isSignedIn) { return }
+
+    const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
+    const newCaseCount = await CaseManagerInstance.methods.doctorCasesCount(address).call().then(caseCount => {
+      return caseCount
+    })
+
+    if (newCaseCount !== this.props.caseCount) {
+      console.log('dispatchNewCaseCount!')
+      this.props.dispatchNewCaseCount(newCaseCount)
+    }
   }
 
   componentWillUnmount () {
     window.removeEventListener("beforeunload", this.unload)
     window.removeEventListener("focus", this.refocus)
+
+    clearInterval(this.pollNewCaseID)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -116,12 +144,11 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
     ) {
       return
     }
-
+    console.log('running new CaseManager code')
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
     CaseManagerInstance.methods
       .doctorCaseAtIndex(address, nextProps.caseCount - 1)
       .call().then(caseAddress => {
-        // console.log(caseAddress)
         const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress })
 
         toastr.success('You have been assigned a new case.', { path: caseRoute, text: 'View Case' })
@@ -246,6 +273,6 @@ const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
       </div>
     )
   }
-})))
+}))))
 
 export default hot(module)(withRouter(App))
