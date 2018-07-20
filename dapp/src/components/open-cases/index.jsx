@@ -79,7 +79,7 @@ function renderCase({ caseAddress, status, caseIndex, isDiagnosingDoctor }) {
 }
 
 export const OpenCasesContainer = withContractRegistry(connect(mapStateToProps)(
-  withSend(withSaga(saga, { propTriggers: ['doctorCasesCount', 'address', 'caseCount', 'CaseManager'] })(class _OpenCasesContainer extends Component {
+  withSend(withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager'] })(class _OpenCasesContainer extends Component {
 
   render () {
     const openCases       = this.props.cases.filter(c => openCase(c))
