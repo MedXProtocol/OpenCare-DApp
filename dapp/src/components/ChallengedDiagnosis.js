@@ -55,16 +55,17 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
       && props.caseKey
       && (props.isPatient || props.isChallengingDoctor)
     ) {
-      const diagnosisJson = await downloadJson(diagnosisHash, props.caseKey)
-      const diagnosis = JSON.parse(diagnosisJson)
-      if (diagnosis === undefined) {
-        console.error('The challenged diagnosis came back undefined!')
-        return
-      }
+      try {
+        const diagnosisJson = await downloadJson(diagnosisHash, props.caseKey)
+        const diagnosis = JSON.parse(diagnosisJson)
 
-      this.setState({
-        diagnosis: diagnosis
-      })
+        this.setState({
+          diagnosis: diagnosis
+        })
+      } catch (error) {
+        toastr.error('There was an error while downloading the diagnosis from IPFS.')
+        console.warn(error)
+      }
     }
   }
 

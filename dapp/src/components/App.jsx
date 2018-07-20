@@ -81,7 +81,7 @@ function* saga({ address, CaseManager, DoctorManager }) {
 }
 
 const App = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['doctorCasesCount', 'address', 'caseCount', 'CaseManager', 'DoctorManager', 'isDoctor'] })(
+  withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager', 'DoctorManager', 'isDoctor'] })(
     class _App extends Component {
 
   componentDidMount () {

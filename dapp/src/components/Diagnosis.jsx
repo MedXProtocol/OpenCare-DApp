@@ -76,13 +76,18 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       || isBlank(this.props.caseKey)
     ) { return }
 
-    const diagnosisJson = await downloadJson(this.props.diagnosisHash, this.props.caseKey)
-    const diagnosis = JSON.parse(diagnosisJson)
+    try {
+      const diagnosisJson = await downloadJson(this.props.diagnosisHash, this.props.caseKey)
+      const diagnosis = JSON.parse(diagnosisJson)
 
-    this.setState({
-      diagnosis,
-      doctorAddress: ''
-    })
+      this.setState({
+        diagnosis,
+        doctorAddress: ''
+      })
+    } catch (error) {
+      toastr.error('There was an error while downloading the diagnosis from IPFS.')
+      console.warn(error)
+    }
   }
 
   componentWillReceiveProps (props) {

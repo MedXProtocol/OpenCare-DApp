@@ -83,8 +83,6 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
       && !isBlank(diagnosisHash)
     )
     const caseIsOpenForDoctor = thisDocDiagnosingFirst || thisDocChallenging
-    console.log(challengeHash)
-    console.log(diagnosisHash)
 
     const challengingDoc = (
       !isBlank(address)
