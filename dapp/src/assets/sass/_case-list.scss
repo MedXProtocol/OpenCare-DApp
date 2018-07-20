@@ -4,12 +4,12 @@
 }
 
 .case-list--item {
-  box-shadow: 1px 1px 2px 0 rgba(200, 205, 210, 0.2);
-  border-radius: 8px;
-  border: 1px solid #dadce0;
+  box-shadow: 1px 1px 1px 0 rgba(200, 205, 210, 0.1);
+  border-radius: 5px;
+  border: 3px solid #eff4f8;
   box-sizing: border-box;
   height: 70px;
-  padding: 24px 10px 22px;
+  padding: 22px 10px 22px;
   position: relative;
   margin: 0 0 24px;
   opacity: 1;
@@ -31,8 +31,9 @@
 }
 
 .case-list--item:hover {
-  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.302),
-              0 1px 4px 1px rgba(60,64,67,0.149);
+  box-shadow: 0 0 10px 4px rgba(60,64,67,0.052),
+              0 1px 2px 0 rgba(60,64,67,0.202),
+              0 1px 4px 0 rgba(60,64,67,0.109);
   border: 1px solid transparent;
   opacity: 1;
 

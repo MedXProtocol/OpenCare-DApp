@@ -83,6 +83,8 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
       && !isBlank(diagnosisHash)
     )
     const caseIsOpenForDoctor = thisDocDiagnosingFirst || thisDocChallenging
+    console.log(challengeHash)
+    console.log(diagnosisHash)
 
     const challengingDoc = (
       !isBlank(address)
@@ -106,14 +108,6 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             challengingDoctorAddress={challengingDoctor}
           />
         </div>
-    } else if (thisDocChallenging) {
-      var submitChallenge =
-        <div className='col-xs-12'>
-          <SubmitDiagnosisContainer
-            caseAddress={caseAddress}
-            caseKey={caseKey}
-            diagnosisHash={diagnosisHash} />
-        </div>
     } else if (!isBlank(diagnosisHash) && diagnosingDoc) {
       var diagnosis =
         <div className='col-xs-12'>
@@ -121,6 +115,14 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             title='Your Diagnosis'
             caseAddress={caseAddress}
             caseKey={caseKey} />
+        </div>
+    } else if (thisDocChallenging) {
+      var submitChallenge =
+        <div className='col-xs-12'>
+          <SubmitDiagnosisContainer
+            caseAddress={caseAddress}
+            caseKey={caseKey}
+            diagnosisHash={diagnosisHash} />
         </div>
     } else if (thisDocDiagnosingFirst) {
       var submitDiagnosis =

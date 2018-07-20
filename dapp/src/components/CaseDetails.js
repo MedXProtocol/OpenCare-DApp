@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import { isEmptyObject } from '~/utils/isEmptyObject'
 import { ImageLoader, CaseDetailsLoader } from './ContentLoaders'
 import { LoadingLines } from '~/components/LoadingLines'
 import { downloadJson, downloadImage } from '../utils/storage-util'
@@ -55,14 +56,17 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
       ])
 
       this.setState({
-        loading: false,
         details,
         firstImageUrl,
         secondImageUrl
       })
     } catch (error) {
       toastr.error('There was an error while downloading your case details from IPFS.')
-      console.error(error)
+      console.warn(error)
+    } finally {
+      this.setState({
+        loading: false
+      })
     }
   }
 
@@ -109,14 +113,37 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
       )
     }
 
-    if (caseKey === null) {
+    if (!this.state.loading && isEmptyObject(details)) {
       jsx = (
         <div className="row">
           <div className="col-xs-12 col-md-6 col-md-offset-3">
             <div className="alert alert-warning">
-              <h3>
+              <h4>
+                Unable to download case data from IPFS
+              </h4>
+              <p>
+                There is probably an issue with the IPFS server. Please contact MedCredits support.
+              </p>
+
+              <br />
+              <small>
+                Error #2: Unable to download case data from IPFS
+              </small>
+              <small>
+                Case address: <span className="eth-address">{caseAddress}</span>
+              </small>
+            </div>
+          </div>
+        </div>
+      )
+    } else if (caseKey === null) {
+      jsx = (
+        <div className="row">
+          <div className="col-xs-12 col-md-6 col-md-offset-3">
+            <div className="alert alert-warning">
+              <h4>
                 Unable to decrypt case data
-              </h3>
+              </h4>
               <p>
                 This case data was likely encrypted with a different secret key than the one you are currently using. Please use the secret key in your previous Emergency Kit or email to decrypt this case.
               </p>

@@ -35,20 +35,20 @@ export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' 
       }
 
       componentDidMount() {
-        if (this.displayName === "WithSaga(_OpenCasesContainer)")
-          console.log("++++++++++++++++++MOUNTING SAGA")
+        // if (this.displayName === "WithSaga(_OpenCasesContainer)")
+        //   console.log("++++++++++++++++++MOUNTING SAGA")
         this.props.dispatchPrepareSaga(this.props, this.sagaKey)
       }
 
       componentWillUnmount() {
-        if (this.displayName === "WithSaga(_OpenCasesContainer)")
-          console.log("------------------UNMOUNTING SAGA")
+        // if (this.displayName === "WithSaga(_OpenCasesContainer)")
+        //   console.log("------------------UNMOUNTING SAGA")
         this.props.dispatchEndSaga(this.sagaKey)
       }
 
       componentWillReceiveProps (props) {
-        if (this.displayName === "WithSaga(_OpenCasesContainer)")
-          console.log('withSaga Received Props')
+        // if (this.displayName === "WithSaga(_OpenCasesContainer)")
+        //   console.log('withSaga Received Props')
 
         let propsChanged = false
         if (typeof propTriggers === 'string') {
@@ -63,8 +63,8 @@ export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' 
             // console.log(propsChanged)
         }
         if (propsChanged) {
-          if (this.displayName === "WithSaga(_OpenCasesContainer)")
-            console.log("props changed!")
+          // if (this.displayName === "WithSaga(_OpenCasesContainer)")
+          //   console.log("props changed!")
           this.props.dispatchRunSaga(props, this.sagaKey)
         }
       }

@@ -49,7 +49,7 @@ function mapStateToProps (state) {
 
   if (isSignedIn && isDoctor) {
     caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
-    console.log('app.js caseCount! ', caseCount)
+    // console.log('app.js caseCount! ', caseCount)
   }
 
   return {

@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
+import { isEmptyObject } from '~/utils/isEmptyObject'
+import { defined } from '~/utils/defined'
 import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
 import { downloadJson } from '~/utils/storage-util'
@@ -59,41 +61,43 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
         console.error('The challenged diagnosis came back undefined!')
         return
       }
+
       this.setState({
-        diagnosis: diagnosis,
-        hidden: false
+        diagnosis: diagnosis
       })
     }
   }
 
   render () {
-    return this.state.hidden ?
-    <div/> :
-    <div className="card">
-      <div className="card-header">
-        <h3 className="card-title">{this.props.title}</h3>
-      </div>
-      <div className="card-body">
-        <div className="row">
-          <div className="col-xs-12">
-            <label>Diagnosis</label>
-            <p>{this.state.diagnosis.diagnosis}</p>
+    return (
+      !defined(this.state.diagnosis) || isEmptyObject(this.state.diagnosis) ?
+      <div/> :
+      <div className="card">
+        <div className="card-header">
+          <h3 className="card-title">{this.props.title}</h3>
+        </div>
+        <div className="card-body">
+          <div className="row">
+            <div className="col-xs-12">
+              <label>Diagnosis</label>
+              <p>{this.state.diagnosis.diagnosis}</p>
+            </div>
+            <div className="col-xs-12">
+              <label>Recommendation</label>
+              <p>{this.state.diagnosis.recommendation}</p>
+            </div>
+            {(this.state.diagnosis.additionalRecommendation)
+              ? (
+                  <div className="col-xs-12">
+                    <label>Additional Recommendation:</label>
+                    <p>{this.state.diagnosis.additionalRecommendation}</p>
+                  </div>
+                )
+              : null}
           </div>
-          <div className="col-xs-12">
-            <label>Recommendation</label>
-            <p>{this.state.diagnosis.recommendation}</p>
-          </div>
-          {(this.state.diagnosis.additionalRecommendation)
-            ? (
-                <div className="col-xs-12">
-                  <label>Additional Recommendation:</label>
-                  <p>{this.state.diagnosis.additionalRecommendation}</p>
-                </div>
-              )
-            : null}
         </div>
       </div>
-    </div>
+    )
   }
 }))
 

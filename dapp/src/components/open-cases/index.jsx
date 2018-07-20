@@ -20,7 +20,7 @@ function mapStateToProps(state) {
   const CaseManager = contractByName(state, 'CaseManager')
   const caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
 
-  console.log(caseCount)
+  // console.log(caseCount)
 
   let cases = []
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
@@ -50,10 +50,10 @@ function mapStateToProps(state) {
 }
 
 function* saga({ address, CaseManager }) {
-console.log(address, CaseManager)
+// console.log(address, CaseManager)
   if (!address || !CaseManager) { return }
   const caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', address)
-console.log(caseCount)
+// console.log(caseCount)
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
     let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
     yield addContract({ address: caseAddress, contractKey: 'Case' })
