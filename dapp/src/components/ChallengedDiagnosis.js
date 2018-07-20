@@ -6,6 +6,7 @@ import { currentAccount } from '~/services/sign-in'
 import { downloadJson } from '~/utils/storage-util'
 import { cacheCallValue, withSaga, cacheCall, addContract } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
+import { toastr } from '~/toastr'
 
 function mapStateToProps(state, { caseAddress, challengingDoctorAddress }) {
   const account = currentAccount()
