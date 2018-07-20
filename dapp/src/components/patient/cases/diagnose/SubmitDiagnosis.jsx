@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
+import ReactTimeout from 'react-timeout'
 import Select from 'react-select'
 import * as Animated from 'react-select/lib/animated';
 import { customStyles } from '~/config/react-select-custom-styles'
+import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
@@ -25,7 +27,7 @@ function mapStateToProps (state, ownProps) {
   }
 }
 
-export const SubmitDiagnosisContainer = connect(mapStateToProps)(withSend(class _SubmitDiagnosisContainer extends Component {
+export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapStateToProps)(withSend(class _SubmitDiagnosisContainer extends Component {
   static propTypes = {
     caseAddress: PropTypes.string,
     caseKey: PropTypes.any,
@@ -85,6 +87,9 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps)(withSend(class 
             showThankYou: true,
             isSubmitting: false
           })
+          this.props.setTimeout(() => {
+            this.props.history.push(routes.DOCTORS_CASES_OPEN)
+          }, 1000)
         })
     }
   }
@@ -388,4 +393,4 @@ export const SubmitDiagnosisContainer = connect(mapStateToProps)(withSend(class 
       </div>
     )
   }
-}))
+}))))

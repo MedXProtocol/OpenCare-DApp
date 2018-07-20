@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { all } from 'redux-saga/effects'
 import { isTrue } from '~/utils/isTrue'
+import { isEmptyObject } from '~/utils/isEmptyObject'
+import { isBlank } from '~/utils/isBlank'
+import { defined } from '~/utils/defined'
 import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -11,7 +14,6 @@ import { Loading } from '~/components/Loading'
 import { withSaga, cacheCall, cacheCallValue, withSend, addContract } from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
-import { isBlank } from '~/utils/isBlank'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
 import { mixpanel } from '~/mixpanel'
@@ -61,7 +63,6 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
 
     this.state = {
       diagnosis: {},
-      hidden: true,
       showThankYouModal: false,
       showChallengeModal: false,
       doctorAddress: '',
@@ -70,14 +71,23 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   }
 
   async componentDidMount() {
-    if (!this.state.hidden || isBlank(this.props.diagnosisHash) || isBlank(this.props.caseKey)) { return }
-    const diagnosisJson = await downloadJson(this.props.diagnosisHash, this.props.caseKey)
-    const diagnosis = JSON.parse(diagnosisJson)
-    this.setState({
-      diagnosis,
-      doctorAddress: '',
-      hidden: false
-    })
+    if (
+      isBlank(this.props.diagnosisHash)
+      || isBlank(this.props.caseKey)
+    ) { return }
+
+    try {
+      const diagnosisJson = await downloadJson(this.props.diagnosisHash, this.props.caseKey)
+      const diagnosis = JSON.parse(diagnosisJson)
+
+      this.setState({
+        diagnosis,
+        doctorAddress: ''
+      })
+    } catch (error) {
+      toastr.error('There was an error while downloading the diagnosis from IPFS.')
+      console.warn(error)
+    }
   }
 
   componentWillReceiveProps (props) {
@@ -193,11 +203,11 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     }
 
     return (
-      this.state.hidden ?
+      !defined(this.state.diagnosis) || isEmptyObject(this.state.diagnosis) ?
       <div /> :
       <div className="card">
         <div className="card-header">
-          <h3 className="card-title">Diagnosis</h3>
+          <h3 className="card-title">{this.props.title}</h3>
         </div>
         <div className="card-body">
           <div className="row">
@@ -293,7 +303,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
             </Modal.Body>
             <Modal.Footer>
               <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-link">Cancel</button>
-              <input type='submit' className="btn btn-primary" value='OK' />
+              <input type='submit' className="btn btn-success" value='OK' />
             </Modal.Footer>
           </form>
         </Modal>

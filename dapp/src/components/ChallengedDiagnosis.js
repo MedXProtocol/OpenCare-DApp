@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
+import { isEmptyObject } from '~/utils/isEmptyObject'
+import { defined } from '~/utils/defined'
 import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
 import { downloadJson } from '~/utils/storage-util'
@@ -54,17 +56,23 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
       && props.caseKey
       && (props.isPatient || props.isChallengingDoctor)
     ) {
-      const diagnosisJson = await downloadJson(diagnosisHash, props.caseKey)
-      const diagnosis = JSON.parse(diagnosisJson)
-      this.setState({
-        diagnosis: diagnosis,
-        hidden: false
-      })
+      try {
+        const diagnosisJson = await downloadJson(diagnosisHash, props.caseKey)
+        const diagnosis = JSON.parse(diagnosisJson)
+
+        this.setState({
+          diagnosis: diagnosis
+        })
+      } catch (error) {
+        toastr.error('There was an error while downloading the diagnosis from IPFS.')
+        console.warn(error)
+      }
     }
   }
 
   render () {
-    return this.state.hidden ?
+    return (
+      !defined(this.state.diagnosis) || isEmptyObject(this.state.diagnosis) ?
       <div/> :
       <div className="card">
         <div className="card-header">
@@ -91,6 +99,7 @@ const ChallengedDiagnosis = connect(mapStateToProps)(withSaga(saga, { propTrigge
           </div>
         </div>
       </div>
+    )
   }
 }))
 

@@ -55,10 +55,12 @@ export function* invalidateTransaction({transactionId, call, receipt}) {
   }, new Set())
 
   contractAddresses.add(call.address)
+  // console.log('in invalidateTransaction')
 
   yield* Array.from(contractAddresses).map(function* (address) {
     const contractKey = yield select(contractKeyByAddress, address)
     if (contractKey) {
+      // console.log('invalidating: ' + address)
       yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
     }
   })
@@ -72,6 +74,7 @@ export function* runSaga({saga, props, key}) {
     yield callSaga(saga, props)
     const emptyCalls = callCountRegistry.decrementCalls(oldCalls)
     if (emptyCalls.length) {
+      // console.log('emptyCalls.length', emptyCalls.length)
       yield put({ type: 'WEB3_STALE_CALLS', calls: emptyCalls })
     }
   } catch (error) {

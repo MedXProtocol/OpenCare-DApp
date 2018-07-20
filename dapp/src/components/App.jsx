@@ -38,7 +38,7 @@ import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { toastr } from '~/toastr'
 
-function mapStateToProps (state, ownProps) {
+function mapStateToProps (state) {
   let caseCount
   const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -49,6 +49,7 @@ function mapStateToProps (state, ownProps) {
 
   if (isSignedIn && isDoctor) {
     caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
+    // console.log('app.js caseCount! ', caseCount)
   }
 
   return {
@@ -72,6 +73,7 @@ function mapDispatchToProps(dispatch) {
 
 function* saga({ address, CaseManager, DoctorManager }) {
   if (!address || !CaseManager || !DoctorManager) { return }
+
   yield all([
     cacheCall(CaseManager, 'doctorCasesCount', address),
     cacheCall(DoctorManager, 'isDoctor', address)

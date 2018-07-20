@@ -57,41 +57,76 @@ function* saga({ match, address, AccountManager }) {
 }
 
 export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'address', 'AccountManager']})(class _DiagnoseCase extends Component {
+
   render () {
-    var challenging = this.props.challengingDoctor === this.props.address
+    const {
+      challengingDoctor,
+      address,
+      diagnosisHash,
+      challengeHash,
+      diagnosingDoctor,
+      caseAddress
+    } = this.props
     const caseKey = decryptDoctorCaseKey(currentAccount(), this.props.patientPublicKey, this.props.encryptedCaseKey)
 
-    if (!isBlank(this.props.challengeHash)) {
+    const thisDocDiagnosingFirst = (
+      !isBlank(address)
+      && !isBlank(diagnosingDoctor)
+      && (diagnosingDoctor === address)
+      && isBlank(diagnosisHash)
+    )
+    const thisDocChallenging = (
+      !isBlank(address)
+      && !isBlank(challengingDoctor)
+      && (challengingDoctor === address)
+      && isBlank(challengeHash)
+      && !isBlank(diagnosisHash)
+    )
+    const caseIsOpenForDoctor = thisDocDiagnosingFirst || thisDocChallenging
+
+    const challengingDoc = (
+      !isBlank(address)
+      && !isBlank(challengingDoctor)
+      && (challengingDoctor === address)
+    )
+
+    const diagnosingDoc = (
+      !isBlank(address)
+      && !isBlank(diagnosingDoctor)
+      && (diagnosingDoctor === address)
+    )
+
+    if (!isBlank(challengeHash) && challengingDoc) {
       var challenge =
         <div className='col-xs-12'>
           <ChallengedDiagnosis
             caseAddress={this.props.match.params.caseAddress}
             caseKey={caseKey}
-            title='Diagnosis'
-            challengingDoctorAddress={this.props.challengingDoctor} />
+            title='Your Diagnosis'
+            challengingDoctorAddress={challengingDoctor}
+          />
         </div>
-    } else if (this.props.challengingDoctor === this.props.address && !this.props.challengeHash) {
-      challenge =
-        <div className='col-xs-12'>
-          <SubmitDiagnosisContainer
-            caseAddress={this.props.caseAddress}
-            caseKey={caseKey}
-            diagnosisHash={this.props.diagnosisHash} />
-        </div>
-    }
-
-    if (!isBlank(this.props.diagnosisHash) && !challenging) {
+    } else if (!isBlank(diagnosisHash) && diagnosingDoc) {
       var diagnosis =
         <div className='col-xs-12'>
           <Diagnosis
-            caseAddress={this.props.caseAddress}
+            title='Your Diagnosis'
+            caseAddress={caseAddress}
             caseKey={caseKey} />
         </div>
-    } else if (this.props.diagnosingDoctor === this.props.address && !this.props.diagnosisHash) {
-      diagnosis =
+    } else if (thisDocChallenging) {
+      var submitChallenge =
         <div className='col-xs-12'>
           <SubmitDiagnosisContainer
-            caseAddress={this.props.caseAddress}
+            caseAddress={caseAddress}
+            caseKey={caseKey}
+            diagnosisHash={diagnosisHash} />
+        </div>
+    } else if (thisDocDiagnosingFirst) {
+      var submitDiagnosis =
+        <div className='col-xs-12'>
+          <SubmitDiagnosisContainer
+            caseAddress={caseAddress}
             caseKey={caseKey} />
         </div>
     }
@@ -113,17 +148,20 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
 
     return (
       <div>
-        <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCase', { caseId: ('' + this.props.caseAddress).substring(0, 6) } )} />
+        <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCase', { caseId: ('' + caseAddress).substring(0, 6) } )} />
         <div className='container'>
           <div className='row'>
+            {diagnosis}
+            {challenge}
             <div id="view-case-details" className='col-xs-12'>
               <CaseDetails
                 caseAddress={this.props.match.params.caseAddress}
                 caseKey={caseKey}
+                caseIsOpenForDoctor={caseIsOpenForDoctor}
                 isDoctor={true} />
             </div>
-            {diagnosis}
-            {challenge}
+            {submitDiagnosis}
+            {submitChallenge}
           </div>
         </div>
       </div>
