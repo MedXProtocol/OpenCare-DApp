@@ -2,6 +2,11 @@ import React, { Component } from 'react'
 import classNames from 'classnames'
 
 export const HippoTextInput = class _HippoTextInput extends Component {
+
+  handleBlur = () => {
+    this.props.onBlur(this.props.name)
+  }
+
   render() {
     const { name, label, error, setRef, onChange, colClasses, type } = this.props
 
@@ -17,6 +22,7 @@ export const HippoTextInput = class _HippoTextInput extends Component {
             <input
               name={name}
               onChange={onChange}
+              onBlur={this.handleBlur}
               type={type ? type : "text"}
               ref={setRef}
               className="form-control" />

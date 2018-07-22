@@ -31,6 +31,7 @@ import { regions } from './regions'
 import { weiToMedX } from '~/utils/weiToMedX'
 import { medXToWei } from '~/utils/medXToWei'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
+import pull from 'lodash.pull'
 
 function mapStateToProps (state) {
   let medXBeingSent
@@ -282,6 +283,18 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       }
     }
 
+    validateField = (fieldName) => {
+      const errors = this.state.errors
+
+      if (!isNotEmptyString(this.state[fieldName])) {
+        errors.push(fieldName)
+      } else {
+        pull(errors, fieldName)
+      }
+
+      this.setState({ errors: errors })
+    }
+
     runValidation = async () => {
       // reset error states
       await this.setState({ errors: [] })
@@ -291,18 +304,21 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
       for (var fieldIndex = 0; fieldIndex < length; fieldIndex++) {
         let fieldName = requiredFields[fieldIndex]
-        if (!isNotEmptyString(this.state[fieldName]))
+        if (!isNotEmptyString(this.state[fieldName])) {
           errors.push(fieldName)
+        }
       }
 
       await this.setState({ errors: errors })
 
-      // Go to first error field
       if (errors.length > 0) {
-        window.location.hash = `#${errors[0]}`;
-        // this[`${errors[0]}Input`].focus() // this only works on text fields
-      }
+        // First reset it so it will still take the user to the anchor even if
+        // we already took them there before (still error on same field)
+        window.location.hash = `#`;
 
+        // Go to first error field
+        window.location.hash = `#${errors[0]}`;
+      }
     }
 
     handleSubmit = async (event) => {
@@ -620,6 +636,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         label='Has it changed in color?'
                         error={errors['color']}
                         setRef={this.setColorRef}
+                        onBlur={this.validateField}
                         onChange={(event) => this.setState({ color: event.target.value })}
                       />
 
@@ -630,6 +647,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         label='Have you tried any treatments so far?'
                         error={errors['prevTreatment']}
                         setRef={this.setPrevTreatmentRef}
+                        onBlur={this.validateField}
                         onChange={(event) => this.setState({ prevTreatment: event.target.value })}
                       />
 
@@ -647,6 +665,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                             label='Age'
                             error={errors['age']}
                             setRef={this.setAgeRef}
+                            onBlur={this.validateField}
                             onChange={(event) => this.setState({ age: event.target.value })}
                           />
                         </div>
