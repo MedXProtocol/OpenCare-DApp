@@ -3,10 +3,7 @@ import { connect } from 'react-redux'
 import { isTrue } from '~/utils/isTrue'
 import { Button, Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
-import Select from 'react-select'
 import ReactTooltip from 'react-tooltip'
-import * as Animated from 'react-select/lib/animated';
-import { customStyles } from '~/config/react-select-custom-styles'
 import { withRouter } from 'react-router-dom'
 import classNames from 'classnames'
 import { isNotEmptyString } from '~/utils/common-util'
@@ -26,9 +23,10 @@ import { Loading } from '~/components/Loading'
 import { HippoImageInput } from '~/components/forms/HippoImageInput'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
 import { HippoTextInput } from '~/components/forms/HippoTextInput'
-import { YourInfo } from './YourInfo'
-import { countries } from './countries'
-import { regions } from './regions'
+import { PatientInfo } from './PatientInfo'
+import { SpotQuestions } from './SpotQuestions'
+import { RashQuestions } from './RashQuestions'
+import { AcneQuestions } from './AcneQuestions'
 import { weiToMedX } from '~/utils/weiToMedX'
 import { medXToWei } from '~/utils/medXToWei'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
@@ -454,6 +452,18 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       }
     }
 
+    handleCountryChange = (newValue) => {
+      this.setState({ country: newValue.value }, this.checkCountry)
+    }
+
+    handleRegionChange = (newValue) => {
+      this.setState({ region: newValue ? newValue.value : '' }, () => {
+        if (this.state.country === 'US') {
+          this.validateField('region')
+        }
+      })
+    }
+
     onChangeDoctor = (option) => {
       this.setState({
         selectedDoctor: option
@@ -562,6 +572,29 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         var secondFileError = <p className='has-error help-block'>{this.state.secondFileError}</p>
       }
 
+      if (this.state.spotRashOrAcne === 'Spot') {
+        var spotQuestions = <SpotQuestions
+          errors={errors}
+          textInputOnChange={this.handleTextInputOnChange}
+          textInputOnBlur={this.handleTextInputOnBlur}
+          buttonGroupOnChange={this.handleButtonGroupOnChange}
+        />
+      } else if (this.state.spotRashOrAcne === 'Rash') {
+        var rashQuestions =<RashQuestions
+          errors={errors}
+          textInputOnChange={this.handleTextInputOnChange}
+          textInputOnBlur={this.handleTextInputOnBlur}
+          buttonGroupOnChange={this.handleButtonGroupOnChange}
+        />
+      } else if (this.state.spotRashOrAcne === 'Acne') {
+        var acneQuestions = <AcneQuestions
+          errors={errors}
+          textInputOnChange={this.handleTextInputOnChange}
+          textInputOnBlur={this.handleTextInputOnBlur}
+          buttonGroupOnChange={this.handleButtonGroupOnChange}
+        />
+      }
+
       return (
         <div>
           <div className="row">
@@ -584,17 +617,19 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                   <div className="form-wrapper">
                     <form onSubmit={this.handleSubmit}>
 
-                      <div className="form-group--heading">
-                        Your Info:
-                      </div>
-
-                      <YourInfo
+                      <PatientInfo
                         errors={errors}
                         textInputOnChange={this.handleTextInputOnChange}
                         textInputOnBlur={this.handleTextInputOnBlur}
                         buttonGroupOnChange={this.handleButtonGroupOnChange}
                         gender={this.state.gender}
                         allergies={this.state.allergies}
+                        setCountryRef={this.setCountryRef}
+                        setRegionRef={this.setRegionRef}
+                        country={this.state.country}
+                        region={this.state.region}
+                        handleCountryChange={this.handleCountryChange}
+                        handleRegionChange={this.handleRegionChange}
                       />
 
                       <div className="form-group--heading">
@@ -617,7 +652,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoImageInput
                         name='secondImage'
                         id='secondImageHash'
-                        label="Close-up Photo:"
+                        label={`Close-up Photo: ${this.state.spotRashOrAcne === 'Rash' ? '(separate location from above if on more than one body part)' : ''}`}
                         colClasses='col-xs-12 col-sm-12 col-md-8'
                         error={errors['secondImageHash']}
                         fileError={secondFileError}
@@ -632,152 +667,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         Details:
                       </div>
 
-                      <HippoToggleButtonGroup
-                        id='howLong'
-                        name="howLong"
-                        colClasses='col-xs-12 col-md-8'
-                        label='How long have you had this problem?'
-                        error={errors['howLong']}
-                        setRef={this.setHowLongRef}
-                        onChange={this.updateHowLong}
-                        values={['Days', 'Weeks', 'Months', 'Years']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='size'
-                        name="size"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Is it growing, shrinking or staying the same size?'
-                        error={errors['size']}
-                        setRef={this.setSizeRef}
-                        onChange={this.updateSize}
-                        values={['Growing', 'Shrinking', 'Same size']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='painful'
-                        name="painful"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Is it painful?'
-                        error={errors['painful']}
-                        setRef={this.setPainfulRef}
-                        onChange={this.updatePainful}
-                        values={['Yes', 'No']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='bleeding'
-                        name="bleeding"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Is it bleeding?'
-                        error={errors['bleeding']}
-                        setRef={this.setBleedingRef}
-                        onChange={this.updateBleeding}
-                        values={['Yes', 'No']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='itching'
-                        name="itching"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Is it itching?'
-                        error={errors['itching']}
-                        setRef={this.setItchingRef}
-                        onChange={this.updateItching}
-                        values={['Yes', 'No']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='skinCancer'
-                        name="skinCancer"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Any history of skin cancer?'
-                        error={errors['skinCancer']}
-                        setRef={this.setSkinCancerRef}
-                        onChange={this.updateSkinCancer}
-                        values={['Yes', 'No']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='sexuallyActive'
-                        name="sexuallyActive"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Are you sexually active?'
-                        error={errors['sexuallyActive']}
-                        setRef={this.setSexuallyActiveRef}
-                        onChange={this.updateSexuallyActive}
-                        values={['Yes', 'No']}
-                      />
-
-                      <HippoTextInput
-                        id='color'
-                        name="color"
-                        colClasses='col-xs-12 col-sm-12 col-md-8'
-                        label='Has it changed in color?'
-                        error={errors['color']}
-                        setRef={this.setColorRef}
-                        onBlur={this.validateField}
-                        onChange={(event) => this.setState({ color: event.target.value })}
-                      />
-
-                      <HippoTextInput
-                        id='prevTreatment'
-                        name="prevTreatment"
-                        colClasses='col-xs-12 col-sm-12 col-md-8'
-                        label='Have you tried any treatments so far?'
-                        error={errors['prevTreatment']}
-                        setRef={this.setPrevTreatmentRef}
-                        onBlur={this.validateField}
-                        onChange={(event) => this.setState({ prevTreatment: event.target.value })}
-                      />
-
-
-                      <div className="form-group--heading">
-                        Additional Info:
-                      </div>
-
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-6 col-md-3">
-                          <div className={classNames('form-group', { 'has-error': errors['country'] })}>
-                            <label className="control-label">Country</label>
-                            <Select
-                              placeholder='Please select your Country'
-                              styles={customStyles}
-                              components={Animated}
-                              closeMenuOnSelect={true}
-                              ref={this.setCountryRef}
-                              options={countries}
-                              onChange={(newValue) => this.setState({ country: newValue.value }, this.checkCountry)}
-                              selected={this.state.country}
-                              required
-                            />
-                            {errors['country']}
-                          </div>
-                        </div>
-                        <div className="col-xs-8 col-sm-3 col-md-3">
-                          <div className={classNames('form-group', { 'has-error': errors['region'] })}>
-                            <label className="control-label">State</label>
-                            <Select
-                              isDisabled={this.state.country !== 'US'}
-                              placeholder='Please select your State'
-                              styles={customStyles}
-                              components={Animated}
-                              closeMenuOnSelect={true}
-                              ref={this.setRegionRef}
-                              options={regions}
-                              onChange={(newValue) => {
-                                this.setState({ region: newValue ? newValue.value : '' }, () => {
-                                  if (this.state.country === 'US') {
-                                    this.validateField('region')
-                                  }
-                                })
-                              }}
-                              selected={this.state.region}
-                            />
-                            {errors['region']}
-                          </div>
-                        </div>
-                      </div>
+                      {spotQuestions}
+                      {rashQuestions}
+                      {acneQuestions}
 
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8">
