@@ -8,7 +8,7 @@ export const YourInfo = class _YourInfo extends Component {
     return (
       <span>
         <div className="row">
-          <div className="col-xs-6 col-sm-4 col-md-2">
+          <div className="col-xs-4 col-sm-3 col-md-2">
             <HippoTextInput
               type='number'
               id='age'
