@@ -93,8 +93,8 @@ const requiredFields = [
 // 'pregnant' => female only
 // 'whatAllergies' => allergies yes only
 // 'region' => USA only
-// 'worseWithPeriod' => female only
-// 'onBirthControl' => female only
+// 'worseWithPeriod' => female and acne only
+// 'onBirthControl' => female and acne only
 // 'hadBefore' => spot/rash only
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(withSend(class _CreateCase extends Component {
@@ -112,6 +112,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         allergies: null,
         pregnant: null,
         whatAllergies: null,
+        spotRashOrAcne: null,
         howLong: null,
         hadBefore: null,
         isTheSpot: [],
@@ -141,7 +142,62 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     handleButtonGroupOnChange = (event) => {
       this.setState({ [event.target.name]: event.target.value }, () => {
         this.validateField(event.target.name)
+
+        this.setOrClearRequired(event.target.name)
       })
+    }
+
+    setOrClearRequired = (fieldName) => {
+      if (fieldName === 'gender') {
+        if (this.state.gender === 'Female') {
+          requiredFields.splice(2, 0, 'pregnant')
+
+          if (this.state.spotRashOrAcne === 'Acne') {
+            const howLongIndex = requiredFields.indexOf('howLong')
+            requiredFields.splice(howLongIndex + 1, 0, 'worseWithPeriod')
+            requiredFields.splice(howLongIndex + 2, 0, 'onBirthControl')
+          }
+        } else {
+          pull(requiredFields, 'pregnant')
+          this.setState({ pregnant: null })
+
+          if (this.state.spotRashOrAcne === 'Acne') {
+            pull(requiredFields, 'worseWithPeriod', 'onBirthControl')
+            this.setState({ worseWithPeriod: null, onBirthControl: null })
+          }
+        }
+      }
+
+      if (fieldName === 'spotRashOrAcne') {
+        if (this.state.spotRashOrAcne === 'Acne' && this.state.gender === 'Female') {
+          const howLongIndex = requiredFields.indexOf('howLong')
+          requiredFields.splice(howLongIndex + 1, 0, 'worseWithPeriod')
+          requiredFields.splice(howLongIndex + 2, 0, 'onBirthControl')
+        } else {
+          pull(requiredFields, 'worseWithPeriod', 'onBirthControl')
+          this.setState({ worseWithPeriod: null, onBirthControl: null })
+        }
+      }
+
+      if (fieldName === 'allergies') {
+        if (this.state.allergies === 'Yes') {
+          const allergiesIndex = requiredFields.indexOf('allergies')
+          requiredFields.splice(allergiesIndex, 0, 'whatAllergies')
+        } else {
+          pull(requiredFields, 'whatAllergies')
+          this.setState({ whatAllergies: null })
+        }
+      }
+
+      if (fieldName === 'spotRashOrAcne') {
+        if (this.state.spotRashOrAcne === 'Spot' || this.state.spotRashOrAcne === 'Rash') {
+          const howLongIndex = requiredFields.indexOf('howLong')
+          requiredFields.splice(howLongIndex, 0, 'hadBefore')
+        } else {
+          pull(requiredFields, 'hadBefore')
+          this.setState({ hadBefore: null })
+        }
+      }
     }
 
     handleCheckboxGroupOnChange = (event) => {
@@ -271,8 +327,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       } else {
         // if region is in the required fields array, remove it
         let index = requiredFields.indexOf('region')
-        if (index > -1)
+        if (index > -1) {
           requiredFields.splice(index, 1)
+        }
 
         this.setState({ region: '' })
         this.regionInput.select.clearValue()
@@ -350,7 +407,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     handleCloseDisclaimerModal = (event) => {
-      event.preventDefault();
+      if (event) {
+        event.preventDefault()
+      }
       this.setState({ showDisclaimerModal: false });
     }
 
@@ -424,6 +483,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         allergies: this.state.allergies,
         pregnant: this.state.pregnant,
         whatAllergies: this.state.whatAllergies,
+        spotRashOrAcne: this.state.spotRashOrAcne,
         howLong: this.state.howLong,
         hadBefore: this.state.hadBefore,
         isTheSpot: this.state.isTheSpot.join(', '),
@@ -745,11 +805,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
             </Modal.Footer>
           </Modal>
 
-          <Modal show={this.state.showDisclaimerModal}>
+          <Modal show={this.state.showDisclaimerModal} onHide={this.handleCloseDisclaimerModal}>
             <Modal.Header>
-               <Modal.Title>
-                  Disclaimer:
-                </Modal.Title>
+              <Modal.Title>
+                Disclaimer:
+              </Modal.Title>
              </Modal.Header>
             <Modal.Body>
               <p>

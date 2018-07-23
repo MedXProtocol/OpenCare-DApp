@@ -92,7 +92,7 @@ export const SecretKey = class _SecretKey extends Component {
           </div>
         </div>
 
-        <Modal show={this.state.showTermsModal}>
+        <Modal show={this.state.showTermsModal} onHide={this.handleCloseTermsModal}>
           <Modal.Header>
              <Modal.Title>
                 Disclaimer:

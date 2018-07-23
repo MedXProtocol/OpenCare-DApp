@@ -56,10 +56,7 @@ function* saga({ address, CaseManager }) {
 
 export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount']})(class _PatientCases extends Component {
   render() {
-    const loading = (
-      this.props.caseCount === undefined
-      || (this.props.caseCount !== undefined && !this.props.cases.length)
-    )
+    const loading = (this.props.caseCount === undefined)
     return (
       <div className="card">
         <ScrollToTopOnMount />

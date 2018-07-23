@@ -51,7 +51,7 @@ $card-columns-margin:               $card-spacer-y;
   }
 
   .title {
-    margin: 0;
+    margin: 3px 0 0 0;
   }
 }
 
@@ -95,10 +95,10 @@ $card-columns-margin:               $card-spacer-y;
   // Enable `flex-grow: 1` for decks and groups so that card blocks take up
   // as much space as possible, ensuring footers are aligned to the bottom.
   flex: 1 1 auto;
-  padding: 2rem 4rem;
+  padding: 4rem;
 
   @media screen and (max-width: 767px) {
-    padding: 2rem 2rem;
+    padding: 2rem;
   }
 }
 

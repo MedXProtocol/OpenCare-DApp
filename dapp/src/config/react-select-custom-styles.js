@@ -6,7 +6,8 @@ export const customStyles = {
     borderRadius: '2px',
     border: state.isDisabled ? '2px solid #eeeeee' : state.isFocused ? '2px solid #09ade0' : '2px solid #cccccc',
     boxShadow: state.isFocused ? 'none' : 'none',
-    borderColor: state.isDisabled ? '#eeeeee' : state.isFocused ? '#09ade0' : '#cccccc'
+    borderColor: state.isDisabled ? '#eeeeee' : state.isFocused ? '#09ade0' : '#cccccc',
+    zIndex: 700
   }),
   dropdownIndicator: (base, state) => ({
     ...base,
@@ -24,5 +25,9 @@ export const customStyles = {
     ...base,
     maxWidth: '260px',
     whiteSpace: 'inherit'
+  }),
+  menu: (base, state) => ({
+    ...base,
+    zIndex: 701
   })
 }

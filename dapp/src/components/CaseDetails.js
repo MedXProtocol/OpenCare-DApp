@@ -230,10 +230,12 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                   <p>{details.allergies}</p>
                 </div>
 
-                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                  <label className="label text-gray">Which allergies:</label>
-                  <p>{details.whatAllergies}</p>
-                </div>
+                {details.whatAllergies && details.whatAllergies.length ? (
+                  <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                    <label className="label text-gray">Which allergies:</label>
+                    <p>{details.whatAllergies}</p>
+                  </div>
+                ) : null}
               </div>
 
               <div className="row case-details--row">
@@ -243,12 +245,12 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                 </div>
 
                 <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                  <label className="label text-gray">How long have they had this problem:</label>
+                  <label className="label text-gray">Problem duration:</label>
                   <p>{details.howLong}</p>
                 </div>
 
                 <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                  <label className="label text-gray">Have they had it before:</label>
+                  <label className="label text-gray">Had it before:</label>
                   <p>{details.hadBefore}</p>
                 </div>
 
@@ -276,7 +278,8 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
 
 
               {
-                details.gender === 'Female' ? (
+                details.spotRashOrAcne === 'Acne'
+                && details.gender === 'Female' ? (
                   <div className="row case-details--row">
                     <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
                       <label className="label text-gray">Worse with period:</label>
