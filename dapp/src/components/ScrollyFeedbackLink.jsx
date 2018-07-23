@@ -9,7 +9,7 @@ export const ScrollyFeedbackLink = class _ScrollyFeedbackLink extends Component 
     transition: 'all .2s ease-in-out',
     bottom: 10,
     right: 10,
-    zIndex: 1
+    zIndex: 1030
   }
 
   hiddenStyle = {

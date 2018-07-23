@@ -20,9 +20,8 @@ import * as routes from '~/config/routes'
 function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-  const caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
-
-  // console.log(caseCount)
+  const caseCount = get(state, 'userStats.caseCount')
+  // const caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
 
   let cases = []
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
@@ -51,11 +50,8 @@ function mapStateToProps(state) {
   }
 }
 
-function* saga({ address, CaseManager }) {
-// console.log(address, CaseManager)
-  if (!address || !CaseManager) { return }
-  const caseCount = yield cacheCall(CaseManager, 'doctorCasesCount', address)
-// console.log(caseCount)
+function* saga({ caseCount, address, CaseManager }) {
+  if (!caseCount || !address || !CaseManager) { return }
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
     let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
     yield addContract({ address: caseAddress, contractKey: 'Case' })
@@ -106,7 +102,6 @@ export const OpenCasesContainer = ReactTimeout(withContractRegistry(connect(mapS
     })
 
     if (newCaseCount !== this.props.caseCount) {
-      console.log('dispatchNewCaseCount!')
       this.props.dispatchNewCaseCount(newCaseCount)
     }
   }

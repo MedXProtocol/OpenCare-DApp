@@ -38,6 +38,7 @@ import { cacheCall } from '~/saga-genesis/sagas'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { toastr } from '~/toastr'
+import { defined } from '~/utils/defined'
 
 function mapStateToProps (state) {
   let caseCount
@@ -138,13 +139,13 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     // Moving from 0 to 1, or 1 to 2, but not undefined/NaN (initial state) to a number
     if (
-      (oldCaseCount === undefined)
+      (!defined(oldCaseCount))
       || isNaN(nextProps.caseCount)
       || (oldCaseCount === nextProps.caseCount)
     ) {
       return
     }
-    console.log('running new CaseManager code')
+
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
     CaseManagerInstance.methods
       .doctorCaseAtIndex(address, nextProps.caseCount - 1)
