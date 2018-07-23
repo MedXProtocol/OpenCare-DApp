@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import classNames from 'classnames'
 import { defined } from '~/utils/defined'
+import FlipMove from 'react-flip-move'
 
 export const HippoTextInput = class _HippoTextInput extends Component {
 
@@ -31,24 +32,34 @@ export const HippoTextInput = class _HippoTextInput extends Component {
   render() {
     const { name, label, error, colClasses, type } = this.props
 
-    if (!this.state.visible) {
-      return null
-    }
-
     return (
-      <div className={colClasses ? 'row' : ''}>
-        <div className={colClasses ? colClasses : ''}>
-          <div className={classNames('form-group', { 'has-error': error })}>
-            <label className="control-label">{label}</label>
-            <input
-              name={name}
-              onChange={this.handleChange}
-              onBlur={this.handleBlur}
-              type={type ? type : "text"}
-              className="form-control" />
-            {error}
-          </div>
-        </div>
+      <div style={{ position: 'relative' }}>
+        <FlipMove
+          enterAnimation="accordionVertical"
+          leaveAnimation="accordionVertical"
+          maintainContainerHeight={true}
+        >
+          {!this.state.visible ?
+            <span key={`key-${name}-hidden`}>
+            </span>
+          : (
+              <div className={colClasses ? 'row' : ''}>
+                <div className={colClasses ? colClasses : ''}>
+                  <div className={classNames('form-group', { 'has-error': error })}>
+                    <label className="control-label">{label}</label>
+                    <input
+                      name={name}
+                      onChange={this.handleChange}
+                      onBlur={this.handleBlur}
+                      type={type ? type : "text"}
+                      className="form-control" />
+                    {error}
+                  </div>
+                </div>
+              </div>
+            )
+          }
+        </FlipMove>
       </div>
     )
   }
