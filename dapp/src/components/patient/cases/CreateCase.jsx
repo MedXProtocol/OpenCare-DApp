@@ -204,6 +204,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         firstImageHash: imageHash,
         firstFileName: fileName
       })
+
+      this.validateField('firstImageHash')
     }
 
     captureSecondImage = async (event) => {
@@ -231,6 +233,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         secondImageHash: imageHash,
         secondFileName: fileName
       })
+
+      this.validateField('secondImageHash')
     }
 
     captureFile = async (event, progressHandler) => {
@@ -243,37 +247,54 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     updateHowLong = (event) => {
-      this.setState({ howLong: event.target.value })
+      this.setState({ howLong: event.target.value }, () => {
+        this.validateField('howLong')
+      })
     }
 
     updateSize = (event) => {
-      this.setState({ size: event.target.value })
+      this.setState({ size: event.target.value }, () => {
+        this.validateField('size')
+      })
     }
 
     updatePainful = (event) => {
-      this.setState({ painful: event.target.value })
+      this.setState({ painful: event.target.value }, () => {
+        this.validateField('painful')
+      })
     }
 
     updateItching = (event) => {
-      this.setState({ itching: event.target.value })
+      this.setState({ itching: event.target.value }, () => {
+        this.validateField('itching')
+      })
     }
 
     updateBleeding = (event) => {
-      this.setState({ bleeding: event.target.value })
+      this.setState({ bleeding: event.target.value }, () => {
+        this.validateField('bleeding')
+      })
     }
 
     updateSkinCancer = (event) => {
-      this.setState({ skinCancer: event.target.value })
+      this.setState({ skinCancer: event.target.value }, () => {
+        this.validateField('skinCancer')
+      })
     }
 
     updateSexuallyActive = (event) => {
-      this.setState({ sexuallyActive: event.target.value })
+      this.setState({ sexuallyActive: event.target.value }, () => {
+        this.validateField('sexuallyActive')
+      })
     }
 
     checkCountry = () => {
+      this.validateField('country')
+
       if (this.state.country === 'US') {
         requiredFields.push('region')
       } else {
+        // if region is in the required fields array, remove it
         let index = requiredFields.indexOf('region')
         if (index > -1)
           requiredFields.splice(index, 1)
@@ -671,7 +692,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         </div>
                         <div className="col-xs-12 col-sm-6 col-md-3">
                           <div className={classNames('form-group', { 'has-error': errors['country'] })}>
-                            <label>Country</label>
+                            <label className="control-label">Country</label>
                             <Select
                               placeholder='Please select your Country'
                               styles={customStyles}
@@ -688,7 +709,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         </div>
                         <div className="col-xs-8 col-sm-3 col-md-3">
                           <div className={classNames('form-group', { 'has-error': errors['region'] })}>
-                            <label>State</label>
+                            <label className="control-label">State</label>
                             <Select
                               isDisabled={this.state.country !== 'US'}
                               placeholder='Please select your State'
@@ -698,7 +719,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               ref={this.setRegionRef}
                               options={regions}
                               onChange={(newValue) => {
-                                this.setState({ region: newValue ? newValue.value : '' })
+                                this.setState({ region: newValue ? newValue.value : '' }, () => {
+                                  if (this.state.country === 'US') {
+                                    this.validateField('region')
+                                  }
+                                })
                               }}
                               selected={this.state.region}
                             />
@@ -710,7 +735,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8">
                           <div className="form-group">
-                            <label>Please include any additional info below <span className="text-gray">(Optional)</span></label>
+                            <label className="control-label">Please include any additional info below <span className="text-gray">(Optional)</span></label>
                             <textarea
                               onChange={(event) => this.setState({ description: event.target.value })}
                               className="form-control"
