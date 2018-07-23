@@ -170,14 +170,14 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
           </div>
           <div className="card-body">
             <div className="row">
-              <div className="col-xs-12 col-md-6 text-center">
+              <div className="col-xs-12 col-md-6">
                 <br />
                 <label className="label text-gray">Overview Photo:</label>
                 <ImageLoader className={classNames({ 'hidden': !this.state.loading })} />
 
                 {this.overviewPhotoHtml()}
               </div>
-              <div className="col-xs-12 col-md-6 text-center">
+              <div className="col-xs-12 col-md-6">
                 <br />
                 <label className="label text-gray">Close-up Photo:</label>
                 <ImageLoader className={classNames({ 'hidden': !this.state.loading })} />
@@ -190,59 +190,127 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
               <div className="col-xs-12 col-sm-12 col-md-6">
                 <CaseDetailsLoader className={classNames('loader--case-details', { 'hidden': !this.state.loading })} />
               </div>
+            </div>
 
-              <div className={classNames({ 'hidden': this.state.loading })}>
-                <div className="col-xs-12">
-                    <label className="label text-gray">How long have you had this problem:</label>
-                    <p>{details.howLong}</p>
-                </div>
-                <div className="col-xs-12">
-                    <label className="label text-gray">Is it growing, shrinking or staying the same size:</label>
-                    <p>{details.size}</p>
-                </div>
-                 <div className="col-xs-12">
-                    <label className="label text-gray">Is it painful:</label>
-                    <p>{details.painful}</p>
-                </div>
-                <div className="col-xs-12">
-                    <label className="label text-gray">Is it bleeding:</label>
-                    <p>{details.bleeding}</p>
-                </div>
-                <div className="col-xs-12">
-                    <label className="label text-gray">Is it itching:</label>
-                    <p>{details.itching}</p>
+            <span className={classNames({ 'hidden': this.state.loading })}>
+              <div className="row case-details--row">
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">Age:</label>
+                  <p>{details.age}</p>
                 </div>
 
-                <div className="col-xs-12">
-                    <label className="label text-gray">Any history of skin cancer:</label>
-                    <p>{details.skinCancer}</p>
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">Gender:</label>
+                  <p>{details.gender}</p>
                 </div>
-                <div className="col-md-6">
-                    <label className="label text-gray">Are you sexually active:</label>
-                    <p>{details.sexuallyActive}</p>
-                </div>
-                <div className="col-xs-12">
-                     <label className="label text-gray">Has it changed in color:</label>
-                     <p>{details.color}</p>
-                 </div>
-                 <div className="col-xs-12">
-                     <label className="label text-gray">Have you tried any treatments so far:</label>
-                     <p>{details.prevTreatment}</p>
-                 </div>
-                <div className="col-xs-12">
-                    <label className="label text-gray">Age:</label>
-                    <p>{details.age}</p>
-                </div>
-                <div className="col-xs-12">
-                    <label className="label text-gray">Country:</label>
-                    <p>{details.country}</p>
-                </div>
-                <div className="col-xs-12">
-                    <label className="label text-gray">Additional comments:</label>
-                    <p>{details.description}</p>
+
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">Pregnant:</label>
+                  <p>{details.pregnant}</p>
                 </div>
               </div>
-            </div>
+
+              <div className="row case-details--row">
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">Country:</label>
+                  <p>{details.country}</p>
+                </div>
+
+                {details.country === 'US' ? (
+                  <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                    <label className="label text-gray">Region:</label>
+                    <p>{details.region}</p>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="row case-details--row">
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">Allergies:</label>
+                  <p>{details.allergies}</p>
+                </div>
+
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">What allergies:</label>
+                  <p>{details.whatAllergies}</p>
+                </div>
+              </div>
+
+              <div className="row case-details--row">
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">Type of problem:</label>
+                  <p>{details.spotRashOrAcne}</p>
+                </div>
+
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">How long have they had this problem:</label>
+                  <p>{details.howLong}</p>
+                </div>
+
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">Have they had it before:</label>
+                  <p>{details.hadBefore}</p>
+                </div>
+
+                {details.spotRashOrAcne === 'Spot' ? (
+                  <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                    <label className="label text-gray">Spot characteristics:</label>
+                    <p>{details.isTheSpot}</p>
+                  </div>
+                ) : null}
+
+                {details.spotRashOrAcne === 'Rash' ? (
+                  <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                    <label className="label text-gray">Rash characteristics:</label>
+                    <p>{details.isTheRash}</p>
+                  </div>
+                ) : null}
+
+                {details.spotRashOrAcne === 'Acne' ? (
+                  <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                    <label className="label text-gray">Acne characteristics:</label>
+                    <p>{details.acneDoesItInclude}</p>
+                  </div>
+                ) : null}
+              </div>
+
+
+              {
+                details.gender === 'Female' ? (
+                  <div className="row case-details--row">
+                    <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                      <label className="label text-gray">Worse with period:</label>
+                      <p>{details.worseWithPeriod}</p>
+                    </div>
+
+                    <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                      <label className="label text-gray">On birth control:</label>
+                      <p>{details.onBirthControl}</p>
+                    </div>
+                  </div>
+                ) : null
+              }
+
+              <div className="row case-details--row">
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">Sexually active:</label>
+                  <p>{details.sexuallyActive}</p>
+                </div>
+
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">Tried treatments previously:</label>
+                  <p>{details.prevTreatment}</p>
+                </div>
+              </div>
+
+              <div className="row case-details--row">
+                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                  <label className="label text-gray">Additional comments:</label>
+                  <p>{details.description}</p>
+                </div>
+              </div>
+            </span>
+
           </div>
         </div>
       )

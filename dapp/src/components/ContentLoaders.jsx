@@ -6,8 +6,8 @@ export const ImageLoader = props => (
     height={175}
     width={400}
     speed={1}
-    primaryColor="#ededed"
-    secondaryColor="#f2f2f2"
+    primaryColor="#eaeaea"
+    secondaryColor="#f5f5f5"
     {...props}
   >
     <rect x="0" y="0" rx="5" ry="5" width="400" height="175" />
@@ -19,8 +19,8 @@ export const CaseDetailsLoader = props => (
     height={160}
     width={400}
     speed={1}
-    primaryColor="#ededed"
-    secondaryColor="#f2f2f2"
+    primaryColor="#eaeaea"
+    secondaryColor="#f5f5f5"
     {...props}
   >
     <circle cx="10" cy="25" r="8" />
