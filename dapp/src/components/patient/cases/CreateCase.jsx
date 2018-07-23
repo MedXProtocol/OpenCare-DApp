@@ -26,6 +26,7 @@ import { Loading } from '~/components/Loading'
 import { HippoImageInput } from '~/components/forms/HippoImageInput'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
 import { HippoTextInput } from '~/components/forms/HippoTextInput'
+import { YourInfo } from './YourInfo'
 import { countries } from './countries'
 import { regions } from './regions'
 import { weiToMedX } from '~/utils/weiToMedX'
@@ -82,6 +83,8 @@ function* saga({ account, AccountManager, MedXToken }) {
 const requiredFields = [
   'firstImageHash',
   'secondImageHash',
+  'gender',
+  'allergies',
   'howLong',
   'size',
   'painful',
@@ -95,6 +98,10 @@ const requiredFields = [
   'country',
   'selectedDoctor'
 ]
+// These fields are dynamically added as required depending on choices the user makes:
+// 'pregnant'
+// 'whatAllergies'
+// 'region'
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(withSend(class _CreateCase extends Component {
     constructor(){
@@ -107,6 +114,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         secondImageHash: null,
         secondFileName: null,
         secondImagePercent: 0,
+        gender: null,
+        allergies: null,
+        pregnant: null,
+        whatAllergies: null,
         howLong: null,
         size: null,
         painful: null,
@@ -132,20 +143,44 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       // We need to update to React 0.16.3 to get this nice syntax instead:
       // this.ageInput = React.createRef();
 
-      this.setFirstImageHashRef = element => { this.firstImageHashInput = element }
-      this.setSecondImageHashRef = element => { this.secondImageHashInput = element }
-      this.setHowLongRef = element => { this.howLongInput = element }
-      this.setSizeRef = element => { this.sizeInput = element }
-      this.setPainfulRef = element => { this.painfulInput = element }
-      this.setBleedingRef = element => { this.bleedingInput = element }
-      this.setItchingRef = element => { this.itchingInput = element }
-      this.setSkinCancerRef = element => { this.skinCancerInput = element }
-      this.setSexuallyActiveRef = element => { this.sexuallyActiveInput = element }
-      this.setColorRef = element => { this.colorInput = element }
-      this.setPrevTreatmentRef = element => { this.prevTreatmentInput = element }
-      this.setAgeRef = element => { this.ageInput = element }
+      // this.setFirstImageHashRef = element => { this.firstImageHashInput = element }
+      // this.setSecondImageHashRef = element => { this.secondImageHashInput = element }
+      // this.setHowLongRef = element => { this.howLongInput = element }
+      // this.setSizeRef = element => { this.sizeInput = element }
+      // this.setPainfulRef = element => { this.painfulInput = element }
+      // this.setBleedingRef = element => { this.bleedingInput = element }
+      // this.setItchingRef = element => { this.itchingInput = element }
+      // this.setSkinCancerRef = element => { this.skinCancerInput = element }
+      // this.setSexuallyActiveRef = element => { this.sexuallyActiveInput = element }
+      // this.setColorRef = element => { this.colorInput = element }
+      // this.setPrevTreatmentRef = element => { this.prevTreatmentInput = element }
+      // this.setAgeRef = element => { this.ageInput = element }
       this.setCountryRef = element => { this.countryInput = element }
       this.setRegionRef = element => { this.regionInput = element }
+    }
+
+    handleSetRef = (element) => {
+      this[`${element.id}Input`] = element
+    }
+
+    // handleButtonGroupOnChange = (event, fieldName) => {
+    //   this.setState({ [fieldName]: event.target.value }, () => {
+    //     this.validateField(fieldName)
+    //   })
+    // }
+
+    handleButtonGroupOnChange = (event) => {
+      this.setState({ [event.target.name]: event.target.value }, () => {
+        this.validateField(event.target.name)
+      })
+    }
+
+    handleTextInputOnChange = (event) => {
+      this.setState({ [event.target.id]: event.target.value })
+    }
+
+    handleTextInputOnBlur = (event) => {
+      this.validateField(event.target.id)
     }
 
     componentWillReceiveProps (props) {
@@ -247,47 +282,47 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       return imageHash
     }
 
-    updateHowLong = (event) => {
-      this.setState({ howLong: event.target.value }, () => {
-        this.validateField('howLong')
-      })
-    }
+    // updateHowLong = (event) => {
+    //   this.setState({ howLong: event.target.value }, () => {
+    //     this.validateField('howLong')
+    //   })
+    // }
 
-    updateSize = (event) => {
-      this.setState({ size: event.target.value }, () => {
-        this.validateField('size')
-      })
-    }
+    // updateSize = (event) => {
+    //   this.setState({ size: event.target.value }, () => {
+    //     this.validateField('size')
+    //   })
+    // }
 
-    updatePainful = (event) => {
-      this.setState({ painful: event.target.value }, () => {
-        this.validateField('painful')
-      })
-    }
+    // updatePainful = (event) => {
+    //   this.setState({ painful: event.target.value }, () => {
+    //     this.validateField('painful')
+    //   })
+    // }
 
-    updateItching = (event) => {
-      this.setState({ itching: event.target.value }, () => {
-        this.validateField('itching')
-      })
-    }
+    // updateItching = (event) => {
+    //   this.setState({ itching: event.target.value }, () => {
+    //     this.validateField('itching')
+    //   })
+    // }
 
-    updateBleeding = (event) => {
-      this.setState({ bleeding: event.target.value }, () => {
-        this.validateField('bleeding')
-      })
-    }
+    // updateBleeding = (event) => {
+    //   this.setState({ bleeding: event.target.value }, () => {
+    //     this.validateField('bleeding')
+    //   })
+    // }
 
-    updateSkinCancer = (event) => {
-      this.setState({ skinCancer: event.target.value }, () => {
-        this.validateField('skinCancer')
-      })
-    }
+    // updateSkinCancer = (event) => {
+    //   this.setState({ skinCancer: event.target.value }, () => {
+    //     this.validateField('skinCancer')
+    //   })
+    // }
 
-    updateSexuallyActive = (event) => {
-      this.setState({ sexuallyActive: event.target.value }, () => {
-        this.validateField('sexuallyActive')
-      })
-    }
+    // updateSexuallyActive = (event) => {
+    //   this.setState({ sexuallyActive: event.target.value }, () => {
+    //     this.validateField('sexuallyActive')
+    //   })
+    // }
 
     checkCountry = () => {
       this.validateField('country')
@@ -430,6 +465,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       const caseInformation = {
         firstImageHash: this.state.firstImageHash,
         secondImageHash: this.state.secondImageHash,
+        gender: this.state.gender,
+        allergies: this.state.allergies,
+        pregnant: this.state.pregnant,
+        whatAllergies: this.state.whatAllergies,
         howLong: this.state.howLong,
         size: this.state.size,
         painful: this.state.painful,
@@ -544,6 +583,20 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                 <div className="card-body">
                   <div className="form-wrapper">
                     <form onSubmit={this.handleSubmit}>
+
+                      <div className="form-group--heading">
+                        Your Info:
+                      </div>
+
+                      <YourInfo
+                        errors={errors}
+                        textInputOnChange={this.handleTextInputOnChange}
+                        textInputOnBlur={this.handleTextInputOnBlur}
+                        buttonGroupOnChange={this.handleButtonGroupOnChange}
+                        gender={this.state.gender}
+                        allergies={this.state.allergies}
+                      />
+
                       <div className="form-group--heading">
                         Imagery:
                       </div>
@@ -684,18 +737,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       </div>
 
                       <div className="row">
-                        <div className="col-xs-6 col-sm-3 col-md-2">
-                          <HippoTextInput
-                            type='number'
-                            id='age'
-                            name='age'
-                            label='Age'
-                            error={errors['age']}
-                            setRef={this.setAgeRef}
-                            onBlur={this.validateField}
-                            onChange={(event) => this.setState({ age: event.target.value })}
-                          />
-                        </div>
                         <div className="col-xs-12 col-sm-6 col-md-3">
                           <div className={classNames('form-group', { 'has-error': errors['country'] })}>
                             <label className="control-label">Country</label>

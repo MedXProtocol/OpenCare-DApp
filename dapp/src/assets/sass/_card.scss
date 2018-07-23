@@ -103,11 +103,7 @@ $card-columns-margin:               $card-spacer-y;
 }
 
 .card-body > .form-wrapper {
-  padding: 1rem;
-
-  @media (max-width: 768px) {
-    padding: 2rem 0;
-  }
+  padding: 2rem 0;
 }
 
 .card-title {
@@ -362,9 +358,8 @@ $card-columns-margin:               $card-spacer-y;
 
 .card-header p {
   line-height: 1.4;
-  margin-bottom: 2rem;
-}
 
-.card-header p:last-child {
-  margin-bottom: 0;
+  @media (max-width: 768px) {
+    margin-bottom: 2rem;
+  }
 }
