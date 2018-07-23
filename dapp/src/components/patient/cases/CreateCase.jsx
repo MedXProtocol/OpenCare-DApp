@@ -138,10 +138,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       this.setRegionRef = element => { this.regionInput = element }
     }
 
-    handleSetRef = (element) => {
-      this[`${element.id}Input`] = element
-    }
-
     handleButtonGroupOnChange = (event) => {
       this.setState({ [event.target.name]: event.target.value }, () => {
         this.validateField(event.target.name)
