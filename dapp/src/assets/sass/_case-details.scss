@@ -1,9 +1,5 @@
 .case-details--row > div {
-  min-height: 100px;
-
-  @media (max-width: 768px) {
-    min-height: 60px;
-  }
+  min-height: 60px;
 }
 
 .case-details--row {

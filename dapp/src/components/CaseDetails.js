@@ -231,7 +231,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                 </div>
 
                 <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                  <label className="label text-gray">What allergies:</label>
+                  <label className="label text-gray">Which allergies:</label>
                   <p>{details.whatAllergies}</p>
                 </div>
               </div>
