@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { isTrue } from '~/utils/isTrue'
-import { Modal } from 'react-bootstrap'
+import { Button, Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import Select from 'react-select'
 import ReactTooltip from 'react-tooltip'
@@ -124,6 +124,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         showBalanceTooLowModal: false,
         showConfirmSubmissionModal: false,
         showPublicKeyModal: false,
+        showTermsModal: false,
         isSubmitting: false,
         errors: []
       }
@@ -370,6 +371,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       this.setState({ showBalanceTooLowModal: false })
     }
 
+    handleCloseDisclaimerModal = (event) => {
+      event.preventDefault();
+      this.setState({ showDisclaimerModal: false });
+    }
+
     handleCancelConfirmSubmissionModal = (event) => {
       event.preventDefault()
       this.setState({ showConfirmSubmissionModal: false })
@@ -524,12 +530,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
               <div className="card">
                 <div className="card-header">
                   <div className="row">
-                    <div className="col-xs-12 col-md-6">
+                    <div className="col-xs-12 col-md-9">
                       <p className="lead lead--card-title">
-                        Provide your physician(s) info about your problem.
+                        Tell your physician about your problem by answering the questions below.
                       </p>
                       <p className="text-gray">
-                        This will be encrypted. Only you and your physician will be able to read it.
+                        All information is encrypted and visible to only you and your physician. <a onClick={(e) => this.setState({ showDisclaimerModal: true })}>Read Disclaimer</a>
                       </p>
                     </div>
                   </div>
@@ -853,6 +859,32 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                 className="btn btn-primary">
                 Yes
               </button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={this.state.showDisclaimerModal}>
+            <Modal.Header>
+               <Modal.Title>
+                  Disclaimer:
+                </Modal.Title>
+             </Modal.Header>
+            <Modal.Body>
+              <p>
+                The MedCredits Health System is a decentralized platform that connects patients
+                and doctors globally. The MedCredits team does not have access to any patient
+                information, and does not guarantee any outcome on behalf of the doctors or
+                patients. For all evaluated cases, there is an option for a discounted second
+                opinion. However, patients should see a local medical provider if there is a
+                degree of concern. Lastly, an evaluation on Hippocrates is only as good as the
+                photos provided. So be sure the photos are high quality!
+              </p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                onClick={this.handleCloseDisclaimerModal}
+                bsStyle="primary">
+                OK
+              </Button>
             </Modal.Footer>
           </Modal>
 
