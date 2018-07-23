@@ -8,6 +8,7 @@ import { cacheCall } from '~/saga-genesis/sagas'
 import { CaseRow } from '~/components/CaseRow'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
+import { LoadingLines } from '~/components/LoadingLines'
 import get from 'lodash.get'
 import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
 import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
@@ -55,37 +56,47 @@ function* saga({ address, CaseManager }) {
 
 export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount']})(class _PatientCases extends Component {
   render() {
+    const loading = (
+      this.props.caseCount === undefined
+      || (this.props.caseCount !== undefined && !this.props.cases.length)
+    )
     return (
       <div className="card">
         <ScrollToTopOnMount />
         <div className="card-body table-responsive">
           {
-            !this.props.cases.length ?
-            <div className="blank-state">
-              <div className="blank-state--inner text-center text-gray">
-                <span>You do not have any historical or pending cases.</span>
+            loading ?
+              <div className="blank-state">
+                <div className="blank-state--inner text-center text-gray">
+                  <span><LoadingLines visible={true} /></span>
+                </div>
               </div>
-            </div> :
-            <div>
-              <h5 className="title subtitle">
-                Current Cases:
-              </h5>
-              <FlipMove enterAnimation="accordionVertical" className="case-list">
-                {this.props.cases.map(({caseAddress, status, caseIndex}) => {
-                  const statusLabel = caseStatusToName(status)
-                  const statusClass = caseStatusToClass(status)
-                  return (
-                    <CaseRow
-                      route={routes.PATIENTS_CASE}
-                      statusLabel={statusLabel}
-                      statusClass={statusClass}
-                      caseAddress={caseAddress}
-                      caseIndex={caseIndex}
-                      key={caseIndex} />
-                  )
-                })}
-              </FlipMove>
-            </div>
+            : !this.props.cases.length ?
+              <div className="blank-state">
+                <div className="blank-state--inner text-center text-gray">
+                  <span>You do not have any historical or pending cases.</span>
+                </div>
+              </div> :
+              <div>
+                <h5 className="title subtitle">
+                  Current Cases:
+                </h5>
+                <FlipMove enterAnimation="accordionVertical" className="case-list">
+                  {this.props.cases.map(({caseAddress, status, caseIndex}) => {
+                    const statusLabel = caseStatusToName(status)
+                    const statusClass = caseStatusToClass(status)
+                    return (
+                      <CaseRow
+                        route={routes.PATIENTS_CASE}
+                        statusLabel={statusLabel}
+                        statusClass={statusClass}
+                        caseAddress={caseAddress}
+                        caseIndex={caseIndex}
+                        key={caseIndex} />
+                    )
+                  })}
+                </FlipMove>
+              </div>
           }
         </div>
       </div>
