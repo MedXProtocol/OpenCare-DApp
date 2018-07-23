@@ -19,13 +19,10 @@ const chalk = require('chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
 
-let config;
-if (process.env.NODE_ENV === 'development') {
-  config = require('../config/webpack.config.staging');
-} else if (process.env.NODE_ENV === 'production') {
+let config = require('../config/webpack.config.staging');
+if (process.env.NODE_ENV === 'production') {
   config = require('../config/webpack.config.prod');
 }
-console.log(config.plugins)
 
 const paths = require('../config/paths');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
@@ -109,7 +106,13 @@ measureFileSizesBeforeBuild(paths.appBuild)
 
 // Create the production build and print the deployment instructions.
 function build(previousFileSizes) {
-  console.log('Creating an optimized production build...');
+
+  if (process.env.NODE_ENV === 'production') {
+    console.log('Creating an optimized production build...');
+  } else {
+    console.log('Creating a (less) optimized dev/staging build...');
+  }
+
   let compiler = webpack(config);
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
