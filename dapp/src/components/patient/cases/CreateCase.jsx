@@ -280,6 +280,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     validateField = (fieldName) => {
+      if (!requiredFields.includes(fieldName)) {
+        return
+      }
+
       const errors = this.state.errors
 
       if (!isNotEmptyString(this.state[fieldName])) {

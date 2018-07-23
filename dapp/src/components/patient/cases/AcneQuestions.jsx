@@ -28,11 +28,11 @@ export const AcneQuestions = class _AcneQuestions extends Component {
         />
 
         <HippoCheckboxGroup
-          id='isTheAcne'
-          name="isTheAcne"
+          id='acneDoesItInclude'
+          name="acneDoesItInclude"
           colClasses='col-xs-12 col-md-8'
           label='Does it include: (check all that apply)'
-          error={errors['isTheAcne']}
+          error={errors['acneDoesItInclude']}
           checkboxGroupOnChange={checkboxGroupOnChange}
           values={['Whiteheads', 'Blackheads', 'Large bumps']}
         />
