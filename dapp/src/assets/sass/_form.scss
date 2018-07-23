@@ -73,8 +73,12 @@
   font-weight: 700;
   font-size: 15px;
   letter-spacing: 1px;
-  margin: 0 0 1rem 0;
+  margin: 4rem 0 1rem 0;
   text-transform: uppercase;
+}
+
+.form-group--heading:first-child {
+  margin-top: 0;
 }
 
 .content .form-group--heading__not-first {

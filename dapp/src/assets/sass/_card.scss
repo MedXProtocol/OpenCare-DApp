@@ -43,10 +43,10 @@ $card-columns-margin:               $card-spacer-y;
   }
 
   .card-body {
-    padding: 3rem;
+    padding: 2rem 4rem;
 
     @media screen and (max-width: 767px) {
-      padding: 3rem 2rem;
+      padding: 2rem 2rem;
     }
   }
 
@@ -95,15 +95,15 @@ $card-columns-margin:               $card-spacer-y;
   // Enable `flex-grow: 1` for decks and groups so that card blocks take up
   // as much space as possible, ensuring footers are aligned to the bottom.
   flex: 1 1 auto;
-  padding: 3rem;
+  padding: 2rem 4rem;
+
+  @media screen and (max-width: 767px) {
+    padding: 2rem 2rem;
+  }
 }
 
 .card-body > .form-wrapper {
-  padding: 1rem;
-
-  @media (max-width: 768px) {
-    padding: 2rem 0;
-  }
+  padding: 2rem 0;
 }
 
 .card-title {
@@ -135,7 +135,7 @@ $card-columns-margin:               $card-spacer-y;
 //
 
 .card-header {
-  padding: 2rem 3rem;
+  padding: 2rem 4rem;
   margin-bottom: 0; // Removes the default margin-bottom of <hN>
   background-color: white;
   border-bottom: $card-border-width solid $card-border-color;
@@ -353,5 +353,13 @@ $card-columns-margin:               $card-spacer-y;
   @media (max-width: 768px) {
     margin-left: 0;
     margin-right: 0;
+  }
+}
+
+.card-header p {
+  line-height: 1.4;
+
+  @media (max-width: 768px) {
+    margin-bottom: 2rem;
   }
 }

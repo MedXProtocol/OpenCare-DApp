@@ -1,12 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { isTrue } from '~/utils/isTrue'
-import { Modal } from 'react-bootstrap'
+import { Button, Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
-import Select from 'react-select'
 import ReactTooltip from 'react-tooltip'
-import * as Animated from 'react-select/lib/animated';
-import { customStyles } from '~/config/react-select-custom-styles'
 import { withRouter } from 'react-router-dom'
 import classNames from 'classnames'
 import { isNotEmptyString } from '~/utils/common-util'
@@ -24,10 +21,10 @@ import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
 import { HippoImageInput } from '~/components/forms/HippoImageInput'
-import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
-import { HippoTextInput } from '~/components/forms/HippoTextInput'
-import { countries } from './countries'
-import { regions } from './regions'
+import { PatientInfo } from './PatientInfo'
+import { SpotQuestions } from './SpotQuestions'
+import { RashQuestions } from './RashQuestions'
+import { AcneQuestions } from './AcneQuestions'
 import { weiToMedX } from '~/utils/weiToMedX'
 import { medXToWei } from '~/utils/medXToWei'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
@@ -80,21 +77,25 @@ function* saga({ account, AccountManager, MedXToken }) {
 }
 
 const requiredFields = [
+  'age',
+  'gender',
+  'country',
+  'allergies',
+  'spotRashOrAcne',
   'firstImageHash',
   'secondImageHash',
   'howLong',
-  'size',
-  'painful',
-  'bleeding',
-  'itching',
-  'skinCancer',
   'sexuallyActive',
-  'color',
   'prevTreatment',
-  'age',
-  'country',
   'selectedDoctor'
 ]
+// These fields are dynamically added as required depending on choices the user makes:
+// 'pregnant' => female only
+// 'whatAllergies' => allergies yes only
+// 'region' => USA only
+// 'worseWithPeriod' => female only
+// 'onBirthControl' => female only
+// 'hadBefore' => spot/rash only
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(withSend(class _CreateCase extends Component {
     constructor(){
@@ -107,44 +108,60 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         secondImageHash: null,
         secondFileName: null,
         secondImagePercent: 0,
+        gender: null,
+        allergies: null,
+        pregnant: null,
+        whatAllergies: null,
         howLong: null,
-        size: null,
-        painful: null,
-        bleeding: null,
-        itching: null,
-        skinCancer: null,
+        hadBefore: null,
+        isTheSpot: [],
+        isTheRash: [],
+        acneDoesItInclude: [],
         sexuallyActive: null,
         age: null,
         country: null,
         region: null,
-        color: null,
         prevTreatment: null,
         description: null,
+        onBirthControl: null,
+        worseWithPeriod: null,
         caseEncryptionKey: genKey(32),
         showBalanceTooLowModal: false,
         showConfirmSubmissionModal: false,
         showPublicKeyModal: false,
+        showTermsModal: false,
         isSubmitting: false,
         errors: []
       }
 
-      // We need to update to React 0.16.3 to get this nice syntax instead:
-      // this.ageInput = React.createRef();
-
-      this.setFirstImageHashRef = element => { this.firstImageHashInput = element }
-      this.setSecondImageHashRef = element => { this.secondImageHashInput = element }
-      this.setHowLongRef = element => { this.howLongInput = element }
-      this.setSizeRef = element => { this.sizeInput = element }
-      this.setPainfulRef = element => { this.painfulInput = element }
-      this.setBleedingRef = element => { this.bleedingInput = element }
-      this.setItchingRef = element => { this.itchingInput = element }
-      this.setSkinCancerRef = element => { this.skinCancerInput = element }
-      this.setSexuallyActiveRef = element => { this.sexuallyActiveInput = element }
-      this.setColorRef = element => { this.colorInput = element }
-      this.setPrevTreatmentRef = element => { this.prevTreatmentInput = element }
-      this.setAgeRef = element => { this.ageInput = element }
       this.setCountryRef = element => { this.countryInput = element }
       this.setRegionRef = element => { this.regionInput = element }
+    }
+
+    handleButtonGroupOnChange = (event) => {
+      this.setState({ [event.target.name]: event.target.value }, () => {
+        this.validateField(event.target.name)
+      })
+    }
+
+    handleCheckboxGroupOnChange = (event) => {
+      let currentValues = this.state[event.target.name]
+
+      if (currentValues.includes(event.target.value)) {
+        pull(currentValues, event.target.value)
+      } else {
+        currentValues.push(event.target.value)
+      }
+
+      this.setState({ [event.target.name]: currentValues })
+    }
+
+    handleTextInputOnChange = (event) => {
+      this.setState({ [event.target.id]: event.target.value })
+    }
+
+    handleTextInputOnBlur = (event) => {
+      this.validateField(event.target.id)
     }
 
     componentWillReceiveProps (props) {
@@ -246,48 +263,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       return imageHash
     }
 
-    updateHowLong = (event) => {
-      this.setState({ howLong: event.target.value }, () => {
-        this.validateField('howLong')
-      })
-    }
-
-    updateSize = (event) => {
-      this.setState({ size: event.target.value }, () => {
-        this.validateField('size')
-      })
-    }
-
-    updatePainful = (event) => {
-      this.setState({ painful: event.target.value }, () => {
-        this.validateField('painful')
-      })
-    }
-
-    updateItching = (event) => {
-      this.setState({ itching: event.target.value }, () => {
-        this.validateField('itching')
-      })
-    }
-
-    updateBleeding = (event) => {
-      this.setState({ bleeding: event.target.value }, () => {
-        this.validateField('bleeding')
-      })
-    }
-
-    updateSkinCancer = (event) => {
-      this.setState({ skinCancer: event.target.value }, () => {
-        this.validateField('skinCancer')
-      })
-    }
-
-    updateSexuallyActive = (event) => {
-      this.setState({ sexuallyActive: event.target.value }, () => {
-        this.validateField('sexuallyActive')
-      })
-    }
-
     checkCountry = () => {
       this.validateField('country')
 
@@ -370,6 +345,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       this.setState({ showBalanceTooLowModal: false })
     }
 
+    handleCloseDisclaimerModal = (event) => {
+      event.preventDefault();
+      this.setState({ showDisclaimerModal: false });
+    }
+
     handleCancelConfirmSubmissionModal = (event) => {
       event.preventDefault()
       this.setState({ showConfirmSubmissionModal: false })
@@ -413,6 +393,18 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       }
     }
 
+    handleCountryChange = (newValue) => {
+      this.setState({ country: newValue.value }, this.checkCountry)
+    }
+
+    handleRegionChange = (newValue) => {
+      this.setState({ region: newValue ? newValue.value : '' }, () => {
+        if (this.state.country === 'US') {
+          this.validateField('region')
+        }
+      })
+    }
+
     onChangeDoctor = (option) => {
       this.setState({
         selectedDoctor: option
@@ -424,17 +416,22 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       const caseInformation = {
         firstImageHash: this.state.firstImageHash,
         secondImageHash: this.state.secondImageHash,
+        gender: this.state.gender,
+        allergies: this.state.allergies,
+        pregnant: this.state.pregnant,
+        whatAllergies: this.state.whatAllergies,
         howLong: this.state.howLong,
-        size: this.state.size,
-        painful: this.state.painful,
-        bleeding: this.state.bleeding,
-        itching: this.state.itching,
+        hadBefore: this.state.hadBefore,
+        isTheSpot: this.state.isTheSpot,
+        isTheRash: this.state.isTheRash,
+        acneDoesItInclude: this.state.acneDoesItInclude,
+        worseWithPeriod: this.state.worseWithPeriod,
+        onBirthControl: this.state.onBirthControl,
         skinCancer: this.state.skinCancer,
         sexuallyActive: this.state.sexuallyActive,
         age: this.state.age,
         country: this.state.country,
         region: this.state.region,
-        color: this.state.color,
         prevTreatment: this.state.prevTreatment,
         description: this.state.description
       }
@@ -517,6 +514,33 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         var secondFileError = <p className='has-error help-block'>{this.state.secondFileError}</p>
       }
 
+      if (this.state.spotRashOrAcne === 'Spot') {
+        var spotQuestions = <SpotQuestions
+          errors={errors}
+          textInputOnChange={this.handleTextInputOnChange}
+          textInputOnBlur={this.handleTextInputOnBlur}
+          buttonGroupOnChange={this.handleButtonGroupOnChange}
+          checkboxGroupOnChange={this.handleCheckboxGroupOnChange}
+        />
+      } else if (this.state.spotRashOrAcne === 'Rash') {
+        var rashQuestions =<RashQuestions
+          errors={errors}
+          textInputOnChange={this.handleTextInputOnChange}
+          textInputOnBlur={this.handleTextInputOnBlur}
+          buttonGroupOnChange={this.handleButtonGroupOnChange}
+          checkboxGroupOnChange={this.handleCheckboxGroupOnChange}
+        />
+      } else if (this.state.spotRashOrAcne === 'Acne') {
+        var acneQuestions = <AcneQuestions
+          errors={errors}
+          textInputOnChange={this.handleTextInputOnChange}
+          textInputOnBlur={this.handleTextInputOnBlur}
+          buttonGroupOnChange={this.handleButtonGroupOnChange}
+          checkboxGroupOnChange={this.handleCheckboxGroupOnChange}
+          gender={this.state.gender}
+        />
+      }
+
       return (
         <div>
           <div className="row">
@@ -524,12 +548,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
               <div className="card">
                 <div className="card-header">
                   <div className="row">
-                    <div className="col-xs-12 col-md-6">
+                    <div className="col-xs-12 col-md-9">
                       <p className="lead lead--card-title">
-                        Provide your physician(s) info about your problem.
+                        Tell your physician about your problem by answering the questions below.
                       </p>
                       <p className="text-gray">
-                        This will be encrypted. Only you and your physician will be able to read it.
+                        All information is encrypted and visible to only you and your physician. <a onClick={(e) => this.setState({ showDisclaimerModal: true })}>Read Disclaimer</a>
                       </p>
                     </div>
                   </div>
@@ -538,6 +562,22 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                 <div className="card-body">
                   <div className="form-wrapper">
                     <form onSubmit={this.handleSubmit}>
+
+                      <PatientInfo
+                        errors={errors}
+                        textInputOnChange={this.handleTextInputOnChange}
+                        textInputOnBlur={this.handleTextInputOnBlur}
+                        buttonGroupOnChange={this.handleButtonGroupOnChange}
+                        gender={this.state.gender}
+                        allergies={this.state.allergies}
+                        setCountryRef={this.setCountryRef}
+                        setRegionRef={this.setRegionRef}
+                        country={this.state.country}
+                        region={this.state.region}
+                        handleCountryChange={this.handleCountryChange}
+                        handleRegionChange={this.handleRegionChange}
+                      />
+
                       <div className="form-group--heading">
                         Imagery:
                       </div>
@@ -558,7 +598,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoImageInput
                         name='secondImage'
                         id='secondImageHash'
-                        label="Close-up Photo:"
+                        label={`Close-up Photo: ${this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}`}
                         colClasses='col-xs-12 col-sm-12 col-md-8'
                         error={errors['secondImageHash']}
                         fileError={secondFileError}
@@ -573,164 +613,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         Details:
                       </div>
 
-                      <HippoToggleButtonGroup
-                        id='howLong'
-                        name="howLong"
-                        colClasses='col-xs-12 col-md-8'
-                        label='How long have you had this problem?'
-                        error={errors['howLong']}
-                        setRef={this.setHowLongRef}
-                        onChange={this.updateHowLong}
-                        values={['Days', 'Weeks', 'Months', 'Years']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='size'
-                        name="size"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Is it growing, shrinking or staying the same size?'
-                        error={errors['size']}
-                        setRef={this.setSizeRef}
-                        onChange={this.updateSize}
-                        values={['Growing', 'Shrinking', 'Same size']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='painful'
-                        name="painful"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Is it painful?'
-                        error={errors['painful']}
-                        setRef={this.setPainfulRef}
-                        onChange={this.updatePainful}
-                        values={['Yes', 'No']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='bleeding'
-                        name="bleeding"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Is it bleeding?'
-                        error={errors['bleeding']}
-                        setRef={this.setBleedingRef}
-                        onChange={this.updateBleeding}
-                        values={['Yes', 'No']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='itching'
-                        name="itching"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Is it itching?'
-                        error={errors['itching']}
-                        setRef={this.setItchingRef}
-                        onChange={this.updateItching}
-                        values={['Yes', 'No']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='skinCancer'
-                        name="skinCancer"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Any history of skin cancer?'
-                        error={errors['skinCancer']}
-                        setRef={this.setSkinCancerRef}
-                        onChange={this.updateSkinCancer}
-                        values={['Yes', 'No']}
-                      />
-
-                      <HippoToggleButtonGroup
-                        id='sexuallyActive'
-                        name="sexuallyActive"
-                        colClasses='col-xs-12 col-md-8'
-                        label='Are you sexually active?'
-                        error={errors['sexuallyActive']}
-                        setRef={this.setSexuallyActiveRef}
-                        onChange={this.updateSexuallyActive}
-                        values={['Yes', 'No']}
-                      />
-
-                      <HippoTextInput
-                        id='color'
-                        name="color"
-                        colClasses='col-xs-12 col-sm-12 col-md-8'
-                        label='Has it changed in color?'
-                        error={errors['color']}
-                        setRef={this.setColorRef}
-                        onBlur={this.validateField}
-                        onChange={(event) => this.setState({ color: event.target.value })}
-                      />
-
-                      <HippoTextInput
-                        id='prevTreatment'
-                        name="prevTreatment"
-                        colClasses='col-xs-12 col-sm-12 col-md-8'
-                        label='Have you tried any treatments so far?'
-                        error={errors['prevTreatment']}
-                        setRef={this.setPrevTreatmentRef}
-                        onBlur={this.validateField}
-                        onChange={(event) => this.setState({ prevTreatment: event.target.value })}
-                      />
-
-
-                      <div className="form-group--heading">
-                        Additional Info:
-                      </div>
-
-                      <div className="row">
-                        <div className="col-xs-6 col-sm-3 col-md-2">
-                          <HippoTextInput
-                            type='number'
-                            id='age'
-                            name='age'
-                            label='Age'
-                            error={errors['age']}
-                            setRef={this.setAgeRef}
-                            onBlur={this.validateField}
-                            onChange={(event) => this.setState({ age: event.target.value })}
-                          />
-                        </div>
-                        <div className="col-xs-12 col-sm-6 col-md-3">
-                          <div className={classNames('form-group', { 'has-error': errors['country'] })}>
-                            <label className="control-label">Country</label>
-                            <Select
-                              placeholder='Please select your Country'
-                              styles={customStyles}
-                              components={Animated}
-                              closeMenuOnSelect={true}
-                              ref={this.setCountryRef}
-                              options={countries}
-                              onChange={(newValue) => this.setState({ country: newValue.value }, this.checkCountry)}
-                              selected={this.state.country}
-                              required
-                            />
-                            {errors['country']}
-                          </div>
-                        </div>
-                        <div className="col-xs-8 col-sm-3 col-md-3">
-                          <div className={classNames('form-group', { 'has-error': errors['region'] })}>
-                            <label className="control-label">State</label>
-                            <Select
-                              isDisabled={this.state.country !== 'US'}
-                              placeholder='Please select your State'
-                              styles={customStyles}
-                              components={Animated}
-                              closeMenuOnSelect={true}
-                              ref={this.setRegionRef}
-                              options={regions}
-                              onChange={(newValue) => {
-                                this.setState({ region: newValue ? newValue.value : '' }, () => {
-                                  if (this.state.country === 'US') {
-                                    this.validateField('region')
-                                  }
-                                })
-                              }}
-                              selected={this.state.region}
-                            />
-                            {errors['region']}
-                          </div>
-                        </div>
-                      </div>
+                      {spotQuestions}
+                      {rashQuestions}
+                      {acneQuestions}
 
                       <div className="row">
                         <div className="col-xs-12 col-sm-12 col-md-8">
@@ -853,6 +738,32 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                 className="btn btn-primary">
                 Yes
               </button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={this.state.showDisclaimerModal}>
+            <Modal.Header>
+               <Modal.Title>
+                  Disclaimer:
+                </Modal.Title>
+             </Modal.Header>
+            <Modal.Body>
+              <p>
+                The MedCredits Health System is a decentralized platform that connects patients
+                and doctors globally. The MedCredits team does not have access to any patient
+                information, and does not guarantee any outcome on behalf of the doctors or
+                patients. For all evaluated cases, there is an option for a discounted second
+                opinion. However, patients should see a local medical provider if there is a
+                degree of concern. Lastly, an evaluation on Hippocrates is only as good as the
+                photos provided. So be sure the photos are high quality!
+              </p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                onClick={this.handleCloseDisclaimerModal}
+                bsStyle="primary">
+                OK
+              </Button>
             </Modal.Footer>
           </Modal>
 

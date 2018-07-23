@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import classNames from 'classnames'
 import { defined } from '~/utils/defined'
-import { ControlLabel, ToggleButtonGroup, ToggleButton, ButtonToolbar } from 'react-bootstrap'
+import { ControlLabel, Checkbox, FormGroup } from 'react-bootstrap'
 import FlipMove from 'react-flip-move'
 
-export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Component {
+export const HippoCheckboxGroup = class _HippoCheckboxGroup extends Component {
 
   constructor(props) {
     super(props)
@@ -22,7 +22,7 @@ export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Comp
 
   handleChange = (event) => {
     event.persist()
-    this.props.buttonGroupOnChange(event)
+    this.props.checkboxGroupOnChange(event)
   }
 
   render() {
@@ -43,20 +43,21 @@ export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Comp
               <div className={colClasses}>
                 <div id={id} className={classNames('form-group', { 'has-error': error })}>
                   <ControlLabel>{label}</ControlLabel>
-                  <ButtonToolbar>
-                    <ToggleButtonGroup name={name} type="radio">
-                      {
-                        values.map((value) => {
-                          return <ToggleButton
-                                  key={`${name}-${value}`}
-                                  onChange={this.handleChange}
-                                  value={value}>
+                  <FormGroup>
+                    {
+                      values.map((value) => {
+                        return <Checkbox
+                                key={`${name}-${value}`}
+                                name={name}
+                                inline
+                                onClick={this.handleChange}
+                                value={value}>
                                   {value}
-                                </ToggleButton>
-                        })
-                      }
-                    </ToggleButtonGroup>
-                  </ButtonToolbar>
+                                </Checkbox>
+                      })
+                    }
+                  </FormGroup>
+
                   {error}
                 </div>
               </div>
