@@ -12,15 +12,15 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
-const publicPath = paths.servedPath;
+let publicPath = paths.servedPath;
 
 // `publicUrl` is just like `publicPath`, but we will provide it to our app
 // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
 // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
-const publicUrl = publicPath.slice(0, -1);
+let publicUrl = publicPath.slice(0, -1);
 
-const getClientEnvironment = require('./env');
-const env = getClientEnvironment(publicUrl);
+let getClientEnvironment = require('./env');
+let env = getClientEnvironment(publicUrl);
 
 const merge = require('webpack-merge')
 const prodStagingShared = require('./webpack.prodStaging.shared')
