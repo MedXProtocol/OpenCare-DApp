@@ -48,6 +48,7 @@ export const HippoTextInput = class _HippoTextInput extends Component {
                   <div className={classNames('form-group', { 'has-error': error })}>
                     <label className="control-label">{label}</label>
                     <input
+                      id={name}
                       name={name}
                       onChange={this.handleChange}
                       onBlur={this.handleBlur}

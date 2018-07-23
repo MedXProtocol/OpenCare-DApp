@@ -21,8 +21,6 @@ import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
 import { HippoImageInput } from '~/components/forms/HippoImageInput'
-import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
-import { HippoTextInput } from '~/components/forms/HippoTextInput'
 import { PatientInfo } from './PatientInfo'
 import { SpotQuestions } from './SpotQuestions'
 import { RashQuestions } from './RashQuestions'
@@ -79,21 +77,19 @@ function* saga({ account, AccountManager, MedXToken }) {
 }
 
 const requiredFields = [
+  'age',
+  'gender',
+  'country',
+  'allergies',
+  'spotRashOrAcne',
   'firstImageHash',
   'secondImageHash',
-  'gender',
-  'allergies',
   'howLong',
+  'hadBefore',
   'size',
-  'painful',
-  'bleeding',
-  'itching',
-  'skinCancer',
   'sexuallyActive',
   'color',
   'prevTreatment',
-  'age',
-  'country',
   'selectedDoctor'
 ]
 // These fields are dynamically added as required depending on choices the user makes:
@@ -117,11 +113,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         pregnant: null,
         whatAllergies: null,
         howLong: null,
+        hadBefore: null,
         size: null,
-        painful: null,
-        bleeding: null,
-        itching: null,
-        skinCancer: null,
+        isTheSpot: [],
         sexuallyActive: null,
         age: null,
         country: null,
@@ -138,21 +132,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         errors: []
       }
 
-      // We need to update to React 0.16.3 to get this nice syntax instead:
-      // this.ageInput = React.createRef();
-
-      // this.setFirstImageHashRef = element => { this.firstImageHashInput = element }
-      // this.setSecondImageHashRef = element => { this.secondImageHashInput = element }
-      // this.setHowLongRef = element => { this.howLongInput = element }
-      // this.setSizeRef = element => { this.sizeInput = element }
-      // this.setPainfulRef = element => { this.painfulInput = element }
-      // this.setBleedingRef = element => { this.bleedingInput = element }
-      // this.setItchingRef = element => { this.itchingInput = element }
-      // this.setSkinCancerRef = element => { this.skinCancerInput = element }
-      // this.setSexuallyActiveRef = element => { this.sexuallyActiveInput = element }
-      // this.setColorRef = element => { this.colorInput = element }
-      // this.setPrevTreatmentRef = element => { this.prevTreatmentInput = element }
-      // this.setAgeRef = element => { this.ageInput = element }
       this.setCountryRef = element => { this.countryInput = element }
       this.setRegionRef = element => { this.regionInput = element }
     }
@@ -161,16 +140,22 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       this[`${element.id}Input`] = element
     }
 
-    // handleButtonGroupOnChange = (event, fieldName) => {
-    //   this.setState({ [fieldName]: event.target.value }, () => {
-    //     this.validateField(fieldName)
-    //   })
-    // }
-
     handleButtonGroupOnChange = (event) => {
       this.setState({ [event.target.name]: event.target.value }, () => {
         this.validateField(event.target.name)
       })
+    }
+
+    handleCheckboxGroupOnChange = (event) => {
+      let currentValues = this.state[event.target.name]
+
+      if (currentValues.includes(event.target.value)) {
+        pull(currentValues, event.target.value)
+      } else {
+        currentValues.push(event.target.value)
+      }
+
+      this.setState({ [event.target.name]: currentValues })
     }
 
     handleTextInputOnChange = (event) => {
@@ -279,48 +264,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
       return imageHash
     }
-
-    // updateHowLong = (event) => {
-    //   this.setState({ howLong: event.target.value }, () => {
-    //     this.validateField('howLong')
-    //   })
-    // }
-
-    // updateSize = (event) => {
-    //   this.setState({ size: event.target.value }, () => {
-    //     this.validateField('size')
-    //   })
-    // }
-
-    // updatePainful = (event) => {
-    //   this.setState({ painful: event.target.value }, () => {
-    //     this.validateField('painful')
-    //   })
-    // }
-
-    // updateItching = (event) => {
-    //   this.setState({ itching: event.target.value }, () => {
-    //     this.validateField('itching')
-    //   })
-    // }
-
-    // updateBleeding = (event) => {
-    //   this.setState({ bleeding: event.target.value }, () => {
-    //     this.validateField('bleeding')
-    //   })
-    // }
-
-    // updateSkinCancer = (event) => {
-    //   this.setState({ skinCancer: event.target.value }, () => {
-    //     this.validateField('skinCancer')
-    //   })
-    // }
-
-    // updateSexuallyActive = (event) => {
-    //   this.setState({ sexuallyActive: event.target.value }, () => {
-    //     this.validateField('sexuallyActive')
-    //   })
-    // }
 
     checkCountry = () => {
       this.validateField('country')
@@ -480,6 +423,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         pregnant: this.state.pregnant,
         whatAllergies: this.state.whatAllergies,
         howLong: this.state.howLong,
+        hadBefore: this.state.hadBefore,
+        isTheSpot: this.state.isTheSpot,
         size: this.state.size,
         painful: this.state.painful,
         bleeding: this.state.bleeding,
@@ -578,6 +523,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           textInputOnChange={this.handleTextInputOnChange}
           textInputOnBlur={this.handleTextInputOnBlur}
           buttonGroupOnChange={this.handleButtonGroupOnChange}
+          checkboxGroupOnChange={this.handleCheckboxGroupOnChange}
         />
       } else if (this.state.spotRashOrAcne === 'Rash') {
         var rashQuestions =<RashQuestions
