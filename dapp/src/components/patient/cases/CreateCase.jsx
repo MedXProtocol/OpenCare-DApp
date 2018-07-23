@@ -85,17 +85,17 @@ const requiredFields = [
   'firstImageHash',
   'secondImageHash',
   'howLong',
-  'hadBefore',
-  'size',
   'sexuallyActive',
-  'color',
   'prevTreatment',
   'selectedDoctor'
 ]
 // These fields are dynamically added as required depending on choices the user makes:
-// 'pregnant'
-// 'whatAllergies'
-// 'region'
+// 'pregnant' => female only
+// 'whatAllergies' => allergies yes only
+// 'region' => USA only
+// 'worseWithPeriod' => female only
+// 'onBirthControl' => female only
+// 'hadBefore' => spot/rash only
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(withSend(class _CreateCase extends Component {
     constructor(){
@@ -114,15 +114,17 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         whatAllergies: null,
         howLong: null,
         hadBefore: null,
-        size: null,
         isTheSpot: [],
+        isTheRash: [],
+        acneDoesItInclude: [],
         sexuallyActive: null,
         age: null,
         country: null,
         region: null,
-        color: null,
         prevTreatment: null,
         description: null,
+        onBirthControl: null,
+        worseWithPeriod: null,
         caseEncryptionKey: genKey(32),
         showBalanceTooLowModal: false,
         showConfirmSubmissionModal: false,
@@ -425,16 +427,15 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         howLong: this.state.howLong,
         hadBefore: this.state.hadBefore,
         isTheSpot: this.state.isTheSpot,
-        size: this.state.size,
-        painful: this.state.painful,
-        bleeding: this.state.bleeding,
-        itching: this.state.itching,
+        isTheRash: this.state.isTheRash,
+        acneDoesItInclude: this.state.acneDoesItInclude,
+        worseWithPeriod: this.state.worseWithPeriod,
+        onBirthControl: this.state.onBirthControl,
         skinCancer: this.state.skinCancer,
         sexuallyActive: this.state.sexuallyActive,
         age: this.state.age,
         country: this.state.country,
         region: this.state.region,
-        color: this.state.color,
         prevTreatment: this.state.prevTreatment,
         description: this.state.description
       }
@@ -531,6 +532,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           textInputOnChange={this.handleTextInputOnChange}
           textInputOnBlur={this.handleTextInputOnBlur}
           buttonGroupOnChange={this.handleButtonGroupOnChange}
+          checkboxGroupOnChange={this.handleCheckboxGroupOnChange}
         />
       } else if (this.state.spotRashOrAcne === 'Acne') {
         var acneQuestions = <AcneQuestions
@@ -538,6 +540,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           textInputOnChange={this.handleTextInputOnChange}
           textInputOnBlur={this.handleTextInputOnBlur}
           buttonGroupOnChange={this.handleButtonGroupOnChange}
+          checkboxGroupOnChange={this.handleCheckboxGroupOnChange}
+          gender={this.state.gender}
         />
       }
 
@@ -598,7 +602,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       <HippoImageInput
                         name='secondImage'
                         id='secondImageHash'
-                        label={`Close-up Photo: ${this.state.spotRashOrAcne === 'Rash' ? '(separate location from above if on more than one body part)' : ''}`}
+                        label={`Close-up Photo: ${this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}`}
                         colClasses='col-xs-12 col-sm-12 col-md-8'
                         error={errors['secondImageHash']}
                         fileError={secondFileError}
