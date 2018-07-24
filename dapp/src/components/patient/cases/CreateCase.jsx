@@ -736,11 +736,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                           <button
                             type="submit"
                             className="btn btn-lg btn-success"
-                            data-tip={this.props.medXBeingSent ? "Your MedX transaction needs to complete, please wait ..." : ''}
+                            data-tip={"Your MedX transaction needs to complete, please wait ..."}
                           >
                             Submit Case
                           </button>
-                          <ReactTooltip effect='solid' place='left' />
+                          <ReactTooltip effect='solid' place='top' />
                           <br />
                           <br />
                           <br />

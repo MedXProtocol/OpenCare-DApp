@@ -111,3 +111,15 @@
     margin-right: 0;
   }
 }
+
+.radio-inline + .radio-inline,
+.checkbox-inline + .checkbox-inline {
+  margin-right: 20px;
+  margin-left: 0;
+}
+
+.radio-inline, .checkbox-inline {
+  margin-bottom: 6px;
+  margin-right: 20px;
+  min-width: 100px;
+}

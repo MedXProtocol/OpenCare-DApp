@@ -56,45 +56,57 @@ function* saga({ address, CaseManager }) {
 
 export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount']})(class _PatientCases extends Component {
   render() {
+    let loadingLines, noCases, cases
     const loading = (this.props.caseCount === undefined)
+
+    if (loading) {
+      loadingLines = (
+        <div className="blank-state">
+          <div className="blank-state--inner text-center text-gray">
+            <span><LoadingLines visible={true} /></span>
+          </div>
+        </div>
+      )
+    } else if (!this.props.cases.length) {
+      noCases = (
+        <div className="blank-state">
+          <div className="blank-state--inner text-center text-gray">
+            <span>You do not have any historical or pending cases.</span>
+          </div>
+        </div>
+      )
+    } else {
+      cases = (
+        <div>
+          <h5 className="title subtitle">
+            Current Cases:
+          </h5>
+          <FlipMove enterAnimation="accordionVertical" className="case-list">
+            {this.props.cases.map(({caseAddress, status, caseIndex}) => {
+              const statusLabel = caseStatusToName(status)
+              const statusClass = caseStatusToClass(status)
+              return (
+                <CaseRow
+                  route={routes.PATIENTS_CASE}
+                  statusLabel={statusLabel}
+                  statusClass={statusClass}
+                  caseAddress={caseAddress}
+                  caseIndex={caseIndex}
+                  key={caseIndex} />
+              )
+            })}
+          </FlipMove>
+        </div>
+      )
+    }
+
     return (
       <div className="card">
         <ScrollToTopOnMount />
         <div className="card-body table-responsive">
-          {
-            loading ?
-              <div className="blank-state">
-                <div className="blank-state--inner text-center text-gray">
-                  <span><LoadingLines visible={true} /></span>
-                </div>
-              </div>
-            : !this.props.cases.length ?
-              <div className="blank-state">
-                <div className="blank-state--inner text-center text-gray">
-                  <span>You do not have any historical or pending cases.</span>
-                </div>
-              </div> :
-              <div>
-                <h5 className="title subtitle">
-                  Current Cases:
-                </h5>
-                <FlipMove enterAnimation="accordionVertical" className="case-list">
-                  {this.props.cases.map(({caseAddress, status, caseIndex}) => {
-                    const statusLabel = caseStatusToName(status)
-                    const statusClass = caseStatusToClass(status)
-                    return (
-                      <CaseRow
-                        route={routes.PATIENTS_CASE}
-                        statusLabel={statusLabel}
-                        statusClass={statusClass}
-                        caseAddress={caseAddress}
-                        caseIndex={caseIndex}
-                        key={caseIndex} />
-                    )
-                  })}
-                </FlipMove>
-              </div>
-          }
+          {loadingLines}
+          {noCases}
+          {cases}
         </div>
       </div>
     )
