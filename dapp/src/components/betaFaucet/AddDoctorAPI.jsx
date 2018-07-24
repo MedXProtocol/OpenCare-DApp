@@ -70,7 +70,7 @@ export const AddDoctorAPI = ReactTimeout(class _AddDoctorAPI extends Component {
       var englishErrorMessage = (
         <small>
           <br />
-          There was an error while upgrading your account to be a Doctor, you may already be registered as a Doctor. If the problem persists please contact MedCredits on Telegram and we can send you Ropsten Testnet MedX:
+          There was an error while upgrading your account to be a Doctor, you may already be registered as a Doctor. If the problem persists please contact MedCredits on Telegram and we can send you Ropsten Testnet MEDX:
           &nbsp; <a
             target="_blank"
             href="https://t.me/MedCredits"
