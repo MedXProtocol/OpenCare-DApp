@@ -4,8 +4,10 @@ import CaseDetails from '~/components/CaseDetails'
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import Diagnosis from '~/components/Diagnosis'
+import { ScrollToTop } from '~/components/ScrollToTop'
 import { currentAccount } from '~/services/sign-in'
 import { isBlank } from '~/utils/isBlank'
+import { isEmptyObject } from '~/utils/isEmptyObject'
 import { decryptDoctorCaseKey } from '~/services/decryptDoctorCaseKey'
 import get from 'lodash.get'
 import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
@@ -16,6 +18,8 @@ import { contractByName } from '~/saga-genesis/state-finders'
 import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state, { match }) {
+  if (isEmptyObject(match.params)) { return {} }
+
   let address = get(state, 'sagaGenesis.accounts[0]')
   const caseAddress = match.params.caseAddress
   const AccountManager = contractByName(state, 'AccountManager')
@@ -42,7 +46,7 @@ function mapStateToProps(state, { match }) {
 }
 
 function* saga({ match, address, AccountManager }) {
-  if (!AccountManager) { return }
+  if (!AccountManager || isEmptyObject(match.params)) { return }
   const caseAddress = match.params.caseAddress
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
@@ -57,8 +61,9 @@ function* saga({ match, address, AccountManager }) {
 }
 
 export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'address', 'AccountManager']})(class _DiagnoseCase extends Component {
-
   render () {
+    if (isEmptyObject(this.props.match.params)) { return null }
+
     const {
       challengingDoctor,
       address,
@@ -148,7 +153,8 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
 
     return (
       <div>
-        <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCase', { caseId: ('' + caseAddress).substring(0, 6) } )} />
+        <ScrollToTop />
+        <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCase', { caseId: ('' + caseAddress).substring(0, 10) + ' ...' } )} />
         <div className='container'>
           <div className='row'>
             {diagnosis}

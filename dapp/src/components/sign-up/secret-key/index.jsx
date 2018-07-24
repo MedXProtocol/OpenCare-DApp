@@ -7,7 +7,7 @@ import { EthAddress } from '~/components/EthAddress'
 import { BodyClass } from '~/components/BodyClass'
 import { formatSecretKey } from '~/services/format-secret-key'
 import { PrintCopySecretKey } from '~/components/PrintCopySecretKey'
-import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
+import { ScrollToTop } from '~/components/ScrollToTop'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
@@ -35,7 +35,7 @@ export const SecretKey = class _SecretKey extends Component {
   render () {
     return (
       <BodyClass isDark={true}>
-        <ScrollToTopOnMount />
+        <ScrollToTop />
         <div className='container'>
           <div className='row'>
             <div className='col-sm-8 col-sm-offset-2'>
