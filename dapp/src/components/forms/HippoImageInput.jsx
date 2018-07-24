@@ -4,18 +4,14 @@ import classNames from 'classnames'
 
 export const HippoImageInput = class _HippoImageInput extends Component {
   render() {
-    const { name, id, label, error, fileError, setRef, onChange,
+    const { name, id, label, subLabel, error, fileError, setRef, onChange,
       currentValue, progressClassNames, progressPercent, colClasses } = this.props
-
-    let required
-    if (this.props.required)
-      required = <span className='star'>*</span>
 
     return (
       <div className="row">
         <div id={id} className={colClasses}>
           <div className={classNames('form-group', { 'has-error': error || fileError })}>
-            <label className='control-label'>{label} {required}</label>
+            <label className='control-label'>{label} <span className="text-gray small">{subLabel}</span></label>
             <div>
               <div className="hidden-input-mask">
                 <input ref={setRef} />

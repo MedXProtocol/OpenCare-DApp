@@ -36,7 +36,7 @@ function warning(message, link) {
 }
 
 function transactionError(transactionError) {
-  const code = transactionErrorToCode(transactionError)
+  const code = transactionErrorToCode(transactionError.message)
   let message = 'There was a transaction error'
   if (code) {
     message = i18next.t(`transactionErrors.${code}`)

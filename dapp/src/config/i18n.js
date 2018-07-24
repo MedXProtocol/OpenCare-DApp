@@ -33,7 +33,12 @@ i18next
             userRevert: 'You rejected the transaction, please submit a valid transaction to proceed',
             outOfGas: 'The transaction ran out of gas',
             evmRevert: 'There was an error in the contract',
-            incorrectNonce: 'The nonce was incorrect (reset the account in MetaMask)'
+            incorrectNonce: 'The nonce was incorrect (reset the account in MetaMask)',
+            cancelled: 'The transaction was cancelled',
+            noContractFound: 'No contract found for address, you may be on the wrong network (MainNet vs. Ropsten)',
+            nonceTooLow: 'The nonce was too low (possibly need to reset the account in MetaMask)',
+            exceedsBlockGasLimit: 'The transaction gasLimit exceeds block gas limit',
+            replacementTransactionUnderpriced: 'The replacement transaction is underpriced (need to provide a higher gas limit)'
           },
           pageTitles: {
             welcome: 'Welcome | Hippocrates',

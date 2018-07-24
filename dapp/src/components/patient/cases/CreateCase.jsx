@@ -674,7 +674,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               <HippoImageInput
                                 name='secondImage'
                                 id='secondImageHash'
-                                label={`Close-up Photo: ${this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}`}
+                                label={'Close-up Photo:'}
+                                subLabel={this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}
                                 colClasses='col-xs-12 col-sm-12 col-md-8'
                                 error={errors['secondImageHash']}
                                 fileError={secondFileError}
