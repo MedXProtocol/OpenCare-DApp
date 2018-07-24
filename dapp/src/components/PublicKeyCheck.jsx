@@ -108,7 +108,7 @@ export const PublicKeyCheck = connect(mapStateToProps)(
                 disabled={this.state.isSubmitting}
                 onClick={this.handleSubmit}
                 bsStyle="info"
-                className="btn-sm btn-clear">
+                className="btn btn-sm btn-clear">
                 Register Account
               </Button>
             </span>

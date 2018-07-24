@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { isTrue } from '~/utils/isTrue'
+import { sleep } from '~/utils/sleep'
 import { Button, Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import ReactTooltip from 'react-tooltip'
@@ -435,6 +436,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
       while(transactionId === undefined) {
         try {
+          await sleep(1200)
+
           transactionId = await this.createNewCase()
 
           if (transactionId) {
@@ -736,7 +739,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                           <button
                             type="submit"
                             className="btn btn-lg btn-success"
-                            data-tip={"Your MedX transaction needs to complete, please wait ..."}
+                            data-tip={this.props.medXBeingSent ? "Your MedX transaction needs to complete, please wait ..." : ""}
                           >
                             Submit Case
                           </button>

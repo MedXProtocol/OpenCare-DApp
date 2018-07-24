@@ -204,10 +204,14 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                   <p>{details.gender}</p>
                 </div>
 
-                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                  <label className="label text-gray">Pregnant:</label>
-                  <p>{details.pregnant}</p>
-                </div>
+                {
+                  details.gender === 'Female' ? (
+                    <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                      <label className="label text-gray">Pregnant:</label>
+                      <p>{details.pregnant}</p>
+                    </div>
+                  ) : null
+                }
               </div>
 
               <div className="row case-details--row">
