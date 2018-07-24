@@ -22,10 +22,10 @@ i18next
             diagnoseCase: 'Sending Diagnosis',
             diagnoseChallengedCase: 'Sending Second Opinion',
             publicKeys: 'Retrieving Account',
-            mint: 'Mint {{mintMedxCount}} MEDX',
+            mint: 'Mint {{mintMedxCount}} MEDT (Test MEDX)',
             requestNextCase: 'Requesting Case',
             setPublicKey: 'Registering Account',
-            sendMedX: 'Sending {{mintMedxCount}} MEDX',
+            sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',
             addDoctor: 'Upgrading to Doctor'
           },

@@ -275,7 +275,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                     Challenge the diagnosis by having another doctor look at your case.
                   </p>
                   <p>
-                    If the diagnosis is the same, you will be charged 15 MEDX.  If the diagnosis is different than the original then you'll be charged 5 MEDX and refunded the remainder.
+                    If the diagnosis is the same, you will be charged 15 MEDT (Test MEDX).  If the diagnosis is different than the original then you'll be charged 5 MEDT (Test MEDX) and refunded the remainder.
                   </p>
                   <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>
                     {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)

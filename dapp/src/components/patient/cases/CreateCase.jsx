@@ -393,7 +393,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           if (this.props.previousCase) {
             this.setState({ showBalanceTooLowModal: true })
           } else if (this.props.medXBeingSent) {
-            toastr.warning('Your MEDX is on the way. Please wait for the transaction to finish prior to submitting your case.')
+            toastr.warning('Your MEDT (Test MEDX) is on the way. Please wait for the transaction to finish prior to submitting your case.')
           } else {
             this.props.showBetaFaucetModal()
           }
@@ -774,7 +774,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
             <Modal.Body>
               <div className="row">
                 <div className="col-xs-12 text-center">
-                  <h4>You need 15 MEDX to submit a case.</h4>
+                  <h4>You need 15 MEDT (Test MEDX) to submit a case.</h4>
                 </div>
               </div>
             </Modal.Body>
@@ -795,7 +795,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                     Are you sure?
                   </h4>
                   <h5>
-                    This will cost you between 5 - 15 MEDX.
+                    This will cost you between 5 - 15 MEDT (Test MEDX).
                     <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
                   </h5>
                 </div>

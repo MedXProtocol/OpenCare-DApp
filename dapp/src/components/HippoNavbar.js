@@ -90,7 +90,7 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
 
           <LinkContainer to={routes.ACCOUNT_WALLET}>
             <MenuItem href={routes.ACCOUNT_WALLET}>
-              MEDX Balance
+              MEDT Balance
             </MenuItem>
           </LinkContainer>
 
@@ -115,7 +115,7 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
       var medXBalance =
         <LinkContainer to={routes.ACCOUNT_WALLET}>
           <NavItem href={routes.ACCOUNT_WALLET}>
-            {this.props.balance ? weiToMedX(this.props.balance) : 0} MEDX
+            {this.props.balance ? weiToMedX(this.props.balance) : 0} MEDT
           </NavItem>
         </LinkContainer>
 
