@@ -29,6 +29,7 @@ import { weiToMedX } from '~/utils/weiToMedX'
 import { medXToWei } from '~/utils/medXToWei'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
+import FlipMove from 'react-flip-move'
 
 function mapStateToProps (state) {
   let medXBeingSent
@@ -642,36 +643,48 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         handleRegionChange={this.handleRegionChange}
                       />
 
-                      <div className="form-group--heading">
-                        Imagery:
-                      </div>
-                      <HippoImageInput
-                        name='firstImage'
-                        id='firstImageHash'
-                        label="Overview Photo:"
-                        colClasses='col-xs-12 col-sm-12 col-md-8'
-                        error={errors['firstImageHash']}
-                        fileError={firstFileError}
-                        setRef={this.setFirstImageHashRef}
-                        onChange={this.captureFirstImage}
-                        currentValue={this.state.firstFileName}
-                        progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
-                        progressPercent={this.state.firstImagePercent}
-                      />
+                      <FlipMove
+                        enterAnimation="accordionVertical"
+                        leaveAnimation="accordionVertical"
+                        maintainContainerHeight={true}
+                      >
+                        {
+                          this.state.spotRashOrAcne ? (
+                            <div key="imagery-key">
+                              <div className="form-group--heading">
+                                Imagery:
+                              </div>
+                              <HippoImageInput
+                                name='firstImage'
+                                id='firstImageHash'
+                                label="Overview Photo:"
+                                colClasses='col-xs-12 col-sm-12 col-md-8'
+                                error={errors['firstImageHash']}
+                                fileError={firstFileError}
+                                setRef={this.setFirstImageHashRef}
+                                onChange={this.captureFirstImage}
+                                currentValue={this.state.firstFileName}
+                                progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
+                                progressPercent={this.state.firstImagePercent}
+                              />
 
-                      <HippoImageInput
-                        name='secondImage'
-                        id='secondImageHash'
-                        label={`Close-up Photo: ${this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}`}
-                        colClasses='col-xs-12 col-sm-12 col-md-8'
-                        error={errors['secondImageHash']}
-                        fileError={secondFileError}
-                        setRef={this.setSecondImageHashRef}
-                        onChange={this.captureSecondImage}
-                        currentValue={this.state.secondFileName}
-                        progressClassNames={this.progressClassNames(this.state.secondImagePercent)}
-                        progressPercent={this.state.secondImagePercent}
-                      />
+                              <HippoImageInput
+                                name='secondImage'
+                                id='secondImageHash'
+                                label={`Close-up Photo: ${this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}`}
+                                colClasses='col-xs-12 col-sm-12 col-md-8'
+                                error={errors['secondImageHash']}
+                                fileError={secondFileError}
+                                setRef={this.setSecondImageHashRef}
+                                onChange={this.captureSecondImage}
+                                currentValue={this.state.secondFileName}
+                                progressClassNames={this.progressClassNames(this.state.secondImagePercent)}
+                                progressPercent={this.state.secondImagePercent}
+                              />
+                            </div>
+                          ) : null
+                        }
+                      </FlipMove>
 
                       <div className="form-group--heading">
                         Details:
