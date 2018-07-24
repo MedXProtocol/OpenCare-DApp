@@ -612,11 +612,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       return (
         <div>
           <div className="row">
-            <div className="col-xs-12">
+            <div className="col-xs-12 col-md-8 col-md-offset-2">
               <div className="card">
                 <div className="card-header">
                   <div className="row">
-                    <div className="col-xs-12 col-md-9">
+                    <div className="col-xs-12 col-md-12">
                       <p className="lead lead--card-title">
                         Tell your physician about your problem by answering the questions below.
                       </p>
@@ -627,132 +627,123 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                   </div>
                 </div>
 
-                <div className="card-body">
-                  <div className="form-wrapper">
-                    <form onSubmit={this.handleSubmit}>
+                <form onSubmit={this.handleSubmit}>
+                  <div className="card-body">
+                    <PatientInfo
+                      errors={errors}
+                      textInputOnChange={this.handleTextInputOnChange}
+                      textInputOnBlur={this.handleTextInputOnBlur}
+                      buttonGroupOnChange={this.handleButtonGroupOnChange}
+                      gender={this.state.gender}
+                      allergies={this.state.allergies}
+                      setCountryRef={this.setCountryRef}
+                      setRegionRef={this.setRegionRef}
+                      country={this.state.country}
+                      region={this.state.region}
+                      handleCountryChange={this.handleCountryChange}
+                      handleRegionChange={this.handleRegionChange}
+                    />
 
-                      <PatientInfo
-                        errors={errors}
-                        textInputOnChange={this.handleTextInputOnChange}
-                        textInputOnBlur={this.handleTextInputOnBlur}
-                        buttonGroupOnChange={this.handleButtonGroupOnChange}
-                        gender={this.state.gender}
-                        allergies={this.state.allergies}
-                        setCountryRef={this.setCountryRef}
-                        setRegionRef={this.setRegionRef}
-                        country={this.state.country}
-                        region={this.state.region}
-                        handleCountryChange={this.handleCountryChange}
-                        handleRegionChange={this.handleRegionChange}
-                      />
-
-                      <FlipMove
-                        enterAnimation="accordionVertical"
-                        leaveAnimation="accordionVertical"
-                        maintainContainerHeight={true}
-                      >
-                        {
-                          this.state.spotRashOrAcne ? (
-                            <div key="imagery-key">
-                              <div className="form-group--heading">
-                                Imagery:
-                              </div>
-                              <HippoImageInput
-                                name='firstImage'
-                                id='firstImageHash'
-                                label="Overview Photo:"
-                                colClasses='col-xs-12 col-sm-12 col-md-8'
-                                error={errors['firstImageHash']}
-                                fileError={firstFileError}
-                                setRef={this.setFirstImageHashRef}
-                                onChange={this.captureFirstImage}
-                                currentValue={this.state.firstFileName}
-                                progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
-                                progressPercent={this.state.firstImagePercent}
-                              />
-
-                              <HippoImageInput
-                                name='secondImage'
-                                id='secondImageHash'
-                                label={'Close-up Photo:'}
-                                subLabel={this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}
-                                colClasses='col-xs-12 col-sm-12 col-md-8'
-                                error={errors['secondImageHash']}
-                                fileError={secondFileError}
-                                setRef={this.setSecondImageHashRef}
-                                onChange={this.captureSecondImage}
-                                currentValue={this.state.secondFileName}
-                                progressClassNames={this.progressClassNames(this.state.secondImagePercent)}
-                                progressPercent={this.state.secondImagePercent}
-                              />
+                    <FlipMove
+                      enterAnimation="accordionVertical"
+                      leaveAnimation="accordionVertical"
+                      maintainContainerHeight={true}
+                    >
+                      {
+                        this.state.spotRashOrAcne ? (
+                          <div key="imagery-key">
+                            <div className="form-group--heading">
+                              Imagery:
                             </div>
-                          ) : null
-                        }
-                      </FlipMove>
+                            <HippoImageInput
+                              name='firstImage'
+                              id='firstImageHash'
+                              label="Overview Photo:"
+                              colClasses='col-xs-12 col-sm-12 col-md-12'
+                              error={errors['firstImageHash']}
+                              fileError={firstFileError}
+                              setRef={this.setFirstImageHashRef}
+                              onChange={this.captureFirstImage}
+                              currentValue={this.state.firstFileName}
+                              progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
+                              progressPercent={this.state.firstImagePercent}
+                            />
 
-                      <div className="form-group--heading">
-                        Details:
-                      </div>
-
-                      {spotQuestions}
-                      {rashQuestions}
-                      {acneQuestions}
-
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8">
-                          <div className="form-group">
-                            <label className="control-label">Please include any additional info below <span className="text-gray">(Optional)</span></label>
-                            <textarea
-                              onChange={(event) => this.setState({ description: event.target.value })}
-                              className="form-control"
-                              rows="5" />
+                            <HippoImageInput
+                              name='secondImage'
+                              id='secondImageHash'
+                              label={'Close-up Photo:'}
+                              subLabel={this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}
+                              colClasses='col-xs-12 col-sm-12 col-md-12'
+                              error={errors['secondImageHash']}
+                              fileError={secondFileError}
+                              setRef={this.setSecondImageHashRef}
+                              onChange={this.captureSecondImage}
+                              currentValue={this.state.secondFileName}
+                              progressClassNames={this.progressClassNames(this.state.secondImagePercent)}
+                              progressPercent={this.state.secondImagePercent}
+                            />
                           </div>
+                        ) : null
+                      }
+                    </FlipMove>
+
+                    <div className="form-group--heading">
+                      Details:
+                    </div>
+
+                    {spotQuestions}
+                    {rashQuestions}
+                    {acneQuestions}
+
+                    <div className="row">
+                      <div className="col-xs-12 col-sm-12 col-md-12">
+                        <div className="form-group">
+                          <label className="control-label">Please include any additional info below <span className="text-gray">(Optional)</span></label>
+                          <textarea
+                            onChange={(event) => this.setState({ description: event.target.value })}
+                            className="form-control"
+                            rows="5" />
                         </div>
                       </div>
+                    </div>
 
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8">
-                          <div className={classNames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
-                            {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
-                              ?
-                              <div>
-                                <label>Select a Doctor<span className='star'>*</span></label>
-                                  <DoctorSelect
-                                    excludeAddresses={[this.props.account]}
-                                    value={this.state.selectedDoctor}
-                                    isClearable={false}
-                                    onChange={this.onChangeDoctor} />
-                              </div>
-                              :
-                              <AvailableDoctorSelect
-                                excludeAddresses={[this.props.account]}
-                                value={this.state.selectedDoctor}
-                                onChange={this.onChangeDoctor} />
-                             }
+                    <div className="row">
+                      <div className="col-xs-12 col-sm-12 col-md-12">
+                        <div className={classNames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
+                          {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
+                            ?
+                            <div>
+                              <label>Select a Doctor<span className='star'>*</span></label>
+                                <DoctorSelect
+                                  excludeAddresses={[this.props.account]}
+                                  value={this.state.selectedDoctor}
+                                  isClearable={false}
+                                  onChange={this.onChangeDoctor} />
+                            </div>
+                            :
+                            <AvailableDoctorSelect
+                              excludeAddresses={[this.props.account]}
+                              value={this.state.selectedDoctor}
+                              onChange={this.onChangeDoctor} />
+                           }
 
-                            {errors['selectedDoctor']}
-                          </div>
+                          {errors['selectedDoctor']}
                         </div>
                       </div>
-
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8 text-right">
-                          <button
-                            type="submit"
-                            className="btn btn-lg btn-success"
-                            data-tip={this.props.medXBeingSent ? "Your MedX transaction needs to complete, please wait ..." : ""}
-                          >
-                            Submit Case
-                          </button>
-                          <ReactTooltip effect='solid' place='top' />
-                          <br />
-                          <br />
-                          <br />
-                        </div>
-                      </div>
-                    </form>
+                    </div>
                   </div>
-                </div>
+                  <div className="card-footer text-right">
+                    <button
+                      type="submit"
+                      className="btn btn-lg btn-success"
+                      data-tip={this.props.medXBeingSent ? "Your MedX transaction needs to complete, please wait ..." : ""}
+                    >
+                      Submit Case
+                    </button>
+                    <ReactTooltip effect='solid' place='top' />
+                  </div>
+                </form>
               </div>
             </div>
           </div>

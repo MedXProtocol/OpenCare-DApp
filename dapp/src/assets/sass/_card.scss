@@ -157,14 +157,14 @@ $card-columns-margin:               $card-spacer-y;
     padding-right: 2rem;
   }
 }
-
 .card-footer {
-  padding: $card-spacer-y $card-spacer-x;
-  background-color: $card-cap-bg;
+  padding: 2rem 4rem;
+  background-color: #fafafa;
   border-top: $card-border-width solid $card-border-color;
 
-  &:last-child {
-    border-radius: 0 0 $card-inner-border-radius $card-inner-border-radius;
+  @media (max-width: 768px) {
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 

@@ -83,7 +83,7 @@ export const EmergencyKit = (
                         </div>
                       </div>
 
-                      <div className="form-wrapper--footer">
+                      <div className="card-footer">
                         <div className='text-right'>
                           <Button
                             bsStyle='success'

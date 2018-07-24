@@ -66,11 +66,6 @@ export const EmergencyKitDisplay = class _EmergencyKitDisplay extends Component 
                   <li>Confirm the master password, then create your account</li>
                 </ol>
 
-                <hr />
-
-
-                <br />
-                <br />
               </div>
             </div>
           </div>
