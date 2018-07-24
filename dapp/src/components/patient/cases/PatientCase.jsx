@@ -51,7 +51,7 @@ export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps
     }
     return (
       <div>
-        <PageTitle renderTitle={(t) => t('pageTitles.patientCase', { caseId: ('' + this.props.match.params.caseAddress).substring(0, 6)})} />
+        <PageTitle renderTitle={(t) => t('pageTitles.patientCase', { caseId: ('' + this.props.match.params.caseAddress).substring(0, 10) + ' ...'})} />
         <div className='container'>
           <div className="row">
             {caseKey ? (

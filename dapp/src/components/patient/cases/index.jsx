@@ -10,7 +10,7 @@ import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
 import { LoadingLines } from '~/components/LoadingLines'
 import get from 'lodash.get'
-import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
+import { ScrollToTop } from '~/components/ScrollToTop'
 import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
 import * as routes from '~/config/routes'
 import rangeRight from 'lodash.rangeright'
@@ -102,7 +102,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
 
     return (
       <div className="card">
-        <ScrollToTopOnMount />
+        <ScrollToTop />
         <div className="card-body table-responsive">
           {loadingLines}
           {noCases}

@@ -5,17 +5,16 @@ import { all } from 'redux-saga/effects'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
-import { CaseRow } from '~/components/CaseRow'
 import get from 'lodash.get'
-import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctor-case-status-labels'
+import { isEmptyObject } from '~/utils/isEmptyObject'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { addContract } from '~/saga-genesis/sagas'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
+import { DiagnoseCaseContainer } from '~/components/doctors/diagnose'
+import { DoctorCaseListing } from '~/components/doctors/DoctorCaseListing'
 import { PageTitle } from '~/components/PageTitle'
-import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
-import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
-import * as routes from '~/config/routes'
+import { ScrollToTop } from '~/components/ScrollToTop'
 
 function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
@@ -62,20 +61,6 @@ function* saga({ caseCount, address, CaseManager }) {
   }
 }
 
-function renderCase({ caseAddress, status, caseIndex, isDiagnosingDoctor }) {
-  const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
-  const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
-  return (
-    <CaseRow
-      route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
-      caseAddress={caseAddress}
-      caseIndex={caseIndex}
-      statusLabel={statusLabel}
-      statusClass={statusClass}
-      key={caseIndex} />
-  )
-}
-
 export const OpenCasesContainer = ReactTimeout(withContractRegistry(connect(mapStateToProps)(
   withSend(withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager'] })(class _OpenCasesContainer extends Component {
 
@@ -107,77 +92,36 @@ export const OpenCasesContainer = ReactTimeout(withContractRegistry(connect(mapS
   }
 
   render () {
-    const openCases       = this.props.cases.filter(c => openCase(c))
-    const historicalCases = this.props.cases.filter(c => historicalCase(c))
+    let doctorCaseListing, diagnoseCase, doScrollToTop
+    const { match, cases } = this.props
+
+    const diagnosisJustSubmitted = (
+      this.previousCaseAddress
+      && !match.params.caseAddress
+    )
+    if (diagnosisJustSubmitted) {
+      doScrollToTop = true
+    }
+    this.previousCaseAddress = match.params.caseAddress
+
+    if (isEmptyObject(match.params)) {
+      doctorCaseListing = <DoctorCaseListing key="doctorCaseListing" cases={cases} />
+    } else {
+      diagnoseCase = <DiagnoseCaseContainer key="diagnoseCaseContainerKey" match={match} />
+    }
 
     return (
       <div>
-        <ScrollToTopOnMount />
+        <ScrollToTop scrollToTop={doScrollToTop} />
+
         <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCases')} />
-        <div className='container'>
-
-          <div className='header-card card'>
-            <div className='card-body'>
-              <div className='row'>
-                <div className='col-md-8 col-sm-12'>
-                  <h3 className="title">
-                    Diagnose Cases
-                  </h3>
-                  <span className="sm-block text-gray">
-                    <strong>Currently Evaluating &amp; Historical</strong>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="row">
-            <div className='col-xs-12'>
-              <div className="card">
-                <div className='card-body'>
-                  <h5 className="title subtitle">
-                    Open Cases:
-                  </h5>
-                  {
-                    !openCases.length ?
-                    <div className="blank-state">
-                      <div className="blank-state--inner text-center text-gray">
-                        <span>You do not have any cases assigned to you right now.</span>
-                      </div>
-                    </div> :
-                    <FlipMove enterAnimation="accordionVertical" className="case-list">
-                      {openCases.map(c => renderCase(c))}
-                    </FlipMove>
-                  }
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="row">
-            <div className='col-xs-12'>
-              <div className="card">
-                <div className='card-body'>
-                  <h5 className="title subtitle">
-                    Historical Cases:
-                  </h5>
-                  {
-                    !historicalCases.length ?
-                    <div className="blank-state">
-                      <div className="blank-state--inner text-center text-gray">
-                        <span>You have not evaluated any cases yet.</span>
-                      </div>
-                    </div> :
-                    <FlipMove enterAnimation="accordionVertical" className="case-list">
-                      {historicalCases.map(c => renderCase(c))}
-                    </FlipMove>
-                  }
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
+        <FlipMove
+          enterAnimation="fade"
+          leaveAnimation="fade"
+        >
+          {diagnoseCase}
+          {doctorCaseListing}
+        </FlipMove>
       </div>
     )
   }

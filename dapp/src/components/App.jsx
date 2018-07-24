@@ -11,7 +11,6 @@ import { SignInContainer } from './sign-in'
 import { PatientDashboard } from './patient/dashboard/'
 import { NewCase } from './patient/cases/NewCase'
 import { PatientCaseContainer } from './patient/cases/PatientCase'
-import { DiagnoseCaseContainer } from './patient/cases/diagnose'
 import { AddDoctor } from './doctors/new'
 import { Mint } from './account/mint'
 import { WalletContainer } from './account/wallet'
@@ -115,7 +114,6 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     })
 
     if (newCaseCount !== this.props.caseCount) {
-      console.log('dispatchNewCaseCount!')
       this.props.dispatchNewCaseCount(newCaseCount)
     }
   }
@@ -235,7 +233,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
                 <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
 
                 <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
-                <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={DiagnoseCaseContainer} />
+                <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={OpenCasesContainer} />
                 <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 
                 <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />

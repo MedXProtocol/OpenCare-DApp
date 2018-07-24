@@ -6,7 +6,6 @@ import { customStyles } from '~/config/react-select-custom-styles'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
 import { Loading } from '~/components/Loading'
 import { isNotEmptyString } from '~/utils/common-util'
 import { mixpanel } from '~/mixpanel'
@@ -54,7 +53,6 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
       formIsValid: false,
       showConfirmationModal: false,
 
-      showThankYou: false,
       isSubmitting: false
     }
   }
@@ -84,9 +82,9 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
         .onTxHash(() => {
           this.setState({
             transactionHandler: null,
-            showThankYou: true,
             isSubmitting: false
           })
+          toastr.success("Thank You - Your diagnosis was received successfully, and we're sending your diagnosis to the patient.")
           this.props.setTimeout(() => {
             this.props.history.push(routes.DOCTORS_CASES_OPEN)
           }, 1000)
@@ -367,25 +365,6 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
               disabled={loading}>
               Yes
             </button>
-          </Modal.Footer>
-        </Modal>
-
-        <Modal show={this.state.showThankYou}>
-          <Modal.Body>
-            <div className="row">
-              <div className="col-xs-12 text-center">
-                <h4>
-                  Thank you!
-                </h4>
-                <h5>
-                  Your diagnosis was received successfully, and we're sending your diagnosis to the patient.
-                </h5>
-              </div>
-            </div>
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Link to={routes.DOCTORS_CASES_OPEN} className="btn btn-primary">OK</Link>
           </Modal.Footer>
         </Modal>
 
