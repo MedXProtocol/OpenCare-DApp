@@ -1,4 +1,4 @@
-export default function (state, {type, transactionId, call, error, receipt, gasUsed, txHash}) {
+export default function (state, { type, transactionId, call, error, receipt, gasUsed, txHash, confirmationNumber, address }) {
   if (typeof state === 'undefined') {
     state = {}
   }
@@ -9,6 +9,7 @@ export default function (state, {type, transactionId, call, error, receipt, gasU
         ...state,
         [transactionId]: {
           call,
+          address,
           inFlight: true
         }
       }
@@ -65,6 +66,10 @@ export default function (state, {type, transactionId, call, error, receipt, gasU
 
     case 'SIGNED_OUT':
       state = {}
+      break
+
+    case 'REMOVE_TRANSACTION':
+      delete state[transactionId]
       break
 
     // no default

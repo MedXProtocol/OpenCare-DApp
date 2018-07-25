@@ -9,29 +9,47 @@ import { CaseRow } from '~/components/CaseRow'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
 import { LoadingLines } from '~/components/LoadingLines'
-import get from 'lodash.get'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
-import * as routes from '~/config/routes'
+import { patientCaseStatusToName, patientCaseStatusToClass } from '~/utils/patientCaseStatusLabels'
+import { defined } from '~/utils/defined'
 import rangeRight from 'lodash.rangeright'
+import get from 'lodash.get'
+import forOwn from 'lodash.forown'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
+  let index = 0
   const cases = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
   const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
 
-  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
-    let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, caseIndex)
+  for (let objIndex = (caseCount - 1); objIndex >= 0; --objIndex) {
+    let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, objIndex)
     if (caseAddress) {
       let status = cacheCallValue(state, caseAddress, 'status')
       cases.push({
         caseAddress,
         status,
-        caseIndex
+        objIndex
       })
     }
   }
+
+  forOwn(state.sagaGenesis.transactions, function(transaction, transactionId) {
+    const { confirmed, error, call } = transaction
+    const isPatientCase = (call && call.method === 'approveAndCall')
+
+    if (isPatientCase && (!confirmed || defined(error))) {
+      transaction = {
+        ...transaction,
+        transactionId,
+        objIndex: parseInt(caseCount, 10) + index
+      }
+      cases.splice(0, 0, transaction)
+      index++
+    }
+  })
 
   return {
     address,
@@ -45,8 +63,8 @@ function* saga({ address, CaseManager }) {
   if (!address || !CaseManager) { return }
   const caseCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', address)
   const indices = rangeRight(caseCount)
-  yield all(indices.map(function* (caseIndex) {
-    const caseAddress = yield cacheCall(CaseManager, 'patientCases', address, caseIndex)
+  yield all(indices.map(function* (objIndex) {
+    const caseAddress = yield cacheCall(CaseManager, 'patientCases', address, objIndex)
     yield all([
       addContract({ address: caseAddress, contractKey: 'Case' }),
       cacheCall(caseAddress, 'status')
@@ -81,18 +99,20 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
           <h5 className="title subtitle">
             Current Cases:
           </h5>
-          <FlipMove enterAnimation="accordionVertical" className="case-list">
-            {this.props.cases.map(({caseAddress, status, caseIndex}) => {
-              const statusLabel = caseStatusToName(status)
-              const statusClass = caseStatusToClass(status)
+          <FlipMove
+            enterAnimation="accordionVertical"
+            leaveAnimation="accordionVertical"
+            className="case-list"
+          >
+            {this.props.cases.map(caseRowObject => {
+              caseRowObject['statusLabel'] = patientCaseStatusToName(caseRowObject.status)
+              caseRowObject['statusClass'] = patientCaseStatusToClass(caseRowObject.status)
               return (
                 <CaseRow
                   route={routes.PATIENTS_CASE}
-                  statusLabel={statusLabel}
-                  statusClass={statusClass}
-                  caseAddress={caseAddress}
-                  caseIndex={caseIndex}
-                  key={caseIndex} />
+                  caseRowObject={caseRowObject}
+                  key={caseRowObject.objIndex}
+                />
               )
             })}
           </FlipMove>

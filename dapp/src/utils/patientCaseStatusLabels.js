@@ -1,4 +1,4 @@
-export function caseStatusToName(status) {
+export function patientCaseStatusToName(status) {
   var statuses = {
     0: 'None',
     1: 'Open',
@@ -13,7 +13,7 @@ export function caseStatusToName(status) {
   return statuses[status]
 }
 
-export function caseStatusToClass(status) {
+export function patientCaseStatusToClass(status) {
   var statuses = {
     0: 'default',
     1: 'info',

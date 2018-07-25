@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Alert, Modal } from 'react-bootstrap'
+import { Modal } from 'react-bootstrap'
 import { all } from 'redux-saga/effects'
 import { isTrue } from '~/utils/isTrue'
 import { isEmptyObject } from '~/utils/isEmptyObject'
@@ -258,15 +258,9 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
         <Modal show={this.state.showChallengeModal} onHide={this.handleCloseChallengeModal}>
           <form onSubmit={this.onSubmitChallenge}>
             <Modal.Header>
-              <div className="row">
-                <div className="col-xs-12">
-                  <Alert bsStyle='info'>
-                    <p>
-                      Challenge Case
-                    </p>
-                  </Alert>
-                </div>
-              </div>
+              <Modal.Title>
+                Challenge Case
+              </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <div className='row'>
