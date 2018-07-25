@@ -4,7 +4,8 @@ import { NavDropdown } from 'react-bootstrap'
 import { I18n } from 'react-i18next'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import classnames from 'classnames'
-import { transactionErrorToCode } from '~/services/transaction-error-to-code'
+import { txErrorMessage } from '~/services/txErrorMessage'
+import { transactionErrorToCode } from '~/services/transactionErrorToCode'
 
 import './CurrentTransactionsList.scss'
 
@@ -89,23 +90,13 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
             if (gasUsed)
               options['gas'] = parseInt(1.2 * gasUsed, 10)
 
-            var code = transactionErrorToCode(error)
-            if (code) {
-              var errorMessage =
-                <p className="small">
-                  {t(`transactionErrors.${code}`)}
-                </p>
-            }
-            if (error && !errorMessage) {
-              let errorHtml = error
-              if (error.message) {
-                errorHtml = error.message
-              }
-              errorMessage =
-                <p className="small">
-                  {errorHtml}
-                </p>
-            }
+            var errorMessage = txErrorMessage(error)
+            errorMessage = (
+              <p className="small">
+                {errorMessage}
+              </p>
+            )
+
             if (call !== undefined && call.args) {
               var resendButton = (
                 <span>

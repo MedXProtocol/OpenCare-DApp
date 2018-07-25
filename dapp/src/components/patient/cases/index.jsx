@@ -37,21 +37,15 @@ function mapStateToProps(state) {
   }
 
   forOwn(state.sagaGenesis.transactions, function(transaction, transactionId) {
-    const { confirmed, error, call, receipt, gasUsed } = transaction
+    const { confirmed, error, call } = transaction
     const isPatientCase = (call && call.method === 'approveAndCall')
 
     if (isPatientCase && (!confirmed || defined(error))) {
-      // could simply merge the transaction obj we're iterating over ?
       transaction = {
         ...transaction,
         transactionId,
-        objIndex: parseInt(caseCount, 10) + index,
-        receipt,
-        error,
-        call,
-        gasUsed
+        objIndex: parseInt(caseCount, 10) + index
       }
-      console.log(transaction)
       cases.splice(0, 0, transaction)
       index++
     }

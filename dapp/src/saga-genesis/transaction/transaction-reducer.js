@@ -67,6 +67,10 @@ export default function (state, { type, transactionId, call, error, receipt, gas
       state = {}
       break
 
+    case 'REMOVE_TRANSACTION':
+      delete state[transactionId]
+      break
+
     // no default
   }
 

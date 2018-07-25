@@ -7,20 +7,22 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight';
 import { EthAddress } from '~/components/EthAddress'
 import { LoadingLines } from '~/components/LoadingLines'
-import { transactionErrorToCode } from '~/services/transaction-error-to-code'
-import i18next from 'i18next'
+import { txErrorMessage } from '~/services/txErrorMessage'
 
 function mapDispatchToProps (dispatch) {
   return {
-    send: (transactionId, call, options) => {
+    dispatchSend: (transactionId, call, options) => {
       dispatch({ type: 'SEND_TRANSACTION', transactionId, call, options })
+    },
+    dispatchRemove: (transactionId) => {
+      dispatch({ type: 'REMOVE_TRANSACTION', transactionId })
     }
   }
 }
 
 export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends Component {
   render () {
-    let caseRoute, viewCase, ethAddress, label, labelClass, itemClass
+    let caseRoute, action, ethAddress, label, labelClass, itemClass, objNumber, remove
     let options = {}
     const { caseRowObject, route } = this.props
     const {
@@ -37,8 +39,9 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
     const style = { zIndex: 998 - objIndex }
 
     if (caseAddress) {
+      objNumber = (objIndex + 1)
       caseRoute = formatRoute(route, { caseAddress })
-      viewCase = (
+      action = (
         <React.Fragment>
           <span className="case-list--item__view__text">View Case&nbsp;</span>
           <FontAwesomeIcon
@@ -50,30 +53,34 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
       labelClass = statusClass
       itemClass = ''
     } else {
+      objNumber = '...'
       caseRoute = '/patients/cases'
-      viewCase = (
+      action = (
         <React.Fragment>
           <LoadingLines visible={true} color="#aaaaaa" />
         </React.Fragment>
       )
       if (error) {
-        const code = transactionErrorToCode(error.message)
-        label = 'There was a transaction error'
-        if (code) {
-          label = i18next.t(`transactionErrors.${code}`)
-        }
+        label = txErrorMessage(error)
         labelClass = 'danger'
 
         if (gasUsed)
           options['gas'] = parseInt(1.2 * gasUsed, 10)
 
-        viewCase = <button
+        action = <button
           className="btn btn-danger btn-xs"
           onClick={(e) => {
             e.preventDefault()
-            this.props.send(transactionId, call, options)
+            this.props.dispatchSend(transactionId, call, options)
           }}
         >Retry</button>
+        remove = <button
+          className="btn-link text-gray"
+          onClick={(e) => {
+            e.preventDefault()
+            this.props.dispatchRemove(transactionId)
+          }}
+        >&times;</button>
       } else if (receipt) {
         label = 'Confirming'
         labelClass = 'warning'
@@ -87,7 +94,7 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
     return (
       <Link to={caseRoute} style={style} className={'case-list--item list' + itemClass}>
         <span className="case-list--item__case-number text-center">
-          {objIndex+1}
+          {objNumber}
         </span>
 
         <span className="case-list--item__status text-center">
@@ -101,7 +108,7 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
         </span>
 
         <span className="case-list--item__view text-center">
-          {viewCase}
+          {action} {remove}
         </span>
       </Link>
     )
