@@ -109,6 +109,7 @@
 
 .btn-group .btn {
   border: 2px solid #ccc;
+  box-shadow: none;
 }
 
 .btn-group .btn:hover,
@@ -199,6 +200,6 @@
   color: $brand-danger;
 }
 
-.btn.btn-no-shadow {
+.btn.btn__no-shadow {
   box-shadow: none;
 }

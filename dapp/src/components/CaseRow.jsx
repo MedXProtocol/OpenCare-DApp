@@ -9,8 +9,8 @@ import { LoadingLines } from '~/components/LoadingLines'
 
 export const CaseRow = class _CaseRow extends Component {
   render () {
-    let caseRoute, viewCase, ethAddress
-    const { route, caseAddress, caseIndex, statusLabel, statusClass } = this.props
+    let caseRoute, viewCase, ethAddress, label, labelClass
+    const { route, caseAddress, caseIndex, receipt, error } = this.props
     const style = { zIndex: 998 - caseIndex }
 
     if (caseAddress) {
@@ -23,6 +23,8 @@ export const CaseRow = class _CaseRow extends Component {
         </React.Fragment>
       )
       ethAddress = <EthAddress address={caseAddress} />
+      label = this.props.statusLabel
+      labelClass = this.props.statusClass
     } else {
       caseRoute = '/patients/cases'
       viewCase = (
@@ -30,6 +32,17 @@ export const CaseRow = class _CaseRow extends Component {
           <LoadingLines visible={true} color="#aaaaaa" />
         </React.Fragment>
       )
+      if (error) {
+        viewCase = 'Retry'
+        label = error
+        labelClass = 'danger'
+      } else if (receipt) {
+        label = 'Confirming'
+        labelClass = 'warning'
+      } else {
+        label = 'Pending'
+        labelClass = 'default'
+      }
     }
 
     return (
@@ -39,8 +52,8 @@ export const CaseRow = class _CaseRow extends Component {
         </span>
 
         <span className="case-list--item__status text-center">
-          <label className={`label label-${statusClass}`}>
-            {statusLabel}
+          <label className={`label label-${labelClass}`}>
+            {label}
           </label>
         </span>
 

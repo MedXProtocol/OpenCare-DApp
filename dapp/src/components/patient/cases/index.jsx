@@ -18,21 +18,11 @@ import forOwn from 'lodash.forown'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
-  let unconfirmedCaseTransactions = []
+  let index = 0
   const cases = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
   const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
-
-  forOwn(state.sagaGenesis.transactions, function(value, key) {
-    const { confirmed, error, call } = value
-    const isPatientCase = (call && call.method === 'approveAndCall')
-
-    if (isPatientCase && (!confirmed || defined(error))) {
-      value['transactionId'] = key
-      unconfirmedCaseTransactions.push(value)
-    }
-  })
 
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
     let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, caseIndex)
@@ -46,12 +36,24 @@ function mapStateToProps(state) {
     }
   }
 
+  forOwn(state.sagaGenesis.transactions, function(transaction) {
+    const { confirmed, error, call } = transaction
+    const isPatientCase = (call && call.method === 'approveAndCall')
+
+    if (isPatientCase && (!confirmed || defined(error))) {
+      transaction['caseIndex'] = parseInt(caseCount, 10) + index
+      transaction['receipt'] = transaction.receipt
+      transaction['error'] = transaction.error
+      cases.splice(0, 0, transaction)
+      index++
+    }
+  })
+
   return {
     address,
     caseCount,
     cases,
-    CaseManager,
-    unconfirmedCaseTransactions
+    CaseManager
   }
 }
 
@@ -96,23 +98,14 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
             Current Cases:
           </h5>
           <FlipMove enterAnimation="accordionVertical" className="case-list">
-            {this.props.unconfirmedCaseTransactions.map((transaction) => {
-              const statusLabel = 'Pending'
-              const statusClass = 'default'
-              return (
-                <CaseRow
-                  statusLabel={statusLabel}
-                  statusClass={statusClass}
-                  caseIndex={transaction.transactionId}
-                  key={`unconfirmed-${transaction.transactionId}}`} />
-              )
-            })}
-            {this.props.cases.map(({caseAddress, status, caseIndex}) => {
+            {this.props.cases.map(({ caseAddress, status, caseIndex, receipt, error }) => {
               const statusLabel = caseStatusToName(status)
               const statusClass = caseStatusToClass(status)
               return (
                 <CaseRow
                   route={routes.PATIENTS_CASE}
+                  receipt={receipt}
+                  error={error}
                   statusLabel={statusLabel}
                   statusClass={statusClass}
                   caseAddress={caseAddress}

@@ -138,7 +138,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
           </p>
           <br />
           <button
-            className='btn btn-danger btn-outline-inverse btn-no-shadow'
+            className='btn btn-danger btn__no-shadow'
             onClick={this.handleReset}>
             Reset Account
           </button>
