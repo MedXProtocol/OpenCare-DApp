@@ -16,25 +16,25 @@ export const CaseRow = class _CaseRow extends Component {
     if (caseAddress) {
       caseRoute = formatRoute(route, { caseAddress: caseAddress })
       viewCase = (
-        <span className="case-list--item__view text-right">
+        <React.Fragment>
           <span className="case-list--item__view__text">View Case&nbsp;</span>
           <FontAwesomeIcon
             icon={faChevronCircleRight} />
-        </span>
+        </React.Fragment>
       )
       ethAddress = <EthAddress address={caseAddress} />
     } else {
       caseRoute = '/patients/cases'
       viewCase = (
-        <span className="case-list--item__view text-right">
+        <React.Fragment>
           <LoadingLines visible={true} color="#aaaaaa" />
-        </span>
+        </React.Fragment>
       )
     }
 
     return (
       <Link to={caseRoute} style={style} className="case-list--item list">
-        <span className="case-list--item__case-number text-right">
+        <span className="case-list--item__case-number text-center">
           {caseIndex+1}
         </span>
 
@@ -48,7 +48,9 @@ export const CaseRow = class _CaseRow extends Component {
           {ethAddress}
         </span>
 
-        {viewCase}
+        <span className="case-list--item__view text-center">
+          {viewCase}
+        </span>
       </Link>
     )
   }
