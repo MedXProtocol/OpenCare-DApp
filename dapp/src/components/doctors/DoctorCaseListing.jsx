@@ -12,7 +12,8 @@ function renderCase(caseRowObject) {
     <CaseRow
       route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
       caseRowObject={caseRowObject}
-      key={caseRowObject.objIndex} />
+      key={caseRowObject.objIndex}
+    />
   )
 }
 

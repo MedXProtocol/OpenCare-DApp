@@ -141,7 +141,7 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
       caseRowObject = parseExistingCaseObject(caseRowObject, route)
     }
 
-    const style = { zIndex: 998 - caseRowObject.objNumber }
+    const style = { zIndex: 998 - caseRowObject.objIndex }
 
     return (
       <Link to={caseRowObject.caseRoute} style={style} className={'case-list--item list' + caseRowObject.itemClass}>
