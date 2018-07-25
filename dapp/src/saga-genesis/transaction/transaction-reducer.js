@@ -1,4 +1,4 @@
-export default function (state, {type, transactionId, call, error, receipt, gasUsed, txHash}) {
+export default function (state, { type, transactionId, call, error, receipt, gasUsed, txHash, confirmationNumber }) {
   if (typeof state === 'undefined') {
     state = {}
   }

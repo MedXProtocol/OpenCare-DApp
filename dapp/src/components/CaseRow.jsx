@@ -5,33 +5,50 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight';
 import { EthAddress } from '~/components/EthAddress'
+import { LoadingLines } from '~/components/LoadingLines'
 
 export const CaseRow = class _CaseRow extends Component {
   render () {
-    const caseRoute = formatRoute(this.props.route, { caseAddress: this.props.caseAddress })
-    const style = { zIndex: 998 - this.props.caseIndex }
+    let caseRoute, viewCase, ethAddress
+    const { route, caseAddress, caseIndex, statusLabel, statusClass } = this.props
+    const style = { zIndex: 998 - caseIndex }
 
-    return (
-      <Link to={caseRoute} style={style} className="case-list--item list">
-        <span className="case-list--item__case-number text-right">
-          {this.props.caseIndex+1}
-        </span>
-
-        <span className="case-list--item__status text-center">
-          <label className={`label label-${this.props.statusClass}`}>
-            {this.props.statusLabel}
-          </label>
-        </span>
-
-        <span className="case-list--item__eth-address text text-left">
-          <EthAddress address={this.props.caseAddress} />
-        </span>
-
+    if (caseAddress) {
+      caseRoute = formatRoute(route, { caseAddress: caseAddress })
+      viewCase = (
         <span className="case-list--item__view text-right">
           <span className="case-list--item__view__text">View Case&nbsp;</span>
           <FontAwesomeIcon
             icon={faChevronCircleRight} />
         </span>
+      )
+      ethAddress = <EthAddress address={caseAddress} />
+    } else {
+      caseRoute = '/patients/cases'
+      viewCase = (
+        <span className="case-list--item__view text-right">
+          <LoadingLines visible={true} color="#aaaaaa" />
+        </span>
+      )
+    }
+
+    return (
+      <Link to={caseRoute} style={style} className="case-list--item list">
+        <span className="case-list--item__case-number text-right">
+          {caseIndex+1}
+        </span>
+
+        <span className="case-list--item__status text-center">
+          <label className={`label label-${statusClass}`}>
+            {statusLabel}
+          </label>
+        </span>
+
+        <span className="case-list--item__eth-address text text-left">
+          {ethAddress}
+        </span>
+
+        {viewCase}
       </Link>
     )
   }

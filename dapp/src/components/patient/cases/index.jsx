@@ -9,17 +9,30 @@ import { CaseRow } from '~/components/CaseRow'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
 import { LoadingLines } from '~/components/LoadingLines'
-import get from 'lodash.get'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
-import * as routes from '~/config/routes'
 import rangeRight from 'lodash.rangeright'
+import get from 'lodash.get'
+import forOwn from 'lodash.forown'
+import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
+  let unconfirmedCaseTransactions = []
   const cases = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
   const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
+
+  unconfirmedCaseTransactions = Object.values(forOwn(state.sagaGenesis.transactions, function(value, key) {
+    const { confirmed, error, call } = value
+
+    if ((call && call.method === 'approveAndCall') && (!confirmed || error)) {
+      value['transactionId'] = key
+      return value
+    } else {
+      return null
+    }
+  }))
 
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
     let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, caseIndex)
@@ -37,7 +50,8 @@ function mapStateToProps(state) {
     address,
     caseCount,
     cases,
-    CaseManager
+    CaseManager,
+    unconfirmedCaseTransactions
   }
 }
 
@@ -82,6 +96,17 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
             Current Cases:
           </h5>
           <FlipMove enterAnimation="accordionVertical" className="case-list">
+            {this.props.unconfirmedCaseTransactions.map((transaction) => {
+              const statusLabel = 'Pending'
+              const statusClass = 'default'
+              return (
+                <CaseRow
+                  statusLabel={statusLabel}
+                  statusClass={statusClass}
+                  caseIndex={transaction.transactionId}
+                  key={`unconfirmed-${transaction.transactionId}}`} />
+              )
+            })}
             {this.props.cases.map(({caseAddress, status, caseIndex}) => {
               const statusLabel = caseStatusToName(status)
               const statusClass = caseStatusToClass(status)

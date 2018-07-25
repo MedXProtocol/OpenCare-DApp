@@ -49,7 +49,7 @@ export function* invalidateAddress({ address }) {
   })
 }
 
-export function* invalidateTransaction({transactionId, call, receipt}) {
+export function* invalidateTransaction({ transactionId, call, receipt }) {
   let contractAddresses = Object.values(receipt.events || {}).reduce((addressSet, event) => {
     return addressSet.add(event.address)
   }, new Set())

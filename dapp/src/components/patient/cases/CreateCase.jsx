@@ -235,7 +235,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
             })
           })
           .onTxHash(() => {
-            toastr.success('Your case has been submitted.')
+            toastr.success('Your case has been broadcast to the network. It will take a moment to be confirmed.')
             mixpanel.track('Case Submitted')
             this.props.history.push('/patients/cases')
           })
