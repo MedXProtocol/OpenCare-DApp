@@ -84,7 +84,6 @@ function parseNewTxObject(caseRowObject, route) {
   }
   itemClass = ' case-list--item__pending'
 
-  console.log(objNumber, caseRoute, label)
   return {
     caseRoute,
     action,

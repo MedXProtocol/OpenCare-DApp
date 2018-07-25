@@ -18,7 +18,7 @@ i18next
             blankState: 'Currently there are no pending transactions',
             challengeWithDoctor: 'Getting Second Opinion',
             diagnoseCase: 'Sending Diagnosis',
-            diagnoseChallengedCase: 'Sending Second Opinion',
+            diagnoseChallengedCase: 'Sending Diagnosis', // don't let the 2nd doctor know it's a second opinion
             publicKeys: 'Retrieving Account',
             mint: 'Mint {{mintMedxCount}} MEDT (Test MEDX)',
             setPublicKey: 'Registering Account',
