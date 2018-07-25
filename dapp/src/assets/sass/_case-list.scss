@@ -47,8 +47,7 @@
   display: inline-block;
 }
 
-.case-list--item.list,
-.case-list--item:hover button {
+.case-list--item.list {
   display: block;
 }
 
@@ -117,4 +116,12 @@
 
 .case-list--item__view .loader {
   margin: 0;
+}
+
+.case-list--item__pending {
+  opacity: 0.7;
+}
+
+.case-list--item button {
+  margin: 0 auto;
 }

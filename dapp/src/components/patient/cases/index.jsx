@@ -24,26 +24,34 @@ function mapStateToProps(state) {
   const CaseManager = contractByName(state, 'CaseManager')
   const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
 
-  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
-    let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, caseIndex)
+  for (let objIndex = (caseCount - 1); objIndex >= 0; --objIndex) {
+    let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, objIndex)
     if (caseAddress) {
       let status = cacheCallValue(state, caseAddress, 'status')
       cases.push({
         caseAddress,
         status,
-        caseIndex
+        objIndex
       })
     }
   }
 
-  forOwn(state.sagaGenesis.transactions, function(transaction) {
-    const { confirmed, error, call } = transaction
+  forOwn(state.sagaGenesis.transactions, function(transaction, transactionId) {
+    const { confirmed, error, call, receipt, gasUsed } = transaction
     const isPatientCase = (call && call.method === 'approveAndCall')
 
     if (isPatientCase && (!confirmed || defined(error))) {
-      transaction['caseIndex'] = parseInt(caseCount, 10) + index
-      transaction['receipt'] = transaction.receipt
-      transaction['error'] = transaction.error
+      // could simply merge the transaction obj we're iterating over ?
+      transaction = {
+        ...transaction,
+        transactionId,
+        objIndex: parseInt(caseCount, 10) + index,
+        receipt,
+        error,
+        call,
+        gasUsed
+      }
+      console.log(transaction)
       cases.splice(0, 0, transaction)
       index++
     }
@@ -61,8 +69,8 @@ function* saga({ address, CaseManager }) {
   if (!address || !CaseManager) { return }
   const caseCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', address)
   const indices = rangeRight(caseCount)
-  yield all(indices.map(function* (caseIndex) {
-    const caseAddress = yield cacheCall(CaseManager, 'patientCases', address, caseIndex)
+  yield all(indices.map(function* (objIndex) {
+    const caseAddress = yield cacheCall(CaseManager, 'patientCases', address, objIndex)
     yield all([
       addContract({ address: caseAddress, contractKey: 'Case' }),
       cacheCall(caseAddress, 'status')
@@ -98,19 +106,16 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
             Current Cases:
           </h5>
           <FlipMove enterAnimation="accordionVertical" className="case-list">
-            {this.props.cases.map(({ caseAddress, status, caseIndex, receipt, error }) => {
-              const statusLabel = caseStatusToName(status)
-              const statusClass = caseStatusToClass(status)
+            {this.props.cases.map(caseRowObject => {
+              // We use different methods here depending on if Patient vs. Doctor(s):
+              caseRowObject['statusLabel'] = caseStatusToName(caseRowObject.status)
+              caseRowObject['statusClass'] = caseStatusToClass(caseRowObject.status)
               return (
                 <CaseRow
                   route={routes.PATIENTS_CASE}
-                  receipt={receipt}
-                  error={error}
-                  statusLabel={statusLabel}
-                  statusClass={statusClass}
-                  caseAddress={caseAddress}
-                  caseIndex={caseIndex}
-                  key={caseIndex} />
+                  caseRowObject={caseRowObject}
+                  key={caseRowObject.objIndex}
+                />
               )
             })}
           </FlipMove>
