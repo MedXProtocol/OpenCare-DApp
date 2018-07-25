@@ -11,6 +11,7 @@ import { addContract } from '~/saga-genesis/sagas'
 import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
+import { defined } from '~/utils/defined'
 import rangeRight from 'lodash.rangeright'
 import get from 'lodash.get'
 import forOwn from 'lodash.forown'
@@ -23,16 +24,15 @@ function mapStateToProps(state) {
   const CaseManager = contractByName(state, 'CaseManager')
   const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
 
-  unconfirmedCaseTransactions = Object.values(forOwn(state.sagaGenesis.transactions, function(value, key) {
+  forOwn(state.sagaGenesis.transactions, function(value, key) {
     const { confirmed, error, call } = value
+    const isPatientCase = (call && call.method === 'approveAndCall')
 
-    if ((call && call.method === 'approveAndCall') && (!confirmed || error)) {
+    if (isPatientCase && (!confirmed || defined(error))) {
       value['transactionId'] = key
-      return value
-    } else {
-      return null
+      unconfirmedCaseTransactions.push(value)
     }
-  }))
+  })
 
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
     let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, caseIndex)
