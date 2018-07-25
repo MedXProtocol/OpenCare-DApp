@@ -1,24 +1,20 @@
 import React, { Component } from 'react'
 import FlipMove from 'react-flip-move'
 import { CaseRow } from '~/components/CaseRow'
-import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctor-case-status-labels'
+import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctorCaseStatusLabels'
 import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
 import * as routes from '~/config/routes'
 
-function renderCase({ caseAddress, status, caseIndex, isDiagnosingDoctor }) {
-  const statusLabel = doctorCaseStatusToName(isDiagnosingDoctor, parseInt(status, 10))
-  const statusClass = doctorCaseStatusToClass(isDiagnosingDoctor, parseInt(status, 10))
+function renderCase(caseRowObject) {
+  caseRowObject['statusLabel'] = doctorCaseStatusToName(caseRowObject)
+  caseRowObject['statusClass'] = doctorCaseStatusToClass(caseRowObject)
   return (
     <CaseRow
       route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
-      caseAddress={caseAddress}
-      caseIndex={caseIndex}
-      statusLabel={statusLabel}
-      statusClass={statusClass}
-      key={caseIndex} />
+      caseRowObject={caseRowObject}
+      key={caseRowObject.objIndex} />
   )
 }
-
 
 export const DoctorCaseListing = class _DoctorCaseListing extends Component {
 
@@ -57,7 +53,11 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                       <span>You do not have any cases assigned to you right now.</span>
                     </div>
                   </div> :
-                  <FlipMove enterAnimation="accordionVertical" className="case-list">
+                  <FlipMove
+                    enterAnimation="accordionVertical"
+                    leaveAnimation="accordionVertical"
+                    className="case-list"
+                  >
                     {openCases.map(c => renderCase(c))}
                   </FlipMove>
                 }
@@ -80,7 +80,11 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                       <span>You have not evaluated any cases yet.</span>
                     </div>
                   </div> :
-                  <FlipMove enterAnimation="accordionVertical" className="case-list">
+                  <FlipMove
+                    enterAnimation="accordionVertical"
+                    leaveAnimation="accordionVertical"
+                    className="case-list"
+                  >
                     {historicalCases.map(c => renderCase(c))}
                   </FlipMove>
                 }

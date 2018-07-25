@@ -8,11 +8,12 @@ import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronC
 import { EthAddress } from '~/components/EthAddress'
 import { LoadingLines } from '~/components/LoadingLines'
 import { txErrorMessage } from '~/services/txErrorMessage'
+import * as routes from '~/config/routes'
 
 function mapDispatchToProps (dispatch) {
   return {
-    dispatchSend: (transactionId, call, options) => {
-      dispatch({ type: 'SEND_TRANSACTION', transactionId, call, options })
+    dispatchSend: (transactionId, call, options, address) => {
+      dispatch({ type: 'SEND_TRANSACTION', transactionId, call, options, address })
     },
     dispatchRemove: (transactionId) => {
       dispatch({ type: 'REMOVE_TRANSACTION', transactionId })
@@ -20,95 +21,147 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
+function parseNewTxObject(caseRowObject, route) {
+  let options = {}
+  let caseRoute,
+    action,
+    ethAddress,
+    label,
+    labelClass,
+    itemClass,
+    objNumber,
+    remove
+  const {
+    caseAddress,
+    objIndex,
+    receipt,
+    error,
+    call,
+    gasUsed,
+    transactionId
+  } = caseRowObject
+
+  objNumber = objIndex ? `${objIndex + 1}` : '...'
+  caseRoute = caseAddress ? formatRoute(route, { caseAddress }) : routes.PATIENTS_CASES
+  action = (
+    <React.Fragment>
+      <LoadingLines visible={true} color="#aaaaaa" />
+    </React.Fragment>
+  )
+
+  ethAddress = caseAddress ? <EthAddress address={caseAddress} /> : null
+
+  if (error) {
+    label = txErrorMessage(error)
+    labelClass = 'danger'
+
+    if (gasUsed)
+      options['gas'] = parseInt(1.2 * gasUsed, 10)
+
+    action = <button
+      className="btn btn-danger btn-xs"
+      onClick={(e) => {
+        e.preventDefault()
+        this.props.dispatchSend(transactionId, call, options, caseAddress)
+      }}
+    >Retry</button>
+    remove = <button
+      className="btn-link text-gray"
+      onClick={(e) => {
+        e.preventDefault()
+        this.props.dispatchRemove(transactionId)
+      }}
+    >&times;</button>
+  } else if (receipt) {
+    label = 'Confirming'
+    labelClass = 'warning'
+  } else if (caseAddress) {
+    label = 'Submitting Diagnosis'
+    labelClass = 'default'
+  } else {
+    label = 'Pending'
+    labelClass = 'default'
+  }
+  itemClass = ' case-list--item__pending'
+
+  console.log(objNumber, caseRoute, label)
+  return {
+    caseRoute,
+    action,
+    ethAddress,
+    label,
+    labelClass,
+    itemClass,
+    objNumber,
+    remove
+  }
+}
+
+function parseExistingCaseObject(caseRowObject, route) {
+  let caseRoute,
+    action,
+    ethAddress,
+    label,
+    labelClass,
+    itemClass,
+    objNumber
+  const {
+    caseAddress,
+    objIndex,
+    statusLabel,
+    statusClass
+  } = caseRowObject
+
+  objNumber = (objIndex + 1)
+  caseRoute = formatRoute(route, { caseAddress })
+  action = (
+    <React.Fragment>
+      <span className="case-list--item__view__text">View Case&nbsp;</span>
+      <FontAwesomeIcon
+        icon={faChevronCircleRight} />
+    </React.Fragment>
+  )
+  ethAddress = <EthAddress address={caseAddress} />
+  label = statusLabel
+  labelClass = statusClass
+  itemClass = ''
+
+  return {
+    objNumber, caseRoute, action, ethAddress, label, labelClass, itemClass
+  }
+}
+
 export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends Component {
   render () {
-    let caseRoute, action, ethAddress, label, labelClass, itemClass, objNumber, remove
-    let options = {}
-    const { caseRowObject, route } = this.props
-    const {
-      caseAddress,
-      objIndex,
-      receipt,
-      error,
-      call,
-      gasUsed,
-      statusLabel,
-      statusClass,
-      transactionId
-    } = caseRowObject
-    const style = { zIndex: 998 - objIndex }
+    let { caseRowObject } = this.props
+    const { route } = this.props
 
-    if (caseAddress) {
-      objNumber = (objIndex + 1)
-      caseRoute = formatRoute(route, { caseAddress })
-      action = (
-        <React.Fragment>
-          <span className="case-list--item__view__text">View Case&nbsp;</span>
-          <FontAwesomeIcon
-            icon={faChevronCircleRight} />
-        </React.Fragment>
-      )
-      ethAddress = <EthAddress address={caseAddress} />
-      label = statusLabel
-      labelClass = statusClass
-      itemClass = ''
+    if (caseRowObject.call) {
+      caseRowObject = parseNewTxObject(caseRowObject, route)
     } else {
-      objNumber = '...'
-      caseRoute = '/patients/cases'
-      action = (
-        <React.Fragment>
-          <LoadingLines visible={true} color="#aaaaaa" />
-        </React.Fragment>
-      )
-      if (error) {
-        label = txErrorMessage(error)
-        labelClass = 'danger'
-
-        if (gasUsed)
-          options['gas'] = parseInt(1.2 * gasUsed, 10)
-
-        action = <button
-          className="btn btn-danger btn-xs"
-          onClick={(e) => {
-            e.preventDefault()
-            this.props.dispatchSend(transactionId, call, options)
-          }}
-        >Retry</button>
-        remove = <button
-          className="btn-link text-gray"
-          onClick={(e) => {
-            e.preventDefault()
-            this.props.dispatchRemove(transactionId)
-          }}
-        >&times;</button>
-      } else if (receipt) {
-        label = 'Confirming'
-        labelClass = 'warning'
-      } else {
-        label = 'Pending'
-        labelClass = 'default'
-      }
-      itemClass = ' case-list--item__pending'
+      caseRowObject = parseExistingCaseObject(caseRowObject, route)
     }
 
+    const style = { zIndex: 998 - caseRowObject.objNumber }
+
     return (
-      <Link to={caseRoute} style={style} className={'case-list--item list' + itemClass}>
+      <Link to={caseRowObject.caseRoute} style={style} className={'case-list--item list' + caseRowObject.itemClass}>
         <span className="case-list--item__case-number text-center">
-          {objNumber}
+          {caseRowObject.objNumber}
         </span>
 
         <span className="case-list--item__status text-center">
-          <label className={`label label-${labelClass}`}>
-            {label}
+          <label className={`label label-${caseRowObject.labelClass}`}>
+            {caseRowObject.label}
           </label>
         </span>
 
         <span className="case-list--item__eth-address text text-left">
-          {ethAddress}
+          {caseRowObject.ethAddress}
         </span>
 
         <span className="case-list--item__view text-center">
-          {action} {remove}
+          {caseRowObject.action} {caseRowObject.remove}
         </span>
       </Link>
     )

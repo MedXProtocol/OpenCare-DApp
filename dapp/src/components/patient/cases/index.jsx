@@ -10,7 +10,7 @@ import { contractByName } from '~/saga-genesis/state-finders'
 import { addContract } from '~/saga-genesis/sagas'
 import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { caseStatusToName, caseStatusToClass } from '~/utils/case-status-labels'
+import { patientCaseStatusToName, patientCaseStatusToClass } from '~/utils/patientCaseStatusLabels'
 import { defined } from '~/utils/defined'
 import rangeRight from 'lodash.rangeright'
 import get from 'lodash.get'
@@ -99,11 +99,14 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
           <h5 className="title subtitle">
             Current Cases:
           </h5>
-          <FlipMove enterAnimation="accordionVertical" className="case-list">
+          <FlipMove
+            enterAnimation="accordionVertical"
+            leaveAnimation="accordionVertical"
+            className="case-list"
+          >
             {this.props.cases.map(caseRowObject => {
-              // We use different methods here depending on if Patient vs. Doctor(s):
-              caseRowObject['statusLabel'] = caseStatusToName(caseRowObject.status)
-              caseRowObject['statusClass'] = caseStatusToClass(caseRowObject.status)
+              caseRowObject['statusLabel'] = patientCaseStatusToName(caseRowObject.status)
+              caseRowObject['statusClass'] = patientCaseStatusToClass(caseRowObject.status)
               return (
                 <CaseRow
                   route={routes.PATIENTS_CASE}

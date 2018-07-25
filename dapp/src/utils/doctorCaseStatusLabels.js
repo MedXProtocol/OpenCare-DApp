@@ -24,9 +24,11 @@ var statusClasses = {
 
 // This is context specific, and will say what state the case is in depending on
 // which doc is viewing the case
-export function doctorCaseStatusToName(isFirstDoc, status) {
+export function doctorCaseStatusToName(caseObject) {
   let statusName
-  let evaluatedState = statusNames[3]
+  const evaluatedState = statusNames[3]
+  const isFirstDoc = caseObject.isDiagnosingDoctor
+  const status = parseInt(caseObject.status, 10)
 
   if (isFirstDoc && status > 2)
     statusName = evaluatedState
@@ -40,9 +42,11 @@ export function doctorCaseStatusToName(isFirstDoc, status) {
 
 // This is context specific, and will provide a different result depending on
 // which doc is viewing the case
-export function doctorCaseStatusToClass(isFirstDoc, status) {
+export function doctorCaseStatusToClass(caseObject) {
   let statusClass
-  let evaluatedState = statusClasses[3]
+  const evaluatedState = statusClasses[3]
+  const isFirstDoc = caseObject.isDiagnosingDoctor
+  const status = parseInt(caseObject.status, 10)
 
   if (isFirstDoc && status > 2)
     statusClass = evaluatedState
