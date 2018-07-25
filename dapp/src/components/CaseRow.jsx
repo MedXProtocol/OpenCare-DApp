@@ -29,7 +29,7 @@ function parseNewTxObject(caseRowObject, route) {
     label,
     labelClass,
     itemClass,
-    objNumber,
+    caseIndex,
     remove
   const {
     caseAddress,
@@ -41,7 +41,7 @@ function parseNewTxObject(caseRowObject, route) {
     transactionId
   } = caseRowObject
 
-  objNumber = objIndex ? `${objIndex + 1}` : '...'
+  caseIndex = '...'
   caseRoute = caseAddress ? formatRoute(route, { caseAddress }) : routes.PATIENTS_CASES
   action = (
     <React.Fragment>
@@ -91,7 +91,7 @@ function parseNewTxObject(caseRowObject, route) {
     label,
     labelClass,
     itemClass,
-    objNumber,
+    caseIndex,
     remove
   }
 }
@@ -103,7 +103,7 @@ function parseExistingCaseObject(caseRowObject, route) {
     label,
     labelClass,
     itemClass,
-    objNumber
+    caseIndex
   const {
     caseAddress,
     objIndex,
@@ -111,7 +111,7 @@ function parseExistingCaseObject(caseRowObject, route) {
     statusClass
   } = caseRowObject
 
-  objNumber = (objIndex + 1)
+  caseIndex = (objIndex + 1)
   caseRoute = formatRoute(route, { caseAddress })
   action = (
     <React.Fragment>
@@ -126,7 +126,7 @@ function parseExistingCaseObject(caseRowObject, route) {
   itemClass = ''
 
   return {
-    objNumber, caseRoute, action, ethAddress, label, labelClass, itemClass
+    caseIndex, caseRoute, action, ethAddress, label, labelClass, itemClass
   }
 }
 
@@ -146,7 +146,7 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
     return (
       <Link to={caseRowObject.caseRoute} style={style} className={'case-list--item list' + caseRowObject.itemClass}>
         <span className="case-list--item__case-number text-center">
-          {caseRowObject.objNumber}
+          {caseRowObject.caseIndex}
         </span>
 
         <span className="case-list--item__status text-center">
