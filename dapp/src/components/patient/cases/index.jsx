@@ -123,7 +123,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
     return (
       <div className="card">
         <ScrollToTop />
-        <div className="card-body table-responsive">
+        <div className="card-body">
           {loadingLines}
           {noCases}
           {cases}
