@@ -33,7 +33,7 @@ import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { withSaga, cacheCallValue, withContractRegistry } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
-import { cacheCall } from '~/saga-genesis/sagas'
+import { addContract, cacheCall } from '~/saga-genesis/sagas'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { toastr } from '~/toastr'
@@ -41,6 +41,7 @@ import { defined } from '~/utils/defined'
 
 function mapStateToProps (state) {
   let caseCount
+  let cases = []
   const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const isSignedIn = get(state, 'account.signedIn')
@@ -51,10 +52,29 @@ function mapStateToProps (state) {
   if (isSignedIn && isDoctor) {
     caseCount = get(state, 'userStats.caseCount')
     // caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
+
+    for (let objIndex = (caseCount - 1); objIndex >= 0; --objIndex) {
+      let caseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, objIndex)
+      if (caseAddress) {
+        const status = cacheCallValue(state, caseAddress, 'status')
+        const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
+        const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
+        if (status && (diagnosingDoctor || challengingDoctor)) {
+          const isDiagnosingDoctor = diagnosingDoctor === address
+          cases.push({
+            caseAddress,
+            status,
+            objIndex,
+            isDiagnosingDoctor
+          })
+        }
+      }
+    }
   }
 
   return {
     address,
+    cases,
     isDoctor,
     DoctorManager,
     isSignedIn,
@@ -75,13 +95,24 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ address, CaseManager, DoctorManager }) {
+function* saga({ address, caseCount, CaseManager, DoctorManager }) {
   if (!address || !CaseManager || !DoctorManager) { return }
 
   yield all([
     cacheCall(CaseManager, 'doctorCasesCount', address),
     cacheCall(DoctorManager, 'isDoctor', address)
   ])
+
+  if (caseCount) {
+    for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
+      let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
+      yield addContract({ address: caseAddress, contractKey: 'Case' })
+      yield all([
+        cacheCall(caseAddress, 'status'),
+        cacheCall(caseAddress, 'diagnosingDoctor')
+      ])
+    }
+  }
 }
 
 const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
@@ -206,7 +237,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       <div>
         <div className="wrapper">
           <div className="main-panel">
-            <HippoNavbarContainer />
+            <HippoNavbarContainer cases={this.props.cases} />
             {ownerWarning}
             {publicKeyCheck}
             <div className="content">
