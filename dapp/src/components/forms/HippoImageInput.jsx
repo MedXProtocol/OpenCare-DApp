@@ -3,9 +3,29 @@ import { ProgressBar } from 'react-bootstrap'
 import classNames from 'classnames'
 
 export const HippoImageInput = class _HippoImageInput extends Component {
+
+  cancelUpload = (e) => {
+    e.preventDefault()
+    this.props.handleCancelUpload(this.props.name)
+  }
+
+  handleReset = (e) => {
+    e.preventDefault()
+    this.props.resetImageState(this.props.name)
+  }
+
   render() {
-    const { name, id, label, subLabel, error, fileError, setRef, onChange,
-      currentValue, progressClassNames, progressPercent, colClasses } = this.props
+    const {
+      name, id, label, subLabel, error, fileError, onChange,
+      currentValue, progressPercent, colClasses, fileUploadActive
+    } = this.props
+
+    const progressClassNames = classNames(
+      {
+        'progress--wrapper__show': fileUploadActive,
+        'progress--wrapper__hide': !fileUploadActive
+      }
+    )
 
     return (
       <div className="row">
@@ -14,17 +34,26 @@ export const HippoImageInput = class _HippoImageInput extends Component {
             <label className='control-label'>{label} <span className="text-gray small">{subLabel}</span></label>
             <div>
               <div className="hidden-input-mask">
-                <input ref={setRef} />
+                <input />
               </div>
-              <label className="btn btn btn-info">
-                Select File ... <input
-                            name={name}
-                            onChange={onChange}
-                            type="file"
-                            accept='image/*'
-                            className="form-control"
-                            style={{ display: 'none' }} />
-              </label>
+              {
+                currentValue ? null : (
+                  <label className="btn btn btn-info">
+                    Select File ... <input
+                      name={name}
+                      onClick={(event) => {
+                        // reset each time so user can choose the same file if they cancel
+                        event.target.value = null
+                      }}
+                      onChange={onChange}
+                      type="file"
+                      accept='image/*'
+                      className="form-control"
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                )
+              }
               <span>
                 &nbsp; {currentValue}
               </span>
@@ -34,6 +63,12 @@ export const HippoImageInput = class _HippoImageInput extends Component {
                   bsStyle="success"
                   now={progressPercent} />
               </div>
+              {fileUploadActive ? (
+                <a onClick={this.cancelUpload} className="btn btn-link btn-lg text-gray">&times;</a>
+              ) : null}
+              {currentValue ? (
+                <a onClick={this.handleReset} className="btn btn-link btn-lg text-gray">&times;</a>
+              ) : null}
               {error}
               {fileError}
             </div>

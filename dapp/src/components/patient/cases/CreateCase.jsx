@@ -8,6 +8,7 @@ import ReactTooltip from 'react-tooltip'
 import { withRouter } from 'react-router-dom'
 import classNames from 'classnames'
 import { isNotEmptyString } from '~/utils/common-util'
+import { cancelablePromise } from '~/utils/cancelablePromise'
 import { uploadJson, uploadFile } from '~/utils/storage-util'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
@@ -255,9 +256,14 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     captureFirstImage = async (event) => {
+      event.stopPropagation()
+      event.preventDefault()
+
       const file = event.target.files[0]
       if (!file) { return }
-      this.setState({firstFileError: null})
+
+      await this.resetImageState('firstImage')
+
       const error = this.validateFile(file)
       if (error) {
         this.setState({ firstFileError: error })
@@ -268,54 +274,92 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       const progressHandler = (percent) => {
         this.setState({ firstImagePercent: percent })
       }
-      // Clear out previous values
-      this.setState({
-        firstImageHash: null,
-        firstFileName: null
-      })
 
-      const imageHash = await this.captureFile(event, progressHandler)
-      this.setState({
-        firstImageHash: imageHash,
-        firstFileName: fileName
-      })
+      const firstUploadPromise = cancelablePromise(
+        new Promise((resolve, reject) => {
+          this.captureFile(file, progressHandler).then(imageHash => {
+            return resolve(imageHash)
+          })
+        })
+      )
+      await this.setState({ firstUploadPromise })
 
-      this.validateField('firstImageHash')
+      firstUploadPromise
+        .promise
+        .then((imageHash) => {
+          this.setState({
+            firstImageHash: imageHash,
+            firstFileName: fileName,
+            firstImagePercent: 0
+          })
+
+          this.validateField('firstImageHash')
+        })
+        .catch((reason) => {
+          this.resetImageState('firstImage')
+        })
+    }
+
+    resetImageState = async (image) => {
+      if (image === 'firstImage') {
+        await this.setState({
+          firstUploadPromise: undefined,
+          firstImageHash: null,
+          firstFileName: null,
+          firstImagePercent: null,
+          firstFileError: null
+        })
+      } else {
+        await this.setState({
+          secondUploadPromise: undefined,
+          secondImageHash: null,
+          secondFileName: null,
+          secondImagePercent: null,
+          secondFileError: null
+        })
+      }
+    }
+
+    handleCancelUpload = async (imageToCancel) => {
+      if (imageToCancel === 'firstImage' && this.state.firstUploadPromise) {
+        this.state.firstUploadPromise.cancel()
+      } else if (this.state.secondUploadPromise) {
+        this.state.secondUploadPromise.cancel()
+      }
     }
 
     captureSecondImage = async (event) => {
-      const file = event.target.files[0]
-      if (!file) { return }
-      this.setState({secondFileError: null})
-      const error = this.validateFile(file)
-      if (error) {
-        this.setState({ secondFileError: error })
-        return
-      }
+      console.warn('update thism ethod')
+      return
+      // const file = event.target.files[0]
+      // if (!file) { return }
+      // await this.setState({ secondFileError: null })
+      // const error = this.validateFile(file)
+      // if (error) {
+      //   this.setState({ secondFileError: error })
+      //   return
+      // }
 
-      const fileName = file.name
-      const progressHandler = (percent) => {
-        this.setState({ secondImagePercent: percent })
-      }
-      // Clear out previous values
-      this.setState({
-        secondImageHash: null,
-        secondFileName: null
-      })
+      // const fileName = file.name
+      // const progressHandler = (percent) => {
+      //   this.setState({ secondImagePercent: percent })
+      // }
+      // // Clear out previous values
+      // this.setState({
+      //   secondImageHash: null,
+      //   secondFileName: null
+      // })
 
-      const imageHash = await this.captureFile(event, progressHandler)
-      this.setState({
-        secondImageHash: imageHash,
-        secondFileName: fileName
-      })
+      // const imageHash = await this.captureFile(event, progressHandler)
+      // this.setState({
+      //   secondImageHash: imageHash,
+      //   secondFileName: fileName
+      // })
 
-      this.validateField('secondImageHash')
+      // this.validateField('secondImageHash')
     }
 
-    captureFile = async (event, progressHandler) => {
-      event.stopPropagation()
-      event.preventDefault()
-      const file = event.target.files[0]
+    captureFile = async (file, progressHandler) => {
       const imageHash = await uploadFile(file, this.state.caseEncryptionKey, progressHandler)
 
       return imageHash
@@ -542,13 +586,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       return await send(MedXToken, 'approveAndCall', CaseManager, medXToWei('15'), data)({ gas: 1600000 })
     }
 
-    progressClassNames = (percent) => {
-      return classNames(
-        {
-          'progress--wrapper__show': percent > 0 && percent < 100,
-          'progress--wrapper__hide': percent === 0 || percent === 100
-        }
-      )
+    fileUploadActive = (percent) => {
+      return (percent > 0 && percent < 100) ? true : false
     }
 
     errorMessage(fieldName) {
@@ -662,10 +701,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               colClasses='col-xs-12 col-sm-12 col-md-12'
                               error={errors['firstImageHash']}
                               fileError={firstFileError}
-                              setRef={this.setFirstImageHashRef}
                               onChange={this.captureFirstImage}
+                              resetImageState={this.resetImageState}
                               currentValue={this.state.firstFileName}
-                              progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
+                              fileUploadActive={this.fileUploadActive(this.state.firstImagePercent)}
+                              handleCancelUpload={this.handleCancelUpload}
                               progressPercent={this.state.firstImagePercent}
                             />
 
@@ -677,10 +717,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               colClasses='col-xs-12 col-sm-12 col-md-12'
                               error={errors['secondImageHash']}
                               fileError={secondFileError}
-                              setRef={this.setSecondImageHashRef}
                               onChange={this.captureSecondImage}
+                              resetImageState={this.resetImageState}
                               currentValue={this.state.secondFileName}
-                              progressClassNames={this.progressClassNames(this.state.secondImagePercent)}
+                              fileUploadActive={this.fileUploadActive(this.state.secondImagePercent)}
+                              handleCancelUpload={this.handleCancelUpload}
                               progressPercent={this.state.secondImagePercent}
                             />
                           </div>
