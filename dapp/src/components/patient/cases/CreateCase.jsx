@@ -1,3 +1,6 @@
+import { cold } from 'react-hot-loader';
+
+
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { isTrue } from '~/utils/isTrue'
@@ -847,4 +850,4 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 }))))
 
-export const CreateCaseContainer = withRouter(CreateCase)
+export const CreateCaseContainer = cold(withRouter(CreateCase))
