@@ -1,18 +1,16 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
-import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
 import PropTypes from 'prop-types'
 import getWeb3 from '~/get-web3'
-import { cacheCall } from '~/saga-genesis/sagas'
-import { addContract } from '~/saga-genesis/sagas'
 import { contractByName } from '~/saga-genesis/state-finders'
-import { withSaga, cacheCallValue, withContractRegistry, withSend } from '~/saga-genesis'
+import { withSaga, withContractRegistry, withSend } from '~/saga-genesis'
 import { DiagnoseCaseContainer } from '~/components/doctors/diagnose'
 import { DoctorCaseListing } from '~/components/doctors/DoctorCaseListing'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
+import { populateCases, populateCasesSaga } from '~/services/populateCases'
 import { defined } from '~/utils/defined'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import forOwn from 'lodash.forown'
@@ -21,29 +19,13 @@ import get from 'lodash.get'
 const DIAGNOSE_TX_REG_EXP = new RegExp(/diagnoseCase|diagnoseChallengedCase/)
 
 function mapStateToProps(state) {
+  let cases = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
   const caseCount = get(state, 'userStats.caseCount')
   // const caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
 
-  let cases = []
-  for (let objIndex = (caseCount - 1); objIndex >= 0; --objIndex) {
-    let caseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, objIndex)
-    if (caseAddress) {
-      const status = cacheCallValue(state, caseAddress, 'status')
-      const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
-      const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
-      if (status && (diagnosingDoctor || challengingDoctor)) {
-        const isDiagnosingDoctor = diagnosingDoctor === address
-        cases.push({
-          caseAddress,
-          status,
-          objIndex,
-          isDiagnosingDoctor
-        })
-      }
-    }
-  }
+  cases = populateCases(state, CaseManager, address, caseCount)
 
   forOwn(state.sagaGenesis.transactions, function(transaction, transactionId) {
     let isDiagnosis = false
@@ -77,14 +59,8 @@ function mapStateToProps(state) {
 
 function* saga({ caseCount, address, CaseManager }) {
   if (!caseCount || !address || !CaseManager) { return }
-  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
-    let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
-    yield addContract({ address: caseAddress, contractKey: 'Case' })
-    yield all([
-      cacheCall(caseAddress, 'status'),
-      cacheCall(caseAddress, 'diagnosingDoctor')
-    ])
-  }
+
+  yield populateCasesSaga(CaseManager, address, caseCount)
 }
 
 export const OpenCasesContainer = ReactTimeout(withContractRegistry(connect(mapStateToProps)(

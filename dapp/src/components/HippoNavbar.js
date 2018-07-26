@@ -136,8 +136,14 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
         var openCasesItem =
           <LinkContainer to={routes.DOCTORS_CASES_OPEN}>
             <NavItem href={routes.DOCTORS_CASES_OPEN}>
-              <span className={classnames('nav-transactions-text--danger', 'nav-transactions--circle')}> &nbsp;
-                {openCaseCount}
+              <span className={classnames(
+                'nav--open-cases__circle',
+                {
+                  'nav--open-cases__not-zero': (openCaseCount > 0),
+                  'nav--open-cases__zero': (openCaseCount === 0),
+                }
+              )}> &nbsp;
+                {openCaseCount} &nbsp;
               </span> Diagnose Cases
             </NavItem>
           </LinkContainer>

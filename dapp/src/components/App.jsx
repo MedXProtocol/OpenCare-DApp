@@ -33,9 +33,10 @@ import { connect } from 'react-redux'
 import get from 'lodash.get'
 import { withSaga, cacheCallValue, withContractRegistry } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
-import { addContract, cacheCall } from '~/saga-genesis/sagas'
+import { cacheCall } from '~/saga-genesis/sagas'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
+import { populateCases, populateCasesSaga } from '~/services/populateCases'
 import { toastr } from '~/toastr'
 import { defined } from '~/utils/defined'
 
@@ -53,23 +54,7 @@ function mapStateToProps (state) {
     caseCount = get(state, 'userStats.caseCount')
     // caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
 
-    for (let objIndex = (caseCount - 1); objIndex >= 0; --objIndex) {
-      let caseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, objIndex)
-      if (caseAddress) {
-        const status = cacheCallValue(state, caseAddress, 'status')
-        const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
-        const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
-        if (status && (diagnosingDoctor || challengingDoctor)) {
-          const isDiagnosingDoctor = diagnosingDoctor === address
-          cases.push({
-            caseAddress,
-            status,
-            objIndex,
-            isDiagnosingDoctor
-          })
-        }
-      }
-    }
+    cases = populateCases(state, CaseManager, address, caseCount)
   }
 
   return {
@@ -104,14 +89,7 @@ function* saga({ address, caseCount, CaseManager, DoctorManager }) {
   ])
 
   if (caseCount) {
-    for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
-      let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
-      yield addContract({ address: caseAddress, contractKey: 'Case' })
-      yield all([
-        cacheCall(caseAddress, 'status'),
-        cacheCall(caseAddress, 'diagnosingDoctor')
-      ])
-    }
+    yield populateCasesSaga(CaseManager, address, caseCount)
   }
 }
 
