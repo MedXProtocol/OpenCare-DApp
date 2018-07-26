@@ -123,3 +123,15 @@
   margin-right: 20px;
   min-width: 100px;
 }
+
+.form-group--file-input {
+  background: #fafafa;
+  padding: 2rem 2rem 1rem 2rem;
+}
+
+.form-group--file-input__filename {
+  font-style: italic;
+  font-size: 14px;
+  font-weight: bold;
+  color: #bbb;
+}

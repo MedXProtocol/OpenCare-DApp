@@ -23,3 +23,10 @@
 .beta-faucet--well {
   min-height: 160px;
 }
+
+.no-underline,
+.no-underline:hover,
+.no-underline:active,
+.no-underline:focus {
+  text-decoration: none;
+}
