@@ -1,6 +1,16 @@
 import { ipfsApi } from '~/ipfsApi'
-import { promisify } from './common-util'
+import { promisify } from '~/utils/common-util'
+import { sleep } from '~/utils/sleep'
 import aes from '~/services/aes'
+
+let uploadProgress = 67
+
+function updateUploadProgress(progressHandler) {
+  if (uploadProgress < 87) {
+    uploadProgress += 2
+    progressHandler(uploadProgress)
+  }
+}
 
 const ipfsMethodWithRetry = async (func, ...args) => {
   let result
@@ -39,18 +49,32 @@ export async function uploadFile(file, encryptionKey, progressHandler) {
 }
 
 export async function doUploadFile(file, encryptionKey, progressHandler) {
+  // READING
   progressHandler(33)
   const reader = new window.FileReader()
   await promisifyFileReader(reader, file)
+
+  // ENCRYPTING
   progressHandler(45)
   const buffer = Buffer.from(reader.result)
   const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
-  progressHandler(67)
+
+  // UPLOADING
+  uploadProgress = 67 // reset each time
+  const interval = setInterval(function() { updateUploadProgress(progressHandler) }, 500)
+
   const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb))
+  clearInterval(interval)
+
+  // PINNING TO IPFS
   progressHandler(89)
   const hash = uploadResult[0].hash
   await promisify(cb => ipfsApi.pin.add(hash, cb))
+
+  // DONE!
   progressHandler(100)
+  await sleep(600)
+
   return hash
 }
 

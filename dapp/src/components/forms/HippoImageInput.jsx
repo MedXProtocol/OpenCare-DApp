@@ -21,6 +21,21 @@ export const HippoImageInput = class _HippoImageInput extends Component {
     this.props.handleCaptureImage(e.target.files[0], this.props.name)
   }
 
+  showProgress = (e) => {
+    const percent = this.props.progressPercent
+    if (percent < 34) {
+      return 'reading file ...'
+    } else if (percent > 34 && percent < 67) {
+      return 'encrypting ...'
+    } else if (percent >= 67 && percent < 89) {
+      return 'uploading ...'
+    } else if (percent >= 89 && percent < 99) {
+      return 'pinning to ipfs'
+    } else if (percent >= 99) {
+      return 'done !'
+    }
+  }
+
   render() {
     const {
       name, id, label, subLabel, error, fileError,
@@ -64,15 +79,21 @@ export const HippoImageInput = class _HippoImageInput extends Component {
                   </label>
                 )
               }
+
               <span className="form-group--file-input__filename">
-                {currentValue}
+                {fileUploadActive ?
+                  <React.Fragment>&nbsp; &nbsp;{this.showProgress()}</React.Fragment>
+                : currentValue}
               </span>
+
               {fileUploadActive ? (
                 <a onClick={this.cancelUpload} className="btn btn-link btn-md text-gray no-underline">{'\u2716'}</a>
               ) : null}
+
               {currentValue ? (
                 <a onClick={this.reset} className="btn btn-link btn-md text-gray no-underline">{'\u2716'}</a>
               ) : null}
+
               <div className={progressClassNames}>
                 <ProgressBar
                   active

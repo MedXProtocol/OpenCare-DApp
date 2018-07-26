@@ -107,10 +107,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       this.state = {
         firstImageHash: null,
         firstImageFileName: null,
-        firstImagePercent: 0,
+        firstImagePercent: null,
         secondImageHash: null,
         secondImageFileName: null,
-        secondImagePercent: 0,
+        secondImagePercent: null,
         gender: null,
         allergies: null,
         pregnant: null,
@@ -286,7 +286,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           this.setState({
             [`${imageToCapture}Hash`]: imageHash,
             [`${imageToCapture}FileName`]: fileName,
-            [`${imageToCapture}Percent`]: 0
+            [`${imageToCapture}Percent`]: null
           })
 
           this.validateField(`${imageToCapture}Hash`)
@@ -348,6 +348,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         errors.push(fieldName)
       } else {
         pull(errors, fieldName)
+      }
+
+      if (errors.includes('firstImageHash')) {
+        this.handleResetImageState('firstImage')
+      } else if (errors.includes('secondImageHash')) {
+        this.handleResetImageState('secondImage')
       }
 
       this.setState({ errors: errors })
@@ -542,7 +548,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     fileUploadActive = (percent) => {
-      return (percent > 0 && percent < 100) ? true : false
+      return (percent !== null) ? true : false
     }
 
     errorMessage(fieldName) {
@@ -550,7 +556,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       if (fieldName === 'country' || fieldName === 'region') {
         msg = 'must be chosen'
       } else if (fieldName.match(/ImageHash/g)) {
-        msg = 'please upload an image and wait for it to complete uploading'
+        msg = 'There was an error uploading this image. Please choose a photo and wait for it to complete uploading'
       } else {
         msg = 'must be filled out'
       }
