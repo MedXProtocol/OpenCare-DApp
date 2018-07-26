@@ -78,7 +78,7 @@
     "react-copy-to-clipboard": "^5.0.1",
     "react-css-transition-replace": "^3.0.3",
     "react-document-title": "^2.0.3",
-    "react-dom": "^16.1.1",
+    "react-dom": "^16.4.1",
     "react-flip-move": "^3.0.2",
     "react-i18next": "^7.7.0",
     "react-redux": "^5.0.7",

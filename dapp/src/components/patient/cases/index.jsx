@@ -38,17 +38,37 @@ function mapStateToProps(state) {
 
   forOwn(state.sagaGenesis.transactions, function(transaction, transactionId) {
     const { confirmed, error, call } = transaction
-    const isPatientCase = (call && call.method === 'approveAndCall')
+    const isNewPatientCase = (call && call.method === 'approveAndCall')
+    const isAccepting = (call && call.method === 'acceptDiagnosis')
+    const isSecondOpinion = (call && call.method === 'challengeWithDoctor')
 
-    if (isPatientCase && (!confirmed || defined(error))) {
-      transaction = {
-        ...transaction,
-        transactionId,
-        objIndex: parseInt(caseCount, 10) + index
+    // A tx we care about
+    if (call && (!confirmed || defined(error))) {
+      // Add new case to cases array
+      if (isNewPatientCase) {
+        transaction = {
+          ...transaction,
+          transactionId,
+          objIndex: parseInt(caseCount, 10) + index
+        }
+        cases.splice(0, 0, transaction)
+        index++
       }
-      cases.splice(0, 0, transaction)
-      index++
     }
+
+    // Update a pre-existing case in the cases array
+    if ((isAccepting || isSecondOpinion) && (!confirmed || defined(error))) {
+      const caseIndex = cases.findIndex(c => c.caseAddress === transaction.address)
+      if (caseIndex >= 0) {
+        cases[caseIndex] = {
+          ...cases[caseIndex],
+          ...transaction,
+          status: -1, // 'pending' tx state, before it's confirmed on the blockchain
+          transactionId
+        }
+      }
+    }
+
   })
 
   return {

@@ -73,16 +73,28 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
           this.props.dispatchRemove(transactionId)
         }}
       >&times;</button>
-    } else if (receipt) {
-      label = 'Confirming'
-      labelClass = 'warning'
-    } else if (caseAddress) {
-      label = 'Submitting Diagnosis'
-      labelClass = 'default'
     } else {
-      label = 'Pending'
+      if (
+        caseRowObject.call.method === 'diagnoseCase'
+        || caseRowObject.call.method === 'diagnoseChallengedCase'
+      ) {
+        label = 'Submitting Diagnosis'
+      } else if (caseRowObject.call.method === 'acceptDiagnosis') {
+        label = 'Accepting Diagnosis'
+      } else if (caseRowObject.call.method === 'challengeWithDoctor') {
+        label = 'Getting Second Opinion'
+      } else {
+        label = 'Pending'
+      }
+
       labelClass = 'default'
     }
+
+    if (receipt) {
+      label += ' - Confirming'
+      labelClass = 'warning'
+    }
+
     itemClass = ' case-list--item__pending'
 
     return {
