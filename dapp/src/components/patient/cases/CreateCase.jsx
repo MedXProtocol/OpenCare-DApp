@@ -698,7 +698,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               name='firstImage'
                               id='firstImageHash'
                               label="Overview Photo:"
-                              colClasses='col-xs-12 col-sm-12 col-md-12'
+                              colClasses='col-xs-12 col-sm-9'
                               error={errors['firstImageHash']}
                               fileError={firstFileError}
                               onChange={this.captureFirstImage}
@@ -714,7 +714,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               id='secondImageHash'
                               label={'Close-up Photo:'}
                               subLabel={this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}
-                              colClasses='col-xs-12 col-sm-12 col-md-12'
+                              colClasses='col-xs-12 col-sm-9'
                               error={errors['secondImageHash']}
                               fileError={secondFileError}
                               onChange={this.captureSecondImage}

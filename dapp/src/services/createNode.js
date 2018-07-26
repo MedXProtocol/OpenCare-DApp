@@ -1,6 +1,7 @@
 import { newNode } from '~/services/newNode'
 
 export async function createNode(callback) {
+  console.log("ARE WE IN HERE?")
   const PeerInfo = await import(/* webpackChunkName: 'p2p' */ 'peer-info')
   const multiaddr = await import(/* webpackChunkName: 'p2p' */ 'multiaddr')
 

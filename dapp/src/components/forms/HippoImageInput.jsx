@@ -30,8 +30,11 @@ export const HippoImageInput = class _HippoImageInput extends Component {
     return (
       <div className="row">
         <div id={id} className={colClasses}>
-          <div className={classNames('form-group', { 'has-error': error || fileError })}>
-            <label className='control-label'>{label} <span className="text-gray small">{subLabel}</span></label>
+          <div className={classNames('form-group', 'form-group--file-input', { 'has-error': error || fileError })}>
+            <label className='control-label'>
+              {label}
+              {subLabel ? <span className="text-gray small"><br/>{subLabel}</span> : null}
+            </label>
             <div>
               <div className="hidden-input-mask">
                 <input />
@@ -55,20 +58,20 @@ export const HippoImageInput = class _HippoImageInput extends Component {
                 )
               }
               <span>
-                &nbsp; {currentValue}
+                {currentValue}
               </span>
+              {fileUploadActive ? (
+                <a onClick={this.cancelUpload} className="btn btn-link btn-md text-gray no-underline">{'\u2716'}</a>
+              ) : null}
+              {currentValue ? (
+                <a onClick={this.handleReset} className="btn btn-link btn-md text-gray no-underline">{'\u2716'}</a>
+              ) : null}
               <div className={progressClassNames}>
                 <ProgressBar
                   active
                   bsStyle="success"
                   now={progressPercent} />
               </div>
-              {fileUploadActive ? (
-                <a onClick={this.cancelUpload} className="btn btn-link btn-lg text-gray">&times;</a>
-              ) : null}
-              {currentValue ? (
-                <a onClick={this.handleReset} className="btn btn-link btn-lg text-gray">&times;</a>
-              ) : null}
               {error}
               {fileError}
             </div>
