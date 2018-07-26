@@ -3,7 +3,7 @@ import { promisify } from '~/utils/common-util'
 import { sleep } from '~/utils/sleep'
 import aes from '~/services/aes'
 
-let uploadProgress = 67
+let uploadProgress
 
 function updateUploadProgress(progressHandler) {
   if (uploadProgress < 87) {
@@ -50,26 +50,30 @@ export async function uploadFile(file, encryptionKey, progressHandler) {
 
 export async function doUploadFile(file, encryptionKey, progressHandler) {
   // READING
-  progressHandler(33)
+  progressHandler(10)
   const reader = new window.FileReader()
   await promisifyFileReader(reader, file)
+  await sleep(300)
 
   // ENCRYPTING
-  progressHandler(45)
+  progressHandler(25)
   const buffer = Buffer.from(reader.result)
   const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
+  await sleep(300)
 
   // UPLOADING
-  uploadProgress = 67 // reset each time
+  uploadProgress = 25 // reset each time
+  updateUploadProgress(progressHandler)
   const interval = setInterval(function() { updateUploadProgress(progressHandler) }, 500)
 
   const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb))
   clearInterval(interval)
 
   // PINNING TO IPFS
-  progressHandler(89)
+  progressHandler(90)
   const hash = uploadResult[0].hash
   await promisify(cb => ipfsApi.pin.add(hash, cb))
+  await sleep(300)
 
   // DONE!
   progressHandler(100)

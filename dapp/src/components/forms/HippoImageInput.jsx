@@ -4,8 +4,17 @@ import classNames from 'classnames'
 
 export const HippoImageInput = class _HippoImageInput extends Component {
 
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      cancelClicked: false
+    }
+  }
+
   cancelUpload = (e) => {
     e.preventDefault()
+    this.setState({ cancelClicked: true })
     this.props.handleCancelUpload(this.props.name)
   }
 
@@ -18,20 +27,25 @@ export const HippoImageInput = class _HippoImageInput extends Component {
     e.stopPropagation()
     e.preventDefault()
 
+    this.setState({ cancelClicked: false })
+
     this.props.handleCaptureImage(e.target.files[0], this.props.name)
   }
 
   showProgress = (e) => {
     const percent = this.props.progressPercent
-    if (percent < 34) {
+
+    if (this.state.cancelClicked) {
+      return 'cancelling ...'
+    } else if (percent === 10) {
       return 'reading file ...'
-    } else if (percent > 34 && percent < 67) {
+    } else if (percent === 25) {
       return 'encrypting ...'
-    } else if (percent >= 67 && percent < 89) {
+    } else if (percent > 25 && percent < 90) {
       return 'uploading ...'
-    } else if (percent >= 89 && percent < 99) {
+    } else if (percent === 90) {
       return 'pinning to ipfs'
-    } else if (percent >= 99) {
+    } else if (percent === 100) {
       return 'done !'
     }
   }
