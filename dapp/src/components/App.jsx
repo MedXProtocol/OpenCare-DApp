@@ -36,11 +36,13 @@ import { contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
+import { populateCases, populateCasesSaga } from '~/services/populateCases'
 import { toastr } from '~/toastr'
 import { defined } from '~/utils/defined'
 
 function mapStateToProps (state) {
   let caseCount
+  let cases = []
   const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const isSignedIn = get(state, 'account.signedIn')
@@ -51,10 +53,13 @@ function mapStateToProps (state) {
   if (isSignedIn && isDoctor) {
     caseCount = get(state, 'userStats.caseCount')
     // caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
+
+    cases = populateCases(state, CaseManager, address, caseCount)
   }
 
   return {
     address,
+    cases,
     isDoctor,
     DoctorManager,
     isSignedIn,
@@ -75,13 +80,17 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ address, CaseManager, DoctorManager }) {
+function* saga({ address, caseCount, CaseManager, DoctorManager }) {
   if (!address || !CaseManager || !DoctorManager) { return }
 
   yield all([
     cacheCall(CaseManager, 'doctorCasesCount', address),
     cacheCall(DoctorManager, 'isDoctor', address)
   ])
+
+  if (caseCount) {
+    yield populateCasesSaga(CaseManager, address, caseCount)
+  }
 }
 
 const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
@@ -206,7 +215,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       <div>
         <div className="wrapper">
           <div className="main-panel">
-            <HippoNavbarContainer />
+            <HippoNavbarContainer cases={this.props.cases} />
             {ownerWarning}
             {publicKeyCheck}
             <div className="content">
