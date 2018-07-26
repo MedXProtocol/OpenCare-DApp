@@ -9,14 +9,21 @@ export const HippoImageInput = class _HippoImageInput extends Component {
     this.props.handleCancelUpload(this.props.name)
   }
 
-  handleReset = (e) => {
+  reset = (e) => {
     e.preventDefault()
-    this.props.resetImageState(this.props.name)
+    this.props.handleResetImageState(this.props.name)
+  }
+
+  captureImage = (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+
+    this.props.handleCaptureImage(e.target.files[0], this.props.name)
   }
 
   render() {
     const {
-      name, id, label, subLabel, error, fileError, onChange,
+      name, id, label, subLabel, error, fileError,
       currentValue, progressPercent, colClasses, fileUploadActive
     } = this.props
 
@@ -48,7 +55,7 @@ export const HippoImageInput = class _HippoImageInput extends Component {
                         // reset each time so user can choose the same file if they cancel
                         event.target.value = null
                       }}
-                      onChange={onChange}
+                      onChange={this.captureImage}
                       type="file"
                       accept='image/*'
                       className="form-control"
@@ -57,14 +64,14 @@ export const HippoImageInput = class _HippoImageInput extends Component {
                   </label>
                 )
               }
-              <span>
+              <span className="form-group--file-input__filename">
                 {currentValue}
               </span>
               {fileUploadActive ? (
                 <a onClick={this.cancelUpload} className="btn btn-link btn-md text-gray no-underline">{'\u2716'}</a>
               ) : null}
               {currentValue ? (
-                <a onClick={this.handleReset} className="btn btn-link btn-md text-gray no-underline">{'\u2716'}</a>
+                <a onClick={this.reset} className="btn btn-link btn-md text-gray no-underline">{'\u2716'}</a>
               ) : null}
               <div className={progressClassNames}>
                 <ProgressBar
