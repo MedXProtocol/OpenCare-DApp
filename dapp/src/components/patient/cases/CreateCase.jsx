@@ -22,6 +22,8 @@ import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } f
 import { contractByName } from '~/saga-genesis/state-finders'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
+import { getOrientation } from '~/services/getOrientation'
+import { EXIF_ORIENTATION_LABEL } from '~/services/exifOrientationLabel'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
@@ -272,9 +274,15 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         this.setState({ [`${imageToCapture}Percent`]: percent })
       }
 
+      getOrientation(file, exifOrientationInt => {
+        const orientation = 'orientation: ' + exifOrientationInt + ": " + EXIF_ORIENTATION_LABEL[exifOrientationInt]
+        console.log(orientation)
+        this.setState({ orientation })
+      })
+
       const cancelableUploadPromise = cancelablePromise(
         new Promise((resolve, reject) => {
-          this.captureFile(file, progressHandler).then(imageHash => {
+          uploadFile(file, this.state.caseEncryptionKey, progressHandler).then(imageHash => {
             return resolve(imageHash)
           })
         })
@@ -313,12 +321,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       } else if (this.state.secondUploadPromise) {
         this.state.secondUploadPromise.cancel()
       }
-    }
-
-    captureFile = async (file, progressHandler) => {
-      const imageHash = await uploadFile(file, this.state.caseEncryptionKey, progressHandler)
-
-      return imageHash
     }
 
     checkCountry = () => {
@@ -670,6 +672,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               fileUploadActive={this.fileUploadActive(this.state.firstImagePercent)}
                               progressPercent={this.state.firstImagePercent}
                             />
+                            {this.state.orientation}
 
                             <HippoImageInput
                               name='secondImage'
@@ -686,6 +689,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               fileUploadActive={this.fileUploadActive(this.state.secondImagePercent)}
                               progressPercent={this.state.secondImagePercent}
                             />
+                            {this.state.orientation}
                           </div>
                         ) : null
                       }
