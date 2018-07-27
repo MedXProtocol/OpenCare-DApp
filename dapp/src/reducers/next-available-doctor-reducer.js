@@ -6,8 +6,6 @@ export default function (state, { type, doctor, addresses }) {
     }
   }
 
-  console.log('reducer: ', type, doctor, addresses)
-
   switch(type) {
     case 'NEXT_AVAILABLE_DOCTOR':
       state = {
