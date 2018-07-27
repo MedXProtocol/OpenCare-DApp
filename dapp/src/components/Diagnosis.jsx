@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactTooltip from 'react-tooltip'
 import { Modal } from 'react-bootstrap'
 import { all } from 'redux-saga/effects'
 import { isTrue } from '~/utils/isTrue'
@@ -57,7 +58,15 @@ function* saga({ caseAddress }) {
   ])
 }
 
-const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(withSend(class _Diagnosis extends Component {
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchForgetNextDoctor: () => {
+      dispatch({ type: 'FORGET_NEXT_DOCTOR' })
+    }
+  }
+}
+
+const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(withSend(class _Diagnosis extends Component {
   constructor(){
     super()
 
@@ -146,6 +155,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
   }
 
   handleChallengeDiagnosis = () => {
+    this.props.dispatchForgetNextDoctor()
     this.setState({ showChallengeModal: true })
   }
 
@@ -278,6 +288,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                   <p>
                     If the diagnosis is the same, you will be charged 15 MEDT (Test MEDX).  If the diagnosis is different than the original then you'll be charged 5 MEDT (Test MEDX) and refunded the remainder.
                   </p>
+                  <hr />
                   <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>
                     {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
                       ?
@@ -305,8 +316,24 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
               </div>
             </Modal.Body>
             <Modal.Footer>
-              <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-link">Cancel</button>
-              <input type='submit' className="btn btn-success" value='OK' />
+              <button
+                onClick={this.handleCloseChallengeModal}
+                type="button"
+                className="btn btn-link"
+              >Cancel</button>
+              <span data-tip={!this.state.selectedDoctor ? 'No available doctors to receive a second opinion from' : ''}>
+                <input
+                  disabled={!this.state.selectedDoctor}
+                  type='submit'
+                  className="btn btn-success"
+                  value='OK'
+                />
+                <ReactTooltip
+                  effect='solid'
+                  place={'top'}
+                  wrapper='span'
+                />
+              </span>
             </Modal.Footer>
           </form>
         </Modal>

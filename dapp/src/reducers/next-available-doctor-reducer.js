@@ -6,6 +6,8 @@ export default function (state, { type, doctor, addresses }) {
     }
   }
 
+  console.log('reducer: ', type, doctor, addresses)
+
   switch(type) {
     case 'NEXT_AVAILABLE_DOCTOR':
       state = {
@@ -26,6 +28,10 @@ export default function (state, { type, doctor, addresses }) {
         ...state,
         initialized: true
       }
+      break
+
+    case 'FORGET_NEXT_DOCTOR':
+      delete state['doctor']
       break
 
     // no default

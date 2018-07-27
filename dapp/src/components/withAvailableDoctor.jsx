@@ -34,7 +34,8 @@ export function withAvailableDoctor(WrappedComponent) {
         componentWillReceiveProps (props) {
           if (props.initialized &&
               props.excludeAddresses.length &&
-              !isEqual(props.excludeAddresses, props.currentlyExcludedDoctors)) {
+              !isEqual(props.excludeAddresses, props.currentlyExcludedDoctors)
+          ) {
             this.props.excludedDoctors(props.excludeAddresses)
           }
         }

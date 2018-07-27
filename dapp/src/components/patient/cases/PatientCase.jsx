@@ -1,16 +1,17 @@
 import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
+import { connect } from 'react-redux'
 import CaseStatus from './CaseStatus'
-import CaseDetails from '~/components/CaseDetails'
 import Diagnosis from '~/components/Diagnosis'
+import CaseDetails from '~/components/CaseDetails'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
+import { PageTitle } from '~/components/PageTitle'
+import { ScrollToTop } from '~/components/ScrollToTop'
 import { decryptCaseKey } from '~/services/decrypt-case-key'
 import { currentAccount } from '~/services/sign-in'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
-import { connect } from 'react-redux'
-import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
@@ -51,6 +52,7 @@ export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps
     }
     return (
       <div>
+        <ScrollToTop />
         <PageTitle renderTitle={(t) => t('pageTitles.patientCase', { caseId: ('' + this.props.match.params.caseAddress).substring(0, 10) + ' ...'})} />
         <div className='container'>
           <div className="row">
