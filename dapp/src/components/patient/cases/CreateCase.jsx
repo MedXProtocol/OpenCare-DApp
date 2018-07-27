@@ -18,6 +18,7 @@ import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
+import { jicCompressImage } from '~/services/jicCompressImage'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { DoctorSelect } from '~/components/DoctorSelect'
@@ -35,7 +36,6 @@ import { AcneQuestions } from './AcneQuestions'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
-import jic from 'j-i-c'
 
 function mapStateToProps (state) {
   let medXBeingSent
@@ -286,8 +286,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       var output_format = 'jpg'
       var source_image = document.getElementById('source_image');
 
+      var result_image = document.getElementById('result_image');
+
       // This function returns an Image Object
-      debugger
       // console.log(jic.compress(source_image, quality, output_format).src)
       // target_img.src = jic.compress(source_img ,quality, output_format).src
 

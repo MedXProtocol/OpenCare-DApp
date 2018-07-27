@@ -40,7 +40,6 @@
     "i18next": "^11.3.2",
     "immutability-helper": "^2.7.0",
     "ipfs-api": "^17.5.0",
-    "j-i-c": "^2.0.2",
     "js-cookie": "^2.2.0",
     "libp2p": "^0.22.0",
     "libp2p-bootstrap": "^0.9.3",
