@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { formatRoute } from 'react-router-named-routes'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight';
@@ -21,159 +22,147 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
-export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends Component {
-  parseNewTxObject = (caseRowObject, route) => {
-    let options = {}
-    let caseRoute,
-      action,
-      ethAddress,
-      label,
-      labelClass,
-      itemClass,
-      caseIndex,
-      remove
-    const {
-      caseAddress,
-      receipt,
-      error,
-      call,
-      gasUsed,
-      transactionId,
-      objIndex
-    } = caseRowObject
+const PENDING_TX_STATUS = -1
 
-    caseIndex = '...'
-    caseRoute = caseAddress ? formatRoute(route, { caseAddress }) : routes.PATIENTS_CASES
-    action = (
+export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends Component {
+
+  getLabel = (caseRowObject, pendingTransaction) => {
+    let label = 'Pending'
+    const { statusLabel, error, receipt } = caseRowObject
+
+    if (pendingTransaction) {
+      const { method } = caseRowObject.call
+
+      if (error) {
+        label = txErrorMessage(error)
+      } else if (method === 'diagnoseCase' || method === 'diagnoseChallengedCase') {
+        label = 'Submitting Diagnosis'
+      } else if (method === 'acceptDiagnosis') {
+        label = 'Accepting Diagnosis'
+      } else if (method === 'challengeWithDoctor') {
+        label = 'Getting Second Opinion'
+      }
+
+      if (receipt) {
+        label += ' - Confirming'
+      }
+    } else {
+      label = statusLabel
+    }
+
+    return label
+  }
+
+  getLabelClass = (caseRowObject) => {
+    let labelClass = 'default'
+    const { error, receipt, statusClass } = caseRowObject
+
+    if (error) {
+      labelClass = 'danger'
+    } else if (receipt) {
+      labelClass = 'warning'
+    } else if (statusClass) {
+      labelClass = statusClass
+    }
+
+    return labelClass
+  }
+
+  getAction(caseRowObject, pendingTransaction) {
+    let options = {}
+    const { caseAddress, error, call, gasUsed, transactionId } = caseRowObject
+
+    let action = (
       <React.Fragment>
         <LoadingLines visible={true} color="#aaaaaa" />
       </React.Fragment>
     )
 
-    ethAddress = caseAddress ? <EthAddress address={caseAddress} /> : null
+    if (pendingTransaction) {
+      if (error) {
+        if (gasUsed) {
+          options['gas'] = parseInt(1.2 * gasUsed, 10)
+        }
 
-    if (error) {
-      label = txErrorMessage(error)
-      labelClass = 'danger'
-
-      if (gasUsed)
-        options['gas'] = parseInt(1.2 * gasUsed, 10)
-
-      action = <button
-        className="btn btn-danger btn-xs"
-        onClick={(e) => {
-          e.preventDefault()
-          this.props.dispatchSend(transactionId, call, options, caseAddress)
-        }}
-      >Retry</button>
-      remove = <button
-        className="btn-link text-gray"
-        onClick={(e) => {
-          e.preventDefault()
-          this.props.dispatchRemove(transactionId)
-        }}
-      >&times;</button>
-    } else {
-      if (
-        caseRowObject.call.method === 'diagnoseCase'
-        || caseRowObject.call.method === 'diagnoseChallengedCase'
-      ) {
-        label = 'Submitting Diagnosis'
-      } else if (caseRowObject.call.method === 'acceptDiagnosis') {
-        label = 'Accepting Diagnosis'
-      } else if (caseRowObject.call.method === 'challengeWithDoctor') {
-        label = 'Getting Second Opinion'
-      } else {
-        label = 'Pending'
+        action = (
+          <button
+            className="btn btn-danger btn-xs"
+            onClick={(e) => {
+              e.preventDefault()
+              this.props.dispatchSend(transactionId, call, options, caseAddress)
+            }}
+          >
+            Retry
+          </button>
+        )
       }
-
-      labelClass = 'default'
+    } else {
+      action = (
+        <React.Fragment>
+          <span className="case-list--item__view__text">View Case&nbsp;</span>
+          <FontAwesomeIcon
+            icon={faChevronCircleRight} />
+        </React.Fragment>
+      )
     }
 
-    if (receipt) {
-      label += ' - Confirming'
-      labelClass = 'warning'
-    }
-
-    itemClass = ' case-list--item__pending'
-
-    return {
-      caseRoute,
-      action,
-      ethAddress,
-      label,
-      labelClass,
-      itemClass,
-      caseIndex,
-      remove,
-      objIndex
-    }
-  }
-
-  parseExistingCaseObject = (caseRowObject, route) => {
-    let caseRoute,
-      action,
-      ethAddress,
-      label,
-      labelClass,
-      itemClass,
-      caseIndex
-    const {
-      caseAddress,
-      objIndex,
-      statusLabel,
-      statusClass
-    } = caseRowObject
-
-    caseIndex = (objIndex + 1)
-    caseRoute = formatRoute(route, { caseAddress })
-    action = (
-      <React.Fragment>
-        <span className="case-list--item__view__text">View Case&nbsp;</span>
-        <FontAwesomeIcon
-          icon={faChevronCircleRight} />
-      </React.Fragment>
-    )
-    ethAddress = <EthAddress address={caseAddress} />
-    label = statusLabel
-    labelClass = statusClass
-    itemClass = ''
-
-    return {
-      caseIndex, caseRoute, action, ethAddress, label, labelClass, itemClass, objIndex
-    }
+    return action
   }
 
   render () {
-    let { caseRowObject } = this.props
-    const { route } = this.props
+    let remove
 
-    if (caseRowObject.call) {
-      caseRowObject = this.parseNewTxObject(caseRowObject, route)
-    } else {
-      caseRowObject = this.parseExistingCaseObject(caseRowObject, route)
+    const { caseRowObject, route } = this.props
+
+    let { caseAddress, objIndex, error, transactionId } = caseRowObject
+
+    const style = { zIndex: 998 - objIndex }
+    const pendingTransaction = (caseRowObject.status === PENDING_TX_STATUS)
+    const number = pendingTransaction ? '...' : (objIndex + 1)
+    const path = caseAddress ? formatRoute(route, { caseAddress }) : routes.PATIENTS_CASES
+    const ethAddress = caseAddress ? <EthAddress address={caseAddress} /> : null
+
+    const action = this.getAction(caseRowObject, pendingTransaction)
+    const label = this.getLabel(caseRowObject, pendingTransaction)
+    const labelClass = this.getLabelClass(caseRowObject)
+
+    if (error) {
+      remove = (
+        <button
+          className="btn-link text-gray"
+          onClick={(e) => {
+            e.preventDefault()
+            this.props.dispatchRemove(transactionId)
+          }}
+        >
+          {'\u2716'}
+        </button>
+      )
     }
 
-    const style = { zIndex: 998 - caseRowObject.objIndex }
 
     return (
-      <Link to={caseRowObject.caseRoute} style={style} className={'case-list--item list' + caseRowObject.itemClass}>
+      <Link to={path} style={style} className={classnames(
+        'case-list--item',
+        'list',
+        { 'case-list--item__pending': pendingTransaction }
+      )}>
         <span className="case-list--item__case-number text-center">
-          {caseRowObject.caseIndex}
+          {number}
         </span>
 
         <span className="case-list--item__status text-center">
-          <label className={`label label-${caseRowObject.labelClass}`}>
-            {caseRowObject.label}
+          <label className={`label label-${labelClass}`}>
+            {label}
           </label>
         </span>
 
         <span className="case-list--item__eth-address text text-left">
-          {caseRowObject.ethAddress}
+          {ethAddress}
         </span>
 
         <span className="case-list--item__view text-center">
-          {caseRowObject.action} {caseRowObject.remove}
+          {action} {remove}
         </span>
       </Link>
     )

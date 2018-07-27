@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import classNames from 'classnames'
+import classnames from 'classnames'
 import { defined } from '~/utils/defined'
 import { ControlLabel, Checkbox, FormGroup } from 'react-bootstrap'
 import FlipMove from 'react-flip-move'
@@ -41,7 +41,7 @@ export const HippoCheckboxGroup = class _HippoCheckboxGroup extends Component {
           : (
             <div className="row" key={`key-${name}-visible`}>
               <div className={colClasses}>
-                <div id={id} className={classNames('form-group', { 'has-error': error })}>
+                <div id={id} className={classnames('form-group', { 'has-error': error })}>
                   <ControlLabel>{label}</ControlLabel>
                   <FormGroup>
                     {

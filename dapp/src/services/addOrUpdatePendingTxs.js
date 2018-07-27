@@ -1,6 +1,8 @@
 import forOwn from 'lodash.forown'
 import { defined } from '~/utils/defined'
 
+const PENDING_TX_STATUS = -1
+
 // Adds cases to the cases array set in the mapStateToProps
 // Contains info about pending tx's
 function addNewCase(cases, transaction, transactionId, objIndex) {
@@ -21,7 +23,7 @@ function updateCase(cases, transaction, transactionId, caseIndex) {
   cases[caseIndex] = {
     ...cases[caseIndex],
     ...transaction,
-    status: -1, // 'pending' tx state, before it's confirmed on the blockchain
+    status: PENDING_TX_STATUS, // 'pending' tx state, before it's confirmed on the blockchain
     transactionId
   }
 

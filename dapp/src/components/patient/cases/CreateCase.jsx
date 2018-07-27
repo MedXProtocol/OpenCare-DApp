@@ -1,24 +1,24 @@
-import { cold } from 'react-hot-loader';
-
-
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { isTrue } from '~/utils/isTrue'
-import { sleep } from '~/utils/sleep'
+import { cold } from 'react-hot-loader';
 import { Button, Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import ReactTooltip from 'react-tooltip'
 import { withRouter } from 'react-router-dom'
-import classNames from 'classnames'
+import classnames from 'classnames'
+import { isTrue } from '~/utils/isTrue'
+import { sleep } from '~/utils/sleep'
 import { isNotEmptyString } from '~/utils/common-util'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { uploadJson, uploadFile } from '~/utils/storage-util'
-import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
+import { weiToMedX } from '~/utils/weiToMedX'
+import { medXToWei } from '~/utils/medXToWei'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
+import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
@@ -30,8 +30,6 @@ import { PatientInfo } from './PatientInfo'
 import { SpotQuestions } from './SpotQuestions'
 import { RashQuestions } from './RashQuestions'
 import { AcneQuestions } from './AcneQuestions'
-import { weiToMedX } from '~/utils/weiToMedX'
-import { medXToWei } from '~/utils/medXToWei'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
@@ -715,7 +713,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
                     <div className="row">
                       <div className="col-xs-12 col-sm-12 col-md-12">
-                        <div className={classNames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
+                        <div className={classnames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
                           {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
                             ?
                             <div>

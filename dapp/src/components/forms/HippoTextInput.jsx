@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import classNames from 'classnames'
+import classnames from 'classnames'
 import { defined } from '~/utils/defined'
 import FlipMove from 'react-flip-move'
 
@@ -45,7 +45,7 @@ export const HippoTextInput = class _HippoTextInput extends Component {
           : (
               <div className={colClasses ? 'row' : ''}>
                 <div className={colClasses ? colClasses : ''}>
-                  <div className={classNames('form-group', { 'has-error': error })}>
+                  <div className={classnames('form-group', { 'has-error': error })}>
                     <label className="control-label">{label}</label>
                     <input
                       id={name}

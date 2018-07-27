@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { ProgressBar } from 'react-bootstrap'
-import classNames from 'classnames'
+import classnames from 'classnames'
 
 export const HippoImageInput = class _HippoImageInput extends Component {
 
@@ -56,7 +56,7 @@ export const HippoImageInput = class _HippoImageInput extends Component {
       currentValue, progressPercent, colClasses, fileUploadActive
     } = this.props
 
-    const progressClassNames = classNames(
+    const progressClassNames = classnames(
       {
         'progress--wrapper__show': fileUploadActive,
         'progress--wrapper__hide': !fileUploadActive
@@ -66,7 +66,7 @@ export const HippoImageInput = class _HippoImageInput extends Component {
     return (
       <div className="row">
         <div id={id} className={colClasses}>
-          <div className={classNames('form-group', 'form-group--file-input', { 'has-error': error || fileError })}>
+          <div className={classnames('form-group', 'form-group--file-input', { 'has-error': error || fileError })}>
             <label className='control-label'>
               {label}
               {subLabel ? <span className="text-gray small"><br/>{subLabel}</span> : null}

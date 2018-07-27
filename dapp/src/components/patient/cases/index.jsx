@@ -94,9 +94,9 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
               caseRowObject['statusClass'] = patientCaseStatusToClass(caseRowObject.status)
               return (
                 <CaseRow
+                  key={caseRowObject.objIndex}
                   route={routes.PATIENTS_CASE}
                   caseRowObject={caseRowObject}
-                  key={caseRowObject.objIndex}
                 />
               )
             })}

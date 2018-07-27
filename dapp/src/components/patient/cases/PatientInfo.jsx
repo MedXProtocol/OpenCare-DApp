@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
 import { HippoTextInput } from '~/components/forms/HippoTextInput'
-import classNames from 'classnames'
+import classnames from 'classnames'
 import Select from 'react-select'
 import * as Animated from 'react-select/lib/animated';
 import { customStyles } from '~/config/react-select-custom-styles'
@@ -65,7 +65,7 @@ export const PatientInfo = class _PatientInfo extends Component {
 
         <div className="row">
           <div className="col-xs-12 col-sm-6 col-md-6">
-            <div className={classNames('form-group', { 'has-error': errors['country'] })}>
+            <div className={classnames('form-group', { 'has-error': errors['country'] })}>
               <label className="control-label">Country</label>
               <Select
                 placeholder='Please select your Country'
@@ -82,7 +82,7 @@ export const PatientInfo = class _PatientInfo extends Component {
             </div>
           </div>
           <div className="col-xs-9 col-sm-6 col-md-6">
-            <div className={classNames('form-group', { 'has-error': errors['region'] })}>
+            <div className={classnames('form-group', { 'has-error': errors['region'] })}>
               <label className="control-label">State</label>
               <Select
                 isDisabled={country !== 'US'}
