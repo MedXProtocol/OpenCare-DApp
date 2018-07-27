@@ -6,8 +6,8 @@ import { nextId } from '../transaction/transaction-factory'
 export function withSend(WrappedComponent) {
   function mapDispatchToProps(dispatch, props) {
     return {
-      dispatchSend: (transactionId, call, options, address) => {
-        dispatch({ type: 'SEND_TRANSACTION', transactionId, call, options, address })
+      dispatchSend: (transactionId, call, address, options) => {
+        dispatch({ type: 'SEND_TRANSACTION', transactionId, call, address, options })
       }
     }
   }
@@ -17,7 +17,7 @@ export function withSend(WrappedComponent) {
       return (options) => {
         let call = createCall(address, method, ...args)
         let transactionId = nextId()
-        this.props.dispatchSend(transactionId, call, options, address)
+        this.props.dispatchSend(transactionId, call, address, options)
         return transactionId
       }
     }

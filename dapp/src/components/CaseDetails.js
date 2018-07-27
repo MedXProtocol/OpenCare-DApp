@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
+import classnames from 'classnames'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { ImageLoader, CaseDetailsLoader } from './ContentLoaders'
 import { LoadingLines } from '~/components/LoadingLines'
@@ -173,14 +173,14 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
               <div className="col-xs-12 col-md-6">
                 <br />
                 <label className="label text-gray">Overview Photo:</label>
-                <ImageLoader className={classNames({ 'hidden': !this.state.loading })} />
+                <ImageLoader className={classnames({ 'hidden': !this.state.loading })} />
 
                 {this.overviewPhotoHtml()}
               </div>
               <div className="col-xs-12 col-md-6">
                 <br />
                 <label className="label text-gray">Close-up Photo:</label>
-                <ImageLoader className={classNames({ 'hidden': !this.state.loading })} />
+                <ImageLoader className={classnames({ 'hidden': !this.state.loading })} />
 
                 {this.closeupPhotoHtml()}
               </div>
@@ -188,11 +188,11 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
             <hr />
             <div className="row">
               <div className="col-xs-12 col-sm-12 col-md-6">
-                <CaseDetailsLoader className={classNames('loader--case-details', { 'hidden': !this.state.loading })} />
+                <CaseDetailsLoader className={classnames('loader--case-details', { 'hidden': !this.state.loading })} />
               </div>
             </div>
 
-            <span className={classNames({ 'hidden': this.state.loading })}>
+            <span className={classnames({ 'hidden': this.state.loading })}>
               <div className="row case-details--row">
                 <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
                   <label className="label text-gray">Age:</label>

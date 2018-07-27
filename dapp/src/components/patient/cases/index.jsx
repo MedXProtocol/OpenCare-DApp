@@ -11,15 +11,13 @@ import { addContract } from '~/saga-genesis/sagas'
 import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { patientCaseStatusToName, patientCaseStatusToClass } from '~/utils/patientCaseStatusLabels'
-import { defined } from '~/utils/defined'
+import { addOrUpdatePendingTxs } from '~/services/addOrUpdatePendingTxs'
 import rangeRight from 'lodash.rangeright'
 import get from 'lodash.get'
-import forOwn from 'lodash.forown'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
-  let index = 0
-  const cases = []
+  let cases = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
   const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
@@ -36,20 +34,7 @@ function mapStateToProps(state) {
     }
   }
 
-  forOwn(state.sagaGenesis.transactions, function(transaction, transactionId) {
-    const { confirmed, error, call } = transaction
-    const isPatientCase = (call && call.method === 'approveAndCall')
-
-    if (isPatientCase && (!confirmed || defined(error))) {
-      transaction = {
-        ...transaction,
-        transactionId,
-        objIndex: parseInt(caseCount, 10) + index
-      }
-      cases.splice(0, 0, transaction)
-      index++
-    }
-  })
+  cases = addOrUpdatePendingTxs(state, cases, caseCount)
 
   return {
     address,
@@ -109,9 +94,9 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
               caseRowObject['statusClass'] = patientCaseStatusToClass(caseRowObject.status)
               return (
                 <CaseRow
+                  key={caseRowObject.objIndex}
                   route={routes.PATIENTS_CASE}
                   caseRowObject={caseRowObject}
-                  key={caseRowObject.objIndex}
                 />
               )
             })}

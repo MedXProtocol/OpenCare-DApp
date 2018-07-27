@@ -5,19 +5,20 @@ import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctorC
 import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
 import * as routes from '~/config/routes'
 
-function renderCase(caseRowObject) {
-  caseRowObject['statusLabel'] = doctorCaseStatusToName(caseRowObject)
-  caseRowObject['statusClass'] = doctorCaseStatusToClass(caseRowObject)
-  return (
-    <CaseRow
-      route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
-      caseRowObject={caseRowObject}
-      key={caseRowObject.objIndex}
-    />
-  )
-}
-
 export const DoctorCaseListing = class _DoctorCaseListing extends Component {
+
+  renderCase = (caseRowObject) => {
+    caseRowObject['statusLabel'] = doctorCaseStatusToName(caseRowObject)
+    caseRowObject['statusClass'] = doctorCaseStatusToClass(caseRowObject)
+
+    return (
+      <CaseRow
+        key={caseRowObject.objIndex}
+        route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
+        caseRowObject={caseRowObject}
+      />
+    )
+  }
 
   render() {
     const openCases       = this.props.cases.filter(c => openCase(c))
@@ -59,7 +60,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                     leaveAnimation="accordionVertical"
                     className="case-list"
                   >
-                    {openCases.map(c => renderCase(c))}
+                    {openCases.map(c => this.renderCase(c))}
                   </FlipMove>
                 }
               </div>
@@ -86,7 +87,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                     leaveAnimation="accordionVertical"
                     className="case-list"
                   >
-                    {historicalCases.map(c => renderCase(c))}
+                    {historicalCases.map(c => this.renderCase(c))}
                   </FlipMove>
                 }
               </div>

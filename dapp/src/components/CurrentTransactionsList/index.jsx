@@ -122,7 +122,9 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
                       e.preventDefault()
                       this.props.dispatchRemove(key)
                     }}
-                  >&times;</button>
+                  >
+                    {'\u2716'}
+                  </button>
                 </React.Fragment>
               )
             }

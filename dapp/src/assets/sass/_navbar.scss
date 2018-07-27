@@ -102,13 +102,13 @@
   height: 17px;
   left: -1px;
   position: absolute;
-  top: 0;
+  top: -1px;
   width: 17px;
   z-index: -1;
 }
 
 .nav--open-cases__circle {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: bold;
   position: relative;
   z-index: 1;

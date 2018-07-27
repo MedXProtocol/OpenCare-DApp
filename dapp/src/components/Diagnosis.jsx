@@ -66,7 +66,8 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       showThankYouModal: false,
       showChallengeModal: false,
       doctorAddress: '',
-      doctorPublicKey: ''
+      doctorPublicKey: '',
+      loading: false
     }
   }
 
@@ -95,28 +96,34 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       this.state.challengeHandler.handle(props.transactions[this.state.challengeTransactionId])
         .onError((error) => {
           toastr.transactionError(error)
-          this.setState({challengeHandler: null})
+          this.setState({ challengeHandler: null, loading: false })
+        })
+        .onConfirmed(() => {
+          this.setState({ challengeHandler: null })
         })
         .onTxHash(() => {
           toastr.success('Working on getting you a second opinion.')
           mixpanel.track('Challenge Diagnosis Submitted')
-          this.setState({
-            challengeHandler: null
-          })
+          this.setState({ loading: false })
         })
     }
     if (this.state.acceptHandler) {
       this.state.acceptHandler.handle(props.transactions[this.state.acceptTransactionId])
         .onError((error) => {
           toastr.transactionError(error)
-          this.setState({acceptHandler: null})
+          this.setState({ acceptHandler: null, loading: false })
+        })
+        .onConfirmed(() => {
+          this.setState({
+            acceptHandler: null
+          })
         })
         .onTxHash(() => {
           toastr.success('You have accepted the diagnosis for this case.')
           mixpanel.track('Accept Diagnosis Submitted')
           this.setState({
-            acceptHandler: null,
-            showThankYouModal: true
+            showThankYouModal: true,
+            loading: false
           })
         })
     }
@@ -133,18 +140,17 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptDiagnosis')()
     this.setState({
       acceptTransactionId,
-      acceptHandler: new TransactionStateHandler()
+      acceptHandler: new TransactionStateHandler(),
+      loading: true
     })
   }
 
   handleChallengeDiagnosis = () => {
-    this.setState({
-      showChallengeModal: true
-    })
+    this.setState({ showChallengeModal: true })
   }
 
   handleCloseThankYouModal = () => {
-    this.setState({showThankYouModal: false})
+    this.setState({ showThankYouModal: false })
     this.props.history.push(routes.PATIENTS_CASES)
   }
 
@@ -180,7 +186,8 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       this.setState({
         showChallengeModal: false,
         challengeTransactionId,
-        challengeHandler: new TransactionStateHandler()
+        challengeHandler: new TransactionStateHandler(),
+        loading: true
       })
     }
   }
@@ -304,7 +311,7 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
           </form>
         </Modal>
 
-        <Loading loading={transactionRunning} />
+        <Loading loading={this.state.loading} />
       </div>
     )
   }

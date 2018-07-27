@@ -11,12 +11,9 @@ import { DoctorCaseListing } from '~/components/doctors/DoctorCaseListing'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { populateCases, populateCasesSaga } from '~/services/populateCases'
-import { defined } from '~/utils/defined'
+import { addOrUpdatePendingTxs } from '~/services/addOrUpdatePendingTxs'
 import { isEmptyObject } from '~/utils/isEmptyObject'
-import forOwn from 'lodash.forown'
 import get from 'lodash.get'
-
-const DIAGNOSE_TX_REG_EXP = new RegExp(/diagnoseCase|diagnoseChallengedCase/)
 
 function mapStateToProps(state) {
   let cases = []
@@ -27,27 +24,7 @@ function mapStateToProps(state) {
 
   cases = populateCases(state, CaseManager, address, caseCount)
 
-  forOwn(state.sagaGenesis.transactions, function(transaction, transactionId) {
-    let isDiagnosis = false
-    const { confirmed, error, call } = transaction
-    if (call && call.method) {
-      isDiagnosis = DIAGNOSE_TX_REG_EXP.test(call.method)
-    }
-
-    if (isDiagnosis && (!confirmed || defined(error))) {
-      const caseIndex = cases.findIndex(c => c.caseAddress === transaction.address)
-
-      // update the existing case row object in the cases array
-      if (caseIndex >= 0) {
-        cases[caseIndex] = {
-          ...cases[caseIndex],
-          ...transaction,
-          status: -1, // 'pending' tx state, before it's confirmed on the blockchain
-          transactionId
-        }
-      }
-    }
-  })
+  cases = addOrUpdatePendingTxs(state, cases, caseCount)
 
   return {
     address,
