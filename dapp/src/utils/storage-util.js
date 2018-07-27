@@ -68,7 +68,6 @@ export async function doUploadFile(file, encryptionKey, progressHandler) {
   const interval = setInterval(function() {
     uploadProgress = updateUploadProgress(progressHandler, uploadProgress)
   }, 500)
-  await sleep(30000)
 
   const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb))
   clearInterval(interval)

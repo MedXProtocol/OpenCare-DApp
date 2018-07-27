@@ -35,6 +35,7 @@ import { AcneQuestions } from './AcneQuestions'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
+import jic from 'j-i-c'
 
 function mapStateToProps (state) {
   let medXBeingSent
@@ -279,6 +280,38 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         console.log(orientation)
         this.setState({ orientation })
       })
+
+      //An Integer from 0 to 100
+      var quality = 50
+      var output_format = 'jpg'
+      var source_image = document.getElementById('source_image');
+
+      // This function returns an Image Object
+      debugger
+      // console.log(jic.compress(source_image, quality, output_format).src)
+      // target_img.src = jic.compress(source_img ,quality, output_format).src
+
+      var reader = new FileReader();
+          reader.onload = function(event) {
+              var i = document.getElementById("source_image");
+                i.src = event.target.result;
+                i.onload = function(){
+                  // var image_width=$(i).width(),
+                    // var image_height=$(i).height();
+
+                    // if(image_width > image_height){
+                    //   i.style.width="320px";
+                    // }else{
+                    //   i.style.height="300px";
+                    // }
+                    // i.style.display = "block";
+                    console.log("Image loaded");
+
+                }
+
+          };
+        reader.readAsDataURL(file);
+
 
       const cancelableUploadPromise = cancelablePromise(
         new Promise((resolve, reject) => {
@@ -672,6 +705,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               fileUploadActive={this.fileUploadActive(this.state.firstImagePercent)}
                               progressPercent={this.state.firstImagePercent}
                             />
+                            <img
+                              id="source_image"
+                              className="img-responsive form-group--image-upload-preview"
+                              alt="firstImage to upload"
+                            />
+
                             {this.state.orientation}
 
                             <HippoImageInput
