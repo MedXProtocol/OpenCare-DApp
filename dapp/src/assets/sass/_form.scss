@@ -137,3 +137,10 @@
   font-weight: bold;
   min-width: 130px;
 }
+
+button.text-gray:hover,
+button.text-gray:focus,
+button.text-gray:active {
+  color: #888 !important;
+  text-decoration: none;
+}

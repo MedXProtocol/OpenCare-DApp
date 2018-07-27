@@ -9,6 +9,7 @@ import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronC
 import { EthAddress } from '~/components/EthAddress'
 import { LoadingLines } from '~/components/LoadingLines'
 import { txErrorMessage } from '~/services/txErrorMessage'
+import { defined } from '~/utils/defined'
 import * as routes from '~/config/routes'
 
 function mapDispatchToProps (dispatch) {
@@ -26,12 +27,12 @@ const PENDING_TX_STATUS = -1
 
 export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends Component {
 
-  getLabel = (caseRowObject, pendingTransaction) => {
+  caseRowLabel = (caseRowObject, pendingTransaction) => {
     let label = 'Pending'
-    const { statusLabel, error, receipt } = caseRowObject
+    const { statusLabel, error, receipt, call } = caseRowObject
 
-    if (pendingTransaction) {
-      const { method } = caseRowObject.call
+    if (pendingTransaction && call) {
+      const { method } = call
 
       if (error) {
         label = txErrorMessage(error)
@@ -53,7 +54,7 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
     return label
   }
 
-  getLabelClass = (caseRowObject) => {
+  caseRowLabelClass = (caseRowObject) => {
     let labelClass = 'default'
     const { error, receipt, statusClass } = caseRowObject
 
@@ -68,7 +69,7 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
     return labelClass
   }
 
-  getAction(caseRowObject, pendingTransaction) {
+  caseRowAction(caseRowObject, pendingTransaction) {
     let options = {}
     const { caseAddress, error, call, gasUsed, transactionId } = caseRowObject
 
@@ -117,14 +118,17 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
     let { caseAddress, objIndex, error, transactionId } = caseRowObject
 
     const style = { zIndex: 998 - objIndex }
-    const pendingTransaction = (caseRowObject.status === PENDING_TX_STATUS)
+    const pendingTransaction = (
+      !defined(caseRowObject.status)
+      || caseRowObject.status === PENDING_TX_STATUS
+    )
     const number = pendingTransaction ? '...' : (objIndex + 1)
     const path = caseAddress ? formatRoute(route, { caseAddress }) : routes.PATIENTS_CASES
     const ethAddress = caseAddress ? <EthAddress address={caseAddress} /> : null
 
-    const action = this.getAction(caseRowObject, pendingTransaction)
-    const label = this.getLabel(caseRowObject, pendingTransaction)
-    const labelClass = this.getLabelClass(caseRowObject)
+    const action = this.caseRowAction(caseRowObject, pendingTransaction)
+    const label = this.caseRowLabel(caseRowObject, pendingTransaction)
+    const labelClass = this.caseRowLabelClass(caseRowObject)
 
     if (error) {
       remove = (

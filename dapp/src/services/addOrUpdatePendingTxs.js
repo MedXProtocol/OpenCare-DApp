@@ -34,7 +34,7 @@ export const addOrUpdatePendingTxs = function(state, cases, caseCount) {
   let index = 0
 
   forOwn(state.sagaGenesis.transactions, function(transaction, transactionId) {
-    if (!!transaction.call) { return } // continue
+    if (!defined(transaction.call)) { return } // continue
 
     const { confirmed, error, call } = transaction
     const method = call.method
