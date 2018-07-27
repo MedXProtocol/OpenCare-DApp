@@ -9,6 +9,8 @@ import {
   throttle,
   takeEvery
 } from 'redux-saga/effects'
+import { fisherYatesShuffle } from '~/services/fisherYatesShuffle'
+import range from 'lodash.range'
 
 function* doctorManager() {
   return yield select(state => contractByName(state, 'DoctorManager'))
@@ -101,15 +103,23 @@ function* findNextAvailableOnlineDoctor () {
 function* findNextAvailableOfflineDoctor() {
   const DoctorManager = yield doctorManager()
   const doctorCount = yield web3Call(DoctorManager, 'doctorCount')
-  let retries = 0
   let doctor = null
-  while (retries < doctorCount) { //not exactly right because it may repeat doctor indices
-    const doctorIndex = parseInt(Math.random() * (doctorCount - 1), 10) + 1
-    doctor = yield fetchDoctorByIndex(doctorIndex)
+
+  // range is non-inclusive on 'end', so if doctorCount is 4 then this will result in [1, 2, 3]
+  // start at 1 since Solidity, 0 is '0x0'
+  let doctorIndices = range(1, doctorCount)
+
+  while (doctorIndices.length > 0) {
+    doctorIndices = fisherYatesShuffle(doctorIndices)
+    const randomIndex = doctorIndices[0]
+
+    doctor = yield fetchDoctorByIndex(randomIndex)
     if (doctor) {
       break
     }
-    retries++
+
+    // remove this doctor from the array so we don't choose it again
+    doctorIndices.splice(randomIndex, 1)
   }
   return doctor
 }
@@ -126,6 +136,7 @@ function* checkDoctorOnline({ address }) {
 
 function* checkDoctorOffline({ address }) {
   const nextDoctor = yield nextAvailableDoctor()
+
   if (!nextDoctor || nextDoctor.address === address) {
     yield setNextAvailableDoctor() // find another one
   }
@@ -148,8 +159,9 @@ function* checkNextAvailableDoctor() {
 export function* nextAvailableDoctorSaga() {
   yield takeEvery('USER_ONLINE', checkDoctorOnline)
   yield takeEvery('USER_OFFLINE', checkDoctorOffline)
-  yield throttle(1000, 'EXCLUDED_DOCTORS', checkExcludedDoctors)
-  yield throttle(500, 'CHECK_AVAILABLE_DOCTORS', checkNextAvailableDoctor)
+  yield takeEvery('FORGET_NEXT_DOCTOR', checkNextAvailableDoctor)
+  yield throttle(700, 'EXCLUDED_DOCTORS', checkExcludedDoctors)
+  yield throttle(900, 'CHECK_AVAILABLE_DOCTORS', checkNextAvailableDoctor)
   yield put({ type: 'AVAILABLE_DOCTOR_INITIALIZED' })
   yield put({ type: 'CHECK_AVAILABLE_DOCTORS' })
 }

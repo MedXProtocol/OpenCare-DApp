@@ -28,6 +28,10 @@ export default function (state, { type, doctor, addresses }) {
       }
       break
 
+    case 'FORGET_NEXT_DOCTOR':
+      delete state['doctor']
+      break
+
     // no default
   }
 

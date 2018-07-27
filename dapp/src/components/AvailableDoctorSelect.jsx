@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { LoadingLines } from '~/components/LoadingLines'
 import { withAvailableDoctor } from '~/components/withAvailableDoctor'
 import get from 'lodash.get'
 
@@ -29,7 +30,19 @@ export const AvailableDoctorSelect =
       }
 
       render () {
-        return this.props.value ? <p>Your doctor will be {get(this.props.value, 'label')}</p> : null
+        return (
+          <h5>
+            {this.props.value
+              ? `Your doctor will be ${get(this.props.value, 'label')}`
+              : (
+                <span>
+                  Finding you a Doctor
+                  <LoadingLines visible={true} color="#cccccc" />
+                </span>
+              )
+            }
+          </h5>
+        )
       }
     }
   )
