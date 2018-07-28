@@ -18,7 +18,7 @@ import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
-import { jicCompressImage } from '~/services/jicCompressImage'
+import { jicImageCompressor } from '~/services/jicImageCompressor'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { DoctorSelect } from '~/components/DoctorSelect'
@@ -275,47 +275,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         this.setState({ [`${imageToCapture}Percent`]: percent })
       }
 
-      getOrientation(file, exifOrientationInt => {
-        const orientation = 'orientation: ' + exifOrientationInt + ": " + EXIF_ORIENTATION_LABEL[exifOrientationInt]
-        console.log(orientation)
-        this.setState({ orientation })
-      })
-
-      //An Integer from 0 to 100
-      var quality = 50
-      var output_format = 'jpg'
-      var source_image = document.getElementById('source_image');
-
-      var result_image = document.getElementById('result_image');
-
-      // This function returns an Image Object
-      // console.log(jic.compress(source_image, quality, output_format).src)
-      // target_img.src = jic.compress(source_img ,quality, output_format).src
-
-      var reader = new FileReader();
-          reader.onload = function(event) {
-              var i = document.getElementById("source_image");
-                i.src = event.target.result;
-                i.onload = function(){
-                  // var image_width=$(i).width(),
-                    // var image_height=$(i).height();
-
-                    // if(image_width > image_height){
-                    //   i.style.width="320px";
-                    // }else{
-                    //   i.style.height="300px";
-                    // }
-                    // i.style.display = "block";
-                    console.log("Image loaded");
-
-                }
-
-          };
-        reader.readAsDataURL(file);
-
+      console.log(file)
 
       const cancelableUploadPromise = cancelablePromise(
-        new Promise((resolve, reject) => {
+        new Promise(async (resolve, reject) => {
+          const compressedFile = await this.compressFile(file)
+          console.log(compressedFile)
+
           uploadFile(file, this.state.caseEncryptionKey, progressHandler).then(imageHash => {
             return resolve(imageHash)
           })
@@ -347,6 +313,39 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         [`${image}Percent`]: null,
         [`${image}Error`]: null
       })
+    }
+
+    async compressFile(file) {
+      getOrientation(file, exifOrientationInt => {
+        const orientation = 'orientation: ' + exifOrientationInt + ": " + EXIF_ORIENTATION_LABEL[exifOrientationInt]
+        console.log(orientation)
+        this.setState({ orientation })
+      })
+
+      const firstImageSource = document.getElementById("first-image-source")
+      const firstImagePreview = document.getElementById("first-image-preview")
+      const qualityPercent = 0.5
+      const scalePercent = 0.4
+      const outputFormat = 'jpg'
+
+      const reader = new FileReader()
+
+      reader.onload = function(event) {
+        firstImageSource.src = event.target.result
+
+        // console.log('source img length: ' + firstImageSource.src.length)
+        firstImageSource.onload = function() {
+          // console.log('firstImageSource, ', firstImageSource)
+
+          // returns an Image Object
+          firstImagePreview.src = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent)
+          // console.log('compressed img length: ' + firstImagePreview.src.length)
+          // console.log('firstImagePreview, ', firstImagePreview)
+        }
+      }
+
+      reader.readAsDataURL(file)
+      console.log(firstImagePreview.src.length)
     }
 
     handleCancelUpload = async (imageToCancel) => {
@@ -707,7 +706,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               progressPercent={this.state.firstImagePercent}
                             />
                             <img
-                              id="source_image"
+                              id="first-image-source"
+                              className="img-responsive form-group--image-upload-preview"
+                              alt="firstImage from user"
+                            />
+                            <img
+                              id="first-image-preview"
                               className="img-responsive form-group--image-upload-preview"
                               alt="firstImage to upload"
                             />
