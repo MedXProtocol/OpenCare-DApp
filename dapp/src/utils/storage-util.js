@@ -48,19 +48,12 @@ export async function uploadFile(file, encryptionKey, progressHandler) {
   return await ipfsMethodWithRetry(doUploadFile, file, encryptionKey, progressHandler)
 }
 
-export async function doUploadFile(file, encryptionKey, progressHandler) {
+export async function doUploadFile(fileAsArrayBuffer, encryptionKey, progressHandler) {
   let uploadProgress = 25 // reset each time
 
-  // READING
-  progressHandler(10)
-  const reader = new window.FileReader()
-  await promisifyFileReader(reader, file)
-  await sleep(300)
-
   // ENCRYPTING
-  progressHandler(25)
-  const buffer = Buffer.from(reader.result)
-  const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
+  progressHandler(uploadProgress)
+  const bufferEncrypted = Buffer.from(aes.encryptBytes(fileAsArrayBuffer, encryptionKey))
   await sleep(300)
 
   // UPLOADING
@@ -121,12 +114,5 @@ export async function doDownloadImage(hash, encryptionKey) {
         reader.readAsDataURL(new Blob([result]))
       }
     })
-  })
-}
-
-function promisifyFileReader(fileReader, file){
-  return new Promise((resolve, reject) => {
-    fileReader.onloadend = resolve  // CHANGE to whatever function you want which would eventually call resolve
-    fileReader.readAsArrayBuffer(file)
   })
 }

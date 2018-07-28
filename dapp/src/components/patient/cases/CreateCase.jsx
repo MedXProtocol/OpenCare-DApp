@@ -36,6 +36,8 @@ import { AcneQuestions } from './AcneQuestions'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
+import { promisify } from '~/utils/common-util'
+import { decode } from 'base64-arraybuffer'
 
 function mapStateToProps (state) {
   let medXBeingSent
@@ -279,10 +281,21 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
       const cancelableUploadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
-          const compressedFile = await this.compressFile(file)
-          console.log(compressedFile)
+          this.readOrientation(file)
+          console.log('reading orientation')
 
-          uploadFile(file, this.state.caseEncryptionKey, progressHandler).then(imageHash => {
+          const base64CompressedFile = await this.compressFile(file)
+          console.log('compressing')
+          progressHandler(10)
+          await sleep(300)
+
+          // convert compressed base64 string to array buffer
+          const fileAsArrayBuffer = new Uint8Array(decode(base64CompressedFile))
+          console.log('reading')
+          progressHandler(20)
+          await sleep(300)
+
+          uploadFile(fileAsArrayBuffer, this.state.caseEncryptionKey, progressHandler).then(imageHash => {
             return resolve(imageHash)
           })
         })
@@ -305,6 +318,14 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         })
     }
 
+    readOrientation = (file) => {
+      getOrientation(file, exifOrientationInt => {
+        const orientation = 'orientation: ' + exifOrientationInt + ": " + EXIF_ORIENTATION_LABEL[exifOrientationInt]
+        console.log(orientation)
+        this.setState({ orientation })
+      })
+    }
+
     handleResetImageState = async (image) => {
       await this.setState({
         [`${image}UploadPromise`]: undefined,
@@ -315,37 +336,43 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       })
     }
 
-    async compressFile(file) {
-      getOrientation(file, exifOrientationInt => {
-        const orientation = 'orientation: ' + exifOrientationInt + ": " + EXIF_ORIENTATION_LABEL[exifOrientationInt]
-        console.log(orientation)
-        this.setState({ orientation })
-      })
+    // promisifyFileReader = (fileReader, file) => {
+    //   return new Promise((resolve, reject) => {
+    //     fileReader.onloadend = resolve
+    //     fileReader.readAsArrayBuffer(file)
+    //   })
+    // }
 
+    async compressFile(file) {
       const firstImageSource = document.getElementById("first-image-source")
       const firstImagePreview = document.getElementById("first-image-preview")
       const qualityPercent = 0.5
       const scalePercent = 0.4
       const outputFormat = 'jpg'
 
-      const reader = new FileReader()
+      const reader = new window.FileReader()
 
-      reader.onload = function(event) {
-        firstImageSource.src = event.target.result
+      return await promisify(cb => {
+        reader.onload = function(event) {
+          firstImageSource.src = event.target.result
 
-        // console.log('source img length: ' + firstImageSource.src.length)
-        firstImageSource.onload = function() {
-          // console.log('firstImageSource, ', firstImageSource)
+          // console.log('source img length: ' + firstImageSource.src.length)
+          firstImageSource.onload = function() {
+            // console.log('firstImageSource, ', firstImageSource)
 
-          // returns an Image Object
-          firstImagePreview.src = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent)
-          // console.log('compressed img length: ' + firstImagePreview.src.length)
-          // console.log('firstImagePreview, ', firstImagePreview)
+            // returns an Image Object
+            const base64CompressedFile = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent)
+            firstImagePreview.src = base64CompressedFile
+            // console.log('compressed img length: ' + firstImagePreview.src.length)
+            // console.log('firstImagePreview, ', firstImagePreview)
+
+            let error
+            cb(error, base64CompressedFile)
+          }
         }
-      }
 
-      reader.readAsDataURL(file)
-      console.log(firstImagePreview.src.length)
+        reader.readAsDataURL(file)
+      })
     }
 
     handleCancelUpload = async (imageToCancel) => {
@@ -587,7 +614,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       return (percent !== null) ? true : false
     }
 
-    errorMessage(fieldName) {
+    errorMessage = (fieldName) => {
       let msg
       if (fieldName === 'country' || fieldName === 'region') {
         msg = 'must be chosen'
@@ -715,7 +742,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               className="img-responsive form-group--image-upload-preview"
                               alt="firstImage to upload"
                             />
-
                             {this.state.orientation}
 
                             <HippoImageInput
@@ -733,7 +759,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               fileUploadActive={this.fileUploadActive(this.state.secondImagePercent)}
                               progressPercent={this.state.secondImagePercent}
                             />
-                            {this.state.orientation}
                           </div>
                         ) : null
                       }
