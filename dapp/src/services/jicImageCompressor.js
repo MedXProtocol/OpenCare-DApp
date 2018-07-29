@@ -71,9 +71,14 @@ export const jicImageCompressor = {
     canvas.width = canvasWidth
     canvas.height = canvasHeight
 
+    // var context = canvas.getContext("2d")
     canvas.getContext("2d").drawImage(sourceImgObj, 0, 0, canvas.width, canvas.height)
+    // var imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+    // var buffer = imageData.data.buffer  // ArrayBuffer
 
-    return canvas.toDataURL(mimeType, qualityPercent)
+    // return canvas.toDataURL(mimeType, qualityPercent)
+    return canvas
+    // return new Uint8Array(buffer)
   },
 
   // /**

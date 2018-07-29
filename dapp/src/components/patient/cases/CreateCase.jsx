@@ -284,18 +284,37 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           this.readOrientation(file)
           console.log('reading orientation')
 
-          const base64CompressedFile = await this.compressFile(file)
           console.log('compressing')
+          // const base64CompressedFile = await this.compressFile(file)
+          const blob = await this.compressFile(file)
+          console.log('compressed!')
+          console.log('blob: ', blob)
+          // console.log(arrayBufferCompressedFile)
           progressHandler(10)
           await sleep(300)
 
+          var arrayBuffer
+          var fileReader = new FileReader()
+          await this.promisifyFileReader(fileReader, blob)
+          arrayBuffer = fileReader.result
+          // fileReader.onload = function(event) {
+            // arrayBuffer = event.target.result
+          // }
+          // fileReader.readAsArrayBuffer(blob)
+          console.log(arrayBuffer)
+
           // convert compressed base64 string to array buffer
-          const fileAsArrayBuffer = new Uint8Array(decode(base64CompressedFile))
+          // const fileAsArrayBuffer = base64CompressedFile
+          // base64Compressed
+
+          // const fileAsArrayBuffer = new Uint8Array(decode(base64CompressedFile))
+          // const fileAsArrayBuffer = new Uint8Array(decode(base64CompressedFile.split(',')[1]))
+
           console.log('reading')
           progressHandler(20)
           await sleep(300)
 
-          uploadFile(fileAsArrayBuffer, this.state.caseEncryptionKey, progressHandler).then(imageHash => {
+          uploadFile(arrayBuffer, this.state.caseEncryptionKey, progressHandler).then(imageHash => {
             return resolve(imageHash)
           })
         })
@@ -336,12 +355,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       })
     }
 
-    // promisifyFileReader = (fileReader, file) => {
-    //   return new Promise((resolve, reject) => {
-    //     fileReader.onloadend = resolve
-    //     fileReader.readAsArrayBuffer(file)
-    //   })
-    // }
+    promisifyFileReader = (fileReader, blob) => {
+      return new Promise((resolve, reject) => {
+        fileReader.onloadend = resolve
+        fileReader.readAsArrayBuffer(blob)
+      })
+    }
 
     async compressFile(file) {
       const firstImageSource = document.getElementById("first-image-source")
@@ -356,18 +375,22 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         reader.onload = function(event) {
           firstImageSource.src = event.target.result
 
-          // console.log('source img length: ' + firstImageSource.src.length)
+          console.log('source img length: ' + firstImageSource.src.length)
           firstImageSource.onload = function() {
             // console.log('firstImageSource, ', firstImageSource)
 
             // returns an Image Object
-            const base64CompressedFile = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent)
-            firstImagePreview.src = base64CompressedFile
-            // console.log('compressed img length: ' + firstImagePreview.src.length)
-            // console.log('firstImagePreview, ', firstImagePreview)
+            // const base64Compressed = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent)
+            const canvas = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent)
+
+            firstImagePreview.src = canvas.toDataURL("image/jpeg", qualityPercent)
+
+            console.log('compressed img length: ' + firstImagePreview.src.length)
 
             let error
-            cb(error, base64CompressedFile)
+            canvas.toBlob((blob) => {
+              cb(error, blob)
+            }, "image/jpeg", qualityPercent)
           }
         }
 
