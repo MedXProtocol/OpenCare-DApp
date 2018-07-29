@@ -54,7 +54,6 @@ export async function doUploadFile(fileAsArrayBuffer, encryptionKey, progressHan
   // ENCRYPTING
   progressHandler(uploadProgress)
   const buffer = Buffer.from(fileAsArrayBuffer)
-  // const buffer = Buffer.from(fileBlob)
   const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
   await sleep(300)
 

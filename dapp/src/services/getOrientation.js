@@ -1,55 +1,61 @@
+import { promisify } from '~/utils/common-util'
+
 // https://stackoverflow.com/questions/7584794/accessing-jpeg-exif-rotation-data-in-javascript-on-the-client-side
 // -2: not jpeg
 // -1: not defined
 
-export const getOrientation = function(file, callback) {
+export const getOrientation = async function(file) {
   var reader = new FileReader()
 
-  reader.onload = function(e) {
-    var view = new DataView(e.target.result)
+  return await promisify(cb => {
+    reader.onload = function(e) {
+      let error
+      const view = new DataView(e.target.result)
 
-    if (view.getUint16(0, false) !== 0xffd8) {
-      return callback(-2)
-    }
-
-    var length = view.byteLength,
-      offset = 2
-
-    while (offset < length) {
-      if (view.getUint16(offset + 2, false) <= 8) {
-        return callback(-1)
+      if (view.getUint16(0, false) !== 0xffd8) {
+        return cb(error, -2)
       }
 
-      var marker = view.getUint16(offset, false)
-      offset += 2
+      const length = view.byteLength
+      let offset = 2
 
-      if (marker === 0xffe1) {
-        offset += 2
-
-        if (view.getUint32(offset, false) !== 0x45786966) {
-          return callback(-1)
+      while (offset < length) {
+        if (view.getUint16(offset + 2, false) <= 8) {
+          return cb(error, -1)
         }
 
-        var little = view.getUint16((offset += 6), false) === 0x4949
-        offset += view.getUint32(offset + 4, little)
-
-        var tags = view.getUint16(offset, little)
+        const marker = view.getUint16(offset, false)
         offset += 2
 
-        for (var i = 0; i < tags; i++) {
-          if (view.getUint16(offset + i * 12, little) === 0x0112) {
-            return callback(view.getUint16(offset + i * 12 + 8, little))
+        if (marker === 0xffe1) {
+          offset += 2
+
+          if (view.getUint32(offset, false) !== 0x45786966) {
+            return cb(error, -1)
           }
+
+          const little = view.getUint16((offset += 6), false) === 0x4949
+          offset += view.getUint32(offset + 4, little)
+
+          const tags = view.getUint16(offset, little)
+          offset += 2
+
+          for (var i = 0; i < tags; i++) {
+            if (view.getUint16(offset + i * 12, little) === 0x0112) {
+              const result = view.getUint16(offset + i * 12 + 8, little)
+              return cb(error, result)
+            }
+          }
+        } else if ((marker & 0xff00) !== 0xff00) {
+          break
+        } else {
+          offset += view.getUint16(offset, false)
         }
-      } else if ((marker & 0xff00) !== 0xff00) {
-        break
-      } else {
-        offset += view.getUint16(offset, false)
       }
+
+      return cb(error, -1)
     }
 
-    return callback(-1)
-  }
-
-  reader.readAsArrayBuffer(file)
+    reader.readAsArrayBuffer(file)
+  })
 }

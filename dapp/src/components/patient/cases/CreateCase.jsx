@@ -281,12 +281,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
       const cancelableUploadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
-          this.readOrientation(file)
+          const orientation = await this.srcImgOrientation(file)
           console.log('reading orientation')
+          console.log(orientation)
 
           console.log('compressing')
           // const base64CompressedFile = await this.compressFile(file)
-          const blob = await this.compressFile(file)
+          const blob = await this.compressFile(file, orientation)
           console.log('compressed!')
           console.log('blob: ', blob)
           // console.log(arrayBufferCompressedFile)
@@ -337,12 +338,15 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         })
     }
 
-    readOrientation = (file) => {
-      getOrientation(file, exifOrientationInt => {
-        const orientation = 'orientation: ' + exifOrientationInt + ": " + EXIF_ORIENTATION_LABEL[exifOrientationInt]
-        console.log(orientation)
-        this.setState({ orientation })
-      })
+    srcImgOrientation = async (file) => {
+      return await getOrientation(file)
+
+      // return await getOrientation(file, exifOrientationInt => {
+      //   const orientation = 'orientation: ' + exifOrientationInt + ": " + EXIF_ORIENTATION_LABEL[exifOrientationInt]
+      //   console.log(orientation)
+      //   // this.setState({ orientation })
+      //   return exifOrientationInt
+      // })
     }
 
     handleResetImageState = async (image) => {
@@ -362,7 +366,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       })
     }
 
-    async compressFile(file) {
+    async compressFile(file, orientation) {
       const firstImageSource = document.getElementById("first-image-source")
       const firstImagePreview = document.getElementById("first-image-preview")
       const qualityPercent = 0.5
@@ -377,17 +381,17 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
           console.log('source img length: ' + firstImageSource.src.length)
           firstImageSource.onload = function() {
+            let error
             // console.log('firstImageSource, ', firstImageSource)
 
             // returns an Image Object
             // const base64Compressed = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent)
-            const canvas = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent)
+            const canvas = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent, orientation)
 
             firstImagePreview.src = canvas.toDataURL("image/jpeg", qualityPercent)
 
             console.log('compressed img length: ' + firstImagePreview.src.length)
 
-            let error
             canvas.toBlob((blob) => {
               cb(error, blob)
             }, "image/jpeg", qualityPercent)
