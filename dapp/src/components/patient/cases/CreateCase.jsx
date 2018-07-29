@@ -346,41 +346,40 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     async compressFile(file, orientation) {
-      const firstImageSource = document.getElementById("first-image-source")
+      // const firstImageSource = document.getElementById("first-image-source")
       // const firstImagePreview = document.getElementById("first-image-preview")
       const qualityPercent = 0.5
 
-      const reader = new window.FileReader()
-
       return await promisify(cb => {
-        reader.onload = (event) => {
-          firstImageSource.src = event.target.result
+        const image = new Image()
 
-          firstImageSource.onload = () => {
-            let error
+        image.onload = (event) => {
+          const width = event.target.width
+          const height = event.target.height
 
-            const scalePercent = this.calculateScalePercent(
-              firstImageSource.naturalWidth,
-              firstImageSource.naturalHeight,
-              1000
-            )
+          let error
 
-            const canvas = jicImageCompressor.compress(
-              firstImageSource,
-              qualityPercent,
-              scalePercent,
-              orientation
-            )
-            // firstImagePreview.src = canvas.toDataURL("image/jpeg", qualityPercent)
+          const scalePercent = this.calculateScalePercent(
+            width,
+            height,
+            1000
+          )
 
-            // console.log('source img length: ' + firstImageSource.src.length)
-            // console.log('compressed img length: ' + firstImagePreview.src.length)
+          const canvas = jicImageCompressor.compress(
+            image,
+            qualityPercent,
+            scalePercent,
+            orientation
+          )
+          // firstImagePreview.src = canvas.toDataURL("image/jpeg", qualityPercent)
 
-            canvas.toBlob((blob) => { cb(error, blob) }, "image/jpeg", qualityPercent)
-          }
+          // console.log('source img length: ' + event.target.src.length)
+          // console.log('compressed img length: ' + event.target.src.length)
+
+          canvas.toBlob((blob) => { cb(error, blob) }, "image/jpeg", qualityPercent)
         }
 
-        reader.readAsDataURL(file)
+        image.src = window.URL.createObjectURL(file)
       })
     }
 
@@ -741,7 +740,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               fileUploadActive={this.fileUploadActive(this.state.firstImagePercent)}
                               progressPercent={this.state.firstImagePercent}
                             />
-                            <img
+                            {/*<img
                               id="first-image-source"
                               className="img-responsive form-group--image-upload-preview hidden"
                               alt="firstImage from user"
@@ -750,7 +749,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               id="first-image-preview"
                               className="img-responsive form-group--image-upload-preview hidden"
                               alt="firstImage to upload"
-                            />
+                            />*/}
 
                             <HippoImageInput
                               name='secondImage'

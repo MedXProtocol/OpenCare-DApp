@@ -25,7 +25,7 @@ export const jicImageCompressor = {
   /**
    * Receives an Image Object (can be JPG OR PNG) and returns a new Image Object compressed
    *
-   * @param {Image} sourceImgObj The source Image Object
+   * @param {Image} sourceImage The source Image Object
    * @param {Float} qualityPercent The resulting output quality (1 is uncompressed, 0.5 is 50% compressed)
    * @param {Float} scalePercent: The percentage to downscale or upscale the image to
    * @param {Number} srcOrientation: The orientation from the EXIF data as an integer
@@ -34,21 +34,22 @@ export const jicImageCompressor = {
    *                  an array buffer, a blog, etc
    */
 
-  compress: function(sourceImgObj, qualityPercent, scalePercent, srcOrientation) {
+  compress: function(sourceImage, qualityPercent, scalePercent, srcOrientation) {
     if (document === undefined) {
       throw new Error("Cannot use JIC compress without document/window")
     }
 
-    let width = sourceImgObj.naturalWidth
-    let height = sourceImgObj.naturalHeight
+    let width = sourceImage.width
+    let height = sourceImage.height
+
     const canvas = document.createElement("canvas")
     const context = canvas.getContext("2d")
 
     // console.log(`original dimensions: ${width} px width X ${height} px height`)
     if (scalePercent) {
       // console.log(`scaling dimensions by: ${scalePercent * 100}%`)
-      width = parseInt(scalePercent * sourceImgObj.naturalWidth, 10)
-      height = parseInt(scalePercent * sourceImgObj.naturalHeight, 10)
+      width = parseInt(scalePercent * sourceImage.width, 10)
+      height = parseInt(scalePercent * sourceImage.height, 10)
     }
     // console.log(`original dimensions: ${width} px width X ${height} px height`)
 
@@ -84,7 +85,7 @@ export const jicImageCompressor = {
       default: break;
     }
 
-    context.drawImage(sourceImgObj, 0, 0, width, height)
+    context.drawImage(sourceImage, 0, 0, width, height)
 
     return canvas
   }
