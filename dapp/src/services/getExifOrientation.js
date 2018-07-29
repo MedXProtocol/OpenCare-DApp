@@ -4,7 +4,7 @@ import { promisify } from '~/utils/common-util'
 // -2: not jpeg
 // -1: not defined
 
-export const getOrientation = async function(file) {
+export const getExifOrientation = async function(file) {
   var reader = new FileReader()
 
   return await promisify(cb => {

@@ -23,8 +23,7 @@ import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } f
 import { contractByName } from '~/saga-genesis/state-finders'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
-import { getOrientation } from '~/services/getOrientation'
-import { EXIF_ORIENTATION_LABEL } from '~/services/exifOrientationLabel'
+import { getExifOrientation } from '~/services/getExifOrientation'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
@@ -37,7 +36,6 @@ import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
 import { promisify } from '~/utils/common-util'
-import { decode } from 'base64-arraybuffer'
 
 function mapStateToProps (state) {
   let medXBeingSent
@@ -277,20 +275,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         this.setState({ [`${imageToCapture}Percent`]: percent })
       }
 
-      console.log(file)
-
       const cancelableUploadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
           const orientation = await this.srcImgOrientation(file)
-          console.log('reading orientation')
-          console.log(orientation)
-
-          console.log('compressing')
-          // const base64CompressedFile = await this.compressFile(file)
           const blob = await this.compressFile(file, orientation)
-          console.log('compressed!')
-          console.log('blob: ', blob)
-          // console.log(arrayBufferCompressedFile)
           progressHandler(10)
           await sleep(300)
 
@@ -298,20 +286,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           var fileReader = new FileReader()
           await this.promisifyFileReader(fileReader, blob)
           arrayBuffer = fileReader.result
-          // fileReader.onload = function(event) {
-            // arrayBuffer = event.target.result
-          // }
-          // fileReader.readAsArrayBuffer(blob)
-          console.log(arrayBuffer)
 
-          // convert compressed base64 string to array buffer
-          // const fileAsArrayBuffer = base64CompressedFile
-          // base64Compressed
-
-          // const fileAsArrayBuffer = new Uint8Array(decode(base64CompressedFile))
-          // const fileAsArrayBuffer = new Uint8Array(decode(base64CompressedFile.split(',')[1]))
-
-          console.log('reading')
           progressHandler(20)
           await sleep(300)
 
@@ -339,14 +314,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     srcImgOrientation = async (file) => {
-      return await getOrientation(file)
-
-      // return await getOrientation(file, exifOrientationInt => {
-      //   const orientation = 'orientation: ' + exifOrientationInt + ": " + EXIF_ORIENTATION_LABEL[exifOrientationInt]
-      //   console.log(orientation)
-      //   // this.setState({ orientation })
-      //   return exifOrientationInt
-      // })
+      return await getExifOrientation(file)
     }
 
     handleResetImageState = async (image) => {
@@ -370,8 +338,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       const firstImageSource = document.getElementById("first-image-source")
       const firstImagePreview = document.getElementById("first-image-preview")
       const qualityPercent = 0.5
-      const scalePercent = 0.4
-      const outputFormat = 'jpg'
+      const scalePercent = 0.5
 
       const reader = new window.FileReader()
 
@@ -379,18 +346,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         reader.onload = function(event) {
           firstImageSource.src = event.target.result
 
-          console.log('source img length: ' + firstImageSource.src.length)
           firstImageSource.onload = function() {
             let error
-            // console.log('firstImageSource, ', firstImageSource)
-
-            // returns an Image Object
-            // const base64Compressed = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent)
-            const canvas = jicImageCompressor.compress(firstImageSource, qualityPercent, outputFormat, scalePercent, orientation)
-
+            const canvas = jicImageCompressor.compress(firstImageSource, qualityPercent, scalePercent, orientation)
             firstImagePreview.src = canvas.toDataURL("image/jpeg", qualityPercent)
-
-            console.log('compressed img length: ' + firstImagePreview.src.length)
+            // console.log('source img length: ' + firstImageSource.src.length)
+            // console.log('compressed img length: ' + firstImagePreview.src.length)
 
             canvas.toBlob((blob) => {
               cb(error, blob)
@@ -761,7 +722,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                             />
                             <img
                               id="first-image-source"
-                              className="img-responsive form-group--image-upload-preview"
+                              className="img-responsive form-group--image-upload-preview hidden"
                               alt="firstImage from user"
                             />
                             <img

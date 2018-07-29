@@ -108,9 +108,14 @@ export async function doDownloadImage(hash, encryptionKey) {
         cb(error, result)
       } else {
         result = aes.decryptBytes(result, encryptionKey)
-        var reader = new window.FileReader()
+        const reader = new window.FileReader()
         reader.onloadend = () => {
-          cb(error, reader.result)
+          let result = reader.result
+
+          // we only save jpeg's on upload & if mime type is missing add it back in
+          result = reader.result.replace("data:;base64,", "data:image/jpeg;base64,")
+
+          cb(error, result)
         }
         reader.readAsDataURL(new Blob([result]))
       }
