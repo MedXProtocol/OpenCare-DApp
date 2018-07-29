@@ -87,33 +87,33 @@ export const jicImageCompressor = {
 
 
 
-    // // swap canvas dimensions for certain orientations before transform
-    // if (srcOrientation > 4 && srcOrientation < 9) {
-    //   canvas.width = canvas.height
-    //   canvas.height = canvas.width
-    // }
+    // swap canvas dimensions for certain orientations before transform
+    if (srcOrientation > 4 && srcOrientation < 9) {
+      canvas.width = height
+      canvas.height = width
+    }
 
-    // // transform context based on orientation
-    // switch (srcOrientation) {
-    //   case 2: context.transform(-1, 0, 0, 1, canvas.width, 0)
-    //     break
-    //   case 3: context.transform(-1, 0, 0, -1, canvas.width, canvas.height)
-    //     break
-    //   case 4: context.transform(1, 0, 0, -1, 0, canvas.height)
-    //     break
-    //   case 5: context.transform(0, 1, 1, 0, 0, 0)
-    //     break
-    //   case 6: context.transform(0, 1, -1, 0, canvas.height, 0)
-    //     break
-    //   case 7: context.transform(0, -1, -1, 0, canvas.height, canvas.width)
-    //     break
-    //   case 8: context.transform(0, -1, 1, 0, 0, canvas.width)
-    //     break
-    //   default: break;
-    // }
+    // transform context based on orientation
+    switch (srcOrientation) {
+      case 2: context.transform(-1, 0, 0, 1, canvas.width, 0)
+        break
+      case 3: context.transform(-1, 0, 0, -1, canvas.width, canvas.height)
+        break
+      case 4: context.transform(1, 0, 0, -1, 0, canvas.height)
+        break
+      case 5: context.transform(0, 1, 1, 0, 0, 0)
+        break
+      case 6: context.transform(0, 1, -1, 0, canvas.height, 0)
+        break
+      case 7: context.transform(0, -1, -1, 0, canvas.height, canvas.width)
+        break
+      case 8: context.transform(0, -1, 1, 0, 0, canvas.width)
+        break
+      default: break;
+    }
 
 
-    // context.drawImage(canvas, 0, 0, canvas.width, canvas.height)
+    context.drawImage(sourceImgObj, 0, 0, canvas.width, canvas.height)
 
 
 
