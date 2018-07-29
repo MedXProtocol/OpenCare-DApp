@@ -334,28 +334,49 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       })
     }
 
+    calculateScalePercent(sourceWidth, sourceHeight, targetSize) {
+      let resizeRatio
+      if ((sourceWidth / sourceHeight) > 1) {
+        resizeRatio = (targetSize / sourceWidth)
+      } else {
+        resizeRatio = (targetSize / sourceHeight)
+      }
+      // console.log(`${sourceWidth}x${sourceHeight} => ${sourceWidth*resizeRatio}x${sourceHeight*resizeRatio}. Resize Ratio is: ${resizeRatio}`)
+      return resizeRatio
+    }
+
     async compressFile(file, orientation) {
       const firstImageSource = document.getElementById("first-image-source")
-      const firstImagePreview = document.getElementById("first-image-preview")
+      // const firstImagePreview = document.getElementById("first-image-preview")
       const qualityPercent = 0.5
-      const scalePercent = 0.5
 
       const reader = new window.FileReader()
 
       return await promisify(cb => {
-        reader.onload = function(event) {
+        reader.onload = (event) => {
           firstImageSource.src = event.target.result
 
-          firstImageSource.onload = function() {
+          firstImageSource.onload = () => {
             let error
-            const canvas = jicImageCompressor.compress(firstImageSource, qualityPercent, scalePercent, orientation)
-            firstImagePreview.src = canvas.toDataURL("image/jpeg", qualityPercent)
+
+            const scalePercent = this.calculateScalePercent(
+              firstImageSource.naturalWidth,
+              firstImageSource.naturalHeight,
+              1000
+            )
+
+            const canvas = jicImageCompressor.compress(
+              firstImageSource,
+              qualityPercent,
+              scalePercent,
+              orientation
+            )
+            // firstImagePreview.src = canvas.toDataURL("image/jpeg", qualityPercent)
+
             // console.log('source img length: ' + firstImageSource.src.length)
             // console.log('compressed img length: ' + firstImagePreview.src.length)
 
-            canvas.toBlob((blob) => {
-              cb(error, blob)
-            }, "image/jpeg", qualityPercent)
+            canvas.toBlob((blob) => { cb(error, blob) }, "image/jpeg", qualityPercent)
           }
         }
 
@@ -727,10 +748,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                             />
                             <img
                               id="first-image-preview"
-                              className="img-responsive form-group--image-upload-preview"
+                              className="img-responsive form-group--image-upload-preview hidden"
                               alt="firstImage to upload"
                             />
-                            {this.state.orientation}
 
                             <HippoImageInput
                               name='secondImage'
