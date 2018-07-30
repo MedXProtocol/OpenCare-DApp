@@ -88,7 +88,7 @@ export const HippoImageInput = class _HippoImageInput extends Component {
                       type="file"
                       accept='image/*'
                       className="form-control"
-                      style={{ display: 'none' }}
+                      style={{ position: 'absolute', left: '-99999px' }}
                     />
                   </label>
                 )

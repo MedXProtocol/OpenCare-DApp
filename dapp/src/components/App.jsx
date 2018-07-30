@@ -212,62 +212,58 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     const WelcomeWrapped = <Welcome isDoctor={this.props.isDoctor} />
 
     return (
-      <div>
-        <div className="wrapper">
-          <div className="main-panel">
-            <HippoNavbarContainer cases={this.props.cases} />
-            {ownerWarning}
-            {publicKeyCheck}
-            <div className="content">
-              {betaFaucetModal}
+      <React.Fragment>
+        <HippoNavbarContainer cases={this.props.cases} />
+        {ownerWarning}
+        {publicKeyCheck}
+        <div className="content">
+          {betaFaucetModal}
 
-              <Switch>
-                <Route path={routes.WELCOME} component={null} />
-                <Route path='/' component={NetworkCheckModal} />
-              </Switch>
+          <Switch>
+            <Route path={routes.WELCOME} component={null} />
+            <Route path='/' component={NetworkCheckModal} />
+          </Switch>
 
-              <Switch>
-                {redirect}
+          <Switch>
+            {redirect}
 
-                <Route path={routes.WELCOME}  render={ () => WelcomeWrapped } />
-                <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
-                <Route path={routes.TRY_METAMASK} component={TryMetamask} />
+            <Route path={routes.WELCOME}  render={ () => WelcomeWrapped } />
+            <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
+            <Route path={routes.TRY_METAMASK} component={TryMetamask} />
 
-                <SignedInRoute path={routes.ACCOUNT_EMERGENCY_KIT} component={EmergencyKit} />
-                <SignedInRoute path={routes.ACCOUNT_CHANGE_PASSWORD} component={ChangePasswordContainer} />
-                <SignedInRoute path={routes.ACCOUNT_MINT} component={Mint} />
-                <SignedInRoute path={routes.ACCOUNT_WALLET} component={WalletContainer} />
+            <SignedInRoute path={routes.ACCOUNT_EMERGENCY_KIT} component={EmergencyKit} />
+            <SignedInRoute path={routes.ACCOUNT_CHANGE_PASSWORD} component={ChangePasswordContainer} />
+            <SignedInRoute path={routes.ACCOUNT_MINT} component={Mint} />
+            <SignedInRoute path={routes.ACCOUNT_WALLET} component={WalletContainer} />
 
-                <Web3Route path={routes.SIGN_IN} component={SignInContainer} />
-                <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
+            <Web3Route path={routes.SIGN_IN} component={SignInContainer} />
+            <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
 
-                <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
-                <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={OpenCasesContainer} />
-                <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
+            <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
+            <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={OpenCasesContainer} />
+            <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 
-                <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
-                <SignedInRoute exact path={routes.PATIENTS_CASES} component={PatientDashboard} />
-                <SignedInRoute path={routes.PATIENTS_CASE} component={PatientCaseContainer} />
+            <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
+            <SignedInRoute exact path={routes.PATIENTS_CASES} component={PatientDashboard} />
+            <SignedInRoute path={routes.PATIENTS_CASE} component={PatientCaseContainer} />
 
-                <Redirect from={routes.HOME} exact to={routes.WELCOME} />
+            <Redirect from={routes.HOME} exact to={routes.WELCOME} />
 
-                <Route path={routes.HOME} component={FourOhFour} />
-              </Switch>
-            </div>
-          </div>
+            <Route path={routes.HOME} component={FourOhFour} />
+          </Switch>
+        </div>
 
-          <footer className="footer">
-            <div className='container'>
-              <div className="row">
-                <div className="col-sm-12 text-center">
-                  <p className="text-footer">
-                    &copy; 2018 MedCredits Inc. - All Rights Reserved.
-                  </p>
-                </div>
+        <footer className="footer">
+          <div className='container'>
+            <div className="row">
+              <div className="col-sm-12 text-center">
+                <p className="text-footer">
+                  &copy; 2018 MedCredits Inc. - All Rights Reserved.
+                </p>
               </div>
             </div>
-          </footer>
-        </div>
+          </div>
+        </footer>
 
         <ReduxToastr
           timeOut={7000}
@@ -278,9 +274,9 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
           transitionOut="bounceOut"
         />
         {feedbackLink}
-      </div>
-    )
-  }
+      </React.Fragment>
+  )
+}
 }))))
 
 export default hot(module)(withRouter(App))
