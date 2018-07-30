@@ -8,7 +8,7 @@ import { isBlank } from '~/utils/isBlank'
 import { withDoctors } from '~/components/withDoctors'
 import { withSend } from '~/saga-genesis'
 
-require('./style.css')
+require('./RegisterDoctor.css')
 
 export const RegisterDoctorContainer =
   withDoctors(

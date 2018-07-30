@@ -4,20 +4,10 @@
   z-index: 1040;
 }
 
-.container > .navbar-header,
-.container > .navbar-collapse,
-.container-fluid > .navbar-header,
-.container-fluid > .navbar-collapse {
+.container > .navbar-header {
   @media (max-width: 768px) {
-    margin-left: -2rem;
-    margin-right: -2rem;
-  }
-}
-
-.nav > li > a {
-  @media (max-width: 768px) {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 
@@ -25,12 +15,18 @@
   padding: 10px;
 
   @media (max-width: 768px) {
-    padding: 1rem 2rem;
+    padding: 1rem 0;
   }
 }
 
 .navbar-brand img {
   height: 100%;
+}
+
+.navbar-toggle {
+  @media (max-width: 768px) {
+    margin-right: 0;
+  }
 }
 
 .navbar-inverse .navbar-toggle:hover,

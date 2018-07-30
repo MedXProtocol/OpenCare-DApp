@@ -267,6 +267,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     handleCaptureImage = async (file, imageToCapture) => {
+      console.log('hello')
       if (!file) { return }
 
       await this.handleResetImageState(imageToCapture)
@@ -675,7 +676,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       }
 
       return (
-        <div>
+        <React.Fragment>
           <div className="row">
             <div className="col-xs-12 col-md-8 col-md-offset-2">
               <div className="card">
@@ -919,7 +920,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           </Modal>
 
           <Loading loading={this.state.isSubmitting} />
-        </div>
+        </React.Fragment>
       )
     }
 }))))
