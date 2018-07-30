@@ -48,18 +48,12 @@ export async function uploadFile(file, encryptionKey, progressHandler) {
   return await ipfsMethodWithRetry(doUploadFile, file, encryptionKey, progressHandler)
 }
 
-export async function doUploadFile(file, encryptionKey, progressHandler) {
+export async function doUploadFile(fileAsArrayBuffer, encryptionKey, progressHandler) {
   let uploadProgress = 25 // reset each time
 
-  // READING
-  progressHandler(10)
-  const reader = new window.FileReader()
-  await promisifyFileReader(reader, file)
-  await sleep(300)
-
   // ENCRYPTING
-  progressHandler(25)
-  const buffer = Buffer.from(reader.result)
+  progressHandler(uploadProgress)
+  const buffer = Buffer.from(fileAsArrayBuffer)
   const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
   await sleep(300)
 
@@ -68,7 +62,6 @@ export async function doUploadFile(file, encryptionKey, progressHandler) {
   const interval = setInterval(function() {
     uploadProgress = updateUploadProgress(progressHandler, uploadProgress)
   }, 500)
-  await sleep(30000)
 
   const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb))
   clearInterval(interval)
@@ -115,19 +108,17 @@ export async function doDownloadImage(hash, encryptionKey) {
         cb(error, result)
       } else {
         result = aes.decryptBytes(result, encryptionKey)
-        var reader = new window.FileReader()
+        const reader = new window.FileReader()
         reader.onloadend = () => {
-          cb(error, reader.result)
+          let result = reader.result
+
+          // we only save jpeg's on upload & if mime type is missing add it back in
+          result = reader.result.replace("data:;base64,", "data:image/jpeg;base64,")
+
+          cb(error, result)
         }
         reader.readAsDataURL(new Blob([result]))
       }
     })
-  })
-}
-
-function promisifyFileReader(fileReader, file){
-  return new Promise((resolve, reject) => {
-    fileReader.onloadend = resolve  // CHANGE to whatever function you want which would eventually call resolve
-    fileReader.readAsArrayBuffer(file)
   })
 }

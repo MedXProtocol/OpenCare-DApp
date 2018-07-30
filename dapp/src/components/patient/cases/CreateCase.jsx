@@ -18,12 +18,12 @@ import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
+import { jicImageCompressor } from '~/services/jicImageCompressor'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
-import { getOrientation } from '~/services/getOrientation'
-import { EXIF_ORIENTATION_LABEL } from '~/services/exifOrientationLabel'
+import { getExifOrientation } from '~/services/getExifOrientation'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
@@ -35,6 +35,7 @@ import { AcneQuestions } from './AcneQuestions'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
+import { promisify } from '~/utils/common-util'
 
 function mapStateToProps (state) {
   let medXBeingSent
@@ -274,15 +275,22 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         this.setState({ [`${imageToCapture}Percent`]: percent })
       }
 
-      getOrientation(file, exifOrientationInt => {
-        const orientation = 'orientation: ' + exifOrientationInt + ": " + EXIF_ORIENTATION_LABEL[exifOrientationInt]
-        console.log(orientation)
-        this.setState({ orientation })
-      })
-
       const cancelableUploadPromise = cancelablePromise(
-        new Promise((resolve, reject) => {
-          uploadFile(file, this.state.caseEncryptionKey, progressHandler).then(imageHash => {
+        new Promise(async (resolve, reject) => {
+          const orientation = await this.srcImgOrientation(file)
+          const blob = await this.compressFile(file, orientation)
+          progressHandler(10)
+          await sleep(300)
+
+          var arrayBuffer
+          var fileReader = new FileReader()
+          await this.promisifyFileReader(fileReader, blob)
+          arrayBuffer = fileReader.result
+
+          progressHandler(20)
+          await sleep(300)
+
+          uploadFile(arrayBuffer, this.state.caseEncryptionKey, progressHandler).then(imageHash => {
             return resolve(imageHash)
           })
         })
@@ -305,6 +313,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         })
     }
 
+    srcImgOrientation = async (file) => {
+      return await getExifOrientation(file)
+    }
+
     handleResetImageState = async (image) => {
       await this.setState({
         [`${image}UploadPromise`]: undefined,
@@ -312,6 +324,48 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         [`${image}FileName`]: null,
         [`${image}Percent`]: null,
         [`${image}Error`]: null
+      })
+    }
+
+    promisifyFileReader = (fileReader, blob) => {
+      return new Promise((resolve, reject) => {
+        fileReader.onloadend = resolve
+        fileReader.readAsArrayBuffer(blob)
+      })
+    }
+
+    calculateScalePercent(sourceWidth, sourceHeight, targetSize) {
+      let resizeRatio
+      if ((sourceWidth / sourceHeight) > 1) {
+        resizeRatio = (targetSize / sourceWidth)
+      } else {
+        resizeRatio = (targetSize / sourceHeight)
+      }
+      // console.log(`${sourceWidth}x${sourceHeight} => ${sourceWidth*resizeRatio}x${sourceHeight*resizeRatio}. Resize Ratio is: ${resizeRatio}`)
+      return resizeRatio
+    }
+
+    async compressFile(file, orientation) {
+      const qualityPercent = 0.5
+
+      return await promisify(cb => {
+        const image = new Image()
+
+        image.onload = (event) => {
+          let error
+          const width = event.target.width
+          const height = event.target.height
+
+          const scalePercent = this.calculateScalePercent(width, height, 1000)
+
+          const canvas = jicImageCompressor.compress(image, qualityPercent, scalePercent, orientation)
+          // console.log('source img length: ' + event.target.src.length)
+          // console.log('compressed img length: ' + event.target.src.length)
+
+          canvas.toBlob((blob) => { cb(error, blob) }, "image/jpeg", qualityPercent)
+        }
+
+        image.src = window.URL.createObjectURL(file)
       })
     }
 
@@ -554,7 +608,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       return (percent !== null) ? true : false
     }
 
-    errorMessage(fieldName) {
+    errorMessage = (fieldName) => {
       let msg
       if (fieldName === 'country' || fieldName === 'region') {
         msg = 'must be chosen'
@@ -672,7 +726,16 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               fileUploadActive={this.fileUploadActive(this.state.firstImagePercent)}
                               progressPercent={this.state.firstImagePercent}
                             />
-                            {this.state.orientation}
+                            {/*<img
+                              id="first-image-source"
+                              className="img-responsive form-group--image-upload-preview hidden"
+                              alt="firstImage from user"
+                            />
+                            <img
+                              id="first-image-preview"
+                              className="img-responsive form-group--image-upload-preview hidden"
+                              alt="firstImage to upload"
+                            />*/}
 
                             <HippoImageInput
                               name='secondImage'
@@ -689,7 +752,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               fileUploadActive={this.fileUploadActive(this.state.secondImagePercent)}
                               progressPercent={this.state.secondImagePercent}
                             />
-                            {this.state.orientation}
                           </div>
                         ) : null
                       }

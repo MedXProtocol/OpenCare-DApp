@@ -144,3 +144,8 @@ button.text-gray:active {
   color: #888 !important;
   text-decoration: none;
 }
+
+.form-group--image-upload-preview {
+  max-height: 600px;
+  max-width: 600px;
+}
