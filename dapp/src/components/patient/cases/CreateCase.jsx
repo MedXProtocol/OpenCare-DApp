@@ -346,33 +346,19 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     async compressFile(file, orientation) {
-      // const firstImageSource = document.getElementById("first-image-source")
-      // const firstImagePreview = document.getElementById("first-image-preview")
       const qualityPercent = 0.5
 
       return await promisify(cb => {
         const image = new Image()
 
         image.onload = (event) => {
+          let error
           const width = event.target.width
           const height = event.target.height
 
-          let error
+          const scalePercent = this.calculateScalePercent(width, height, 1000)
 
-          const scalePercent = this.calculateScalePercent(
-            width,
-            height,
-            1000
-          )
-
-          const canvas = jicImageCompressor.compress(
-            image,
-            qualityPercent,
-            scalePercent,
-            orientation
-          )
-          // firstImagePreview.src = canvas.toDataURL("image/jpeg", qualityPercent)
-
+          const canvas = jicImageCompressor.compress(image, qualityPercent, scalePercent, orientation)
           // console.log('source img length: ' + event.target.src.length)
           // console.log('compressed img length: ' + event.target.src.length)
 
