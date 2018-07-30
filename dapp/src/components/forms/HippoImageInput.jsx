@@ -14,7 +14,9 @@ export const HippoImageInput = class _HippoImageInput extends Component {
 
   cancelUpload = (e) => {
     e.preventDefault()
-    this.setState({ cancelClicked: true })
+    this.setState({
+      cancelClicked: true
+    })
     this.props.handleCancelUpload(this.props.name)
   }
 
@@ -27,7 +29,9 @@ export const HippoImageInput = class _HippoImageInput extends Component {
     e.stopPropagation()
     e.preventDefault()
 
-    this.setState({ cancelClicked: false })
+    this.setState({
+      cancelClicked: false
+    })
 
     this.props.handleCaptureImage(e.target.files[0], this.props.name)
   }
@@ -76,14 +80,10 @@ export const HippoImageInput = class _HippoImageInput extends Component {
                 <input />
               </div>
               {
-                currentValue ? null : (
+                this.props.uploadPromise ? null : (
                   <label className="btn btn btn-info">
                     Select File ... <input
                       name={name}
-                      onClick={(event) => {
-                        // reset each time so user can choose the same file if they cancel
-                        event.target.value = null
-                      }}
                       onChange={this.captureImage}
                       type="file"
                       accept='image/*'

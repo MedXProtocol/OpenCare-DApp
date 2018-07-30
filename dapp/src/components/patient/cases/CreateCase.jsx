@@ -309,6 +309,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           this.validateField(`${imageToCapture}Hash`)
         })
         .catch((reason) => {
+          // cancel pressed
           this.handleResetImageState(imageToCapture)
         })
     }
@@ -722,6 +723,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               handleCaptureImage={this.handleCaptureImage}
                               handleResetImageState={this.handleResetImageState}
                               handleCancelUpload={this.handleCancelUpload}
+                              uploadPromise={this.state.firstImageUploadPromise}
                               currentValue={this.state.firstImageFileName}
                               fileUploadActive={this.fileUploadActive(this.state.firstImagePercent)}
                               progressPercent={this.state.firstImagePercent}
@@ -748,6 +750,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               handleCaptureImage={this.handleCaptureImage}
                               handleResetImageState={this.handleResetImageState}
                               handleCancelUpload={this.handleCancelUpload}
+                              uploadPromise={this.state.secondImageUploadPromise}
                               currentValue={this.state.secondImageFileName}
                               fileUploadActive={this.fileUploadActive(this.state.secondImagePercent)}
                               progressPercent={this.state.secondImagePercent}
