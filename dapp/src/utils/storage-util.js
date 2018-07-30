@@ -4,7 +4,7 @@ import { sleep } from '~/utils/sleep'
 import aes from '~/services/aes'
 
 function updateUploadProgress(progressHandler, uploadProgress) {
-  if (uploadProgress < 87) {
+  if (uploadProgress < 88) {
     uploadProgress += 2
     progressHandler(uploadProgress)
   }
@@ -49,7 +49,7 @@ export async function uploadFile(file, encryptionKey, progressHandler) {
 }
 
 export async function doUploadFile(fileAsArrayBuffer, encryptionKey, progressHandler) {
-  let uploadProgress = 25 // reset each time
+  let uploadProgress = 40 // reset each time
 
   // ENCRYPTING
   progressHandler(uploadProgress)
@@ -58,7 +58,7 @@ export async function doUploadFile(fileAsArrayBuffer, encryptionKey, progressHan
   await sleep(300)
 
   // UPLOADING
-  uploadProgress = updateUploadProgress(progressHandler, uploadProgress)
+  progressHandler(51)
   const interval = setInterval(function() {
     uploadProgress = updateUploadProgress(progressHandler, uploadProgress)
   }, 500)

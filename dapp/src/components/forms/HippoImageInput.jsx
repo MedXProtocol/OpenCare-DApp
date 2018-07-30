@@ -41,11 +41,13 @@ export const HippoImageInput = class _HippoImageInput extends Component {
 
     if (this.state.cancelClicked) {
       return 'cancelling ...'
-    } else if (percent === 10) {
+    } else if (percent < 9) {
       return 'reading file ...'
-    } else if (percent === 25) {
+    } else if (percent > 9 && percent < 25) {
+      return 'compressing ...'
+    } else if (percent > 25 && percent < 50) {
       return 'encrypting ...'
-    } else if (percent > 25 && percent < 90) {
+    } else if (percent > 50 && percent < 90) {
       return 'uploading ...'
     } else if (percent === 90) {
       return 'pinning to ipfs'
@@ -75,7 +77,7 @@ export const HippoImageInput = class _HippoImageInput extends Component {
               {label}
               {subLabel ? <span className="text-gray small"><br/>{subLabel}</span> : null}
             </label>
-            <div>
+            <div className="form-group--file-input__input-container">
               <div className="hidden-input-mask">
                 <input />
               </div>

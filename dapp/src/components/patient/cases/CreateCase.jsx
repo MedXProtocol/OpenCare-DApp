@@ -282,8 +282,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           progressHandler(10)
           await sleep(300)
 
-          var arrayBuffer
-          var fileReader = new FileReader()
+          let arrayBuffer
+          const fileReader = new FileReader()
           await this.promisifyFileReader(fileReader, blob)
           arrayBuffer = fileReader.result
 
