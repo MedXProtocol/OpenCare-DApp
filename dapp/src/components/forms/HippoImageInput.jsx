@@ -26,8 +26,8 @@ export const HippoImageInput = class _HippoImageInput extends Component {
   }
 
   captureImage = (e) => {
-    e.stopPropagation()
-    e.preventDefault()
+    // e.stopPropagation()
+    // e.preventDefault()
 
     this.setState({
       cancelClicked: false
