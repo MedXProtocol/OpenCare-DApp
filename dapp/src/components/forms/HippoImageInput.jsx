@@ -78,21 +78,17 @@ export const HippoImageInput = class _HippoImageInput extends Component {
               {subLabel ? <span className="text-gray small"><br/>{subLabel}</span> : null}
             </label>
             <div className="form-group--file-input__input-container">
-              <div className="hidden-input-mask">
-                <input />
-              </div>
               {
                 this.props.uploadPromise ? null : (
-                  <label className="btn btn btn-info">
+                  <React.Fragment>
                     Select File ... <input
                       name={name}
                       onChange={this.captureImage}
                       type="file"
                       accept='image/*'
-                      className="form-control"
-                      style={{ display: 'none' }}
+                      className="form-control btn btn btn-info"
                     />
-                  </label>
+                  </React.Fragment>
                 )
               }
 
