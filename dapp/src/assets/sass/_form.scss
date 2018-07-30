@@ -7,11 +7,11 @@
 }
 
 .form-wrapper--body {
-  padding: 3rem;
+  padding: 3rem 2rem;
 }
 
 .form-wrapper--body__extra-padding {
-  padding: 6rem;
+  padding: 6rem 4rem;
 
   @media (max-width: 768px) {
     padding: 4rem 2rem;
@@ -35,7 +35,7 @@
   background: #fafafa;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
-  padding: 20px 30px;
+  padding: 2rem 2rem;
 }
 
 .form-wrapper--footer .loader {
@@ -139,9 +139,4 @@ button.text-gray:focus,
 button.text-gray:active {
   color: #888 !important;
   text-decoration: none;
-}
-
-.form-group--image-upload-preview {
-  max-height: 600px;
-  max-width: 600px;
 }

@@ -99,6 +99,19 @@ export const HippoImageInput = class _HippoImageInput extends Component {
                 )
               }
 
+              <input
+                                      onClick={this.captureImage}
+                                      onChange={this.captureImage}
+                                    type="file"
+                                    accept='image/*'
+                                  /> input w/ onclick / onchange
+
+                <input
+                                      type="file"
+                                      accept='image/*'
+                                    /> regular ol input
+
+
               <span className="form-group--file-input__filename">
                 {fileUploadActive ?
                   <React.Fragment>&nbsp; &nbsp;{this.showProgress()}</React.Fragment>
