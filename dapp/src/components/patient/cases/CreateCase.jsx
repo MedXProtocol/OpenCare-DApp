@@ -73,6 +73,9 @@ function mapDispatchToProps(dispatch) {
   return {
     showBetaFaucetModal: () => {
       dispatch({ type: 'SHOW_BETA_FAUCET_MODAL' })
+    },
+    dispatchExcludedDoctors: (addresses) => {
+      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
     }
   }
 }
@@ -243,6 +246,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
             toastr.success('Your case has been broadcast to the network. It will take a moment to be confirmed.')
             mixpanel.track('Case Submitted')
             this.props.history.push('/patients/cases')
+
+            // This ensures we attempt to randomly find a different doctor for the next
+            // case this patient may submit
+            this.props.dispatchExcludedDoctors([this.props.account])
           })
       }
     }

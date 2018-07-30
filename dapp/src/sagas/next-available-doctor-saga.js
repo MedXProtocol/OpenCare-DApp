@@ -6,8 +6,7 @@ import { isBlank } from '~/utils/isBlank'
 import {
   select,
   put,
-  throttle,
-  takeEvery
+  takeLatest
 } from 'redux-saga/effects'
 import { fisherYatesShuffle } from '~/services/fisherYatesShuffle'
 import range from 'lodash.range'
@@ -24,9 +23,9 @@ function* nextAvailableDoctor () {
   return yield select((state) => state.nextAvailableDoctor.doctor)
 }
 
-function* isOnline(address) {
-  return yield select((state) => state.heartbeat[address])
-}
+// function* isOnline(address) {
+//   return yield select((state) => state.heartbeat[address])
+// }
 
 function* isExcluded(address) {
   const excludedAddresses = yield select(state => state.nextAvailableDoctor.excludedAddresses)
@@ -36,10 +35,13 @@ function* isExcluded(address) {
 function* fetchDoctorCredentials(address) {
   let credentials = null
   if (yield isExcluded(address)) { return null }
+
   const isActive = yield web3Call(yield doctorManager(), 'isActive', address)
   if (!isActive) { return null }
+
   const publicKey = yield web3Call(yield accountManager(), 'publicKeys', address)
   if (isBlank(publicKey)) { return null }
+
   credentials = {
     address,
     isActive,
@@ -119,35 +121,28 @@ function* findNextAvailableOfflineDoctor() {
     }
 
     // remove this doctor from the array so we don't choose it again
-    doctorIndices.splice(randomIndex, 1)
+    doctorIndices.shift()
   }
   return doctor
 }
 
-function* checkDoctorOnline({ address }) {
-  const nextDoctor = yield nextAvailableDoctor()
-  if (!nextDoctor || !(yield isOnline(nextDoctor.address))) {
-    const doctor = yield fetchDoctorByAddress(address)
-    if (doctor) {
-      yield put({ type: 'NEXT_AVAILABLE_DOCTOR', doctor })
-    }
-  }
-}
+// function* checkDoctorOnline({ address }) {
+//   const nextDoctor = yield nextAvailableDoctor()
+//   if (!nextDoctor || !(yield isOnline(nextDoctor.address))) {
+//     const doctor = yield fetchDoctorByAddress(address)
+//     if (doctor) {
+//       yield put({ type: 'NEXT_AVAILABLE_DOCTOR', doctor })
+//     }
+//   }
+// }
 
-function* checkDoctorOffline({ address }) {
-  const nextDoctor = yield nextAvailableDoctor()
+// function* checkDoctorOffline({ address }) {
+//   const nextDoctor = yield nextAvailableDoctor()
 
-  if (!nextDoctor || nextDoctor.address === address) {
-    yield setNextAvailableDoctor() // find another one
-  }
-}
-
-function* checkExcludedDoctors({ addresses }) {
-  const nextDoctor = yield nextAvailableDoctor()
-  if (!nextDoctor || addresses.indexOf(nextDoctor.address) !== -1) {
-    yield setNextAvailableDoctor() // find another one
-  }
-}
+//   if (!nextDoctor || nextDoctor.address === address) {
+//     yield setNextAvailableDoctor() // find another one
+//   }
+// }
 
 function* checkNextAvailableDoctor() {
   const nextDoctor = yield nextAvailableDoctor()
@@ -156,12 +151,17 @@ function* checkNextAvailableDoctor() {
   }
 }
 
+function* forgetAndFindNext() {
+  yield put({ type: 'FORGET_NEXT_DOCTOR' })
+  yield put({ type: 'CHECK_AVAILABLE_DOCTORS' })
+}
+
 export function* nextAvailableDoctorSaga() {
-  yield takeEvery('USER_ONLINE', checkDoctorOnline)
-  yield takeEvery('USER_OFFLINE', checkDoctorOffline)
-  yield takeEvery('FORGET_NEXT_DOCTOR', checkNextAvailableDoctor)
-  yield throttle(700, 'EXCLUDED_DOCTORS', checkExcludedDoctors)
-  yield throttle(900, 'CHECK_AVAILABLE_DOCTORS', checkNextAvailableDoctor)
-  yield put({ type: 'AVAILABLE_DOCTOR_INITIALIZED' })
+  // yield takeEvery('USER_ONLINE', checkDoctorOnline)
+  // yield takeEvery('USER_OFFLINE', checkDoctorOffline)
+
+  yield takeLatest('EXCLUDED_DOCTORS', forgetAndFindNext)
+
+  yield takeLatest('CHECK_AVAILABLE_DOCTORS', checkNextAvailableDoctor)
   yield put({ type: 'CHECK_AVAILABLE_DOCTORS' })
 }
