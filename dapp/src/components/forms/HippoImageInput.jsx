@@ -26,13 +26,8 @@ export const HippoImageInput = class _HippoImageInput extends Component {
   }
 
   captureImage = (e) => {
-    // e.stopPropagation()
-    // e.preventDefault()
-    console.log('clicked !')
-
     this.setState({
-      cancelClicked: false,
-      clicked: 'clicked!'
+      cancelClicked: false
     })
 
     this.props.handleCaptureImage(e.target.files[0], this.props.name)
@@ -79,7 +74,6 @@ export const HippoImageInput = class _HippoImageInput extends Component {
               {label}
               {subLabel ? <span className="text-gray small"><br/>{subLabel}</span> : null}
             </label>
-            {this.state.clicked}
 
             <div className="form-group--file-input__input-container">
               {
@@ -88,7 +82,6 @@ export const HippoImageInput = class _HippoImageInput extends Component {
                     Select File ... <input
                       id={`${id}-input`}
                       name={name}
-                      onClick={this.captureImage}
                       onChange={this.captureImage}
                       type="file"
                       accept='image/*'
@@ -98,19 +91,6 @@ export const HippoImageInput = class _HippoImageInput extends Component {
                   </label>
                 )
               }
-
-              <input
-                                      onClick={this.captureImage}
-                                      onChange={this.captureImage}
-                                    type="file"
-                                    accept='image/*'
-                                  /> input w/ onclick / onchange
-
-                <input
-                                      type="file"
-                                      accept='image/*'
-                                    /> regular ol input
-
 
               <span className="form-group--file-input__filename">
                 {fileUploadActive ?

@@ -267,10 +267,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     handleCaptureImage = async (file, imageToCapture) => {
-      this.setState({
-        clicked: 'clicked!'
-      })
-
       if (!file) { return }
 
       await this.handleResetImageState(imageToCapture)
@@ -739,7 +735,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                               fileUploadActive={this.fileUploadActive(this.state.firstImagePercent)}
                               progressPercent={this.state.firstImagePercent}
                             />
-                            {this.state.clicked}
 
                             <HippoImageInput
                               name='secondImage'
