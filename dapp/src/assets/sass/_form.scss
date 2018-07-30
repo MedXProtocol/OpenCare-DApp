@@ -94,17 +94,6 @@
   color: #ccc;
 }
 
-.hidden-input-mask {
-  height: 0;
-  width: 0;
-  overflow: hidden;
-}
-
-.hidden-input-mask input {
-  opacity: 0;
-  pointer-events: none;
-}
-
 .form-wrapper--footer .loader {
   @media (max-width: 768px) {
     margin-left: 0;
@@ -127,6 +116,9 @@
 .form-group--file-input {
   background: #fafafa;
   padding: 2rem 2rem 1rem 2rem;
+
+  margin-left: -2rem;
+  margin-right: -2rem;
 }
 
 .form-group--file-input__filename {
