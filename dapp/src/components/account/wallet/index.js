@@ -49,7 +49,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
               <div className="card">
                 <div className="card-header">
                   <h3 className="title">
-                    MEDX Balance
+                    MEDT (Test MEDX) Balance
                     <br /><small className="eth-address text-gray">ethereum address: <EthAddress address={this.props.address} /></small>
                   </h3>
                 </div>
@@ -58,7 +58,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTri
                     <p className='lead text-center'>
                       <FontAwesomeIcon
                         icon={faHeartbeat} />
-                      &nbsp; {weiToMedX(this.props.balance)} MEDX
+                      &nbsp; {weiToMedX(this.props.balance)} MEDT
                     </p>
 
                     {this.props.canMint &&

@@ -1,22 +1,29 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { isTrue } from '~/utils/isTrue'
+import { cold } from 'react-hot-loader';
 import { Button, Modal } from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import ReactTooltip from 'react-tooltip'
 import { withRouter } from 'react-router-dom'
-import classNames from 'classnames'
+import classnames from 'classnames'
+import { isTrue } from '~/utils/isTrue'
+import { sleep } from '~/utils/sleep'
 import { isNotEmptyString } from '~/utils/common-util'
+import { cancelablePromise } from '~/utils/cancelablePromise'
 import { uploadJson, uploadFile } from '~/utils/storage-util'
-import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import hashToHex from '~/utils/hash-to-hex'
+import { weiToMedX } from '~/utils/weiToMedX'
+import { medXToWei } from '~/utils/medXToWei'
 import get from 'lodash.get'
 import getWeb3 from '~/get-web3'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
+import { jicImageCompressor } from '~/services/jicImageCompressor'
+import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
+import { getExifOrientation } from '~/services/getExifOrientation'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
@@ -25,11 +32,10 @@ import { PatientInfo } from './PatientInfo'
 import { SpotQuestions } from './SpotQuestions'
 import { RashQuestions } from './RashQuestions'
 import { AcneQuestions } from './AcneQuestions'
-import { weiToMedX } from '~/utils/weiToMedX'
-import { medXToWei } from '~/utils/medXToWei'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
+import { promisify } from '~/utils/common-util'
 
 function mapStateToProps (state) {
   let medXBeingSent
@@ -67,6 +73,9 @@ function mapDispatchToProps(dispatch) {
   return {
     showBetaFaucetModal: () => {
       dispatch({ type: 'SHOW_BETA_FAUCET_MODAL' })
+    },
+    dispatchExcludedDoctors: (addresses) => {
+      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
     }
   }
 }
@@ -104,11 +113,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
       this.state = {
         firstImageHash: null,
-        firstFileName: null,
-        firstImagePercent: 0,
+        firstImageFileName: null,
+        firstImagePercent: null,
         secondImageHash: null,
-        secondFileName: null,
-        secondImagePercent: 0,
+        secondImageFileName: null,
+        secondImagePercent: null,
         gender: null,
         allergies: null,
         pregnant: null,
@@ -234,9 +243,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
             })
           })
           .onTxHash(() => {
-            toastr.success('Your case has been submitted.')
+            toastr.success('Your case has been broadcast to the network. It will take a moment to be confirmed.')
             mixpanel.track('Case Submitted')
             this.props.history.push('/patients/cases')
+
+            // This ensures we attempt to randomly find a different doctor for the next
+            // case this patient may submit
+            this.props.dispatchExcludedDoctors([this.props.account])
           })
       }
     }
@@ -253,71 +266,123 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       return error
     }
 
-    captureFirstImage = async (event) => {
-      const file = event.target.files[0]
+    handleCaptureImage = async (file, imageToCapture) => {
       if (!file) { return }
-      this.setState({firstFileError: null})
+
+      await this.handleResetImageState(imageToCapture)
+
       const error = this.validateFile(file)
       if (error) {
-        this.setState({ firstFileError: error })
+        this.setState({ [`${imageToCapture}Error`]: error })
         return
       }
 
       const fileName = file.name
       const progressHandler = (percent) => {
-        this.setState({ firstImagePercent: percent })
+        this.setState({ [`${imageToCapture}Percent`]: percent })
       }
-      // Clear out previous values
-      this.setState({
-        firstImageHash: null,
-        firstFileName: null
-      })
 
-      const imageHash = await this.captureFile(event, progressHandler)
-      this.setState({
-        firstImageHash: imageHash,
-        firstFileName: fileName
-      })
+      const cancelableUploadPromise = cancelablePromise(
+        new Promise(async (resolve, reject) => {
+          const orientation = await this.srcImgOrientation(file)
+          const blob = await this.compressFile(file, orientation)
+          progressHandler(10)
+          await sleep(300)
 
-      this.validateField('firstImageHash')
+          let arrayBuffer
+          const fileReader = new FileReader()
+          await this.promisifyFileReader(fileReader, blob)
+          arrayBuffer = fileReader.result
+
+          progressHandler(20)
+          await sleep(300)
+
+          uploadFile(arrayBuffer, this.state.caseEncryptionKey, progressHandler).then(imageHash => {
+            return resolve(imageHash)
+          })
+        })
+      )
+      await this.setState({ [`${imageToCapture}UploadPromise`]: cancelableUploadPromise })
+
+      cancelableUploadPromise
+        .promise
+        .then((imageHash) => {
+          this.setState({
+            [`${imageToCapture}Hash`]: imageHash,
+            [`${imageToCapture}FileName`]: fileName,
+            [`${imageToCapture}Percent`]: null
+          })
+
+          this.validateField(`${imageToCapture}Hash`)
+        })
+        .catch((reason) => {
+          // cancel pressed
+          this.handleResetImageState(imageToCapture)
+        })
     }
 
-    captureSecondImage = async (event) => {
-      const file = event.target.files[0]
-      if (!file) { return }
-      this.setState({secondFileError: null})
-      const error = this.validateFile(file)
-      if (error) {
-        this.setState({ secondFileError: error })
-        return
-      }
-
-      const fileName = file.name
-      const progressHandler = (percent) => {
-        this.setState({ secondImagePercent: percent })
-      }
-      // Clear out previous values
-      this.setState({
-        secondImageHash: null,
-        secondFileName: null
-      })
-
-      const imageHash = await this.captureFile(event, progressHandler)
-      this.setState({
-        secondImageHash: imageHash,
-        secondFileName: fileName
-      })
-
-      this.validateField('secondImageHash')
+    srcImgOrientation = async (file) => {
+      return await getExifOrientation(file)
     }
 
-    captureFile = async (event, progressHandler) => {
-      event.stopPropagation()
-      event.preventDefault()
-      const file = event.target.files[0]
-      const imageHash = await uploadFile(file, this.state.caseEncryptionKey, progressHandler)
+    handleResetImageState = async (image) => {
+      await this.setState({
+        [`${image}UploadPromise`]: undefined,
+        [`${image}Hash`]: null,
+        [`${image}FileName`]: null,
+        [`${image}Percent`]: null,
+        [`${image}Error`]: null
+      })
+    }
 
-      return imageHash
+    promisifyFileReader = (fileReader, blob) => {
+      return new Promise((resolve, reject) => {
+        fileReader.onloadend = resolve
+        fileReader.readAsArrayBuffer(blob)
+      })
+    }
+
+    calculateScalePercent(sourceWidth, sourceHeight, targetSize) {
+      let resizeRatio
+      if ((sourceWidth / sourceHeight) > 1) {
+        resizeRatio = (targetSize / sourceWidth)
+      } else {
+        resizeRatio = (targetSize / sourceHeight)
+      }
+      // console.log(`${sourceWidth}x${sourceHeight} => ${sourceWidth*resizeRatio}x${sourceHeight*resizeRatio}. Resize Ratio is: ${resizeRatio}`)
+      return resizeRatio
+    }
+
+    async compressFile(file, orientation) {
+      const qualityPercent = 0.5
+
+      return await promisify(cb => {
+        const image = new Image()
+
+        image.onload = (event) => {
+          let error
+          const width = event.target.width
+          const height = event.target.height
+
+          const scalePercent = this.calculateScalePercent(width, height, 1000)
+
+          const canvas = jicImageCompressor.compress(image, qualityPercent, scalePercent, orientation)
+          // console.log('source img length: ' + event.target.src.length)
+          // console.log('compressed img length: ' + event.target.src.length)
+
+          canvas.toBlob((blob) => { cb(error, blob) }, "image/jpeg", qualityPercent)
+        }
+
+        image.src = window.URL.createObjectURL(file)
+      })
+    }
+
+    handleCancelUpload = async (imageToCancel) => {
+      if (imageToCancel === 'firstImage' && this.state.firstImageUploadPromise) {
+        this.state.firstImageUploadPromise.cancel()
+      } else if (this.state.secondUploadPromise) {
+        this.state.secondUploadPromise.cancel()
+      }
     }
 
     checkCountry = () => {
@@ -348,6 +413,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         errors.push(fieldName)
       } else {
         pull(errors, fieldName)
+      }
+
+      if (errors.includes('firstImageHash')) {
+        this.handleResetImageState('firstImage')
+      } else if (errors.includes('secondImageHash')) {
+        this.handleResetImageState('secondImage')
       }
 
       this.setState({ errors: errors })
@@ -392,7 +463,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           if (this.props.previousCase) {
             this.setState({ showBalanceTooLowModal: true })
           } else if (this.props.medXBeingSent) {
-            toastr.warning('Your MEDX is on the way. Please wait for the transaction to finish prior to submitting your case.')
+            toastr.warning('Your MEDT (Test MEDX) is on the way. Please wait for the transaction to finish prior to submitting your case.')
           } else {
             this.props.showBetaFaucetModal()
           }
@@ -435,6 +506,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
       while(transactionId === undefined) {
         try {
+          await sleep(1200)
+
           transactionId = await this.createNewCase()
 
           if (transactionId) {
@@ -539,21 +612,16 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       return await send(MedXToken, 'approveAndCall', CaseManager, medXToWei('15'), data)({ gas: 1600000 })
     }
 
-    progressClassNames = (percent) => {
-      return classNames(
-        {
-          'progress--wrapper__show': percent > 0 && percent < 100,
-          'progress--wrapper__hide': percent === 0 || percent === 100
-        }
-      )
+    fileUploadActive = (percent) => {
+      return (percent !== null) ? true : false
     }
 
-    errorMessage(fieldName) {
+    errorMessage = (fieldName) => {
       let msg
       if (fieldName === 'country' || fieldName === 'region') {
         msg = 'must be chosen'
       } else if (fieldName.match(/ImageHash/g)) {
-        msg = 'please upload an image and wait for it to complete uploading'
+        msg = 'There was an error uploading this image. Please choose a photo and wait for it to complete uploading'
       } else {
         msg = 'must be filled out'
       }
@@ -571,12 +639,12 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           </p>
       }
 
-      if (this.state.firstFileError) {
-        var firstFileError = <p className='has-error help-block'>{this.state.firstFileError}</p>
+      if (this.state.firstImageError) {
+        var firstImageError = <p className='has-error help-block'>{this.state.firstImageError}</p>
       }
 
-      if (this.state.secondFileError) {
-        var secondFileError = <p className='has-error help-block'>{this.state.secondFileError}</p>
+      if (this.state.secondImageError) {
+        var secondImageError = <p className='has-error help-block'>{this.state.secondImageError}</p>
       }
 
       if (this.state.spotRashOrAcne === 'Spot') {
@@ -607,13 +675,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       }
 
       return (
-        <div>
+        <React.Fragment>
           <div className="row">
-            <div className="col-xs-12">
+            <div className="col-xs-12 col-md-8 col-md-offset-2">
               <div className="card">
                 <div className="card-header">
                   <div className="row">
-                    <div className="col-xs-12 col-md-9">
+                    <div className="col-xs-12 col-md-12">
                       <p className="lead lead--card-title">
                         Tell your physician about your problem by answering the questions below.
                       </p>
@@ -624,131 +692,127 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                   </div>
                 </div>
 
-                <div className="card-body">
-                  <div className="form-wrapper">
-                    <form onSubmit={this.handleSubmit}>
+                <form onSubmit={this.handleSubmit}>
+                  <div className="card-body">
+                    <PatientInfo
+                      errors={errors}
+                      textInputOnChange={this.handleTextInputOnChange}
+                      textInputOnBlur={this.handleTextInputOnBlur}
+                      buttonGroupOnChange={this.handleButtonGroupOnChange}
+                      gender={this.state.gender}
+                      allergies={this.state.allergies}
+                      setCountryRef={this.setCountryRef}
+                      setRegionRef={this.setRegionRef}
+                      country={this.state.country}
+                      region={this.state.region}
+                      handleCountryChange={this.handleCountryChange}
+                      handleRegionChange={this.handleRegionChange}
+                    />
 
-                      <PatientInfo
-                        errors={errors}
-                        textInputOnChange={this.handleTextInputOnChange}
-                        textInputOnBlur={this.handleTextInputOnBlur}
-                        buttonGroupOnChange={this.handleButtonGroupOnChange}
-                        gender={this.state.gender}
-                        allergies={this.state.allergies}
-                        setCountryRef={this.setCountryRef}
-                        setRegionRef={this.setRegionRef}
-                        country={this.state.country}
-                        region={this.state.region}
-                        handleCountryChange={this.handleCountryChange}
-                        handleRegionChange={this.handleRegionChange}
-                      />
-
-                      <FlipMove
-                        enterAnimation="accordionVertical"
-                        leaveAnimation="accordionVertical"
-                        maintainContainerHeight={true}
-                      >
-                        {
-                          this.state.spotRashOrAcne ? (
-                            <div key="imagery-key">
-                              <div className="form-group--heading">
-                                Imagery:
-                              </div>
-                              <HippoImageInput
-                                name='firstImage'
-                                id='firstImageHash'
-                                label="Overview Photo:"
-                                colClasses='col-xs-12 col-sm-12 col-md-8'
-                                error={errors['firstImageHash']}
-                                fileError={firstFileError}
-                                setRef={this.setFirstImageHashRef}
-                                onChange={this.captureFirstImage}
-                                currentValue={this.state.firstFileName}
-                                progressClassNames={this.progressClassNames(this.state.firstImagePercent)}
-                                progressPercent={this.state.firstImagePercent}
-                              />
-
-                              <HippoImageInput
-                                name='secondImage'
-                                id='secondImageHash'
-                                label={`Close-up Photo: ${this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}`}
-                                colClasses='col-xs-12 col-sm-12 col-md-8'
-                                error={errors['secondImageHash']}
-                                fileError={secondFileError}
-                                setRef={this.setSecondImageHashRef}
-                                onChange={this.captureSecondImage}
-                                currentValue={this.state.secondFileName}
-                                progressClassNames={this.progressClassNames(this.state.secondImagePercent)}
-                                progressPercent={this.state.secondImagePercent}
-                              />
+                    <FlipMove
+                      enterAnimation="accordionVertical"
+                      leaveAnimation="accordionVertical"
+                      maintainContainerHeight={true}
+                    >
+                      {
+                        this.state.spotRashOrAcne ? (
+                          <div key="imagery-key">
+                            <div className="form-group--heading">
+                              Imagery:
                             </div>
-                          ) : null
-                        }
-                      </FlipMove>
+                            <HippoImageInput
+                              name='firstImage'
+                              id='firstImageHash'
+                              label="Overview Photo:"
+                              colClasses='col-xs-12'
+                              error={errors['firstImageHash']}
+                              fileError={firstImageError}
+                              handleCaptureImage={this.handleCaptureImage}
+                              handleResetImageState={this.handleResetImageState}
+                              handleCancelUpload={this.handleCancelUpload}
+                              uploadPromise={this.state.firstImageUploadPromise}
+                              currentValue={this.state.firstImageFileName}
+                              fileUploadActive={this.fileUploadActive(this.state.firstImagePercent)}
+                              progressPercent={this.state.firstImagePercent}
+                            />
 
-                      <div className="form-group--heading">
-                        Details:
-                      </div>
-
-                      {spotQuestions}
-                      {rashQuestions}
-                      {acneQuestions}
-
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8">
-                          <div className="form-group">
-                            <label className="control-label">Please include any additional info below <span className="text-gray">(Optional)</span></label>
-                            <textarea
-                              onChange={(event) => this.setState({ description: event.target.value })}
-                              className="form-control"
-                              rows="5" />
+                            <HippoImageInput
+                              name='secondImage'
+                              id='secondImageHash'
+                              label={'Close-up Photo:'}
+                              subLabel={this.state.spotRashOrAcne === 'Spot' ? '' : '(separate location from above if on more than one body part)'}
+                              colClasses='col-xs-12'
+                              error={errors['secondImageHash']}
+                              fileError={secondImageError}
+                              handleCaptureImage={this.handleCaptureImage}
+                              handleResetImageState={this.handleResetImageState}
+                              handleCancelUpload={this.handleCancelUpload}
+                              uploadPromise={this.state.secondImageUploadPromise}
+                              currentValue={this.state.secondImageFileName}
+                              fileUploadActive={this.fileUploadActive(this.state.secondImagePercent)}
+                              progressPercent={this.state.secondImagePercent}
+                            />
                           </div>
+                        ) : null
+                      }
+                    </FlipMove>
+
+                    <div className="form-group--heading">
+                      Details:
+                    </div>
+
+                    {spotQuestions}
+                    {rashQuestions}
+                    {acneQuestions}
+
+                    <div className="row">
+                      <div className="col-xs-12 col-sm-12 col-md-12">
+                        <div className="form-group">
+                          <label className="control-label">Please include any additional info below <span className="text-gray">(Optional)</span></label>
+                          <textarea
+                            onChange={(event) => this.setState({ description: event.target.value })}
+                            className="form-control"
+                            rows="5" />
                         </div>
                       </div>
+                    </div>
 
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8">
-                          <div className={classNames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
-                            {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
-                              ?
-                              <div>
-                                <label>Select a Doctor<span className='star'>*</span></label>
-                                  <DoctorSelect
-                                    excludeAddresses={[this.props.account]}
-                                    value={this.state.selectedDoctor}
-                                    isClearable={false}
-                                    onChange={this.onChangeDoctor} />
-                              </div>
-                              :
-                              <AvailableDoctorSelect
-                                excludeAddresses={[this.props.account]}
-                                value={this.state.selectedDoctor}
-                                onChange={this.onChangeDoctor} />
-                             }
+                    <div className="row">
+                      <div className="col-xs-12 col-sm-12 col-md-12">
+                        <div className={classnames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
+                          {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
+                            ?
+                            <div>
+                              <label>Select a Doctor<span className='star'>*</span></label>
+                                <DoctorSelect
+                                  excludeAddresses={[this.props.account]}
+                                  value={this.state.selectedDoctor}
+                                  isClearable={false}
+                                  onChange={this.onChangeDoctor} />
+                            </div>
+                            :
+                            <AvailableDoctorSelect
+                              excludeAddresses={[this.props.account]}
+                              value={this.state.selectedDoctor}
+                              onChange={this.onChangeDoctor} />
+                           }
 
-                            {errors['selectedDoctor']}
-                          </div>
+                          {errors['selectedDoctor']}
                         </div>
                       </div>
-
-                      <div className="row">
-                        <div className="col-xs-12 col-sm-12 col-md-8 text-right">
-                          <button
-                            type="submit"
-                            className="btn btn-lg btn-success"
-                            data-tip={this.props.medXBeingSent ? "Your MedX transaction needs to complete, please wait ..." : ''}
-                          >
-                            Submit Case
-                          </button>
-                          <ReactTooltip effect='solid' place='left' />
-                          <br />
-                          <br />
-                          <br />
-                        </div>
-                      </div>
-                    </form>
+                    </div>
                   </div>
-                </div>
+                  <div className="card-footer text-right">
+                    <button
+                      type="submit"
+                      className="btn btn-lg btn-success"
+                      data-tip={this.props.medXBeingSent ? "Your MedX transaction needs to complete, please wait ..." : ""}
+                    >
+                      Submit Case
+                    </button>
+                    <ReactTooltip effect='solid' place='top' />
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -779,7 +843,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
             <Modal.Body>
               <div className="row">
                 <div className="col-xs-12 text-center">
-                  <h4>You need 15 MEDX to submit a case.</h4>
+                  <h4>You need 15 MEDT (Test MEDX) to submit a case.</h4>
                 </div>
               </div>
             </Modal.Body>
@@ -800,7 +864,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                     Are you sure?
                   </h4>
                   <h5>
-                    This will cost you between 5 - 15 MEDX.
+                    This will cost you between 5 - 15 MEDT (Test MEDX).
                     <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
                   </h5>
                 </div>
@@ -845,9 +909,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           </Modal>
 
           <Loading loading={this.state.isSubmitting} />
-        </div>
+        </React.Fragment>
       )
     }
 }))))
 
-export const CreateCaseContainer = withRouter(CreateCase)
+export const CreateCaseContainer = cold(withRouter(CreateCase))

@@ -4,7 +4,7 @@ import { Alert } from 'react-bootstrap'
 import masterPasswordInvalid from '~/services/master-password-invalid'
 import { BodyClass } from '~/components/BodyClass'
 import { LoadingLines } from '~/components/LoadingLines'
-import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
+import { ScrollToTop } from '~/components/ScrollToTop'
 import PropTypes from 'prop-types'
 
 export const MasterPassword = class _MasterPassword extends Component {
@@ -42,7 +42,7 @@ export const MasterPassword = class _MasterPassword extends Component {
     }
     return (
       <BodyClass isDark={true}>
-        <ScrollToTopOnMount />
+        <ScrollToTop />
         <div className='container'>
           <form className='row' onSubmit={this.onSubmit}>
             <div className='col-sm-8 col-sm-offset-2'>

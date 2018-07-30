@@ -12,7 +12,7 @@ import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall } from '~/saga-genesis/sagas'
-import { ScrollToTopOnMount } from '~/components/ScrollToTopOnMount'
+import { ScrollToTop } from '~/components/ScrollToTop'
 import { BodyClass } from '~/components/BodyClass'
 import { Loading } from '~/components/Loading'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
@@ -138,7 +138,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
           </p>
           <br />
           <button
-            className='btn btn-danger btn-outline-inverse btn-no-shadow'
+            className='btn btn-danger btn__no-shadow'
             onClick={this.handleReset}>
             Reset Account
           </button>
@@ -148,7 +148,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
     }
     return (
       <BodyClass isDark={true}>
-        <ScrollToTopOnMount />
+        <ScrollToTop />
         <div>
           <PageTitle renderTitle={(t) => t('pageTitles.signIn')} />
           <div className='container'>

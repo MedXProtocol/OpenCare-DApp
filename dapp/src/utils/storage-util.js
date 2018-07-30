@@ -1,6 +1,16 @@
 import { ipfsApi } from '~/ipfsApi'
-import { promisify } from './common-util'
+import { promisify } from '~/utils/common-util'
+import { sleep } from '~/utils/sleep'
 import aes from '~/services/aes'
+
+function updateUploadProgress(progressHandler, uploadProgress) {
+  if (uploadProgress < 88) {
+    uploadProgress += 2
+    progressHandler(uploadProgress)
+  }
+
+  return uploadProgress
+}
 
 const ipfsMethodWithRetry = async (func, ...args) => {
   let result
@@ -38,19 +48,34 @@ export async function uploadFile(file, encryptionKey, progressHandler) {
   return await ipfsMethodWithRetry(doUploadFile, file, encryptionKey, progressHandler)
 }
 
-export async function doUploadFile(file, encryptionKey, progressHandler) {
-  progressHandler(33)
-  const reader = new window.FileReader()
-  await promisifyFileReader(reader, file)
-  progressHandler(45)
-  const buffer = Buffer.from(reader.result)
+export async function doUploadFile(fileAsArrayBuffer, encryptionKey, progressHandler) {
+  let uploadProgress = 40 // reset each time
+
+  // ENCRYPTING
+  progressHandler(uploadProgress)
+  const buffer = Buffer.from(fileAsArrayBuffer)
   const bufferEncrypted = Buffer.from(aes.encryptBytes(buffer, encryptionKey))
-  progressHandler(67)
+  await sleep(300)
+
+  // UPLOADING
+  progressHandler(51)
+  const interval = setInterval(function() {
+    uploadProgress = updateUploadProgress(progressHandler, uploadProgress)
+  }, 500)
+
   const uploadResult = await promisify(cb => ipfsApi.add(bufferEncrypted, cb))
-  progressHandler(89)
+  clearInterval(interval)
+
+  // PINNING TO IPFS
+  progressHandler(90)
   const hash = uploadResult[0].hash
   await promisify(cb => ipfsApi.pin.add(hash, cb))
+  await sleep(300)
+
+  // DONE!
   progressHandler(100)
+  await sleep(600)
+
   return hash
 }
 
@@ -83,19 +108,17 @@ export async function doDownloadImage(hash, encryptionKey) {
         cb(error, result)
       } else {
         result = aes.decryptBytes(result, encryptionKey)
-        var reader = new window.FileReader()
+        const reader = new window.FileReader()
         reader.onloadend = () => {
-          cb(error, reader.result)
+          let result = reader.result
+
+          // we only save jpeg's on upload & if mime type is missing add it back in
+          result = reader.result.replace("data:;base64,", "data:image/jpeg;base64,")
+
+          cb(error, result)
         }
         reader.readAsDataURL(new Blob([result]))
       }
     })
-  })
-}
-
-function promisifyFileReader(fileReader, file){
-  return new Promise((resolve, reject) => {
-    fileReader.onloadend = resolve  // CHANGE to whatever function you want which would eventually call resolve
-    fileReader.readAsArrayBuffer(file)
   })
 }

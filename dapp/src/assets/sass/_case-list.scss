@@ -47,8 +47,7 @@
   display: inline-block;
 }
 
-.case-list--item.list,
-.case-list--item:hover button {
+.case-list--item.list {
   display: block;
 }
 
@@ -56,21 +55,19 @@
   color: $brand-info;
   font-size: 16px;
   font-weight: 700;
-  min-width: 4%;
   transition: color 200ms ease-in;
+  min-width: 9%;
 
   @media (max-width: 768px) {
-    padding: 0 6px;
     width: 15%;
   }
 }
 
 .case-list--item__status {
-  min-width: 30%;
+  min-width: 40%;
 
   @media (max-width: 768px) {
-    padding: 0 6px;
-    width: 66%;
+    width: 62%;
   }
 }
 
@@ -98,12 +95,12 @@
   font-weight: 700;
   padding-right: 20px;
   transition: color 200ms ease-in;
-  min-width: 20%;
+  min-width: 12%;
 
   @media (max-width: 768px) {
     color: $brand-info;
-    min-width: 13%;
-    width: 13%;
+    min-width: 60px;
+    width: 60px;
   }
 }
 
@@ -115,4 +112,16 @@
 
 .case-list--item:hover .case-list--item__view {
   color: $brand-info;
+}
+
+.case-list--item__view .loader {
+  margin: 0;
+}
+
+.case-list--item__pending {
+  opacity: 0.7;
+}
+
+.case-list--item button {
+  margin: 0 auto;
 }

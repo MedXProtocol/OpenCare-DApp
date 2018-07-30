@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
 import { HippoTextInput } from '~/components/forms/HippoTextInput'
-import classNames from 'classnames'
+import classnames from 'classnames'
 import Select from 'react-select'
 import * as Animated from 'react-select/lib/animated';
 import { customStyles } from '~/config/react-select-custom-styles'
@@ -29,7 +29,7 @@ export const PatientInfo = class _PatientInfo extends Component {
         </div>
 
         <div className="row">
-          <div className="col-xs-4 col-sm-3 col-md-2">
+          <div className="col-xs-4 col-sm-3 col-md-3">
             <HippoTextInput
               type='number'
               id='age'
@@ -45,7 +45,7 @@ export const PatientInfo = class _PatientInfo extends Component {
         <HippoToggleButtonGroup
           id='gender'
           name="gender"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='Gender'
           error={errors['gender']}
           buttonGroupOnChange={buttonGroupOnChange}
@@ -55,7 +55,7 @@ export const PatientInfo = class _PatientInfo extends Component {
         <HippoToggleButtonGroup
           id='pregnant'
           name="pregnant"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='Pregnant?'
           error={errors['pregnant']}
           buttonGroupOnChange={buttonGroupOnChange}
@@ -64,8 +64,8 @@ export const PatientInfo = class _PatientInfo extends Component {
         />
 
         <div className="row">
-          <div className="col-xs-12 col-sm-6 col-md-4">
-            <div className={classNames('form-group', { 'has-error': errors['country'] })}>
+          <div className="col-xs-12 col-sm-6 col-md-6">
+            <div className={classnames('form-group', { 'has-error': errors['country'] })}>
               <label className="control-label">Country</label>
               <Select
                 placeholder='Please select your Country'
@@ -81,8 +81,8 @@ export const PatientInfo = class _PatientInfo extends Component {
               {errors['country']}
             </div>
           </div>
-          <div className="col-xs-9 col-sm-6 col-md-4">
-            <div className={classNames('form-group', { 'has-error': errors['region'] })}>
+          <div className="col-xs-9 col-sm-6 col-md-6">
+            <div className={classnames('form-group', { 'has-error': errors['region'] })}>
               <label className="control-label">State</label>
               <Select
                 isDisabled={country !== 'US'}
@@ -103,7 +103,7 @@ export const PatientInfo = class _PatientInfo extends Component {
         <HippoToggleButtonGroup
           id='allergies'
           name="allergies"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='Allergies?'
           error={errors['allergies']}
           buttonGroupOnChange={buttonGroupOnChange}
@@ -113,7 +113,7 @@ export const PatientInfo = class _PatientInfo extends Component {
         <HippoTextInput
           id='whatAllergies'
           name="whatAllergies"
-          colClasses='col-xs-12 col-sm-12 col-md-8'
+          colClasses='col-xs-12 col-sm-12 col-md-12'
           label='What are they?'
           error={errors['whatAllergies']}
           textInputOnBlur={textInputOnBlur}
@@ -128,7 +128,7 @@ export const PatientInfo = class _PatientInfo extends Component {
         <HippoToggleButtonGroup
           id='spotRashOrAcne'
           name="spotRashOrAcne"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='Do you have a concerning spot, rash or acne?'
           error={errors['spotRashOrAcne']}
           buttonGroupOnChange={buttonGroupOnChange}

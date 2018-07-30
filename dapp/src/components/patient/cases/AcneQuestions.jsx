@@ -20,7 +20,7 @@ export const AcneQuestions = class _AcneQuestions extends Component {
         <HippoToggleButtonGroup
           id='howLong'
           name="howLong"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='How long has it been there?'
           error={errors['howLong']}
           buttonGroupOnChange={buttonGroupOnChange}
@@ -30,7 +30,7 @@ export const AcneQuestions = class _AcneQuestions extends Component {
         <HippoCheckboxGroup
           id='acneDoesItInclude'
           name="acneDoesItInclude"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-8 col-md-8'
           label='Does it include: (check all that apply)'
           error={errors['acneDoesItInclude']}
           checkboxGroupOnChange={checkboxGroupOnChange}
@@ -41,7 +41,7 @@ export const AcneQuestions = class _AcneQuestions extends Component {
         <HippoToggleButtonGroup
           id='worseWithPeriod'
           name="worseWithPeriod"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='Worse with your period?'
           error={errors['worseWithPeriod']}
           buttonGroupOnChange={buttonGroupOnChange}
@@ -52,7 +52,7 @@ export const AcneQuestions = class _AcneQuestions extends Component {
         <HippoToggleButtonGroup
           id='onBirthControl'
           name="onBirthControl"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='Are you on birth control?'
           error={errors['onBirthControl']}
           buttonGroupOnChange={buttonGroupOnChange}
@@ -63,7 +63,7 @@ export const AcneQuestions = class _AcneQuestions extends Component {
         <HippoToggleButtonGroup
           id='sexuallyActive'
           name="sexuallyActive"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='Are you sexually active?'
           error={errors['sexuallyActive']}
           buttonGroupOnChange={buttonGroupOnChange}
@@ -73,7 +73,7 @@ export const AcneQuestions = class _AcneQuestions extends Component {
         <HippoTextInput
           id='prevTreatment'
           name="prevTreatment"
-          colClasses='col-xs-12 col-sm-12 col-md-8'
+          colClasses='col-xs-12 col-sm-12 col-md-12'
           label='Have you tried any treatments?'
           error={errors['prevTreatment']}
           textInputOnBlur={textInputOnBlur}

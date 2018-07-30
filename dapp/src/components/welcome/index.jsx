@@ -51,7 +51,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                   </p>
                   <ol>
                     <li>
-                      Download the MetaMask Extension (<a target='_blank' rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">Chrome</a> / <a target='_blank' rel="noopener noreferrer" href="https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/">Firefox</a>) or the Cipher mobile browser (<a target='_blank' rel="noopener noreferrer" href="https://itunes.apple.com/app/cipher-browser-for-ethereum/id1294572970">iOS</a> / <a target='_blank' rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.cipherbrowser.cipher">Android</a>)
+                      Download the MetaMask Extension (<a target='_blank' rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">Chrome</a> / <a target='_blank' rel="noopener noreferrer" href="https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/">Firefox</a>) or the Trust mobile browser (<a target='_blank' rel="noopener noreferrer" href="https://itunes.apple.com/us/app/trust-ethereum-wallet/id1288339409">iOS</a> / <a target='_blank' rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp">Android</a>)
                     </li>
                     <li>
                       Sign up and submit your skin ailment
@@ -62,7 +62,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                   </ol>
                   <hr />
                   <p className="text-danger small">
-                    NOTE: This is the public Beta 2.1 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for October 2018.
+                    NOTE: This is the public Beta 2.2 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for October 2018.
                   </p>
                 </div>
 

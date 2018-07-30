@@ -1,8 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { toastr as toastrLib } from 'react-redux-toastr'
-import { transactionErrorToCode } from '~/services/transaction-error-to-code'
-import i18next from 'i18next'
+import { txErrorMessage } from '~/services/txErrorMessage'
 
 const ToastrLinkComponent = ({ link, remove }) => {
   if (!link.path) {
@@ -36,12 +35,7 @@ function warning(message, link) {
 }
 
 function transactionError(transactionError) {
-  const code = transactionErrorToCode(transactionError)
-  let message = 'There was a transaction error'
-  if (code) {
-    message = i18next.t(`transactionErrors.${code}`)
-  }
-  error(message)
+  error(txErrorMessage(transactionError))
 }
 
 export const toastr = {

@@ -19,7 +19,7 @@ export const SpotQuestions = class _SpotQuestions extends Component {
         <HippoToggleButtonGroup
           id='howLong'
           name="howLong"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='How long has it been there?'
           error={errors['howLong']}
           buttonGroupOnChange={buttonGroupOnChange}
@@ -29,7 +29,7 @@ export const SpotQuestions = class _SpotQuestions extends Component {
         <HippoToggleButtonGroup
           id='hadBefore'
           name="hadBefore"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='Have you had a spot like this before?'
           error={errors['hadBefore']}
           buttonGroupOnChange={buttonGroupOnChange}
@@ -39,7 +39,7 @@ export const SpotQuestions = class _SpotQuestions extends Component {
         <HippoCheckboxGroup
           id='isTheSpot'
           name="isTheSpot"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-8 col-md-8'
           label='Is the spot: (check all that apply)'
           error={errors['isTheSpot']}
           checkboxGroupOnChange={checkboxGroupOnChange}
@@ -49,7 +49,7 @@ export const SpotQuestions = class _SpotQuestions extends Component {
         <HippoToggleButtonGroup
           id='sexuallyActive'
           name="sexuallyActive"
-          colClasses='col-xs-12 col-md-8'
+          colClasses='col-xs-12 col-md-12'
           label='Are you sexually active?'
           error={errors['sexuallyActive']}
           buttonGroupOnChange={buttonGroupOnChange}
@@ -59,7 +59,7 @@ export const SpotQuestions = class _SpotQuestions extends Component {
         <HippoTextInput
           id='prevTreatment'
           name="prevTreatment"
-          colClasses='col-xs-12 col-sm-12 col-md-8'
+          colClasses='col-xs-12 col-sm-12 col-md-12'
           label='Have you tried any treatments?'
           error={errors['prevTreatment']}
           textInputOnBlur={textInputOnBlur}

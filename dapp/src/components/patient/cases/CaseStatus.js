@@ -97,13 +97,13 @@ const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['cas
         case 7:
           alert =
             <div className="alert alert-success">
-              You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded 10 MEDX and may consider re-submitting your case to the network or visiting your local dermatologist.
+              You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded 10 MEDT (Test MEDX) and may consider re-submitting your case to the network or visiting your local dermatologist.
             </div>
           break
         case 8:
           alert =
             <div className="alert alert-success">
-              You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of 15 MEDX was charged for your first opinion and discounted second opinion.
+              You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of 15 MEDT (Test MEDX) was charged for your first opinion and discounted second opinion.
             </div>
           break
         default:

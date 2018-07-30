@@ -37,7 +37,7 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
 
       if (response.status === 200) {
         this.setState({
-          responseMessage: "500 MedX is on the way",
+          responseMessage: "500 MEDT (Test MEDX) is on the way",
           txHash: response.data.txHash
         })
         this.props.addExternalTransaction('sendMedX', response.data.txHash)
@@ -73,7 +73,7 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
       var englishErrorMessage = (
         <small>
           <br />
-          There was an error while sending you MedX, you may have already received it or it's on the way. If the problem persists please contact MedCredits on Telegram and we can send you Ropsten Testnet MedX:
+          There was an error while sending you MEDT (Test MEDX), you may have already received it or it's on the way. If the problem persists please contact MedCredits on Telegram and we can send you Ropsten Testnet MedX:
           &nbsp; <a
             target="_blank"
             href="https://t.me/MedCredits"
@@ -115,7 +115,7 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
 
     return (
       <div className="col-xs-12 text-center">
-        <strong>Current MedX Balance:</strong>
+        <strong>Current MEDT (Test MEDX) Balance:</strong>
         <h2 className="header--no-top-margin">
           {weiToMedX(this.props.medXBalance)}
           <img
@@ -131,15 +131,15 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
         </p>
         <hr />
         <p>
-          To submit a case to a doctor you will need MedX.
-          <br />We can send you 500 MedX to get started:
+          To submit a case to a doctor you will need MEDT (Test MEDX).
+          <br />We can send you 500 MEDT to get started:
         </p>
         <p>
           <a
             disabled={isSending}
             onClick={this.handleSendMedX}
             className="btn btn-lg btn-primary"
-          >{isSending ? 'Sending ...' : 'Send Me MedX'}</a>
+          >{isSending ? 'Sending ...' : 'Send Me MEDT'}</a>
         </p>
         {isSending || responseMessage || errorMessage ? responseWell : ''}
         <p>

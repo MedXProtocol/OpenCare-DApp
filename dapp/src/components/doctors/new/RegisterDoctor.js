@@ -8,7 +8,7 @@ import { isBlank } from '~/utils/isBlank'
 import { withDoctors } from '~/components/withDoctors'
 import { withSend } from '~/saga-genesis'
 
-require('./style.css')
+require('./RegisterDoctor.css')
 
 export const RegisterDoctorContainer =
   withDoctors(
@@ -127,7 +127,7 @@ export const RegisterDoctorContainer =
                                   appear={true}
                                   classNames="fade">
                                     <tr key={`doctor-row-${doctorIndex}`} className={!isActive ? 'deactivated' : ''}>
-                                      <td className='text-center'>
+                                      <td width="5%" className='text-center'>
                                         {
                                           online
                                             ?
@@ -136,18 +136,18 @@ export const RegisterDoctorContainer =
                                             <div className='register-doctor__offline-circle' />
                                          }
                                       </td>
-                                      <td width="50%" className="eth-address text">
+                                      <td width="46%" className="eth-address text">
                                         <span>
                                           <EthAddress address={address} showFull={true} />
                                         </span>
                                       </td>
-                                      <td width="30%" className="td--status">
+                                      <td width="20%" className="td--status">
                                         {name}
                                       </td>
-                                      <td>
+                                      <td width="14%">
                                         {isBlank(publicKey) ? 'No' : 'Yes'}
                                       </td>
-                                      <td width="20%" className="td-actions text-right">
+                                      <td width="15%" className="td-actions text-right">
                                         { isActive ? (
                                             <a
                                               onClick={() => { this.handleDeactivate(name, address) }}

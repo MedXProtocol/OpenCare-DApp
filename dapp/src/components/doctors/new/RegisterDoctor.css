@@ -1,4 +1,4 @@
-.register-doctor__online-circle:before {
+  .register-doctor__online-circle:before {
   background-color: #44ce46;
 }
 
@@ -22,4 +22,11 @@
 
 .beta-faucet--well {
   min-height: 160px;
+}
+
+.no-underline,
+.no-underline:hover,
+.no-underline:active,
+.no-underline:focus {
+  text-decoration: none;
 }

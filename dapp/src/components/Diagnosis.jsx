@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Alert, Modal } from 'react-bootstrap'
+import ReactTooltip from 'react-tooltip'
+import { Modal } from 'react-bootstrap'
 import { all } from 'redux-saga/effects'
 import { isTrue } from '~/utils/isTrue'
 import { isEmptyObject } from '~/utils/isEmptyObject'
@@ -21,6 +22,7 @@ import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
+import isEqual from 'lodash.isequal'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -32,8 +34,11 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const transactions = state.sagaGenesis.transactions
   const isPatient = account === patientAddress
+  const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
+
   return {
     account,
+    currentlyExcludedDoctors,
     status,
     diagnosisHash,
     transactions,
@@ -57,7 +62,15 @@ function* saga({ caseAddress }) {
   ])
 }
 
-const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(withSend(class _Diagnosis extends Component {
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchExcludedDoctors: (addresses) => {
+      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
+    }
+  }
+}
+
+const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(withSend(class _Diagnosis extends Component {
   constructor(){
     super()
 
@@ -66,7 +79,8 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       showThankYouModal: false,
       showChallengeModal: false,
       doctorAddress: '',
-      doctorPublicKey: ''
+      doctorPublicKey: '',
+      loading: false
     }
   }
 
@@ -90,33 +104,52 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     }
   }
 
+  setExcludedDoctorAddresses = (props) => {
+    if (props.diagnosingDoctor && props.currentlyExcludedDoctors) {
+      const excludeAddresses = [props.diagnosingDoctor, props.account]
+
+      if (!isEqual(excludeAddresses, props.currentlyExcludedDoctors)) {
+        props.dispatchExcludedDoctors(excludeAddresses)
+      }
+    }
+  }
+
   componentWillReceiveProps (props) {
+    this.setExcludedDoctorAddresses(props)
+
     if (this.state.challengeHandler) {
       this.state.challengeHandler.handle(props.transactions[this.state.challengeTransactionId])
         .onError((error) => {
           toastr.transactionError(error)
-          this.setState({challengeHandler: null})
+          this.setState({ challengeHandler: null, loading: false })
+        })
+        .onConfirmed(() => {
+          this.setState({ challengeHandler: null })
         })
         .onTxHash(() => {
           toastr.success('Working on getting you a second opinion.')
           mixpanel.track('Challenge Diagnosis Submitted')
-          this.setState({
-            challengeHandler: null
-          })
+          this.setState({ loading: false })
         })
     }
+
     if (this.state.acceptHandler) {
       this.state.acceptHandler.handle(props.transactions[this.state.acceptTransactionId])
         .onError((error) => {
           toastr.transactionError(error)
-          this.setState({acceptHandler: null})
+          this.setState({ acceptHandler: null, loading: false })
+        })
+        .onConfirmed(() => {
+          this.setState({
+            acceptHandler: null
+          })
         })
         .onTxHash(() => {
           toastr.success('You have accepted the diagnosis for this case.')
           mixpanel.track('Accept Diagnosis Submitted')
           this.setState({
-            acceptHandler: null,
-            showThankYouModal: true
+            showThankYouModal: true,
+            loading: false
           })
         })
     }
@@ -133,18 +166,17 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
     const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptDiagnosis')()
     this.setState({
       acceptTransactionId,
-      acceptHandler: new TransactionStateHandler()
+      acceptHandler: new TransactionStateHandler(),
+      loading: true
     })
   }
 
   handleChallengeDiagnosis = () => {
-    this.setState({
-      showChallengeModal: true
-    })
+    this.setState({ showChallengeModal: true })
   }
 
   handleCloseThankYouModal = () => {
-    this.setState({showThankYouModal: false})
+    this.setState({ showThankYouModal: false })
     this.props.history.push(routes.PATIENTS_CASES)
   }
 
@@ -180,7 +212,8 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
       this.setState({
         showChallengeModal: false,
         challengeTransactionId,
-        challengeHandler: new TransactionStateHandler()
+        challengeHandler: new TransactionStateHandler(),
+        loading: true
       })
     }
   }
@@ -258,15 +291,9 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
         <Modal show={this.state.showChallengeModal} onHide={this.handleCloseChallengeModal}>
           <form onSubmit={this.onSubmitChallenge}>
             <Modal.Header>
-              <div className="row">
-                <div className="col-xs-12">
-                  <Alert bsStyle='info'>
-                    <p>
-                      Challenge Case
-                    </p>
-                  </Alert>
-                </div>
-              </div>
+              <Modal.Title>
+                Challenge Case
+              </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <div className='row'>
@@ -275,8 +302,9 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
                     Challenge the diagnosis by having another doctor look at your case.
                   </p>
                   <p>
-                    If the diagnosis is the same, you will be charged 15 MEDX.  If the diagnosis is different than the original then you'll be charged 5 MEDX and refunded the remainder.
+                    If the diagnosis is the same, you will be charged 15 MEDT (Test MEDX).  If the diagnosis is different than the original then you'll be charged 5 MEDT (Test MEDX) and refunded the remainder.
                   </p>
+                  <hr />
                   <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>
                     {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
                       ?
@@ -304,13 +332,29 @@ const Diagnosis = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['case
               </div>
             </Modal.Body>
             <Modal.Footer>
-              <button onClick={this.handleCloseChallengeModal} type="button" className="btn btn-link">Cancel</button>
-              <input type='submit' className="btn btn-success" value='OK' />
+              <button
+                onClick={this.handleCloseChallengeModal}
+                type="button"
+                className="btn btn-link"
+              >Cancel</button>
+              <span data-tip={!this.state.selectedDoctor ? 'No available doctors to receive a second opinion from' : ''}>
+                <input
+                  disabled={!this.state.selectedDoctor}
+                  type='submit'
+                  className="btn btn-success"
+                  value='OK'
+                />
+                <ReactTooltip
+                  effect='solid'
+                  place={'top'}
+                  wrapper='span'
+                />
+              </span>
             </Modal.Footer>
           </form>
         </Modal>
 
-        <Loading loading={transactionRunning} />
+        <Loading loading={this.state.loading} />
       </div>
     )
   }

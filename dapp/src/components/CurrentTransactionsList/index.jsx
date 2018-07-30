@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavDropdown } from 'react-bootstrap'
 import { I18n } from 'react-i18next'
-import { TransitionGroup, CSSTransition } from 'react-transition-group'
+import FlipMove from 'react-flip-move'
 import classnames from 'classnames'
-import { transactionErrorToCode } from '~/services/transaction-error-to-code'
+import { txErrorMessage } from '~/services/txErrorMessage'
+import { transactionErrorToCode } from '~/services/transactionErrorToCode'
 
 import './CurrentTransactionsList.scss'
 
@@ -23,8 +24,11 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    send: (transactionId, call, options) => {
-      dispatch({ type: 'SEND_TRANSACTION', transactionId, call, options })
+    dispatchSend: (transactionId, call, options, address) => {
+      dispatch({ type: 'SEND_TRANSACTION', transactionId, call, options, address })
+    },
+    dispatchRemove: (transactionId) => {
+      dispatch({ type: 'REMOVE_TRANSACTION', transactionId })
     }
   }
 }
@@ -68,7 +72,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
       } else {
         transactions = this.props.pendingOrErrorTransactions.reverse().map(tx => {
           const key   = tx[0]
-          const { call, error, confirmed, gasUsed } = tx[1]
+          const { call, error, confirmed, gasUsed, address } = tx[1]
           let name
 
           // This is a patch to prevent the page from crashing, we need to figure out
@@ -89,59 +93,65 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
             if (gasUsed)
               options['gas'] = parseInt(1.2 * gasUsed, 10)
 
-            var code = transactionErrorToCode(error)
-            if (code) {
-              var errorMessage =
-                <p className="small">
-                  {t(`transactionErrors.${code}`)}
-                </p>
-            }
-            if (error && !errorMessage) {
-              errorMessage =
-                <p className="small">
-                  {error}
-                </p>
-            }
+            var errorMessage = txErrorMessage(error)
+            errorMessage = (
+              <p className="small">
+                {errorMessage}
+              </p>
+            )
+
             if (call !== undefined && call.args) {
               var resendButton = (
-                <span>
+                <React.Fragment>
                   {errorMessage ? null : <br />}
                   <a
                     onClick={(e) => {
                       e.preventDefault()
-                      this.props.send(key, call, options)
+                      this.props.dispatchSend(key, call, options, address)
                     }}
                   >
                     Retry
                   </a>
-                </span>
+                </React.Fragment>
+              )
+              var removeButton = (
+                <React.Fragment>
+                  <button
+                    className="btn-link text-gray"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      this.props.dispatchRemove(key)
+                    }}
+                  >
+                    {'\u2716'}
+                  </button>
+                </React.Fragment>
               )
             }
           }
 
           return (
-            <CSSTransition
+            <li
               key={`transaction-${key}`}
-              timeout={500}
-              classNames="fade">
-              <li className="nav-transactions--item">
-                <span className={classnames('nav-transactions--circle', this.getClassName(error, confirmed))} /> &nbsp;
-                {t(`transactions.${name}`, {
-                  mintMedxCount: mintMedxCount
-                })}
-                {confirmed}
-                {errorMessage}
-                {resendButton}
-              </li>
-            </CSSTransition>
+              className="nav-transactions--item"
+            >
+              <span className={classnames('nav-transactions--circle', this.getClassName(error, confirmed))} /> &nbsp;
+              {t(`transactions.${name}`, {
+                mintMedxCount: mintMedxCount
+              })}
+              {confirmed}
+              {errorMessage}
+              {resendButton}
+              {removeButton}
+            </li>
           )
         })
 
         transactionHtml = (
           <ul className="nav-transactions--group">
-            <TransitionGroup component={null}>
+            <FlipMove>
               {transactions}
-            </TransitionGroup>
+            </FlipMove>
           </ul>
         )
       }

@@ -15,17 +15,14 @@ i18next
             addOrReactivateDoctor: 'Adding / Reactivating Doctor',
             deactivateDoctor: 'Deactivating Doctor',
             approveAndCall: 'Sending Case Info',
-            setChallengingDoctor: 'Authorizing Second Opinion',
-            setDiagnosingDoctor: 'Authorizing Physician',
             blankState: 'Currently there are no pending transactions',
             challengeWithDoctor: 'Getting Second Opinion',
             diagnoseCase: 'Sending Diagnosis',
-            diagnoseChallengedCase: 'Sending Second Opinion',
+            diagnoseChallengedCase: 'Sending Diagnosis', // don't let the 2nd doctor know it's a second opinion
             publicKeys: 'Retrieving Account',
-            mint: 'Mint {{mintMedxCount}} MEDX',
-            requestNextCase: 'Requesting Case',
+            mint: 'Mint {{mintMedxCount}} MEDT (Test MEDX)',
             setPublicKey: 'Registering Account',
-            sendMedX: 'Sending {{mintMedxCount}} MEDX',
+            sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',
             addDoctor: 'Upgrading to Doctor'
           },
@@ -33,7 +30,12 @@ i18next
             userRevert: 'You rejected the transaction, please submit a valid transaction to proceed',
             outOfGas: 'The transaction ran out of gas',
             evmRevert: 'There was an error in the contract',
-            incorrectNonce: 'The nonce was incorrect (reset the account in MetaMask)'
+            incorrectNonce: 'The nonce was incorrect (reset the account in MetaMask)',
+            cancelled: 'The transaction was cancelled',
+            noContractFound: 'No contract found for address, you may be on the wrong network (MainNet vs. Ropsten)',
+            nonceTooLow: 'The nonce was too low (possibly need to reset the account in MetaMask)',
+            exceedsBlockGasLimit: 'The transaction gasLimit exceeds block gas limit',
+            replacementTransactionUnderpriced: 'The replacement transaction is underpriced (need to provide a higher gas limit)'
           },
           pageTitles: {
             welcome: 'Welcome | Hippocrates',

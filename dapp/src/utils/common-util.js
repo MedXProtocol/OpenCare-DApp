@@ -1,12 +1,13 @@
-export const promisify = (inner) =>
-    new Promise((resolve, reject) =>
-    inner((err, res) => {
-        if (err) { reject(err) }
+export const promisify = (funcToCall) => {
+  return new Promise((resolve, reject) => {
+    return funcToCall((error, result) => {
+      if (error) { reject(error) }
 
-        resolve(res);
+      resolve(result)
     })
-);
+  })
+}
 
 export const isNotEmptyString = (value) => {
-    return value && value !== "";
+  return value && value !== ""
 }

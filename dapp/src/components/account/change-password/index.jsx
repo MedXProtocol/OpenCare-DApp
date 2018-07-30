@@ -110,16 +110,16 @@ export const ChangePassword = class _ChangePassword extends Component {
                     <span className="title">Change Your Master Password</span>
                   </h3>
                 </div>
-                <div className="card-body">
-                  <p className='text-gray'>
-                    This password is combined with your Secret Key to sign in. To retrieve your Secret Key, visit your <Link to={routes.ACCOUNT_EMERGENCY_KIT}>Emergency Kit</Link>.
-                  </p>
+                <form onSubmit={this.onSubmit}>
+                  <div className="card-body">
+                    <p className='text-gray'>
+                      This password is combined with your Secret Key to sign in. To retrieve your Secret Key, visit your <Link to={routes.ACCOUNT_EMERGENCY_KIT}>Emergency Kit</Link>.
+                    </p>
 
-                  {success}
+                    {success}
 
-                  <br />
+                    <br />
 
-                  <form onSubmit={this.onSubmit}>
                     <div className="form-wrapper">
                       <div className='form-group'>
                         <label>Current Master Password:</label>
@@ -155,7 +155,8 @@ export const ChangePassword = class _ChangePassword extends Component {
                           placeholder="********" />
                       </div>
                     </div>
-
+                  </div>
+                  <div className="card-footer">
                     <div className='text-right'>
                       <Button
                         bsStyle='success'
@@ -164,9 +165,9 @@ export const ChangePassword = class _ChangePassword extends Component {
                         Change Password
                       </Button>
                     </div>
-                  </form>
+                  </div>
+                </form>
 
-                </div>
               </div>
             </div>
           </div>

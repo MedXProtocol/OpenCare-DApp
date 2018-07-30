@@ -29,21 +29,21 @@ export const TryMetamask = class _TryMetamask extends Component {
                   <hr />
                   <br />
                   <h4>
-                    On mobile? Try the Cipher browser:
+                    On mobile? Try the Trust browser:
                   </h4>
                   <a
-                    href="https://itunes.apple.com/app/cipher-browser-for-ethereum/id1294572970"
+                    href="https://itunes.apple.com/us/app/trust-ethereum-wallet/id1288339409"
                     target="_blank"
                     rel="noopener noreferrer"
-                    title="Download Cipher from Apple App Store">
+                    title="Download Trust from Apple App Store">
                     <img src={AppStoreButtonImg} alt="Apple App Store Button" width="100" />
                   </a>
                   &nbsp; &nbsp; &nbsp;
                   <a
-                    href="https://play.google.com/store/apps/details?id=com.cipherbrowser.cipher"
+                    href="https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp"
                     target="_blank"
                     rel="noopener noreferrer"
-                    title="Download Cipher from Google Play Store">
+                    title="Download Trust from Google Play Store">
                     <img src={PlayStoreButtonImg} alt="Google Play Store Button" width="100" />
                   </a>
                 </div>

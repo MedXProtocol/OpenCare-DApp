@@ -8,16 +8,15 @@ import { formatRoute } from 'react-router-named-routes'
 import getWeb3 from '~/get-web3'
 import { SignUpContainer } from './sign-up'
 import { SignInContainer } from './sign-in'
-import { PatientDashboard } from './patient/dashboard/'
+import { PatientDashboard } from './patient/dashboard'
 import { NewCase } from './patient/cases/NewCase'
 import { PatientCaseContainer } from './patient/cases/PatientCase'
-import { DiagnoseCaseContainer } from './patient/cases/diagnose'
 import { AddDoctor } from './doctors/new'
 import { Mint } from './account/mint'
 import { WalletContainer } from './account/wallet'
 import { EmergencyKit } from './account/emergency-kit'
 import { ChangePasswordContainer } from './account/change-password'
-import { OpenCasesContainer } from './open-cases'
+import { OpenCasesContainer } from './doctors/cases'
 import { Welcome } from '~/components/welcome'
 import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
@@ -37,11 +36,13 @@ import { contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
+import { populateCases, populateCasesSaga } from '~/services/populateCases'
 import { toastr } from '~/toastr'
 import { defined } from '~/utils/defined'
 
 function mapStateToProps (state) {
   let caseCount
+  let cases = []
   const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const isSignedIn = get(state, 'account.signedIn')
@@ -52,10 +53,13 @@ function mapStateToProps (state) {
   if (isSignedIn && isDoctor) {
     caseCount = get(state, 'userStats.caseCount')
     // caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
+
+    cases = populateCases(state, CaseManager, address, caseCount)
   }
 
   return {
     address,
+    cases,
     isDoctor,
     DoctorManager,
     isSignedIn,
@@ -76,13 +80,17 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ address, CaseManager, DoctorManager }) {
+function* saga({ address, caseCount, CaseManager, DoctorManager }) {
   if (!address || !CaseManager || !DoctorManager) { return }
 
   yield all([
     cacheCall(CaseManager, 'doctorCasesCount', address),
     cacheCall(DoctorManager, 'isDoctor', address)
   ])
+
+  if (caseCount) {
+    yield populateCasesSaga(CaseManager, address, caseCount)
+  }
 }
 
 const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
@@ -115,7 +123,6 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     })
 
     if (newCaseCount !== this.props.caseCount) {
-      console.log('dispatchNewCaseCount!')
       this.props.dispatchNewCaseCount(newCaseCount)
     }
   }
@@ -205,62 +212,58 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     const WelcomeWrapped = <Welcome isDoctor={this.props.isDoctor} />
 
     return (
-      <div>
-        <div className="wrapper">
-          <div className="main-panel">
-            <HippoNavbarContainer />
-            {ownerWarning}
-            {publicKeyCheck}
-            <div className="content">
-              {betaFaucetModal}
+      <React.Fragment>
+        <HippoNavbarContainer cases={this.props.cases} />
+        {ownerWarning}
+        {publicKeyCheck}
+        <div className="content">
+          {betaFaucetModal}
 
-              <Switch>
-                <Route path={routes.WELCOME} component={null} />
-                <Route path='/' component={NetworkCheckModal} />
-              </Switch>
+          <Switch>
+            <Route path={routes.WELCOME} component={null} />
+            <Route path='/' component={NetworkCheckModal} />
+          </Switch>
 
-              <Switch>
-                {redirect}
+          <Switch>
+            {redirect}
 
-                <Route path={routes.WELCOME}  render={ () => WelcomeWrapped } />
-                <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
-                <Route path={routes.TRY_METAMASK} component={TryMetamask} />
+            <Route path={routes.WELCOME}  render={ () => WelcomeWrapped } />
+            <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
+            <Route path={routes.TRY_METAMASK} component={TryMetamask} />
 
-                <SignedInRoute path={routes.ACCOUNT_EMERGENCY_KIT} component={EmergencyKit} />
-                <SignedInRoute path={routes.ACCOUNT_CHANGE_PASSWORD} component={ChangePasswordContainer} />
-                <SignedInRoute path={routes.ACCOUNT_MINT} component={Mint} />
-                <SignedInRoute path={routes.ACCOUNT_WALLET} component={WalletContainer} />
+            <SignedInRoute path={routes.ACCOUNT_EMERGENCY_KIT} component={EmergencyKit} />
+            <SignedInRoute path={routes.ACCOUNT_CHANGE_PASSWORD} component={ChangePasswordContainer} />
+            <SignedInRoute path={routes.ACCOUNT_MINT} component={Mint} />
+            <SignedInRoute path={routes.ACCOUNT_WALLET} component={WalletContainer} />
 
-                <Web3Route path={routes.SIGN_IN} component={SignInContainer} />
-                <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
+            <Web3Route path={routes.SIGN_IN} component={SignInContainer} />
+            <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
 
-                <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
-                <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={DiagnoseCaseContainer} />
-                <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
+            <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
+            <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={OpenCasesContainer} />
+            <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 
-                <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
-                <SignedInRoute exact path={routes.PATIENTS_CASES} component={PatientDashboard} />
-                <SignedInRoute path={routes.PATIENTS_CASE} component={PatientCaseContainer} />
+            <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
+            <SignedInRoute exact path={routes.PATIENTS_CASES} component={PatientDashboard} />
+            <SignedInRoute path={routes.PATIENTS_CASE} component={PatientCaseContainer} />
 
-                <Redirect from={routes.HOME} exact to={routes.WELCOME} />
+            <Redirect from={routes.HOME} exact to={routes.WELCOME} />
 
-                <Route path={routes.HOME} component={FourOhFour} />
-              </Switch>
-            </div>
-          </div>
+            <Route path={routes.HOME} component={FourOhFour} />
+          </Switch>
+        </div>
 
-          <footer className="footer">
-            <div className='container'>
-              <div className="row">
-                <div className="col-sm-12 text-center">
-                  <p className="text-footer">
-                    &copy; 2018 MedCredits Inc. - All Rights Reserved.
-                  </p>
-                </div>
+        <footer className="footer">
+          <div className='container'>
+            <div className="row">
+              <div className="col-sm-12 text-center">
+                <p className="text-footer">
+                  &copy; 2018 MedCredits Inc. - All Rights Reserved.
+                </p>
               </div>
             </div>
-          </footer>
-        </div>
+          </div>
+        </footer>
 
         <ReduxToastr
           timeOut={7000}
@@ -271,9 +274,9 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
           transitionOut="bounceOut"
         />
         {feedbackLink}
-      </div>
-    )
-  }
+      </React.Fragment>
+  )
+}
 }))))
 
 export default hot(module)(withRouter(App))

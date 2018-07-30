@@ -11,8 +11,18 @@ body {
 
   @media (max-width: 768px) {
     padding-top: 0;
-    margin-left: -2rem;
-    margin-right: -2rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+// Forces everything to fit within browser window on mobile
+.content .container,
+.navbar-header {
+  @media (max-width: 768px) {
+    padding: 0;
+    overflow-x: hidden;
+    width: 100%;
   }
 }
 
@@ -76,6 +86,16 @@ h4 .small-inverse,
 h5 .small-inverse,
 h6 .small-inverse {
   color: #4aa8f7;
+}
+
+h5,
+.h5 {
+  font-size: 16px;
+}
+
+h6,
+.h6 {
+  font-size: 14px;
 }
 
 .header--no-top-margin {
@@ -216,11 +236,5 @@ small,
 .text-center-on-xs {
   @media (max-width: $screen-sm) {
     text-align: center;
-  }
-}
-
-.container {
-  @media (max-width: 768px) {
-    padding: 0 2rem;
   }
 }
