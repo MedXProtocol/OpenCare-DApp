@@ -22,6 +22,7 @@ import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
+import isEqual from 'lodash.isequal'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -33,8 +34,11 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const transactions = state.sagaGenesis.transactions
   const isPatient = account === patientAddress
+  const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
+
   return {
     account,
+    currentlyExcludedDoctors,
     status,
     diagnosisHash,
     transactions,
@@ -60,8 +64,8 @@ function* saga({ caseAddress }) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatchForgetNextDoctor: () => {
-      dispatch({ type: 'FORGET_NEXT_DOCTOR' })
+    dispatchExcludedDoctors: (addresses) => {
+      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
     }
   }
 }
@@ -100,7 +104,19 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { 
     }
   }
 
+  setExcludedDoctorAddresses = (props) => {
+    if (props.diagnosingDoctor && props.currentlyExcludedDoctors) {
+      const excludeAddresses = [props.diagnosingDoctor, props.account]
+
+      if (!isEqual(excludeAddresses, props.currentlyExcludedDoctors)) {
+        props.dispatchExcludedDoctors(excludeAddresses)
+      }
+    }
+  }
+
   componentWillReceiveProps (props) {
+    this.setExcludedDoctorAddresses(props)
+
     if (this.state.challengeHandler) {
       this.state.challengeHandler.handle(props.transactions[this.state.challengeTransactionId])
         .onError((error) => {
@@ -116,6 +132,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { 
           this.setState({ loading: false })
         })
     }
+
     if (this.state.acceptHandler) {
       this.state.acceptHandler.handle(props.transactions[this.state.acceptTransactionId])
         .onError((error) => {
@@ -155,7 +172,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { 
   }
 
   handleChallengeDiagnosis = () => {
-    this.props.dispatchForgetNextDoctor()
     this.setState({ showChallengeModal: true })
   }
 
