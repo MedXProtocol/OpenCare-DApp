@@ -36,12 +36,17 @@ To run the truffle tests:
 
 ### To run the beta faucet lambda endpoint:
 
-Install the npm packages in the `lambda` dir, then run `lambda-serve.sh`:
+Install the npm packages in the `lambda` dir:
 
-`$ cd lambda`
-`$ npm i`
-`$ cd ..`
-`$ ./lambda-serve.sh` (boots up lambda compute endpoints)
+```sh
+$ cd lambda
+$ npm i
+$ cd ..
+```
+
+Then compile the functions and run the server with:
+
+`$ npm run lambda` (boots up lambda compute endpoints)
 
 ### Running Webpack Dev server
 

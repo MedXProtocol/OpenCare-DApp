@@ -9,7 +9,8 @@
     "staging-build": "./scripts/staging-build.sh",
     "production-build": "./scripts/production-build.sh",
     "migrate": "truffle-migrate-off-chain",
-    "migrate-reset": "truffle-migrate-off-chain --reset"
+    "migrate-reset": "truffle-migrate-off-chain --reset",
+    "lambda": "cd lambda && ./lambda-serve.sh"
   },
   "devDependencies": {
     "babel-plugin-root-import": "^5.1.0",
