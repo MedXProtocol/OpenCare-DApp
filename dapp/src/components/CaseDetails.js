@@ -5,6 +5,7 @@ import classnames from 'classnames'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { ImageLoader, CaseDetailsLoader } from './ContentLoaders'
 import { LoadingLines } from '~/components/LoadingLines'
+import { cancelablePromise } from '~/utils/cancelablePromise'
 import { downloadJson, downloadImage } from '../utils/storage-util'
 import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
@@ -31,7 +32,8 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     this.state = {
       firstImageUrl: '',
       secondImageUrl: '',
-      loading: true
+      loading: true,
+      cancelableDownloadPromise: undefined
     }
   }
 
@@ -43,27 +45,48 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     this.init(props)
   }
 
+  componentWillUnmount () {
+    if (this.state.cancelableDownloadPromise) {
+      this.state.cancelableDownloadPromise.cancel()
+    }
+  }
+
   async init (props) {
     if (this.state.details || !(props.caseDetailsHash && props.caseKey)) { return }
 
     try {
-      const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
-      const details = JSON.parse(detailsJson)
+      const cancelableDownloadPromise = cancelablePromise(
+        new Promise(async (resolve, reject) => {
+          const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
+          const details = JSON.parse(detailsJson)
 
-      const [firstImageUrl, secondImageUrl] = await Promise.all([
-        downloadImage(details.firstImageHash, props.caseKey),
-        downloadImage(details.secondImageHash, props.caseKey)
-      ])
+          const [firstImageUrl, secondImageUrl] = await Promise.all([
+            downloadImage(details.firstImageHash, props.caseKey),
+            downloadImage(details.secondImageHash, props.caseKey)
+          ])
 
-      this.setState({
-        details,
-        firstImageUrl,
-        secondImageUrl
-      })
+          return resolve({
+            details,
+            firstImageUrl,
+            secondImageUrl
+          })
+        })
+      )
+
+      this.setState({ cancelableDownloadPromise })
+
+      cancelableDownloadPromise
+        .promise
+        .then((result) => {
+          this.setState(result)
+          this.setState({
+            loading: false
+          })
+        })
+        .catch((reason) => console.log('isCanceled', reason.isCanceled));
     } catch (error) {
       toastr.error('There was an error while downloading your case details from IPFS.')
       console.warn(error)
-    } finally {
       this.setState({
         loading: false
       })

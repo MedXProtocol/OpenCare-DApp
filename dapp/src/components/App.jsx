@@ -122,6 +122,8 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       return caseCount
     })
 
+    console.log(newCaseCount, this.props.caseCount)
+
     if (newCaseCount !== this.props.caseCount) {
       this.props.dispatchNewCaseCount(newCaseCount)
     }
