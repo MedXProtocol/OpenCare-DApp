@@ -19,6 +19,8 @@ export function* deregisterKey(key) {
   const callCountRegistry = yield getContext('callCountRegistry')
   const calls = callCountRegistry.deregister(key)
   if (calls.length) {
+    console.log('in deregisterKey key', key)
+    console.log(calls)
     yield put({type: 'WEB3_STALE_CALLS', calls})
   }
 }
@@ -72,6 +74,9 @@ export function* runSaga({saga, props, key}) {
     yield callSaga(saga, props)
     const emptyCalls = callCountRegistry.decrementCalls(oldCalls)
     if (emptyCalls.length) {
+      console.log('in runSaga emptyCalls.length')
+      console.log(emptyCalls)
+
       yield put({ type: 'WEB3_STALE_CALLS', calls: emptyCalls })
     }
   } catch (error) {

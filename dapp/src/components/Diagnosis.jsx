@@ -2,18 +2,18 @@ import React, { Component } from 'react'
 import ReactTooltip from 'react-tooltip'
 import { Modal } from 'react-bootstrap'
 import { all } from 'redux-saga/effects'
-import { isTrue } from '~/utils/isTrue'
-import { isEmptyObject } from '~/utils/isEmptyObject'
-import { isBlank } from '~/utils/isBlank'
-import { defined } from '~/utils/defined'
 import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
-import { downloadJson } from '~/utils/storage-util'
 import { Loading } from '~/components/Loading'
 import { withSaga, cacheCall, cacheCallValue, withSend, addContract } from '~/saga-genesis'
 import { connect } from 'react-redux'
+import { cancelablePromise } from '~/utils/cancelablePromise'
+import { isTrue } from '~/utils/isTrue'
+import { isEmptyObject } from '~/utils/isEmptyObject'
+import { isBlank } from '~/utils/isBlank'
+import { downloadJson } from '~/utils/storage-util'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
@@ -70,7 +70,10 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(withSend(class _Diagnosis extends Component {
+const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
+  withSaga(saga, { propTriggers: ['caseAddress', 'diagnosisHash', 'status'] })(
+    withSend(class _Diagnosis extends Component {
+
   constructor(){
     super()
 
@@ -78,26 +81,61 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { 
       diagnosis: {},
       showThankYouModal: false,
       showChallengeModal: false,
-      doctorAddress: '',
       doctorPublicKey: '',
-      loading: false
+      loading: false,
+      cancelableDownloadPromise: undefined
     }
   }
 
-  async componentDidMount() {
+  componentDidMount () {
+    this.getInitialDiagnosis(this.props)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.getInitialDiagnosis(nextProps)
+
+    this.setExcludedDoctorAddresses(nextProps)
+
+    this.subscribeChallengeHandler(nextProps)
+    this.acceptChallengeHandler(nextProps)
+  }
+
+  componentWillUnmount () {
+    if (this.state.cancelableDownloadPromise) {
+      this.state.cancelableDownloadPromise.cancel()
+    }
+  }
+
+  async getInitialDiagnosis (props) {
     if (
-      isBlank(this.props.diagnosisHash)
-      || isBlank(this.props.caseKey)
+      this.state.cancelableDownloadPromise
+      || !isEmptyObject(this.state.diagnosis)
+      || isBlank(props.diagnosisHash)
+      || isBlank(props.caseKey)
     ) { return }
 
     try {
-      const diagnosisJson = await downloadJson(this.props.diagnosisHash, this.props.caseKey)
-      const diagnosis = JSON.parse(diagnosisJson)
+      const cancelableDownloadPromise = cancelablePromise(
+        new Promise(async (resolve, reject) => {
+          const diagnosisJson = await downloadJson(props.diagnosisHash, props.caseKey)
+          const diagnosis = JSON.parse(diagnosisJson)
 
-      this.setState({
-        diagnosis,
-        doctorAddress: ''
-      })
+          return resolve({ diagnosis })
+        })
+      )
+
+      this.setState({ cancelableDownloadPromise })
+
+      cancelableDownloadPromise
+        .promise
+        .then((result) => {
+          this.setState(result)
+
+          this.setState({
+            loading: false
+          })
+        })
+        .catch((reason) => console.log('isCanceled', reason.isCanceled));
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')
       console.warn(error)
@@ -114,9 +152,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { 
     }
   }
 
-  componentWillReceiveProps (props) {
-    this.setExcludedDoctorAddresses(props)
-
+  subscribeChallengeHandler = (props) => {
     if (this.state.challengeHandler) {
       this.state.challengeHandler.handle(props.transactions[this.state.challengeTransactionId])
         .onError((error) => {
@@ -132,7 +168,9 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { 
           this.setState({ loading: false })
         })
     }
+  }
 
+  acceptChallengeHandler = (props) => {
     if (this.state.acceptHandler) {
       this.state.acceptHandler.handle(props.transactions[this.state.acceptTransactionId])
         .onError((error) => {
@@ -236,126 +274,127 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { 
     }
 
     return (
-      !defined(this.state.diagnosis) || isEmptyObject(this.state.diagnosis) ?
-      <div /> :
-      <div className="card">
-        <div className="card-header">
-          <h3 className="card-title">{this.props.title}</h3>
-        </div>
-        <div className="card-body">
-          <div className="row">
-            <div className="col-xs-12">
-              <label>Diagnosis</label>
-              <p>
-                {this.state.diagnosis.diagnosis}
-              </p>
-            </div>
-            <div className="col-xs-12">
-              <label>Recommendation</label>
-              <p>
-                {this.state.diagnosis.recommendation}
-              </p>
-            </div>
-            {this.state.diagnosis.additionalRecommendation
-              ? (
-                  <div className="col-xs-12">
-                    <label>Additional Recommendation:</label>
-                    <p>
-                      {this.state.diagnosis.additionalRecommendation}
-                    </p>
-                  </div>
-                )
-              : null}
+      isEmptyObject(this.state.diagnosis) ?
+        <div /> : (
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">{this.props.title}</h3>
           </div>
-        </div>
-
-        {buttons}
-
-        <Modal show={this.state.showThankYouModal} onHide={this.handleCloseThankYouModal}>
-          <Modal.Body>
+          <div className="card-body">
             <div className="row">
-              <div className="col-xs-12 text-center">
-                <h4>
-                  You have accepted the case diagnosis.
-                </h4>
-                <h5>
-                  Thank you for using MedCredits!
-                </h5>
+              <div className="col-xs-12">
+                <label>Diagnosis</label>
+                <p>
+                  {this.state.diagnosis.diagnosis}
+                </p>
               </div>
+              <div className="col-xs-12">
+                <label>Recommendation</label>
+                <p>
+                  {this.state.diagnosis.recommendation}
+                </p>
+              </div>
+              {this.state.diagnosis.additionalRecommendation
+                ? (
+                    <div className="col-xs-12">
+                      <label>Additional Recommendation:</label>
+                      <p>
+                        {this.state.diagnosis.additionalRecommendation}
+                      </p>
+                    </div>
+                  )
+                : null}
             </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
-          </Modal.Footer>
-        </Modal>
-        <Modal show={this.state.showChallengeModal} onHide={this.handleCloseChallengeModal}>
-          <form onSubmit={this.onSubmitChallenge}>
-            <Modal.Header>
-              <Modal.Title>
-                Challenge Case
-              </Modal.Title>
-            </Modal.Header>
+          </div>
+
+          {buttons}
+
+          <Modal show={this.state.showThankYouModal} onHide={this.handleCloseThankYouModal}>
             <Modal.Body>
-              <div className='row'>
-                <div className='col-xs-12'>
-                  <p>
-                    Challenge the diagnosis by having another doctor look at your case.
-                  </p>
-                  <p>
-                    If the diagnosis is the same, you will be charged 15 MEDT (Test MEDX).  If the diagnosis is different than the original then you'll be charged 5 MEDT (Test MEDX) and refunded the remainder.
-                  </p>
-                  <hr />
-                  <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>
-                    {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
-                      ?
-                      <div>
-                        <label className='control-label'>Select Another Doctor</label>
-                        <DoctorSelect
-                          excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
-                          value={this.state.selectedDoctor}
-                          isClearable={false}
-                          onChange={this.onChangeDoctor} />
-                        {!this.state.doctorAddressError ||
-                          <p className='help-block has-error'>
-                            {this.state.doctorAddressError}
-                          </p>
-                        }
-                      </div>
-                      :
-                      <AvailableDoctorSelect
-                        excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
-                        value={this.state.selectedDoctor}
-                        onChange={this.onChangeDoctor} />
-                     }
-                  </div>
+              <div className="row">
+                <div className="col-xs-12 text-center">
+                  <h4>
+                    You have accepted the case diagnosis.
+                  </h4>
+                  <h5>
+                    Thank you for using MedCredits!
+                  </h5>
                 </div>
               </div>
             </Modal.Body>
             <Modal.Footer>
-              <button
-                onClick={this.handleCloseChallengeModal}
-                type="button"
-                className="btn btn-link"
-              >Cancel</button>
-              <span data-tip={!this.state.selectedDoctor ? 'No available doctors to receive a second opinion from' : ''}>
-                <input
-                  disabled={!this.state.selectedDoctor}
-                  type='submit'
-                  className="btn btn-success"
-                  value='OK'
-                />
-                <ReactTooltip
-                  effect='solid'
-                  place={'top'}
-                  wrapper='span'
-                />
-              </span>
+              <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
             </Modal.Footer>
-          </form>
-        </Modal>
+          </Modal>
+          <Modal show={this.state.showChallengeModal} onHide={this.handleCloseChallengeModal}>
+            <form onSubmit={this.onSubmitChallenge}>
+              <Modal.Header>
+                <Modal.Title>
+                  Challenge Case
+                </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <div className='row'>
+                  <div className='col-xs-12'>
+                    <p>
+                      Challenge the diagnosis by having another doctor look at your case.
+                    </p>
+                    <p>
+                      If the diagnosis is the same, you will be charged 15 MEDT (Test MEDX).  If the diagnosis is different than the original then you'll be charged 5 MEDT (Test MEDX) and refunded the remainder.
+                    </p>
+                    <hr />
+                    <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>
+                      {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
+                        ?
+                        <div>
+                          <label className='control-label'>Select Another Doctor</label>
+                          <DoctorSelect
+                            excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
+                            value={this.state.selectedDoctor}
+                            isClearable={false}
+                            onChange={this.onChangeDoctor} />
+                          {!this.state.doctorAddressError ||
+                            <p className='help-block has-error'>
+                              {this.state.doctorAddressError}
+                            </p>
+                          }
+                        </div>
+                        :
+                        <AvailableDoctorSelect
+                          excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
+                          value={this.state.selectedDoctor}
+                          onChange={this.onChangeDoctor} />
+                       }
+                    </div>
+                  </div>
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                <button
+                  onClick={this.handleCloseChallengeModal}
+                  type="button"
+                  className="btn btn-link"
+                >Cancel</button>
+                <span data-tip={!this.state.selectedDoctor ? 'No available doctors to receive a second opinion from' : ''}>
+                  <input
+                    disabled={!this.state.selectedDoctor}
+                    type='submit'
+                    className="btn btn-success"
+                    value='OK'
+                  />
+                  <ReactTooltip
+                    effect='solid'
+                    place={'top'}
+                    wrapper='span'
+                  />
+                </span>
+              </Modal.Footer>
+            </form>
+          </Modal>
 
-        <Loading loading={this.state.loading} />
-      </div>
+          <Loading loading={this.state.loading} />
+        </div>
+      )
     )
   }
 })))

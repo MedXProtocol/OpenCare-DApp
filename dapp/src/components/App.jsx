@@ -75,6 +75,7 @@ function mapDispatchToProps(dispatch) {
       dispatch({ type: 'SIGN_OUT' })
     },
     dispatchNewCaseCount: (caseCount) => {
+      console.log(caseCount)
       dispatch({ type: 'UPDATE_CASE_COUNT', caseCount })
     }
   }
@@ -118,9 +119,12 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     if (!CaseManager || !address || !isDoctor || !isSignedIn) { return }
 
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
-    const newCaseCount = await CaseManagerInstance.methods.doctorCasesCount(address).call().then(caseCount => {
-      return caseCount
-    })
+    const newCaseCount = await CaseManagerInstance.methods.doctorCasesCount(address).call()
+      .then(c => {
+        return c
+      })
+
+    console.log('Wat: ', newCaseCount, this.props.caseCount)
 
     if (newCaseCount !== this.props.caseCount) {
       this.props.dispatchNewCaseCount(newCaseCount)
@@ -137,12 +141,16 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   componentWillReceiveProps (nextProps) {
     this.onAccountChangeSignOut(nextProps)
 
-    this.showNewCaseAssignedToast(nextProps)
+    if (nextProps.isSignedIn && nextProps.isDoctor) {
+      this.showNewCaseAssignedToast(nextProps)
+    }
   }
 
   showNewCaseAssignedToast = (nextProps) => {
     const { contractRegistry, CaseManager, address } = this.props
     const oldCaseCount = this.props.caseCount
+
+    console.log('in showNewCaseAssignedToast')
 
     // Moving from 0 to 1, or 1 to 2, but not undefined/NaN (initial state) to a number
     if (
@@ -152,6 +160,8 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     ) {
       return
     }
+
+    console.log('showNewCaseAssignedToast PASSED!')
 
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
     CaseManagerInstance.methods
