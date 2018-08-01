@@ -3,7 +3,6 @@ import ReactTimeout from 'react-timeout'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
 import PropTypes from 'prop-types'
-import getWeb3 from '~/get-web3'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { withSaga, withContractRegistry, withSend } from '~/saga-genesis'
 import { DiagnoseCaseContainer } from '~/components/doctors/diagnose'
@@ -42,33 +41,6 @@ function* saga({ caseCount, address, CaseManager }) {
 
 export const OpenCasesContainer = ReactTimeout(withContractRegistry(connect(mapStateToProps)(
   withSend(withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager'] })(class _OpenCasesContainer extends Component {
-
-  componentDidMount() {
-    // Remove this when we figure out how to update the Challenged Doctor's cases list
-    // automatically from the block listener!
-    this.pollNewCaseID = this.props.setInterval(this.pollForNewCase, 2000)
-  }
-
-  componentWillUnmount () {
-    clearInterval(this.pollNewCaseID)
-  }
-
-  // Remove this when we figure out how to update the Challenged Doctor's cases list
-  // automatically from the block listener!
-  pollForNewCase = async () => {
-    const { contractRegistry, CaseManager, address, isDoctor, isSignedIn } = this.props
-
-    if (!CaseManager || !address || !isDoctor || !isSignedIn) { return }
-
-    const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
-    const newCaseCount = await CaseManagerInstance.methods.doctorCasesCount(address).call().then(caseCount => {
-      return caseCount
-    })
-
-    if (newCaseCount !== this.props.caseCount) {
-      this.props.dispatchNewCaseCount(newCaseCount)
-    }
-  }
 
   render () {
     let doctorCaseListing, diagnoseCase, doScrollToTop
