@@ -17,7 +17,12 @@ function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
+
+  const bytesDiagnosisHash = cacheCallValue(state, caseAddress, 'diagnosisHash')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
+
+  console.log('patient gets bytesDiagnosisHash', bytesDiagnosisHash)
+  console.log('patient gets diagnosisHash', diagnosisHash)
 
   return {
     diagnosisHash,
@@ -36,7 +41,10 @@ function* saga({ match }) {
   ])
 }
 
-export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match']})(class _PatientCase extends Component {
+export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps)(
+  withSaga(saga, { propTriggers: ['match', 'diagnosisHash']})(
+    class _PatientCase extends Component {
+
   render() {
     const caseKey = decryptCaseKey(currentAccount(), this.props.encryptedCaseKey, this.props.caseKeySalt)
 
@@ -50,6 +58,7 @@ export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps
           />
         </div>
     }
+
     return (
       <div>
         <ScrollToTop />

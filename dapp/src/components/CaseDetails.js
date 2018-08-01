@@ -38,11 +38,11 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
   }
 
   componentDidMount () {
-    this.init(this.props)
+    this.getCaseDetails(this.props)
   }
 
   componentWillReceiveProps (props) {
-    this.init(props)
+    this.getCaseDetails(props)
   }
 
   componentWillUnmount () {
@@ -51,8 +51,12 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     }
   }
 
-  async init (props) {
-    if (this.state.details || !(props.caseDetailsHash && props.caseKey)) { return }
+  getCaseDetails (props) {
+    if (
+      this.state.details
+      || !(props.caseDetailsHash && props.caseKey)
+      || this.state.cancelableDownloadPromise
+    ) { return }
 
     try {
       const cancelableDownloadPromise = cancelablePromise(
@@ -328,18 +332,31 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
                 </div>
 
                 <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                  <label className="label text-gray">Tried treatments previously:</label>
+                  <label className="label text-gray">Previously tried treatments:</label>
                   <p>{details.prevTreatment}</p>
                 </div>
               </div>
 
-              <div className="row case-details--row">
-                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                  <label className="label text-gray">Additional comments:</label>
-                  <p>{details.description}</p>
+              {details.description ? (
+                <div className="row case-details--row">
+                  <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                    <label className="label text-gray">Additional comments:</label>
+                    <p>{details.description}</p>
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </span>
+
+            <hr />
+
+            <div className="row">
+              <div className="col-xs-12">
+                <p className="text-gray small text-center">
+
+                  <strong>Case Address:</strong> {this.props.caseAddress}
+                </p>
+              </div>
+            </div>
 
           </div>
         </div>
