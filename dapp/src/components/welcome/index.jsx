@@ -51,7 +51,13 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                   </p>
                   <ol>
                     <li>
-                      Download the MetaMask Extension (<a target='_blank' rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">Chrome</a> / <a target='_blank' rel="noopener noreferrer" href="https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/">Firefox</a>) or the Trust mobile browser (<a target='_blank' rel="noopener noreferrer" href="https://itunes.apple.com/us/app/trust-ethereum-wallet/id1288339409">iOS</a> / <a target='_blank' rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp">Android</a>)
+                      Download the MetaMask Extension (
+                        <a target='_blank' rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">Chrome</a>
+                        &nbsp;/&nbsp;
+                        <a target='_blank' rel="noopener noreferrer" href="https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/">Firefox</a>)
+                        or the Cipher mobile browser (<a target='_blank' rel="noopener noreferrer" href="https://itunes.apple.com/us/app/cipher-browser-ethereum/id1294572970?mt=8">iOS</a>
+                        &nbsp;/&nbsp;
+                        <a target='_blank' rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=com.cipherbrowser.cipher">Android</a>)
                     </li>
                     <li>
                       Sign up and submit your skin ailment
