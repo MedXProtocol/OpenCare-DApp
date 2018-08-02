@@ -268,8 +268,8 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
     const diagnosisInformation = {
       diagnosis: this.state.diagnosis,
-      overTheCounterRecommendation,
-      prescriptionRecommendation,
+      overTheCounterRecommendation: this.state.overTheCounterRecommendation,
+      prescriptionRecommendation: this.state.prescriptionRecommendation,
       sideEffects: this.state.sideEffects,
       sideEffectsAdditional: this.state.sideEffectsAdditional,
       counseling: this.state.counseling,
