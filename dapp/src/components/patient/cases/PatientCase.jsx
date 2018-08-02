@@ -19,14 +19,11 @@ function mapStateToProps(state, { match }) {
   const caseAddress = match.params.caseAddress
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
-
-  const bytesDiagnosisHash = cacheCallValue(state, caseAddress, 'diagnosisHash')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
-
-  // console.log('patient gets bytesDiagnosisHash', bytesDiagnosisHash)
-  // console.log('patient gets diagnosisHash', diagnosisHash)
+  const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
 
   return {
+    challengeHash,
     diagnosisHash,
     encryptedCaseKey,
     caseKeySalt,
@@ -43,12 +40,13 @@ function* saga({ match, networkId }) {
   yield all([
     cacheCall(caseAddress, 'encryptedCaseKey'),
     cacheCall(caseAddress, 'caseKeySalt'),
-    cacheCall(caseAddress, 'diagnosisHash')
+    cacheCall(caseAddress, 'diagnosisHash'),
+    cacheCall(caseAddress, 'challengeHash')
   ])
 }
 
 export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: [ 'match', 'diagnosisHash', 'networkId' ]})(
+  withSaga(saga, { propTriggers: [ 'match', 'diagnosisHash', 'challengeHash', 'networkId' ]})(
     class _PatientCase extends Component {
 
   render() {
@@ -59,6 +57,17 @@ export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps
         <div className='col-xs-12'>
           <Diagnosis
             title='Initial Diagnosis'
+            caseAddress={this.props.match.params.caseAddress}
+            caseKey={caseKey}
+          />
+        </div>
+    }
+
+    if (this.props.challengeHash) {
+      var challenge =
+        <div className='col-xs-12'>
+          <ChallengedDiagnosis
+            title='Second Diagnosis'
             caseAddress={this.props.match.params.caseAddress}
             caseKey={caseKey}
           />
@@ -78,13 +87,8 @@ export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps
             ) : null}
 
             {diagnosis}
-            <div className='col-xs-12'>
-              <ChallengedDiagnosis
-                caseAddress={this.props.match.params.caseAddress}
-                caseKey={caseKey}
-                title='Second Diagnosis'
-              />
-            </div>
+            {challenge}
+
             <div className='col-xs-12'>
               <CaseDetails
                 caseAddress={this.props.match.params.caseAddress}

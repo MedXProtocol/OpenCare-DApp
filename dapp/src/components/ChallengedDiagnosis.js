@@ -13,16 +13,12 @@ import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress, challengingDoctorAddress }) {
   const account = currentAccount()
-  const bytesChallengeHash = cacheCallValue(state, caseAddress, 'challengeHash')
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const isPatient = account.address() === patientAddress
   const isChallengingDoctor = account.address() === challengingDoctorAddress
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
-
-  console.log('patient gets bytesChallengeHash', bytesChallengeHash)
-  console.log('patient gets challengeHash', challengeHash)
 
   return {
     isChallengingDoctor,

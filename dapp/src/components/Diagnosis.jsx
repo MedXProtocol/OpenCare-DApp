@@ -127,7 +127,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
           if (diagnosisJson) {
             const diagnosis = JSON.parse(diagnosisJson)
-            return resolve({ diagnosisJson })
+            return resolve({ diagnosis })
           } else {
             console.log(diagnosisJson)
             return reject('There was an error')

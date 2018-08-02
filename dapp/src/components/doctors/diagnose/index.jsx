@@ -28,16 +28,8 @@ function mapStateToProps(state, { match }) {
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'doctorEncryptedCaseKeys', address)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
-  const bytesDiagnosisHash = cacheCallValue(state, caseAddress, 'diagnosisHash')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
-  const bytesChallengeHash = cacheCallValue(state, caseAddress, 'challengeHash')
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
-
-  // console.log('doctor gets bytesDiagnosisHash', bytesDiagnosisHash)
-  // console.log('doctor gets diagnosisHash', diagnosisHash)
-
-  // console.log('doctor gets bytesChallengeHash', bytesChallengeHash)
-  // console.log('doctor gets challengeHash', challengeHash)
 
   return {
     address,
