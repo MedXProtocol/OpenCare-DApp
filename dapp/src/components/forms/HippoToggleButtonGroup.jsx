@@ -28,8 +28,12 @@ export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Comp
   render() {
     const { id, name, error, label, values, colClasses } = this.props
 
+    let controlLabel = label ? <ControlLabel>{label}</ControlLabel> : null
+
+    let formGroupClasses = classnames('form-group', { 'has-error': error }, this.props.formGroupClassNames)
+
     return (
-      <div style={{ position: 'relative' }}>
+      <React.Fragment>
         <FlipMove
           enterAnimation="accordionVertical"
           leaveAnimation="accordionVertical"
@@ -41,8 +45,8 @@ export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Comp
           : (
             <div className="row" key={`key-${name}-visible`}>
               <div className={colClasses}>
-                <div id={id} className={classnames('form-group', { 'has-error': error })}>
-                  <ControlLabel>{label}</ControlLabel>
+                <div id={id} className={formGroupClasses}>
+                  {controlLabel}
                   <ButtonToolbar>
                     <ToggleButtonGroup name={name} type="radio">
                       {
@@ -63,7 +67,7 @@ export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Comp
             </div>
           )}
         </FlipMove>
-      </div>
+      </React.Fragment>
     )
   }
 }

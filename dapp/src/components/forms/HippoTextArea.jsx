@@ -2,8 +2,9 @@ import React, { Component } from 'react'
 import classnames from 'classnames'
 import { defined } from '~/utils/defined'
 import FlipMove from 'react-flip-move'
+import TextareaAutosize from 'react-autosize-textarea'
 
-export const HippoTextInput = class _HippoTextInput extends Component {
+export const HippoTextArea = class _HippoTextArea extends Component {
 
   constructor(props) {
     super(props)
@@ -21,27 +22,23 @@ export const HippoTextInput = class _HippoTextInput extends Component {
 
   handleBlur = (event) => {
     event.persist()
-    this.props.textInputOnBlur(event, this.props.name)
+    this.props.textAreaOnBlur(event, this.props.name)
   }
 
   handleChange = (event) => {
     event.persist()
-    this.props.textInputOnChange(event, this.props.name)
+    this.props.textAreaOnChange(event, this.props.name)
   }
 
   render() {
-    let { label } = this.props
-    const { name, error, colClasses, type } = this.props
-
+    const { label } = this.props
+    const { name, error, colClasses } = this.props
+    let controlLabel
     if (this.props.optional) {
-      label = <React.Fragment>
+      controlLabel = <label className="control-label">
         {label} <span className="text-gray">(Optional)</span>
-      </React.Fragment>
+      </label>
     }
-
-    let controlLabel = <label className="control-label">
-      {label}
-    </label>
 
     return (
       <React.Fragment>
@@ -58,13 +55,13 @@ export const HippoTextInput = class _HippoTextInput extends Component {
                 <div className={colClasses ? colClasses : ''}>
                   <div className={classnames('form-group', { 'has-error': error })}>
                     {controlLabel}
-                    <input
+                    <TextareaAutosize
                       id={name}
                       name={name}
                       onChange={this.handleChange}
                       onBlur={this.handleBlur}
-                      type={type ? type : "text"}
-                      className="form-control" />
+                      className="form-control"
+                    />
                     {error}
                   </div>
                 </div>

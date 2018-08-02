@@ -68,6 +68,10 @@
   color: $medcredits-text-gray;
 }
 
+.has-error.help-block {
+  color: $brand-danger;
+}
+
 .form-group--heading {
   color: $medcredits-text-gray;
   font-weight: 700;
@@ -139,4 +143,20 @@ button.text-gray:focus,
 button.text-gray:active {
   color: #888 !important;
   text-decoration: none;
+}
+
+.form-group__no-margin {
+  margin: 0;
+}
+
+.form-group--logical-grouping {
+  background: #fafafa;
+  padding: 2rem 2rem 1rem 2rem;
+
+  margin-left: -2rem;
+  margin-right: -2rem;
+}
+
+.control-label {
+  width: 100%;
 }
