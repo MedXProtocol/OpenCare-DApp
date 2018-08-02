@@ -19,7 +19,7 @@ export function* addContract({address, name, contractKey, networkId}) {
 
   let existingContractKey = yield select(contractKeyByAddress, address)
   if (existingContractKey !== contractKey) {
-    console.table({type: "ADD_CONTRACT", address, name, contractKey, networkId})
+    // console.table({type: "ADD_CONTRACT", address, name, contractKey, networkId})
     yield put({type: "ADD_CONTRACT", address, name, contractKey, networkId})
   }
 }
