@@ -160,14 +160,13 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
           <div className='row'>
             {diagnosis}
             {challenge}
-            {/*
             <div id="view-case-details" className='col-xs-12'>
               <CaseDetails
                 caseAddress={this.props.match.params.caseAddress}
                 caseKey={caseKey}
                 caseIsOpenForDoctor={caseIsOpenForDoctor}
                 isDoctor={true} />
-            </div>*/}
+            </div>
             {submitDiagnosis}
             {submitChallenge}
           </div>

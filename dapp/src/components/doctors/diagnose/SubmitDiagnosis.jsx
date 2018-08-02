@@ -674,7 +674,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                   Are you sure?
                 </h4>
                 <h5>
-                  This will send your diagnosis and overTheCounterRecommendation to the patient.
+                  This will send your diagnosis to the patient.
                 </h5>
               </div>
             </div>
