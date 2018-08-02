@@ -23,6 +23,7 @@ import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import isEqual from 'lodash.isequal'
+import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -36,6 +37,8 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const isPatient = account === patientAddress
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
 
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+
   return {
     account,
     currentlyExcludedDoctors,
@@ -46,11 +49,14 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
     encryptedCaseKey,
     caseKeySalt,
     diagnosingDoctor,
-    selectedDoctor: ''
+    selectedDoctor: '',
+    networkId
   }
 }
 
-function* saga({ caseAddress }) {
+function* saga({ caseAddress, networkId }) {
+  if (!networkId) { return }
+
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
     cacheCall(caseAddress, 'status'),
@@ -71,7 +77,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['caseAddress', 'diagnosisHash', 'status'] })(
+  withSaga(saga, { propTriggers: ['caseAddress', 'diagnosisHash', 'status', 'networkId'] })(
     withSend(class _Diagnosis extends Component {
 
   constructor(){

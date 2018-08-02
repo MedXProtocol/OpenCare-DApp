@@ -12,8 +12,10 @@ import { currentAccount } from '~/services/sign-in'
 import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
+import get from 'lodash.get'
 
 function mapStateToProps(state, { match }) {
+  const networkId = get(state, 'sagaGenesis.network.networkId')
   const caseAddress = match.params.caseAddress
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
@@ -21,18 +23,22 @@ function mapStateToProps(state, { match }) {
   const bytesDiagnosisHash = cacheCallValue(state, caseAddress, 'diagnosisHash')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
 
-  console.log('patient gets bytesDiagnosisHash', bytesDiagnosisHash)
-  console.log('patient gets diagnosisHash', diagnosisHash)
+  // console.log('patient gets bytesDiagnosisHash', bytesDiagnosisHash)
+  // console.log('patient gets diagnosisHash', diagnosisHash)
 
   return {
     diagnosisHash,
     encryptedCaseKey,
-    caseKeySalt
+    caseKeySalt,
+    networkId
   }
 }
 
-function* saga({ match }) {
+function* saga({ match, networkId }) {
+  if (!networkId) { return }
+
   const caseAddress = match.params.caseAddress
+
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
     cacheCall(caseAddress, 'encryptedCaseKey'),
@@ -42,7 +48,7 @@ function* saga({ match }) {
 }
 
 export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['match', 'diagnosisHash']})(
+  withSaga(saga, { propTriggers: [ 'match', 'diagnosisHash', 'networkId' ]})(
     class _PatientCase extends Component {
 
   render() {

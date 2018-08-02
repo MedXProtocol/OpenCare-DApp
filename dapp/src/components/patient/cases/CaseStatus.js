@@ -5,6 +5,7 @@ import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
+import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress }) {
   const status = (cacheCallValue(state, caseAddress, 'status') || '0')
@@ -15,18 +16,22 @@ function mapStateToProps(state, { caseAddress }) {
   const diagnosingDoctorName = cacheCallValue(state, DoctorManager, 'name', diagnosingDoctor)
   const challengingDoctorName = cacheCallValue(state, DoctorManager, 'name', challengingDoctor)
 
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+
   return {
     status,
     DoctorManager,
     diagnosingDoctor,
     diagnosingDoctorName,
     challengingDoctor,
-    challengingDoctorName
+    challengingDoctorName,
+    networkId
   }
 }
 
-function* saga({ caseAddress, DoctorManager }) {
-  if (!caseAddress || !DoctorManager) { return }
+function* saga({ caseAddress, DoctorManager, networkId }) {
+  if (!networkId || !caseAddress || !DoctorManager) { return }
+
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'status')
   let diagnosingDoctor = yield cacheCall(caseAddress, 'diagnosingDoctor')
@@ -37,7 +42,10 @@ function* saga({ caseAddress, DoctorManager }) {
   }
 }
 
-const CaseStatus = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress', 'DoctorManager', 'diagnosingDoctor', 'challengingDoctor'] })(class _CaseStatus extends Component {
+const CaseStatus = connect(mapStateToProps)(
+  withSaga(saga, { propTriggers: ['caseAddress', 'DoctorManager', 'diagnosingDoctor', 'challengingDoctor', 'networkId'] })(
+    class _CaseStatus extends Component {
+
     render() {
       var status = parseInt(this.props.status, 10)
       let alert

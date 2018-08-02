@@ -9,6 +9,7 @@ import { downloadJson } from '~/utils/storage-util'
 import { cacheCallValue, withSaga, cacheCall, addContract } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { toastr } from '~/toastr'
+import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress, challengingDoctorAddress }) {
   const account = currentAccount()
@@ -18,24 +19,29 @@ function mapStateToProps(state, { caseAddress, challengingDoctorAddress }) {
   const isPatient = account.address() === patientAddress
   const isChallengingDoctor = account.address() === challengingDoctorAddress
 
-  console.log('patient gets bytesChallengeHash', bytesChallengeHash)
-  console.log('patient gets challengeHash', challengeHash)
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+
+  // console.log('patient gets bytesChallengeHash', bytesChallengeHash)
+  // console.log('patient gets challengeHash', challengeHash)
 
   return {
     isChallengingDoctor,
     challengeHash,
-    isPatient
+    isPatient,
+    networkId
   }
 }
 
-function* saga({ caseAddress }) {
+function* saga({ caseAddress, networkId }) {
+  if (!networkId) { return }
+
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'challengeHash')
   yield cacheCall(caseAddress, 'patient')
 }
 
 const ChallengedDiagnosis = connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: [ 'caseAddress', 'challengeHash' ] })(
+  withSaga(saga, { propTriggers: [ 'caseAddress', 'challengeHash', 'networkId' ] })(
     class _ChallengedDiagnosis extends Component {
 
   constructor(props){

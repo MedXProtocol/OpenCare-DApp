@@ -33,11 +33,11 @@ function mapStateToProps(state, { match }) {
   const bytesChallengeHash = cacheCallValue(state, caseAddress, 'challengeHash')
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
 
-  console.log('doctor gets bytesDiagnosisHash', bytesDiagnosisHash)
-  console.log('doctor gets diagnosisHash', diagnosisHash)
+  // console.log('doctor gets bytesDiagnosisHash', bytesDiagnosisHash)
+  // console.log('doctor gets diagnosisHash', diagnosisHash)
 
-  console.log('doctor gets bytesChallengeHash', bytesChallengeHash)
-  console.log('doctor gets challengeHash', challengeHash)
+  // console.log('doctor gets bytesChallengeHash', bytesChallengeHash)
+  // console.log('doctor gets challengeHash', challengeHash)
 
   return {
     address,
@@ -56,6 +56,7 @@ function mapStateToProps(state, { match }) {
 function* saga({ match, address, AccountManager }) {
   if (!AccountManager || isEmptyObject(match.params)) { return }
   const caseAddress = match.params.caseAddress
+  // console.log('called by doctors/diagnose.js saga')
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield all([

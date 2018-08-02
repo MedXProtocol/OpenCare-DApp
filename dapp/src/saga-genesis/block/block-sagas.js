@@ -23,6 +23,10 @@ function createBlockTrackerEmitter (web3) {
     const blockTracker = new PollingBlockTracker({provider: web3.currentProvider})
 
     blockTracker.on('latest', (block) => {
+      // console.log('isFirst: ', isFirst)
+      // if (block.transactions.length) {
+        // console.log(block.transactions)
+      // }
       if (isFirst) {
         isFirst = false
       } else {
@@ -31,7 +35,8 @@ function createBlockTrackerEmitter (web3) {
     })
 
     blockTracker.start().catch((error) => {
-      emit({type: 'BLOCK_TRACKER_FAILED', error})
+      console.error('Block Tracker Failed with error:')
+      console.error(error)
       emit(END)
     })
 
@@ -54,6 +59,7 @@ function* addAddressIfExists(addressSet, address) {
   address = address.toLowerCase()
   const contractKey = yield select(contractKeyByAddress, address)
   if (contractKey) {
+    // console.log('contractKey for address: ', contractKey, address)
     addressSet.add(address)
     return true
   }
@@ -66,6 +72,10 @@ export function* collectTransactionAddresses(addressSet, transaction) {
   const from = yield call(addAddressIfExists, addressSet, transaction.from)
   if (to || from) {
     const receipt = yield web3.eth.getTransactionReceipt(transaction.hash)
+    // if (receipt) {
+    //   console.log('receipt logs: ')
+    //   console.log(receipt.logs)
+    // }
     yield* receipt.logs.map(function* (log) {
       yield call(addAddressIfExists, addressSet, log.address)
     })
@@ -82,6 +92,9 @@ export function* collectAllTransactionAddresses(transactions) {
 
 export function* latestBlock({block}) {
   const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
+  // if (addressSet.length) {
+  //   console.log('addressSet', addressSet)
+  // }
   yield* Array.from(addressSet).map(function* (address) {
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   })

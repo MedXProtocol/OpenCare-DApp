@@ -11,22 +11,29 @@ import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { toastr } from '~/toastr'
+import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress }) {
   let caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+
   return {
-    caseDetailsHash: getFileHashFromBytes(caseDataHash)
+    caseDetailsHash: getFileHashFromBytes(caseDataHash),
+    networkId
   }
 }
 
 function* saga({ caseAddress, networkId }) {
-  if (!caseAddress) { return }
+  if (!networkId || !caseAddress) { return }
+
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'caseDataHash')
 }
 
-const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(
-  class _CaseDetails extends Component {
+const CaseDetails = withContractRegistry(connect(mapStateToProps)(
+  withSaga(saga, { propTriggers: ['caseAddress', 'networkId'] })(
+    class _CaseDetails extends Component {
+
   constructor (props) {
     super(props)
     this.state = {
