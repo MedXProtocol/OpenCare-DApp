@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { cacheCallValue, withSaga, cacheCall, addContract } from '~/saga-genesis'
 import { currentAccount } from '~/services/sign-in'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { isBlank } from '~/utils/isBlank'
 import { downloadJson } from '~/utils/storage-util'
-import { cacheCallValue, withSaga, cacheCall, addContract } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
+import { DiagnosisDisplay } from '~/components/DiagnosisDisplay'
 import { toastr } from '~/toastr'
 import get from 'lodash.get'
 
@@ -122,24 +123,7 @@ const ChallengedDiagnosis = connect(mapStateToProps)(
             <h3 className="card-title">{this.props.title}</h3>
           </div>
           <div className="card-body">
-            <div className="row">
-              <div className="col-xs-12">
-                <label>Diagnosis</label>
-                <p>{this.state.diagnosis.diagnosis}</p>
-              </div>
-              <div className="col-xs-12">
-                <label>Recommendation</label>
-                <p>{this.state.diagnosis.recommendation}</p>
-              </div>
-              {(this.state.diagnosis.additionalRecommendation)
-                ? (
-                    <div className="col-xs-12">
-                      <label>Additional Recommendation:</label>
-                      <p>{this.state.diagnosis.additionalRecommendation}</p>
-                    </div>
-                  )
-                : null}
-            </div>
+            <DiagnosisDisplay diagnosis={this.state.diagnosis} />
           </div>
         </div>
       )
