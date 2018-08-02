@@ -15,6 +15,7 @@ import { isEmptyObject } from '~/utils/isEmptyObject'
 import { isBlank } from '~/utils/isBlank'
 import { downloadJson } from '~/utils/storage-util'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
+import { DiagnosisDisplay } from '~/components/DiagnosisDisplay'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
 import { mixpanel } from '~/mixpanel'
@@ -288,37 +289,15 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     return (
-      isEmptyObject(this.state.diagnosis) ?
-        <div /> : (
+      isEmptyObject(this.state.diagnosis)
+        ? <div />
+        : (
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">{this.props.title}</h3>
           </div>
           <div className="card-body">
-            <div className="row">
-              <div className="col-xs-12">
-                <label>Diagnosis</label>
-                <p>
-                  {this.state.diagnosis.diagnosis}
-                </p>
-              </div>
-              <div className="col-xs-12">
-                <label>Recommendation</label>
-                <p>
-                  {this.state.diagnosis.recommendation}
-                </p>
-              </div>
-              {this.state.diagnosis.additionalRecommendation
-                ? (
-                    <div className="col-xs-12">
-                      <label>Additional Recommendation:</label>
-                      <p>
-                        {this.state.diagnosis.additionalRecommendation}
-                      </p>
-                    </div>
-                  )
-                : null}
-            </div>
+            <DiagnosisDisplay diagnosis={this.state.diagnosis} />
           </div>
 
           {buttons}

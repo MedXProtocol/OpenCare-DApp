@@ -28,6 +28,7 @@ import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
 import { HippoImageInput } from '~/components/forms/HippoImageInput'
+import { HippoTextArea } from '~/components/forms/HippoTextArea'
 import { PatientInfo } from './PatientInfo'
 import { SpotQuestions } from './SpotQuestions'
 import { RashQuestions } from './RashQuestions'
@@ -227,6 +228,14 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     handleTextInputOnBlur = (event) => {
+      this.validateField(event.target.id)
+    }
+
+    handleTextAreaOnChange = (event) => {
+      this.setState({ [event.target.id]: event.target.value })
+    }
+
+    handleTextAreaOnBlur = (event) => {
       this.validateField(event.target.id)
     }
 
@@ -765,17 +774,18 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                     {rashQuestions}
                     {acneQuestions}
 
-                    <div className="row">
-                      <div className="col-xs-12 col-sm-12 col-md-12">
-                        <div className="form-group">
-                          <label className="control-label">Please include any additional info below <span className="text-gray">(Optional)</span></label>
-                          <textarea
-                            onChange={(event) => this.setState({ description: event.target.value })}
-                            className="form-control"
-                            rows="5" />
-                        </div>
-                      </div>
-                    </div>
+                    <HippoTextArea
+                      id='description'
+                      name='description'
+                      colClasses='col-xs-12'
+                      label='Please include any additional info below'
+                      optional={true}
+                      error={errors['description']}
+                      textAreaOnBlur={this.handleTextAreaOnBlur}
+                      textAreaOnChange={this.handleTextAreaOnChange}
+                    />
+
+                    <hr />
 
                     <div className="row">
                       <div className="col-xs-12 col-sm-12 col-md-12">

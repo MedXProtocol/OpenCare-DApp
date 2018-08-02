@@ -69,7 +69,7 @@ export const HippoImageInput = class _HippoImageInput extends Component {
     return (
       <div className="row">
         <div id={id} className={colClasses}>
-          <div className={classnames('form-group', 'form-group--file-input', { 'has-error': error || fileError })}>
+          <div className={classnames('form-group', 'form-group--logical-grouping', { 'has-error': error || fileError })}>
             <label className='control-label' htmlFor={`${id}-input`}>
               {label}
               {subLabel ? <span className="text-gray small"><br/>{subLabel}</span> : null}
