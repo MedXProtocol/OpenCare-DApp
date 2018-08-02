@@ -69,18 +69,25 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(
       const cancelableDownloadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
           const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
-          const details = JSON.parse(detailsJson)
 
-          const [firstImageUrl, secondImageUrl] = await Promise.all([
-            downloadImage(details.firstImageHash, props.caseKey),
-            downloadImage(details.secondImageHash, props.caseKey)
-          ])
+          if (detailsJson) {
+            const details = JSON.parse(detailsJson)
 
-          return resolve({
-            details,
-            firstImageUrl,
-            secondImageUrl
-          })
+            const [firstImageUrl, secondImageUrl] = await Promise.all([
+              downloadImage(details.firstImageHash, props.caseKey),
+              downloadImage(details.secondImageHash, props.caseKey)
+            ])
+
+            return resolve({
+              details,
+              firstImageUrl,
+              secondImageUrl
+            })
+          } else {
+            console.log('rejecting')
+            console.log(detailsJson)
+            return reject('There was an error')
+          }
         })
       )
 
@@ -90,11 +97,15 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(
         .promise
         .then((result) => {
           this.setState(result)
+        })
+        .catch((reason) => {
+          console.log('isCanceled', reason.isCanceled)
+        })
+        .finally(() => {
           this.setState({
             loading: false
           })
         })
-        .catch((reason) => console.log('isCanceled', reason.isCanceled));
     } catch (error) {
       toastr.error('There was an error while downloading your case details from IPFS.')
       console.warn(error)

@@ -124,9 +124,14 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
       const cancelableDownloadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
           const diagnosisJson = await downloadJson(props.diagnosisHash, props.caseKey)
-          const diagnosis = JSON.parse(diagnosisJson)
 
-          return resolve({ diagnosis })
+          if (diagnosisJson) {
+            const diagnosis = JSON.parse(diagnosisJson)
+            return resolve({ diagnosisJson })
+          } else {
+            console.log(diagnosisJson)
+            return reject('There was an error')
+          }
         })
       )
 
@@ -136,12 +141,15 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         .promise
         .then((result) => {
           this.setState(result)
-
+        })
+        .catch((reason) => {
+          console.log('isCanceled', reason.isCanceled)
+        })
+        .finally(() => {
           this.setState({
             loading: false
           })
         })
-        .catch((reason) => console.log('isCanceled', reason.isCanceled));
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')
       console.warn(error)

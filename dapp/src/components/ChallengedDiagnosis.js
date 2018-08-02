@@ -21,8 +21,8 @@ function mapStateToProps(state, { caseAddress, challengingDoctorAddress }) {
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
-  // console.log('patient gets bytesChallengeHash', bytesChallengeHash)
-  // console.log('patient gets challengeHash', challengeHash)
+  console.log('patient gets bytesChallengeHash', bytesChallengeHash)
+  console.log('patient gets challengeHash', challengeHash)
 
   return {
     isChallengingDoctor,
@@ -84,9 +84,14 @@ const ChallengedDiagnosis = connect(mapStateToProps)(
       const cancelableDownloadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
           const diagnosisJson = await downloadJson(props.challengeHash, props.caseKey)
-          const diagnosis = JSON.parse(diagnosisJson)
 
-          return resolve({ diagnosis })
+          if (diagnosisJson) {
+            const diagnosis = JSON.parse(diagnosisJson)
+            return resolve({ diagnosis })
+          } else {
+            console.log(diagnosisJson)
+            return reject('There was an error')
+          }
         })
       )
 
@@ -96,11 +101,15 @@ const ChallengedDiagnosis = connect(mapStateToProps)(
         .promise
         .then((result) => {
           this.setState(result)
+        })
+        .catch((reason) => {
+          console.log('isCanceled', reason.isCanceled)
+        })
+        .finally(() => {
           this.setState({
             loading: false
           })
         })
-        .catch((reason) => console.log('isCanceled', reason.isCanceled));
 
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')
