@@ -784,7 +784,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       textAreaOnBlur={this.handleTextAreaOnBlur}
                       textAreaOnChange={this.handleTextAreaOnChange}
                     />
-                    {/*onChange={(event) => this.setState({ description: event.target.value })}*/}
+
+                    <hr />
 
                     <div className="row">
                       <div className="col-xs-12 col-sm-12 col-md-12">

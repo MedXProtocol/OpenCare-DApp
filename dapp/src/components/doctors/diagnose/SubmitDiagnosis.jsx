@@ -1,3 +1,4 @@
+import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
 import Select from 'react-select'
@@ -17,10 +18,10 @@ import { withSend } from '~/saga-genesis'
 import { customStyles } from '~/config/react-select-custom-styles'
 import { groupedRecommendationOptions } from './recommendationOptions'
 import { groupedDiagnosisOptions } from './diagnosisOptions'
-import { HippoCheckboxGroup } from '~/components/forms/HippoCheckboxGroup'
+import { HippoStringDisplay } from '~/components/HippoStringDisplay'
 import { HippoTextArea } from '~/components/forms/HippoTextArea'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
-// import { HippoTextInput } from '~/components/forms/HippoTextInput'
+import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 import { Loading } from '~/components/Loading'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
@@ -54,12 +55,20 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
       overTheCounterNotes: '',
       overTheCounterFrequency: '',
       overTheCounterDuration: '',
-      overTheCounterRecommendation: null,
+      overTheCounterRecommendation: '',
 
-      // topicalMedicationsRecommendation: [],
-      // oralMedicationsRecommendation: [],
-      // proceduresRecommendation: [],
-      // otherRecommendation: [],
+      prescriptionUse: null,
+      prescriptionMedication: [],
+      prescriptionNotes: '',
+      prescriptionFrequency: '',
+      prescriptionDuration: '',
+      prescriptionRecommendation: '',
+
+      sideEffects: '',
+      sideEffectsAdditional: '',
+
+      counseling: '',
+      counselingAdditional: '',
 
       personalMessage: '',
 
@@ -68,7 +77,6 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
       diagnosis: null,
 
-      formIsValid: false,
       showConfirmationModal: false,
 
       isSubmitting: false,
@@ -218,33 +226,37 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     this.setState({ diagnosis: newValue.value }, this.validateInputs)
   }
 
-  // Combines the selected overTheCounterRecommendation values into a string
+  // Combines the selected overTheCounter* and prescription* values into their
+  // respective React groups
   buildFinalRecommendation = () => {
-    let overTheCounterRecommendation = <React.Fragment>
-      <strong>{this.state.overTheCounterMedication.join(', ')}</strong>
-      <br />
-      {this.state.overTheCounterUse} {this.state.overTheCounterFrequency} for {this.state.overTheCounterDuration}
-      <br />
-      {this.state.overTheCounterNotes}
-    </React.Fragment>
-
-    this.setState({ overTheCounterRecommendation }, this.validateInputs)
+    this.buildRecommendation('overTheCounter')
+    this.buildRecommendation('prescription')
   }
 
-  validateInputs = () => {
-    const valid =
-      isNotEmptyString(this.state.diagnosis) &&
-      isNotEmptyString(this.state.overTheCounterRecommendation)
+  buildRecommendation = (fieldGroup) => {
+    let recommendation = ''
+    let duration = ''
 
-    this.setState({ formIsValid: valid })
+    if (this.state[`${fieldGroup}Medication`].length > 0) {
+      if (this.state[`${fieldGroup}Duration`]) {
+        duration = `for ${this.state[`${fieldGroup}Duration`]}`
+      }
+      recommendation = <React.Fragment>
+        <strong>{this.state[`${fieldGroup}Medication`].join(', ')}</strong>
+        <br />
+        {this.state[`${fieldGroup}Use`]} {this.state[`${fieldGroup}Frequency`]} {duration}
+        <br />
+        {this.state[`${fieldGroup}Notes`]}
+      </React.Fragment>
+    }
+
+    this.setState({ [`${fieldGroup}Recommendation`]: recommendation }, this.validateInputs)
   }
 
   handleSubmit = async (event) => {
     event.preventDefault()
 
     await this.runValidation()
-
-    console.log('formIsValid! ', this.state.formIsValid)
 
     if (this.state.errors.length === 0) {
       this.setState({
@@ -263,9 +275,23 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
       showConfirmationModal: false
     })
 
+    const overTheCounter = ReactDOMServer.renderToStaticMarkup(this.state.overTheCounterRecommendation)
+    overTheCounter.replace('<strong>', '').replace('</strong>', '')
+    overTheCounter.replace('<br/>', ', ')
+
+    const prescriptionMedication = ReactDOMServer.renderToStaticMarkup(this.state.prescriptionRecommendation)
+    prescriptionMedication.replace('<strong>', '').replace('</strong>', '')
+    prescriptionMedication.replace('<br/>', ', ')
+    console.log(prescriptionMedication)
+
     const diagnosisInformation = {
       diagnosis: this.state.diagnosis,
-      overTheCounterRecommendation: this.state.overTheCounterRecommendation,
+      overTheCounterRecommendation: overTheCounter,
+      prescriptionMedicationRecommendation: prescriptionMedication,
+      sideEffects: this.state.sideEffects,
+      sideEffectsAdditional: this.state.sideEffectsAdditional,
+      counseling: this.state.counseling,
+      counselingAdditional: this.state.counselingAdditional,
       personalMessage: this.state.personalMessage
     }
     const diagnosisJson = JSON.stringify(diagnosisInformation)
@@ -315,7 +341,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
           <form onSubmit={this.handleSubmit} >
             <div id="submit-diagnosis" className="card-header">
               <h3 className="card-title">
-                Submit Diagnosis
+                Send Diagnosis
                 <br /><small><a className="link--internal" href="#view-case-details">View Case Details</a></small>
               </h3>
             </div>
@@ -336,10 +362,14 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                     {errors['diagnosis']}
                   </div>
 
+                  <div className="form-group--heading">
+                    Medication Recommendation(s):
+                  </div>
+
                   <div className="form-group form-group--logical-grouping">
                     <label>Over-the-Counter Medication</label>
 
-                    <div className={classnames('form-group', { 'has-error': errors['overTheCounterMedication'] })}>
+                    <div className={classnames('form-group')}>
                       <Select
                         placeholder={groupedRecommendationOptions.overTheCounter.label}
                         styles={customStyles}
@@ -351,7 +381,6 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                         selected={this.state.overTheCounterMedication}
                         required
                       />
-                      {errors['overTheCounterMedication']}
                     </div>
 
                     <HippoToggleButtonGroup
@@ -360,9 +389,9 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                       colClasses='col-xs-12'
                       label=''
                       formGroupClassNames=''
-                      error={errors['overTheCounterUse']}
                       buttonGroupOnChange={this.handleButtonGroupOnChange}
                       values={['Apply', 'Wash', 'Take by mouth']}
+                      visible={this.state.overTheCounterMedication.length > 0 ? true : false}
                     />
 
                     <div className="row">
@@ -372,9 +401,9 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                         rowClasses=''
                         colClasses='col-xs-6'
                         label='Frequency'
-                        error={errors['overTheCounterFrequency']}
                         textAreaOnBlur={this.handleTextAreaOnBlur}
                         textAreaOnChange={this.handleTextAreaOnChange}
+                        visible={this.state.overTheCounterMedication.length > 0 ? true : false}
                       />
 
                       <HippoTextArea
@@ -383,9 +412,9 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                         rowClasses=''
                         colClasses='col-xs-6'
                         label='Duration'
-                        error={errors['overTheCounterDuration']}
                         textAreaOnBlur={this.handleTextAreaOnBlur}
                         textAreaOnChange={this.handleTextAreaOnChange}
+                        visible={this.state.overTheCounterMedication.length > 0 ? true : false}
                       />
                     </div>
 
@@ -395,32 +424,168 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                       colClasses='col-xs-12'
                       label='Notes'
                       optional={true}
-                      error={errors['overTheCounterNotes']}
                       textAreaOnBlur={this.handleTextAreaOnBlur}
                       textAreaOnChange={this.handleTextAreaOnChange}
+                      visible={this.state.overTheCounterMedication.length > 0 ? true : false}
                     />
                   </div>
 
-                  <HippoTextArea
+                  <div className="form-group form-group--logical-grouping">
+                    <label>Prescription Medication</label>
+
+                    <div className={classnames('form-group')}>
+                      <Select
+                        placeholder={groupedRecommendationOptions.prescriptionMedications.label}
+                        styles={customStyles}
+                        components={Animated}
+                        closeMenuOnSelect={true}
+                        options={groupedRecommendationOptions.prescriptionMedications.options}
+                        isMulti={true}
+                        onChange={this.recommendationSelectUpdated('prescriptionMedication')}
+                        selected={this.state.prescriptionMedication}
+                        required
+                      />
+                    </div>
+
+                    <HippoToggleButtonGroup
+                      id='prescriptionUse'
+                      name='prescriptionUse'
+                      colClasses='col-xs-12'
+                      label=''
+                      formGroupClassNames=''
+                      buttonGroupOnChange={this.handleButtonGroupOnChange}
+                      values={['Apply', 'Wash', 'Take by mouth']}
+                      visible={this.state.prescriptionMedication.length > 0 ? true : false}
+                    />
+
+                    <div className="row">
+                      <HippoTextArea
+                        id='prescriptionFrequency'
+                        name="prescriptionFrequency"
+                        rowClasses=''
+                        colClasses='col-xs-6'
+                        label='Frequency'
+                        textAreaOnBlur={this.handleTextAreaOnBlur}
+                        textAreaOnChange={this.handleTextAreaOnChange}
+                        visible={this.state.prescriptionMedication.length > 0 ? true : false}
+                      />
+
+                      <HippoTextArea
+                        id='prescriptionDuration'
+                        name="prescriptionDuration"
+                        rowClasses=''
+                        colClasses='col-xs-6'
+                        label='Duration'
+                        textAreaOnBlur={this.handleTextAreaOnBlur}
+                        textAreaOnChange={this.handleTextAreaOnChange}
+                        visible={this.state.prescriptionMedication.length > 0 ? true : false}
+                      />
+                    </div>
+
+                    <HippoTextArea
+                      id='prescriptionNotes'
+                      name="prescriptionNotes"
+                      colClasses='col-xs-12'
+                      label='Notes'
+                      optional={true}
+                      textAreaOnBlur={this.handleTextAreaOnBlur}
+                      textAreaOnChange={this.handleTextAreaOnChange}
+                      visible={this.state.prescriptionMedication.length > 0 ? true : false}
+                    />
+                  </div>
+
+                  <div className="form-group--heading">
+                    Side Effects:
+                  </div>
+
+                  <small className="alert alert-info">
+                    Side effects to be Auto-populated, see examples here:
+
+                    &nbsp;&nbsp;&nbsp;
+                    <InfoQuestionMark
+                      character='1'
+                      place="bottom"
+                      tooltipText="Example #1: Topical steroids<br/>Side effects of topical steroids when used for a prolonged period can include but <br/>are not limited to striae, telangiectasias skin thinning, change in skin pigment, <br/>acne/folliculitis, and dermatitis."
+                    />
+                    &nbsp;&nbsp;&nbsp;
+                    <InfoQuestionMark
+                      character='2'
+                      place="bottom"
+                      tooltipText="Example #2: Doxycycline<br/>Side effects of doxycycline include but are not limited to nausea, vomiting, esophagitis, <br/>photosensitivity, liver toxicity. This medication should be not used by pregnant women."
+                    />
+                    &nbsp;&nbsp;
+                  </small>
+                  <br />
+                  <br />
+
+                  {/*<HippoTextArea
                     id='sideEffects'
                     name='sideEffects'
                     colClasses='col-xs-12 col-sm-12 col-md-12'
                     label='Side Effects'
                     optional={true}
-                    error={errors['sideEffects']}
                     textAreaOnBlur={this.handleTextAreaOnBlur}
                     textAreaOnChange={this.handleTextAreaOnChange}
-                  />
+                  />*/}
                   <HippoTextArea
                     id='sideEffectsAdditional'
                     name='sideEffectsAdditional'
                     colClasses='col-xs-12 col-sm-12 col-md-12'
                     label='Additional Side Effects'
                     optional={true}
-                    error={errors['sideEffectsAdditional']}
                     textAreaOnBlur={this.handleTextAreaOnBlur}
                     textAreaOnChange={this.handleTextAreaOnChange}
                   />
+
+
+
+                  <div className="form-group--heading">
+                    Counseling:
+                  </div>
+
+                  <small className="alert alert-info">
+                    Counseling to be Auto-populated, see examples here:
+                    &nbsp;&nbsp;&nbsp;
+                    <InfoQuestionMark
+                      character='1'
+                      place="bottom"
+                      tooltipText="Example #1: ABCDEs of Melanoma:<br/>1) Asymmetry – The lesion does not appear to be equal. <br/>2) Border – The borders are irregular or not clearly identifiable. <br/>3) Color: The lesion is multicolored and there are varying shades of color. <br/>4) Diameter: Lesions larger than 6 mm are more concerning for melanoma. <br/>Ugly Duckling spots that appear different from other moles on the body may also be concerning. <br/>5) Evolving: Changes in size or shape of lesion may be concerning for cancer."
+                    />
+                    &nbsp;&nbsp;&nbsp;
+                    <InfoQuestionMark
+                      character='2'
+                      place="bottom"
+                      tooltipText="Example #2: These are common, benign lesions. They rarely become cancerous."
+                    />
+                    &nbsp;&nbsp;
+                  </small>
+                  <br />
+                  <br />
+
+                  {/*
+                  <HippoTextArea
+                    id='counseling'
+                    name='counseling'
+                    colClasses='col-xs-12 col-sm-12 col-md-12'
+                    label='Counseling'
+                    optional={true}
+                    textAreaOnBlur={this.handleTextAreaOnBlur}
+                    textAreaOnChange={this.handleTextAreaOnChange}
+                  />
+                  */}
+                  <HippoTextArea
+                    id='counselingAdditional'
+                    name='counselingAdditional'
+                    colClasses='col-xs-12 col-sm-12 col-md-12'
+                    label='Additional Counseling'
+                    optional={true}
+                    textAreaOnBlur={this.handleTextAreaOnBlur}
+                    textAreaOnChange={this.handleTextAreaOnChange}
+                  />
+
+                  <div className="form-group--heading">
+                    Personal Message:
+                  </div>
 
                   <HippoTextArea
                     id='personalMessage'
@@ -433,33 +598,58 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                   />
                 </div>
 
-                <div className="col-xs-12 col-md-4">
+                <div
+                  className="col-xs-12 col-md-4"
+                  style={{display: (this.state.diagnosis !== null) ? 'block' : 'none' }}
+                >
                   <div className="well">
-                    <label className="text-gray">Your diagnosis:</label>
-                    <p>
-                      {(this.state.diagnosis !== null)
-                        ? this.state.diagnosis
-                        : 'no diagnosis entered.'}
-                    </p>
+                    <HippoStringDisplay
+                      label="Your Diagnosis:"
+                      value={this.state.diagnosis}
+                      visibleIf={this.state.diagnosis !== null}
+                    />
 
+                    <HippoStringDisplay
+                      label="Over-the-Counter Medication:"
+                      value={this.state.overTheCounterRecommendation}
+                      visibleIf={this.state.overTheCounterMedication.length > 0}
+                    />
 
-                    <label className="text-gray">Over the Counter Medication:</label>
-                    <p>
-                      {(this.state.overTheCounterRecommendation !== null)
-                        ? this.state.overTheCounterRecommendation
-                        : 'no overTheCounterRecommendation entered.'}
-                    </p>
+                    <HippoStringDisplay
+                      label="Prescription Medication:"
+                      value={this.state.prescriptionRecommendation}
+                      visibleIf={this.state.prescriptionMedication.length > 0}
+                    />
 
-                    {(this.state.personalMessage)
-                      ? (
-                          <div>
-                            <label className="text-gray">Personal Message:</label>
-                            <p>
-                              {this.state.personalMessage}
-                            </p>
-                          </div>
-                        )
-                      : null}
+                    <HippoStringDisplay
+                      label="Side Effects:"
+                      value={this.state.sideEffects}
+                      visibleIf={this.state.sideEffects.length > 0}
+                    />
+
+                    <HippoStringDisplay
+                      label="Additional Side Effects:"
+                      value={this.state.sideEffectsAdditional}
+                      visibleIf={this.state.sideEffectsAdditional.length > 0}
+                    />
+
+                    <HippoStringDisplay
+                      label="Counseling:"
+                      value={this.state.counseling}
+                      visibleIf={this.state.counseling.length > 0}
+                    />
+
+                    <HippoStringDisplay
+                      label="Additional Counseling:"
+                      value={this.state.counselingAdditional}
+                      visibleIf={this.state.counselingAdditional.length > 0}
+                    />
+
+                    <HippoStringDisplay
+                      label="Personal Message:"
+                      value={this.state.personalMessage}
+                      visibleIf={this.state.personalMessage.length > 0}
+                    />
                   </div>
                 </div>
               </div>

@@ -64,6 +64,7 @@ export const HippoTextArea = class _HippoTextArea extends Component {
                   <div className={classnames('form-group', { 'has-error': error })}>
                     {controlLabel}
                     <TextareaAutosize
+                      rows={2}
                       id={name}
                       name={name}
                       onChange={this.handleChange}

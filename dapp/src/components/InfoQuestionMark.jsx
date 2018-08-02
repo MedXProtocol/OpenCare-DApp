@@ -6,11 +6,17 @@ import PropTypes from 'prop-types'
 
 export const InfoQuestionMark = class _InfoQuestionMark extends Component {
   render () {
+    let char = <FontAwesomeIcon
+      icon={faQuestionCircle}
+    />
+
+    if (this.props.character) {
+      char = this.props.character
+    }
+
     return (
       <span className='info-question-mark' data-tip={this.props.tooltipText}>
-        <FontAwesomeIcon
-          icon={faQuestionCircle}
-        />
+        {char}
         <ReactTooltip
           html={true}
           effect='solid'
