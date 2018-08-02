@@ -6,6 +6,10 @@ import TextareaAutosize from 'react-autosize-textarea'
 
 export const HippoTextArea = class _HippoTextArea extends Component {
 
+  static defaultProps = {
+    rowClasses: 'row'
+  }
+
   constructor(props) {
     super(props)
 
@@ -31,14 +35,18 @@ export const HippoTextArea = class _HippoTextArea extends Component {
   }
 
   render() {
-    const { label } = this.props
-    const { name, error, colClasses } = this.props
-    let controlLabel
+    let { label } = this.props
+    const { name, error, colClasses, rowClasses } = this.props
+
     if (this.props.optional) {
-      controlLabel = <label className="control-label">
+      label = <React.Fragment>
         {label} <span className="text-gray">(Optional)</span>
-      </label>
+      </React.Fragment>
     }
+
+    const controlLabel = <label className="control-label">
+      {label}
+    </label>
 
     return (
       <React.Fragment>
@@ -51,7 +59,7 @@ export const HippoTextArea = class _HippoTextArea extends Component {
             <span key={`key-${name}-hidden`}>
             </span>
           : (
-              <div className={colClasses ? 'row' : ''}>
+              <div className={rowClasses}>
                 <div className={colClasses ? colClasses : ''}>
                   <div className={classnames('form-group', { 'has-error': error })}>
                     {controlLabel}

@@ -39,7 +39,7 @@ export const HippoTextInput = class _HippoTextInput extends Component {
       </React.Fragment>
     }
 
-    let controlLabel = <label className="control-label">
+    const controlLabel = <label className="control-label">
       {label}
     </label>
 

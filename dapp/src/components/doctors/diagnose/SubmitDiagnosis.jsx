@@ -49,22 +49,24 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     super(props, context)
 
     this.state = {
-      overTheCounterUse: [],
-      overTheCounterRecommendation: [],
+      overTheCounterUse: null,
+      overTheCounterMedication: [],
       overTheCounterNotes: '',
       overTheCounterFrequency: '',
       overTheCounterDuration: '',
-      topicalMedicationsRecommendation: [],
-      oralMedicationsRecommendation: [],
-      proceduresRecommendation: [],
-      otherRecommendation: [],
-      additionalRecommendation: '',
+      overTheCounterRecommendation: null,
+
+      // topicalMedicationsRecommendation: [],
+      // oralMedicationsRecommendation: [],
+      // proceduresRecommendation: [],
+      // otherRecommendation: [],
+
+      personalMessage: '',
 
       isChallenge: false,
       originalDiagnosis: null,
 
       diagnosis: null,
-      recommendation: null,
 
       formIsValid: false,
       showConfirmationModal: false,
@@ -144,8 +146,17 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
   //   this.validateField(event.target.id)
   // }
 
+  handleButtonGroupOnChange = (event) => {
+    this.setState({ [event.target.name]: event.target.value }, () => {
+      this.validateField(event.target.name)
+      this.buildFinalRecommendation()
+    })
+  }
+
   handleTextAreaOnChange = (event) => {
-    this.setState({ [event.target.id]: event.target.value })
+    this.setState({
+      [event.target.id]: event.target.value
+    }, this.buildFinalRecommendation)
   }
 
   handleTextAreaOnBlur = (event) => {
@@ -207,30 +218,23 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     this.setState({ diagnosis: newValue.value }, this.validateInputs)
   }
 
-  // This is the recommendation the physician can type into the textarea below
-  updateAdditionalRecommendation = (event) => {
-    this.setState({ additionalRecommendation: event.target.value })
-  }
-
-  // Combines the selected recommendation arrays
+  // Combines the selected overTheCounterRecommendation values into a string
   buildFinalRecommendation = () => {
-    let overTheCounter =
-      `${this.state.overTheCounterUse}
-      ${this.state.overTheCounterRecommendation.join(', ')}. ${this.state.overTheCounterNotes}
-      ${this.state.overTheCounterFrequency} for ${this.state.overTheCounterDuration}`
+    let overTheCounterRecommendation = <React.Fragment>
+      <strong>{this.state.overTheCounterMedication.join(', ')}</strong>
+      <br />
+      {this.state.overTheCounterUse} {this.state.overTheCounterFrequency} for {this.state.overTheCounterDuration}
+      <br />
+      {this.state.overTheCounterNotes}
+    </React.Fragment>
 
-    let recommendation = [
-      overTheCounter
-    ].filter(element => (element !== (undefined || null || '')))
-     .join(', ')
-
-    this.setState({ recommendation }, this.validateInputs)
+    this.setState({ overTheCounterRecommendation }, this.validateInputs)
   }
 
   validateInputs = () => {
     const valid =
       isNotEmptyString(this.state.diagnosis) &&
-      isNotEmptyString(this.state.recommendation)
+      isNotEmptyString(this.state.overTheCounterRecommendation)
 
     this.setState({ formIsValid: valid })
   }
@@ -239,6 +243,8 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     event.preventDefault()
 
     await this.runValidation()
+
+    console.log('formIsValid! ', this.state.formIsValid)
 
     if (this.state.errors.length === 0) {
       this.setState({
@@ -259,8 +265,8 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
     const diagnosisInformation = {
       diagnosis: this.state.diagnosis,
-      recommendation: this.state.recommendation,
-      additionalRecommendation: this.state.additionalRecommendation
+      overTheCounterRecommendation: this.state.overTheCounterRecommendation,
+      personalMessage: this.state.personalMessage
     }
     const diagnosisJson = JSON.stringify(diagnosisInformation)
     const ipfsHash = await uploadJson(diagnosisJson, this.props.caseKey)
@@ -284,11 +290,9 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
   errorMessage = (fieldName) => {
     let msg
-    if (fieldName === 'overTheCounterRecommendation') {
-      msg = 'must be chosen'
-    } else {
-      msg = 'must be filled out'
-    }
+
+    msg = 'must be filled out'
+
     return msg
   }
 
@@ -335,28 +339,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                   <div className="form-group form-group--logical-grouping">
                     <label>Over-the-Counter Medication</label>
 
-                    <HippoToggleButtonGroup
-                      id='overTheCounterUse'
-                      name='overTheCounterUse'
-                      colClasses='col-xs-12 col-md-12'
-                      label=''
-                      formGroupClassNames='form-group__no-margin'
-                      error={errors['overTheCounterUse']}
-                      buttonGroupOnChange={this.handleButtonGroupOnChange}
-                      values={['Apply', 'Wash', 'Take by mouth']}
-                    />
-
-                    <HippoCheckboxGroup
-                      id='overTheCounterUse'
-                      name='overTheCounterUse'
-                      colClasses='col-xs-12'
-                      label=''
-                      formGroupClassNames='form-group__no-margin'
-                      error={errors['overTheCounterUse']}
-                      checkboxGroupOnChange={this.handleCheckboxGroupOnChange}
-                      values={['Apply', 'Wash', 'Take by mouth']}
-                    />
-                    <div className={classnames('form-group', { 'has-error': errors['overTheCounterRecommendation'] })}>
+                    <div className={classnames('form-group', { 'has-error': errors['overTheCounterMedication'] })}>
                       <Select
                         placeholder={groupedRecommendationOptions.overTheCounter.label}
                         styles={customStyles}
@@ -364,39 +347,55 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                         closeMenuOnSelect={true}
                         options={groupedRecommendationOptions.overTheCounter.options}
                         isMulti={true}
-                        onChange={this.recommendationSelectUpdated('overTheCounterRecommendation')}
-                        selected={this.state.overTheCounterRecommendation}
+                        onChange={this.recommendationSelectUpdated('overTheCounterMedication')}
+                        selected={this.state.overTheCounterMedication}
                         required
                       />
-                      {errors['overTheCounterRecommendation']}
+                      {errors['overTheCounterMedication']}
                     </div>
+
+                    <HippoToggleButtonGroup
+                      id='overTheCounterUse'
+                      name='overTheCounterUse'
+                      colClasses='col-xs-12'
+                      label=''
+                      formGroupClassNames=''
+                      error={errors['overTheCounterUse']}
+                      buttonGroupOnChange={this.handleButtonGroupOnChange}
+                      values={['Apply', 'Wash', 'Take by mouth']}
+                    />
+
+                    <div className="row">
+                      <HippoTextArea
+                        id='overTheCounterFrequency'
+                        name="overTheCounterFrequency"
+                        rowClasses=''
+                        colClasses='col-xs-6'
+                        label='Frequency'
+                        error={errors['overTheCounterFrequency']}
+                        textAreaOnBlur={this.handleTextAreaOnBlur}
+                        textAreaOnChange={this.handleTextAreaOnChange}
+                      />
+
+                      <HippoTextArea
+                        id='overTheCounterDuration'
+                        name="overTheCounterDuration"
+                        rowClasses=''
+                        colClasses='col-xs-6'
+                        label='Duration'
+                        error={errors['overTheCounterDuration']}
+                        textAreaOnBlur={this.handleTextAreaOnBlur}
+                        textAreaOnChange={this.handleTextAreaOnChange}
+                      />
+                    </div>
+
                     <HippoTextArea
                       id='overTheCounterNotes'
                       name="overTheCounterNotes"
-                      colClasses='col-xs-12 col-sm-12 col-md-12'
+                      colClasses='col-xs-12'
                       label='Notes'
                       optional={true}
                       error={errors['overTheCounterNotes']}
-                      textAreaOnBlur={this.handleTextAreaOnBlur}
-                      textAreaOnChange={this.handleTextAreaOnChange}
-                    />
-                    <HippoTextArea
-                      id='overTheCounterFrequency'
-                      name="overTheCounterFrequency"
-                      colClasses='col-xs-6'
-                      label='Frequency'
-                      optional={true}
-                      error={errors['overTheCounterFrequency']}
-                      textAreaOnBlur={this.handleTextAreaOnBlur}
-                      textAreaOnChange={this.handleTextAreaOnChange}
-                    />
-                    <HippoTextArea
-                      id='overTheCounterDuration'
-                      name="overTheCounterDuration"
-                      colClasses='col-xs-6'
-                      label='Duration'
-                      optional={true}
-                      error={errors['overTheCounterDuration']}
                       textAreaOnBlur={this.handleTextAreaOnBlur}
                       textAreaOnChange={this.handleTextAreaOnChange}
                     />
@@ -423,96 +422,15 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                     textAreaOnChange={this.handleTextAreaOnChange}
                   />
 
-                    {/*<HippoTextInput
-                      id='overTheCounterExtended'
-                      name="overTheCounterExtended"
-                      colClasses='col-xs-12 col-sm-12 col-md-12'
-                      label='Further Notes'
-                      optional={true}
-                      error={errors['overTheCounterExtended']}
-                      textInputOnBlur={this.handleTextInputOnBlur}
-                      textInputOnChange={this.handleTextInputOnChange}
-                    />*/}
-
-                    {/*<label>Recommendation(s)<span className='star'>*</span></label>
-
-                    <div className="form-group">
-                      <Select
-                        placeholder={groupedRecommendationOptions.overTheCounter.label}
-                        styles={customStyles}
-                        components={Animated}
-                        closeMenuOnSelect={true}
-                        options={groupedRecommendationOptions.overTheCounter.options}
-                        isMulti={true}
-                        onChange={this.recommendationSelectUpdated('overTheCounterRecommendation')}
-                        selected={this.state.overTheCounterRecommendation}
-                        required />
-                    </div>
-
-                    <div className="form-group">
-                      <Select
-                        placeholder={groupedRecommendationOptions.topicalMedications.label}
-                        styles={customStyles}
-                        components={Animated}
-                        closeMenuOnSelect={true}
-                        options={groupedRecommendationOptions.topicalMedications.options}
-                        isMulti={true}
-                        onChange={this.recommendationSelectUpdated('topicalMedicationsRecommendation')}
-                        selected={this.state.topicalMedicationsRecommendation}
-                        required />
-                    </div>
-
-                    <div className="form-group">
-                      <Select
-                        placeholder={groupedRecommendationOptions.oralMedications.label}
-                        styles={customStyles}
-                        components={Animated}
-                        closeMenuOnSelect={true}
-                        options={groupedRecommendationOptions.oralMedications.options}
-                        isMulti={true}
-                        onChange={this.recommendationSelectUpdated('oralMedicationsRecommendation')}
-                        selected={this.state.oralMedicationsRecommendation}
-                        required />
-                    </div>
-
-                    <div className="form-group">
-                      <Select
-                        placeholder={groupedRecommendationOptions.procedures.label}
-                        styles={customStyles}
-                        components={Animated}
-                        closeMenuOnSelect={true}
-                        options={groupedRecommendationOptions.procedures.options}
-                        isMulti={true}
-                        onChange={this.recommendationSelectUpdated('proceduresRecommendation')}
-                        selected={this.state.proceduresRecommendation}
-                        required />
-                    </div>
-
-                    <div className="form-group">
-                      <Select
-                        placeholder={groupedRecommendationOptions.other.label}
-                        styles={customStyles}
-                        components={Animated}
-                        closeMenuOnSelect={true}
-                        options={groupedRecommendationOptions.other.options}
-                        isMulti={true}
-                        onChange={this.recommendationSelectUpdated('otherRecommendation')}
-                        selected={this.state.otherRecommendation}
-                        required />
-                    </div>
-                  </div>*/}
-
-                  <div className="form-group">
-                    <label>
-                      Additional Recommendation
-                      &nbsp; <span className="text-gray">(Optional)</span>
-                    </label>
-
-                    <textarea
-                      onChange={this.updateAdditionalRecommendation}
-                      className="form-control"
-                      rows="3" />
-                  </div>
+                  <HippoTextArea
+                    id='personalMessage'
+                    name='personalMessage'
+                    colClasses='col-xs-12 col-sm-12 col-md-12'
+                    label='Personal Message'
+                    optional={true}
+                    textAreaOnBlur={this.handleTextAreaOnBlur}
+                    textAreaOnChange={this.handleTextAreaOnChange}
+                  />
                 </div>
 
                 <div className="col-xs-12 col-md-4">
@@ -524,19 +442,20 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                         : 'no diagnosis entered.'}
                     </p>
 
-                    <label className="text-gray">Your recommendation:</label>
+
+                    <label className="text-gray">Over the Counter Medication:</label>
                     <p>
-                      {(this.state.recommendation !== null)
-                        ? this.state.recommendation
-                        : 'no recommendation entered.'}
+                      {(this.state.overTheCounterRecommendation !== null)
+                        ? this.state.overTheCounterRecommendation
+                        : 'no overTheCounterRecommendation entered.'}
                     </p>
 
-                    {(this.state.additionalRecommendation.length > 0)
+                    {(this.state.personalMessage)
                       ? (
                           <div>
-                            <label className="text-gray">Your additional recommendation:</label>
+                            <label className="text-gray">Personal Message:</label>
                             <p>
-                              {this.state.additionalRecommendation}
+                              {this.state.personalMessage}
                             </p>
                           </div>
                         )
@@ -565,7 +484,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                   Are you sure?
                 </h4>
                 <h5>
-                  This will send your diagnosis and recommendation to the patient.
+                  This will send your diagnosis and overTheCounterRecommendation to the patient.
                 </h5>
               </div>
             </div>
