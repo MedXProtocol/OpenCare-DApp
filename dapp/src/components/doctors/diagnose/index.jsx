@@ -143,9 +143,11 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
     } else if (caseKey === null) {
       diagnosis = (
         <div className="col-xs-12 col-md-6 col-md-offset-3">
-          <h4 className="text-danger">
-            Cannot submit diagnosis
-          </h4>
+          <div className="alert alert-warning">
+            <h4>
+              Cannot submit diagnosis
+            </h4>
+          </div>
           <hr />
         </div>
       )

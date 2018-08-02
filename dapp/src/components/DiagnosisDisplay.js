@@ -18,8 +18,8 @@ export const DiagnosisDisplay = ({ diagnosis }) => {
 
       <HippoStringDisplay
         label="Prescription Medication:"
-        value={diagnosis.prescriptionMedicationRecommendation}
-        visibleIf={diagnosis.prescriptionMedicationRecommendation.length > 0}
+        value={diagnosis.prescriptionRecommendation}
+        visibleIf={diagnosis.prescriptionRecommendation.length > 0}
       />
 
       <HippoStringDisplay

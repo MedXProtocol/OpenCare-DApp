@@ -36,8 +36,6 @@ function mapStateToProps (state, ownProps) {
 const requiredFields = [
   'diagnosis'
 ]
-// These fields are dynamically added as required depending on choices the user makes:
-// 'pregnant' => female only
 
 export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapStateToProps)(withSend(class _SubmitDiagnosisContainer extends Component {
   static propTypes = {
@@ -146,14 +144,6 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     this.setState({ [event.target.name]: currentValues })
   }
 
-  // handleTextInputOnChange = (event) => {
-  //   this.setState({ [event.target.id]: event.target.value })
-  // }
-
-  // handleTextInputOnBlur = (event) => {
-  //   this.validateField(event.target.id)
-  // }
-
   handleButtonGroupOnChange = (event) => {
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.validateField(event.target.name)
@@ -248,6 +238,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
         <br />
         {this.state[`${fieldGroup}Notes`]}
       </React.Fragment>
+      recommendation = ReactDOMServer.renderToStaticMarkup(recommendation)
     }
 
     this.setState({ [`${fieldGroup}Recommendation`]: recommendation }, this.validateInputs)
@@ -275,19 +266,10 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
       showConfirmationModal: false
     })
 
-    const overTheCounter = ReactDOMServer.renderToStaticMarkup(this.state.overTheCounterRecommendation)
-    overTheCounter.replace('<strong>', '').replace('</strong>', '')
-    overTheCounter.replace('<br/>', ', ')
-
-    const prescriptionMedication = ReactDOMServer.renderToStaticMarkup(this.state.prescriptionRecommendation)
-    prescriptionMedication.replace('<strong>', '').replace('</strong>', '')
-    prescriptionMedication.replace('<br/>', ', ')
-    console.log(prescriptionMedication)
-
     const diagnosisInformation = {
       diagnosis: this.state.diagnosis,
-      overTheCounterRecommendation: overTheCounter,
-      prescriptionMedicationRecommendation: prescriptionMedication,
+      overTheCounterRecommendation,
+      prescriptionRecommendation,
       sideEffects: this.state.sideEffects,
       sideEffectsAdditional: this.state.sideEffectsAdditional,
       counseling: this.state.counseling,
