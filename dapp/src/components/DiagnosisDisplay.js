@@ -13,43 +13,43 @@ export const DiagnosisDisplay = ({ diagnosis }) => {
       <HippoStringDisplay
         label="Over-the-Counter Medication:"
         value={diagnosis.overTheCounterRecommendation}
-        visibleIf={diagnosis.overTheCounterRecommendation.length > 0}
+        visibleIf={!!diagnosis.overTheCounterRecommendation}
       />
 
       <HippoStringDisplay
         label="Prescription Medication:"
         value={diagnosis.prescriptionRecommendation}
-        visibleIf={diagnosis.prescriptionRecommendation.length > 0}
+        visibleIf={!!diagnosis.prescriptionRecommendation}
       />
 
       <HippoStringDisplay
         label="Side Effects:"
         value={diagnosis.sideEffects}
-        visibleIf={diagnosis.sideEffects.length > 0}
+        visibleIf={!!diagnosis.sideEffects}
       />
 
       <HippoStringDisplay
         label="Additional Side Effects:"
         value={diagnosis.sideEffectsAdditional}
-        visibleIf={diagnosis.sideEffectsAdditional.length > 0}
+        visibleIf={!!diagnosis.sideEffectsAdditional}
       />
 
       <HippoStringDisplay
         label="Counseling:"
         value={diagnosis.counseling}
-        visibleIf={diagnosis.counseling.length > 0}
+        visibleIf={!!diagnosis.counseling}
       />
 
       <HippoStringDisplay
         label="Additional Counseling:"
         value={diagnosis.counselingAdditional}
-        visibleIf={diagnosis.counselingAdditional.length > 0}
+        visibleIf={!!diagnosis.counselingAdditional}
       />
 
       <HippoStringDisplay
         label="Personal Message:"
         value={diagnosis.personalMessage}
-        visibleIf={diagnosis.personalMessage.length > 0}
+        visibleIf={!!diagnosis.personalMessage}
       />
     </React.Fragment>
   )
