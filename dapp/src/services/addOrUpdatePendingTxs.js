@@ -30,10 +30,10 @@ function updateCase(cases, transaction, transactionId, caseIndex) {
   return cases
 }
 
-export const addOrUpdatePendingTxs = function(state, cases, caseCount) {
+export const addOrUpdatePendingTxs = function(transactions, cases, caseCount) {
   let index = 0
 
-  forOwn(state.sagaGenesis.transactions, function(transaction, transactionId) {
+  forOwn(transactions, function(transaction, transactionId) {
     if (!defined(transaction.call)) { return } // continue
 
     const { confirmed, error, call } = transaction

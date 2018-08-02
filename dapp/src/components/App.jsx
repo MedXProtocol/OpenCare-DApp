@@ -75,7 +75,7 @@ function mapDispatchToProps(dispatch) {
       dispatch({ type: 'SIGN_OUT' })
     },
     dispatchNewCaseCount: (caseCount) => {
-      console.log(caseCount)
+      // console.log(caseCount)
       dispatch({ type: 'UPDATE_CASE_COUNT', caseCount })
     }
   }
@@ -124,7 +124,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
         return c
       })
 
-    console.log('Wat: ', newCaseCount, this.props.caseCount)
+    // console.log('Wat: ', newCaseCount, this.props.caseCount)
 
     if (newCaseCount !== this.props.caseCount) {
       this.props.dispatchNewCaseCount(newCaseCount)
@@ -150,7 +150,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     const { contractRegistry, CaseManager, address } = this.props
     const oldCaseCount = this.props.caseCount
 
-    console.log('in showNewCaseAssignedToast')
+    // console.log('in showNewCaseAssignedToast')
 
     // Moving from 0 to 1, or 1 to 2, but not undefined/NaN (initial state) to a number
     if (
@@ -161,7 +161,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       return
     }
 
-    console.log('showNewCaseAssignedToast PASSED!')
+    // console.log('showNewCaseAssignedToast PASSED!')
 
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
     CaseManagerInstance.methods
@@ -237,7 +237,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
           <Switch>
             {redirect}
 
-            <Route path={routes.WELCOME}  render={ () => WelcomeWrapped } />
+            <Route path={routes.WELCOME} render={ () => WelcomeWrapped } />
             <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
             <Route path={routes.TRY_METAMASK} component={TryMetamask} />
 
@@ -249,7 +249,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
             <Web3Route path={routes.SIGN_IN} component={SignInContainer} />
             <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
 
-            <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
+            <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} cases={this.props.cases} />
             <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={OpenCasesContainer} />
             <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 

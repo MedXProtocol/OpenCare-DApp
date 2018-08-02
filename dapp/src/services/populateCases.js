@@ -29,6 +29,8 @@ export const populateCases = function(state, CaseManager, address, caseCount) {
 export const populateCasesSaga = function*(CaseManager, address, caseCount) {
   for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
     let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
+    // console.log('called by populateCases')
+    // console.log('populateCases loop: ', caseIndex, caseCount, caseAddress)
     yield addContract({ address: caseAddress, contractKey: 'Case' })
     yield all([
       cacheCall(caseAddress, 'status'),
