@@ -4,9 +4,11 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { ImageLoader, CaseDetailsLoader } from './ContentLoaders'
+import { HippoTimestamp } from '~/components/HippoTimestamp'
 import { LoadingLines } from '~/components/LoadingLines'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { downloadJson, downloadImage } from '../utils/storage-util'
+import { all } from 'redux-saga/effects'
 import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
@@ -14,11 +16,14 @@ import { toastr } from '~/toastr'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress }) {
-  let caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
   const networkId = get(state, 'sagaGenesis.network.networkId')
+
+  const caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
+  const createdAt = cacheCallValue(state, caseAddress, 'createdAt')
 
   return {
     caseDetailsHash: getFileHashFromBytes(caseDataHash),
+    createdAt: createdAt,
     networkId
   }
 }
@@ -27,7 +32,10 @@ function* saga({ caseAddress, networkId }) {
   if (!networkId || !caseAddress) { return }
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
-  yield cacheCall(caseAddress, 'caseDataHash')
+  yield all([
+    yield cacheCall(caseAddress, 'caseDataHash'),
+    yield cacheCall(caseAddress, 'createdAt')
+  ])
 }
 
 const CaseDetails = withContractRegistry(connect(mapStateToProps)(
@@ -149,6 +157,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(
     const { caseKey, caseAddress, caseIsOpenForDoctor } = this.props
     const details = this.state.details || {}
     let jsx
+
     if (caseIsOpenForDoctor) {
       var submitDiagnosisLink = (
         <span>
@@ -370,8 +379,9 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(
             <div className="row">
               <div className="col-xs-12">
                 <p className="text-gray small text-center">
-
                   <strong>Case Address:</strong> {this.props.caseAddress}
+                  <br />
+                  <HippoTimestamp timeInUtcSecondsSinceEpoch={this.props.createdAt} />
                 </p>
               </div>
             </div>

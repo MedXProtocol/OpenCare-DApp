@@ -24,12 +24,14 @@ function mapStateToProps(state) {
   const transactions = state.sagaGenesis.transactions
 
   for (let objIndex = (caseCount - 1); objIndex >= 0; --objIndex) {
-    let caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, objIndex)
+    const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, objIndex)
     if (caseAddress) {
-      let status = cacheCallValue(state, caseAddress, 'status')
+      const status = cacheCallValue(state, caseAddress, 'status')
+      const createdAt = cacheCallValue(state, caseAddress, 'createdAt')
       cases.push({
         caseAddress,
         status,
+        createdAt,
         objIndex
       })
     }
@@ -54,6 +56,7 @@ function* saga({ address, CaseManager }) {
     // console.log('called by patients cases index saga')
     yield all([
       addContract({ address: caseAddress, contractKey: 'Case' }),
+      cacheCall(caseAddress, 'createdAt'),
       cacheCall(caseAddress, 'status')
     ])
   }))

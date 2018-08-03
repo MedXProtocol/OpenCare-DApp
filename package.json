@@ -30,5 +30,7 @@
     "web3": "^0.20.6",
     "zeppelin-solidity": "^1.4.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "date-fns": "^2.0.0-alpha.16"
+  }
 }

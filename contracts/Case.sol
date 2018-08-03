@@ -42,6 +42,8 @@ contract Case is Ownable, Initializable {
     ClosedConfirmed
   }
 
+  uint public createdAt;
+
   event CaseCreated(address indexed patient);
   event CaseEvaluated(address indexed patient, address indexed doctor);
   event CaseClosed(address indexed patient, address indexed doctor);
@@ -102,6 +104,7 @@ contract Case is Ownable, Initializable {
     require(_encryptedCaseKey.length != 0);
     require(_caseKeySalt.length != 0);
     require(_caseHash.length != 0);
+    createdAt = block.timestamp;
     owner = msg.sender;
     status = CaseStatus.Open;
     encryptedCaseKey = _encryptedCaseKey; // don't need to store this
