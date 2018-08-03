@@ -8,9 +8,12 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight';
 import { EthAddress } from '~/components/EthAddress'
 import { LoadingLines } from '~/components/LoadingLines'
+import { HippoTimestamp } from '~/components/HippoTimestamp'
 import { txErrorMessage } from '~/services/txErrorMessage'
 import { defined } from '~/utils/defined'
 import * as routes from '~/config/routes'
+
+const PENDING_TX_STATUS = -1
 
 function mapDispatchToProps (dispatch) {
   return {
@@ -22,8 +25,6 @@ function mapDispatchToProps (dispatch) {
     }
   }
 }
-
-const PENDING_TX_STATUS = -1
 
 export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends Component {
 
@@ -111,11 +112,12 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
   }
 
   render () {
-    let remove
-
     const { caseRowObject, route } = this.props
 
-    let { caseAddress, objIndex, error, transactionId } = caseRowObject
+    let remove
+    let { caseAddress, objIndex, error, transactionId, createdAt } = caseRowObject
+
+    const timestamp = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
 
     const style = { zIndex: 998 - objIndex }
     const pendingTransaction = (
@@ -144,7 +146,6 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
       )
     }
 
-
     return (
       <Link to={path} style={style} className={classnames(
         'case-list--item',
@@ -163,6 +164,7 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
 
         <span className="case-list--item__eth-address text text-left">
           {ethAddress}
+          {timestamp}
         </span>
 
         <span className="case-list--item__view text-center">
