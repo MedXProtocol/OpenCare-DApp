@@ -146,12 +146,7 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
     }
 
     if (createdAt > 0) {
-      timestamp = (
-        <React.Fragment>
-          <br />
-          <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
-        </React.Fragment>
-      )
+      timestamp = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
     }
 
     return (

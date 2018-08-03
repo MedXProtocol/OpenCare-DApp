@@ -4,17 +4,25 @@
 }
 
 .case-list--item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+
   box-shadow: 1px 1px 1px 0 rgba(200, 205, 210, 0.1);
   border-radius: 5px;
   border: 3px solid #eff4f8;
   box-sizing: border-box;
   height: 70px;
-  padding: 22px 10px 22px;
+  list-style-type: none;
+  padding: 0;
   position: relative;
   margin: 0 0 24px;
   opacity: 1;
-  list-style-type: none;
+  text-decoration: none;
   width: 100%;
+
   transition: opacity .15s cubic-bezier(0.4,0.0,0.2,1),
               border .15s cubic-bezier(0.4,0.0,0.2,1),
               box-shadow .15s cubic-bezier(0.4,0.0,0.2,1);
@@ -24,8 +32,9 @@
     border: 1px solid white;
     border-bottom-color: rgba(200, 205, 210, 0.2);
     box-shadow: none;
-    height: 60px;
-    padding: 6px 0;
+    height: 64px;
+    margin: 0 0 6px;
+    padding: 0;
     transition: none;
   }
 }
@@ -36,6 +45,7 @@
               0 1px 4px 0 rgba(60,64,67,0.109);
   border: 1px solid transparent;
   opacity: 1;
+  text-decoration: none;
 
   @media (max-width: 768px) {
     border-bottom-color: rgba(200, 205, 210, 0.2);
@@ -44,11 +54,9 @@
 }
 
 .case-list--item > span {
-  display: inline-block;
-}
-
-.case-list--item.list {
-  display: block;
+  display: inline-flex;
+  flex-wrap: wrap;
+  margin: auto;
 }
 
 .case-list--item__case-number {
@@ -56,7 +64,7 @@
   font-size: 16px;
   font-weight: 700;
   transition: color 200ms ease-in;
-  min-width: 9%;
+  width: 40px;
 
   @media (max-width: 768px) {
     width: 15%;
@@ -64,7 +72,7 @@
 }
 
 .case-list--item__status {
-  min-width: 40%;
+  min-width: 30%;
 
   @media (max-width: 768px) {
     width: 62%;
@@ -72,20 +80,20 @@
 }
 
 .case-list--item__eth-address {
-  min-width: 20%;
+  width: 265px;
 
   @media (max-width: 768px) {
     display: none !important;
   }
 }
 
-.case-list--item__eth-address .address__short {
+.case-list--item__eth-address span {
   color: #ccc;
   font-size: 14px;
   text-decoration: none;
 }
 
-.case-list--item:hover .case-list--item__eth-address .address__short {
+.case-list--item:hover .case-list--item__eth-address span {
   color: #aaa;
 }
 
@@ -93,15 +101,18 @@
   color: lighten($brand-info, 40%);
   float: right;
   font-weight: 700;
-  padding-right: 20px;
   transition: color 200ms ease-in;
-  min-width: 12%;
+  width: 110px;
 
   @media (max-width: 768px) {
     color: $brand-info;
     min-width: 60px;
     width: 60px;
   }
+}
+
+.case-list--item__view svg {
+  margin-top: 3px;
 }
 
 .case-list--item__view__text {
