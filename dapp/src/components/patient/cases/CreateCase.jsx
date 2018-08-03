@@ -665,7 +665,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           checkboxGroupOnChange={this.handleCheckboxGroupOnChange}
         />
       } else if (this.state.spotRashOrAcne === 'Rash') {
-        var rashQuestions =<RashQuestions
+        var rashQuestions = <RashQuestions
           errors={errors}
           textInputOnChange={this.handleTextInputOnChange}
           textInputOnBlur={this.handleTextInputOnBlur}

@@ -170,6 +170,17 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     }
   }
 
+  resetFieldGroup(fieldGroup) {
+    this.setState({
+      [`${fieldGroup}Use`]: null,
+      [`${fieldGroup}Medication`]: [],
+      [`${fieldGroup}Notes`]: '',
+      [`${fieldGroup}Frequency`]: '',
+      [`${fieldGroup}Duration`]: '',
+      [`${fieldGroup}Recommendation`]: ''
+    })
+  }
+
   handleButtonGroupOnChange = (event) => {
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.buildFinalRecommendation()
@@ -186,8 +197,14 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     // no-op
   }
 
-  recommendationSelectUpdated = (key) => {
+  recommendationSelectUpdated = (fieldGroup) => {
     return (newValue) => {
+      const key = `${fieldGroup}Medication`
+
+      if (newValue.length === 0) {
+        this.resetFieldGroup(fieldGroup)
+      }
+
       this.setState({
         [key]: newValue.map(option => option.value)
       }, this.buildFinalRecommendation)
@@ -388,7 +405,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                               closeMenuOnSelect={true}
                               options={groupedRecommendationOptions.overTheCounter.options}
                               isMulti={true}
-                              onChange={this.recommendationSelectUpdated('overTheCounterMedication')}
+                              onChange={this.recommendationSelectUpdated('overTheCounter')}
                               selected={this.state.overTheCounterMedication}
                               required
                             />
@@ -465,7 +482,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                               closeMenuOnSelect={true}
                               options={groupedRecommendationOptions.prescriptionMedications.options}
                               isMulti={true}
-                              onChange={this.recommendationSelectUpdated('prescriptionMedication')}
+                              onChange={this.recommendationSelectUpdated('prescription')}
                               selected={this.state.prescriptionMedication}
                               required
                             />
