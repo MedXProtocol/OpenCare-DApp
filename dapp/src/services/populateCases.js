@@ -3,13 +3,10 @@ import { addContract, cacheCall } from '~/saga-genesis/sagas'
 import { cacheCallValue } from '~/saga-genesis'
 import rangeRight from 'lodash.rangeright'
 
-const MAX_CASES_PER_PAGE = 5
-
-export const populateCases = function(state, CaseManager, address, caseCount, caseCountMax) {
+export const populateCases = function(state, CaseManager, address, caseCount) {
   const cases = []
 
-  const max = caseCountMax || MAX_CASES_PER_PAGE
-  const indices = rangeRight(caseCount - Math.max(max), caseCount)
+  const indices = rangeRight(caseCount)
 
   indices.forEach(function (objIndex) {
     let caseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, objIndex)
@@ -32,12 +29,10 @@ export const populateCases = function(state, CaseManager, address, caseCount, ca
   return cases
 }
 
-export const populateCasesSaga = function*(CaseManager, address, caseCount, caseCountMax) {
+export const populateCasesSaga = function*(CaseManager, address, caseCount) {
   if (!address || !CaseManager) { return }
 
-  const max = caseCountMax || MAX_CASES_PER_PAGE
-
-  const indices = rangeRight(caseCount - Math.max(max), caseCount)
+  const indices = rangeRight(caseCount)
 
   yield all(indices.map(function* (objIndex) {
     const caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, objIndex)
