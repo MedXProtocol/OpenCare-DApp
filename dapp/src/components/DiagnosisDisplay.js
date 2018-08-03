@@ -23,6 +23,12 @@ export const DiagnosisDisplay = ({ diagnosis }) => {
       />
 
       <HippoStringDisplay
+        label="No Further Treatment Necessary"
+        value={''}
+        visibleIf={diagnosis.noFurtherTreatment === 1}
+      />
+
+      <HippoStringDisplay
         label="Side Effects:"
         value={diagnosis.sideEffects}
         visibleIf={!!diagnosis.sideEffects}

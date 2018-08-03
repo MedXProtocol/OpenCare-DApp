@@ -7,8 +7,7 @@ const overTheCounter = [
   'Hydrocortisone 1% cream',
   'Medicated shampoo such as Selenium Chloride or Head and Shoulders',
   'Lukewarm water while showering',
-  'Lotion after showering',
-  'No further treatments needed'
+  'Lotion after showering'
 ]
 
 const prescriptionMedications = [
@@ -51,11 +50,11 @@ const prescriptionMedications = [
 
 export const groupedRecommendationOptions = {
   "overTheCounter": {
-    "label": "Medication(s)",
+    "label": "Choose Over-the-Counter Medication",
     "options": overTheCounter.map(option => ({ "value": option, "label": option }))
   },
   "prescriptionMedications": {
-    "label": "Medication(s)",
+    "label": "Choose Prescription Medication",
     "options": prescriptionMedications.map(option => ({ "value": option, "label": option }))
   }
 }
