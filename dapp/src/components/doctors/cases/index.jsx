@@ -26,10 +26,6 @@ function mapStateToProps(state) {
   }
 }
 
-// page1
-// 0, 4
-// page2
-// 5, 9
 function paginateCases(cases, pageNumber, perPage) {
   const start = (perPage % pageNumber) * perPage
   const offset = start + perPage
