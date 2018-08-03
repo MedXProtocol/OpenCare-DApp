@@ -31,7 +31,7 @@ export const HippoTextInput = class _HippoTextInput extends Component {
 
   render() {
     let { label } = this.props
-    const { name, error, colClasses, type } = this.props
+    const { name, error, colClasses, type, min } = this.props
 
     if (this.props.optional) {
       label = <React.Fragment>
@@ -59,6 +59,7 @@ export const HippoTextInput = class _HippoTextInput extends Component {
                   <div className={classnames('form-group', { 'has-error': error })}>
                     {controlLabel}
                     <input
+                      min={min}
                       id={name}
                       name={name}
                       onChange={this.handleChange}
