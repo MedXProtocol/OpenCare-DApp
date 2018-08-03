@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { format } from 'date-fns'
 
 function formatCreatedAt(time) {
@@ -25,8 +24,4 @@ export const HippoTimestamp = ({ timeInUtcSecondsSinceEpoch }) => {
       {/*&nbsp;<small>({formattedCreatedAt.timezoneOffset})</small>*/}
     </span>
   )
-}
-
-HippoTimestamp.propTypes = {
-  timeInUtcSecondsSinceEpoch: PropTypes.any.isRequired
 }

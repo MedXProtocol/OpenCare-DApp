@@ -112,11 +112,12 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
   }
 
   render () {
-    let remove, timestamp
-
     const { caseRowObject, route } = this.props
 
+    let remove
     let { caseAddress, objIndex, error, transactionId, createdAt } = caseRowObject
+
+    const timestamp = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
 
     const style = { zIndex: 998 - objIndex }
     const pendingTransaction = (
@@ -143,10 +144,6 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
           {'\u2716'}
         </button>
       )
-    }
-
-    if (createdAt > 0) {
-      timestamp = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
     }
 
     return (
