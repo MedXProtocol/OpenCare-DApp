@@ -1,11 +1,14 @@
 import { all } from 'redux-saga/effects'
 import { addContract, cacheCall } from '~/saga-genesis/sagas'
 import { cacheCallValue } from '~/saga-genesis'
+import rangeRight from 'lodash.rangeright'
 
 export const populateCases = function(state, CaseManager, address, caseCount) {
   const cases = []
 
-  for (let objIndex = (caseCount - 1); objIndex >= 0; --objIndex) {
+  const indices = rangeRight(caseCount)
+
+  indices.forEach(function (objIndex) {
     let caseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, objIndex)
     if (caseAddress) {
       const status = cacheCallValue(state, caseAddress, 'status')
@@ -21,20 +24,23 @@ export const populateCases = function(state, CaseManager, address, caseCount) {
         })
       }
     }
-  }
+  })
 
   return cases
 }
 
 export const populateCasesSaga = function*(CaseManager, address, caseCount) {
-  for (let caseIndex = (caseCount - 1); caseIndex >= 0; --caseIndex) {
-    let caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, caseIndex)
-    // console.log('called by populateCases')
-    // console.log('populateCases loop: ', caseIndex, caseCount, caseAddress)
+  if (!address || !CaseManager) { return }
+
+  const indices = rangeRight(caseCount)
+
+  yield all(indices.map(function* (objIndex) {
+    const caseAddress = yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, objIndex)
+
     yield addContract({ address: caseAddress, contractKey: 'Case' })
     yield all([
       cacheCall(caseAddress, 'status'),
       cacheCall(caseAddress, 'diagnosingDoctor')
     ])
-  }
+  }))
 }

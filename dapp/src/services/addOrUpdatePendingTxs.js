@@ -3,7 +3,7 @@ import { defined } from '~/utils/defined'
 
 const PENDING_TX_STATUS = -1
 
-// Adds cases to the cases array set in the mapStateToProps
+// Adds cases not yet committed to the blockchain to the cases array set in the mapStateToProps
 // Contains info about pending tx's
 function addNewCase(cases, transaction, transactionId, objIndex) {
   transaction = {

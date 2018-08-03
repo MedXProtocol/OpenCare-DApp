@@ -250,7 +250,8 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
             <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
 
             <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} cases={this.props.cases} />
-            <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={OpenCasesContainer} />
+            <SignedInRoute exact path={routes.DOCTORS_CASES_OPEN_PAGE_NUMBER} component={OpenCasesContainer} cases={this.props.cases} />
+            <SignedInRoute exact path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={OpenCasesContainer} />
             <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 
             <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
