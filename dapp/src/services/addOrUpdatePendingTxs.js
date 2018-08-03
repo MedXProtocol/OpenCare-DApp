@@ -11,6 +11,7 @@ function addNewCase(cases, transaction, transactionId, objIndex) {
     transactionId,
     objIndex
   }
+
   cases.splice(0, 0, transaction)
 
   return cases

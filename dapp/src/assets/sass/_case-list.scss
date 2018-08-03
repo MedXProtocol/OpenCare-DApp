@@ -16,6 +16,7 @@
   box-sizing: border-box;
   height: 70px;
   list-style-type: none;
+  line-height: 66px;
   padding: 0;
   position: relative;
   margin: 0 0 24px;
@@ -32,8 +33,7 @@
     border: 1px solid white;
     border-bottom-color: rgba(200, 205, 210, 0.2);
     box-shadow: none;
-    height: 64px;
-    margin: 0 0 6px;
+    margin: 0 0 3px;
     padding: 0;
     transition: none;
   }
@@ -59,9 +59,15 @@
   margin: auto;
 }
 
+.case-list--item .label {
+  background: transparent;
+  line-height: inherit;
+  margin: 0;
+  padding: 0;
+}
+
 .case-list--item__case-number {
   color: $brand-info;
-  font-size: 16px;
   font-weight: 700;
   transition: color 200ms ease-in;
   width: 40px;
@@ -80,6 +86,7 @@
 }
 
 .case-list--item__eth-address {
+  line-height: 22px;
   width: 265px;
 
   @media (max-width: 768px) {
@@ -112,7 +119,11 @@
 }
 
 .case-list--item__view svg {
-  margin-top: 3px;
+  margin-top: 24px;
+
+  @media (max-width: 768px) {
+    margin-top: 0;
+  }
 }
 
 .case-list--item__view__text {

@@ -22,7 +22,7 @@ export const HippoTimestamp = ({ timeInUtcSecondsSinceEpoch }) => {
     <span className="text-gray">
       {formattedCreatedAt.date}
       &nbsp;- {formattedCreatedAt.time}
-      &nbsp;<small>({formattedCreatedAt.timezoneOffset})</small>
+      {/*&nbsp;<small>({formattedCreatedAt.timezoneOffset})</small>*/}
     </span>
   )
 }

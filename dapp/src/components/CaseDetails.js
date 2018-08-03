@@ -33,8 +33,8 @@ function* saga({ caseAddress, networkId }) {
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
-    yield cacheCall(caseAddress, 'caseDataHash'),
-    yield cacheCall(caseAddress, 'createdAt')
+    cacheCall(caseAddress, 'caseDataHash'),
+    cacheCall(caseAddress, 'createdAt')
   ])
 }
 
