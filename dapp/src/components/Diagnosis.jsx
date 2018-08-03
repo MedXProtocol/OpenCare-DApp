@@ -86,7 +86,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
     this.state = {
       diagnosis: {},
-      showThankYouModal: false,
       showChallengeModal: false,
       doctorPublicKey: '',
       loading: false,
@@ -180,7 +179,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         .onTxHash(() => {
           toastr.success('Working on getting you a second opinion.')
           mixpanel.track('Challenge Diagnosis Submitted')
-          this.setState({ loading: false })
+          this.props.history.push(routes.PATIENTS_CASES)
         })
     }
   }
@@ -198,12 +197,9 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
           })
         })
         .onTxHash(() => {
-          toastr.success('You have accepted the diagnosis for this case.')
+          toastr.success('You have accepted the case diagnosis. Thank you for using MedCredits!')
           mixpanel.track('Accept Diagnosis Submitted')
-          this.setState({
-            showThankYouModal: true,
-            loading: false
-          })
+          this.props.history.push(routes.PATIENTS_CASES)
         })
     }
   }
@@ -226,11 +222,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
   handleChallengeDiagnosis = () => {
     this.setState({ showChallengeModal: true })
-  }
-
-  handleCloseThankYouModal = () => {
-    this.setState({ showThankYouModal: false })
-    this.props.history.push(routes.PATIENTS_CASES)
   }
 
   handleCloseChallengeModal = () => {
@@ -280,9 +271,19 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         <div className="card-footer">
           <div className="row">
             <div className="col-xs-12 text-right" >
-              <button disabled={transactionRunning} onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
+              <button
+                disabled={transactionRunning}
+                onClick={this.handleChallengeDiagnosis}
+                type="button"
+                className="btn btn-warning"
+              >Get Second Opinion</button>
               &nbsp;
-              <button disabled={transactionRunning} onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
+              <button
+                disabled={transactionRunning}
+                onClick={this.handleAcceptDiagnosis}
+                type="button"
+                className="btn btn-success"
+              >Accept</button>
             </div>
           </div>
         </div>
@@ -302,23 +303,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
           {buttons}
 
-          <Modal show={this.state.showThankYouModal} onHide={this.handleCloseThankYouModal}>
-            <Modal.Body>
-              <div className="row">
-                <div className="col-xs-12 text-center">
-                  <h4>
-                    You have accepted the case diagnosis.
-                  </h4>
-                  <h5>
-                    Thank you for using MedCredits!
-                  </h5>
-                </div>
-              </div>
-            </Modal.Body>
-            <Modal.Footer>
-              <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
-            </Modal.Footer>
-          </Modal>
           <Modal show={this.state.showChallengeModal} onHide={this.handleCloseChallengeModal}>
             <form onSubmit={this.onSubmitChallenge}>
               <Modal.Header>
