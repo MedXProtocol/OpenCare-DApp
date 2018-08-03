@@ -251,12 +251,35 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     if (this.state.diagnosis === null) {
       errors.push('diagnosis')
     }
+
     if (
       this.state.overTheCounterRecommendation === ''
       && this.state.prescriptionRecommendation === ''
       && this.state.noFurtherTreatment === false
     ) {
       errors.push('oneRecommendation')
+    }
+
+    if (
+      this.state.overTheCounterRecommendation !== ''
+    ) {
+      if (this.state.overTheCounterFrequency === '') {
+        errors.push('overTheCounterFrequency')
+      }
+      if (this.state.overTheCounterDuration === '') {
+        errors.push('overTheCounterDuration')
+      }
+    }
+
+    if (
+      this.state.prescriptionRecommendation !== ''
+    ) {
+      if (this.state.prescriptionFrequency === '') {
+        errors.push('prescriptionFrequency')
+      }
+      if (this.state.prescriptionDuration === '') {
+        errors.push('prescriptionDuration')
+      }
     }
 
     if (errors.length > 0) {
@@ -325,7 +348,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
   }
 
   errorMessage = (fieldName) => {
-    let msg
+    let msg = 'must be filled out'
 
     if (fieldName === 'diagnosis') {
       msg = 'please enter a diagnosis or choose "Other"'
@@ -429,6 +452,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                               rowClasses=''
                               colClasses='col-xs-6'
                               label='Frequency'
+                              error={errors['overTheCounterFrequency']}
                               textAreaOnBlur={this.handleTextAreaOnBlur}
                               textAreaOnChange={this.handleTextAreaOnChange}
                               visible={this.state.overTheCounterMedication.length > 0 ? true : false}
@@ -440,6 +464,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                               rowClasses=''
                               colClasses='col-xs-6'
                               label='Duration'
+                              error={errors['overTheCounterDuration']}
                               textAreaOnBlur={this.handleTextAreaOnBlur}
                               textAreaOnChange={this.handleTextAreaOnChange}
                               visible={this.state.overTheCounterMedication.length > 0 ? true : false}
@@ -506,6 +531,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                               rowClasses=''
                               colClasses='col-xs-6'
                               label='Frequency'
+                              error={errors['prescriptionFrequency']}
                               textAreaOnBlur={this.handleTextAreaOnBlur}
                               textAreaOnChange={this.handleTextAreaOnChange}
                               visible={this.state.prescriptionMedication.length > 0 ? true : false}
@@ -517,6 +543,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                               rowClasses=''
                               colClasses='col-xs-6'
                               label='Duration'
+                              error={errors['prescriptionDuration']}
                               textAreaOnBlur={this.handleTextAreaOnBlur}
                               textAreaOnChange={this.handleTextAreaOnChange}
                               visible={this.state.prescriptionMedication.length > 0 ? true : false}
