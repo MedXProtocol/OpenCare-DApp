@@ -114,7 +114,7 @@ export const AddDoctorAPI = ReactTimeout(class _AddDoctorAPI extends Component {
       <div className="col-xs-12 text-center">
         <strong>Would you like to Diagnose Cases?</strong>
         <p>
-          During the beta you can opt to become a
+          During this version of the beta you can opt to become a
           <br />Doctor and diagnose patient cases.
         </p>
         <br />
