@@ -76,26 +76,31 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(
     try {
       const cancelableDownloadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
-          const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
+          var worker = new Worker('worker.js');
+          worker.postMessage('Hello World');
 
-          if (detailsJson) {
-            const details = JSON.parse(detailsJson)
+          return resolve()
 
-            const [firstImageUrl, secondImageUrl] = await Promise.all([
-              downloadImage(details.firstImageHash, props.caseKey),
-              downloadImage(details.secondImageHash, props.caseKey)
-            ])
+          // const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
 
-            return resolve({
-              details,
-              firstImageUrl,
-              secondImageUrl
-            })
-          } else {
-            console.log('rejecting')
-            console.log(detailsJson)
-            return reject('There was an error')
-          }
+          // if (detailsJson) {
+          //   const details = JSON.parse(detailsJson)
+
+          //   const [firstImageUrl, secondImageUrl] = await Promise.all([
+          //     downloadImage(details.firstImageHash, props.caseKey),
+          //     downloadImage(details.secondImageHash, props.caseKey)
+          //   ])
+
+          //   return resolve({
+          //     details,
+          //     firstImageUrl,
+          //     secondImageUrl
+          //   })
+          // } else {
+          //   console.log('rejecting')
+          //   console.log(detailsJson)
+          //   return reject('There was an error')
+          // }
         })
       )
 
