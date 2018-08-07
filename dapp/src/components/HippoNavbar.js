@@ -25,7 +25,6 @@ import { cacheCall } from '~/saga-genesis/sagas'
 import { withContractRegistry, withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
-import { openCase } from '~/services/openOrHistoricalCaseService'
 import { weiToMedX } from '~/utils/weiToMedX'
 import * as routes from '~/config/routes'
 
@@ -107,13 +106,8 @@ export const HippoNavbar = withContractRegistry(
   }
 
   render() {
-    let openCaseCount
-    const isDoctor = this.props.isDoctor
+    const { isDoctor, openCasesLength } = this.props
     const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
-
-    if (isDoctor && this.props.cases) {
-      openCaseCount = this.props.cases.filter(c => openCase(c)).length
-    }
 
     if (this.props.signedIn && this.props.address) {
       var profileMenu =
@@ -177,11 +171,11 @@ export const HippoNavbar = withContractRegistry(
               <span className={classnames(
                 'nav--open-cases__circle',
                 {
-                  'nav--open-cases__not-zero': (openCaseCount > 0),
-                  'nav--open-cases__zero': (openCaseCount === 0),
+                  'nav--open-cases__not-zero': (openCasesLength > 0),
+                  'nav--open-cases__zero': (openCasesLength === 0),
                 }
               )}> &nbsp;
-                {openCaseCount} &nbsp;
+                {openCasesLength} &nbsp;
               </span> Diagnose Cases
             </NavItem>
           </LinkContainer>
