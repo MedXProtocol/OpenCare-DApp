@@ -258,7 +258,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
               </p>
               <hr />
               <p>
-                <a onClick={this.closeModal} className="btn btn-info">Close this</a>
+                <a onClick={this.closeModal} className="btn btn-primary">Close this</a>
               </p>
             </div>
           )

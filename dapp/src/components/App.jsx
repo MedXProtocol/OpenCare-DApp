@@ -34,6 +34,7 @@ import get from 'lodash.get'
 import { withSaga, cacheCallValue, withContractRegistry } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall } from '~/saga-genesis/sagas'
+import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { populateCases, populateCasesSaga } from '~/services/populateCases'
@@ -42,7 +43,7 @@ import { defined } from '~/utils/defined'
 
 function mapStateToProps (state) {
   let caseCount
-  let cases = []
+  let [ openCases, historicalCases ] = [ [], [] ]
   const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const isSignedIn = get(state, 'account.signedIn')
@@ -54,12 +55,15 @@ function mapStateToProps (state) {
     caseCount = get(state, 'userStats.caseCount')
     // caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
 
-    cases = populateCases(state, CaseManager, address, caseCount)
+    const cases = populateCases(state, CaseManager, address, caseCount)
+    openCases       = cases.filter(c => openCase(c))
+    historicalCases = cases.filter(c => historicalCase(c))
   }
 
   return {
     address,
-    cases,
+    openCases,
+    historicalCases,
     isDoctor,
     DoctorManager,
     isSignedIn,
@@ -223,7 +227,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     return (
       <React.Fragment>
-        <HippoNavbarContainer cases={this.props.cases} />
+        <HippoNavbarContainer openCasesLength={this.props.openCases.length} />
         {ownerWarning}
         {publicKeyCheck}
         <div className="content">
@@ -249,9 +253,20 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
             <Web3Route path={routes.SIGN_IN} component={SignInContainer} />
             <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
 
-            <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} cases={this.props.cases} />
-            <SignedInRoute exact path={routes.DOCTORS_CASES_OPEN_PAGE_NUMBER} component={OpenCasesContainer} cases={this.props.cases} />
-            <SignedInRoute exact path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={OpenCasesContainer} />
+            <SignedInRoute path={routes.DOCTORS_CASES_OPEN}
+              component={OpenCasesContainer}
+              historicalCases={this.props.historicalCases}
+              openCases={this.props.openCases}
+            />
+            <SignedInRoute exact path={routes.DOCTORS_CASES_OPEN_PAGE_NUMBER}
+              component={OpenCasesContainer}
+              historicalCases={this.props.historicalCases}
+              openCases={this.props.openCases}
+            />
+            <SignedInRoute exact path={routes.DOCTORS_CASES_DIAGNOSE_CASE}
+              component={OpenCasesContainer}
+            />
+
             <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 
             <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />

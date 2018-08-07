@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { formatRoute } from 'react-router-named-routes'
 import classnames from 'classnames'
 import { CaseRow } from '~/components/CaseRow'
-import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
 import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctorCaseStatusLabels'
 import * as routes from '~/config/routes'
 
@@ -24,10 +23,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
   }
 
   render() {
-    const { cases, currentPageNumber, pageNumbers } = this.props
-
-    const openCases       = cases.filter(c => openCase(c))
-    const historicalCases = cases.filter(c => historicalCase(c))
+    const { openCases, paginatedHistoricalCases, currentPageNumber, pageNumbers } = this.props
 
     return (
       <div className='container'>
@@ -81,7 +77,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                   Historical Cases:
                 </h5>
                 {
-                  !historicalCases.length ?
+                  !paginatedHistoricalCases.length ?
                   <div className="blank-state">
                     <div className="blank-state--inner text-center text-gray">
                       <span>You have not evaluated any cases yet.</span>
@@ -92,7 +88,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                     leaveAnimation="accordionVertical"
                     className="case-list"
                   >
-                    {historicalCases.map(c => this.renderCase(c))}
+                    {paginatedHistoricalCases.map(c => this.renderCase(c))}
                   </FlipMove>
                 }
               </div>

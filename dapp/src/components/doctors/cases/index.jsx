@@ -26,24 +26,24 @@ function mapStateToProps(state) {
   }
 }
 
-function paginateCases(cases, pageNumber, perPage) {
+function paginateCases(historicalCases, pageNumber, perPage) {
   const start = (perPage % pageNumber) * perPage
   const offset = start + perPage
 
-  return [...cases.slice(start, offset)]
+  return [...historicalCases.slice(start, offset)]
 }
 
 export const OpenCasesContainer = connect(mapStateToProps)(class _OpenCasesContainer extends Component {
 
   componentDidMount() {
-    this.moveToFirstPage(this.props)
+    this.redirectToFirstPage(this.props)
   }
 
   componentWillReceiveProps(nextProps) {
-    this.moveToFirstPage(nextProps)
+    this.redirectToFirstPage(nextProps)
   }
 
-  moveToFirstPage = (props) => {
+  redirectToFirstPage = (props) => {
     if (!props.match.params.caseAddress && !props.match.params.pageNumber) {
       const firstPageRoute = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { pageNumber: 1 })
       props.history.push(firstPageRoute)
@@ -52,19 +52,21 @@ export const OpenCasesContainer = connect(mapStateToProps)(class _OpenCasesConta
 
   render () {
     let doctorCaseListing, diagnoseCase, doScrollToTop
-    const { cases, caseCount, match, transactions } = this.props
+    const { historicalCases, openCases, caseCount, match, transactions } = this.props
 
     if (match.params.caseAddress) {
       diagnoseCase = <DiagnoseCaseContainer key="diagnoseCaseContainerKey" match={match} />
     } else {
-      const totalPages = Math.ceil(cases.length / MAX_CASES_PER_PAGE)
+      const totalPages = Math.ceil(historicalCases.length / MAX_CASES_PER_PAGE)
       const pageNumbers = range(1, totalPages + 1)
 
-      let paginatedCases = paginateCases(cases, match.params.pageNumber, MAX_CASES_PER_PAGE)
-      paginatedCases = addOrUpdatePendingTxs(transactions, paginatedCases, caseCount)
+      let paginatedHistoricalCases = paginateCases(historicalCases, match.params.pageNumber, MAX_CASES_PER_PAGE)
+      paginatedHistoricalCases = addOrUpdatePendingTxs(transactions, paginatedHistoricalCases, caseCount)
+
       doctorCaseListing = <DoctorCaseListing
         key="doctorCaseListing"
-        cases={paginatedCases}
+        openCases={openCases}
+        paginatedHistoricalCases={paginatedHistoricalCases}
         pageNumbers={pageNumbers}
         currentPageNumber={parseInt(match.params.pageNumber, 10)}
       />
@@ -97,9 +99,11 @@ export const OpenCasesContainer = connect(mapStateToProps)(class _OpenCasesConta
 })
 
 OpenCasesContainer.propTypes = {
-  cases: PropTypes.array.isRequired
+  openCases: PropTypes.array,
+  historicalCases: PropTypes.array
 }
 
 OpenCasesContainer.defaultProps = {
-  cases: []
+  openCases: [],
+  historicalCases: []
 }
