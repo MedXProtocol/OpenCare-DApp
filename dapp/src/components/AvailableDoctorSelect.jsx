@@ -30,17 +30,24 @@ export const AvailableDoctorSelect =
       }
 
       render () {
+        let msg = (
+          <span>
+            Finding you a Doctor
+            <LoadingLines visible={true} color="#cccccc" />
+          </span>
+        )
+
+        if (this.props.noDoctorsAvailable) {
+          msg = "No doctors available. Please check back at another time."
+        }
+
+        if (this.props.value) {
+          msg = `Your doctor will be ${get(this.props.value, 'label')}`
+        }
+
         return (
           <h5>
-            {this.props.value
-              ? `Your doctor will be ${get(this.props.value, 'label')}`
-              : (
-                <span>
-                  Finding you a Doctor
-                  <LoadingLines visible={true} color="#cccccc" />
-                </span>
-              )
-            }
+            {msg}
           </h5>
         )
       }
