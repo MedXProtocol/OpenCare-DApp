@@ -23,12 +23,19 @@ function* nextAvailableDoctor () {
   return yield select((state) => state.nextAvailableDoctor.doctor)
 }
 
+function* thisAccount () {
+  return yield select((state) => state.sagaGenesis.accounts[0])
+}
+
 // function* isOnline(address) {
 //   return yield select((state) => state.heartbeat[address])
 // }
 
 function* isExcluded(address) {
-  const excludedAddresses = yield select(state => state.nextAvailableDoctor.excludedAddresses)
+  let excludedAddresses = yield select(state => state.nextAvailableDoctor.excludedAddresses)
+
+  excludedAddresses = [...excludedAddresses, yield thisAccount()]
+
   return excludedAddresses.indexOf(address) !== -1
 }
 
@@ -88,7 +95,8 @@ function* setNextAvailableDoctor() {
   if (doctor) {
     yield put({ type: 'NEXT_AVAILABLE_DOCTOR', doctor })
   } else {
-    console.warn('No doctors are available')
+    yield put({ type: 'NO_DOCTORS_AVAILABLE' })
+    // console.warn('No doctors are available')
   }
 }
 
@@ -153,15 +161,12 @@ function* checkNextAvailableDoctor() {
 
 function* forgetAndFindNext() {
   yield put({ type: 'FORGET_NEXT_DOCTOR' })
-  yield put({ type: 'CHECK_AVAILABLE_DOCTORS' })
+  yield checkNextAvailableDoctor()
 }
 
 export function* nextAvailableDoctorSaga() {
   // yield takeEvery('USER_ONLINE', checkDoctorOnline)
   // yield takeEvery('USER_OFFLINE', checkDoctorOffline)
-
   yield takeLatest('EXCLUDED_DOCTORS', forgetAndFindNext)
-
-  yield takeLatest('CHECK_AVAILABLE_DOCTORS', checkNextAvailableDoctor)
-  yield put({ type: 'CHECK_AVAILABLE_DOCTORS' })
+  yield put({ type: 'EXCLUDED_DOCTORS', addresses: [] })
 }

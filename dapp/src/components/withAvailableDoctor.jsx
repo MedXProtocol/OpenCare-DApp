@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 function mapStateToProps(state, ownProps) {
   return {
+    noDoctorsAvailable: state.nextAvailableDoctor.noDoctorsAvailable,
     doctor: state.nextAvailableDoctor.doctor,
     currentlyExcludedDoctors: state.nextAvailableDoctor.excludedAddresses
   }

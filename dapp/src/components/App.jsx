@@ -75,7 +75,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    signOut: () => {
+    dispatchSignOut: () => {
       dispatch({ type: 'SIGN_OUT' })
     },
     dispatchNewCaseCount: (caseCount) => {
@@ -193,7 +193,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
   signOut () {
     this.skipRequestedPathname = true
-    this.props.signOut()
+    this.props.dispatchSignOut()
   }
 
   render () {

@@ -1,6 +1,7 @@
 export default function (state, { type, doctor, addresses }) {
   if (typeof state === 'undefined') {
     state = {
+      noDoctorsAvailable: false,
       excludedAddresses: []
     }
   }
@@ -21,7 +22,20 @@ export default function (state, { type, doctor, addresses }) {
       break
 
     case 'FORGET_NEXT_DOCTOR':
+      state = {
+        ...state,
+        noDoctorsAvailable: false
+      }
+
       delete state['doctor']
+
+      break
+
+    case 'NO_DOCTORS_AVAILABLE':
+      state = {
+        ...state,
+        noDoctorsAvailable: true
+      }
       break
 
     // no default
