@@ -182,7 +182,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     })
   }
 
-  handleExampleSideEffectsChecked = (event) => {
+  handleSideEffectsChecked = (event) => {
     const value = parseInt(event.target.value, 10)
     let sideEffectValuesChosen = this.state.sideEffectValuesChosen
     let sideEffectsText = []
@@ -197,7 +197,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
     this.setState({
       sideEffectValuesChosen,
-      autopopulatedSideEffectsText: sideEffectsText.join('<br/>')
+      autopopulatedSideEffectsText: sideEffectsText.join('<br/><br/>')
     })
   }
 
@@ -216,7 +216,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
     this.setState({
       counselingValuesChosen,
-      autopopulatedCounselingText: counselingText.join('<br/>')
+      autopopulatedCounselingText: counselingText.join('<br/><br/>')
     })
   }
 
@@ -660,7 +660,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                                 <div className="form-group">
                                   <Checkbox
                                     inline
-                                    onClick={this.handleExampleSideEffectsChecked}
+                                    onClick={this.handleSideEffectsChecked}
                                     value={0}
                                   >
                                     Topical Steroids
@@ -668,7 +668,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
                                   <Checkbox
                                     inline
-                                    onClick={this.handleExampleSideEffectsChecked}
+                                    onClick={this.handleSideEffectsChecked}
                                     value={1}
                                   >
                                     Doxycycline

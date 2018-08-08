@@ -18,8 +18,8 @@ export const DiagnosisDisplay = ({ diagnosis }) => {
     })
   }
 
-  const autopopulatedSideEffectsText = sideEffectsText.join('<br/>')
-  const autopopulatedCounselingText = counselingText.join('<br/>')
+  const autopopulatedSideEffectsText = sideEffectsText.join('<br/><br/>')
+  const autopopulatedCounselingText = counselingText.join('<br/><br/>')
 
   return (
     <React.Fragment>
