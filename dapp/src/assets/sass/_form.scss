@@ -139,10 +139,14 @@ button.text-gray:active {
 
 .form-group--logical-grouping {
   background: #fafafa;
-  padding: 2rem 2rem 1rem 2rem;
+  padding: 3rem 2rem 0.5rem 2rem;
 
   margin-left: -2rem;
   margin-right: -2rem;
+}
+
+.form-group--logical-grouping .form-group {
+  margin-bottom: 1.5rem;
 }
 
 .control-label {

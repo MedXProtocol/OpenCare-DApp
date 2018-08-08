@@ -1,8 +1,26 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { HippoStringDisplay } from '~/components/HippoStringDisplay'
+import { sideEffectValues, counselingValues } from '~/sideEffectsAndCounselingValues'
 
 export const DiagnosisDisplay = ({ diagnosis }) => {
+  let [ sideEffectsText, counselingText ] = [ [], [] ]
+
+  if (diagnosis.sideEffectValuesChosen) {
+    diagnosis.sideEffectValuesChosen.sort().forEach(index => {
+      sideEffectsText.push(sideEffectValues[index])
+    })
+  }
+
+  if (diagnosis.counselingValuesChosen) {
+    diagnosis.counselingValuesChosen.sort().forEach(index => {
+      counselingText.push(counselingValues[index])
+    })
+  }
+
+  const autopopulatedSideEffectsText = sideEffectsText.join('<br/>')
+  const autopopulatedCounselingText = counselingText.join('<br/>')
+
   return (
     <React.Fragment>
       <HippoStringDisplay
@@ -30,8 +48,8 @@ export const DiagnosisDisplay = ({ diagnosis }) => {
 
       <HippoStringDisplay
         label="Side Effects:"
-        value={diagnosis.sideEffects}
-        visibleIf={!!diagnosis.sideEffects}
+        value={autopopulatedSideEffectsText}
+        visibleIf={!!autopopulatedSideEffectsText}
       />
 
       <HippoStringDisplay
@@ -42,8 +60,8 @@ export const DiagnosisDisplay = ({ diagnosis }) => {
 
       <HippoStringDisplay
         label="Counseling:"
-        value={diagnosis.counseling}
-        visibleIf={!!diagnosis.counseling}
+        value={autopopulatedCounselingText}
+        visibleIf={!!autopopulatedCounselingText}
       />
 
       <HippoStringDisplay
