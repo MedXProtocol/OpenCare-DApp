@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
-import CaseDetails from '~/components/CaseDetails'
+import { CaseDetails } from '~/components/CaseDetails'
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import Diagnosis from '~/components/Diagnosis'

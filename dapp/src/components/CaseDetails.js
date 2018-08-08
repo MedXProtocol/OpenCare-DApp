@@ -38,7 +38,7 @@ function* saga({ caseAddress, networkId }) {
   ])
 }
 
-const CaseDetails = withContractRegistry(connect(mapStateToProps)(
+export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
   withSaga(saga, { propTriggers: ['caseAddress', 'networkId'] })(
     class _CaseDetails extends Component {
 
@@ -76,31 +76,26 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(
     try {
       const cancelableDownloadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
-          var worker = new Worker('worker.js');
-          worker.postMessage('Hello World');
+          const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
 
-          return resolve()
+          if (detailsJson) {
+            const details = JSON.parse(detailsJson)
 
-          // const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
+            const [firstImageUrl, secondImageUrl] = await Promise.all([
+              downloadImage(details.firstImageHash, props.caseKey),
+              downloadImage(details.secondImageHash, props.caseKey)
+            ])
 
-          // if (detailsJson) {
-          //   const details = JSON.parse(detailsJson)
-
-          //   const [firstImageUrl, secondImageUrl] = await Promise.all([
-          //     downloadImage(details.firstImageHash, props.caseKey),
-          //     downloadImage(details.secondImageHash, props.caseKey)
-          //   ])
-
-          //   return resolve({
-          //     details,
-          //     firstImageUrl,
-          //     secondImageUrl
-          //   })
-          // } else {
-          //   console.log('rejecting')
-          //   console.log(detailsJson)
-          //   return reject('There was an error')
-          // }
+            return resolve({
+              details,
+              firstImageUrl,
+              secondImageUrl
+            })
+          } else {
+            console.log('rejecting')
+            console.log(detailsJson)
+            return reject('There was an error')
+          }
         })
       )
 
@@ -410,5 +405,3 @@ CaseDetails.defaultProps = {
   secondImageUrl: null,
   details: {}
 }
-
-export default CaseDetails
