@@ -1,7 +1,11 @@
 import React, { Component } from 'react'
 import { Button } from 'react-bootstrap'
+import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { toastr } from '~/toastr'
+import { mixpanel } from '~/mixpanel'
 
-const SECONDS_IN_A_DAY = 86400
+// const SECONDS_IN_A_DAY = 86400
+const SECONDS_IN_A_DAY = 20
 // const UNIX_EPOCH_MILISECONDS = 1000
 
 export const AbandonedCaseActions = class _AbandonedCaseActions extends Component {
@@ -11,6 +15,32 @@ export const AbandonedCaseActions = class _AbandonedCaseActions extends Componen
 
     this.state = {
       isSubmitting: false
+    }
+  }
+
+  handleForceAcceptDiagnosis = () => {
+    const acceptAsDoctorAfterADay = this.props.send(this.props.caseAddress, 'acceptAsDoctorAfterADay')()
+    this.setState({
+      acceptAsDoctorAfterADay,
+      acceptHandler: new TransactionStateHandler(),
+      loading: true
+    })
+  }
+
+  acceptChallengeHandler = (props) => {
+    if (this.state.acceptHandler) {
+      this.state.acceptHandler.handle(props.transactions[this.state.acceptTransactionId])
+        .onError((error) => {
+          toastr.transactionError(error)
+          this.setState({ acceptHandler: null, loading: false })
+        })
+        .onConfirmed(() => {
+          this.setState({ acceptHandler: null, loading: false })
+        })
+        .onTxHash(() => {
+          toastr.success('Your accept diagnosis transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your MEDX.')
+          mixpanel.track('Doctor Force Accepting After 24 Hours')
+        })
     }
   }
 
@@ -30,8 +60,8 @@ export const AbandonedCaseActions = class _AbandonedCaseActions extends Componen
           <br />You can close the case on their behalf to earn your MEDX:
           <br />
           <Button
-            disabled={this.state.isSubmitting}
-            onClick={this.handleSubmit}
+            disabled={this.state.loading}
+            onClick={this.handleForceAcceptDiagnosis}
             className="btn btn-sm btn-clear"
           >
             Close Case

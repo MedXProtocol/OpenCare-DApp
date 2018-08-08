@@ -39,7 +39,6 @@ export const Loading = ReactTimeout(class _Loading extends Component {
           <br />
           <br />
           <a
-            style={{'color': 'white'}}
             className="btn btn-sm btn-clear"
             onClick={(e) => {
               e.preventDefault()
