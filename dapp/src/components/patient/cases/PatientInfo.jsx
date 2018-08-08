@@ -31,10 +31,11 @@ export const PatientInfo = class _PatientInfo extends Component {
         <div className="row">
           <div className="col-xs-4 col-sm-3 col-md-3">
             <HippoTextInput
-              type='number'
-              id='age'
-              name='age'
-              label='Age'
+              min="0"
+              type="number"
+              id="age"
+              name="age"
+              label="Age"
               error={errors['age']}
               textInputOnBlur={textInputOnBlur}
               textInputOnChange={textInputOnChange}

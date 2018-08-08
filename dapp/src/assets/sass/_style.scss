@@ -50,6 +50,10 @@ a {
   margin-top: 0;
   margin-bottom: 20px;
   padding: 6px 0;
+
+  @media (max-width: 768px) {
+    margin-bottom: 0;
+  }
 }
 
 .no-margin {
@@ -237,4 +241,8 @@ small,
   @media (max-width: $screen-sm) {
     text-align: center;
   }
+}
+
+.info-question-mark {
+  cursor: pointer;
 }

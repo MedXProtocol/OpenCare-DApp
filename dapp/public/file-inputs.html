@@ -192,3 +192,19 @@ input, button, select, textarea {
     margin: 0;
 }
 </style>
+
+
+
+<h1>
+  Worker Test:
+</h1>
+<div id="workerTest">
+</div>
+
+<script>
+if (window.Worker) {
+  document.getElementById('workerTest').innerText = 'worker good!'
+} else {
+  document.getElementById('workerTest').innerText = 'no workers :('
+}
+</script>

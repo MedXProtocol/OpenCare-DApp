@@ -4,29 +4,44 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { ImageLoader, CaseDetailsLoader } from './ContentLoaders'
+import { HippoTimestamp } from '~/components/HippoTimestamp'
 import { LoadingLines } from '~/components/LoadingLines'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { downloadJson, downloadImage } from '../utils/storage-util'
+import { all } from 'redux-saga/effects'
 import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { toastr } from '~/toastr'
+import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress }) {
-  let caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+
+  const caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
+  const createdAt = cacheCallValue(state, caseAddress, 'createdAt')
+
   return {
-    caseDetailsHash: getFileHashFromBytes(caseDataHash)
+    caseDetailsHash: getFileHashFromBytes(caseDataHash),
+    createdAt: createdAt,
+    networkId
   }
 }
 
 function* saga({ caseAddress, networkId }) {
-  if (!caseAddress) { return }
+  if (!networkId || !caseAddress) { return }
+
   yield addContract({ address: caseAddress, contractKey: 'Case' })
-  yield cacheCall(caseAddress, 'caseDataHash')
+  yield all([
+    cacheCall(caseAddress, 'caseDataHash'),
+    cacheCall(caseAddress, 'createdAt')
+  ])
 }
 
-const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['caseAddress'] })(
-  class _CaseDetails extends Component {
+const CaseDetails = withContractRegistry(connect(mapStateToProps)(
+  withSaga(saga, { propTriggers: ['caseAddress', 'networkId'] })(
+    class _CaseDetails extends Component {
+
   constructor (props) {
     super(props)
     this.state = {
@@ -61,19 +76,31 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     try {
       const cancelableDownloadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
-          const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
-          const details = JSON.parse(detailsJson)
+          var worker = new Worker('worker.js');
+          worker.postMessage('Hello World');
 
-          const [firstImageUrl, secondImageUrl] = await Promise.all([
-            downloadImage(details.firstImageHash, props.caseKey),
-            downloadImage(details.secondImageHash, props.caseKey)
-          ])
+          return resolve()
 
-          return resolve({
-            details,
-            firstImageUrl,
-            secondImageUrl
-          })
+          // const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
+
+          // if (detailsJson) {
+          //   const details = JSON.parse(detailsJson)
+
+          //   const [firstImageUrl, secondImageUrl] = await Promise.all([
+          //     downloadImage(details.firstImageHash, props.caseKey),
+          //     downloadImage(details.secondImageHash, props.caseKey)
+          //   ])
+
+          //   return resolve({
+          //     details,
+          //     firstImageUrl,
+          //     secondImageUrl
+          //   })
+          // } else {
+          //   console.log('rejecting')
+          //   console.log(detailsJson)
+          //   return reject('There was an error')
+          // }
         })
       )
 
@@ -83,11 +110,15 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
         .promise
         .then((result) => {
           this.setState(result)
+        })
+        .catch((reason) => {
+          console.log('isCanceled', reason.isCanceled)
+        })
+        .finally(() => {
           this.setState({
             loading: false
           })
         })
-        .catch((reason) => console.log('isCanceled', reason.isCanceled));
     } catch (error) {
       toastr.error('There was an error while downloading your case details from IPFS.')
       console.warn(error)
@@ -131,6 +162,7 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
     const { caseKey, caseAddress, caseIsOpenForDoctor } = this.props
     const details = this.state.details || {}
     let jsx
+
     if (caseIsOpenForDoctor) {
       var submitDiagnosisLink = (
         <span>
@@ -352,8 +384,9 @@ const CaseDetails = withContractRegistry(connect(mapStateToProps)(withSaga(saga,
             <div className="row">
               <div className="col-xs-12">
                 <p className="text-gray small text-center">
-
                   <strong>Case Address:</strong> {this.props.caseAddress}
+                  <br />
+                  <HippoTimestamp timeInUtcSecondsSinceEpoch={this.props.createdAt} />
                 </p>
               </div>
             </div>

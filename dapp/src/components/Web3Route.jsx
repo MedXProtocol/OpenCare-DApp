@@ -19,7 +19,7 @@ function mapStateToProps (state, ownProps) {
 export const Web3Route = connect(mapStateToProps)(class _Web3Route extends Component {
   renderComponent (props) {
     const Component = this.props.component
-    return <Component {...props} />
+    return <Component {...props} {...this.props} />
   }
 
   redirect () {

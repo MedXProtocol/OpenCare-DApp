@@ -15,6 +15,7 @@ import { isEmptyObject } from '~/utils/isEmptyObject'
 import { isBlank } from '~/utils/isBlank'
 import { downloadJson } from '~/utils/storage-util'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
+import { DiagnosisDisplay } from '~/components/DiagnosisDisplay'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKey } from '~/services/reencryptCaseKey'
 import { mixpanel } from '~/mixpanel'
@@ -23,6 +24,7 @@ import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import isEqual from 'lodash.isequal'
+import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -36,6 +38,8 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const isPatient = account === patientAddress
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
 
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+
   return {
     account,
     currentlyExcludedDoctors,
@@ -46,11 +50,14 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
     encryptedCaseKey,
     caseKeySalt,
     diagnosingDoctor,
-    selectedDoctor: ''
+    selectedDoctor: '',
+    networkId
   }
 }
 
-function* saga({ caseAddress }) {
+function* saga({ caseAddress, networkId }) {
+  if (!networkId) { return }
+
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
     cacheCall(caseAddress, 'status'),
@@ -71,7 +78,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['caseAddress', 'diagnosisHash', 'status'] })(
+  withSaga(saga, { propTriggers: ['caseAddress', 'diagnosisHash', 'status', 'networkId'] })(
     withSend(class _Diagnosis extends Component {
 
   constructor(){
@@ -79,7 +86,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
     this.state = {
       diagnosis: {},
-      showThankYouModal: false,
       showChallengeModal: false,
       doctorPublicKey: '',
       loading: false,
@@ -118,9 +124,14 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
       const cancelableDownloadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
           const diagnosisJson = await downloadJson(props.diagnosisHash, props.caseKey)
-          const diagnosis = JSON.parse(diagnosisJson)
 
-          return resolve({ diagnosis })
+          if (diagnosisJson) {
+            const diagnosis = JSON.parse(diagnosisJson)
+            return resolve({ diagnosis })
+          } else {
+            console.log(diagnosisJson)
+            return reject('There was an error')
+          }
         })
       )
 
@@ -130,12 +141,15 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         .promise
         .then((result) => {
           this.setState(result)
-
+        })
+        .catch((reason) => {
+          console.log('isCanceled', reason.isCanceled)
+        })
+        .finally(() => {
           this.setState({
             loading: false
           })
         })
-        .catch((reason) => console.log('isCanceled', reason.isCanceled));
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')
       console.warn(error)
@@ -165,7 +179,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         .onTxHash(() => {
           toastr.success('Working on getting you a second opinion.')
           mixpanel.track('Challenge Diagnosis Submitted')
-          this.setState({ loading: false })
+          this.props.history.push(routes.PATIENTS_CASES)
         })
     }
   }
@@ -183,12 +197,9 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
           })
         })
         .onTxHash(() => {
-          toastr.success('You have accepted the diagnosis for this case.')
+          toastr.success('You have accepted the case diagnosis. Thank you for using MedCredits!')
           mixpanel.track('Accept Diagnosis Submitted')
-          this.setState({
-            showThankYouModal: true,
-            loading: false
-          })
+          this.props.history.push(routes.PATIENTS_CASES)
         })
     }
   }
@@ -211,11 +222,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
   handleChallengeDiagnosis = () => {
     this.setState({ showChallengeModal: true })
-  }
-
-  handleCloseThankYouModal = () => {
-    this.setState({ showThankYouModal: false })
-    this.props.history.push(routes.PATIENTS_CASES)
   }
 
   handleCloseChallengeModal = () => {
@@ -265,67 +271,38 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         <div className="card-footer">
           <div className="row">
             <div className="col-xs-12 text-right" >
-              <button disabled={transactionRunning} onClick={this.handleChallengeDiagnosis} type="button" className="btn btn-warning">Get Second Opinion</button>
+              <button
+                disabled={transactionRunning}
+                onClick={this.handleChallengeDiagnosis}
+                type="button"
+                className="btn btn-warning"
+              >Get Second Opinion</button>
               &nbsp;
-              <button disabled={transactionRunning} onClick={this.handleAcceptDiagnosis} type="button" className="btn btn-success">Accept</button>
+              <button
+                disabled={transactionRunning}
+                onClick={this.handleAcceptDiagnosis}
+                type="button"
+                className="btn btn-success"
+              >Accept</button>
             </div>
           </div>
         </div>
     }
 
     return (
-      isEmptyObject(this.state.diagnosis) ?
-        <div /> : (
+      isEmptyObject(this.state.diagnosis)
+        ? <div />
+        : (
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">{this.props.title}</h3>
           </div>
           <div className="card-body">
-            <div className="row">
-              <div className="col-xs-12">
-                <label>Diagnosis</label>
-                <p>
-                  {this.state.diagnosis.diagnosis}
-                </p>
-              </div>
-              <div className="col-xs-12">
-                <label>Recommendation</label>
-                <p>
-                  {this.state.diagnosis.recommendation}
-                </p>
-              </div>
-              {this.state.diagnosis.additionalRecommendation
-                ? (
-                    <div className="col-xs-12">
-                      <label>Additional Recommendation:</label>
-                      <p>
-                        {this.state.diagnosis.additionalRecommendation}
-                      </p>
-                    </div>
-                  )
-                : null}
-            </div>
+            <DiagnosisDisplay diagnosis={this.state.diagnosis} />
           </div>
 
           {buttons}
 
-          <Modal show={this.state.showThankYouModal} onHide={this.handleCloseThankYouModal}>
-            <Modal.Body>
-              <div className="row">
-                <div className="col-xs-12 text-center">
-                  <h4>
-                    You have accepted the case diagnosis.
-                  </h4>
-                  <h5>
-                    Thank you for using MedCredits!
-                  </h5>
-                </div>
-              </div>
-            </Modal.Body>
-            <Modal.Footer>
-              <button onClick={this.handleCloseThankYouModal} type="button" className="btn btn-primary">OK</button>
-            </Modal.Footer>
-          </Modal>
           <Modal show={this.state.showChallengeModal} onHide={this.handleCloseChallengeModal}>
             <form onSubmit={this.onSubmitChallenge}>
               <Modal.Header>

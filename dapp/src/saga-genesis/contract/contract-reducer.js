@@ -15,6 +15,7 @@ export default function (state, {type, address, name, contractKey, networkId}) {
   switch (type) {
     case 'ADD_CONTRACT':
       var networkConfig = state.networks[networkId] || {}
+      // console.log('in ADD_CONTRACT', networkConfig, state.networks, networkId)
       state = {
         networks: {
           ...state.networks,

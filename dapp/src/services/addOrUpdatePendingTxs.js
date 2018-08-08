@@ -3,7 +3,7 @@ import { defined } from '~/utils/defined'
 
 const PENDING_TX_STATUS = -1
 
-// Adds cases to the cases array set in the mapStateToProps
+// Adds cases not yet committed to the blockchain to the cases array set in the mapStateToProps
 // Contains info about pending tx's
 function addNewCase(cases, transaction, transactionId, objIndex) {
   transaction = {
@@ -11,6 +11,7 @@ function addNewCase(cases, transaction, transactionId, objIndex) {
     transactionId,
     objIndex
   }
+
   cases.splice(0, 0, transaction)
 
   return cases
@@ -30,10 +31,10 @@ function updateCase(cases, transaction, transactionId, caseIndex) {
   return cases
 }
 
-export const addOrUpdatePendingTxs = function(state, cases, caseCount) {
+export const addOrUpdatePendingTxs = function(transactions, cases, caseCount) {
   let index = 0
 
-  forOwn(state.sagaGenesis.transactions, function(transaction, transactionId) {
+  forOwn(transactions, function(transaction, transactionId) {
     if (!defined(transaction.call)) { return } // continue
 
     const { confirmed, error, call } = transaction

@@ -7,7 +7,7 @@ export default function (state, { type, caseCount }) {
 
   switch (type) {
     case 'UPDATE_CASE_COUNT':
-      console.log(caseCount)
+      // console.log(caseCount)
       state = {
         ...state,
         caseCount

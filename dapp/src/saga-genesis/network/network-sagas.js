@@ -14,6 +14,7 @@ export function* refreshNetwork() {
   const existingNetworkId = yield select((state) => state.sagaGenesis.network.networkId)
   let networkId = yield web3.eth.net.getId()
   if (existingNetworkId !== networkId) {
+    // console.log('FINALLY HAVE NETWORK ID!')
     yield put({type: 'WEB3_NETWORK_ID', web3, networkId})
   }
 }
@@ -26,5 +27,6 @@ export function* startNetworkPolling() {
 }
 
 export default function* () {
+  // console.log('IN START NETWORKING POLLING')
   yield fork(startNetworkPolling)
 }

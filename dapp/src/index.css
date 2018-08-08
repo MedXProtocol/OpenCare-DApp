@@ -19,6 +19,7 @@
 @import './assets/sass/loading';
 @import "./assets/sass/loading-lines";
 @import "./assets/sass/modal";
+@import "./assets/sass/pagination";
 @import "./assets/sass/progress";
 @import "./assets/sass/navbar";
 @import "./assets/sass/star";

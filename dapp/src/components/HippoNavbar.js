@@ -25,7 +25,6 @@ import { cacheCall } from '~/saga-genesis/sagas'
 import { withContractRegistry, withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
-import { openCase } from '~/services/openOrHistoricalCaseService'
 import { weiToMedX } from '~/utils/weiToMedX'
 import * as routes from '~/config/routes'
 
@@ -40,8 +39,9 @@ function mapStateToProps (state) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const signedIn = state.account.signedIn
 
-  if (isDoctor)
+  if (isDoctor) {
     doctorName = cacheCallValue(state, DoctorManager, 'name', address)
+  }
 
   return {
     address,
@@ -58,8 +58,11 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    signOut: () => {
+    dispatchSignOut: () => {
       dispatch({ type: 'SIGN_OUT' })
+    },
+    dispatchShowBetaFaucetModal: () => {
+      dispatch({ type: 'SHOW_BETA_FAUCET_MODAL', manuallyOpened: true })
     }
   }
 }
@@ -74,24 +77,47 @@ function* saga({ address, DoctorManager, MedXToken }) {
   ])
 }
 
-export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['address', 'DoctorManager', 'MedXToken'] })(class _HippoNavbar extends Component {
+export const HippoNavbar = withContractRegistry(
+  connect(mapStateToProps, mapDispatchToProps)(
+    withSaga(saga, { propTriggers: ['address', 'DoctorManager', 'MedXToken'] })(
+      class _HippoNavbar extends Component {
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      profileMenuOpen: false
+    }
+  }
+
   signOut = () => {
-    this.props.signOut()
+    this.props.dispatchSignOut()
     this.props.history.push(routes.SIGN_IN)
   }
 
-  render() {
-    let openCaseCount
-    const isDoctor = this.props.isDoctor
-    const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
+  toggleProfileMenu = (value) => {
+    this.setState({ profileMenuOpen: value  })
+  }
 
-    if (isDoctor && this.props.cases) {
-      openCaseCount = this.props.cases.filter(c => openCase(c)).length
-    }
+  handleBetaFeaturesClick = (event) => {
+    event.preventDefault()
+    this.props.dispatchShowBetaFaucetModal()
+    this.toggleProfileMenu(false)
+  }
+
+  render() {
+    const { isDoctor, openCasesLength } = this.props
+    const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
 
     if (this.props.signedIn && this.props.address) {
       var profileMenu =
-        <NavDropdown title={nameOrAccountString} id='account-dropdown'>
+        <NavDropdown
+          title={nameOrAccountString}
+          id='account-dropdown'
+          open={this.state.profileMenuOpen}
+          onToggle={(value) => this.toggleProfileMenu(value)}
+
+        >
           <MenuItem header>Profile</MenuItem>
 
           <LinkContainer to={routes.ACCOUNT_WALLET}>
@@ -99,6 +125,12 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
               MEDT Balance
             </MenuItem>
           </LinkContainer>
+
+          <li role="presentation">
+            <a role="menuitem" onClick={this.handleBetaFeaturesClick}>
+              Beta Features
+            </a>
+          </li>
 
           <MenuItem header>Security</MenuItem>
           <LinkContainer to={routes.ACCOUNT_EMERGENCY_KIT}>
@@ -139,11 +171,11 @@ export const HippoNavbar = withContractRegistry(connect(mapStateToProps, mapDisp
               <span className={classnames(
                 'nav--open-cases__circle',
                 {
-                  'nav--open-cases__not-zero': (openCaseCount > 0),
-                  'nav--open-cases__zero': (openCaseCount === 0),
+                  'nav--open-cases__not-zero': (openCasesLength > 0),
+                  'nav--open-cases__zero': (openCasesLength === 0),
                 }
               )}> &nbsp;
-                {openCaseCount} &nbsp;
+                {openCasesLength} &nbsp;
               </span> Diagnose Cases
             </NavItem>
           </LinkContainer>

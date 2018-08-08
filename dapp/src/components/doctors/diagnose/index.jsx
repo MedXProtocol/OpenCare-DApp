@@ -28,16 +28,8 @@ function mapStateToProps(state, { match }) {
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'doctorEncryptedCaseKeys', address)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
-  const bytesDiagnosisHash = cacheCallValue(state, caseAddress, 'diagnosisHash')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
-  const bytesChallengeHash = cacheCallValue(state, caseAddress, 'challengeHash')
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
-
-  console.log('doctor gets bytesDiagnosisHash', bytesDiagnosisHash)
-  console.log('doctor gets diagnosisHash', diagnosisHash)
-
-  console.log('doctor gets bytesChallengeHash', bytesChallengeHash)
-  console.log('doctor gets challengeHash', challengeHash)
 
   return {
     address,
@@ -56,6 +48,7 @@ function mapStateToProps(state, { match }) {
 function* saga({ match, address, AccountManager }) {
   if (!AccountManager || isEmptyObject(match.params)) { return }
   const caseAddress = match.params.caseAddress
+  // console.log('called by doctors/diagnose.js saga')
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield all([
@@ -150,9 +143,11 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
     } else if (caseKey === null) {
       diagnosis = (
         <div className="col-xs-12 col-md-6 col-md-offset-3">
-          <h4 className="text-danger">
-            Cannot submit diagnosis
-          </h4>
+          <div className="alert alert-warning">
+            <h4>
+              Cannot submit diagnosis
+            </h4>
+          </div>
           <hr />
         </div>
       )

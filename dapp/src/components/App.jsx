@@ -34,6 +34,7 @@ import get from 'lodash.get'
 import { withSaga, cacheCallValue, withContractRegistry } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall } from '~/saga-genesis/sagas'
+import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { populateCases, populateCasesSaga } from '~/services/populateCases'
@@ -42,7 +43,7 @@ import { defined } from '~/utils/defined'
 
 function mapStateToProps (state) {
   let caseCount
-  let cases = []
+  let [ openCases, historicalCases ] = [ [], [] ]
   const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const isSignedIn = get(state, 'account.signedIn')
@@ -54,12 +55,15 @@ function mapStateToProps (state) {
     caseCount = get(state, 'userStats.caseCount')
     // caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
 
-    cases = populateCases(state, CaseManager, address, caseCount)
+    const cases = populateCases(state, CaseManager, address, caseCount)
+    openCases       = cases.filter(c => openCase(c))
+    historicalCases = cases.filter(c => historicalCase(c))
   }
 
   return {
     address,
-    cases,
+    openCases,
+    historicalCases,
     isDoctor,
     DoctorManager,
     isSignedIn,
@@ -71,11 +75,11 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    signOut: () => {
+    dispatchSignOut: () => {
       dispatch({ type: 'SIGN_OUT' })
     },
     dispatchNewCaseCount: (caseCount) => {
-      console.log(caseCount)
+      // console.log(caseCount)
       dispatch({ type: 'UPDATE_CASE_COUNT', caseCount })
     }
   }
@@ -124,7 +128,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
         return c
       })
 
-    console.log('Wat: ', newCaseCount, this.props.caseCount)
+    // console.log('Wat: ', newCaseCount, this.props.caseCount)
 
     if (newCaseCount !== this.props.caseCount) {
       this.props.dispatchNewCaseCount(newCaseCount)
@@ -150,7 +154,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     const { contractRegistry, CaseManager, address } = this.props
     const oldCaseCount = this.props.caseCount
 
-    console.log('in showNewCaseAssignedToast')
+    // console.log('in showNewCaseAssignedToast')
 
     // Moving from 0 to 1, or 1 to 2, but not undefined/NaN (initial state) to a number
     if (
@@ -161,7 +165,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       return
     }
 
-    console.log('showNewCaseAssignedToast PASSED!')
+    // console.log('showNewCaseAssignedToast PASSED!')
 
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
     CaseManagerInstance.methods
@@ -189,7 +193,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
   signOut () {
     this.skipRequestedPathname = true
-    this.props.signOut()
+    this.props.dispatchSignOut()
   }
 
   render () {
@@ -223,7 +227,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     return (
       <React.Fragment>
-        <HippoNavbarContainer cases={this.props.cases} />
+        <HippoNavbarContainer openCasesLength={this.props.openCases.length} />
         {ownerWarning}
         {publicKeyCheck}
         <div className="content">
@@ -237,7 +241,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
           <Switch>
             {redirect}
 
-            <Route path={routes.WELCOME}  render={ () => WelcomeWrapped } />
+            <Route path={routes.WELCOME} render={ () => WelcomeWrapped } />
             <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
             <Route path={routes.TRY_METAMASK} component={TryMetamask} />
 
@@ -249,8 +253,20 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
             <Web3Route path={routes.SIGN_IN} component={SignInContainer} />
             <Web3Route path={routes.SIGN_UP} component={SignUpContainer} />
 
-            <SignedInRoute path={routes.DOCTORS_CASES_OPEN} component={OpenCasesContainer} />
-            <SignedInRoute path={routes.DOCTORS_CASES_DIAGNOSE_CASE} component={OpenCasesContainer} />
+            <SignedInRoute path={routes.DOCTORS_CASES_OPEN}
+              component={OpenCasesContainer}
+              historicalCases={this.props.historicalCases}
+              openCases={this.props.openCases}
+            />
+            <SignedInRoute exact path={routes.DOCTORS_CASES_OPEN_PAGE_NUMBER}
+              component={OpenCasesContainer}
+              historicalCases={this.props.historicalCases}
+              openCases={this.props.openCases}
+            />
+            <SignedInRoute exact path={routes.DOCTORS_CASES_DIAGNOSE_CASE}
+              component={OpenCasesContainer}
+            />
+
             <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 
             <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />

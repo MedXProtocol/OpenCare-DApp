@@ -1,12 +1,13 @@
-export default function (state, {type, networkId}) {
+export default function (state, { type, networkId }) {
   if (typeof state === 'undefined') {
     state = {
-      networkId: ''
+      networkId: undefined
     }
   }
 
   switch (type) {
     case 'WEB3_NETWORK_ID':
+      // console.log('setting network id in state')
       state = {
         networkId
       }

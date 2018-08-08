@@ -12,6 +12,7 @@ export const ACCOUNT_MINT = '/account/mint'
 export const ACCOUNT_WALLET = '/account/wallet'
 
 export const DOCTORS_CASES_OPEN = '/doctors/cases/open'
+export const DOCTORS_CASES_OPEN_PAGE_NUMBER = '/doctors/cases/:pageNumber'
 export const DOCTORS_CASES_DIAGNOSE_CASE = '/doctors/cases/diagnose/:caseAddress'
 export const DOCTORS_NEW = '/doctors/new'
 

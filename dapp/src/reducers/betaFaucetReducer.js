@@ -1,4 +1,4 @@
-export const betaFaucet = function (state, { type }) {
+export const betaFaucet = function (state, { type, manuallyOpened }) {
   if (typeof state === 'undefined') {
     state = {}
   }
@@ -7,14 +7,16 @@ export const betaFaucet = function (state, { type }) {
     case 'HIDE_BETA_FAUCET_MODAL':
       state = {
         ...state,
-        betaFaucetModalDismissed: true
+        betaFaucetModalDismissed: true,
+        manuallyOpened
       }
       break
 
     case 'SHOW_BETA_FAUCET_MODAL':
       state = {
         ...state,
-        betaFaucetModalDismissed: false
+        betaFaucetModalDismissed: false,
+        manuallyOpened
       }
       break
 

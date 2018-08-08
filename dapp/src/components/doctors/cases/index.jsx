@@ -1,50 +1,76 @@
 import React, { Component } from 'react'
-import ReactTimeout from 'react-timeout'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
 import PropTypes from 'prop-types'
-import { contractByName } from '~/saga-genesis/state-finders'
-import { withSaga, withContractRegistry, withSend } from '~/saga-genesis'
 import { DiagnoseCaseContainer } from '~/components/doctors/diagnose'
 import { DoctorCaseListing } from '~/components/doctors/DoctorCaseListing'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { populateCases, populateCasesSaga } from '~/services/populateCases'
 import { addOrUpdatePendingTxs } from '~/services/addOrUpdatePendingTxs'
-import { isEmptyObject } from '~/utils/isEmptyObject'
+import { formatRoute } from 'react-router-named-routes'
+import range from 'lodash.range'
 import get from 'lodash.get'
+import * as routes from '~/config/routes'
+
+const MAX_CASES_PER_PAGE = 5
 
 function mapStateToProps(state) {
-  let cases = []
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const CaseManager = contractByName(state, 'CaseManager')
   const caseCount = get(state, 'userStats.caseCount')
-  // const caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
-
-  cases = populateCases(state, CaseManager, address, caseCount)
-
-  cases = addOrUpdatePendingTxs(state, cases, caseCount)
+  const transactions = state.sagaGenesis.transactions
 
   return {
     address,
     caseCount,
-    cases,
-    CaseManager
+    transactions
   }
 }
 
-function* saga({ caseCount, address, CaseManager }) {
-  if (!caseCount || !address || !CaseManager) { return }
+function paginateCases(historicalCases, pageNumber, perPage) {
+  const start = (perPage % pageNumber) * perPage
+  const offset = start + perPage
 
-  yield populateCasesSaga(CaseManager, address, caseCount)
+  return [...historicalCases.slice(start, offset)]
 }
 
-export const OpenCasesContainer = ReactTimeout(withContractRegistry(connect(mapStateToProps)(
-  withSend(withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager'] })(class _OpenCasesContainer extends Component {
+export const OpenCasesContainer = connect(mapStateToProps)(class _OpenCasesContainer extends Component {
+
+  componentDidMount() {
+    this.redirectToFirstPage(this.props)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.redirectToFirstPage(nextProps)
+  }
+
+  redirectToFirstPage = (props) => {
+    if (!props.match.params.caseAddress && !props.match.params.pageNumber) {
+      const firstPageRoute = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { pageNumber: 1 })
+      props.history.push(firstPageRoute)
+    }
+  }
 
   render () {
     let doctorCaseListing, diagnoseCase, doScrollToTop
-    const { match, cases } = this.props
+    const { historicalCases, openCases, caseCount, match, transactions } = this.props
+
+    if (match.params.caseAddress) {
+      diagnoseCase = <DiagnoseCaseContainer key="diagnoseCaseContainerKey" match={match} />
+    } else {
+      const totalPages = Math.ceil(historicalCases.length / MAX_CASES_PER_PAGE)
+      const pageNumbers = range(1, totalPages + 1)
+
+      let paginatedHistoricalCases = paginateCases(historicalCases, match.params.pageNumber, MAX_CASES_PER_PAGE)
+      paginatedHistoricalCases = addOrUpdatePendingTxs(transactions, paginatedHistoricalCases, caseCount)
+
+      doctorCaseListing = <DoctorCaseListing
+        key="doctorCaseListing"
+        openCases={openCases}
+        paginatedHistoricalCases={paginatedHistoricalCases}
+        pageNumbers={pageNumbers}
+        currentPageNumber={parseInt(match.params.pageNumber, 10)}
+      />
+    }
 
     const diagnosisJustSubmitted = (
       this.previousCaseAddress
@@ -54,12 +80,6 @@ export const OpenCasesContainer = ReactTimeout(withContractRegistry(connect(mapS
       doScrollToTop = true
     }
     this.previousCaseAddress = match.params.caseAddress
-
-    if (isEmptyObject(match.params)) {
-      doctorCaseListing = <DoctorCaseListing key="doctorCaseListing" cases={cases} />
-    } else {
-      diagnoseCase = <DiagnoseCaseContainer key="diagnoseCaseContainerKey" match={match} />
-    }
 
     return (
       <div>
@@ -76,12 +96,14 @@ export const OpenCasesContainer = ReactTimeout(withContractRegistry(connect(mapS
       </div>
     )
   }
-})))))
+})
 
 OpenCasesContainer.propTypes = {
-  cases: PropTypes.array.isRequired
+  openCases: PropTypes.array,
+  historicalCases: PropTypes.array
 }
 
 OpenCasesContainer.defaultProps = {
-  cases: []
+  openCases: [],
+  historicalCases: []
 }
