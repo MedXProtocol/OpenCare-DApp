@@ -51,18 +51,24 @@
 
 // This is to be used against a colored / dark background
 .btn-clear {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 30px;
+  background-color: white;
+  border-radius: 50px;
   border: 3px solid white;
   box-shadow: none;
+  color: #000;
+  font-weight: bold;
+  font-size: 13px;
+  letter-spacing: 0.15rem;
+  margin-top: 10px;
+  padding: 5px 40px 4px;
 }
 
 .btn-clear:hover,
 .btn-clear:focus,
 .btn-clear:active {
-  background-color: transparent;
-  border: 3px solid rgba(255, 255, 255, 0.8);
-  color: white;
+  background-color: white;
+  border-color: white;
+  transform: scale(1.05);
 }
 
 .btn-clear.disabled:hover,
@@ -74,6 +80,27 @@
   background-color: inherit;
   border-color: inherit;
 }
+
+.alert-primary .btn-clear {
+  color: $brand-primary;
+}
+
+.alert-success .btn-clear {
+  color: $brand-success;
+}
+
+.alert-warning .btn-clear {
+  color: $brand-warning;
+}
+
+.alert-info .btn-clear {
+  color: $brand-info;
+}
+
+.alert-danger .btn-clear {
+  color: $brand-danger;
+}
+
 
 .btn-toolbar .btn {
   border-radius: 2px;
