@@ -120,7 +120,6 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
           />
         </div>
     } else if (!isBlank(diagnosisHash) && diagnosingDoc) {
-      console.log(diagnosisHash, diagnosingDoc)
       var diagnosis =
         <div className='col-xs-12'>
           <AbandonedCaseActions

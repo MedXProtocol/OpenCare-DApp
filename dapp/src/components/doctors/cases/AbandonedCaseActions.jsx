@@ -20,10 +20,6 @@ export const AbandonedCaseActions = class _AbandonedCaseActions extends Componen
     )
     const waitingOnPatient = (this.props.status === '3')
 
-    console.log('hasBeenOneDay', hasBeenOneDay)
-    console.log(this.props.status)
-    console.log('waitingOnPatient', waitingOnPatient)
-
     if (!this.props.createdAt || !hasBeenOneDay || !waitingOnPatient) {
       return null
     } else {
