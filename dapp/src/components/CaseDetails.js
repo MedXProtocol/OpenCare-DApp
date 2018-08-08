@@ -105,14 +105,12 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
         .promise
         .then((result) => {
           this.setState(result)
-        })
-        .catch((reason) => {
-          console.log('isCanceled', reason.isCanceled)
-        })
-        .finally(() => {
           this.setState({
             loading: false
           })
+        })
+        .catch((reason) => {
+          console.log('isCanceled', reason.isCanceled)
         })
     } catch (error) {
       toastr.error('There was an error while downloading your case details from IPFS.')

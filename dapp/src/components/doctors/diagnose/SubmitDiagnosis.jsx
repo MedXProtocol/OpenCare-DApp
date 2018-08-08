@@ -5,7 +5,7 @@ import Select from 'react-select'
 import { connect } from 'react-redux'
 import * as Animated from 'react-select/lib/animated';
 import { withRouter } from 'react-router-dom'
-import { Modal } from 'react-bootstrap'
+import { Checkbox, Modal } from 'react-bootstrap'
 import FlipMove from 'react-flip-move'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
@@ -19,12 +19,13 @@ import { withSend } from '~/saga-genesis'
 import { customStyles } from '~/config/react-select-custom-styles'
 import { groupedRecommendationOptions } from './recommendationOptions'
 import { groupedDiagnosisOptions } from './diagnosisOptions'
+import { sideEffectValues, counselingValues } from '~/sideEffectsAndCounselingValues'
 import { HippoStringDisplay } from '~/components/HippoStringDisplay'
 import { HippoTextArea } from '~/components/forms/HippoTextArea'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
-import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 import { Loading } from '~/components/Loading'
 import { toastr } from '~/toastr'
+import pull from 'lodash.pull'
 import * as routes from '~/config/routes'
 
 function mapStateToProps (state, ownProps) {
@@ -60,11 +61,13 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
       noFurtherTreatment: false,
 
-      sideEffects: '',
       sideEffectsAdditional: '',
+      sideEffectValuesChosen: [],
+      autopopulatedSideEffectsText: '',
 
-      counseling: '',
       counselingAdditional: '',
+      counselingValuesChosen: [],
+      autopopulatedCounselingText: '',
 
       personalMessage: '',
 
@@ -152,14 +155,12 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
         .promise
         .then((result) => {
           this.setState(result)
-        })
-        .catch((reason) => {
-          console.log('isCanceled', reason.isCanceled)
-        })
-        .finally(() => {
           this.setState({
             loading: false
           })
+        })
+        .catch((reason) => {
+          console.log('isCanceled', reason.isCanceled)
         })
     } catch (error) {
       toastr.error('There was an error while downloading your case details from IPFS.')
@@ -178,6 +179,44 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
       [`${fieldGroup}Frequency`]: '',
       [`${fieldGroup}Duration`]: '',
       [`${fieldGroup}Recommendation`]: ''
+    })
+  }
+
+  handleExampleSideEffectsChecked = (event) => {
+    const value = parseInt(event.target.value, 10)
+    let sideEffectValuesChosen = this.state.sideEffectValuesChosen
+    let sideEffectsText = []
+
+    sideEffectValuesChosen.includes(value)
+      ? pull(sideEffectValuesChosen, value)
+      : sideEffectValuesChosen.push(value)
+
+    sideEffectValuesChosen.sort().forEach(index => {
+      sideEffectsText.push(sideEffectValues[index])
+    })
+
+    this.setState({
+      sideEffectValuesChosen,
+      autopopulatedSideEffectsText: sideEffectsText.join('<br/>')
+    })
+  }
+
+  handleCounselingChecked = (event) => {
+    const value = parseInt(event.target.value, 10)
+    let counselingValuesChosen = this.state.counselingValuesChosen
+    let counselingText = []
+
+    counselingValuesChosen.includes(value)
+      ? pull(counselingValuesChosen, value)
+      : counselingValuesChosen.push(value)
+
+    counselingValuesChosen.sort().forEach(index => {
+      counselingText.push(counselingValues[index])
+    })
+
+    this.setState({
+      counselingValuesChosen,
+      autopopulatedCounselingText: counselingText.join('<br/>')
     })
   }
 
@@ -321,9 +360,9 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
       overTheCounterRecommendation: this.state.overTheCounterRecommendation,
       prescriptionRecommendation: this.state.prescriptionRecommendation,
       noFurtherTreatment: this.state.noFurtherTreatment ? 1 : 0,
-      sideEffects: this.state.sideEffects,
+      sideEffectValuesChosen: this.state.sideEffectValuesChosen,
       sideEffectsAdditional: this.state.sideEffectsAdditional,
-      counseling: this.state.counseling,
+      counselingValuesChosen: this.state.counselingValuesChosen,
       counselingAdditional: this.state.counselingAdditional,
       personalMessage: this.state.personalMessage
     }
@@ -601,96 +640,110 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                       ? <span key={`key-sideEffects-hidden`} />
                       : (
                         <div key={`key-sideEffects`}>
-                          <div className="form-group--heading">
-                            Side Effects:
+                          <div className="form-group form-group--logical-grouping">
+                            <div className="form-group--heading">
+                              Side Effects:
+                            </div>
+
+                            <div className="row">
+                              <div className="col-xs-12">
+                                <div className="form-group">
+                                  <small className="text-gray">
+                                    (Side effects to be Auto-populated based on diagnosis and recommendation choices.)
+                                  </small>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="row">
+                              <div className="col-xs-12">
+                                <div className="form-group">
+                                  <Checkbox
+                                    inline
+                                    onClick={this.handleExampleSideEffectsChecked}
+                                    value={0}
+                                  >
+                                    Topical Steroids
+                                  </Checkbox>
+
+                                  <Checkbox
+                                    inline
+                                    onClick={this.handleExampleSideEffectsChecked}
+                                    value={1}
+                                  >
+                                    Doxycycline
+                                  </Checkbox>
+                                </div>
+                              </div>
+                            </div>
+                            <p dangerouslySetInnerHTML={{__html: this.state.autopopulatedSideEffectsText}} />
+                            <br />
+
+                            <HippoTextArea
+                              id='sideEffectsAdditional'
+                              name='sideEffectsAdditional'
+                              colClasses='col-xs-12 col-sm-12 col-md-12'
+                              label='Additional Side Effects'
+                              optional={true}
+                              textAreaOnBlur={this.handleTextAreaOnBlur}
+                              textAreaOnChange={this.handleTextAreaOnChange}
+                            />
                           </div>
-
-                          <small className="alert alert-info">
-                            Side effects to be Auto-populated, see examples here:
-
-                            &nbsp;&nbsp;&nbsp;
-                            <InfoQuestionMark
-                              character='1'
-                              place="bottom"
-                              tooltipText="Example #1: Topical steroids<br/>Side effects of topical steroids when used for a prolonged period can include but <br/>are not limited to striae, telangiectasias skin thinning, change in skin pigment, <br/>acne/folliculitis, and dermatitis."
-                            />
-                            &nbsp;&nbsp;&nbsp;
-                            <InfoQuestionMark
-                              character='2'
-                              place="bottom"
-                              tooltipText="Example #2: Doxycycline<br/>Side effects of doxycycline include but are not limited to nausea, vomiting, esophagitis, <br/>photosensitivity, liver toxicity. This medication should be not used by pregnant women."
-                            />
-                            &nbsp;&nbsp;
-                          </small>
-                          <br />
-                          <br />
-
-                          {/*<HippoTextArea
-                            id='sideEffects'
-                            name='sideEffects'
-                            colClasses='col-xs-12 col-sm-12 col-md-12'
-                            label='Side Effects'
-                            optional={true}
-                            textAreaOnBlur={this.handleTextAreaOnBlur}
-                            textAreaOnChange={this.handleTextAreaOnChange}
-                          />*/}
-                          <HippoTextArea
-                            id='sideEffectsAdditional'
-                            name='sideEffectsAdditional'
-                            colClasses='col-xs-12 col-sm-12 col-md-12'
-                            label='Additional Side Effects'
-                            optional={true}
-                            textAreaOnBlur={this.handleTextAreaOnBlur}
-                            textAreaOnChange={this.handleTextAreaOnChange}
-                          />
                         </div>
                         )
                     }
                   </FlipMove>
 
-                  <div className="form-group--heading">
-                    Counseling:
+
+                  <div className="form-group form-group--logical-grouping">
+                    <div className="form-group--heading">
+                      Counseling:
+                    </div>
+
+                    <div className="row">
+                      <div className="col-xs-12">
+                        <div className="form-group">
+                          <small className="text-gray">
+                            (Counseling to be Auto-populated based on diagnosis and recommendation(s).)
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="row">
+                      <div className="col-xs-12">
+                        <div className="form-group">
+                          <Checkbox
+                            inline
+                            onClick={this.handleCounselingChecked}
+                            value={0}
+                          >
+                            Melanoma
+                          </Checkbox>
+
+                          <Checkbox
+                            inline
+                            onClick={this.handleCounselingChecked}
+                            value={1}
+                          >
+                            Benign Lesions
+                          </Checkbox>
+                        </div>
+                      </div>
+                    </div>
+                    <p dangerouslySetInnerHTML={{__html: this.state.autopopulatedCounselingText}} />
+                    <br />
+
+                    <HippoTextArea
+                      id='counselingAdditional'
+                      name='counselingAdditional'
+                      colClasses='col-xs-12 col-sm-12 col-md-12'
+                      label='Additional Counseling'
+                      optional={true}
+                      textAreaOnBlur={this.handleTextAreaOnBlur}
+                      textAreaOnChange={this.handleTextAreaOnChange}
+                    />
                   </div>
-
-                  <small className="alert alert-info">
-                    Counseling to be Auto-populated, see examples here:
-                    &nbsp;&nbsp;&nbsp;
-                    <InfoQuestionMark
-                      character='1'
-                      place="bottom"
-                      tooltipText="Example #1: ABCDEs of Melanoma:<br/>1) Asymmetry – The lesion does not appear to be equal. <br/>2) Border – The borders are irregular or not clearly identifiable. <br/>3) Color: The lesion is multicolored and there are varying shades of color. <br/>4) Diameter: Lesions larger than 6 mm are more concerning for melanoma. <br/>Ugly Duckling spots that appear different from other moles on the body may also be concerning. <br/>5) Evolving: Changes in size or shape of lesion may be concerning for cancer."
-                    />
-                    &nbsp;&nbsp;&nbsp;
-                    <InfoQuestionMark
-                      character='2'
-                      place="bottom"
-                      tooltipText="Example #2: These are common, benign lesions. They rarely become cancerous."
-                    />
-                    &nbsp;&nbsp;
-                  </small>
-                  <br />
-                  <br />
-
-                  {/*
-                  <HippoTextArea
-                    id='counseling'
-                    name='counseling'
-                    colClasses='col-xs-12 col-sm-12 col-md-12'
-                    label='Counseling'
-                    optional={true}
-                    textAreaOnBlur={this.handleTextAreaOnBlur}
-                    textAreaOnChange={this.handleTextAreaOnChange}
-                  />
-                  */}
-                  <HippoTextArea
-                    id='counselingAdditional'
-                    name='counselingAdditional'
-                    colClasses='col-xs-12 col-sm-12 col-md-12'
-                    label='Additional Counseling'
-                    optional={true}
-                    textAreaOnBlur={this.handleTextAreaOnBlur}
-                    textAreaOnChange={this.handleTextAreaOnChange}
-                  />
 
                   <div className="form-group--heading">
                     Personal Message:
@@ -738,8 +791,8 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
                     <HippoStringDisplay
                       label="Side Effects:"
-                      value={this.state.sideEffects}
-                      visibleIf={this.state.sideEffects.length > 0}
+                      value={this.state.autopopulatedSideEffectsText}
+                      visibleIf={this.state.autopopulatedSideEffectsText.length > 0}
                     />
 
                     <HippoStringDisplay
@@ -750,8 +803,8 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
                     <HippoStringDisplay
                       label="Counseling:"
-                      value={this.state.counseling}
-                      visibleIf={this.state.counseling.length > 0}
+                      value={this.state.autopopulatedCounselingText}
+                      visibleIf={this.state.autopopulatedCounselingText.length > 0}
                     />
 
                     <HippoStringDisplay
