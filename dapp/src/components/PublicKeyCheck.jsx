@@ -22,8 +22,10 @@ function mapStateToProps (state) {
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account.address())
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account.address())
   const publicKeyIsDefined = publicKey !== undefined
-  const publicKeyMatches = publicKey === '0x' + account.hexPublicKey()
-  const isVisible = publicKeyIsDefined && !publicKeyMatches && isDoctor
+
+  // const publicKeyMatches = publicKey === '0x' + account.hexPublicKey()
+  // const isVisible = publicKeyIsDefined && !publicKeyMatches && isDoctor
+  const isVisible = false
 
   return {
     account,
