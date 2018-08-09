@@ -1,57 +1,65 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { Button } from 'react-bootstrap'
+import { withRouter } from 'react-router-dom'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
 import { withSend } from '~/saga-genesis'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
+import * as routes from '~/config/routes'
 
-// const SECONDS_IN_A_DAY = 86400
-const SECONDS_IN_A_DAY = 40
-// const UNIX_EPOCH_MILISECONDS = 1000
+function mapStateToProps(state, { caseAddress, caseKey }) {
+  const transactions = state.sagaGenesis.transactions
 
-export const AbandonedCaseActions = withSend(class _AbandonedCaseActions extends Component {
+  return {
+    transactions
+  }
+}
+
+const AbandonedCaseActions = connect(mapStateToProps)(withSend(class _AbandonedCaseActions extends Component {
 
   constructor(props) {
     super(props)
 
     this.state = {
-      isSubmitting: false
+      loading: false
     }
   }
 
+  componentWillReceiveProps (nextProps) {
+    this.forceAcceptDiagnosisHandler(nextProps)
+  }
+
   handleForceAcceptDiagnosis = () => {
-    const acceptAsDoctorAfterADay = this.props.send(this.props.caseAddress, 'acceptAsDoctorAfterADay')()
+    const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptAsDoctorAfterADay')()
     this.setState({
-      acceptAsDoctorAfterADay,
-      acceptHandler: new TransactionStateHandler(),
+      acceptTransactionId,
+      forceAcceptDiagnosisHandler: new TransactionStateHandler(),
       loading: true
     })
   }
 
-  acceptChallengeHandler = (props) => {
-    if (this.state.acceptHandler) {
-      this.state.acceptHandler.handle(props.transactions[this.state.acceptTransactionId])
+  forceAcceptDiagnosisHandler = (props) => {
+    if (this.state.forceAcceptDiagnosisHandler) {
+      this.state.forceAcceptDiagnosisHandler.handle(props.transactions[this.state.acceptTransactionId])
         .onError((error) => {
           toastr.transactionError(error)
-          this.setState({ acceptHandler: null, loading: false })
+          this.setState({ forceAcceptDiagnosisHandler: null, loading: false })
         })
         .onConfirmed(() => {
-          this.setState({ acceptHandler: null, loading: false })
+          this.setState({ forceAcceptDiagnosisHandler: null, loading: false })
         })
         .onTxHash(() => {
           toastr.success('Your accept diagnosis transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your MEDX.')
           mixpanel.track('Doctor Force Accepting After 24 Hours')
+          this.props.history.push(routes.DOCTORS_CASES_OPEN)
         })
     }
   }
 
   render () {
-    const hasBeenOneDay = (
-      (Math.floor(Date.now() / 1000) - this.props.createdAt) > SECONDS_IN_A_DAY
-    )
-    const waitingOnPatient = (this.props.status === '3')
-
-    if (!this.props.createdAt || !hasBeenOneDay || !waitingOnPatient) {
+    if (!this.props.createdAt || !caseStaleForOneDay(this.props.createdAt, this.props.status)) {
       return null
     } else {
       return (
@@ -73,5 +81,6 @@ export const AbandonedCaseActions = withSend(class _AbandonedCaseActions extends
       )
     }
   }
-})
+}))
 
+export const AbandonedCaseActionsContainer = withRouter(AbandonedCaseActions)
