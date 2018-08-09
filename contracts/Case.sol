@@ -130,7 +130,7 @@ contract Case is Ownable, Initializable {
     require(_doctor != patient);
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
-    caseManager().addOpenCase(_doctor, address(this));
+    caseManager().addOpenCase(_doctor, this);
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit SetDiagnosingDoctor(patient, msg.sender, _doctorEncryptedKey);
   }
@@ -142,7 +142,6 @@ contract Case is Ownable, Initializable {
   function diagnoseCase(bytes _diagnosisHash) external onlyDiagnosingDoctor {
     require(status == CaseStatus.Evaluating);
     status = CaseStatus.Evaluated;
-    caseManager().removeOpenCase(diagnosingDoctor, address(this));
     diagnosisHash = _diagnosisHash;
     emit CaseEvaluated(patient, diagnosingDoctor);
   }
@@ -154,6 +153,8 @@ contract Case is Ownable, Initializable {
     /* TODO: add evaluation time logic */
     require(status == CaseStatus.Evaluated);
     status = CaseStatus.Closed;
+    caseManager().removeOpenCase(diagnosingDoctor, this);
+    caseManager().addClosedCase(diagnosingDoctor, this);
     medXToken.transfer(diagnosingDoctor, caseFee);
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
     emit CaseClosed(patient, diagnosingDoctor);
@@ -162,7 +163,6 @@ contract Case is Ownable, Initializable {
   function challengeWithDoctor(address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
     require(status == CaseStatus.Evaluated, 'Status must match');
     status = CaseStatus.Challenging;
-    caseManager().addOpenCase(_doctor, address(this));
     setChallengingDoctor(_doctor, _doctorEncryptedKey);
     caseManager().addChallengeDoctor(_doctor);
     emit CaseChallenged(patient, _doctor);
@@ -172,6 +172,7 @@ contract Case is Ownable, Initializable {
     require(_doctor != patient);
     require(_doctor != diagnosingDoctor);
     challengingDoctor = _doctor;
+    caseManager().addOpenCase(challengingDoctor, this);
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit SetChallengingDoctor(patient, msg.sender, _doctorEncryptedKey);
   }
@@ -183,7 +184,10 @@ contract Case is Ownable, Initializable {
    */
   function diagnoseChallengedCase(bytes _secondaryDiagnosisHash, bool _accept) external onlyChallengeDoctor {
     require(status == CaseStatus.Challenging);
-    caseManager().removeOpenCase(challengingDoctor, address(this));
+    caseManager().removeOpenCase(challengingDoctor, this);
+    caseManager().addClosedCase(challengingDoctor, this);
+    caseManager().removeOpenCase(diagnosingDoctor, this);
+    caseManager().addClosedCase(diagnosingDoctor, this);
     challengeHash = _secondaryDiagnosisHash;
     if (_accept)
         confirmChallengedDiagnosis();

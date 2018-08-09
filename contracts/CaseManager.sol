@@ -24,23 +24,45 @@ contract CaseManager is Ownable, Pausable, Initializable {
     Registry public registry;
 
     mapping (address => address[]) public doctorCases;
-    mapping (address => LinkedList.UInt256) openDoctorCasesList;
+
     /**
       * This mapping stores the list index of an open case for each doctor
       */
     mapping (address => mapping (address => uint256)) doctorOpenCaseNodeIndices;
+    mapping (address => LinkedList.UInt256) openDoctorCasesList;
+
+    /**
+      * This mapping stores the list index of an close case for each doctor
+      */
+    mapping (address => mapping (address => uint256)) doctorClosedCaseNodeIndices;
+    mapping (address => LinkedList.UInt256) closedDoctorCasesList;
 
     event NewCase(address indexed caseAddress, uint256 indexed index);
 
-    modifier isCase(address _case) {
-      require(_case != address(0));
-      require(caseIndices[_case] != uint256(0));
+    modifier onlyIsCase(address _case) {
+      isCase(_case);
+      _;
+    }
+
+    modifier isDoctorCase(address _doctor, Case _case) {
+      require(_doctor == _case.diagnosingDoctor() || _doctor == _case.challengingDoctor());
+      _;
+    }
+
+    modifier onlyCase(address _case) {
+      isCase(_case);
+      require(msg.sender == _case);
       _;
     }
 
     modifier onlyThis() {
       require(this == msg.sender);
       _;
+    }
+
+    function isCase(address _case) {
+      require(_case != address(0));
+      require(caseIndices[_case] != uint256(0));
     }
 
     /**
@@ -192,7 +214,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       emit NewCase(newCase, caseIndex);
     }
 
-    function addChallengeDoctor(address _doctor) external isCase(msg.sender) {
+    function addChallengeDoctor(address _doctor) external onlyIsCase(msg.sender) {
       doctorCases[_doctor].push(msg.sender);
     }
 
@@ -209,16 +231,17 @@ contract CaseManager is Ownable, Pausable, Initializable {
       return AccountManager(registry.lookup(keccak256('AccountManager')));
     }
 
-    function addOpenCase(address _doctor, address _case) external {
-      require(doctorOpenCaseNodeIndices[_doctor][_case] == 0);
+    function addOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+      require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0);
       uint256 caseIndex = caseIndices[_case];
       require(caseIndex != 0);
       uint256 nodeIndex = openDoctorCasesList[_doctor].enqueue(caseIndex);
+      require(nodeIndex != 0);
       doctorOpenCaseNodeIndices[_doctor][_case] = nodeIndex;
     }
 
-    function removeOpenCase(address _doctor, address _case) external {
-      uint256 nodeIndex = doctorOpenCaseNodeIndices[_doctor][_case];
+    function removeOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+      uint256 nodeIndex = doctorOpenCaseNodeIndices[_doctor][address(_case)];
       require(nodeIndex != 0);
       doctorOpenCaseNodeIndices[_doctor][_case] = 0;
       openDoctorCasesList[_doctor].remove(nodeIndex);
@@ -227,8 +250,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
     /**
       * @return The number of open cases for a doctor
       */
-    function openCaseCount(address _doctor) external view returns (uint256) {
-      openDoctorCasesList[_doctor].length();
+    function openCaseCount(address _doctor) public view returns (uint256) {
+      return openDoctorCasesList[_doctor].length();
     }
 
     /**
@@ -250,5 +273,41 @@ contract CaseManager is Ownable, Pausable, Initializable {
       */
     function openCaseAddress(address _doctor, uint256 nodeId) external view returns (address) {
       return caseList[openDoctorCasesList[_doctor].value(nodeId)];
+    }
+
+    function addClosedCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+      require(doctorClosedCaseNodeIndices[_doctor][address(_case)] == 0);
+      uint256 caseIndex = caseIndices[_case];
+      require(caseIndex != 0);
+      uint256 nodeIndex = closedDoctorCasesList[_doctor].enqueue(caseIndex);
+      doctorClosedCaseNodeIndices[_doctor][_case] = nodeIndex;
+    }
+
+    /**
+      * @return The number of closed cases for a doctor
+      */
+    function closedCaseCount(address _doctor) external view returns (uint256) {
+      return closedDoctorCasesList[_doctor].length();
+    }
+
+    /**
+      * @return The node id of the first closed case for a doctor
+      */
+    function firstClosedCaseId(address _doctor) external view returns (uint256) {
+      return closedDoctorCasesList[_doctor].peekId();
+    }
+
+    /**
+      * @return The node id of the node that follows the given node
+      */
+    function nextClosedCaseId(address _doctor, uint256 nodeId) external view returns (uint256) {
+      return closedDoctorCasesList[_doctor].nextId(nodeId);
+    }
+
+    /**
+      * @return The address of the case for the given node
+      */
+    function closedCaseAddress(address _doctor, uint256 nodeId) external view returns (address) {
+      return caseList[closedDoctorCasesList[_doctor].value(nodeId)];
     }
 }
