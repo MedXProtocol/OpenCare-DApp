@@ -130,6 +130,7 @@ contract Case is Ownable, Initializable {
     require(_doctor != patient);
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
+    caseManager().addOpenCase(_doctor, address(this));
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit SetDiagnosingDoctor(patient, msg.sender, _doctorEncryptedKey);
   }
@@ -141,6 +142,7 @@ contract Case is Ownable, Initializable {
   function diagnoseCase(bytes _diagnosisHash) external onlyDiagnosingDoctor {
     require(status == CaseStatus.Evaluating);
     status = CaseStatus.Evaluated;
+    caseManager().removeOpenCase(diagnosingDoctor, address(this));
     diagnosisHash = _diagnosisHash;
     emit CaseEvaluated(patient, diagnosingDoctor);
   }
@@ -160,9 +162,10 @@ contract Case is Ownable, Initializable {
   function challengeWithDoctor(address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
     require(status == CaseStatus.Evaluated, 'Status must match');
     status = CaseStatus.Challenging;
+    caseManager().addOpenCase(_doctor, address(this));
     setChallengingDoctor(_doctor, _doctorEncryptedKey);
     caseManager().addChallengeDoctor(_doctor);
-    emit CaseChallenged(patient, diagnosingDoctor);
+    emit CaseChallenged(patient, _doctor);
   }
 
   function setChallengingDoctor (address _doctor, bytes _doctorEncryptedKey) internal isDoctor(_doctor) {
@@ -180,6 +183,7 @@ contract Case is Ownable, Initializable {
    */
   function diagnoseChallengedCase(bytes _secondaryDiagnosisHash, bool _accept) external onlyChallengeDoctor {
     require(status == CaseStatus.Challenging);
+    caseManager().removeOpenCase(challengingDoctor, address(this));
     challengeHash = _secondaryDiagnosisHash;
     if (_accept)
         confirmChallengedDiagnosis();
@@ -197,7 +201,7 @@ contract Case is Ownable, Initializable {
     medXToken.transfer(challengingDoctor, (caseFee * 50) / 100);
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
-    emit CaseClosedConfirmed(patient, diagnosingDoctor);
+    emit CaseClosedConfirmed(patient, challengingDoctor);
   }
 
   /**
@@ -209,7 +213,7 @@ contract Case is Ownable, Initializable {
     medXToken.transfer(challengingDoctor, (caseFee * 50) / 100);
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
-    emit CaseClosedRejected(patient, diagnosingDoctor);
+    emit CaseClosedRejected(patient, challengingDoctor);
   }
 
   function doctorManager() internal view returns (DoctorManager) {
