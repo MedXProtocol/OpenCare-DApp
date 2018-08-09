@@ -6,11 +6,13 @@ import "./Registry.sol";
 import "./AccountManager.sol";
 import "./Delegate.sol";
 import "./Initializable.sol";
+import "./LinkedList.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
 contract CaseManager is Ownable, Pausable, Initializable {
     using SafeMath for uint256;
+    using LinkedList for LinkedList.UInt256;
 
     uint256 public caseFee;
 
@@ -22,6 +24,11 @@ contract CaseManager is Ownable, Pausable, Initializable {
     Registry public registry;
 
     mapping (address => address[]) public doctorCases;
+    LinkedList.UInt256 openDoctorCasesList;
+    /**
+      * This mapping stores the list index of an open case for each doctor
+      */
+    mapping (address => mapping (address => uint256)) doctorOpenCaseNodeIndices;
 
     event NewCase(address indexed caseAddress, uint256 indexed index);
 
@@ -200,5 +207,20 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
     function accountManager() internal view returns (AccountManager) {
       return AccountManager(registry.lookup(keccak256('AccountManager')));
+    }
+
+    function addOpenCase(address _doctor, address _case) {
+      require(doctorOpenCaseNodeIndices[_doctor][_case] == 0);
+      uint256 caseIndex = caseIndices[_case];
+      require(caseIndex != uint256(0));
+      uint256 nodeIndex = openDoctorCasesList.enqueue(caseIndex);
+      doctorOpenCaseNodeIndices[_doctor][_case] = nodeIndex;
+    }
+
+    function removeOpenCase(address _doctor, address _case) {
+      uint256 nodeIndex = doctorOpenCaseNodeIndices[_doctor][_case];
+      require(nodeIndex != uint256(0));
+      doctorOpenCaseNodeIndices[_doctor][_case] = 0;
+      openDoctorCasesList.remove(nodeIndex);
     }
 }
