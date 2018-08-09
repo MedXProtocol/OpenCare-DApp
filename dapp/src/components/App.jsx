@@ -70,11 +70,10 @@ function mapDispatchToProps(dispatch) {
 
 function* saga({ address, CaseManager, DoctorManager }) {
   if (!address || !CaseManager || !DoctorManager) { return }
-
-  yield all([
-    cacheCall(CaseManager, 'doctorCasesCount', address),
-    cacheCall(DoctorManager, 'isDoctor', address)
-  ])
+  const isDoctor = yield cacheCall(DoctorManager, 'isDoctor', address)
+  if (isDoctor) {
+    yield cacheCall(CaseManager, 'openCaseCount', address)
+  }
 }
 
 const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
@@ -106,8 +105,6 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       .then(c => {
         return c
       })
-
-    // console.log('Wat: ', newCaseCount, this.props.caseCount)
 
     if (newCaseCount !== this.props.caseCount) {
       this.props.dispatchNewCaseCount(newCaseCount)

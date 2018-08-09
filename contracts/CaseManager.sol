@@ -31,11 +31,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
     mapping (address => mapping (address => uint256)) doctorOpenCaseNodeIndices;
     mapping (address => LinkedList.UInt256) openDoctorCasesList;
 
-    /**
-      * This mapping stores the list index of an close case for each doctor
-      */
-    mapping (address => mapping (address => uint256)) doctorClosedCaseNodeIndices;
-    mapping (address => LinkedList.UInt256) closedDoctorCasesList;
+    mapping (address => address[]) public doctorClosedCases;
+    mapping (address => mapping(address => bool)) closedCases;
 
     event NewCase(address indexed caseAddress, uint256 indexed index);
 
@@ -276,38 +273,19 @@ contract CaseManager is Ownable, Pausable, Initializable {
     }
 
     function addClosedCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
-      require(doctorClosedCaseNodeIndices[_doctor][address(_case)] == 0);
-      uint256 caseIndex = caseIndices[_case];
-      require(caseIndex != 0);
-      uint256 nodeIndex = closedDoctorCasesList[_doctor].enqueue(caseIndex);
-      doctorClosedCaseNodeIndices[_doctor][_case] = nodeIndex;
+      require(closedCases[_doctor][_case] == false);
+      doctorClosedCases[_doctor].push(address(_case));
+      closedCases[_doctor][_case] = true;
     }
 
     /**
       * @return The number of closed cases for a doctor
       */
     function closedCaseCount(address _doctor) external view returns (uint256) {
-      return closedDoctorCasesList[_doctor].length();
+      return doctorClosedCases[_doctor].length;
     }
 
-    /**
-      * @return The node id of the first closed case for a doctor
-      */
-    function firstClosedCaseId(address _doctor) external view returns (uint256) {
-      return closedDoctorCasesList[_doctor].peekId();
-    }
-
-    /**
-      * @return The node id of the node that follows the given node
-      */
-    function nextClosedCaseId(address _doctor, uint256 nodeId) external view returns (uint256) {
-      return closedDoctorCasesList[_doctor].nextId(nodeId);
-    }
-
-    /**
-      * @return The address of the case for the given node
-      */
-    function closedCaseAddress(address _doctor, uint256 nodeId) external view returns (address) {
-      return caseList[closedDoctorCasesList[_doctor].value(nodeId)];
+    function closedCaseAtIndex(address _doctor, uint256 _index) external view returns (address) {
+      return doctorClosedCases[_doctor][_index];
     }
 }
