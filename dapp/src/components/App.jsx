@@ -34,7 +34,6 @@ import get from 'lodash.get'
 import { withSaga, cacheCallValue, withContractRegistry } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall } from '~/saga-genesis/sagas'
-import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { populateCases, populateCasesSaga } from '~/services/populateCases'
@@ -42,32 +41,20 @@ import { toastr } from '~/toastr'
 import { defined } from '~/utils/defined'
 
 function mapStateToProps (state) {
-  let caseCount
-  let [ openCases, historicalCases ] = [ [], [] ]
   const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount', address)
   const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
 
-  if (isSignedIn && isDoctor) {
-    caseCount = get(state, 'userStats.caseCount')
-    // caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
-
-    const cases = populateCases(state, CaseManager, address, caseCount)
-    openCases       = cases.filter(c => openCase(c))
-    historicalCases = cases.filter(c => historicalCase(c))
-  }
-
   return {
     address,
-    openCases,
-    historicalCases,
     isDoctor,
     DoctorManager,
     isSignedIn,
-    caseCount,
+    openCaseCount,
     CaseManager,
     isOwner
   }
@@ -77,25 +64,17 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatchSignOut: () => {
       dispatch({ type: 'SIGN_OUT' })
-    },
-    dispatchNewCaseCount: (caseCount) => {
-      // console.log(caseCount)
-      dispatch({ type: 'UPDATE_CASE_COUNT', caseCount })
     }
   }
 }
 
-function* saga({ address, caseCount, CaseManager, DoctorManager }) {
+function* saga({ address, CaseManager, DoctorManager }) {
   if (!address || !CaseManager || !DoctorManager) { return }
 
   yield all([
     cacheCall(CaseManager, 'doctorCasesCount', address),
     cacheCall(DoctorManager, 'isDoctor', address)
   ])
-
-  if (caseCount) {
-    yield populateCasesSaga(CaseManager, address, caseCount)
-  }
 }
 
 const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
@@ -145,27 +124,33 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   componentWillReceiveProps (nextProps) {
     this.onAccountChangeSignOut(nextProps)
 
-    if (nextProps.isSignedIn && nextProps.isDoctor) {
+    console.log(nextProps.openCaseCount, this.props.openCaseCount)
+
+    if (
+      nextProps.isSignedIn
+      && nextProps.isDoctor
+      && (nextProps.openCaseCount > this.props.openCaseCount)
+    ) {
       this.showNewCaseAssignedToast(nextProps)
     }
   }
 
   showNewCaseAssignedToast = (nextProps) => {
     const { contractRegistry, CaseManager, address } = this.props
-    const oldCaseCount = this.props.caseCount
+    // const oldCaseCount = this.props.caseCount
 
     // console.log('in showNewCaseAssignedToast')
 
     // Moving from 0 to 1, or 1 to 2, but not undefined/NaN (initial state) to a number
-    if (
-      (!defined(oldCaseCount))
-      || isNaN(nextProps.caseCount)
-      || (oldCaseCount === nextProps.caseCount)
-    ) {
-      return
-    }
+    // if (
+    //   (!defined(oldCaseCount))
+    //   || isNaN(nextProps.caseCount)
+    //   || (oldCaseCount === nextProps.caseCount)
+    // ) {
+    //   return
+    // }
 
-    // console.log('showNewCaseAssignedToast PASSED!')
+    console.log('showNewCaseAssignedToast PASSED!')
 
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
     CaseManagerInstance.methods
@@ -227,7 +212,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     return (
       <React.Fragment>
-        <HippoNavbarContainer openCasesLength={this.props.openCases.length} />
+        <HippoNavbarContainer openCasesLength={this.props.openCaseCount} />
         {ownerWarning}
         {publicKeyCheck}
         <div className="content">
@@ -255,13 +240,9 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
             <SignedInRoute path={routes.DOCTORS_CASES_OPEN}
               component={OpenCasesContainer}
-              historicalCases={this.props.historicalCases}
-              openCases={this.props.openCases}
             />
             <SignedInRoute exact path={routes.DOCTORS_CASES_OPEN_PAGE_NUMBER}
               component={OpenCasesContainer}
-              historicalCases={this.props.historicalCases}
-              openCases={this.props.openCases}
             />
             <SignedInRoute exact path={routes.DOCTORS_CASES_DIAGNOSE_CASE}
               component={OpenCasesContainer}
