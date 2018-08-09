@@ -5,7 +5,6 @@ import rangeRight from 'lodash.rangeright'
 
 export const populateCases = function(state, CaseManager, address, caseCount) {
   const cases = []
-
   const indices = rangeRight(caseCount)
 
   indices.forEach(function (objIndex) {
@@ -33,7 +32,7 @@ export const populateCases = function(state, CaseManager, address, caseCount) {
 }
 
 export const populateCasesSaga = function*(CaseManager, address, caseCount) {
-  if (!address || !CaseManager) { return }
+  if (!address || !CaseManager || !caseCount) { return }
 
   const indices = rangeRight(caseCount)
 

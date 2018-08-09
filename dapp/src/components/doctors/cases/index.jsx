@@ -8,6 +8,7 @@ import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { addOrUpdatePendingTxs } from '~/services/addOrUpdatePendingTxs'
 import { formatRoute } from 'react-router-named-routes'
+import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
 import range from 'lodash.range'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
@@ -16,15 +17,37 @@ const MAX_CASES_PER_PAGE = 5
 
 function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const caseCount = get(state, 'userStats.caseCount')
+  const CaseManager = contractByName(state, 'CaseManager')
   const transactions = state.sagaGenesis.transactions
+
+  // const caseCount = get(state, 'userStats.caseCount')
+  let openCaseCount = cacheCallValue(state, CaseManager, 'doctorOpenCaseCount', address)
+  let caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
+  if (caseCount) {
+    caseCount = parseInt(caseCount, 10)
+  }
+
+  // caseCount = get(state, 'userStats.caseCount')
+  const openCases = populateCases(state, CaseManager, address, openCaseCount)
+  const historicalCases = populateCases(state, CaseManager, address, caseCount, MAX_CASES_PER_PAGE)
+  historicalCases = cases.filter(c => historicalCase(c))
 
   return {
     address,
+    CaseManager,
     caseCount,
+    openCaseCount,
+    openCases,
+    historicalCases,
     transactions
   }
 }
+
+function* saga({ address, CaseManager, caseCount }) {
+  if (!address || !CaseManager || !caseCount) { return }
+
+  yield populateCasesSaga(CaseManager, address, caseCount)
+})
 
 function paginateCases(historicalCases, pageNumber, perPage) {
   const start = (perPage % pageNumber) * perPage
@@ -33,7 +56,9 @@ function paginateCases(historicalCases, pageNumber, perPage) {
   return [...historicalCases.slice(start, offset)]
 }
 
-export const OpenCasesContainer = connect(mapStateToProps)(class _OpenCasesContainer extends Component {
+export const OpenCasesContainer = connect(mapStateToProps)(
+  withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager'] })(
+    class _OpenCasesContainer extends Component {
 
   componentDidMount() {
     this.redirectToFirstPage(this.props)
