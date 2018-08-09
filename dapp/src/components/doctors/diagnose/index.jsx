@@ -123,6 +123,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
       var diagnosis =
         <div className='col-xs-12'>
           <AbandonedCaseActions
+            caseAddress={caseAddress}
             status={this.props.caseStatus}
             createdAt={this.props.caseCreatedAt}
           />

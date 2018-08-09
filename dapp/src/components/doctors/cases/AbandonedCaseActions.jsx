@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
 import { Button } from 'react-bootstrap'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
+import { withSend } from '~/saga-genesis'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
 
 // const SECONDS_IN_A_DAY = 86400
-const SECONDS_IN_A_DAY = 20
+const SECONDS_IN_A_DAY = 40
 // const UNIX_EPOCH_MILISECONDS = 1000
 
-export const AbandonedCaseActions = class _AbandonedCaseActions extends Component {
+export const AbandonedCaseActions = withSend(class _AbandonedCaseActions extends Component {
 
   constructor(props) {
     super(props)
@@ -72,5 +73,5 @@ export const AbandonedCaseActions = class _AbandonedCaseActions extends Componen
       )
     }
   }
-}
+})
 
