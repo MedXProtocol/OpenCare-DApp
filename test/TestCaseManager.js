@@ -19,14 +19,16 @@ contract('CaseManager', function (accounts) {
 
   let env
 
+  let caseCharge = web3.toWei(15, 'ether')
+
   const ipfsHash = '0x516d61485a4a774243486a54726d3848793244356d50706a64636d5a4d396e5971554e475a6855435368526e5a4a' // generateBytes(50)
   const encryptedCaseKey = '0x265995a0a13dad6fbc6769d0c9a99f07dcb1acb7bc8c5f8c5a85ab6739512b9bcad881a302630a17dcbdbe908683d13d3f2363a2e006af9df53068c0860f2f73'
   const caseKeySalt = '0x365995a0a13dad6fbc6769d0c9a99f07dcb1acb7bc8c5f8c5a85ab6739512b9bcad881a302630a17dcbdbe908683d13d3f2363a2e006af9df53068c0860f2f74'
 
   before(async () => {
     env = await createEnvironment(artifacts)
-    await env.medXToken.mint(patient, 1000000000000)
-    await env.medXToken.mint(patient2, 1000000000000)
+    await env.medXToken.mint(patient, web3.toWei('500', 'ether'))
+    await env.medXToken.mint(patient2, web3.toWei('500', 'ether'))
     await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr. Octagon')
     await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Zaius')
   })
@@ -38,7 +40,7 @@ contract('CaseManager', function (accounts) {
   describe('initialize()', () => {
     it('should not be called again', async () => {
       await expectThrow(async () => {
-        await env.caseManager.initialize(web3.utils.toWei('10'), env.medXToken.address, env.registry.address)
+        await env.caseManager.initialize(web3.toWei('10', 'ether'), env.medXToken.address, env.registry.address)
       })
     })
   })
@@ -46,7 +48,7 @@ contract('CaseManager', function (accounts) {
   describe('createAndAssignCase()', () => {
     it('should work', async () => {
       var hexData = env.caseManager.contract.createAndAssignCase.getData(
-        '42',
+        patient,
         encryptedCaseKey,
         caseKeySalt,
         ipfsHash,
@@ -55,7 +57,7 @@ contract('CaseManager', function (accounts) {
       )
 
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
-      await env.medXToken.approveAndCall(env.caseManager.address, 15, hexData, { from: patient })
+      await env.medXToken.approveAndCall(env.caseManager.address, caseCharge, hexData, { from: patient })
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
       assert.equal(await env.caseManager.getPatientCaseListCount(patient), 1)
       assert.equal(await env.caseManager.doctorCasesCount(doctor), 1)
@@ -73,7 +75,7 @@ contract('CaseManager', function (accounts) {
   describe('createAndAssignCaseWithPublicKey()', () => {
     it('should work', async () => {
       var hexData = env.caseManager.contract.createAndAssignCaseWithPublicKey.getData(
-        '46',
+        patient2,
         encryptedCaseKey,
         caseKeySalt,
         ipfsHash,
@@ -83,7 +85,7 @@ contract('CaseManager', function (accounts) {
       )
 
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
-      await env.medXToken.approveAndCall(env.caseManager.address, 15, hexData, { from: patient2 })
+      await env.medXToken.approveAndCall(env.caseManager.address, caseCharge, hexData, { from: patient2 })
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
       assert.equal(await env.caseManager.getPatientCaseListCount(patient2), 1)
       assert.equal(await env.caseManager.doctorCasesCount(doctor), 1)

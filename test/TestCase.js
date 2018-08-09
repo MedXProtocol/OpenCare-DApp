@@ -12,11 +12,11 @@ contract('Case', function (accounts) {
   let patient = accounts[0]
   let doctorAddress
   let doctorAddress2
-  let caseFee = 10
+  let caseFee = web3.toWei(10, 'ether')
 
   before(async () => {
     env = await createEnvironment(artifacts)
-    await env.medXToken.mint(patient, 1000000000000)
+    await env.medXToken.mint(patient, web3.toWei(1000, 'ether'))
 
     await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc')
 
