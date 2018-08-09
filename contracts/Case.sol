@@ -72,17 +72,6 @@ contract Case is Ownable, Initializable {
   /**
    * @dev - throws if called by any account that is not the initial diagnosing doctor.
    */
-  modifier onlyPatientOrDiagnosingDoctor() {
-    require(
-      (msg.sender == patient) || (msg.sender == diagnosingDoctor),
-      'Must be the patient or initial diagnosing doctor'
-    );
-    _;
-  }
-
-  /**
-   * @dev - throws if called by any account that is not the initial diagnosing doctor.
-   */
   modifier onlyDiagnosingDoctor() {
     require(msg.sender == diagnosingDoctor, 'Must be the initial diagnosing doctor');
     _;
@@ -182,7 +171,7 @@ contract Case is Ownable, Initializable {
     accept();
   }
 
-  function accept() internal onlyPatientOrDiagnosingDoctor {
+  function accept() internal {
     require(status == CaseStatus.Evaluated);
     status = CaseStatus.Closed;
     medXToken.transfer(diagnosingDoctor, caseFee);
