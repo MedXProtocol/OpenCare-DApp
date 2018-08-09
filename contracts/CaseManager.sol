@@ -24,7 +24,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
     Registry public registry;
 
     mapping (address => address[]) public doctorCases;
-    LinkedList.UInt256 openDoctorCasesList;
+    mapping (address => LinkedList.UInt256) openDoctorCasesList;
     /**
       * This mapping stores the list index of an open case for each doctor
       */
@@ -183,12 +183,12 @@ contract CaseManager is Ownable, Pausable, Initializable {
     ) public onlyThis {
       Case newCase = Case(new Delegate(registry, keccak256("Case")));
       newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
-      newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
       patientCases[_patient].push(address(newCase));
       doctorCases[_doctor].push(newCase);
       medXToken.transferFrom(_patient, newCase, createCaseCost());
+      newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
       emit NewCase(newCase, caseIndex);
     }
 
@@ -209,18 +209,46 @@ contract CaseManager is Ownable, Pausable, Initializable {
       return AccountManager(registry.lookup(keccak256('AccountManager')));
     }
 
-    function addOpenCase(address _doctor, address _case) {
+    function addOpenCase(address _doctor, address _case) external {
       require(doctorOpenCaseNodeIndices[_doctor][_case] == 0);
       uint256 caseIndex = caseIndices[_case];
-      require(caseIndex != uint256(0));
-      uint256 nodeIndex = openDoctorCasesList.enqueue(caseIndex);
+      require(caseIndex != 0);
+      uint256 nodeIndex = openDoctorCasesList[_doctor].enqueue(caseIndex);
       doctorOpenCaseNodeIndices[_doctor][_case] = nodeIndex;
     }
 
-    function removeOpenCase(address _doctor, address _case) {
+    function removeOpenCase(address _doctor, address _case) external {
       uint256 nodeIndex = doctorOpenCaseNodeIndices[_doctor][_case];
-      require(nodeIndex != uint256(0));
+      require(nodeIndex != 0);
       doctorOpenCaseNodeIndices[_doctor][_case] = 0;
-      openDoctorCasesList.remove(nodeIndex);
+      openDoctorCasesList[_doctor].remove(nodeIndex);
+    }
+
+    /**
+      * @return The number of open cases for a doctor
+      */
+    function openCaseCount(address _doctor) external view returns (uint256) {
+      openDoctorCasesList[_doctor].length();
+    }
+
+    /**
+      * @return The node id of the first open case for a doctor
+      */
+    function firstOpenCaseId(address _doctor) external view returns (uint256) {
+      return openDoctorCasesList[_doctor].peekId();
+    }
+
+    /**
+      * @return The node id of the node that follows the given node
+      */
+    function nextOpenCaseId(address _doctor, uint256 nodeId) external view returns (uint256) {
+      return openDoctorCasesList[_doctor].nextId(nodeId);
+    }
+
+    /**
+      * @return The address of the case for the given node
+      */
+    function openCaseAddress(address _doctor, uint256 nodeId) external view returns (address) {
+      return caseList[openDoctorCasesList[_doctor].value(nodeId)];
     }
 }
