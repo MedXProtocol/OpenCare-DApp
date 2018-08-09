@@ -212,7 +212,8 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     }
 
     if (this.props.isSignedIn) {
-      var publicKeyCheck = <PublicKeyCheck />
+      var publicKeyCheck = null
+      // var publicKeyCheck = <PublicKeyCheck />
       var betaFaucetModal = <BetaFaucetModal />
       var feedbackLink = <ScrollyFeedbackLink scrollDiffAmount={50} />
     }
