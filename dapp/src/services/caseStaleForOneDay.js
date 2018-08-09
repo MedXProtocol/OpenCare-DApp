@@ -1,5 +1,4 @@
-// const SECONDS_IN_A_DAY = 86400
-const SECONDS_IN_A_DAY = 40
+const SECONDS_IN_A_DAY = 86400
 
 export function caseStaleForOneDay(createdAt, status) {
   if (!createdAt) {

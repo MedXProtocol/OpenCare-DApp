@@ -177,8 +177,7 @@ contract Case is Ownable, Initializable {
    * @dev - The initial doctor accepts the evaluation and tokens are credited to them
    */
   function acceptAsDoctorAfterADay() external onlyDiagnosingDoctor {
-    // require((block.timestamp - createdAt) > 86400);
-    require((block.timestamp - createdAt) > 40);
+    require((block.timestamp - createdAt) > 86400);
 
     accept();
   }
