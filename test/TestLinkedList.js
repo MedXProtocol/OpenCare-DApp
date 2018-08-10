@@ -122,4 +122,39 @@ contract('TestLinkedList', function (accounts) {
       assert.equal(await linkedList.peek(), 0)
     })
   })
+
+  describe('nextId()', () => {
+    describe('with three nodes', () => {
+      beforeEach(async () => {
+        await linkedList.enqueue(1)
+        await linkedList.enqueue(2)
+        await linkedList.enqueue(3)
+      })
+
+      it('should give the next node id correctly', async () => {
+        assert.equal(await linkedList.peek(), 1)
+
+        const firstId = await linkedList.peekId()
+        console.log(firstId)
+        console.log(firstId.toString())
+        assert.equal(firstId, 1)
+
+        const secondId = await linkedList.nextId(firstId)
+        console.log(secondId)
+        console.log(secondId.toString())
+        assert.equal(secondId, 2)
+
+        const thirdId = await linkedList.nextId(secondId)
+        console.log(thirdId)
+        console.log(thirdId.toString())
+        assert.equal(thirdId, 3)
+
+        const fourthId = await linkedList.nextId(thirdId)
+        console.log(fourthId)
+        console.log(fourthId.toString())
+        assert.equal(fourthId, 0)
+      })
+    })
+  })
+
 });
