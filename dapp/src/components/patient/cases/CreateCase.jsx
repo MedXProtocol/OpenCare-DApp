@@ -22,7 +22,7 @@ import { jicImageCompressor } from '~/services/jicImageCompressor'
 import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { DoctorSelect } from '~/components/DoctorSelect'
-import { reencryptCaseKey } from '~/services/reencryptCaseKey'
+import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { getExifOrientation } from '~/services/getExifOrientation'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
@@ -602,7 +602,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     const encryptedCaseKey = await account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 
     const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
-    const doctorEncryptedCaseKey = reencryptCaseKey({ account, encryptedCaseKey, doctorPublicKey, caseKeySalt })
+    const doctorEncryptedCaseKey = await reencryptCaseKeyAsync({ account, encryptedCaseKey, doctorPublicKey, caseKeySalt })
 
     let hashHex = hashToHex(hash)
 
