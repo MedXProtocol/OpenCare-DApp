@@ -20,8 +20,6 @@ let hexPublicKey = null
 
 export class Account {
   constructor (json) {
-    hexPublicKey = null
-
     this._json = json
     this.secretKeyWithSaltCache = {}
   }
