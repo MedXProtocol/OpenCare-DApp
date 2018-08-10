@@ -13,7 +13,7 @@ export const populateCases = function(state, caseAddresses) {
     const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
     const objIndex = cacheCallValue(state, CaseManager, 'caseIndices', caseAddress)
 
-    if (status && (diagnosingDoctor || challengingDoctor)) {
+    if (status && objIndex && (diagnosingDoctor || challengingDoctor)) {
       const isDiagnosingDoctor = diagnosingDoctor === address
       caseList.push({
         createdAt,
@@ -28,13 +28,14 @@ export const populateCases = function(state, caseAddresses) {
   }, [])
 }
 
-export const populateCasesSaga = function* (CaseManager, caseAddresses, caseCount) {
+export const populateCasesSaga = function* (CaseManager, caseAddresses) {
   yield all(caseAddresses.map(function* (caseAddress) {
     yield addContract({ address: caseAddress, contractKey: 'Case' })
     yield all([
       cacheCall(caseAddress, 'status'),
       cacheCall(caseAddress, 'createdAt'),
       cacheCall(caseAddress, 'diagnosingDoctor'),
+      cacheCall(caseAddress, 'challengingDoctor'),
       cacheCall(CaseManager, 'caseIndices', caseAddress)
     ])
   }))
