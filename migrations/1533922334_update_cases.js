@@ -4,10 +4,10 @@ let Case = artifacts.require('./Case.sol');
 
 async function migrateCase(cm, index) {
   const caseAddress = await cm.caseList(index)
-  const case = await Case.at(caseAddress)
-  const diagnosingDoctor = await case.diagnosingDoctor()
-  const challengingDoctor = await case.challengingDoctor()
-  const status = await case.status()
+  const caze = await Case.at(caseAddress)
+  const diagnosingDoctor = await caze.diagnosingDoctor()
+  const challengingDoctor = await caze.challengingDoctor()
+  const status = await caze.status()
   if (status == '4' || status == '7' || status == '8') {
     await cm.addClosedCase(diagnosingDoctor, caseAddress)
     if (challengingDoctor) {
