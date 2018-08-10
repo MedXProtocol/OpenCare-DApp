@@ -65,22 +65,31 @@ contract Case is Ownable, Initializable {
    * @dev - throws if called by any account other than a doctor.
    */
   modifier isDoctor(address _doctor) {
-    require(doctorManager().isDoctor(_doctor));
+    require(doctorManager().isDoctor(_doctor), 'Sender must be a Doctor');
     _;
   }
 
+  /**
+   * @dev - throws if called by any account that is not the initial diagnosing doctor.
+   */
   modifier onlyDiagnosingDoctor() {
-    require(msg.sender == diagnosingDoctor);
+    require(msg.sender == diagnosingDoctor, 'Must be the initial diagnosing doctor');
     _;
   }
 
+  /**
+   * @dev - throws if called by any account that is not the challenging doctor.
+   */
   modifier onlyChallengeDoctor() {
-    require(msg.sender == challengingDoctor);
+    require(msg.sender == challengingDoctor, 'Must be the second opinion challenging doctor');
     _;
   }
 
+  /**
+   * @dev - throws if called by any account that is not the deployed case manager
+   */
   modifier onlyCaseManager() {
-    require(msg.sender == address(caseManager()));
+    require(msg.sender == address(caseManager()), 'Must be the Case Manager contract');
     _;
   }
 
@@ -146,10 +155,23 @@ contract Case is Ownable, Initializable {
   }
 
   /**
-   * @dev - The user accepts the evaluation and tokens are credited to doctor and rest is returned to the patient
+   * @dev - The patient accepts the evaluation and tokens are credited to doctor
+   * and rest is returned to the patient
    */
   function acceptDiagnosis() external onlyPatient {
-    /* TODO: add evaluation time logic */
+    accept();
+  }
+
+  /**
+   * @dev - The initial doctor accepts the evaluation and tokens are credited to them
+   */
+  function acceptAsDoctorAfterADay() external onlyDiagnosingDoctor {
+    require((block.timestamp - createdAt) > 86400);
+
+    accept();
+  }
+
+  function accept() internal {
     require(status == CaseStatus.Evaluated);
     status = CaseStatus.Closed;
     medXToken.transfer(diagnosingDoctor, caseFee);

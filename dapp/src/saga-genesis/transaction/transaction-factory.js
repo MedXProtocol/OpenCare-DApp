@@ -1,4 +1,4 @@
-let transactionIds = 1
+let transactionIds = 0
 
 export function nextId() {
   transactionIds += 1

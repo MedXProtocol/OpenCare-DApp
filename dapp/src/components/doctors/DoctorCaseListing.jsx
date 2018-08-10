@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { formatRoute } from 'react-router-named-routes'
 import classnames from 'classnames'
 import { CaseRow } from '~/components/CaseRow'
+import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
 import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctorCaseStatusLabels'
 import * as routes from '~/config/routes'
 
@@ -12,6 +13,11 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
   renderCase = (caseRowObject) => {
     caseRowObject['statusLabel'] = doctorCaseStatusToName(caseRowObject)
     caseRowObject['statusClass'] = doctorCaseStatusToClass(caseRowObject)
+
+    if (caseStaleForOneDay(caseRowObject.createdAt, caseRowObject.status)) {
+      caseRowObject['statusLabel'] = 'Requires Attention'
+      caseRowObject['statusClass'] = 'warning'
+    }
 
     return (
       <CaseRow

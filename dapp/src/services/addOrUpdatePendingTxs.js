@@ -41,7 +41,7 @@ export const addOrUpdatePendingTxs = function(transactions, cases, caseCount) {
     const method = call.method
 
     const isNewPatientCase = (method === 'approveAndCall')
-    const isAccepting = (method === 'acceptDiagnosis')
+    const isAccepting = (method === 'acceptDiagnosis' || method === 'acceptAsDoctorAfterADay')
     const isSecondOpinion = (method === 'challengeWithDoctor')
     const isDiagnosis = (method === 'diagnoseCase' || method === 'diagnoseChallengedCase')
 
