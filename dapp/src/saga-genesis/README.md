@@ -74,7 +74,7 @@ function* retrievePureContractState(blah, bloh) {
 ```javascript
 
 function* saga({ caseAddress }) {
-  const case = yield buildCase({ caseAddress })
+  const kase = yield buildCase({ caseAddress })
 }
 
 ```
