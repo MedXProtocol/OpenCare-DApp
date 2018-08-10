@@ -46,6 +46,7 @@ export function* invalidateAddress({ address }) {
   yield* contractCalls.map(function* (callState) {
     if (callState.count > 0) {
       const { call } = callState
+      console.log('call', call)
       yield put({type: 'WEB3_CALL', call })
     }
   })
