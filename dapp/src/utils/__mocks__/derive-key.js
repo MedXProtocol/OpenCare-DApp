@@ -6,3 +6,7 @@ const key = Buffer.from(bytes).toString('hex')
 export function deriveKey() {
   return key
 }
+
+export function deriveKeyAsync() {
+  return Promise.resolve(key)
+}

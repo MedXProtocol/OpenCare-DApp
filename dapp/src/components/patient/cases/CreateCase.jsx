@@ -599,7 +599,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     const hash = await uploadJson(caseJson, this.state.caseEncryptionKey)
     const account = currentAccount()
     const caseKeySalt = genKey(32)
-    const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
+    const encryptedCaseKey = await account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 
     const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
     const doctorEncryptedCaseKey = reencryptCaseKey({ account, encryptedCaseKey, doctorPublicKey, caseKeySalt })

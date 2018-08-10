@@ -5,8 +5,8 @@ describe('Account', () => {
   let account
   let secretKey = '962c9ad617c687a18e6e0280d09c685b52671e8cde50c1a1e86601287c422ce4'
 
-  beforeEach(() => {
-    account = Account.create({
+  beforeEach(async () => {
+    account = await Account.create({
       address: '0xc1a9b3F3c2ce1cc8cF102e665a1Ea99627A20F6e',
       secretKey: secretKey,
       masterPassword: 'whatever'
