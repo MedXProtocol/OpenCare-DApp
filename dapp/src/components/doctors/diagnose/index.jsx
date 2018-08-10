@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { CaseDetails } from '~/components/CaseDetails'
+import { AbandonedCaseActionsContainer } from '~/components/doctors/cases/AbandonedCaseActions'
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import Diagnosis from '~/components/Diagnosis'
@@ -23,6 +24,8 @@ function mapStateToProps(state, { match }) {
   let address = get(state, 'sagaGenesis.accounts[0]')
   const caseAddress = match.params.caseAddress
   const AccountManager = contractByName(state, 'AccountManager')
+  const caseStatus = cacheCallValue(state, caseAddress, 'status')
+  const caseCreatedAt = cacheCallValue(state, caseAddress, 'createdAt')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'doctorEncryptedCaseKeys', address)
@@ -34,6 +37,8 @@ function mapStateToProps(state, { match }) {
   return {
     address,
     caseAddress,
+    caseStatus,
+    caseCreatedAt,
     showDiagnosis: !!address,
     diagnosingDoctor,
     diagnosisHash,
@@ -53,6 +58,8 @@ function* saga({ match, address, AccountManager }) {
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield all([
     cacheCall(AccountManager, 'publicKeys', patientAddress),
+    cacheCall(caseAddress, 'status'),
+    cacheCall(caseAddress, 'createdAt'),
     cacheCall(caseAddress, 'doctorEncryptedCaseKeys', address),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(caseAddress, 'diagnosisHash'),
@@ -115,10 +122,16 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
     } else if (!isBlank(diagnosisHash) && diagnosingDoc) {
       var diagnosis =
         <div className='col-xs-12'>
+          <AbandonedCaseActionsContainer
+            caseAddress={caseAddress}
+            status={this.props.caseStatus}
+            createdAt={this.props.caseCreatedAt}
+          />
           <Diagnosis
             title='Your Diagnosis'
             caseAddress={caseAddress}
-            caseKey={caseKey} />
+            caseKey={caseKey}
+          />
         </div>
     } else if (thisDocChallenging) {
       var submitChallenge =

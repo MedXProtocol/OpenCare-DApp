@@ -11,7 +11,8 @@ i18next
       en: {
         translation: {
           transactions: {
-            acceptDiagnosis: 'Accept Diagnosis',
+            acceptDiagnosis: 'Accepting Diagnosis',
+            acceptAsDoctorAfterADay: 'Accepting Diagnosis',
             addOrReactivateDoctor: 'Adding / Reactivating Doctor',
             deactivateDoctor: 'Deactivating Doctor',
             approveAndCall: 'Sending Case Info',

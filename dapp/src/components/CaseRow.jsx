@@ -39,7 +39,7 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
         label = txErrorMessage(error)
       } else if (method === 'diagnoseCase' || method === 'diagnoseChallengedCase') {
         label = 'Submitting Diagnosis'
-      } else if (method === 'acceptDiagnosis') {
+      } else if (method === 'acceptDiagnosis' || method === 'acceptAsDoctorAfterADay') {
         label = 'Accepting Diagnosis'
       } else if (method === 'challengeWithDoctor') {
         label = 'Getting Second Opinion'

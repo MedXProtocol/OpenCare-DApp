@@ -145,5 +145,10 @@
 }
 
 .case-list--item button {
-  margin: 0 auto;
+  height: 28px;
+  margin: -20px auto 0;
+}
+
+.case-list--item button.btn-danger {
+  margin-top: 0;
 }
