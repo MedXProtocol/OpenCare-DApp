@@ -16,8 +16,12 @@ import { isBlank } from '~/utils/isBlank'
 // NOTE: NOTE:
 export const ACCOUNT_VERSION = 8
 
+let hexPublicKey = null
+
 export class Account {
   constructor (json) {
+    hexPublicKey = null
+
     this._json = json
     this.secretKeyWithSaltCache = {}
   }
@@ -73,8 +77,12 @@ export class Account {
     return this.secretKey()
   }
 
+  // Memoized pattern to avoid deriving multiple times
   hexPublicKey () {
-    const hexPublicKey = this.deriveKeyPair().getPublic(true, 'hex')
+    if (!hexPublicKey) {
+      hexPublicKey = this.deriveKeyPair().getPublic(true, 'hex')
+    }
+
     return hexPublicKey
   }
 
