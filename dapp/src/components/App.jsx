@@ -36,7 +36,6 @@ import { contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
-import { populateCases, populateCasesSaga } from '~/services/populateCases'
 import { toastr } from '~/toastr'
 import { defined } from '~/utils/defined'
 
@@ -90,38 +89,36 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     // Remove this when we figure out how to update the Challenged Doctor's cases list
     // automatically from the block listener!
-    this.pollNewCaseID = this.props.setInterval(this.pollForNewCase, 2000)
+    // this.pollNewCaseID = this.props.setInterval(this.pollForNewCase, 2000)
   }
 
   // Remove this when we figure out how to update the Challenged Doctor's cases list
   // automatically from the block listener!
   pollForNewCase = async () => {
-    const { contractRegistry, CaseManager, address, isDoctor, isSignedIn } = this.props
-
-    if (!CaseManager || !address || !isDoctor || !isSignedIn) { return }
-
-    const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
-    const newCaseCount = await CaseManagerInstance.methods.doctorCasesCount(address).call()
-      .then(c => {
-        return c
-      })
-
-    if (newCaseCount !== this.props.caseCount) {
-      this.props.dispatchNewCaseCount(newCaseCount)
-    }
+    // const { contractRegistry, CaseManager, address, isDoctor, isSignedIn } = this.props
+    //
+    // if (!CaseManager || !address || !isDoctor || !isSignedIn) { return }
+    //
+    // const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
+    // const newCaseCount = await CaseManagerInstance.methods.doctorCasesCount(address).call()
+    //   .then(c => {
+    //     return c
+    //   })
+    //
+    // if (newCaseCount !== this.props.caseCount) {
+    //   this.props.dispatchNewCaseCount(newCaseCount)
+    // }
   }
 
   componentWillUnmount () {
     window.removeEventListener("beforeunload", this.unload)
     window.removeEventListener("focus", this.refocus)
 
-    clearInterval(this.pollNewCaseID)
+    // clearInterval(this.pollNewCaseID)
   }
 
   componentWillReceiveProps (nextProps) {
     this.onAccountChangeSignOut(nextProps)
-
-    console.log(nextProps.openCaseCount, this.props.openCaseCount)
 
     if (
       nextProps.isSignedIn

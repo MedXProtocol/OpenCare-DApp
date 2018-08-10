@@ -47,8 +47,10 @@ contract CaseManager is Ownable, Pausable, Initializable {
     }
 
     modifier onlyCase(address _case) {
-      isCase(_case);
-      require(msg.sender == _case);
+      if (msg.sender != owner) {
+        isCase(_case);
+        require(msg.sender == _case);
+      }
       _;
     }
 
@@ -220,8 +222,11 @@ contract CaseManager is Ownable, Pausable, Initializable {
     }
 
     function doctorCaseAtIndex(address _doctor, uint256 _doctorAuthIndex) external view returns (address) {
-      require(_doctorAuthIndex < doctorCases[_doctor].length);
-      return doctorCases[_doctor][_doctorAuthIndex];
+      if (_doctorAuthIndex < doctorCases[_doctor].length) {
+        return doctorCases[_doctor][_doctorAuthIndex];
+      } else {
+        return 0;
+      }
     }
 
     function accountManager() internal view returns (AccountManager) {
@@ -286,6 +291,10 @@ contract CaseManager is Ownable, Pausable, Initializable {
     }
 
     function closedCaseAtIndex(address _doctor, uint256 _index) external view returns (address) {
-      return doctorClosedCases[_doctor][_index];
+      if (_index < doctorClosedCases[_doctor].length) {
+        return doctorClosedCases[_doctor][_index];
+      } else {
+        return 0;
+      }
     }
 }
