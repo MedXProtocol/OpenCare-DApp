@@ -101,17 +101,17 @@ function* web3CallExecute({call}) {
         yield put({ type: 'WEB3_CALL_RETURN', call, response })
       } catch (error) {
         yield put({ type: 'WEB3_CALL_ERROR', call, error })
-        console.error(call, error)
+        console.error('Error on WEB3 Call: ', call.method, call.args, call, error)
       } finally {
         callsInFlight.delete(call.hash)
       }
     })
   } catch (error) {
     if (yield cancelled()) {
-      console.warn(error)
+      console.warn('Cancelled on WEB3 Call: ', call.method, call.args, call, error)
       yield put({ type: 'WEB3_CALL_CANCELLED', call })
     } else {
-      console.error(call, error)
+      console.error('Error on WEB3 Call: ', call.method, call.args, call, error)
       yield put({ type: 'WEB3_CALL_ERROR', call, error })
     }
   }

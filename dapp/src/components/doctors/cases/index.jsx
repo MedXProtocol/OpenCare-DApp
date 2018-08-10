@@ -15,6 +15,7 @@ import {
   withSaga,
   cacheCall
 } from '~/saga-genesis'
+import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
@@ -32,7 +33,7 @@ function mapStateToProps(state, { match }) {
   let currentNodeId = cacheCallValue(state, CaseManager, 'firstOpenCaseId', address)
   while (currentNodeId && currentNodeId !== '0') {
     const openCaseAddress = cacheCallValue(state, CaseManager, 'openCaseAddress', address, currentNodeId)
-    if (openCaseAddress) {
+    if (openCaseAddress && !isBlank(openCaseAddress)) {
       openCaseAddresses.push(openCaseAddress)
     }
     currentNodeId = cacheCallValue(state, CaseManager, 'nextOpenCaseId', address, currentNodeId)
@@ -52,7 +53,7 @@ function mapStateToProps(state, { match }) {
   if (closedCaseCount) {
     for (var i = start; i < end; i++) {
       const closedCaseAddress = cacheCallValue(state, CaseManager, 'closedCaseAtIndex', address, i)
-      if (closedCaseAddress) {
+      if (closedCaseAddress && !isBlank(closedCaseAddress)) {
         historicalCaseAddresses.push(closedCaseAddress)
       } else {
         break
