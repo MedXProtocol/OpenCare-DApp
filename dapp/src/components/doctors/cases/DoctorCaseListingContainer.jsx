@@ -21,6 +21,7 @@ function mapStateToProps(state, { openCaseAddresses, openCaseCount, closedCaseAd
   openCases = addOrUpdatePendingTxs(transactions, openCases)
 
   const closedCases = populateCases(state, closedCaseAddresses, closedCaseCount)
+
   return {
     CaseManager,
     openCases,

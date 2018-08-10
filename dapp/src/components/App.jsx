@@ -40,6 +40,7 @@ import get from 'lodash.get'
 function mapStateToProps (state) {
   const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
   const openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount', address)
   const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
@@ -51,6 +52,7 @@ function mapStateToProps (state) {
     isDoctor,
     DoctorManager,
     isSignedIn,
+    caseCount,
     openCaseCount,
     CaseManager,
     isOwner
@@ -69,50 +71,28 @@ function* saga({ address, CaseManager, DoctorManager }) {
   if (!address || !CaseManager || !DoctorManager) { return }
   const isDoctor = yield cacheCall(DoctorManager, 'isDoctor', address)
   if (isDoctor) {
+    yield cacheCall(CaseManager, 'doctorCasesCount', address)
     yield cacheCall(CaseManager, 'openCaseCount', address)
   }
 }
 
 const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager', 'DoctorManager', 'isDoctor'] })(
+  withSaga(saga, { propTriggers: ['address', 'caseCount', 'openCaseCount', 'CaseManager', 'DoctorManager', 'isDoctor'] })(
     class _App extends Component {
 
   componentDidMount () {
     window.addEventListener("beforeunload", this.unload)
     window.addEventListener("focus", this.refocus)
     this.onAccountChangeSignOut(this.props)
+
     if (process.env.NODE_ENV !== 'development' && !this.props.address && this.props.isSignedIn) {
       this.signOut()
     }
-
-    // Remove this when we figure out how to update the Challenged Doctor's cases list
-    // automatically from the block listener!
-    // this.pollNewCaseID = this.props.setInterval(this.pollForNewCase, 2000)
-  }
-
-  // Remove this when we figure out how to update the Challenged Doctor's cases list
-  // automatically from the block listener!
-  pollForNewCase = async () => {
-    // const { contractRegistry, CaseManager, address, isDoctor, isSignedIn } = this.props
-    //
-    // if (!CaseManager || !address || !isDoctor || !isSignedIn) { return }
-    //
-    // const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
-    // const newCaseCount = await CaseManagerInstance.methods.doctorCasesCount(address).call()
-    //   .then(c => {
-    //     return c
-    //   })
-    //
-    // if (newCaseCount !== this.props.caseCount) {
-    //   this.props.dispatchNewCaseCount(newCaseCount)
-    // }
   }
 
   componentWillUnmount () {
     window.removeEventListener("beforeunload", this.unload)
     window.removeEventListener("focus", this.refocus)
-
-    // clearInterval(this.pollNewCaseID)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -129,24 +109,12 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
   showNewCaseAssignedToast = (nextProps) => {
     const { contractRegistry, CaseManager, address } = this.props
-    // const oldCaseCount = this.props.caseCount
 
-    // console.log('in showNewCaseAssignedToast')
-
-    // Moving from 0 to 1, or 1 to 2, but not undefined/NaN (initial state) to a number
-    // if (
-    //   (!defined(oldCaseCount))
-    //   || isNaN(nextProps.caseCount)
-    //   || (oldCaseCount === nextProps.caseCount)
-    // ) {
-    //   return
-    // }
-
-    console.log('showNewCaseAssignedToast PASSED!')
+    // console.log('showNewCaseAssignedToast PASSED!', nextProps.caseCount)
 
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
     CaseManagerInstance.methods
-      .doctorCaseAtIndex(address, nextProps.caseCount - 1)
+      .doctorCaseAtIndex(address, nextProps.caseCount)
       .call().then(caseAddress => {
         const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress })
 

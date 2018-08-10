@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
-import PropTypes from 'prop-types'
 import { DiagnoseCaseContainer } from '~/components/doctors/diagnose'
 import { DoctorCaseListingContainer } from '~/components/doctors/cases/DoctorCaseListingContainer'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { addOrUpdatePendingTxs } from '~/services/addOrUpdatePendingTxs'
 import { formatRoute } from 'react-router-named-routes'
 import {
   cacheCallValue,
@@ -22,9 +20,12 @@ import * as routes from '~/config/routes'
 const MAX_CASES_PER_PAGE = 5
 
 function mapStateToProps(state, { match }) {
+  let start = 0
+  let end = 0
+  let pageNumbers = []
+
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-  const transactions = state.sagaGenesis.transactions
 
   let openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount', address)
   const openCaseAddresses = []
@@ -37,6 +38,7 @@ function mapStateToProps(state, { match }) {
     }
     currentNodeId = cacheCallValue(state, CaseManager, 'nextOpenCaseId', address, currentNodeId)
   }
+  console.log('openCaseAddresses', openCaseAddresses.length)
 
   let closedCaseCount = cacheCallValue(state, CaseManager, 'closedCaseCount', address)
   // console.log(openCaseCount, closedCaseCount)
@@ -47,16 +49,26 @@ function mapStateToProps(state, { match }) {
   }
   // console.log(closedCaseCount)
 
-  let { pageNumber } = match.params
-  if (!pageNumber) {
-    pageNumber = 1
+  let { currentPage } = match.params
+  if (!currentPage) {
+    currentPage = 1
   }
-  const start = ((parseInt(pageNumber, 10) - 1) * MAX_CASES_PER_PAGE)
-  const end = start + MAX_CASES_PER_PAGE
+
+  // const start = ((parseInt(currentPage, 10) - 1) * MAX_CASES_PER_PAGE)
+  // const end = start + MAX_CASES_PER_PAGE
   let closedCaseAddresses = []
   if (closedCaseCount) {
-    for (var i = start; i < end; i++) {
+    const totalPages = Math.ceil(closedCaseCount / MAX_CASES_PER_PAGE)
+    pageNumbers = range(1, totalPages + 1)
+
+    start = (closedCaseCount - ((parseInt(currentPage, 10) - 1) * MAX_CASES_PER_PAGE))
+    end = Math.max((start - MAX_CASES_PER_PAGE), 0)
+
+    console.log(totalPages, pageNumbers, start, end)
+
+    for (let i = (start - 1); i >= end; i--) {
       const closedCaseAddress = cacheCallValue(state, CaseManager, 'closedCaseAtIndex', address, i)
+      console.log(closedCaseAddress)
 
       if (closedCaseAddress && !isBlank(closedCaseAddress)) {
         closedCaseAddresses.push(closedCaseAddress)
@@ -73,10 +85,10 @@ function mapStateToProps(state, { match }) {
     openCaseCount,
     openCaseAddresses,
     closedCaseAddresses,
-    transactions,
-    pageNumber,
+    pageNumbers,
+    currentPage,
     start,
-    end
+    end,
   }
 }
 
@@ -92,7 +104,7 @@ function* saga({ address, CaseManager, start, end }) {
     currentNodeId = yield cacheCall(CaseManager, 'nextOpenCaseId', address, currentNodeId)
   }
 
-  yield range(start, end).map(function* (index) {
+  yield range((start - 1), end).map(function* (index) {
     yield cacheCall(CaseManager, 'closedCaseAtIndex', address, index)
   })
 }
@@ -124,15 +136,13 @@ export const OpenCasesContainer = connect(mapStateToProps)(
           openCaseAddresses,
           closedCaseCount,
           match,
-          transactions
+          currentPage,
+          pageNumbers
         } = this.props
 
         if (match.params.caseAddress) {
           diagnoseCase = <DiagnoseCaseContainer key="diagnoseCaseContainerKey" match={match} />
         } else {
-          const totalPages = Math.ceil(closedCaseCount / MAX_CASES_PER_PAGE)
-          const pageNumbers = range(1, totalPages + 1)
-
           doctorCaseListing = <DoctorCaseListingContainer
             key="doctorCaseListing"
             openCaseAddresses={openCaseAddresses}
@@ -140,7 +150,7 @@ export const OpenCasesContainer = connect(mapStateToProps)(
             openCaseCount={openCaseCount}
             closedCaseCount={closedCaseCount}
             pageNumbers={pageNumbers}
-            currentPageNumber={parseInt(match.params.pageNumber, 10)}
+            currentPage={currentPage}
           />
         }
 

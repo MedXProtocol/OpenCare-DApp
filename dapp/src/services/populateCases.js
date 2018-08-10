@@ -1,7 +1,6 @@
 import { all } from 'redux-saga/effects'
 import { addContract, cacheCall, contractByName } from '~/saga-genesis'
 import { cacheCallValue } from '~/saga-genesis'
-import rangeRight from 'lodash.rangeright'
 
 export const populateCases = function(state, caseAddresses) {
   const CaseManager = contractByName(state, 'CaseManager')
