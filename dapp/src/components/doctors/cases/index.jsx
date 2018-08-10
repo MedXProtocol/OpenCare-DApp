@@ -31,6 +31,7 @@ function mapStateToProps(state, { match }) {
   const openCaseAddresses = []
 
   let currentNodeId = cacheCallValue(state, CaseManager, 'firstOpenCaseId', address)
+  console.log('currentNodeId (top)', currentNodeId)
   while (currentNodeId && currentNodeId !== '0') {
     const openCaseAddress = cacheCallValue(state, CaseManager, 'openCaseAddress', address, currentNodeId)
     if (openCaseAddress && !isBlank(openCaseAddress)) {
@@ -38,16 +39,13 @@ function mapStateToProps(state, { match }) {
     }
     currentNodeId = cacheCallValue(state, CaseManager, 'nextOpenCaseId', address, currentNodeId)
   }
-  console.log('openCaseAddresses', openCaseAddresses.length)
 
   let closedCaseCount = cacheCallValue(state, CaseManager, 'closedCaseCount', address)
-  // console.log(openCaseCount, closedCaseCount)
   if (closedCaseCount) {
     closedCaseCount = parseInt(closedCaseCount, 10)
   } else {
     closedCaseCount = 0
   }
-  // console.log(closedCaseCount)
 
   let { currentPage } = match.params
   if (!currentPage) {
@@ -95,13 +93,17 @@ function mapStateToProps(state, { match }) {
 function* saga({ address, CaseManager, start, end }) {
   if (!address || !CaseManager) { return }
 
-  yield cacheCall(CaseManager, 'openCaseCount', address)
+  const cc = yield cacheCall(CaseManager, 'openCaseCount', address)
+  console.log('cc', cc)
+
   yield cacheCall(CaseManager, 'closedCaseCount', address)
 
   let currentNodeId = yield cacheCall(CaseManager, 'firstOpenCaseId', address)
+  console.log('currentNodeId: ', currentNodeId)
   while (currentNodeId && currentNodeId !== '0') {
     yield cacheCall(CaseManager, 'openCaseAddress', address, currentNodeId)
     currentNodeId = yield cacheCall(CaseManager, 'nextOpenCaseId', address, currentNodeId)
+    console.log('currentNodeId (loop): ', currentNodeId)
   }
 
   yield range((start - 1), end).map(function* (index) {
