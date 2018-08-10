@@ -13,35 +13,35 @@ import {
   contractByName
 } from '~/saga-genesis'
 
-function mapStateToProps(state, { openCaseAddresses, openCaseCount, historicalCaseAddresses, closedCaseCount }) {
+function mapStateToProps(state, { openCaseAddresses, openCaseCount, closedCaseAddresses, closedCaseCount }) {
   const CaseManager = contractByName(state, 'CaseManager')
   const transactions = state.sagaGenesis.transactions
 
   let openCases = populateCases(state, openCaseAddresses, openCaseCount)
   openCases = addOrUpdatePendingTxs(transactions, openCases)
 
-  const historicalCases = populateCases(state, historicalCaseAddresses, closedCaseCount)
+  const closedCases = populateCases(state, closedCaseAddresses, closedCaseCount)
   return {
     CaseManager,
     openCases,
-    historicalCases
+    closedCases
   }
 }
 
-function* saga({ CaseManager, openCaseAddresses, historicalCaseAddresses }) {
+function* saga({ CaseManager, openCaseAddresses, closedCaseAddresses }) {
   if (!CaseManager) { return }
 
   yield populateCasesSaga(CaseManager, openCaseAddresses)
-  yield populateCasesSaga(CaseManager, historicalCaseAddresses)
+  yield populateCasesSaga(CaseManager, closedCaseAddresses)
 }
 
 export const DoctorCaseListingContainer = connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: [ 'CaseManager', 'openCaseAddresses', 'openCaseCount', 'historicalCaseAddresses', 'closedCaseCount' ] })(
+  withSaga(saga, { propTriggers: [ 'CaseManager', 'openCaseAddresses', 'openCaseCount', 'closedCaseAddresses', 'closedCaseCount' ] })(
     class _DoctorCaseListingContainer extends Component {
       render () {
         return <DoctorCaseListing
           openCases={this.props.openCases}
-          paginatedHistoricalCases={this.props.historicalCases}
+          closedCases={this.props.closedCases}
           pageNumbers={this.props.pageNumbers}
           currentPageNumber={this.props.currentPageNumber}
         />

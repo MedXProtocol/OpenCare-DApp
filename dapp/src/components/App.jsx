@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
-import { all } from 'redux-saga/effects'
 import ReduxToastr from 'react-redux-toastr'
 import ReactTimeout from 'react-timeout'
 import { hot } from 'react-hot-loader'
@@ -30,14 +29,13 @@ import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
 import { connect } from 'react-redux'
-import get from 'lodash.get'
 import { withSaga, cacheCallValue, withContractRegistry } from '~/saga-genesis'
 import { contractByName } from '~/saga-genesis/state-finders'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { toastr } from '~/toastr'
-import { defined } from '~/utils/defined'
+import get from 'lodash.get'
 
 function mapStateToProps (state) {
   const CaseManager = contractByName(state, 'CaseManager')

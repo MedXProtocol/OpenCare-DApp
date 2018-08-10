@@ -29,7 +29,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
   }
 
   render() {
-    const { openCases, paginatedHistoricalCases, currentPageNumber, pageNumbers } = this.props
+    const { openCases, closedCases, currentPageNumber, pageNumbers } = this.props
 
     return (
       <div className='container'>
@@ -83,7 +83,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                   Historical Cases:
                 </h5>
                 {
-                  !paginatedHistoricalCases.length ?
+                  !closedCases.length ?
                   <div className="blank-state">
                     <div className="blank-state--inner text-center text-gray">
                       <span>You have not evaluated any cases yet.</span>
@@ -94,7 +94,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                     leaveAnimation="accordionVertical"
                     className="case-list"
                   >
-                    {paginatedHistoricalCases.map(c => this.renderCase(c))}
+                    {closedCases.map(c => this.renderCase(c))}
                   </FlipMove>
                 }
               </div>

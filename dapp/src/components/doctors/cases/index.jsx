@@ -8,7 +8,6 @@ import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { addOrUpdatePendingTxs } from '~/services/addOrUpdatePendingTxs'
 import { formatRoute } from 'react-router-named-routes'
-import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
 import {
   cacheCallValue,
   contractByName,
@@ -40,21 +39,27 @@ function mapStateToProps(state, { match }) {
   }
 
   let closedCaseCount = cacheCallValue(state, CaseManager, 'closedCaseCount', address)
+  // console.log(openCaseCount, closedCaseCount)
   if (closedCaseCount) {
     closedCaseCount = parseInt(closedCaseCount, 10)
   } else {
     closedCaseCount = 0
   }
+  // console.log(closedCaseCount)
 
-  const { pageNumber } = match.params || 1
+  let { pageNumber } = match.params
+  if (!pageNumber) {
+    pageNumber = 1
+  }
   const start = ((parseInt(pageNumber, 10) - 1) * MAX_CASES_PER_PAGE)
   const end = start + MAX_CASES_PER_PAGE
-  let historicalCaseAddresses = []
+  let closedCaseAddresses = []
   if (closedCaseCount) {
     for (var i = start; i < end; i++) {
       const closedCaseAddress = cacheCallValue(state, CaseManager, 'closedCaseAtIndex', address, i)
+
       if (closedCaseAddress && !isBlank(closedCaseAddress)) {
-        historicalCaseAddresses.push(closedCaseAddress)
+        closedCaseAddresses.push(closedCaseAddress)
       } else {
         break
       }
@@ -67,7 +72,7 @@ function mapStateToProps(state, { match }) {
     closedCaseCount,
     openCaseCount,
     openCaseAddresses,
-    historicalCaseAddresses,
+    closedCaseAddresses,
     transactions,
     pageNumber,
     start,
@@ -79,12 +84,13 @@ function* saga({ address, CaseManager, start, end }) {
   if (!address || !CaseManager) { return }
 
   yield cacheCall(CaseManager, 'openCaseCount', address)
+  yield cacheCall(CaseManager, 'closedCaseCount', address)
+
   let currentNodeId = yield cacheCall(CaseManager, 'firstOpenCaseId', address)
   while (currentNodeId && currentNodeId !== '0') {
     yield cacheCall(CaseManager, 'openCaseAddress', address, currentNodeId)
     currentNodeId = yield cacheCall(CaseManager, 'nextOpenCaseId', address, currentNodeId)
   }
-  yield cacheCall(CaseManager, 'closedCaseCount', address)
 
   yield range(start, end).map(function* (index) {
     yield cacheCall(CaseManager, 'closedCaseAtIndex', address, index)
@@ -92,7 +98,7 @@ function* saga({ address, CaseManager, start, end }) {
 }
 
 export const OpenCasesContainer = connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager'] })(
+  withSaga(saga, { propTriggers: ['address', 'openCaseCount', 'closedCaseCount', 'CaseManager', 'start', 'end'] })(
     class _OpenCasesContainer extends Component {
 
       componentDidMount() {
@@ -113,7 +119,7 @@ export const OpenCasesContainer = connect(mapStateToProps)(
       render () {
         let doctorCaseListing, diagnoseCase, doScrollToTop
         const {
-          historicalCaseAddresses,
+          closedCaseAddresses,
           openCaseCount,
           openCaseAddresses,
           closedCaseCount,
@@ -130,7 +136,7 @@ export const OpenCasesContainer = connect(mapStateToProps)(
           doctorCaseListing = <DoctorCaseListingContainer
             key="doctorCaseListing"
             openCaseAddresses={openCaseAddresses}
-            historicalCaseAddresses={historicalCaseAddresses}
+            closedCaseAddresses={closedCaseAddresses}
             openCaseCount={openCaseCount}
             closedCaseCount={closedCaseCount}
             pageNumbers={pageNumbers}
@@ -168,5 +174,5 @@ export const OpenCasesContainer = connect(mapStateToProps)(
 
 OpenCasesContainer.defaultProps = {
   openCaseAddresses: [],
-  historicalCaseAddresses: []
+  closedCaseAddresses: []
 }
