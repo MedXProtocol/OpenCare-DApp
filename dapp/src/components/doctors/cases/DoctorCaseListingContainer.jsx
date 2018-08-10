@@ -16,7 +16,10 @@ import {
 function mapStateToProps(state, { openCaseAddresses, openCaseCount, historicalCaseAddresses, closedCaseCount }) {
   const CaseManager = contractByName(state, 'CaseManager')
   const transactions = state.sagaGenesis.transactions
-  const openCases = addOrUpdatePendingTxs(transactions, populateCases(state, openCaseAddresses, openCaseCount))
+
+  let openCases = populateCases(state, openCaseAddresses, openCaseCount)
+  openCases = addOrUpdatePendingTxs(transactions, openCases)
+
   const historicalCases = populateCases(state, historicalCaseAddresses, closedCaseCount)
   return {
     CaseManager,
@@ -25,14 +28,15 @@ function mapStateToProps(state, { openCaseAddresses, openCaseCount, historicalCa
   }
 }
 
-function* saga({ CaseManager, openCaseAddresses, openCaseCount, historicalCaseAddresses, closedCaseCount }) {
+function* saga({ CaseManager, openCaseAddresses, historicalCaseAddresses }) {
   if (!CaseManager) { return }
-  yield populateCasesSaga(CaseManager, openCaseAddresses, openCaseCount)
-  yield populateCasesSaga(CaseManager, historicalCaseAddresses, closedCaseCount)
+
+  yield populateCasesSaga(CaseManager, openCaseAddresses)
+  yield populateCasesSaga(CaseManager, historicalCaseAddresses)
 }
 
 export const DoctorCaseListingContainer = connect(mapStateToProps)(
-  withSaga(saga)(
+  withSaga(saga, { propTriggers: [ 'CaseManager', 'openCaseAddresses', 'openCaseCount', 'historicalCaseAddresses', 'closedCaseCount' ] })(
     class _DoctorCaseListingContainer extends Component {
       render () {
         return <DoctorCaseListing
