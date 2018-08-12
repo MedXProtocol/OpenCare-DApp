@@ -1,9 +1,9 @@
 import aes from '~/services/aes'
-import { deriveKey } from '~/utils/derive-key'
+import { deriveKeyAsync } from '~/utils/derive-key'
 
-export default function decryptSecretKey(account, masterPassword) {
-  var preimage = deriveKey(masterPassword, account.salt)
-  var storedMasterPassword = deriveKey(preimage, account.preimageSalt).toString('hex')
+export default async function decryptSecretKeyAsync(account, masterPassword) {
+  var preimage = await deriveKeyAsync(masterPassword, account.salt)
+  var storedMasterPassword = (await deriveKeyAsync(preimage, account.preimageSalt)).toString('hex')
   if (account.storedMasterPassword !== storedMasterPassword) {
     throw new Error(`Given master password is incorrect`)
   }

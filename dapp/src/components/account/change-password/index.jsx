@@ -41,12 +41,13 @@ export const ChangePassword = class _ChangePassword extends Component {
     }, this.doChange)
   }
 
-  doChange = () => {
+  doChange = async () => {
     let currentPasswordError = ''
     let matchPasswordError = masterPasswordInvalid(this.state.newMasterPassword)
     let account = currentAccount()
 
-    if (!account.isMasterPassword(this.state.currentMasterPassword)) {
+    let isMasterPassword = await account.isMasterPassword(this.state.currentMasterPassword)
+    if (!isMasterPassword) {
       currentPasswordError = 'The current Master Password you have entered is incorrect'
     } else if (this.state.newMasterPassword !== this.state.confirmNewMasterPassword) {
       matchPasswordError = 'Both passwords must match'
@@ -63,9 +64,9 @@ export const ChangePassword = class _ChangePassword extends Component {
     }
   }
 
-  onNewMasterPassword = (account) => {
+  onNewMasterPassword = async (account) => {
     let dynamicNextPath = this.props.isDoctor ? routes.DOCTORS_CASES_OPEN : routes.PATIENTS_CASES
-    let newAccount = Account.create({
+    let newAccount = await Account.create({
       address: account.address(),
       secretKey: account.secretKey(),
       masterPassword: this.state.newMasterPassword

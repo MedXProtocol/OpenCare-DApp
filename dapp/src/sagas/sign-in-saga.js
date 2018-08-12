@@ -1,4 +1,4 @@
-import { put, takeEvery } from 'redux-saga/effects'
+import { put, takeEvery, call } from 'redux-saga/effects'
 import { signIn } from '~/services/sign-in'
 import secretKeyInvalid from '~/services/secret-key-invalid'
 import masterPasswordInvalid from '~/services/master-password-invalid'
@@ -14,6 +14,7 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
   }
 
   if (secretKey) { //Then we are signing into an existing account
+    console.log('Login with custom secret key')
     var secretKeyError = secretKeyInvalid(secretKey)
     if (secretKeyError) {
       yield put({ type: 'SIGN_IN_ERROR', secretKeyError })
@@ -21,10 +22,11 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
     }
 
     if (account) { // then the secret key must match the account secret key
-      let newAccount = Account.build({ address, secretKey, masterPassword })
+      console.log('Using custom secret key for an existing account')
+      let newAccount = yield call([Account, 'build'], { address, secretKey, masterPassword })
       if (account.hashedSecretKey === newAccount.hashedSecretKey) {
         try {
-          account.unlock(masterPassword)
+          yield call([account, 'unlockAsync'], masterPassword)
           yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
         } catch (error) {
           yield put({type: 'SIGN_IN_ERROR', masterPasswordError: error.message })
@@ -37,8 +39,10 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
     }
 
   } else if (account) { // Check the existing account
+    console.log('no secret key passed, checking account')
     try {
-      account.unlock(masterPassword)
+      yield call([account, 'unlockAsync'], masterPassword)
+      console.log('account unlocked')
       yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
     } catch (error) {
       yield put({type: 'SIGN_IN_ERROR', masterPasswordError: error.message })
