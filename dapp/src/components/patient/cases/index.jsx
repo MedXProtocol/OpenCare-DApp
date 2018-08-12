@@ -20,11 +20,14 @@ function mapStateToProps(state) {
   let cases = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-  const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
+  let caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
+  if (caseCount) {
+    caseCount = parseInt(caseCount, 10)
+  }
   const transactions = state.sagaGenesis.transactions
 
-  for (let objIndex = (caseCount - 1); objIndex >= 0; --objIndex) {
-    const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, objIndex)
+  for (let objIndex = caseCount; objIndex > 0; --objIndex) {
+    const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, objIndex - 1)
     if (caseAddress) {
       const status = cacheCallValue(state, caseAddress, 'status')
       const createdAt = cacheCallValue(state, caseAddress, 'createdAt')
@@ -32,7 +35,7 @@ function mapStateToProps(state) {
         caseAddress,
         status,
         createdAt,
-        objIndex
+        objIndex: objIndex
       })
     }
   }
@@ -43,7 +46,8 @@ function mapStateToProps(state) {
     address,
     caseCount,
     cases,
-    CaseManager
+    CaseManager,
+    transactions
   }
 }
 
@@ -51,8 +55,8 @@ function* saga({ address, CaseManager }) {
   if (!address || !CaseManager) { return }
   const caseCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', address)
   const indices = rangeRight(caseCount)
-  yield all(indices.map(function* (objIndex) {
-    const caseAddress = yield cacheCall(CaseManager, 'patientCases', address, objIndex)
+  yield all(indices.map(function* (index) {
+    const caseAddress = yield cacheCall(CaseManager, 'patientCases', address, index)
     // console.log('called by patients cases index saga')
     yield all([
       addContract({ address: caseAddress, contractKey: 'Case' }),
@@ -62,7 +66,7 @@ function* saga({ address, CaseManager }) {
   }))
 }
 
-export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount']})(class _PatientCases extends Component {
+export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount', 'transactions']})(class _PatientCases extends Component {
   render() {
     let loadingLines, noCases, cases
     const loading = (this.props.caseCount === undefined)

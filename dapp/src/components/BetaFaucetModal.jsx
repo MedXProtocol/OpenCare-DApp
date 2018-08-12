@@ -250,6 +250,8 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         } else {
           content = (
             <div className="col-xs-12 text-center">
+              <br />
+              <br />
               <h2 className="header--no-top-margin">
                 You're all set!
               </h2>
@@ -286,7 +288,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
                 </div>
               </div>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="modal__beta-faucet">
               <div className="row">
                 <ReactCSSTransitionReplace transitionName="page"
                                            transitionEnterTimeout={400}

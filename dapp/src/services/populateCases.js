@@ -10,7 +10,10 @@ export const populateCases = function(state, caseAddresses) {
     const createdAt = cacheCallValue(state, caseAddress, 'createdAt')
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
     const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
-    const objIndex = cacheCallValue(state, CaseManager, 'caseIndices', caseAddress)
+    let objIndex = cacheCallValue(state, CaseManager, 'caseIndices', caseAddress)
+    if (objIndex) {
+      objIndex = parseInt(objIndex, 10)
+    }
 
     if (status && objIndex && (diagnosingDoctor || challengingDoctor)) {
       const isDiagnosingDoctor = diagnosingDoctor === address

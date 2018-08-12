@@ -28,6 +28,9 @@ function mapStateToProps(state, { match }) {
   const CaseManager = contractByName(state, 'CaseManager')
 
   let openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount', address)
+  if (openCaseCount) {
+    openCaseCount = parseInt(openCaseCount, 10)
+  }
   const openCaseAddresses = []
 
   let currentNodeId = cacheCallValue(state, CaseManager, 'firstOpenCaseId', address)
@@ -36,7 +39,7 @@ function mapStateToProps(state, { match }) {
     if (openCaseAddress && !isBlank(openCaseAddress)) {
       openCaseAddresses.push(openCaseAddress)
     }
-    console.log('currentNodeId (mSTP)', currentNodeId, openCaseAddress)
+    // console.log('currentNodeId (mSTP)', currentNodeId, openCaseAddress)
     currentNodeId = cacheCallValue(state, CaseManager, 'nextOpenCaseId', address, currentNodeId)
   }
 
@@ -62,11 +65,11 @@ function mapStateToProps(state, { match }) {
     start = (closedCaseCount - ((parseInt(currentPage, 10) - 1) * MAX_CASES_PER_PAGE))
     end = Math.max((start - MAX_CASES_PER_PAGE), 0)
 
-    console.log(totalPages, pageNumbers, start, end)
+    // console.log(totalPages, pageNumbers, start, end)
 
     for (let i = (start - 1); i >= end; i--) {
       const closedCaseAddress = cacheCallValue(state, CaseManager, 'closedCaseAtIndex', address, i)
-      console.log(closedCaseAddress)
+      // console.log(closedCaseAddress)
 
       if (closedCaseAddress && !isBlank(closedCaseAddress)) {
         closedCaseAddresses.push(closedCaseAddress)
@@ -92,17 +95,29 @@ function mapStateToProps(state, { match }) {
 
 function* saga({ address, CaseManager, start, end }) {
   if (!address || !CaseManager) { return }
+    console.log('**************RUNNING SAGA**************')
+  let openAddresses = []
 
-  const cc = yield cacheCall(CaseManager, 'openCaseCount', address)
-  console.log('cc', cc)
-
+  let openCaseCount = yield cacheCall(CaseManager, 'openCaseCount', address)
+  if (openCaseCount) {
+    openCaseCount = parseInt(openCaseCount, 10)
+  }
+  console.log('openCaseCount', openCaseCount)
   yield cacheCall(CaseManager, 'closedCaseCount', address)
 
-  let currentNodeId = yield cacheCall(CaseManager, 'firstOpenCaseId', address)
-  while (currentNodeId && currentNodeId !== '0') {
-    const add = yield cacheCall(CaseManager, 'openCaseAddress', address, currentNodeId)
-    console.log('currentNodeId (saga): ', currentNodeId, add)
-    currentNodeId = yield cacheCall(CaseManager, 'nextOpenCaseId', address, currentNodeId)
+  while (openCaseCount !== openAddresses.length) {
+    openAddresses = []
+    let currentNodeId = yield cacheCall(CaseManager, 'firstOpenCaseId', address)
+    while (currentNodeId && currentNodeId !== '0') {
+      const add = yield cacheCall(CaseManager, 'openCaseAddress', address, currentNodeId)
+      console.log('currentNodeId (saga): ', currentNodeId, add)
+      if (add) {
+        yield openAddresses.push(add)
+      }
+      currentNodeId = yield cacheCall(CaseManager, 'nextOpenCaseId', address, currentNodeId)
+
+      console.log(openCaseCount, openAddresses.length)
+    }
   }
 
   yield range((start - 1), end).map(function* (index) {
@@ -111,7 +126,7 @@ function* saga({ address, CaseManager, start, end }) {
 }
 
 export const OpenCasesContainer = connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['address', 'openCaseCount', 'closedCaseCount', 'CaseManager', 'start', 'end'] })(
+  withSaga(saga, { propTriggers: ['address', 'openCaseCount', 'closedCaseCount', 'CaseManager', 'currentPage', 'start', 'end'] })(
     class _OpenCasesContainer extends Component {
 
       componentDidMount() {

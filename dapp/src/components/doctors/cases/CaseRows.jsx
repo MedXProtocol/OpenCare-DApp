@@ -32,7 +32,7 @@ function mapStateToProps(state, { caseAddresses }) {
     }
   }
 
-  cases = addOrUpdatePendingTxs(transactions, cases, caseCount)
+  cases = addOrUpdatePendingTxs(transactions, cases)
 
   return {
     address,
