@@ -64,8 +64,6 @@ export const addOrUpdatePendingTxs = function(transactions, cases, caseCount) {
     }
   })
 
-  console.log(cases)
-
   return cases
 }
 

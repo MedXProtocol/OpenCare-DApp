@@ -46,8 +46,7 @@ function mapStateToProps(state) {
     address,
     caseCount,
     cases,
-    CaseManager,
-    transactions
+    CaseManager
   }
 }
 
@@ -66,7 +65,7 @@ function* saga({ address, CaseManager }) {
   }))
 }
 
-export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount', 'transactions']})(class _PatientCases extends Component {
+export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount']})(class _PatientCases extends Component {
   render() {
     let loadingLines, noCases, cases
     const loading = (this.props.caseCount === undefined)

@@ -40,7 +40,7 @@ import get from 'lodash.get'
 function mapStateToProps (state) {
   const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const caseCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
+  const doctorCasesCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
   const openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount', address)
   const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
@@ -52,7 +52,7 @@ function mapStateToProps (state) {
     isDoctor,
     DoctorManager,
     isSignedIn,
-    caseCount,
+    doctorCasesCount,
     openCaseCount,
     CaseManager,
     isOwner
@@ -70,6 +70,7 @@ function mapDispatchToProps(dispatch) {
 function* saga({ address, CaseManager, DoctorManager }) {
   if (!address || !CaseManager || !DoctorManager) { return }
   const isDoctor = yield cacheCall(DoctorManager, 'isDoctor', address)
+console.log('RUNNING APP JS SAGA')
   if (isDoctor) {
     yield cacheCall(CaseManager, 'doctorCasesCount', address)
     yield cacheCall(CaseManager, 'openCaseCount', address)
@@ -77,7 +78,7 @@ function* saga({ address, CaseManager, DoctorManager }) {
 }
 
 const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['address', 'caseCount', 'openCaseCount', 'CaseManager', 'DoctorManager', 'isDoctor'] })(
+  withSaga(saga, { propTriggers: ['address', 'doctorCasesCount', 'openCaseCount', 'CaseManager', 'DoctorManager', 'isDoctor'] })(
     class _App extends Component {
 
   componentDidMount () {
@@ -110,11 +111,9 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   showNewCaseAssignedToast = (nextProps) => {
     const { contractRegistry, CaseManager, address } = this.props
 
-    // console.log('showNewCaseAssignedToast PASSED!', nextProps.caseCount)
-
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
     CaseManagerInstance.methods
-      .doctorCaseAtIndex(address, nextProps.caseCount)
+      .doctorCaseAtIndex(address, nextProps.doctorCasesCount)
       .call().then(caseAddress => {
         const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress })
 

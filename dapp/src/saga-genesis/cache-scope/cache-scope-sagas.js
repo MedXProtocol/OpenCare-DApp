@@ -53,14 +53,20 @@ export function* invalidateAddress({ address }) {
 }
 
 export function* invalidateTransaction({ transactionId, call, receipt }) {
+  console.log('call', call)
+  console.log('receipt', receipt)
+
   let contractAddresses = Object.values(receipt.events || {}).reduce((addressSet, event) => {
     return addressSet.add(event.address)
   }, new Set())
 
+  console.log('contractAddresses', contractAddresses)
   contractAddresses.add(call.address)
+  console.log('call.address', call.address)
 
   yield* Array.from(contractAddresses).map(function* (address) {
     const contractKey = yield select(contractKeyByAddress, address)
+    console.log('contractKey', contractKey)
     if (contractKey) {
       yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
     }

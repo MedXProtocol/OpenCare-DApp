@@ -29,7 +29,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
   }
 
   render() {
-    const { openCases, closedCases, currentPageNumber, pageNumbers } = this.props
+    const { openCases, closedCases, currentPage, pageNumbers } = this.props
 
     return (
       <div className='container'>
@@ -102,14 +102,14 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
               <nav aria-label="Page navigation" className="text-center">
                 <ul className="pagination">
                   {pageNumbers.map(function(number) {
-                    const path = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { pageNumber: number })
+                    const path = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { currentPage: number })
 
                     return (
                       <li
                         key={`page-number-${number}`}
                         className={classnames(
                           'pagination--page-number',
-                          { 'active': currentPageNumber === number }
+                          { 'active': currentPage === number }
                         )}
                       >
                         <Link to={path}>

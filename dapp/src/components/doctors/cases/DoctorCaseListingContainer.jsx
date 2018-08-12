@@ -44,7 +44,7 @@ export const DoctorCaseListingContainer = connect(mapStateToProps)(
           openCases={this.props.openCases}
           closedCases={this.props.closedCases}
           pageNumbers={this.props.pageNumbers}
-          currentPageNumber={this.props.currentPageNumber}
+          currentPage={this.props.currentPage}
         />
       }
     }

@@ -53,10 +53,10 @@ function mapStateToProps(state, { match }) {
   let { currentPage } = match.params
   if (!currentPage) {
     currentPage = 1
+  } else {
+    currentPage = parseInt(currentPage, 10)
   }
 
-  // const start = ((parseInt(currentPage, 10) - 1) * MAX_CASES_PER_PAGE)
-  // const end = start + MAX_CASES_PER_PAGE
   let closedCaseAddresses = []
   if (closedCaseCount) {
     const totalPages = Math.ceil(closedCaseCount / MAX_CASES_PER_PAGE)
@@ -65,11 +65,8 @@ function mapStateToProps(state, { match }) {
     start = (closedCaseCount - ((parseInt(currentPage, 10) - 1) * MAX_CASES_PER_PAGE))
     end = Math.max((start - MAX_CASES_PER_PAGE), 0)
 
-    // console.log(totalPages, pageNumbers, start, end)
-
     for (let i = (start - 1); i >= end; i--) {
       const closedCaseAddress = cacheCallValue(state, CaseManager, 'closedCaseAtIndex', address, i)
-      // console.log(closedCaseAddress)
 
       if (closedCaseAddress && !isBlank(closedCaseAddress)) {
         closedCaseAddresses.push(closedCaseAddress)
@@ -120,8 +117,8 @@ function* saga({ address, CaseManager, start, end }) {
     }
   }
 
-  yield range((start - 1), end).map(function* (index) {
-    yield cacheCall(CaseManager, 'closedCaseAtIndex', address, index)
+  yield range(start, end).map(function* (index) {
+    yield cacheCall(CaseManager, 'closedCaseAtIndex', address, index - 1)
   })
 }
 
@@ -138,8 +135,8 @@ export const OpenCasesContainer = connect(mapStateToProps)(
       }
 
       redirectToFirstPage = (props) => {
-        if (!props.match.params.caseAddress && !props.match.params.pageNumber) {
-          const firstPageRoute = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { pageNumber: 1 })
+        if (!props.match.params.caseAddress && !props.match.params.currentPage) {
+          const firstPageRoute = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { currentPage: 1 })
           props.history.push(firstPageRoute)
         }
       }
