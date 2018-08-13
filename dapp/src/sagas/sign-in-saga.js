@@ -1,4 +1,4 @@
-import { put, takeEvery } from 'redux-saga/effects'
+import { put, takeEvery, call } from 'redux-saga/effects'
 import { signIn } from '~/services/sign-in'
 import secretKeyInvalid from '~/services/secret-key-invalid'
 import masterPasswordInvalid from '~/services/master-password-invalid'
@@ -21,10 +21,10 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
     }
 
     if (account) { // then the secret key must match the account secret key
-      let newAccount = Account.build({ address, secretKey, masterPassword })
+      let newAccount = yield call([Account, 'build'], { address, secretKey, masterPassword })
       if (account.hashedSecretKey === newAccount.hashedSecretKey) {
         try {
-          account.unlock(masterPassword)
+          yield call([account, 'unlockAsync'], masterPassword)
           yield put({ type: 'SIGN_IN_OK', account, masterPassword, address })
           mixpanel.track("Signin")
         } catch (error) {
@@ -39,7 +39,7 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
 
   } else if (account) { // Check the existing account
     try {
-      account.unlock(masterPassword)
+      yield call([account, 'unlockAsync'], masterPassword)
       yield put({ type: 'SIGN_IN_OK', account, masterPassword, address })
       mixpanel.track("Signin")
     } catch (error) {

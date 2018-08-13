@@ -31,6 +31,7 @@
     "zeppelin-solidity": "^1.4.0"
   },
   "dependencies": {
-    "date-fns": "^2.0.0-alpha.16"
+    "date-fns": "^2.0.0-alpha.16",
+    "lodash.shuffle": "^4.2.0"
   }
 }
