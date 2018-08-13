@@ -1,7 +1,7 @@
-import { deriveKey } from '~/utils/derive-key'
+import { deriveKeyAsync } from '~/utils/derive-key'
 
-export function isAccountMasterPassword(account, masterPassword) {
-  var preimage = deriveKey(masterPassword, account.salt)
-  var hashedMasterPassword = deriveKey(preimage, account.preimageSalt).toString('hex')
+export async function isAccountMasterPassword(account, masterPassword) {
+  var preimage = await deriveKeyAsync(masterPassword, account.salt)
+  var hashedMasterPassword = (await deriveKeyAsync(preimage, account.preimageSalt)).toString('hex')
   return hashedMasterPassword === account.storedMasterPassword
 }

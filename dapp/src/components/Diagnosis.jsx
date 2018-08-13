@@ -17,7 +17,7 @@ import { downloadJson } from '~/utils/storage-util'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { DiagnosisDisplay } from '~/components/DiagnosisDisplay'
 import { DoctorSelect } from '~/components/DoctorSelect'
-import { reencryptCaseKey } from '~/services/reencryptCaseKey'
+import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { mixpanel } from '~/mixpanel'
 import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
@@ -230,7 +230,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
     })
   }
 
-  onSubmitChallenge = (e) => {
+  onSubmitChallenge = async (e) => {
     e.preventDefault()
     this.setState({ doctorAddressError: '' })
     if (!this.state.selectedDoctor) {
@@ -241,7 +241,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
       const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
       const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
       const caseKeySalt = this.props.caseKeySalt.substring(2)
-      const doctorEncryptedCaseKey = reencryptCaseKey({
+      const doctorEncryptedCaseKey = await reencryptCaseKeyAsync({
         account: currentAccount(),
         encryptedCaseKey,
         doctorPublicKey,

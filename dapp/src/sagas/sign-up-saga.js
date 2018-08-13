@@ -17,7 +17,7 @@ export function* signUpSaga({ address, secretKey, masterPassword, overrideAccoun
   }
 
   let account = Account.get(address)
-  let newAccount = Account.build({ address, secretKey, masterPassword })
+  let newAccount = yield call([Account, 'build'], { address, secretKey, masterPassword })
   let differentAccountExists = false
 
   if (account && (account.hashedSecretKey !== newAccount.hashedSecretKey)) {

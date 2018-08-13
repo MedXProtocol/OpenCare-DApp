@@ -22,13 +22,13 @@ export const EmergencyKit = (
       this.setState({ isChecking: true }, this.checkMasterPassword)
     }
 
-    checkMasterPassword = () => {
+    checkMasterPassword = async () => {
       let error
       let masterPasswordOk = false
-
+      let isMasterPassword = await currentAccount().isMasterPassword(this.state.masterPassword)
       if (!this.state.masterPassword)
         error = 'You must enter a master password'
-      else if (currentAccount().isMasterPassword(this.state.masterPassword))
+      else if (isMasterPassword)
         masterPasswordOk = true
       else
         error = 'The master password does not match the account password'
