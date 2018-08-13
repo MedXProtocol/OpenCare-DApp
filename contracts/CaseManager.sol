@@ -35,6 +35,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
     mapping (address => mapping(address => bool)) closedCases;
 
     event NewCase(address indexed caseAddress, uint256 indexed index);
+    event CaseOpened(address indexed doctor, address indexed caseAddress);
+    event CaseClosed(address indexed doctor, address indexed caseAddress);
 
     modifier onlyIsCase(address _case) {
       isCase(_case);
@@ -240,6 +242,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       uint256 nodeIndex = openDoctorCasesList[_doctor].enqueue(caseIndex);
       require(nodeIndex != 0);
       doctorOpenCaseNodeIndices[_doctor][_case] = nodeIndex;
+      emit CaseOpened(_doctor, _case);
     }
 
     function removeOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
@@ -281,6 +284,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       require(closedCases[_doctor][_case] == false);
       doctorClosedCases[_doctor].push(address(_case));
       closedCases[_doctor][_case] = true;
+      emit CaseClosed(_doctor, _case);
     }
 
     /**

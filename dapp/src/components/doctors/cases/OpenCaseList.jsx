@@ -12,8 +12,6 @@ function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
 
-  console.log('OPENCASELIST MSTP')
-
   let openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount', address)
   const openCaseAddresses = []
 
@@ -25,8 +23,6 @@ function mapStateToProps(state) {
     }
     currentNodeId = cacheCallValue(state, CaseManager, 'nextOpenCaseId', address, currentNodeId)
   }
-  console.log('OPENCASELIST MSTP END', openCaseAddresses)
-
 
   return {
     openCaseAddresses

@@ -14,13 +14,14 @@ import {
 import {
   contractKeyByAddress
 } from '../state-finders'
+import {
+  executeWeb3Call
+} from '~/saga-genesis/call-cache/call-cache-sagas'
 
 export function* deregisterKey(key) {
   const callCountRegistry = yield getContext('callCountRegistry')
   const calls = callCountRegistry.deregister(key)
   if (calls.length) {
-    // console.log('in deregisterKey key', key)
-    // console.log(calls)
     yield put({type: 'WEB3_STALE_CALLS', calls})
   }
 }
@@ -46,27 +47,20 @@ export function* invalidateAddress({ address }) {
   yield* contractCalls.map(function* (callState) {
     if (callState.count > 0) {
       const { call } = callState
-      console.log('call', call)
-      yield put({type: 'WEB3_CALL', call })
+      yield executeWeb3Call(call)
     }
   })
 }
 
 export function* invalidateTransaction({ transactionId, call, receipt }) {
-  console.log('call', call)
-  console.log('receipt', receipt)
-
   let contractAddresses = Object.values(receipt.events || {}).reduce((addressSet, event) => {
     return addressSet.add(event.address)
   }, new Set())
 
-  console.log('contractAddresses', contractAddresses)
   contractAddresses.add(call.address)
-  console.log('call.address', call.address)
 
   yield* Array.from(contractAddresses).map(function* (address) {
     const contractKey = yield select(contractKeyByAddress, address)
-    console.log('contractKey', contractKey)
     if (contractKey) {
       yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
     }

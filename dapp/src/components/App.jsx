@@ -70,7 +70,6 @@ function mapDispatchToProps(dispatch) {
 function* saga({ address, CaseManager, DoctorManager }) {
   if (!address || !CaseManager || !DoctorManager) { return }
   const isDoctor = yield cacheCall(DoctorManager, 'isDoctor', address)
-console.log('RUNNING APP JS SAGA')
   if (isDoctor) {
     yield cacheCall(CaseManager, 'doctorCasesCount', address)
     yield cacheCall(CaseManager, 'openCaseCount', address)

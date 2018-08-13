@@ -10,7 +10,8 @@ import {
   cacheCallValue,
   contractByName,
   withSaga,
-  cacheCall
+  cacheCall,
+  callNoCache
 } from '~/saga-genesis'
 import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'
@@ -39,7 +40,6 @@ function mapStateToProps(state, { match }) {
     if (openCaseAddress && !isBlank(openCaseAddress)) {
       openCaseAddresses.push(openCaseAddress)
     }
-    // console.log('currentNodeId (mSTP)', currentNodeId, openCaseAddress)
     currentNodeId = cacheCallValue(state, CaseManager, 'nextOpenCaseId', address, currentNodeId)
   }
 
@@ -92,29 +92,23 @@ function mapStateToProps(state, { match }) {
 
 function* saga({ address, CaseManager, start, end }) {
   if (!address || !CaseManager) { return }
-    console.log('**************RUNNING SAGA**************')
   let openAddresses = []
 
   let openCaseCount = yield cacheCall(CaseManager, 'openCaseCount', address)
   if (openCaseCount) {
     openCaseCount = parseInt(openCaseCount, 10)
   }
-  console.log('openCaseCount', openCaseCount)
   yield cacheCall(CaseManager, 'closedCaseCount', address)
 
-  while (openCaseCount !== openAddresses.length) {
-    openAddresses = []
-    let currentNodeId = yield cacheCall(CaseManager, 'firstOpenCaseId', address)
-    while (currentNodeId && currentNodeId !== '0') {
-      const add = yield cacheCall(CaseManager, 'openCaseAddress', address, currentNodeId)
-      console.log('currentNodeId (saga): ', currentNodeId, add)
-      if (add) {
-        yield openAddresses.push(add)
-      }
-      currentNodeId = yield cacheCall(CaseManager, 'nextOpenCaseId', address, currentNodeId)
-
-      console.log(openCaseCount, openAddresses.length)
+  openAddresses = []
+  let currentNodeId = yield cacheCall(CaseManager, 'firstOpenCaseId', address)
+  while (currentNodeId && currentNodeId !== '0') {
+    const add = yield cacheCall(CaseManager, 'openCaseAddress', address, currentNodeId)
+    if (add) {
+      yield openAddresses.push(add)
     }
+
+    currentNodeId = yield cacheCall(CaseManager, 'nextOpenCaseId', address, currentNodeId)
   }
 
   yield range(start, end).map(function* (index) {
