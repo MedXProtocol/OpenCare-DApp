@@ -69,7 +69,10 @@ export default function (state, { type, transactionId, call, error, receipt, gas
       break
 
     case 'REMOVE_TRANSACTION':
-      delete state[transactionId]
+      const copy = Object.assign({}, state)
+      delete copy[transactionId]
+      state = copy
+
       break
 
     // no default
