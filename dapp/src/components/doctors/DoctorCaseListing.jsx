@@ -14,7 +14,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
     caseRowObject['statusLabel'] = doctorCaseStatusToName(caseRowObject)
     caseRowObject['statusClass'] = doctorCaseStatusToClass(caseRowObject)
 
-    if (caseStaleForOneDay(caseRowObject.createdAt, caseRowObject.status)) {
+    if (caseStaleForOneDay(caseRowObject.updatedAt, caseRowObject.status)) {
       caseRowObject['statusLabel'] = 'Requires Attention'
       caseRowObject['statusClass'] = 'warning'
     }

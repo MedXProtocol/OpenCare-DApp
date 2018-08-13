@@ -43,6 +43,7 @@ contract Case is Ownable, Initializable {
   }
 
   uint public createdAt;
+  uint public updatedAt;
 
   event CaseCreated(address indexed patient);
   event CaseEvaluated(address indexed patient, address indexed doctor);
@@ -114,6 +115,7 @@ contract Case is Ownable, Initializable {
     require(_caseKeySalt.length != 0);
     require(_caseHash.length != 0);
     createdAt = block.timestamp;
+    updatedAt = block.timestamp;
     owner = msg.sender;
     status = CaseStatus.Open;
     encryptedCaseKey = _encryptedCaseKey; // don't need to store this
@@ -131,6 +133,10 @@ contract Case is Ownable, Initializable {
    */
   function () public payable {
     revert();
+  }
+
+  function touchUpdatedAt() internal {
+    updatedAt = block.timestamp;
   }
 
   function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyCaseManager isDoctor(_doctor) {
@@ -152,6 +158,7 @@ contract Case is Ownable, Initializable {
     require(status == CaseStatus.Evaluating);
     status = CaseStatus.Evaluated;
     diagnosisHash = _diagnosisHash;
+    touchUpdatedAt();
     emit CaseEvaluated(patient, diagnosingDoctor);
   }
 
@@ -167,7 +174,7 @@ contract Case is Ownable, Initializable {
    * @dev - The initial doctor accepts the evaluation and tokens are credited to them
    */
   function acceptAsDoctorAfterADay() external onlyDiagnosingDoctor {
-    require((block.timestamp - createdAt) > 86400);
+    require((block.timestamp - updatedAt) > 86400);
 
     accept();
   }
@@ -179,6 +186,7 @@ contract Case is Ownable, Initializable {
     caseManager().addClosedCase(diagnosingDoctor, this);
     medXToken.transfer(diagnosingDoctor, caseFee);
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+    touchUpdatedAt();
     emit CaseClosed(patient, diagnosingDoctor);
   }
 
@@ -187,6 +195,7 @@ contract Case is Ownable, Initializable {
     status = CaseStatus.Challenging;
     setChallengingDoctor(_doctor, _doctorEncryptedKey);
     caseManager().addChallengeDoctor(_doctor);
+    touchUpdatedAt();
     emit CaseChallenged(patient, _doctor);
   }
 
@@ -211,6 +220,7 @@ contract Case is Ownable, Initializable {
     caseManager().removeOpenCase(diagnosingDoctor, this);
     caseManager().addClosedCase(diagnosingDoctor, this);
     challengeHash = _secondaryDiagnosisHash;
+    touchUpdatedAt();
     if (_accept)
         confirmChallengedDiagnosis();
     else
