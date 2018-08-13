@@ -10,8 +10,7 @@ import {
   cacheCallValue,
   contractByName,
   withSaga,
-  cacheCall,
-  callNoCache
+  cacheCall
 } from '~/saga-genesis'
 import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'

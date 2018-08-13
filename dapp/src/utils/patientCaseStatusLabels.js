@@ -6,7 +6,7 @@ export function patientCaseStatusToName(status) {
     3: 'Evaluated, Please Review',
     4: 'Closed',
     5: 'Challenged',
-    6: 'Challenging',
+    6: '2nd Doctor Reviewing',
     7: 'Diagnosis Received',
     8: 'Diagnosis Confirmed'
   }
