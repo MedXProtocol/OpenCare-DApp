@@ -165,6 +165,8 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
         </div>
       )
       challenge = null
+      submitDiagnosis = null
+      submitChallenge = null
     }
 
     return (

@@ -13,8 +13,8 @@ library LinkedList {
     uint256 tail;
 
     mapping (uint256 => uint256) element;
-    mapping (uint256 => uint256) next;
     mapping (uint256 => uint256) prev;
+    mapping (uint256 => uint256) next;
   }
 
   /**
@@ -27,8 +27,8 @@ library LinkedList {
     self.element[id] = _value;
 
     if (self.tail > 0) {
-      self.prev[self.tail] = id;
-      self.next[id] = self.tail;
+      self.next[self.tail] = id;
+      self.prev[id] = self.tail;
     } else {
       self.head = id;
     }
@@ -46,9 +46,9 @@ library LinkedList {
       self.head = 0;
       self.tail = 0;
     } else {
-      uint256 prev = self.prev[self.head];
-      self.next[prev] = 0;
-      self.head = prev;
+      uint256 next = self.next[self.head];
+      self.prev[next] = 0;
+      self.head = next;
     }
 
     self.count = self.count.sub(1);
@@ -57,20 +57,20 @@ library LinkedList {
   }
 
   function remove(UInt256 storage self, uint256 _node) internal returns (uint256) {
-    uint256 next = self.next[_node];
     uint256 prev = self.prev[_node];
+    uint256 next = self.next[_node];
 
     // attach previous
     if (self.tail == _node) {
-      self.tail = next;
-      self.prev[next] = 0;
+      self.tail = prev;
+      self.next[prev] = 0;
     } else {
       self.next[prev] = next;
     }
 
     if (self.head == _node) {
-      self.head = prev;
-      self.next[prev] = 0;
+      self.head = next;
+      self.prev[next] = 0;
     } else {
       self.prev[next] = prev;
     }

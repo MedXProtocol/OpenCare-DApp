@@ -15,8 +15,8 @@ export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' 
           dispatch({ type: 'PREPARE_SAGA', saga, key, props })
         },
 
-        dispatchRunSaga: (props, key) => {
-          dispatch({ type: `RUN_SAGA_${key}`, saga, props, key })
+        dispatchRunSaga: (props, key, displayName) => {
+          dispatch({ type: `RUN_SAGA_${key}`, saga, props, key, displayName })
         },
 
         dispatchEndSaga: (key) => {
@@ -43,21 +43,21 @@ export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' 
       }
 
       componentWillReceiveProps (props) {
-        let propsChanged = false
-        if (typeof propTriggers === 'string') {
-          propsChanged = this.props[propTriggers] !== props[propTriggers]
-        } else if (Array.isArray(propTriggers)) {
-          propsChanged = propTriggers.reduce((changed, prop) => {
-            return changed || this.props[prop] !== props[prop]
-          }, false)
-        }
-        if (propsChanged) {
-          this.props.dispatchRunSaga(props, this.sagaKey)
-        }
+        // let propsChanged = false
+        // if (typeof propTriggers === 'string') {
+        //   propsChanged = this.props[propTriggers] !== props[propTriggers]
+        // } else if (Array.isArray(propTriggers)) {
+        //   propsChanged = propTriggers.reduce((changed, prop) => {
+        //     return changed || this.props[prop] !== props[prop]
+        //   }, false)
+        // }
+        // if (propsChanged) {
+        this.props.dispatchRunSaga(props, this.sagaKey, this.displayName)
+        // }
       }
 
       render () {
-        return <WrappedComponent {...this.props} />
+        return <WrappedComponent {...this.props} sagaKey={this.sagaKey}/>
       }
     })
 

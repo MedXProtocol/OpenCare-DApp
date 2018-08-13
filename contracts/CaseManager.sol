@@ -6,11 +6,13 @@ import "./Registry.sol";
 import "./AccountManager.sol";
 import "./Delegate.sol";
 import "./Initializable.sol";
+import "./LinkedList.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
 contract CaseManager is Ownable, Pausable, Initializable {
     using SafeMath for uint256;
+    using LinkedList for LinkedList.UInt256;
 
     uint256 public caseFee;
 
@@ -23,17 +25,45 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
     mapping (address => address[]) public doctorCases;
 
-    event NewCase(address indexed caseAddress, uint256 indexed index);
+    /**
+      * This mapping stores the list index of an open case for each doctor
+      */
+    mapping (address => mapping (address => uint256)) doctorOpenCaseNodeIndices;
+    mapping (address => LinkedList.UInt256) openDoctorCasesList;
 
-    modifier isCase(address _case) {
-      require(_case != address(0));
-      require(caseIndices[_case] != uint256(0));
+    mapping (address => address[]) public doctorClosedCases;
+    mapping (address => mapping(address => bool)) closedCases;
+
+    event NewCase(address indexed caseAddress, uint256 indexed index);
+    event CaseOpened(address indexed doctor, address indexed caseAddress);
+    event CaseClosed(address indexed doctor, address indexed caseAddress);
+
+    modifier onlyIsCase(address _case) {
+      isCase(_case);
+      _;
+    }
+
+    modifier isDoctorCase(address _doctor, Case _case) {
+      require(_doctor == _case.diagnosingDoctor() || _doctor == _case.challengingDoctor());
+      _;
+    }
+
+    modifier onlyCase(address _case) {
+      if (msg.sender != owner) {
+        isCase(_case);
+        require(msg.sender == _case);
+      }
       _;
     }
 
     modifier onlyThis() {
       require(this == msg.sender);
       _;
+    }
+
+    function isCase(address _case) {
+      require(_case != address(0));
+      require(caseIndices[_case] != uint256(0));
     }
 
     /**
@@ -176,16 +206,16 @@ contract CaseManager is Ownable, Pausable, Initializable {
     ) public onlyThis {
       Case newCase = Case(new Delegate(registry, keccak256("Case")));
       newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
-      newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
       patientCases[_patient].push(address(newCase));
       doctorCases[_doctor].push(newCase);
       medXToken.transferFrom(_patient, newCase, createCaseCost());
+      newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
       emit NewCase(newCase, caseIndex);
     }
 
-    function addChallengeDoctor(address _doctor) external isCase(msg.sender) {
+    function addChallengeDoctor(address _doctor) external onlyIsCase(msg.sender) {
       doctorCases[_doctor].push(msg.sender);
     }
 
@@ -194,11 +224,81 @@ contract CaseManager is Ownable, Pausable, Initializable {
     }
 
     function doctorCaseAtIndex(address _doctor, uint256 _doctorAuthIndex) external view returns (address) {
-      require(_doctorAuthIndex < doctorCases[_doctor].length);
-      return doctorCases[_doctor][_doctorAuthIndex];
+      if (_doctorAuthIndex < doctorCases[_doctor].length) {
+        return doctorCases[_doctor][_doctorAuthIndex];
+      } else {
+        return 0;
+      }
     }
 
     function accountManager() internal view returns (AccountManager) {
       return AccountManager(registry.lookup(keccak256('AccountManager')));
+    }
+
+    function addOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+      require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0);
+      uint256 caseIndex = caseIndices[_case];
+      require(caseIndex != 0);
+      uint256 nodeIndex = openDoctorCasesList[_doctor].enqueue(caseIndex);
+      require(nodeIndex != 0);
+      doctorOpenCaseNodeIndices[_doctor][_case] = nodeIndex;
+      emit CaseOpened(_doctor, _case);
+    }
+
+    function removeOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+      uint256 nodeIndex = doctorOpenCaseNodeIndices[_doctor][address(_case)];
+      require(nodeIndex != 0);
+      doctorOpenCaseNodeIndices[_doctor][_case] = 0;
+      openDoctorCasesList[_doctor].remove(nodeIndex);
+    }
+
+    /**
+      * @return The number of open cases for a doctor
+      */
+    function openCaseCount(address _doctor) public view returns (uint256) {
+      return openDoctorCasesList[_doctor].length();
+    }
+
+    /**
+      * @return The node id of the first open case for a doctor
+      */
+    function firstOpenCaseId(address _doctor) external view returns (uint256) {
+      return openDoctorCasesList[_doctor].peekId();
+    }
+
+    /**
+      * @return The node id of the node that follows the given node
+      */
+    function nextOpenCaseId(address _doctor, uint256 nodeId) external view returns (uint256) {
+      return openDoctorCasesList[_doctor].nextId(nodeId);
+    }
+
+    /**
+      * @return The address of the case for the given node
+      */
+    function openCaseAddress(address _doctor, uint256 nodeId) external view returns (address) {
+      return caseList[openDoctorCasesList[_doctor].value(nodeId)];
+    }
+
+    function addClosedCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+      require(closedCases[_doctor][_case] == false);
+      doctorClosedCases[_doctor].push(address(_case));
+      closedCases[_doctor][_case] = true;
+      emit CaseClosed(_doctor, _case);
+    }
+
+    /**
+      * @return The number of closed cases for a doctor
+      */
+    function closedCaseCount(address _doctor) external view returns (uint256) {
+      return doctorClosedCases[_doctor].length;
+    }
+
+    function closedCaseAtIndex(address _doctor, uint256 _index) external view returns (address) {
+      if (_index < doctorClosedCases[_doctor].length) {
+        return doctorClosedCases[_doctor][_index];
+      } else {
+        return 0;
+      }
     }
 }

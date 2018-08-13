@@ -9,11 +9,15 @@ import accountSagas from './account/account-sagas'
 import { addContract } from './contract/contract-sagas'
 import blockSagas from './block/block-sagas'
 import cacheScopeSagas from './cache-scope/cache-scope-sagas'
-import cacheCallSagas, { cacheCall, web3Call } from './call-cache/call-cache-sagas'
+
+import cacheCallSagas from './call-cache/call-cache-sagas'
+
 import networkSagas from './network/network-sagas'
 import ethBalanceSagas from './ethBalance/ethBalanceSagas'
 import transactionSagas, { web3Send } from './transaction/transaction-sagas'
 import web3Initialize from './web3/web3-sagas'
+
+export * from './call-cache/call-cache-sagas'
 
 function* takeOnceAndRun(pattern, saga) {
   const action = yield take(pattern)
@@ -36,8 +40,6 @@ function* start({ web3 }) {
 }
 
 export {
-  cacheCall,
-  web3Call,
   web3Send,
   addContract,
   takeOnceAndRun

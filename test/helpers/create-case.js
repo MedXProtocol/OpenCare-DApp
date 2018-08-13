@@ -13,7 +13,7 @@ module.exports = async function(env, patientAddress, doctorAddress) {
   )
   let currentCount = await env.caseManager.getPatientCaseListCount(patientAddress)
   currentCount = parseInt(currentCount.toString())
-  await env.medXToken.approveAndCall(env.caseManager.address, 15, hexData, { from: patientAddress })
+  await env.medXToken.approveAndCall(env.caseManager.address, web3.toWei(15, 'ether'), hexData, { from: patientAddress })
   let nextCount = await env.caseManager.getPatientCaseListCount(patientAddress)
   assert.equal(nextCount, currentCount + 1)
   return await env.caseManager.patientCases(patientAddress, currentCount)
