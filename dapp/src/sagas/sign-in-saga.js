@@ -14,7 +14,6 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
   }
 
   if (secretKey) { //Then we are signing into an existing account
-    console.log('Login with custom secret key')
     var secretKeyError = secretKeyInvalid(secretKey)
     if (secretKeyError) {
       yield put({ type: 'SIGN_IN_ERROR', secretKeyError })
@@ -22,7 +21,6 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
     }
 
     if (account) { // then the secret key must match the account secret key
-      console.log('Using custom secret key for an existing account')
       let newAccount = yield call([Account, 'build'], { address, secretKey, masterPassword })
       if (account.hashedSecretKey === newAccount.hashedSecretKey) {
         try {
@@ -39,10 +37,8 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
     }
 
   } else if (account) { // Check the existing account
-    console.log('no secret key passed, checking account')
     try {
       yield call([account, 'unlockAsync'], masterPassword)
-      console.log('account unlocked')
       yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
     } catch (error) {
       yield put({type: 'SIGN_IN_ERROR', masterPasswordError: error.message })
