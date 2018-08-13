@@ -182,18 +182,12 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   onAccountChangeSignOut (nextProps) {
     if (this.props.address && this.props.address !== nextProps.address) {
       this.signOut()
-      if (window) {
-        window.location.reload(true)
-      }
     }
   }
 
   unload = () => {
     if (process.env.NODE_ENV !== 'development') {
       this.signOut()
-      if (window) {
-        window.location.reload(true)
-      }
     }
   }
 
