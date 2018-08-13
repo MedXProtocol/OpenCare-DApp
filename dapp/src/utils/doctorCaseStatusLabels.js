@@ -2,11 +2,11 @@ const statusNames = {
   0: 'None',
   1: 'Open',
   2: 'Evaluating',
-  3: 'Evaluated',
+  3: 'Awaiting Patient',
   4: 'Closed',
-  5: 'Evaluated',
+  5: 'Awaiting Patient',
   6: 'Evaluating',
-  7: 'Diagnosis Sent',
+  7: 'Awaiting Patient',
   8: 'Diagnosis Confirmed'
 }
 
