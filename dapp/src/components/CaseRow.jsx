@@ -119,12 +119,12 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
 
     const timestamp = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
 
-    const style = { zIndex: 998 - objIndex }
+    const style = { zIndex: 998 - parseInt(objIndex, 10) }
     const pendingTransaction = (
       !defined(caseRowObject.status)
       || caseRowObject.status === PENDING_TX_STATUS
     )
-    const number = pendingTransaction ? '...' : (objIndex + 1)
+    const number = pendingTransaction ? '...' : objIndex
     const path = caseAddress ? formatRoute(route, { caseAddress }) : routes.PATIENTS_CASES
     const ethAddress = caseAddress ? <EthAddress address={caseAddress} /> : null
 

@@ -156,7 +156,7 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
     const details = this.state.details || {}
     let jsx
 
-    if (caseIsOpenForDoctor) {
+    if (caseIsOpenForDoctor && !this.state.loading) {
       var submitDiagnosisLink = (
         <span>
           <br />

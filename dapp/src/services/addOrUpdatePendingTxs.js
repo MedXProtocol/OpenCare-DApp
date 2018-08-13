@@ -49,7 +49,7 @@ export const addOrUpdatePendingTxs = function(transactions, cases, caseCount) {
     if (!confirmed || defined(error)) {
       // Add new case
       if (isNewPatientCase) {
-        const objIndex = parseInt(caseCount, 10) + index
+        const objIndex = parseInt(caseCount, 10) + index + 1
         cases = addNewCase(cases, transaction, transactionId, objIndex)
         index++
       }
