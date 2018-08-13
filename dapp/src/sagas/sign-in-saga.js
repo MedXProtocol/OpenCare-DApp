@@ -25,33 +25,36 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
       if (account.hashedSecretKey === newAccount.hashedSecretKey) {
         try {
           yield call([account, 'unlockAsync'], masterPassword)
-          yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
+          yield put({ type: 'SIGN_IN_OK', account, masterPassword, address })
+          mixpanel.track("Signin")
         } catch (error) {
-          yield put({type: 'SIGN_IN_ERROR', masterPasswordError: error.message })
+          yield put({ type: 'SIGN_IN_ERROR', masterPasswordError: error.message })
         }
       } else {
-        yield put({type: 'SIGN_IN_ERROR', secretKeyError: 'An account already exists for your address' })
+        yield put({ type: 'SIGN_IN_ERROR', secretKeyError: 'An account already exists for your address' })
       }
     } else {
-      yield put({type: 'SIGN_UP', address, secretKey, masterPassword, overrideAccount})
+      yield put({ type: 'SIGN_UP', address, secretKey, masterPassword, overrideAccount })
     }
 
   } else if (account) { // Check the existing account
     try {
       yield call([account, 'unlockAsync'], masterPassword)
-      yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
+      yield put({ type: 'SIGN_IN_OK', account, masterPassword, address })
+      mixpanel.track("Signin")
     } catch (error) {
-      yield put({type: 'SIGN_IN_ERROR', masterPasswordError: error.message })
+      yield put({ type: 'SIGN_IN_ERROR', masterPasswordError: error.message })
     }
   } else { // error! no existing account
-    yield put({type: 'SIGN_IN_ERROR', secretKeyError: 'You must enter a secret key'})
+    yield put({ type: 'SIGN_IN_ERROR', secretKeyError: 'You must enter a secret key' })
   }
 }
 
 export function* signInOkSaga({ account, masterPassword, address }) {
   signIn(account)
   mixpanel.identify(account.address())
-  yield put({type: 'SIGNED_IN'})
+  yield put({ type: 'SIGNED_IN' })
+  yield put({ type: 'EXCLUDED_DOCTORS', addresses: [] })
 }
 
 export default function* rootSaga() {

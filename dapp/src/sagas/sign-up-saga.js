@@ -30,10 +30,10 @@ export function* signUpSaga({ address, secretKey, masterPassword, overrideAccoun
   }
 
   if (differentAccountExists && !overrideAccount) {
-    yield put({type: 'SIGN_IN_ERROR', overrideError: true })
+    yield put({ type: 'SIGN_IN_ERROR', overrideError: true })
   } else {
     const account = yield call(Account.create, { address, secretKey, masterPassword })
-    yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
+    yield put({ type: 'SIGN_IN_OK', account, masterPassword, address })
     mixpanel.track("Signup")
   }
 }
