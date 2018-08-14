@@ -28,7 +28,7 @@ i18next
             addDoctor: 'Upgrading to Doctor'
           },
           transactionErrors: {
-            userRevert: 'You rejected the transaction, please submit a valid transaction to proceed',
+            userRevert: 'You rejected the transaction',
             outOfGas: 'The transaction ran out of gas',
             evmRevert: 'There was an error in the contract',
             incorrectNonce: 'The nonce was incorrect (reset the account in MetaMask)',

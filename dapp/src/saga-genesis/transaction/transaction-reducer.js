@@ -8,6 +8,7 @@ export default function (state, { type, transactionId, call, error, receipt, gas
       state = {
         ...state,
         [transactionId]: {
+          transactionId,
           call,
           address,
           inFlight: true
