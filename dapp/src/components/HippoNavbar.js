@@ -168,6 +168,7 @@ export const HippoNavbar = withContractRegistry(
         var openCasesItem =
           <LinkContainer to={routes.DOCTORS_CASES_OPEN}>
             <NavItem href={routes.DOCTORS_CASES_OPEN}>
+              Diagnose Cases
               <span className={classnames(
                 'nav--open-cases__circle',
                 {
@@ -176,7 +177,7 @@ export const HippoNavbar = withContractRegistry(
                 }
               )}> &nbsp;
                 {openCasesLength} &nbsp;
-              </span> Diagnose Cases
+              </span>
             </NavItem>
           </LinkContainer>
       }
