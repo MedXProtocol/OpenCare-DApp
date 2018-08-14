@@ -1,8 +1,8 @@
 var deployAndRegister = require('./support/deploy-and-register')
 
-let AccountManager = artifacts.require("./AccountManager.sol");
+let CaseManager = artifacts.require("./CaseManager.sol");
 let Registry = artifacts.require('./Registry.sol');
 
 module.exports = function(deployer) {
-  deployAndRegister(deployer, AccountManager, Registry, 'AccountManagerTarget')
+  return deployAndRegister(deployer, CaseManager, Registry, 'CaseManagerTarget')
 };

@@ -155,6 +155,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     this.setRegionRef = element => { this.regionInput = element }
   }
 
+  componentDidMount () {
+    this.props.dispatchExcludedDoctors([this.props.account])
+  }
+
   componentWillReceiveProps (props) {
     if (this.state.createCaseEvents) {
       this.state.createCaseEvents.handle(props.transactions[this.state.transactionId])

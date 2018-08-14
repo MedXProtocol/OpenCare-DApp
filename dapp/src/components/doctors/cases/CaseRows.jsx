@@ -16,11 +16,20 @@ function mapStateToProps(state, { caseAddresses }) {
 
   const cases = caseAddresses.map((caseAddress) => {
     const status = cacheCallValue(state, caseAddress, 'status')
-    const createdAt = cacheCallValue(state, caseAddress, 'createdAt')
+    let createdAt = cacheCallValue(state, caseAddress, 'createdAt')
+    if (createdAt) {
+      createdAt = parseInt(createdAt, 10)
+    }
+    let updatedAt = cacheCallValue(state, caseAddress, 'updatedAt')
+    if (updatedAt) {
+      updatedAt = parseInt(updatedAt, 10)
+    }
+
     return {
       caseAddress,
       status,
       createdAt,
+      updatedAt,
       objIndex
     }
   })
