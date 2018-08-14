@@ -1,12 +1,13 @@
 pragma solidity ^0.4.23;
 
-import "./Case.sol";
-import "./MedXToken.sol";
-import "./Registry.sol";
-import "./AccountManager.sol";
+import "./ICase.sol";
+import "./IMedXToken.sol";
+import "./IRegistry.sol";
+import "./IAccountManager.sol";
 import "./Delegate.sol";
 import "./Initializable.sol";
 import "./LinkedList.sol";
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
@@ -20,16 +21,16 @@ contract CaseManager is Ownable, Pausable, Initializable {
     mapping (address => uint256) public caseIndices;
     mapping (address => address[]) public patientCases;
 
-    MedXToken public medXToken;
-    Registry public registry;
+    IMedXToken public medXToken;
+    IRegistry public registry;
 
     mapping (address => address[]) public doctorCases;
 
     /**
       * This mapping stores the list index of an open case for each doctor
       */
-    mapping (address => mapping (address => uint256)) doctorOpenCaseNodeIndices;
-    mapping (address => LinkedList.UInt256) openDoctorCasesList;
+    mapping (address => mapping (address => uint256)) public doctorOpenCaseNodeIndices;
+    mapping (address => LinkedList.UInt256) public openDoctorCasesList;
 
     mapping (address => address[]) public doctorClosedCases;
     mapping (address => mapping(address => bool)) closedCases;
@@ -43,8 +44,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
       _;
     }
 
-    modifier isDoctorCase(address _doctor, Case _case) {
-      require(_doctor == _case.diagnosingDoctor() || _doctor == _case.challengingDoctor());
+    modifier isDoctorCase(address _doctor, ICase _case) {
+      require(_doctor == _case.getDiagnosingDoctor() || _doctor == _case.getChallengingDoctor());
       _;
     }
 
@@ -71,16 +72,16 @@ contract CaseManager is Ownable, Pausable, Initializable {
      * @param _baseCaseFee - initial case fee
      * @param _medXToken - the MedX token
      */
-    function initialize(uint256 _baseCaseFee, MedXToken _medXToken, Registry _registry) external notInitialized {
+    function initialize(uint256 _baseCaseFee, address _medXToken, address _registry) external notInitialized {
         require(_baseCaseFee > 0);
-        require(address(_medXToken) != 0x0);
-        require(address(_registry) != 0x0);
+        require(_medXToken != 0x0);
+        require(_registry != 0x0);
         setInitialized();
 
         owner = msg.sender;
         caseFee = _baseCaseFee;
-        medXToken = _medXToken;
-        registry = _registry;
+        medXToken = IMedXToken(_medXToken);
+        registry = IRegistry(_registry);
         caseList.push(address(0));
     }
 
@@ -184,7 +185,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       bytes _doctorEncryptedKey,
       bytes _patientPublicKey
     ) public onlyThis {
-      AccountManager am = accountManager();
+      IAccountManager am = accountManager();
       require(am.publicKeys(_patient).length == 0);
       am.setPublicKey(_patient, _patientPublicKey);
       createAndAssignCase(
@@ -204,7 +205,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       address _doctor,
       bytes _doctorEncryptedKey
     ) public onlyThis {
-      Case newCase = Case(new Delegate(registry, keccak256("Case")));
+      ICase newCase = ICase(new Delegate(registry, keccak256("Case")));
       newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
@@ -231,11 +232,11 @@ contract CaseManager is Ownable, Pausable, Initializable {
       }
     }
 
-    function accountManager() internal view returns (AccountManager) {
-      return AccountManager(registry.lookup(keccak256('AccountManager')));
+    function accountManager() internal view returns (IAccountManager) {
+      return IAccountManager(registry.lookup(keccak256('AccountManager')));
     }
 
-    function addOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+    function addOpenCase(address _doctor, ICase _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
       require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0);
       uint256 caseIndex = caseIndices[_case];
       require(caseIndex != 0);
@@ -245,7 +246,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       emit CaseOpened(_doctor, _case);
     }
 
-    function removeOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+    function removeOpenCase(address _doctor, ICase _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
       uint256 nodeIndex = doctorOpenCaseNodeIndices[_doctor][address(_case)];
       require(nodeIndex != 0);
       doctorOpenCaseNodeIndices[_doctor][_case] = 0;
@@ -280,7 +281,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       return caseList[openDoctorCasesList[_doctor].value(nodeId)];
     }
 
-    function addClosedCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+    function addClosedCase(address _doctor, ICase _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
       require(closedCases[_doctor][_case] == false);
       doctorClosedCases[_doctor].push(address(_case));
       closedCases[_doctor][_case] = true;

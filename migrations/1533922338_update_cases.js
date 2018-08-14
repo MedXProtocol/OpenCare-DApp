@@ -27,13 +27,12 @@ module.exports = function(deployer) {
     const CaseManagerAddress = await registryInstance.lookup(web3.sha3('CaseManager'))
     const cm = await CaseManager.at(CaseManagerAddress)
     const caseCount = await cm.getAllCaseListCount()
-
     for (var i = 1; i <= caseCount; i++) {
       try {
         await migrateCase(cm, i)
         console.log('Migrated case ', i)
       } catch (error) {
-        console.warn('Case already migrated: ', i)
+        console.warn('Case already migrated: ', i, error)
       }
     }
   })

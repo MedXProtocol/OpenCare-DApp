@@ -4,5 +4,7 @@ let Case = artifacts.require("./Case.sol");
 let Registry = artifacts.require('./Registry.sol');
 
 module.exports = function(deployer) {
-  deployAndRegister(deployer, Case, Registry, 'Case')
+  deployer.then(async () => {
+    return deployAndRegister(deployer, Case, Registry, 'Case')
+  })
 };
