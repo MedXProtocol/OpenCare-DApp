@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
 import { DiagnoseCaseContainer } from '~/components/doctors/diagnose'
-import { DoctorCaseListingContainer } from '~/components/doctors/cases/DoctorCaseListingContainer'
+import { DoctorCaseListing } from './DoctorCaseListing'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { formatRoute } from 'react-router-named-routes'
@@ -27,11 +27,6 @@ function mapStateToProps(state, { match }) {
 
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-
-  let openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount', address)
-  if (openCaseCount) {
-    openCaseCount = parseInt(openCaseCount, 10)
-  }
   const openCaseAddresses = []
 
   let currentNodeId = cacheCallValue(state, CaseManager, 'firstOpenCaseId', address)
@@ -79,26 +74,18 @@ function mapStateToProps(state, { match }) {
   return {
     address,
     CaseManager,
-    closedCaseCount,
-    openCaseCount,
     openCaseAddresses,
     closedCaseAddresses,
     pageNumbers,
     currentPage,
     start,
-    end,
+    end
   }
 }
 
 function* saga({ address, CaseManager, start, end }) {
   if (!address || !CaseManager) { return }
   let openAddresses = []
-
-  let openCaseCount = yield cacheCall(CaseManager, 'openCaseCount', address)
-  if (openCaseCount) {
-    openCaseCount = parseInt(openCaseCount, 10)
-  }
-  yield cacheCall(CaseManager, 'closedCaseCount', address)
 
   openAddresses = []
   let currentNodeId = yield cacheCall(CaseManager, 'firstOpenCaseId', address)
@@ -117,7 +104,7 @@ function* saga({ address, CaseManager, start, end }) {
 }
 
 export const OpenCasesContainer = connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['address', 'openCaseCount', 'closedCaseCount', 'CaseManager', 'currentPage', 'start', 'end'] })(
+  withSaga(saga, { propTriggers: ['address', 'CaseManager', 'currentPage', 'start', 'end'] })(
     class _OpenCasesContainer extends Component {
 
       componentDidMount() {
@@ -139,9 +126,7 @@ export const OpenCasesContainer = connect(mapStateToProps)(
         let doctorCaseListing, diagnoseCase, doScrollToTop
         const {
           closedCaseAddresses,
-          openCaseCount,
           openCaseAddresses,
-          closedCaseCount,
           match,
           currentPage,
           pageNumbers
@@ -150,15 +135,15 @@ export const OpenCasesContainer = connect(mapStateToProps)(
         if (match.params.caseAddress) {
           diagnoseCase = <DiagnoseCaseContainer key="diagnoseCaseContainerKey" match={match} />
         } else {
-          doctorCaseListing = <DoctorCaseListingContainer
-            key="doctorCaseListing"
-            openCaseAddresses={openCaseAddresses}
-            closedCaseAddresses={closedCaseAddresses}
-            openCaseCount={openCaseCount}
-            closedCaseCount={closedCaseCount}
-            pageNumbers={pageNumbers}
-            currentPage={currentPage}
-          />
+          doctorCaseListing = (
+            <DoctorCaseListing
+              key="doctor-case-listing"
+              openCaseAddresses={openCaseAddresses}
+              closedCaseAddresses={closedCaseAddresses}
+              pageNumbers={pageNumbers}
+              currentPage={currentPage}
+            />
+          )
         }
 
         const diagnosisJustSubmitted = (
