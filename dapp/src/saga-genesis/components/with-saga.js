@@ -43,17 +43,7 @@ export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' 
       }
 
       componentWillReceiveProps (props) {
-        // let propsChanged = false
-        // if (typeof propTriggers === 'string') {
-        //   propsChanged = this.props[propTriggers] !== props[propTriggers]
-        // } else if (Array.isArray(propTriggers)) {
-        //   propsChanged = propTriggers.reduce((changed, prop) => {
-        //     return changed || this.props[prop] !== props[prop]
-        //   }, false)
-        // }
-        // if (propsChanged) {
         this.props.dispatchRunSaga(props, this.sagaKey, this.displayName)
-        // }
       }
 
       render () {

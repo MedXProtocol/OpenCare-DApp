@@ -39,9 +39,10 @@ import get from 'lodash.get'
 
 function mapStateToProps (state) {
   const CaseManager = contractByName(state, 'CaseManager')
+  const CaseStatusManager = contractByName(state, 'CaseStatusManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const doctorCasesCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
-  const openCaseCount = cacheCallValue(state, CaseManager, 'openCaseCount', address)
+  const openCaseCount = cacheCallValue(state, CaseStatusManager, 'openCaseCount', address)
   const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
@@ -55,6 +56,7 @@ function mapStateToProps (state) {
     doctorCasesCount,
     openCaseCount,
     CaseManager,
+    CaseStatusManager,
     isOwner
   }
 }
@@ -67,12 +69,12 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ address, CaseManager, DoctorManager }) {
-  if (!address || !CaseManager || !DoctorManager) { return }
+function* saga({ address, CaseManager, CaseStatusManager, DoctorManager }) {
+  if (!address || !CaseManager || !DoctorManager || !CaseStatusManager) { return }
   const isDoctor = yield cacheCall(DoctorManager, 'isDoctor', address)
   if (isDoctor) {
     yield cacheCall(CaseManager, 'doctorCasesCount', address)
-    yield cacheCall(CaseManager, 'openCaseCount', address)
+    yield cacheCall(CaseStatusManager, 'openCaseCount', address)
   }
 }
 

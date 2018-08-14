@@ -6,6 +6,7 @@ import "./IDoctorManager.sol";
 import "./IRegistry.sol";
 import "./Initializable.sol";
 import "./ICaseManager.sol";
+import "./CaseStatusManager.sol";
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -142,7 +143,7 @@ contract Case is Ownable, Initializable, ICase {
     require(_doctor != patient);
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
-    /* caseManager().addOpenCase(_doctor, this); */
+    caseStatusManager().addOpenCase(_doctor, this);
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit SetDiagnosingDoctor(patient, msg.sender, _doctorEncryptedKey);
   }
@@ -178,8 +179,8 @@ contract Case is Ownable, Initializable, ICase {
   function accept() internal {
     require(status == CaseStatus.Evaluated);
     status = CaseStatus.Closed;
-    caseManager().removeOpenCase(diagnosingDoctor, this);
-    caseManager().addClosedCase(diagnosingDoctor, this);
+    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
+    caseStatusManager().addClosedCase(diagnosingDoctor, this);
     medXToken.transfer(diagnosingDoctor, caseFee);
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
     emit CaseClosed(patient, diagnosingDoctor);
@@ -197,7 +198,7 @@ contract Case is Ownable, Initializable, ICase {
     require(_doctor != patient);
     require(_doctor != diagnosingDoctor);
     challengingDoctor = _doctor;
-    caseManager().addOpenCase(challengingDoctor, this);
+    caseStatusManager().addOpenCase(challengingDoctor, this);
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit SetChallengingDoctor(patient, msg.sender, _doctorEncryptedKey);
   }
@@ -209,10 +210,10 @@ contract Case is Ownable, Initializable, ICase {
    */
   function diagnoseChallengedCase(bytes _secondaryDiagnosisHash, bool _accept) external onlyChallengeDoctor {
     require(status == CaseStatus.Challenging);
-    caseManager().removeOpenCase(challengingDoctor, this);
-    caseManager().addClosedCase(challengingDoctor, this);
-    caseManager().removeOpenCase(diagnosingDoctor, this);
-    caseManager().addClosedCase(diagnosingDoctor, this);
+    caseStatusManager().removeOpenCase(challengingDoctor, this);
+    caseStatusManager().addClosedCase(challengingDoctor, this);
+    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
+    caseStatusManager().addClosedCase(diagnosingDoctor, this);
     challengeHash = _secondaryDiagnosisHash;
     if (_accept)
         confirmChallengedDiagnosis();
@@ -251,6 +252,10 @@ contract Case is Ownable, Initializable, ICase {
 
   function caseManager() internal view returns (ICaseManager) {
     return ICaseManager(registry.lookup(keccak256("CaseManager")));
+  }
+
+  function caseStatusManager() internal view returns (CaseStatusManager) {
+    return CaseStatusManager(registry.lookup(keccak256("CaseStatusManager")));
   }
 
   function getDiagnosingDoctor() public view returns (address) {
