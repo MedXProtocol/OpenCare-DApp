@@ -12,6 +12,7 @@ import {
   withSaga,
   contractByName
 } from '~/saga-genesis'
+import sortBy from 'lodash.sortby'
 
 function mapStateToProps(state, { openCaseAddresses, closedCaseAddresses, closedCaseCount }) {
   const CaseManager = contractByName(state, 'CaseManager')
@@ -19,6 +20,7 @@ function mapStateToProps(state, { openCaseAddresses, closedCaseAddresses, closed
 
   let openCases = populateCases(state, openCaseAddresses)
   openCases = addOrUpdatePendingTxs(transactions, openCases)
+  openCases = sortBy(openCases, ['status'])
 
   const closedCases = populateCases(state, closedCaseAddresses, closedCaseCount)
 
