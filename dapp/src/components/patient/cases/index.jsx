@@ -12,16 +12,14 @@ import { ScrollToTop } from '~/components/ScrollToTop'
 import { addPendingTx } from '~/services/pendingTxs'
 import { defined } from '~/utils/defined'
 import range from 'lodash.range'
-
 import get from 'lodash.get'
-import forOwn from 'lodash.forown'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
   let caseAddresses = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-  const transactions = state.sagaGenesis.transactions
+  const transactions = Object.values(state.sagaGenesis.transactions)
   let caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   if (caseCount) {
     caseCount = parseInt(caseCount, 10)
@@ -69,10 +67,10 @@ function renderCaseRows(caseAddresses, transactions, caseCount) {
 
 
   let objIndex = caseCount + 1
-  forOwn(transactions, function(transaction, transactionId) {
+  transactions.forEach(transaction => {
     if (!defined(transaction.call)) { return } // continue
 
-    const caseRowObject = addPendingTx(transaction, transactionId, objIndex)
+    const caseRowObject = addPendingTx(transaction, objIndex)
 
     if (caseRowObject) {
       caseRows.push(

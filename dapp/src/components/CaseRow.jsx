@@ -20,7 +20,6 @@ import { patientCaseStatusToName, patientCaseStatusToClass } from '~/utils/patie
 import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctorCaseStatusLabels'
 import { defined } from '~/utils/defined'
 import get from 'lodash.get'
-import forOwn from 'lodash.forown'
 import * as routes from '~/config/routes'
 
 const PENDING_TX_STATUS = -1
@@ -85,14 +84,17 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   }
 
   // If this caseRowObject has an ongoing blockchain transaction this will update
-  const pendingOrErrorTransactions = transactions.filter(transaction => {
-    const { call, confirmed, error } = transaction
-    return (call && (!confirmed || defined(error)))
+  const caseRowTransactions = transactions.filter(transaction => {
+    const { call, confirmed, error, address } = transaction
+    return (
+      call && (!confirmed || defined(error))
+        && (caseRowObject.caseAddress === address)
+    )
   })
 
-  forOwn(pendingOrErrorTransactions, function(transaction, transactionId) {
+  caseRowTransactions.forEach(transaction => {
     if (caseRowObject.caseAddress === transaction.address) {
-      caseRowObject = updatePendingTx(caseRowObject, transaction, transactionId)
+      caseRowObject = updatePendingTx(caseRowObject, transaction)
     }
   })
 
@@ -247,7 +249,7 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
     if (error) {
       remove = (
         <button
-          className="btn-link text-gray"
+          className="btn-link text-gray btn__remove-transaction"
           onClick={(e) => {
             e.preventDefault()
             this.props.dispatchRemove(transactionId)

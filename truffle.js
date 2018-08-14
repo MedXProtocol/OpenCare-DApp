@@ -8,19 +8,28 @@ module.exports = {
     development: {
       host: "127.0.0.1",
       port: 8545,
-      network_id: 1234
+      network_id: 1234,
+      gas: 4712394,
+      gasPrice: 60 * 1000000000
     },
     ropsten: {
       provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.ROPSTEN_PROVIDER_URL),
       network_id: 3,
-      gas: 4683623,
+      gas: 4712394,
       gasPrice: 60 * 1000000000
     },
     rinkeby: {
       provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.RINKEBY_PROVIDER_URL),
       network_id: 4,
-      gas: 4683623,
-      gasPrice: 20 * 1000000000
+      gas: 4712394,
+      gasPrice: 10 * 1000000000
+    }
+  },
+  mocha: {
+    reporter: 'eth-gas-reporter',
+    reporterOptions : {
+      currency: 'CAD',
+      gasPrice: 21
     }
   }
 }

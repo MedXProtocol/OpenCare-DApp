@@ -4,7 +4,7 @@ const PENDING_TX_STATUS = -1
 
 // Adds cases not yet committed to the blockchain to the cases array set in the mapStateToProps
 // Contains info about pending tx's
-export const addPendingTx = function(transaction, transactionId, objIndex) {
+export const addPendingTx = function(transaction, objIndex) {
   let caseRowObject
   const { confirmed, error, call } = transaction
   const isNewPatientCase = (call.method === 'approveAndCall')
@@ -14,7 +14,6 @@ export const addPendingTx = function(transaction, transactionId, objIndex) {
   if (isNewPatientCase && (!confirmed || defined(error))) {
     caseRowObject = {
       ...transaction,
-      transactionId,
       objIndex
     }
   }
@@ -23,7 +22,7 @@ export const addPendingTx = function(transaction, transactionId, objIndex) {
 
 // Updates the cases array set in the mapStateToProps with any information about pending
 // tx's for this Case
-export const updatePendingTx = function(caseRowObject, transaction, transactionId) {
+export const updatePendingTx = function(caseRowObject, transaction) {
   const method = transaction.call.method
   const isAccepting = (method === 'acceptDiagnosis' || method === 'acceptAsDoctorAfterADay')
   const isSecondOpinion = (method === 'challengeWithDoctor')
@@ -34,7 +33,6 @@ export const updatePendingTx = function(caseRowObject, transaction, transactionI
     return {
       ...caseRowObject,
       ...transaction,
-      transactionId,
       status: PENDING_TX_STATUS // 'pending' tx state, before it's confirmed on the blockchain
     }
   } else {

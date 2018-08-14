@@ -9,7 +9,7 @@ const generateBytes = require('./helpers/generate-bytes')
 const createEnvironment = require('./helpers/create-environment')
 const createCase = require('./helpers/create-case')
 const caseStatus = require('./helpers/case-status')
-const resetCaseManager = require('./helpers/reset-case-factory')
+const resetCaseManager = require('./helpers/reset-case-manager')
 
 contract('CaseManager', function (accounts) {
   let patient = accounts[0]
@@ -34,7 +34,13 @@ contract('CaseManager', function (accounts) {
   })
 
   beforeEach(async () => {
-    env.caseManager = await resetCaseManager(artifacts, env)
+    await resetCaseManager(artifacts, env)
+  })
+
+  describe('CaseManager', () => {
+    it("should work", async () => {
+      const caseManager = await CaseManager.new()
+    })
   })
 
   describe('initialize()', () => {
