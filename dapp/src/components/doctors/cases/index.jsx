@@ -10,8 +10,7 @@ import {
   cacheCallValue,
   contractByName,
   withSaga,
-  cacheCall,
-  callNoCache
+  cacheCall
 } from '~/saga-genesis'
 import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'
@@ -97,6 +96,8 @@ function* saga({ address, CaseManager, start, end }) {
 
     currentNodeId = yield cacheCall(CaseManager, 'nextOpenCaseId', address, currentNodeId)
   }
+
+  yield cacheCall(CaseManager, 'closedCaseCount', address)
 
   yield range(start, end).map(function* (index) {
     yield cacheCall(CaseManager, 'closedCaseAtIndex', address, index - 1)

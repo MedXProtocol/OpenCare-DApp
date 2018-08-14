@@ -9,9 +9,11 @@ import { contractByName } from '~/saga-genesis/state-finders'
 import { CaseRow } from '~/components/CaseRow'
 import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { addPendingTxs } from '~/services/pendingTxs'
+import { addPendingTx } from '~/services/pendingTxs'
+import { defined } from '~/utils/defined'
 import rangeRight from 'lodash.rangeright'
 import get from 'lodash.get'
+import forOwn from 'lodash.forown'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
@@ -63,7 +65,26 @@ function renderCaseRows(caseAddresses, transactions, caseCount) {
     )
   })
 
-  caseRows = addPendingTxs(caseRows, transactions, caseCount)
+
+  let objIndex = caseCount + 1
+  forOwn(transactions, function(transaction, transactionId) {
+    if (!defined(transaction.call)) { return } // continue
+
+    const caseRowObject = addPendingTx(transaction, transactionId, objIndex)
+
+    if (caseRowObject) {
+      caseRows.splice(0, 0, (
+        <CaseRow
+          caseRowObject={caseRowObject}
+          objIndex={objIndex}
+          key={`new-case-row-${objIndex}`}
+          context='patient'
+        />
+      ))
+
+      objIndex++
+    }
+  })
 
   return caseRows
 }

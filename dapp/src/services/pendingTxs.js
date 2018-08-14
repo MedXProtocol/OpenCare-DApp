@@ -1,45 +1,24 @@
-import React from 'react'
-import { CaseRow } from '~/components/CaseRow'
 import { defined } from '~/utils/defined'
-import forOwn from 'lodash.forown'
 
 const PENDING_TX_STATUS = -1
 
 // Adds cases not yet committed to the blockchain to the cases array set in the mapStateToProps
 // Contains info about pending tx's
-export const addPendingTxs = function(caseRows, transactions, caseCount) {
-  let objIndex = caseCount + 1
+export const addPendingTx = function(transaction, transactionId, objIndex) {
+  let caseRowObject
+  const { confirmed, error, call } = transaction
+  const isNewPatientCase = (call.method === 'approveAndCall')
 
-  forOwn(transactions, function(transaction, transactionId) {
-    if (!defined(transaction.call)) { return } // continue
-
-    const { confirmed, error, call } = transaction
-    const method = call.method
-
-    const isNewPatientCase = (method === 'approveAndCall')
-
-    // A tx we care about
-    if (isNewPatientCase && (defined(error))) {
-    // if (isNewPatientCase && (!confirmed || defined(error))) {
-      const caseRowObject = {
-        ...transaction,
-        transactionId,
-        objIndex
-      }
-      caseRows.splice(0, 0, (
-        <CaseRow
-          caseRowObject={caseRowObject}
-          objIndex={objIndex}
-          key={`new-case-row-${objIndex}`}
-          context='patient'
-        />
-      ))
-
-      objIndex++
+  // TODO: Find a way to only fade this out after a few seconds
+  // A tx we care about
+  if (isNewPatientCase && (!confirmed || defined(error))) {
+    caseRowObject = {
+      ...transaction,
+      transactionId,
+      objIndex
     }
-  })
-
-  return caseRows
+  }
+  return caseRowObject
 }
 
 // Updates the cases array set in the mapStateToProps with any information about pending
