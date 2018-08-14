@@ -135,7 +135,7 @@ export const CaseRow = connect(null, mapDispatchToProps)(class _CaseRow extends 
     if (error) {
       remove = (
         <button
-          className="btn-link text-gray"
+          className="btn-link text-gray btn__remove-transaction"
           onClick={(e) => {
             e.preventDefault()
             this.props.dispatchRemove(transactionId)
