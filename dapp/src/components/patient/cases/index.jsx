@@ -11,7 +11,8 @@ import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { addPendingTx } from '~/services/pendingTxs'
 import { defined } from '~/utils/defined'
-import rangeRight from 'lodash.rangeright'
+import range from 'lodash.range'
+
 import get from 'lodash.get'
 import forOwn from 'lodash.forown'
 import * as routes from '~/config/routes'
@@ -26,8 +27,8 @@ function mapStateToProps(state) {
     caseCount = parseInt(caseCount, 10)
   }
 
-  caseAddresses = rangeRight(caseCount).reduce((accumulator, index) => {
-    const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, index - 1)
+  caseAddresses = range(caseCount).reduce((accumulator, index) => {
+    const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, index)
     if (caseAddress) {
       accumulator.push(caseAddress)
     }
@@ -46,7 +47,8 @@ function mapStateToProps(state) {
 function* saga({ address, CaseManager }) {
   if (!address || !CaseManager) { return }
   const caseCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', address)
-  const indices = rangeRight(caseCount)
+
+  const indices = range(caseCount)
   yield all(indices.map(function* (index) {
     yield cacheCall(CaseManager, 'patientCases', address, index)
   }))
@@ -73,20 +75,20 @@ function renderCaseRows(caseAddresses, transactions, caseCount) {
     const caseRowObject = addPendingTx(transaction, transactionId, objIndex)
 
     if (caseRowObject) {
-      caseRows.splice(0, 0, (
+      caseRows.push(
         <CaseRow
           caseRowObject={caseRowObject}
           objIndex={objIndex}
           key={`new-case-row-${objIndex}`}
           context='patient'
         />
-      ))
+      )
 
       objIndex++
     }
   })
 
-  return caseRows
+  return caseRows.reverse()
 }
 
 export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount']})(class _PatientCases extends Component {

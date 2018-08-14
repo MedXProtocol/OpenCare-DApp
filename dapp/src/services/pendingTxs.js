@@ -24,15 +24,13 @@ export const addPendingTx = function(transaction, transactionId, objIndex) {
 // Updates the cases array set in the mapStateToProps with any information about pending
 // tx's for this Case
 export const updatePendingTx = function(caseRowObject, transaction, transactionId) {
-  const { confirmed, error, call } = transaction
-  const method = { call }
-
+  const method = transaction.call.method
   const isAccepting = (method === 'acceptDiagnosis' || method === 'acceptAsDoctorAfterADay')
   const isSecondOpinion = (method === 'challengeWithDoctor')
   const isDiagnosis = (method === 'diagnoseCase' || method === 'diagnoseChallengedCase')
 
   // A tx we care about
-  if ((isAccepting || isSecondOpinion || isDiagnosis) && (!confirmed || defined(error))) {
+  if (isAccepting || isSecondOpinion || isDiagnosis) {
     return {
       ...caseRowObject,
       ...transaction,

@@ -91,6 +91,14 @@
   }
 }
 
+.nav--open-cases__circle {
+  font-size: 12px;
+  font-weight: bold;
+  position: relative;
+  top: -1px;
+  z-index: 1;
+}
+
 .nav--open-cases__circle:after {
   border-radius: 100%;
   content: "";
@@ -98,16 +106,9 @@
   height: 17px;
   left: -1px;
   position: absolute;
-  top: -1px;
+  top: 0;
   width: 17px;
   z-index: -1;
-}
-
-.nav--open-cases__circle {
-  font-size: 12px;
-  font-weight: bold;
-  position: relative;
-  z-index: 1;
 }
 
 .nav--open-cases__not-zero:after {

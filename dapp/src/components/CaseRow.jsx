@@ -29,7 +29,7 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   let status, createdAt, updatedAt
   if (caseRowObject === undefined) { caseRowObject = {} }
 
-  const transactions = state.sagaGenesis.transactions
+  const transactions = Object.values(state.sagaGenesis.transactions)
   const CaseManager = contractByName(state, 'CaseManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
@@ -85,13 +85,15 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   }
 
   // If this caseRowObject has an ongoing blockchain transaction this will update
-  forOwn(transactions, function(transaction, transactionId) {
-    if (!defined(transaction.call)) { return } // same as `continue` in `forOwn` loops
+  const pendingOrErrorTransactions = transactions.filter(transaction => {
+    const { call, confirmed, error } = transaction
+    return (call && (!confirmed || defined(error)))
+  })
 
-    const thisCaseRow = caseRowObject.caseAddress === transaction.address
-    if (!thisCaseRow) { return }
-
-    caseRowObject = updatePendingTx(caseRowObject, transaction, transactionId)
+  forOwn(pendingOrErrorTransactions, function(transaction, transactionId) {
+    if (caseRowObject.caseAddress === transaction.address) {
+      caseRowObject = updatePendingTx(caseRowObject, transaction, transactionId)
+    }
   })
 
   return {
