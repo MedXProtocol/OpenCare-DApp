@@ -1,10 +1,10 @@
-let CaseManager = artifacts.require("./CaseManager.sol");
-let CaseStatusManager = artifacts.require("./CaseStatusManager.sol");
-let Registry = artifacts.require('./Registry.sol');
-let Case = artifacts.require('./Case.sol');
+const CaseManager = artifacts.require("./CaseManager.sol");
+const CaseStatusManager = artifacts.require("./CaseStatusManager.sol");
+const Registry = artifacts.require('./Registry.sol');
+const Case = artifacts.require('./Case.sol');
+const promisify = require('../test/helpers/promisify').promisify
 
-async function migrateCase(cm, cms, index) {
-  const caseAddress = await cm.caseList(index)
+async function migrateCase(cms, caseAddress) {
   const kase = await Case.at(caseAddress)
   const diagnosingDoctor = await kase.diagnosingDoctor()
   const challengingDoctor = await kase.challengingDoctor()
@@ -22,6 +22,28 @@ async function migrateCase(cm, cms, index) {
   }
 }
 
+async function isCaseMigrated(cms, caseAddress) {
+
+
+}
+
+async function getMigratedCases(cms) {
+  var cases = promisify(cb => {
+    const events = web3.eth.filter({
+      address: cms.address,
+      fromBlock: 0,
+      toBlock: 'latest'
+    })
+    events.get(cb)
+  })
+  var logs = await cases
+  var caseAddresses = new Set()
+  logs.forEach(log => {
+    caseAddresses.add('0x' + log.topics[2].substring(26).toLowerCase())
+  })
+  return caseAddresses
+}
+
 module.exports = function(deployer) {
   deployer.then(async () => {
     const registryInstance = await Registry.deployed()
@@ -30,12 +52,18 @@ module.exports = function(deployer) {
     const cm = await CaseManager.at(CaseManagerAddress)
     const cms = await CaseStatusManager.at(CaseStatusManagerAddress)
     const caseCount = await cm.getAllCaseListCount()
+    const caseAddresses = await getMigratedCases(cms)
     for (var i = 1; i <= caseCount; i++) {
-      try {
-        await migrateCase(cm, cms, i)
-        console.log('Migrated case ', i)
-      } catch (error) {
-        console.warn('Case already migrated: ', i, error)
+      const caseAddress = await cm.caseList(i)
+      if (!caseAddresses.has(caseAddress.toLowerCase())) {
+        try {
+          await migrateCase(cms, caseAddress)
+          console.log('Migrated case ', i, caseAddress)
+        } catch (error) {
+          console.error('Could not migrate case ', caseAddress, i, error)
+        }
+      } else {
+        console.log('Case already migrated: ', i, caseAddress)
       }
     }
   })
