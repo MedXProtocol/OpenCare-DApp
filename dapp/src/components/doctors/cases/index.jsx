@@ -8,6 +8,7 @@ import { ScrollToTop } from '~/components/ScrollToTop'
 import { formatRoute } from 'react-router-named-routes'
 import {
   cacheCallValue,
+  cacheCallValueInt,
   contractByName,
   withSaga,
   cacheCall
@@ -38,10 +39,8 @@ function mapStateToProps(state, { match }) {
     currentNodeId = cacheCallValue(state, CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
   }
 
-  let closedCaseCount = cacheCallValue(state, CaseStatusManager, 'closedCaseCount', address)
-  if (closedCaseCount) {
-    closedCaseCount = parseInt(closedCaseCount, 10)
-  } else {
+  let closedCaseCount = cacheCallValueInt(state, CaseStatusManager, 'closedCaseCount', address)
+  if (!closedCaseCount) {
     closedCaseCount = 0
   }
 

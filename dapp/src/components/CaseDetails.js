@@ -9,9 +9,14 @@ import { LoadingLines } from '~/components/LoadingLines'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { downloadJson, downloadImage } from '../utils/storage-util'
 import { all } from 'redux-saga/effects'
-import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
+import {
+  withContractRegistry,
+  withSaga,
+  cacheCallValue,
+  cacheCall,
+  addContract
+} from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
-import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { toastr } from '~/toastr'
 import get from 'lodash.get'
 
