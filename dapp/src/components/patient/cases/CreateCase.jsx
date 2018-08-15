@@ -19,13 +19,19 @@ import getWeb3 from '~/get-web3'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
 import { jicImageCompressor } from '~/services/jicImageCompressor'
-import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
-import { contractByName } from '~/saga-genesis/state-finders'
+import {
+  contractByName,
+  withContractRegistry,
+  cacheCall,
+  cacheCallValue,
+  withSaga,
+  withSend,
+  TransactionStateHandler
+} from '~/saga-genesis'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { getExifOrientation } from '~/services/getExifOrientation'
 import { mixpanel } from '~/mixpanel'
-import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
 import { HippoImageInput } from '~/components/forms/HippoImageInput'
 import { HippoTextArea } from '~/components/forms/HippoTextArea'

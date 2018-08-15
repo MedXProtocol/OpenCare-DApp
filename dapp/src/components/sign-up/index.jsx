@@ -8,8 +8,7 @@ import { mixpanel } from '~/mixpanel'
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
 import { MasterPasswordContainer } from './master-password'
 import { SecretKeyContainer } from './secret-key'
-import { cacheCall, cacheCallValue, withSaga } from '~/saga-genesis'
-import { contractByName } from '~/saga-genesis/state-finders'
+import { contractByName, cacheCall, cacheCallValue, withSaga } from '~/saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state) {

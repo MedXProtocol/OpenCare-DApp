@@ -6,6 +6,7 @@ import { all } from 'redux-saga/effects'
 import {
   cacheCall,
   withSaga,
+  addContract,
   cacheCallValue,
   cacheCallValueInt,
   contractByName
@@ -26,13 +27,15 @@ function mapStateToProps (state) {
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
     const isFirstDoc = diagnosingDoctor === address
 
-    if (isCaseRequiringDoctorsAttention(isFirstDoc, status, updatedAt)) {
+    if (isCaseRequiringDoctorsAttention(isFirstDoc, updatedAt, status)) {
       casesRequiringAttentionCount++
     }
   })
 
   return {
-    casesRequiringAttentionCount
+    address,
+    casesRequiringAttentionCount,
+    CaseStatusManager
   }
 }
 
@@ -42,6 +45,7 @@ function* saga({ address, CaseStatusManager }) {
   const openAddresses = yield openCaseAddressesSaga(CaseStatusManager, address)
 
   yield openAddresses.map(function* (caseAddress) {
+    yield addContract({ address: caseAddress, contractKey: 'Case' })
     yield all([
       cacheCall(caseAddress, 'status'),
       cacheCall(caseAddress, 'updatedAt'),
@@ -64,9 +68,7 @@ export const HippoCasesRequiringAttention = connect(mapStateToProps)(
               'nav--open-cases__not-zero': (casesRequiringAttentionCount > 0),
               'nav--open-cases__zero': (casesRequiringAttentionCount === 0),
             }
-          )}> &nbsp;
-            {casesRequiringAttentionCount} &nbsp;
-          </span>
+          )}>{casesRequiringAttentionCount}</span>
         )
       }
 

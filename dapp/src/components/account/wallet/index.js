@@ -5,9 +5,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faHeartbeat from '@fortawesome/fontawesome-free-solid/faHeartbeat';
-import { cacheCall } from '~/saga-genesis/sagas'
-import { withSaga } from '~/saga-genesis/components'
-import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
+import { cacheCall, withSaga, cacheCallValue, contractByName } from '~/saga-genesis'
 import { EthAddress } from '~/components/EthAddress'
 import * as routes from '~/config/routes'
 import { PageTitle } from '~/components/PageTitle'

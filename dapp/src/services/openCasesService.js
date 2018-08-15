@@ -18,7 +18,7 @@ export const mapOpenCaseAddresses = function(state, CaseStatusManager, address) 
 }
 
 export const openCaseAddressesSaga = function* (CaseStatusManager, address) {
-  let openAddresses = []
+  const openAddresses = []
 
   let currentNodeId = yield cacheCall(CaseStatusManager, 'firstOpenCaseId', address)
   while (currentNodeId && currentNodeId !== '0') {
@@ -29,4 +29,6 @@ export const openCaseAddressesSaga = function* (CaseStatusManager, address) {
 
     currentNodeId = yield cacheCall(CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
   }
+
+  return openAddresses
 }
