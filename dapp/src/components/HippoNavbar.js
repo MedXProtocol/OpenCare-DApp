@@ -21,9 +21,13 @@ import logo from '../assets/img/logo.png'
 import get from 'lodash.get'
 import networkIdToName from '~/utils/network-id-to-name'
 import { connect } from 'react-redux'
-import { cacheCall } from '~/saga-genesis/sagas'
-import { withContractRegistry, withSaga } from '~/saga-genesis/components'
-import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
+import {
+  cacheCall,
+  withContractRegistry,
+  withSaga,
+  cacheCallValue,
+  contractByName
+} from '~/saga-genesis'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import { weiToMedX } from '~/utils/weiToMedX'
 import * as routes from '~/config/routes'

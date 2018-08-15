@@ -27,8 +27,7 @@ var statusClasses = {
 export function doctorCaseStatusToName(caseObject) {
   let statusName
   const evaluatedState = statusNames[3]
-  const isFirstDoc = caseObject.isDiagnosingDoctor
-  const status = parseInt(caseObject.status, 10)
+  const { isFirstDoc, status } = caseObject
 
   if (status === 4 || status === 7 || status === 8)
     statusName = statusNames[4]
@@ -45,8 +44,7 @@ export function doctorCaseStatusToName(caseObject) {
 export function doctorCaseStatusToClass(caseObject) {
   let statusClass
   const evaluatedState = statusClasses[3]
-  const isFirstDoc = caseObject.isDiagnosingDoctor
-  const status = parseInt(caseObject.status, 10)
+  const { isFirstDoc, status } = caseObject
 
   if (isFirstDoc && status === 4)
     statusClass = statusClasses[4]

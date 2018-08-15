@@ -4,6 +4,7 @@ import rootSagaGenesis from './sagas'
 import {
   cacheCallState,
   cacheCallValue,
+  cacheCallValueInt,
   contractByName
 } from './state-finders'
 import {
@@ -12,6 +13,7 @@ import {
   withSend,
   withSaga
 } from './components'
+export { TransactionStateHandler } from './TransactionStateHandler'
 export { nextId } from './transaction/transaction-factory'
 
 export * from './sagas'
@@ -24,6 +26,7 @@ export {
   rootSagaGenesis,
   cacheCallState,
   cacheCallValue,
+  cacheCallValueInt,
   contractByName,
   ContractRegistry,
   ContractRegistryProvider

@@ -29,9 +29,13 @@ import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
 import { connect } from 'react-redux'
-import { withSaga, cacheCallValue, withContractRegistry } from '~/saga-genesis'
-import { contractByName } from '~/saga-genesis/state-finders'
-import { cacheCall } from '~/saga-genesis/sagas'
+import {
+  cacheCall,
+  withSaga,
+  cacheCallValue,
+  withContractRegistry,
+  contractByName
+} from '~/saga-genesis'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { toastr } from '~/toastr'

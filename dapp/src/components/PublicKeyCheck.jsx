@@ -4,11 +4,16 @@ import { all } from 'redux-saga/effects'
 import { Button } from 'react-bootstrap'
 import ReactTooltip from 'react-tooltip'
 import { currentAccount } from '~/services/sign-in'
-import { cacheCallValue, withSend, withSaga, cacheCall } from '~/saga-genesis'
-import { contractByName } from '~/saga-genesis/state-finders'
+import {
+  cacheCallValue,
+  withSend,
+  withSaga,
+  cacheCall,
+  contractByName,
+  TransactionStateHandler
+} from '~/saga-genesis'
 import { mixpanel } from '~/mixpanel'
 import { CSSTransition } from 'react-transition-group'
-import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 
