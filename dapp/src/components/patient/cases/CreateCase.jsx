@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import { isTrue } from '~/utils/isTrue'
 import { sleep } from '~/utils/sleep'
-import { isNotEmptyString } from '~/utils/common-util'
+import { isNotEmptyString } from '~/utils/isNotEmptyString'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { uploadJson, uploadFile } from '~/utils/storage-util'
 import hashToHex from '~/utils/hash-to-hex'
@@ -36,7 +36,7 @@ import { AcneQuestions } from './AcneQuestions'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
-import { promisify } from '~/utils/common-util'
+import { promisify } from '~/utils/promisify'
 
 function mapStateToProps (state) {
   let medXBeingSent

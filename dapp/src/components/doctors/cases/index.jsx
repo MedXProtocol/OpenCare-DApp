@@ -12,6 +12,7 @@ import {
   withSaga,
   cacheCall
 } from '~/saga-genesis'
+import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
 import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'
 import get from 'lodash.get'
@@ -27,16 +28,7 @@ function mapStateToProps(state, { match }) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
 
-  const openCaseAddresses = []
-
-  let currentNodeId = cacheCallValue(state, CaseStatusManager, 'firstOpenCaseId', address)
-  while (currentNodeId && currentNodeId !== '0') {
-    const openCaseAddress = cacheCallValue(state, CaseStatusManager, 'openCaseAddress', address, currentNodeId)
-    if (openCaseAddress && !isBlank(openCaseAddress)) {
-      openCaseAddresses.push(openCaseAddress)
-    }
-    currentNodeId = cacheCallValue(state, CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
-  }
+  const openCaseAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
 
   let closedCaseCount = cacheCallValue(state, CaseStatusManager, 'closedCaseCount', address)
   if (closedCaseCount) {
@@ -87,12 +79,7 @@ function* saga({ address, CaseStatusManager, start, end }) {
   if (!address || !CaseStatusManager) { return }
   yield cacheCall(CaseStatusManager, 'closedCaseCount', address)
 
-  let currentNodeId = yield cacheCall(CaseStatusManager, 'firstOpenCaseId', address)
-  while (currentNodeId && currentNodeId !== '0') {
-    yield cacheCall(CaseStatusManager, 'openCaseAddress', address, currentNodeId)
-
-    currentNodeId = yield cacheCall(CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
-  }
+  const openAddresses = yield openCaseAddressesSaga(CaseStatusManager, address)
 
   yield range(start, end).map(function* (index) {
     yield cacheCall(CaseStatusManager, 'closedCaseAtIndex', address, index - 1)

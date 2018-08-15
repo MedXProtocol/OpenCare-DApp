@@ -13,7 +13,7 @@ import {
   END
 } from 'redux-saga'
 import { createNode } from '~/services/createNode'
-import { promisify } from '~/utils/common-util'
+import { promisify } from '~/utils/promisify'
 
 const HEARTBEAT_SUBSCRIPTION_CHANNEL = '/MedCredits/Heartbeat'
 const HEARTBEAT_INTERVAL = 2000

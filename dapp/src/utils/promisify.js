@@ -7,7 +7,3 @@ export const promisify = (funcToCall) => {
     })
   })
 }
-
-export const isNotEmptyString = (value) => {
-  return value && value !== ""
-}

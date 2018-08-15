@@ -9,6 +9,7 @@ import { withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
 import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
 import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
+import { isCaseRequiringDoctorsAttention } from '~/utils/isCaseRequiringDoctorsAttention'
 
 function mapStateToProps (state) {
   let casesRequiringAttentionCount = 0
@@ -23,11 +24,7 @@ function mapStateToProps (state) {
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
     const isFirstDoc = diagnosingDoctor === address
 
-    if (
-      (isFirstDoc && status === '2')
-      || (!isFirstDoc && status === '6')
-      || (isFirstDoc && caseStaleForOneDay(updatedAt, status))
-    ) {
+    if (isCaseRequiringDoctorsAttention(isFirstDoc)) {
       casesRequiringAttentionCount++
     }
   })
