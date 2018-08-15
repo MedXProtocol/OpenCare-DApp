@@ -20,7 +20,7 @@ import { Welcome } from '~/components/welcome'
 import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
-import { HippoNavbarContainer } from '~/components/HippoNavbar'
+import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
 import { PublicKeyCheck } from '~/components/PublicKeyCheck'
 import { BetaFaucetModal } from '~/components/BetaFaucetModal'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
@@ -29,9 +29,13 @@ import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
 import { connect } from 'react-redux'
-import { withSaga, cacheCallValue, withContractRegistry } from '~/saga-genesis'
-import { contractByName } from '~/saga-genesis/state-finders'
-import { cacheCall } from '~/saga-genesis/sagas'
+import {
+  cacheCall,
+  withSaga,
+  cacheCallValue,
+  withContractRegistry,
+  contractByName
+} from '~/saga-genesis'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { toastr } from '~/toastr'

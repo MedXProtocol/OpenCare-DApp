@@ -5,9 +5,14 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
-import { contractByName } from '~/saga-genesis/state-finders'
-import { withSaga, cacheCallValue } from '~/saga-genesis'
-import { addContract, cacheCall } from '~/saga-genesis/sagas'
+import {
+  withSaga,
+  cacheCallValue,
+  cacheCallValueInt,
+  contractByName,
+  addContract,
+  cacheCall
+} from '~/saga-genesis'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight';
 import { EthAddress } from '~/components/EthAddress'
@@ -33,30 +38,18 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   if (caseAddress) {
-    status = cacheCallValue(state, caseAddress, 'status')
-    if (status) {
-      status = parseInt(status, 10)
-    }
-    createdAt = cacheCallValue(state, caseAddress, 'createdAt')
-    if (createdAt) {
-      createdAt = parseInt(createdAt, 10)
-    }
-    updatedAt = cacheCallValue(state, caseAddress, 'updatedAt')
-    if (updatedAt) {
-      updatedAt = parseInt(updatedAt, 10)
-    }
+    status = cacheCallValueInt(state, caseAddress, 'status')
+    createdAt = cacheCallValueInt(state, caseAddress, 'createdAt')
+    updatedAt = cacheCallValueInt(state, caseAddress, 'updatedAt')
 
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
 
     if (!objIndex) {
-      objIndex = cacheCallValue(state, CaseManager, 'caseIndices', caseAddress)
-      if (objIndex) {
-        objIndex = parseInt(objIndex, 10)
-      }
+      objIndex = cacheCallValueInt(state, CaseManager, 'caseIndices', caseAddress)
     }
 
     if (status && objIndex && diagnosingDoctor) {
-      const isDiagnosingDoctor = diagnosingDoctor === address
+      const isFirstDoc = diagnosingDoctor === address
 
       caseRowObject = {
         caseAddress,
@@ -64,7 +57,7 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
         createdAt,
         updatedAt,
         objIndex,
-        isDiagnosingDoctor
+        isFirstDoc
       }
     }
   }

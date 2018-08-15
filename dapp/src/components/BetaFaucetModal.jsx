@@ -3,16 +3,13 @@ import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import ReactCSSTransitionReplace from 'react-css-transition-replace';
 import ReactTimeout from 'react-timeout'
-import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
-import { withSaga } from '~/saga-genesis'
-import { cacheCall } from '~/saga-genesis/sagas'
+import { cacheCall, withSaga, cacheCallValue, contractByName, nextId } from '~/saga-genesis'
 import { Modal } from 'react-bootstrap'
 import get from 'lodash.get'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
 import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
 import { weiToMedX } from '~/utils/weiToMedX'
-import { nextId } from '~/saga-genesis/transaction/transaction-factory'
 
 function mapStateToProps (state) {
   let dontShowEther, dontShowMedX, dontShowAddDoctor

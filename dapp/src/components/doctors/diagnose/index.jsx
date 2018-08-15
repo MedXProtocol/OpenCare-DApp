@@ -11,11 +11,16 @@ import { isBlank } from '~/utils/isBlank'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { decryptDoctorCaseKey } from '~/services/decryptDoctorCaseKey'
 import get from 'lodash.get'
-import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
-import { cacheCall, addContract } from '~/saga-genesis/sagas'
+import {
+  cacheCall,
+  addContract,
+  withContractRegistry,
+  withSaga,
+  cacheCallValue,
+  contractByName
+} from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
-import { contractByName } from '~/saga-genesis/state-finders'
 import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state, { match }) {

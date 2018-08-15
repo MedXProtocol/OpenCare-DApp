@@ -7,7 +7,14 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
 import { Loading } from '~/components/Loading'
-import { withSaga, cacheCall, cacheCallValue, withSend, addContract } from '~/saga-genesis'
+import {
+  withSaga,
+  cacheCall,
+  cacheCallValue,
+  withSend,
+  addContract,
+  TransactionStateHandler
+} from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { isTrue } from '~/utils/isTrue'
@@ -19,7 +26,6 @@ import { DiagnosisDisplay } from '~/components/DiagnosisDisplay'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { mixpanel } from '~/mixpanel'
-import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'

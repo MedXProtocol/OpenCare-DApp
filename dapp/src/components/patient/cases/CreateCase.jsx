@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import { isTrue } from '~/utils/isTrue'
 import { sleep } from '~/utils/sleep'
-import { isNotEmptyString } from '~/utils/common-util'
+import { isNotEmptyString } from '~/utils/isNotEmptyString'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { uploadJson, uploadFile } from '~/utils/storage-util'
 import hashToHex from '~/utils/hash-to-hex'
@@ -19,13 +19,19 @@ import getWeb3 from '~/get-web3'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
 import { jicImageCompressor } from '~/services/jicImageCompressor'
-import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
-import { contractByName } from '~/saga-genesis/state-finders'
+import {
+  contractByName,
+  withContractRegistry,
+  cacheCall,
+  cacheCallValue,
+  withSaga,
+  withSend,
+  TransactionStateHandler
+} from '~/saga-genesis'
 import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { getExifOrientation } from '~/services/getExifOrientation'
 import { mixpanel } from '~/mixpanel'
-import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
 import { HippoImageInput } from '~/components/forms/HippoImageInput'
 import { HippoTextArea } from '~/components/forms/HippoTextArea'
@@ -36,7 +42,7 @@ import { AcneQuestions } from './AcneQuestions'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
-import { promisify } from '~/utils/common-util'
+import { promisify } from '~/utils/promisify'
 
 function mapStateToProps (state) {
   let medXBeingSent
@@ -153,10 +159,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
     this.setCountryRef = element => { this.countryInput = element }
     this.setRegionRef = element => { this.regionInput = element }
-  }
-
-  componentDidMount () {
-    this.props.dispatchExcludedDoctors([this.props.account])
   }
 
   componentWillReceiveProps (props) {

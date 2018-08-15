@@ -1,5 +1,5 @@
 import { ipfsApi } from '~/ipfsApi'
-import { promisify } from '~/utils/common-util'
+import { promisify } from '~/utils/promisify'
 import { sleep } from '~/utils/sleep'
 import aes from '~/services/aes'
 

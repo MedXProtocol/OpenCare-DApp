@@ -3,9 +3,14 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
 import { all } from 'redux-saga/effects'
-import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
-import { cacheCall } from '~/saga-genesis/sagas'
-import { contractByName } from '~/saga-genesis/state-finders'
+import {
+  cacheCall,
+  contractByName,
+  withSaga,
+  withContractRegistry,
+  cacheCallValue,
+  cacheCallValueInt
+} from '~/saga-genesis'
 import { CaseRow } from '~/components/CaseRow'
 import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
@@ -20,10 +25,7 @@ function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
   const transactions = Object.values(state.sagaGenesis.transactions)
-  let caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
-  if (caseCount) {
-    caseCount = parseInt(caseCount, 10)
-  }
+  const caseCount = cacheCallValueInt(state, CaseManager, 'getPatientCaseListCount', address)
 
   caseAddresses = range(caseCount).reduce((accumulator, index) => {
     const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, index)

@@ -1,5 +1,5 @@
 import pbkdf2 from 'pbkdf2'
-import { promisify } from './common-util';
+import { promisify } from './promisify';
 
 const ITERATIONS = 10000
 

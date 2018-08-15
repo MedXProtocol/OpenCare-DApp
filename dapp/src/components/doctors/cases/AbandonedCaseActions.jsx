@@ -3,10 +3,14 @@ import { connect } from 'react-redux'
 import { Button } from 'react-bootstrap'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { all } from 'redux-saga/effects'
-import { cacheCallValue, withSaga, withSend } from '~/saga-genesis'
-import { cacheCall } from '~/saga-genesis/sagas'
+import {
+  cacheCall,
+  cacheCallValueInt,
+  withSaga,
+  withSend,
+  TransactionStateHandler
+} from '~/saga-genesis'
 import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
@@ -14,15 +18,8 @@ import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const transactions = state.sagaGenesis.transactions
-
-  let status = cacheCallValue(state, caseAddress, 'status')
-  if (status) {
-    status = parseInt(status, 10)
-  }
-  let updatedAt = cacheCallValue(state, caseAddress, 'updatedAt')
-  if (updatedAt) {
-    updatedAt = parseInt(updatedAt, 10)
-  }
+  const status = cacheCallValueInt(state, caseAddress, 'status')
+  const updatedAt = cacheCallValueInt(state, caseAddress, 'updatedAt')
 
   return {
     transactions,

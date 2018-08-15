@@ -8,10 +8,12 @@ import { ScrollToTop } from '~/components/ScrollToTop'
 import { formatRoute } from 'react-router-named-routes'
 import {
   cacheCallValue,
+  cacheCallValueInt,
   contractByName,
   withSaga,
   cacheCall
 } from '~/saga-genesis'
+import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
 import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'
 import get from 'lodash.get'
@@ -27,21 +29,10 @@ function mapStateToProps(state, { match }) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
 
-  const openCaseAddresses = []
+  const openCaseAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
 
-  let currentNodeId = cacheCallValue(state, CaseStatusManager, 'firstOpenCaseId', address)
-  while (currentNodeId && currentNodeId !== '0') {
-    const openCaseAddress = cacheCallValue(state, CaseStatusManager, 'openCaseAddress', address, currentNodeId)
-    if (openCaseAddress && !isBlank(openCaseAddress)) {
-      openCaseAddresses.push(openCaseAddress)
-    }
-    currentNodeId = cacheCallValue(state, CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
-  }
-
-  let closedCaseCount = cacheCallValue(state, CaseStatusManager, 'closedCaseCount', address)
-  if (closedCaseCount) {
-    closedCaseCount = parseInt(closedCaseCount, 10)
-  } else {
+  let closedCaseCount = cacheCallValueInt(state, CaseStatusManager, 'closedCaseCount', address)
+  if (!closedCaseCount) {
     closedCaseCount = 0
   }
 
@@ -85,18 +76,9 @@ function mapStateToProps(state, { match }) {
 
 function* saga({ address, CaseStatusManager, start, end }) {
   if (!address || !CaseStatusManager) { return }
-  let openAddresses = []
   yield cacheCall(CaseStatusManager, 'closedCaseCount', address)
 
-  let currentNodeId = yield cacheCall(CaseStatusManager, 'firstOpenCaseId', address)
-  while (currentNodeId && currentNodeId !== '0') {
-    const add = yield cacheCall(CaseStatusManager, 'openCaseAddress', address, currentNodeId)
-    if (add) {
-      yield openAddresses.push(add)
-    }
-
-    currentNodeId = yield cacheCall(CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
-  }
+  yield openCaseAddressesSaga(CaseStatusManager, address)
 
   yield range(start, end).map(function* (index) {
     yield cacheCall(CaseStatusManager, 'closedCaseAtIndex', address, index - 1)
