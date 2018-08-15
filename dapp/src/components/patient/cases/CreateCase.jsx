@@ -713,7 +713,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       Tell your physician about your problem by answering the questions below.
                     </p>
                     <p className="text-gray">
-                      All information is encrypted and visible to only you and the dermatologist. By submitting a case on Hippocrates, you agree to the terms in our disclaimer: <a onClick={(e) => this.setState({ showDisclaimerModal: true })}>Read Disclaimer</a>
+                      All information is encrypted and visible to only you and the dermatologist. By submitting a case on DermX, you agree to the terms in our disclaimer: <a onClick={(e) => this.setState({ showDisclaimerModal: true })}>Read Disclaimer</a>
                     </p>
                   </div>
                 </div>

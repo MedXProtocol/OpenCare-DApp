@@ -17,7 +17,9 @@ import PropTypes from 'prop-types'
 import ReactTooltip from 'react-tooltip'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle';
-import logo from '~/assets/img/logo.png'
+// import logo from '~/assets/img/logo.png'
+import dermXLogoImg from '~/assets/img/dermx-logo-white.png'
+import dermXLogoImg2x from '~/assets/img/dermx-logo-white@2x.png'
 import get from 'lodash.get'
 import networkIdToName from '~/utils/network-id-to-name'
 import { connect } from 'react-redux'
@@ -207,7 +209,12 @@ export const HippoNavbar = withContractRegistry(
         <Navbar.Header>
           <Navbar.Brand>
             <Link to={routes.HOME} className="navbar-brand">
-              <img src={logo} alt="MedCredits"></img>
+              <img
+                src={dermXLogoImg}
+                alt="DermX Logo"
+                srcSet={`${dermXLogoImg} 1x, ${dermXLogoImg2x} 2x`}
+                width="110"
+              />
             </Link>
           </Navbar.Brand>
           <Navbar.Toggle />

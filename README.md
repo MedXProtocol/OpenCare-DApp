@@ -4,7 +4,7 @@
 
 Smart contracts used by MedCredits.
 
-Hippocrates Dapp readme is location [here](dapp/README.md)
+DermX Dapp readme is location [here](dapp/README.md)
 
 ### Setup
 

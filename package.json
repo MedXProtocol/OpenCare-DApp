@@ -1,5 +1,5 @@
 {
-  "name": "Hippocrates",
+  "name": "DermX",
   "version": "0.0.1",
   "scripts": {
     "start": "./scripts/ganache.sh",

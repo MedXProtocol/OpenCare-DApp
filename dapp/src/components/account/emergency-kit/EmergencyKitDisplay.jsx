@@ -26,7 +26,7 @@ export const EmergencyKitDisplay = class _EmergencyKitDisplay extends Component 
             <div className="card">
               <div className="card-header">
                 <h3 className="title card-title">
-                  Hippocrates Emergency Kit
+                  DermX Emergency Kit
                 </h3>
               </div>
 
@@ -60,7 +60,7 @@ export const EmergencyKitDisplay = class _EmergencyKitDisplay extends Component 
                 </p>
                 <ol>
                   <li>Ensure you are using a Web3-enabled browser and that the current account is <b>{this.props.account}</b></li>
-                  <li>Go to the Hippocrates sign up page: <a href={routes.SIGN_UP} target='_blank' rel="noopener noreferrer">/sign-up</a></li>
+                  <li>Go to the DermX sign up page: <a href={routes.SIGN_UP} target='_blank' rel="noopener noreferrer">/sign-up</a></li>
                   <li>Enter the above secret key</li>
                   <li>Enter a new master password to encrypt your data locally</li>
                   <li>Confirm the master password, then create your account</li>
