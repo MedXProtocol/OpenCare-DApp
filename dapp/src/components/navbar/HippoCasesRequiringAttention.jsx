@@ -7,23 +7,15 @@ import { all } from 'redux-saga/effects'
 import { cacheCall } from '~/saga-genesis/sagas'
 import { withSaga } from '~/saga-genesis/components'
 import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
-import { isBlank } from '~/utils/isBlank'
 import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
+import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
 
 function mapStateToProps (state) {
   let casesRequiringAttentionCount = 0
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
-  const openAddresses = []
 
-  let currentNodeId = cacheCallValue(state, CaseStatusManager, 'firstOpenCaseId', address)
-  while (currentNodeId && currentNodeId !== '0') {
-    const openCaseAddress = cacheCallValue(state, CaseStatusManager, 'openCaseAddress', address, currentNodeId)
-    if (openCaseAddress && !isBlank(openCaseAddress)) {
-      openAddresses.push(openCaseAddress)
-    }
-    currentNodeId = cacheCallValue(state, CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
-  }
+  const openAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
 
   openAddresses.forEach(caseAddress => {
     const status = cacheCallValue(state, caseAddress, 'status')
@@ -48,23 +40,13 @@ function mapStateToProps (state) {
 function* saga({ address, CaseStatusManager }) {
   if (!address || !CaseStatusManager) { return }
 
-  let openAddresses = []
-
-  let currentNodeId = yield cacheCall(CaseStatusManager, 'firstOpenCaseId', address)
-  while (currentNodeId && currentNodeId !== '0') {
-    const caseAddress = yield cacheCall(CaseStatusManager, 'openCaseAddress', address, currentNodeId)
-    if (caseAddress) {
-      yield openAddresses.push(caseAddress)
-    }
-
-    currentNodeId = yield cacheCall(CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
-  }
-
+  const openAddresses = yield openCaseAddressesSaga(CaseStatusManager, address)
 
   yield openAddresses.map(function* (caseAddress) {
     yield all([
       cacheCall(caseAddress, 'status'),
-      cacheCall(caseAddress, 'updatedAt')
+      cacheCall(caseAddress, 'updatedAt'),
+      cacheCall(caseAddress, 'diagnosingDoctor')
     ])
   })
 }
