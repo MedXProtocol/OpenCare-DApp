@@ -85,15 +85,11 @@ function mapStateToProps(state, { match }) {
 
 function* saga({ address, CaseStatusManager, start, end }) {
   if (!address || !CaseStatusManager) { return }
-  let openAddresses = []
   yield cacheCall(CaseStatusManager, 'closedCaseCount', address)
 
   let currentNodeId = yield cacheCall(CaseStatusManager, 'firstOpenCaseId', address)
   while (currentNodeId && currentNodeId !== '0') {
-    const add = yield cacheCall(CaseStatusManager, 'openCaseAddress', address, currentNodeId)
-    if (add) {
-      yield openAddresses.push(add)
-    }
+    yield cacheCall(CaseStatusManager, 'openCaseAddress', address, currentNodeId)
 
     currentNodeId = yield cacheCall(CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
   }
