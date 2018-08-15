@@ -43,7 +43,7 @@ function* saga({ account, AccountManager, DoctorManager }) {
 }
 
 export const PublicKeyCheck = connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['account', 'AccountManager'] })(withSend(class _PublicKeyCheck extends Component {
+  withSaga(saga)(withSend(class _PublicKeyCheck extends Component {
     constructor(props) {
       super(props)
       this.state = {}

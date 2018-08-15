@@ -111,7 +111,7 @@ const requiredFields = [
 // 'hadBefore' => spot/rash only
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(
+  withSaga(saga)(
     withSend(class _CreateCase extends Component {
 
   constructor(){

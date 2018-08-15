@@ -38,7 +38,7 @@ function* saga({ caseAddress }) {
   ])
 }
 
-const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga, { propTriggers: ['status', 'updatedAt'] })(
+const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
   class _AbandonedCaseActions extends Component {
 
     static propTypes = {

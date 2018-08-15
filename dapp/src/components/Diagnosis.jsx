@@ -78,7 +78,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['caseAddress', 'diagnosisHash', 'status', 'networkId'] })(
+  withSaga(saga)(
     withSend(class _Diagnosis extends Component {
 
   constructor(){

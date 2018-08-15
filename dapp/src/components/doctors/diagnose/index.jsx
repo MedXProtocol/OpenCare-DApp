@@ -64,7 +64,7 @@ function* saga({ match, address, AccountManager }) {
   ])
 }
 
-export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'address', 'AccountManager']})(class _DiagnoseCase extends Component {
+export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class _DiagnoseCase extends Component {
   render () {
     if (isEmptyObject(this.props.match.params)) { return null }
 

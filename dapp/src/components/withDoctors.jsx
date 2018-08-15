@@ -59,7 +59,7 @@ function* saga({ DoctorManager, AccountManager }) {
 export function withDoctors(WrappedComponent) {
   return (
     connect(mapStateToProps)(
-      withSaga(saga, { propTriggers: ['doctorCount', 'DoctorManager', 'AccountManager', 'isActive'] })(
+      withSaga(saga)(
         class _withDoctors extends Component {
           static propTypes = {
             excludeAddresses: PropTypes.array

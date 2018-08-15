@@ -79,7 +79,7 @@ function* saga({ address, DoctorManager, MedXToken }) {
 
 export const HippoNavbar = withContractRegistry(
   connect(mapStateToProps, mapDispatchToProps)(
-    withSaga(saga, { propTriggers: ['address', 'DoctorManager', 'MedXToken'] })(
+    withSaga(saga)(
       class _HippoNavbar extends Component {
 
   constructor(props) {

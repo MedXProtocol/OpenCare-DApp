@@ -120,4 +120,4 @@ export const SignUp = class _SignUp extends Component {
   }
 }
 
-export const SignUpContainer = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga, { propTriggers: ['address', 'AccountManager'] })(SignUp)))
+export const SignUpContainer = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga)(SignUp)))

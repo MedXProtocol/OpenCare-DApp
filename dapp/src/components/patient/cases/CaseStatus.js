@@ -43,7 +43,7 @@ function* saga({ caseAddress, DoctorManager, networkId }) {
 }
 
 const CaseStatus = connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['caseAddress', 'DoctorManager', 'diagnosingDoctor', 'challengingDoctor', 'networkId'] })(
+  withSaga(saga)(
     class _CaseStatus extends Component {
 
     render() {

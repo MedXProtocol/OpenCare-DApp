@@ -89,7 +89,7 @@ function renderCaseRows(caseAddresses, transactions, caseCount) {
   return caseRows.reverse()
 }
 
-export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount']})(class _PatientCases extends Component {
+export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class _PatientCases extends Component {
   render() {
     let loadingLines, noCases, caseRows
     const { caseAddresses, caseCount, transactions } = this.props

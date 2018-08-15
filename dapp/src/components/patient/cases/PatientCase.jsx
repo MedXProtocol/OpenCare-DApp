@@ -46,7 +46,7 @@ function* saga({ match, networkId }) {
 }
 
 export const PatientCaseContainer = connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: [ 'match', 'diagnosisHash', 'challengeHash', 'networkId' ]})(
+  withSaga(saga)(
     class _PatientCase extends Component {
       constructor (props) {
         super(props)

@@ -54,7 +54,7 @@ function* saga({ account, DoctorManager }) {
 }
 
 export const SignInContainer = ReactTimeout(withSend(withRouter(
-  withSaga(saga, { propTriggers: ['account', 'DoctorManager'] })(
+  withSaga(saga)(
     connect(mapStateToProps, mapDispatchToProps)(
       class _SignIn extends Component {
 
