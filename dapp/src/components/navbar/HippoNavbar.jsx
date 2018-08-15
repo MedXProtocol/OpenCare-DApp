@@ -17,13 +17,18 @@ import PropTypes from 'prop-types'
 import ReactTooltip from 'react-tooltip'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle';
-import logo from '../assets/img/logo.png'
+import logo from '~/assets/img/logo.png'
 import get from 'lodash.get'
 import networkIdToName from '~/utils/network-id-to-name'
 import { connect } from 'react-redux'
-import { cacheCall } from '~/saga-genesis/sagas'
-import { withContractRegistry, withSaga } from '~/saga-genesis/components'
-import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
+import {
+  cacheCall,
+  withContractRegistry,
+  withSaga,
+  cacheCallValue,
+  contractByName
+} from '~/saga-genesis'
+import { HippoCasesRequiringAttention } from './HippoCasesRequiringAttention'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import { weiToMedX } from '~/utils/weiToMedX'
 import * as routes from '~/config/routes'
@@ -79,7 +84,7 @@ function* saga({ address, DoctorManager, MedXToken }) {
 
 export const HippoNavbar = withContractRegistry(
   connect(mapStateToProps, mapDispatchToProps)(
-    withSaga(saga, { propTriggers: ['address', 'DoctorManager', 'MedXToken'] })(
+    withSaga(saga)(
       class _HippoNavbar extends Component {
 
   constructor(props) {
@@ -106,7 +111,7 @@ export const HippoNavbar = withContractRegistry(
   }
 
   render() {
-    const { isDoctor, openCasesLength } = this.props
+    const { isDoctor } = this.props
     const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
 
     if (this.props.signedIn && this.props.address) {
@@ -168,15 +173,7 @@ export const HippoNavbar = withContractRegistry(
         var openCasesItem =
           <LinkContainer to={routes.DOCTORS_CASES_OPEN}>
             <NavItem href={routes.DOCTORS_CASES_OPEN}>
-              <span className={classnames(
-                'nav--open-cases__circle',
-                {
-                  'nav--open-cases__not-zero': (openCasesLength > 0),
-                  'nav--open-cases__zero': (openCasesLength === 0),
-                }
-              )}> &nbsp;
-                {openCasesLength} &nbsp;
-              </span> Diagnose Cases
+              <HippoCasesRequiringAttention /> Diagnose Cases
             </NavItem>
           </LinkContainer>
       }

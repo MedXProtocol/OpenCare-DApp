@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { CaseDetails } from '~/components/CaseDetails'
+import { AbandonedCaseActionsContainer } from '~/components/doctors/cases/AbandonedCaseActions'
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import Diagnosis from '~/components/Diagnosis'
@@ -10,11 +11,16 @@ import { isBlank } from '~/utils/isBlank'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { decryptDoctorCaseKey } from '~/services/decryptDoctorCaseKey'
 import get from 'lodash.get'
-import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
-import { cacheCall, addContract } from '~/saga-genesis/sagas'
+import {
+  cacheCall,
+  addContract,
+  withContractRegistry,
+  withSaga,
+  cacheCallValue,
+  contractByName
+} from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
-import { contractByName } from '~/saga-genesis/state-finders'
 import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps(state, { match }) {
@@ -53,6 +59,8 @@ function* saga({ match, address, AccountManager }) {
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield all([
     cacheCall(AccountManager, 'publicKeys', patientAddress),
+    cacheCall(caseAddress, 'status'),
+    cacheCall(caseAddress, 'updatedAt'),
     cacheCall(caseAddress, 'doctorEncryptedCaseKeys', address),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(caseAddress, 'diagnosisHash'),
@@ -61,7 +69,7 @@ function* saga({ match, address, AccountManager }) {
   ])
 }
 
-export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['match', 'address', 'AccountManager']})(class _DiagnoseCase extends Component {
+export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class _DiagnoseCase extends Component {
   render () {
     if (isEmptyObject(this.props.match.params)) { return null }
 
@@ -115,10 +123,12 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
     } else if (!isBlank(diagnosisHash) && diagnosingDoc) {
       var diagnosis =
         <div className='col-xs-12'>
+          <AbandonedCaseActionsContainer caseAddress={caseAddress} />
           <Diagnosis
             title='Your Diagnosis'
             caseAddress={caseAddress}
-            caseKey={caseKey} />
+            caseKey={caseKey}
+          />
         </div>
     } else if (thisDocChallenging) {
       var submitChallenge =
@@ -152,6 +162,8 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
         </div>
       )
       challenge = null
+      submitDiagnosis = null
+      submitChallenge = null
     }
 
     return (

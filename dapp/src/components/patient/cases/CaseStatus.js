@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withSaga, cacheCallValue } from '~/saga-genesis'
-import { cacheCall, addContract } from '~/saga-genesis/sagas'
-import { contractByName } from '~/saga-genesis/state-finders'
+import {
+  withSaga,
+  cacheCallValue,
+  contractByName,
+  cacheCall,
+  addContract
+} from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
 import get from 'lodash.get'
@@ -43,11 +47,11 @@ function* saga({ caseAddress, DoctorManager, networkId }) {
 }
 
 const CaseStatus = connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['caseAddress', 'DoctorManager', 'diagnosingDoctor', 'challengingDoctor', 'networkId'] })(
+  withSaga(saga)(
     class _CaseStatus extends Component {
 
     render() {
-      var status = parseInt(this.props.status, 10)
+      const status = this.props.status
       let alert
       switch (status) {
         case 1:

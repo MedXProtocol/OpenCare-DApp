@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import { isTrue } from '~/utils/isTrue'
 import { sleep } from '~/utils/sleep'
-import { isNotEmptyString } from '~/utils/common-util'
+import { isNotEmptyString } from '~/utils/isNotEmptyString'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { uploadJson, uploadFile } from '~/utils/storage-util'
 import hashToHex from '~/utils/hash-to-hex'
@@ -19,13 +19,19 @@ import getWeb3 from '~/get-web3'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
 import { jicImageCompressor } from '~/services/jicImageCompressor'
-import { withContractRegistry, cacheCall, cacheCallValue, withSaga, withSend } from '~/saga-genesis'
-import { contractByName } from '~/saga-genesis/state-finders'
+import {
+  contractByName,
+  withContractRegistry,
+  cacheCall,
+  cacheCallValue,
+  withSaga,
+  withSend,
+  TransactionStateHandler
+} from '~/saga-genesis'
 import { DoctorSelect } from '~/components/DoctorSelect'
-import { reencryptCaseKey } from '~/services/reencryptCaseKey'
+import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { getExifOrientation } from '~/services/getExifOrientation'
 import { mixpanel } from '~/mixpanel'
-import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { Loading } from '~/components/Loading'
 import { HippoImageInput } from '~/components/forms/HippoImageInput'
 import { HippoTextArea } from '~/components/forms/HippoTextArea'
@@ -36,7 +42,7 @@ import { AcneQuestions } from './AcneQuestions'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
-import { promisify } from '~/utils/common-util'
+import { promisify } from '~/utils/promisify'
 
 function mapStateToProps (state) {
   let medXBeingSent
@@ -111,7 +117,7 @@ const requiredFields = [
 // 'hadBefore' => spot/rash only
 
 export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['account', 'MedXToken', 'AccountManager'] })(
+  withSaga(saga)(
     withSend(class _CreateCase extends Component {
 
   constructor(){
@@ -599,10 +605,10 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     const hash = await uploadJson(caseJson, this.state.caseEncryptionKey)
     const account = currentAccount()
     const caseKeySalt = genKey(32)
-    const encryptedCaseKey = account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
+    const encryptedCaseKey = await account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 
     const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
-    const doctorEncryptedCaseKey = reencryptCaseKey({ account, encryptedCaseKey, doctorPublicKey, caseKeySalt })
+    const doctorEncryptedCaseKey = await reencryptCaseKeyAsync({ account, encryptedCaseKey, doctorPublicKey, caseKeySalt })
 
     let hashHex = hashToHex(hash)
 
@@ -707,7 +713,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       Tell your physician about your problem by answering the questions below.
                     </p>
                     <p className="text-gray">
-                      All information is encrypted and visible to only you and your physician. <a onClick={(e) => this.setState({ showDisclaimerModal: true })}>Read Disclaimer</a>
+                      All information is encrypted and visible to only you and the dermatologist. By submitting a case on Hippocrates, you agree to the terms in our disclaimer: <a onClick={(e) => this.setState({ showDisclaimerModal: true })}>Read Disclaimer</a>
                     </p>
                   </div>
                 </div>
@@ -740,6 +746,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         <div key="imagery-key">
                           <div className="form-group--heading">
                             Imagery:
+                          </div>
+                          <div className="form-group--heading form-group--heading__help">
+                            An evaluation is only as good as the photos provided. So be sure the photos are high quality!
                           </div>
                           <HippoImageInput
                             name='firstImage'
@@ -912,13 +921,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
            </Modal.Header>
           <Modal.Body>
             <p>
-              The MedCredits Health System is a decentralized platform that connects patients
-              and doctors globally. The MedCredits team does not have access to any patient
-              information, and does not guarantee any outcome on behalf of the doctors or
-              patients. For all evaluated cases, there is an option for a discounted second
-              opinion. However, patients should see a local medical provider if there is a
-              degree of concern. Lastly, an evaluation on Hippocrates is only as good as the
-              photos provided. So be sure the photos are high quality!
+              The MedX Health System is a decentralized platform that connects patients,
+              consulting providers and specialists globally. The MedX team does not have access
+              to any patient information, and does not guarantee any outcome on behalf of the
+              doctors or patients. For all evaluated cases, there is an option for a discounted
+              second opinion. However, patients should see a specialist if there is a degree of
+              concern. Lastly, an evaluation is only as good as the photos provided. So be sure
+              the photos are high quality.
             </p>
           </Modal.Body>
           <Modal.Footer>

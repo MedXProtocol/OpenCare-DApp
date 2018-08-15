@@ -9,6 +9,7 @@ function* web3Initialize() {
     const web3 = new Web3(window.web3.currentProvider)
     yield put({type: 'WEB3_INITIALIZED', web3})
   } else {
+    console.error("window.web3 doesn't exist!")
     yield put({type: 'WEB3_INITIALIZE_ERROR'})
   }
 }

@@ -9,9 +9,14 @@ import { LoadingLines } from '~/components/LoadingLines'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { downloadJson, downloadImage } from '../utils/storage-util'
 import { all } from 'redux-saga/effects'
-import { withContractRegistry, withSaga, cacheCallValue } from '~/saga-genesis'
+import {
+  withContractRegistry,
+  withSaga,
+  cacheCallValue,
+  cacheCall,
+  addContract
+} from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
-import { cacheCall, addContract } from '~/saga-genesis/sagas'
 import { toastr } from '~/toastr'
 import get from 'lodash.get'
 
@@ -39,7 +44,7 @@ function* saga({ caseAddress, networkId }) {
 }
 
 export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: ['caseAddress', 'networkId'] })(
+  withSaga(saga)(
     class _CaseDetails extends Component {
 
   constructor (props) {
@@ -156,7 +161,7 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
     const details = this.state.details || {}
     let jsx
 
-    if (caseIsOpenForDoctor) {
+    if (caseIsOpenForDoctor && !this.state.loading) {
       var submitDiagnosisLink = (
         <span>
           <br />
@@ -343,7 +348,7 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
                     </div>
 
                     <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                      <label className="label text-gray">On birth control:</label>
+                      <label className="label text-gray">Taking birth control:</label>
                       <p>{details.onBirthControl}</p>
                     </div>
                   </div>

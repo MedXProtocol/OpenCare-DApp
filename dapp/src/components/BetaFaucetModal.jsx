@@ -3,16 +3,13 @@ import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import ReactCSSTransitionReplace from 'react-css-transition-replace';
 import ReactTimeout from 'react-timeout'
-import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
-import { withSaga } from '~/saga-genesis'
-import { cacheCall } from '~/saga-genesis/sagas'
+import { cacheCall, withSaga, cacheCallValue, contractByName, nextId } from '~/saga-genesis'
 import { Modal } from 'react-bootstrap'
 import get from 'lodash.get'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
 import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
 import { weiToMedX } from '~/utils/weiToMedX'
-import { nextId } from '~/saga-genesis/transaction/transaction-factory'
 
 function mapStateToProps (state) {
   let dontShowEther, dontShowMedX, dontShowAddDoctor
@@ -90,7 +87,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['BetaFaucet', 'ethBalance', 'medXBalance', 'CaseManager', 'DoctorManager', 'MedXToken', 'address'] })(
+  withSaga(saga)(
     class _BetaFaucetModal extends Component {
 
       constructor(props) {
@@ -250,6 +247,8 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         } else {
           content = (
             <div className="col-xs-12 text-center">
+              <br />
+              <br />
               <h2 className="header--no-top-margin">
                 You're all set!
               </h2>
@@ -286,7 +285,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
                 </div>
               </div>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="modal__beta-faucet">
               <div className="row">
                 <ReactCSSTransitionReplace transitionName="page"
                                            transitionEnterTimeout={400}

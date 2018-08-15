@@ -1,13 +1,17 @@
 pragma solidity ^0.4.23;
 
-import "./MedXToken.sol";
-import "./DoctorManager.sol";
-import "./Registry.sol";
+import "./ICase.sol";
+import "./IMedXToken.sol";
+import "./IDoctorManager.sol";
+import "./IRegistry.sol";
 import "./Initializable.sol";
-import "./CaseManager.sol";
+import "./ICaseManager.sol";
+import "./CaseStatusManager.sol";
+
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract Case is Ownable, Initializable {
+contract Case is Ownable, Initializable, ICase {
   using SafeMath for uint256;
 
   uint256 public caseFee;
@@ -20,8 +24,8 @@ contract Case is Ownable, Initializable {
   bytes public diagnosisHash;
   bytes public challengeHash;
 
-  Registry public registry;
-  MedXToken public medXToken;
+  IRegistry public registry;
+  IMedXToken public medXToken;
 
   CaseStatus public status;
 
@@ -43,6 +47,7 @@ contract Case is Ownable, Initializable {
   }
 
   uint public createdAt;
+  uint public updatedAt;
 
   event CaseCreated(address indexed patient);
   event CaseEvaluated(address indexed patient, address indexed doctor);
@@ -65,22 +70,31 @@ contract Case is Ownable, Initializable {
    * @dev - throws if called by any account other than a doctor.
    */
   modifier isDoctor(address _doctor) {
-    require(doctorManager().isDoctor(_doctor));
+    require(doctorManager().isDoctor(_doctor), 'Sender must be a Doctor');
     _;
   }
 
+  /**
+   * @dev - throws if called by any account that is not the initial diagnosing doctor.
+   */
   modifier onlyDiagnosingDoctor() {
-    require(msg.sender == diagnosingDoctor);
+    require(msg.sender == diagnosingDoctor, 'Must be the initial diagnosing doctor');
     _;
   }
 
+  /**
+   * @dev - throws if called by any account that is not the challenging doctor.
+   */
   modifier onlyChallengeDoctor() {
-    require(msg.sender == challengingDoctor);
+    require(msg.sender == challengingDoctor, 'Must be the second opinion challenging doctor');
     _;
   }
 
+  /**
+   * @dev - throws if called by any account that is not the deployed case manager
+   */
   modifier onlyCaseManager() {
-    require(msg.sender == address(caseManager()));
+    require(msg.sender == address(caseManager()), 'Must be the Case Manager contract');
     _;
   }
 
@@ -97,14 +111,15 @@ contract Case is Ownable, Initializable {
       bytes _caseKeySalt,
       bytes _caseHash,
       uint256 _caseFee,
-      MedXToken _token,
-      Registry _registry
+      address _token,
+      address _registry
   ) external notInitialized {
     setInitialized();
     require(_encryptedCaseKey.length != 0);
     require(_caseKeySalt.length != 0);
     require(_caseHash.length != 0);
     createdAt = block.timestamp;
+    updatedAt = block.timestamp;
     owner = msg.sender;
     status = CaseStatus.Open;
     encryptedCaseKey = _encryptedCaseKey; // don't need to store this
@@ -112,8 +127,8 @@ contract Case is Ownable, Initializable {
     patient = _patient;
     caseDataHash = _caseHash; // don't need to store this
     caseFee = _caseFee;
-    medXToken = _token;
-    registry = _registry;
+    medXToken = IMedXToken(_token);
+    registry = IRegistry(_registry);
     emit CaseCreated(patient);
   }
 
@@ -124,12 +139,17 @@ contract Case is Ownable, Initializable {
     revert();
   }
 
+  function touchUpdatedAt() internal {
+    updatedAt = block.timestamp;
+  }
+
   function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyCaseManager isDoctor(_doctor) {
     require(status == CaseStatus.Open);
     require(diagnosingDoctor == address(0));
     require(_doctor != patient);
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
+    caseStatusManager().addOpenCase(_doctor, this);
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit SetDiagnosingDoctor(patient, msg.sender, _doctorEncryptedKey);
   }
@@ -142,18 +162,35 @@ contract Case is Ownable, Initializable {
     require(status == CaseStatus.Evaluating);
     status = CaseStatus.Evaluated;
     diagnosisHash = _diagnosisHash;
+    touchUpdatedAt();
     emit CaseEvaluated(patient, diagnosingDoctor);
   }
 
   /**
-   * @dev - The user accepts the evaluation and tokens are credited to doctor and rest is returned to the patient
+   * @dev - The patient accepts the evaluation and tokens are credited to doctor
+   * and rest is returned to the patient
    */
   function acceptDiagnosis() external onlyPatient {
-    /* TODO: add evaluation time logic */
+    accept();
+  }
+
+  /**
+   * @dev - The initial doctor accepts the evaluation and tokens are credited to them
+   */
+  function acceptAsDoctorAfterADay() external onlyDiagnosingDoctor {
+    require((block.timestamp - updatedAt) > 86400);
+
+    accept();
+  }
+
+  function accept() internal {
     require(status == CaseStatus.Evaluated);
     status = CaseStatus.Closed;
+    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
+    caseStatusManager().addClosedCase(diagnosingDoctor, this);
     medXToken.transfer(diagnosingDoctor, caseFee);
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+    touchUpdatedAt();
     emit CaseClosed(patient, diagnosingDoctor);
   }
 
@@ -162,13 +199,15 @@ contract Case is Ownable, Initializable {
     status = CaseStatus.Challenging;
     setChallengingDoctor(_doctor, _doctorEncryptedKey);
     caseManager().addChallengeDoctor(_doctor);
-    emit CaseChallenged(patient, diagnosingDoctor);
+    touchUpdatedAt();
+    emit CaseChallenged(patient, _doctor);
   }
 
   function setChallengingDoctor (address _doctor, bytes _doctorEncryptedKey) internal isDoctor(_doctor) {
     require(_doctor != patient);
     require(_doctor != diagnosingDoctor);
     challengingDoctor = _doctor;
+    caseStatusManager().addOpenCase(challengingDoctor, this);
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit SetChallengingDoctor(patient, msg.sender, _doctorEncryptedKey);
   }
@@ -180,7 +219,12 @@ contract Case is Ownable, Initializable {
    */
   function diagnoseChallengedCase(bytes _secondaryDiagnosisHash, bool _accept) external onlyChallengeDoctor {
     require(status == CaseStatus.Challenging);
+    caseStatusManager().removeOpenCase(challengingDoctor, this);
+    caseStatusManager().addClosedCase(challengingDoctor, this);
+    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
+    caseStatusManager().addClosedCase(diagnosingDoctor, this);
     challengeHash = _secondaryDiagnosisHash;
+    touchUpdatedAt();
     if (_accept)
         confirmChallengedDiagnosis();
     else
@@ -194,10 +238,10 @@ contract Case is Ownable, Initializable {
     status = CaseStatus.ClosedConfirmed;
 
     medXToken.transfer(diagnosingDoctor, caseFee);
-    medXToken.transfer(challengingDoctor, (caseFee * 50) / 100);
+    medXToken.transfer(challengingDoctor, caseFee.mul(50).div(100));
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
-    emit CaseClosedConfirmed(patient, diagnosingDoctor);
+    emit CaseClosedConfirmed(patient, challengingDoctor);
   }
 
   /**
@@ -206,17 +250,29 @@ contract Case is Ownable, Initializable {
   function rejectChallengedDiagnosis() internal {
     status = CaseStatus.ClosedRejected;
 
-    medXToken.transfer(challengingDoctor, (caseFee * 50) / 100);
+    medXToken.transfer(challengingDoctor, caseFee.mul(50).div(100));
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
-    emit CaseClosedRejected(patient, diagnosingDoctor);
+    emit CaseClosedRejected(patient, challengingDoctor);
   }
 
-  function doctorManager() internal view returns (DoctorManager) {
-    return DoctorManager(registry.lookup(keccak256("DoctorManager")));
+  function doctorManager() internal view returns (IDoctorManager) {
+    return IDoctorManager(registry.lookup(keccak256("DoctorManager")));
   }
 
-  function caseManager() internal view returns (CaseManager) {
-    return CaseManager(registry.lookup(keccak256("CaseManager")));
+  function caseManager() internal view returns (ICaseManager) {
+    return ICaseManager(registry.lookup(keccak256("CaseManager")));
+  }
+
+  function caseStatusManager() internal view returns (CaseStatusManager) {
+    return CaseStatusManager(registry.lookup(keccak256("CaseStatusManager")));
+  }
+
+  function getDiagnosingDoctor() public view returns (address) {
+    return diagnosingDoctor;
+  }
+
+  function getChallengingDoctor() public view returns (address) {
+    return challengingDoctor;
   }
 }

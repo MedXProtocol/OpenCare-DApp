@@ -14,8 +14,7 @@ import hashToHex from '~/utils/hash-to-hex'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { uploadJson, downloadJson } from '~/utils/storage-util'
 import { isBlank } from '~/utils/isBlank'
-import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
-import { withSend } from '~/saga-genesis'
+import { TransactionStateHandler, withSend } from '~/saga-genesis'
 import { customStyles } from '~/config/react-select-custom-styles'
 import { groupedRecommendationOptions } from './recommendationOptions'
 import { groupedDiagnosisOptions } from './diagnosisOptions'
@@ -616,14 +615,12 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                           className="form-group form-group--logical-grouping"
                           key={`key-noFurtherTreatment`}
                         >
-                          <div className={classnames('form-group')}>
-                            <label className="checkbox-inline">
-                              <input type="checkbox" onClick={(event) =>
-                                this.setState({ 'noFurtherTreatment': !this.state.noFurtherTreatment })
-                              } /> &nbsp;
-                              No Further Treatment Necessary
-                            </label>
-                          </div>
+                          <label className="checkbox-inline">
+                            <input type="checkbox" onClick={(event) =>
+                              this.setState({ 'noFurtherTreatment': !this.state.noFurtherTreatment })
+                            } /> &nbsp;
+                            No Further Treatment Necessary
+                          </label>
                         </div>
                       )
                     }

@@ -8,7 +8,7 @@ import {
   put,
   takeLatest
 } from 'redux-saga/effects'
-import { fisherYatesShuffle } from '~/services/fisherYatesShuffle'
+import shuffle from 'lodash.shuffle'
 import range from 'lodash.range'
 
 function* doctorManager() {
@@ -120,7 +120,7 @@ function* findNextAvailableOfflineDoctor() {
   let doctorIndices = range(1, doctorCount)
 
   while (doctorIndices.length > 0) {
-    doctorIndices = fisherYatesShuffle(doctorIndices)
+    doctorIndices = shuffle(doctorIndices)
     const randomIndex = doctorIndices[0]
 
     doctor = yield fetchDoctorByIndex(randomIndex)

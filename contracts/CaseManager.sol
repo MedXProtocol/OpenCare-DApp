@@ -1,11 +1,12 @@
 pragma solidity ^0.4.23;
 
-import "./Case.sol";
-import "./MedXToken.sol";
-import "./Registry.sol";
-import "./AccountManager.sol";
+import "./ICase.sol";
+import "./IMedXToken.sol";
+import "./IRegistry.sol";
+import "./IAccountManager.sol";
 import "./Delegate.sol";
 import "./Initializable.sol";
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
@@ -18,16 +19,15 @@ contract CaseManager is Ownable, Pausable, Initializable {
     mapping (address => uint256) public caseIndices;
     mapping (address => address[]) public patientCases;
 
-    MedXToken public medXToken;
-    Registry public registry;
+    IMedXToken public medXToken;
+    IRegistry public registry;
 
     mapping (address => address[]) public doctorCases;
 
     event NewCase(address indexed caseAddress, uint256 indexed index);
 
-    modifier isCase(address _case) {
-      require(_case != address(0));
-      require(caseIndices[_case] != uint256(0));
+    modifier onlyIsCase(address _case) {
+      isCase(_case);
       _;
     }
 
@@ -36,21 +36,26 @@ contract CaseManager is Ownable, Pausable, Initializable {
       _;
     }
 
+    function isCase(address _case) {
+      require(_case != address(0));
+      require(caseIndices[_case] != uint256(0));
+    }
+
     /**
      * @dev - Constructor
      * @param _baseCaseFee - initial case fee
      * @param _medXToken - the MedX token
      */
-    function initialize(uint256 _baseCaseFee, MedXToken _medXToken, Registry _registry) external notInitialized {
+    function initialize(uint256 _baseCaseFee, address _medXToken, address _registry) external notInitialized {
         require(_baseCaseFee > 0);
-        require(address(_medXToken) != 0x0);
-        require(address(_registry) != 0x0);
+        require(_medXToken != 0x0);
+        require(_registry != 0x0);
         setInitialized();
 
         owner = msg.sender;
         caseFee = _baseCaseFee;
-        medXToken = _medXToken;
-        registry = _registry;
+        medXToken = IMedXToken(_medXToken);
+        registry = IRegistry(_registry);
         caseList.push(address(0));
     }
 
@@ -154,7 +159,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       bytes _doctorEncryptedKey,
       bytes _patientPublicKey
     ) public onlyThis {
-      AccountManager am = accountManager();
+      IAccountManager am = accountManager();
       require(am.publicKeys(_patient).length == 0);
       am.setPublicKey(_patient, _patientPublicKey);
       createAndAssignCase(
@@ -174,18 +179,18 @@ contract CaseManager is Ownable, Pausable, Initializable {
       address _doctor,
       bytes _doctorEncryptedKey
     ) public onlyThis {
-      Case newCase = Case(new Delegate(registry, keccak256("Case")));
+      ICase newCase = ICase(new Delegate(registry, keccak256("Case")));
       newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
-      newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
       patientCases[_patient].push(address(newCase));
       doctorCases[_doctor].push(newCase);
       medXToken.transferFrom(_patient, newCase, createCaseCost());
+      newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
       emit NewCase(newCase, caseIndex);
     }
 
-    function addChallengeDoctor(address _doctor) external isCase(msg.sender) {
+    function addChallengeDoctor(address _doctor) external onlyIsCase(msg.sender) {
       doctorCases[_doctor].push(msg.sender);
     }
 
@@ -194,11 +199,14 @@ contract CaseManager is Ownable, Pausable, Initializable {
     }
 
     function doctorCaseAtIndex(address _doctor, uint256 _doctorAuthIndex) external view returns (address) {
-      require(_doctorAuthIndex < doctorCases[_doctor].length);
-      return doctorCases[_doctor][_doctorAuthIndex];
+      if (_doctorAuthIndex < doctorCases[_doctor].length) {
+        return doctorCases[_doctor][_doctorAuthIndex];
+      } else {
+        return 0;
+      }
     }
 
-    function accountManager() internal view returns (AccountManager) {
-      return AccountManager(registry.lookup(keccak256('AccountManager')));
+    function accountManager() internal view returns (IAccountManager) {
+      return IAccountManager(registry.lookup(keccak256('AccountManager')));
     }
 }

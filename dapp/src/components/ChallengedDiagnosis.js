@@ -38,7 +38,7 @@ function* saga({ caseAddress, networkId }) {
 }
 
 const ChallengedDiagnosis = connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: [ 'caseAddress', 'challengeHash', 'networkId' ] })(
+  withSaga(saga)(
     class _ChallengedDiagnosis extends Component {
 
   constructor(props){

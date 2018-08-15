@@ -42,19 +42,27 @@ function* waitForResponse(call) {
   }
 }
 
-function* runCall(call, cacheActive) {
+export function* runCall(call, cacheActive) {
+  if (typeof cacheActive === 'undefined') {
+    cacheActive = yield isCacheActive(call)
+  }
   let response = null
   const inFlight = isInFlight(call)
   if (cacheActive && !inFlight) {
     response = yield findResponse(call)
   } else {
-    if (!inFlight) {
-      callsInFlight.add(call.hash)
-      yield put({ type: 'WEB3_CALL', call })
-    }
-    response = yield waitForResponse(call)
+    response = yield executeWeb3Call(call)
   }
   return response
+}
+
+export function* executeWeb3Call(call) {
+  const inFlight = isInFlight(call)
+  if (!inFlight) {
+    callsInFlight.add(call.hash)
+    yield put({ type: 'WEB3_CALL', call })
+  }
+  return yield waitForResponse(call)
 }
 
 /**
@@ -67,10 +75,15 @@ export function* cacheCall(address, method, ...args) {
   return yield runCall(call, cacheActive)
 }
 
+export function* callNoCache(address, method, ...args) {
+  const call = createCall(address, method, ...args)
+  yield put({ type: 'WEB3_CALL', call })
+  return yield waitForResponse(call)
+}
+
 export function* web3Call(address, method, ...args) {
   const call = createCall(address, method, ...args)
-  const cacheActive = yield isCacheActive(call)
-  return yield runCall(call, cacheActive)
+  return yield runCall(call)
 }
 
 function* findCallMethod(call) {
@@ -101,17 +114,17 @@ function* web3CallExecute({call}) {
         yield put({ type: 'WEB3_CALL_RETURN', call, response })
       } catch (error) {
         yield put({ type: 'WEB3_CALL_ERROR', call, error })
-        console.error(error)
+        console.error('Error on WEB3 Call: ', call.method, call.args, call, error)
       } finally {
         callsInFlight.delete(call.hash)
       }
     })
   } catch (error) {
     if (yield cancelled()) {
-      console.warn(error)
+      console.warn('Cancelled on WEB3 Call: ', call.method, call.args, call, error)
       yield put({ type: 'WEB3_CALL_CANCELLED', call })
     } else {
-      console.error(error)
+      console.error('Error on WEB3 Call: ', call.method, call.args, call, error)
       yield put({ type: 'WEB3_CALL_ERROR', call, error })
     }
   }

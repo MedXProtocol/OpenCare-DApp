@@ -3,12 +3,10 @@ import {
   all
 } from 'redux-saga/effects'
 import {
-  contractByName
-} from '~/saga-genesis/state-finders'
-import {
+  contractByName,
   addContract,
   web3Call
-} from '~/saga-genesis/sagas'
+} from '~/saga-genesis'
 
 function* lookupAndAddContract(web3, name) {
   const Registry = yield select(contractByName, 'Registry')
@@ -20,6 +18,7 @@ function* lookupAndAddContract(web3, name) {
 export default function* ({ web3 }) {
   yield all([
     lookupAndAddContract(web3, 'CaseManager'),
+    lookupAndAddContract(web3, 'CaseStatusManager'),
     lookupAndAddContract(web3, 'DoctorManager'),
     lookupAndAddContract(web3, 'AccountManager'),
     lookupAndAddContract(web3, 'BetaFaucet')

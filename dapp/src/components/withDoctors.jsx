@@ -3,8 +3,7 @@ import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
 import PropTypes from 'prop-types'
-import { withSaga, cacheCallValue, cacheCall } from '~/saga-genesis'
-import { contractByName } from '~/saga-genesis/state-finders'
+import { withSaga, cacheCallValue, cacheCall, contractByName } from '~/saga-genesis'
 import get from 'lodash.get'
 import range from 'lodash.range'
 
@@ -59,7 +58,7 @@ function* saga({ DoctorManager, AccountManager }) {
 export function withDoctors(WrappedComponent) {
   return (
     connect(mapStateToProps)(
-      withSaga(saga, { propTriggers: ['doctorCount', 'DoctorManager', 'AccountManager', 'isActive'] })(
+      withSaga(saga)(
         class _withDoctors extends Component {
           static propTypes = {
             excludeAddresses: PropTypes.array

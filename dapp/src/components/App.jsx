@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
-import { all } from 'redux-saga/effects'
 import ReduxToastr from 'react-redux-toastr'
 import ReactTimeout from 'react-timeout'
 import { hot } from 'react-hot-loader'
@@ -21,7 +20,7 @@ import { Welcome } from '~/components/welcome'
 import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
-import { HippoNavbarContainer } from '~/components/HippoNavbar'
+import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
 import { PublicKeyCheck } from '~/components/PublicKeyCheck'
 import { BetaFaucetModal } from '~/components/BetaFaucetModal'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
@@ -30,43 +29,38 @@ import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
 import { connect } from 'react-redux'
-import get from 'lodash.get'
-import { withSaga, cacheCallValue, withContractRegistry } from '~/saga-genesis'
-import { contractByName } from '~/saga-genesis/state-finders'
-import { cacheCall } from '~/saga-genesis/sagas'
-import { openCase, historicalCase } from '~/services/openOrHistoricalCaseService'
+import {
+  cacheCall,
+  withSaga,
+  cacheCallValue,
+  withContractRegistry,
+  contractByName
+} from '~/saga-genesis'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
-import { populateCases, populateCasesSaga } from '~/services/populateCases'
 import { toastr } from '~/toastr'
-import { defined } from '~/utils/defined'
+import get from 'lodash.get'
 
 function mapStateToProps (state) {
-  let caseCount
-  let cases = []
   const CaseManager = contractByName(state, 'CaseManager')
+  const CaseStatusManager = contractByName(state, 'CaseStatusManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const doctorCasesCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
+  const openCaseCount = cacheCallValue(state, CaseStatusManager, 'openCaseCount', address)
   const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
 
-
-  if (isSignedIn && isDoctor) {
-    caseCount = get(state, 'userStats.caseCount')
-    // caseCount = parseInt(cacheCallValue(state, CaseManager, 'doctorCasesCount', address), 10)
-
-    cases = populateCases(state, CaseManager, address, caseCount)
-  }
-
   return {
     address,
-    cases,
     isDoctor,
     DoctorManager,
     isSignedIn,
-    caseCount,
+    doctorCasesCount,
+    openCaseCount,
     CaseManager,
+    CaseStatusManager,
     isOwner
   }
 }
@@ -75,106 +69,56 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatchSignOut: () => {
       dispatch({ type: 'SIGN_OUT' })
-    },
-    dispatchNewCaseCount: (caseCount) => {
-      dispatch({ type: 'UPDATE_CASE_COUNT', caseCount })
     }
   }
 }
 
-function* saga({ address, caseCount, CaseManager, DoctorManager }) {
-  if (!address || !CaseManager || !DoctorManager) { return }
-
-  yield all([
-    cacheCall(CaseManager, 'doctorCasesCount', address),
-    cacheCall(DoctorManager, 'isDoctor', address)
-  ])
-
-  if (caseCount) {
-    yield populateCasesSaga(CaseManager, address, caseCount)
+function* saga({ address, CaseManager, CaseStatusManager, DoctorManager }) {
+  if (!address || !CaseManager || !DoctorManager || !CaseStatusManager) { return }
+  const isDoctor = yield cacheCall(DoctorManager, 'isDoctor', address)
+  if (isDoctor) {
+    yield cacheCall(CaseManager, 'doctorCasesCount', address)
+    yield cacheCall(CaseStatusManager, 'openCaseCount', address)
   }
 }
 
 const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['address', 'caseCount', 'CaseManager', 'DoctorManager', 'isDoctor'] })(
+  withSaga(saga)(
     class _App extends Component {
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      openCases: [],
-      historicalCases: []
-    }
-  }
 
   componentDidMount () {
     window.addEventListener("beforeunload", this.unload)
     window.addEventListener("focus", this.refocus)
     this.onAccountChangeSignOut(this.props)
+
     if (process.env.NODE_ENV !== 'development' && !this.props.address && this.props.isSignedIn) {
       this.signOut()
-    }
-
-    // Remove this when we figure out how to update the Challenged Doctor's cases list
-    // automatically from the block listener!
-    this.pollNewCaseID = this.props.setInterval(this.pollForNewCase, 2000)
-  }
-
-  // Remove this when we figure out how to update the Challenged Doctor's cases list
-  // automatically from the block listener!
-  pollForNewCase = async () => {
-    const { contractRegistry, CaseManager, address, isDoctor, isSignedIn } = this.props
-
-    if (!CaseManager || !address || !isDoctor || !isSignedIn) { return }
-
-    const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
-    const newCaseCount = await CaseManagerInstance.methods.doctorCasesCount(address).call()
-      .then(c => {
-        return c
-      })
-
-    if (newCaseCount !== this.props.caseCount) {
-      this.props.dispatchNewCaseCount(newCaseCount)
     }
   }
 
   componentWillUnmount () {
     window.removeEventListener("beforeunload", this.unload)
     window.removeEventListener("focus", this.refocus)
-
-    clearInterval(this.pollNewCaseID)
   }
 
   componentWillReceiveProps (nextProps) {
     this.onAccountChangeSignOut(nextProps)
 
-    if (nextProps.isSignedIn && nextProps.isDoctor) {
+    if (
+      nextProps.isSignedIn
+      && nextProps.isDoctor
+      && (nextProps.openCaseCount > this.props.openCaseCount)
+    ) {
       this.showNewCaseAssignedToast(nextProps)
     }
-
-    this.setState({
-      openCases: nextProps.cases.filter(c => openCase(c)),
-      historicalCases: nextProps.cases.filter(c => historicalCase(c))
-    })
   }
 
   showNewCaseAssignedToast = (nextProps) => {
     const { contractRegistry, CaseManager, address } = this.props
-    const oldCaseCount = this.props.caseCount
-
-    // Moving from 0 to 1, or 1 to 2, but not undefined/NaN (initial state) to a number
-    if (
-      (!defined(oldCaseCount))
-      || isNaN(nextProps.caseCount)
-      || (oldCaseCount === nextProps.caseCount)
-    ) {
-      return
-    }
 
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
     CaseManagerInstance.methods
-      .doctorCaseAtIndex(address, nextProps.caseCount - 1)
+      .doctorCaseAtIndex(address, nextProps.doctorCasesCount)
       .call().then(caseAddress => {
         const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress })
 
@@ -230,11 +174,9 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     const WelcomeWrapped = <Welcome isDoctor={this.props.isDoctor} />
 
-
-
     return (
       <React.Fragment>
-        <HippoNavbarContainer openCasesLength={this.state.openCases.length} />
+        <HippoNavbarContainer openCasesLength={this.props.openCaseCount} />
         {ownerWarning}
         {publicKeyCheck}
         <div className="content">
@@ -262,13 +204,9 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
             <SignedInRoute path={routes.DOCTORS_CASES_OPEN}
               component={OpenCasesContainer}
-              historicalCases={this.state.historicalCases}
-              openCases={this.state.openCases}
             />
             <SignedInRoute exact path={routes.DOCTORS_CASES_OPEN_PAGE_NUMBER}
               component={OpenCasesContainer}
-              historicalCases={this.state.historicalCases}
-              openCases={this.state.openCases}
             />
             <SignedInRoute exact path={routes.DOCTORS_CASES_DIAGNOSE_CASE}
               component={OpenCasesContainer}

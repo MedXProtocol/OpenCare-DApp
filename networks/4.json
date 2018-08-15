@@ -1,5 +1,5 @@
 {
-  "migrationVersion": 1533323026,
+  "migrationVersion": 1534268870,
   "contracts": [
     {
       "contractName": "Migrations",
@@ -20,10 +20,6 @@
     {
       "contractName": "Delegate",
       "address": "0x10ed9f5e5dfbeb9897bc98584e81a729442f10a5"
-    },
-    {
-      "contractName": "SkipList",
-      "address": "0xe67bcda514427cae665ae9fe9cd4736116db1816"
     },
     {
       "contractName": "CaseManager",
@@ -64,10 +60,6 @@
     {
       "contractName": "Delegate",
       "address": "0xd99fe864b8d98eb07aa89712b1016969c5bdc1fb"
-    },
-    {
-      "contractName": "SkipList",
-      "address": "0x276d5ad7164f7e7b5651c7a14e6eaf912e746b1f"
     },
     {
       "contractName": "CaseManager",
@@ -180,6 +172,42 @@
     {
       "contractName": "Case",
       "address": "0xbac7051a648e5d5feb8da3b3ba9ebe5e3f6538e1"
+    },
+    {
+      "contractName": "Case",
+      "address": "0x4b63e985a2c01f737ea6d2acd7beb4733a62e70a"
+    },
+    {
+      "contractName": "Case",
+      "address": "0x265ce5e5f5cedf39f8230b87c42058457431dd27"
+    },
+    {
+      "contractName": "CaseManager",
+      "address": "0x0ab39bd2f5b2edbb78342ed75c23a87176bfdf94"
+    },
+    {
+      "contractName": "CaseManager",
+      "address": "0x64e0e695c0e8aaaeed0f121420f392535d2d1e98"
+    },
+    {
+      "contractName": "Case",
+      "address": "0x2533d5340834dc815dc9a6bc3953d0681aa71e63"
+    },
+    {
+      "contractName": "CaseManager",
+      "address": "0x63da863507f40608e12d7830d2de53d7844b73e0"
+    },
+    {
+      "contractName": "CaseStatusManager",
+      "address": "0x4fdb521600b9d81fc693bf49f3f21f43d6e9ff14"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0xb50fd9152d178fd89ca653936a9e539c09888ec3"
+    },
+    {
+      "contractName": "Case",
+      "address": "0x4782750bbd4c798377a24930a9af3527e90a80ae"
     }
   ]
 }

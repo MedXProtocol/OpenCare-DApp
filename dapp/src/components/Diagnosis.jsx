@@ -7,7 +7,14 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
 import { Loading } from '~/components/Loading'
-import { withSaga, cacheCall, cacheCallValue, withSend, addContract } from '~/saga-genesis'
+import {
+  withSaga,
+  cacheCall,
+  cacheCallValue,
+  withSend,
+  addContract,
+  TransactionStateHandler
+} from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { isTrue } from '~/utils/isTrue'
@@ -17,9 +24,8 @@ import { downloadJson } from '~/utils/storage-util'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { DiagnosisDisplay } from '~/components/DiagnosisDisplay'
 import { DoctorSelect } from '~/components/DoctorSelect'
-import { reencryptCaseKey } from '~/services/reencryptCaseKey'
+import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { mixpanel } from '~/mixpanel'
-import { TransactionStateHandler } from '~/saga-genesis/TransactionStateHandler'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
@@ -78,7 +84,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['caseAddress', 'diagnosisHash', 'status', 'networkId'] })(
+  withSaga(saga)(
     withSend(class _Diagnosis extends Component {
 
   constructor(){
@@ -230,7 +236,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
     })
   }
 
-  onSubmitChallenge = (e) => {
+  onSubmitChallenge = async (e) => {
     e.preventDefault()
     this.setState({ doctorAddressError: '' })
     if (!this.state.selectedDoctor) {
@@ -241,7 +247,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
       const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
       const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
       const caseKeySalt = this.props.caseKeySalt.substring(2)
-      const doctorEncryptedCaseKey = reencryptCaseKey({
+      const doctorEncryptedCaseKey = await reencryptCaseKeyAsync({
         account: currentAccount(),
         encryptedCaseKey,
         doctorPublicKey,

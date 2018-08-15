@@ -22,10 +22,6 @@
       "address": "0xe82c7dde85e1a1cafa0e3852b06c3e2b9dd39bf7"
     },
     {
-      "contractName": "SkipList",
-      "address": "0x4d94b8eb07622e62ed4368feaa9ddbcbb1662752"
-    },
-    {
       "contractName": "CaseManager",
       "address": "0xf0ac3836e856cc0544a3d31032658cd218ee64d3"
     },
@@ -114,10 +110,6 @@
       "address": "0xff9350e6522e4b6a522b0862a1e4c73576291ae6"
     },
     {
-      "contractName": "SkipList",
-      "address": "0x6e233bc27afb023dfba40cb07f9b16fe8ff986b5"
-    },
-    {
       "contractName": "CaseManager",
       "address": "0x92e77d85ce6908340ab997f8b22bf45a27104dd7"
     },
@@ -184,10 +176,6 @@
     {
       "contractName": "Delegate",
       "address": "0x0efc128662f70d0a6a8bef34fc140f6dfde1b513"
-    },
-    {
-      "contractName": "SkipList",
-      "address": "0x97c53fb0ade00b2924d35f12010835403dcef249"
     },
     {
       "contractName": "CaseManager",
@@ -268,10 +256,6 @@
     {
       "contractName": "Delegate",
       "address": "0x680c1adea5830fe490a8f356ee8839a2b64be7de"
-    },
-    {
-      "contractName": "SkipList",
-      "address": "0x033c5eb8deea5ff4d7847d1799c9dbc256ede7bf"
     },
     {
       "contractName": "CaseManager",

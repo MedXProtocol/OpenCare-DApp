@@ -3,68 +3,98 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
 import { all } from 'redux-saga/effects'
-import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
-import { cacheCall } from '~/saga-genesis/sagas'
+import {
+  cacheCall,
+  contractByName,
+  withSaga,
+  withContractRegistry,
+  cacheCallValue,
+  cacheCallValueInt
+} from '~/saga-genesis'
 import { CaseRow } from '~/components/CaseRow'
-import { contractByName } from '~/saga-genesis/state-finders'
-import { addContract } from '~/saga-genesis/sagas'
 import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { patientCaseStatusToName, patientCaseStatusToClass } from '~/utils/patientCaseStatusLabels'
-import { addOrUpdatePendingTxs } from '~/services/addOrUpdatePendingTxs'
-import rangeRight from 'lodash.rangeright'
+import { addPendingTx } from '~/services/pendingTxs'
+import { defined } from '~/utils/defined'
+import range from 'lodash.range'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state) {
-  let cases = []
+  let caseAddresses = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-  const caseCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
-  const transactions = state.sagaGenesis.transactions
+  const transactions = Object.values(state.sagaGenesis.transactions)
+  const caseCount = cacheCallValueInt(state, CaseManager, 'getPatientCaseListCount', address)
 
-  for (let objIndex = (caseCount - 1); objIndex >= 0; --objIndex) {
-    const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, objIndex)
+  caseAddresses = range(caseCount).reduce((accumulator, index) => {
+    const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, index)
     if (caseAddress) {
-      const status = cacheCallValue(state, caseAddress, 'status')
-      const createdAt = cacheCallValue(state, caseAddress, 'createdAt')
-      cases.push({
-        caseAddress,
-        status,
-        createdAt,
-        objIndex
-      })
+      accumulator.push(caseAddress)
     }
-  }
-
-  cases = addOrUpdatePendingTxs(transactions, cases, caseCount)
+    return accumulator
+  }, [])
 
   return {
     address,
     caseCount,
-    cases,
-    CaseManager
+    caseAddresses,
+    CaseManager,
+    transactions
   }
 }
 
 function* saga({ address, CaseManager }) {
   if (!address || !CaseManager) { return }
   const caseCount = yield cacheCall(CaseManager, 'getPatientCaseListCount', address)
-  const indices = rangeRight(caseCount)
-  yield all(indices.map(function* (objIndex) {
-    const caseAddress = yield cacheCall(CaseManager, 'patientCases', address, objIndex)
-    // console.log('called by patients cases index saga')
-    yield all([
-      addContract({ address: caseAddress, contractKey: 'Case' }),
-      cacheCall(caseAddress, 'createdAt'),
-      cacheCall(caseAddress, 'status')
-    ])
+
+  const indices = range(caseCount)
+  yield all(indices.map(function* (index) {
+    yield cacheCall(CaseManager, 'patientCases', address, index)
   }))
 }
 
-export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga, { propTriggers: ['account', 'CaseManager', 'caseCount']})(class _PatientCases extends Component {
+function renderCaseRows(caseAddresses, transactions, caseCount) {
+  let caseRows = caseAddresses.map((caseAddress, index) => {
+    return (
+      <CaseRow
+        objIndex={index+1}
+        caseAddress={caseAddress}
+        key={`open-case-row-${index}`}
+        route={routes.PATIENTS_CASE}
+        context='patient'
+      />
+    )
+  })
+
+
+  let objIndex = caseCount + 1
+  transactions.forEach(transaction => {
+    if (!defined(transaction.call)) { return } // continue
+
+    const caseRowObject = addPendingTx(transaction, objIndex)
+
+    if (caseRowObject) {
+      caseRows.push(
+        <CaseRow
+          caseRowObject={caseRowObject}
+          objIndex={objIndex}
+          key={`new-case-row-${objIndex}`}
+          context='patient'
+        />
+      )
+
+      objIndex++
+    }
+  })
+
+  return caseRows.reverse()
+}
+
+export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class _PatientCases extends Component {
   render() {
-    let loadingLines, noCases, cases
+    let loadingLines, noCases, caseRows
+    const { caseAddresses, caseCount, transactions } = this.props
     const loading = (this.props.caseCount === undefined)
 
     if (loading) {
@@ -75,7 +105,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
           </div>
         </div>
       )
-    } else if (!this.props.cases.length) {
+    } else if (!caseAddresses.length) {
       noCases = (
         <div className="blank-state">
           <div className="blank-state--inner text-center text-gray">
@@ -84,7 +114,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
         </div>
       )
     } else {
-      cases = (
+      caseRows = (
         <div>
           <h5 className="title subtitle">
             Current Cases:
@@ -94,17 +124,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
             leaveAnimation="accordionVertical"
             className="case-list"
           >
-            {this.props.cases.map(caseRowObject => {
-              caseRowObject['statusLabel'] = patientCaseStatusToName(caseRowObject.status)
-              caseRowObject['statusClass'] = patientCaseStatusToClass(caseRowObject.status)
-              return (
-                <CaseRow
-                  key={caseRowObject.objIndex}
-                  route={routes.PATIENTS_CASE}
-                  caseRowObject={caseRowObject}
-                />
-              )
-            })}
+            {renderCaseRows(caseAddresses, transactions, caseCount)}
           </FlipMove>
         </div>
       )
@@ -116,7 +136,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
         <div className="card-body">
           {loadingLines}
           {noCases}
-          {cases}
+          {caseRows}
         </div>
       </div>
     )

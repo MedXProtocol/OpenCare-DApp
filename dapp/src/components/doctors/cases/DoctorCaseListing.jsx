@@ -4,26 +4,27 @@ import { Link } from 'react-router-dom'
 import { formatRoute } from 'react-router-named-routes'
 import classnames from 'classnames'
 import { CaseRow } from '~/components/CaseRow'
-import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctorCaseStatusLabels'
 import * as routes from '~/config/routes'
+
+function renderCaseRows(caseAddresses, key) {
+  const caseRows = caseAddresses.map((caseAddress, index) => {
+    return (
+      <CaseRow
+        caseAddress={caseAddress}
+        key={`${key}-case-row-${index}`}
+        route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
+        context='doctor'
+      />
+    )
+  })
+
+  return caseRows
+}
 
 export const DoctorCaseListing = class _DoctorCaseListing extends Component {
 
-  renderCase = (caseRowObject) => {
-    caseRowObject['statusLabel'] = doctorCaseStatusToName(caseRowObject)
-    caseRowObject['statusClass'] = doctorCaseStatusToClass(caseRowObject)
-
-    return (
-      <CaseRow
-        key={caseRowObject.objIndex}
-        route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
-        caseRowObject={caseRowObject}
-      />
-    )
-  }
-
   render() {
-    const { openCases, paginatedHistoricalCases, currentPageNumber, pageNumbers } = this.props
+    const { openCaseAddresses, closedCaseAddresses, currentPage, pageNumbers } = this.props
 
     return (
       <div className='container'>
@@ -50,7 +51,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                   Open Cases:
                 </h5>
                 {
-                  !openCases.length ?
+                  !openCaseAddresses.length ?
                   <div className="blank-state">
                     <div className="blank-state--inner text-center text-gray">
                       <span>You do not have any cases assigned to you right now.</span>
@@ -61,7 +62,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                     leaveAnimation="accordionVertical"
                     className="case-list"
                   >
-                    {openCases.map(c => this.renderCase(c))}
+                    {renderCaseRows(openCaseAddresses, 'open')}
                   </FlipMove>
                 }
               </div>
@@ -77,7 +78,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                   Historical Cases:
                 </h5>
                 {
-                  !paginatedHistoricalCases.length ?
+                  !closedCaseAddresses.length ?
                   <div className="blank-state">
                     <div className="blank-state--inner text-center text-gray">
                       <span>You have not evaluated any cases yet.</span>
@@ -88,7 +89,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                     leaveAnimation="accordionVertical"
                     className="case-list"
                   >
-                    {paginatedHistoricalCases.map(c => this.renderCase(c))}
+                    {renderCaseRows(closedCaseAddresses, 'closed')}
                   </FlipMove>
                 }
               </div>
@@ -96,14 +97,14 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
               <nav aria-label="Page navigation" className="text-center">
                 <ul className="pagination">
                   {pageNumbers.map(function(number) {
-                    const path = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { pageNumber: number })
+                    const path = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { currentPage: number })
 
                     return (
                       <li
                         key={`page-number-${number}`}
                         className={classnames(
                           'pagination--page-number',
-                          { 'active': currentPageNumber === number }
+                          { 'active': currentPage === number }
                         )}
                       >
                         <Link to={path}>

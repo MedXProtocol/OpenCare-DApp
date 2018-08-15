@@ -1,109 +1,162 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
-import PropTypes from 'prop-types'
 import { DiagnoseCaseContainer } from '~/components/doctors/diagnose'
-import { DoctorCaseListing } from '~/components/doctors/DoctorCaseListing'
+import { DoctorCaseListing } from './DoctorCaseListing'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { addOrUpdatePendingTxs } from '~/services/addOrUpdatePendingTxs'
 import { formatRoute } from 'react-router-named-routes'
+import {
+  cacheCallValue,
+  cacheCallValueInt,
+  contractByName,
+  withSaga,
+  cacheCall
+} from '~/saga-genesis'
+import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
+import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
 
 const MAX_CASES_PER_PAGE = 5
 
-function mapStateToProps(state) {
+function mapStateToProps(state, { match }) {
+  let start = 0
+  let end = 0
+  let pageNumbers = []
+
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const caseCount = get(state, 'userStats.caseCount')
-  const transactions = state.sagaGenesis.transactions
+  const CaseStatusManager = contractByName(state, 'CaseStatusManager')
+
+  const openCaseAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
+
+  let closedCaseCount = cacheCallValueInt(state, CaseStatusManager, 'closedCaseCount', address)
+  if (!closedCaseCount) {
+    closedCaseCount = 0
+  }
+
+  let { currentPage } = match.params
+  if (!currentPage) {
+    currentPage = 1
+  } else {
+    currentPage = parseInt(currentPage, 10)
+  }
+
+  let closedCaseAddresses = []
+  if (closedCaseCount) {
+    const totalPages = Math.ceil(closedCaseCount / MAX_CASES_PER_PAGE)
+    pageNumbers = range(1, totalPages + 1)
+
+    start = (closedCaseCount - ((parseInt(currentPage, 10) - 1) * MAX_CASES_PER_PAGE))
+    end = Math.max((start - MAX_CASES_PER_PAGE), 0)
+
+    for (let i = (start - 1); i >= end; i--) {
+      const closedCaseAddress = cacheCallValue(state, CaseStatusManager, 'closedCaseAtIndex', address, i)
+
+      if (closedCaseAddress && !isBlank(closedCaseAddress)) {
+        closedCaseAddresses.push(closedCaseAddress)
+      } else {
+        break
+      }
+    }
+  }
 
   return {
     address,
-    caseCount,
-    transactions
+    CaseStatusManager,
+    openCaseAddresses,
+    closedCaseAddresses,
+    pageNumbers,
+    currentPage,
+    start,
+    end
   }
 }
 
-function paginateCases(historicalCases, pageNumber, perPage) {
-  const start = (perPage % pageNumber) * perPage
-  const offset = start + perPage
+function* saga({ address, CaseStatusManager, start, end }) {
+  if (!address || !CaseStatusManager) { return }
+  yield cacheCall(CaseStatusManager, 'closedCaseCount', address)
 
-  return [...historicalCases.slice(start, offset)]
+  yield openCaseAddressesSaga(CaseStatusManager, address)
+
+  yield range(start, end).map(function* (index) {
+    yield cacheCall(CaseStatusManager, 'closedCaseAtIndex', address, index - 1)
+  })
 }
 
-export const OpenCasesContainer = connect(mapStateToProps)(class _OpenCasesContainer extends Component {
+export const OpenCasesContainer = connect(mapStateToProps)(
+  withSaga(saga)(
+    class _OpenCasesContainer extends Component {
 
-  componentDidMount() {
-    this.redirectToFirstPage(this.props)
-  }
+      componentDidMount() {
+        this.redirectToFirstPage(this.props)
+      }
 
-  componentWillReceiveProps(nextProps) {
-    this.redirectToFirstPage(nextProps)
-  }
+      componentWillReceiveProps(nextProps) {
+        this.redirectToFirstPage(nextProps)
+      }
 
-  redirectToFirstPage = (props) => {
-    if (!props.match.params.caseAddress && !props.match.params.pageNumber) {
-      const firstPageRoute = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { pageNumber: 1 })
-      props.history.push(firstPageRoute)
+      redirectToFirstPage = (props) => {
+        if (!props.match.params.caseAddress && !props.match.params.currentPage) {
+          const firstPageRoute = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { currentPage: 1 })
+          props.history.push(firstPageRoute)
+        }
+      }
+
+      render () {
+        let doctorCaseListing, diagnoseCase, doScrollToTop
+        const {
+          closedCaseAddresses,
+          openCaseAddresses,
+          match,
+          currentPage,
+          pageNumbers
+        } = this.props
+
+        if (match.params.caseAddress) {
+          diagnoseCase = <DiagnoseCaseContainer key="diagnoseCaseContainerKey" match={match} />
+        } else {
+          doctorCaseListing = (
+            <DoctorCaseListing
+              key="doctor-case-listing"
+              openCaseAddresses={openCaseAddresses}
+              closedCaseAddresses={closedCaseAddresses}
+              pageNumbers={pageNumbers}
+              currentPage={currentPage}
+            />
+          )
+        }
+
+        const diagnosisJustSubmitted = (
+          this.previousCaseAddress
+          && !match.params.caseAddress
+        )
+        if (diagnosisJustSubmitted) {
+          doScrollToTop = true
+        }
+        this.previousCaseAddress = match.params.caseAddress
+
+        return (
+          <div>
+            <ScrollToTop scrollToTop={doScrollToTop} />
+
+            <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCases')} />
+            <FlipMove
+              enterAnimation="fade"
+              leaveAnimation="fade"
+            >
+              {diagnoseCase}
+              {doctorCaseListing}
+            </FlipMove>
+          </div>
+        )
+      }
     }
-  }
-
-  render () {
-    let doctorCaseListing, diagnoseCase, doScrollToTop
-    const { historicalCases, openCases, caseCount, match, transactions } = this.props
-
-    if (match.params.caseAddress) {
-      diagnoseCase = <DiagnoseCaseContainer key="diagnoseCaseContainerKey" match={match} />
-    } else {
-      const totalPages = Math.ceil(historicalCases.length / MAX_CASES_PER_PAGE)
-      const pageNumbers = range(1, totalPages + 1)
-
-      let paginatedHistoricalCases = paginateCases(historicalCases, match.params.pageNumber, MAX_CASES_PER_PAGE)
-      paginatedHistoricalCases = addOrUpdatePendingTxs(transactions, paginatedHistoricalCases, caseCount)
-
-      doctorCaseListing = <DoctorCaseListing
-        key="doctorCaseListing"
-        openCases={openCases}
-        paginatedHistoricalCases={paginatedHistoricalCases}
-        pageNumbers={pageNumbers}
-        currentPageNumber={parseInt(match.params.pageNumber, 10)}
-      />
-    }
-
-    const diagnosisJustSubmitted = (
-      this.previousCaseAddress
-      && !match.params.caseAddress
-    )
-    if (diagnosisJustSubmitted) {
-      doScrollToTop = true
-    }
-    this.previousCaseAddress = match.params.caseAddress
-
-    return (
-      <div>
-        <ScrollToTop scrollToTop={doScrollToTop} />
-
-        <PageTitle renderTitle={(t) => t('pageTitles.diagnoseCases')} />
-        <FlipMove
-          enterAnimation="fade"
-          leaveAnimation="fade"
-        >
-          {diagnoseCase}
-          {doctorCaseListing}
-        </FlipMove>
-      </div>
-    )
-  }
-})
-
-OpenCasesContainer.propTypes = {
-  openCases: PropTypes.array,
-  historicalCases: PropTypes.array
-}
+  )
+)
 
 OpenCasesContainer.defaultProps = {
-  openCases: [],
-  historicalCases: []
+  openCaseAddresses: [],
+  closedCaseAddresses: []
 }

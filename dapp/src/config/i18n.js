@@ -11,7 +11,8 @@ i18next
       en: {
         translation: {
           transactions: {
-            acceptDiagnosis: 'Accept Diagnosis',
+            acceptDiagnosis: 'Accepting Diagnosis',
+            acceptAsDoctorAfterADay: 'Accepting Diagnosis',
             addOrReactivateDoctor: 'Adding / Reactivating Doctor',
             deactivateDoctor: 'Deactivating Doctor',
             approveAndCall: 'Sending Case Info',
@@ -27,7 +28,7 @@ i18next
             addDoctor: 'Upgrading to Doctor'
           },
           transactionErrors: {
-            userRevert: 'You rejected the transaction, please submit a valid transaction to proceed',
+            userRevert: 'You rejected the transaction',
             outOfGas: 'The transaction ran out of gas',
             evmRevert: 'There was an error in the contract',
             incorrectNonce: 'The nonce was incorrect (reset the account in MetaMask)',

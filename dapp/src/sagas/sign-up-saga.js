@@ -2,8 +2,7 @@ import { put, call, takeEvery, select } from 'redux-saga/effects'
 import masterPasswordInvalid from '~/services/master-password-invalid'
 import { Account } from '~/accounts/Account'
 import { mixpanel } from '~/mixpanel'
-import { contractByName } from '~/saga-genesis/state-finders'
-import { web3Call } from '~/saga-genesis'
+import { contractByName, web3Call } from '~/saga-genesis'
 
 export function* signUpSaga({ address, secretKey, masterPassword, overrideAccount }) {
   if (!address) {
@@ -17,7 +16,7 @@ export function* signUpSaga({ address, secretKey, masterPassword, overrideAccoun
   }
 
   let account = Account.get(address)
-  let newAccount = Account.build({ address, secretKey, masterPassword })
+  let newAccount = yield call([Account, 'build'], { address, secretKey, masterPassword })
   let differentAccountExists = false
 
   if (account && (account.hashedSecretKey !== newAccount.hashedSecretKey)) {
@@ -30,10 +29,10 @@ export function* signUpSaga({ address, secretKey, masterPassword, overrideAccoun
   }
 
   if (differentAccountExists && !overrideAccount) {
-    yield put({type: 'SIGN_IN_ERROR', overrideError: true })
+    yield put({ type: 'SIGN_IN_ERROR', overrideError: true })
   } else {
     const account = yield call(Account.create, { address, secretKey, masterPassword })
-    yield put({type: 'SIGN_IN_OK', account, masterPassword, address})
+    yield put({ type: 'SIGN_IN_OK', account, masterPassword, address })
     mixpanel.track("Signup")
   }
 }

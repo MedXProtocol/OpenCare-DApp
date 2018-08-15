@@ -7,10 +7,9 @@ import { CaseDetails } from '~/components/CaseDetails'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
-import { decryptCaseKey } from '~/services/decrypt-case-key'
+import { decryptCaseKeyAsync } from '~/services/decrypt-case-key'
 import { currentAccount } from '~/services/sign-in'
-import { withSaga, withContractRegistry, cacheCallValue } from '~/saga-genesis'
-import { cacheCall, addContract } from '~/saga-genesis/sagas'
+import { withSaga, cacheCallValue, cacheCall, addContract } from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import get from 'lodash.get'
 
@@ -45,59 +44,87 @@ function* saga({ match, networkId }) {
   ])
 }
 
-export const PatientCaseContainer = withContractRegistry(connect(mapStateToProps)(
-  withSaga(saga, { propTriggers: [ 'match', 'diagnosisHash', 'challengeHash', 'networkId' ]})(
+export const PatientCaseContainer = connect(mapStateToProps)(
+  withSaga(saga)(
     class _PatientCase extends Component {
+      constructor (props) {
+        super(props)
+        this.state = {}
+      }
 
-  render() {
-    const caseKey = decryptCaseKey(currentAccount(), this.props.encryptedCaseKey, this.props.caseKeySalt)
+      componentDidMount () {
+        this.decryptCaseKey(this.props)
+      }
 
-    if (this.props.diagnosisHash) {
-      var diagnosis =
-        <div className='col-xs-12'>
-          <Diagnosis
-            title='Initial Diagnosis'
-            caseAddress={this.props.match.params.caseAddress}
-            caseKey={caseKey}
-          />
-        </div>
-    }
+      componentWillReceiveProps (props) {
+        this.decryptCaseKey(props)
+      }
 
-    if (this.props.challengeHash) {
-      var challenge =
-        <div className='col-xs-12'>
-          <ChallengedDiagnosis
-            title='Second Diagnosis'
-            caseAddress={this.props.match.params.caseAddress}
-            caseKey={caseKey}
-          />
-        </div>
-    }
+      decryptCaseKey (props) {
+        if (props.encryptedCaseKey && props.caseKeySalt) {
+          decryptCaseKeyAsync(currentAccount(), props.encryptedCaseKey, props.caseKeySalt)
+            .then(caseKey => {
+              this.setState({ caseKey })
+            })
+        }
+      }
 
-    return (
-      <div>
-        <ScrollToTop />
-        <PageTitle renderTitle={(t) => t('pageTitles.patientCase', { caseId: ('' + this.props.match.params.caseAddress).substring(0, 10) + ' ...'})} />
-        <div className='container'>
-          <div className="row">
-            {caseKey ? (
+      render() {
+        const caseKey = this.state.caseKey
+
+        if (caseKey) {
+          if (this.props.diagnosisHash) {
+            var diagnosis =
               <div className='col-xs-12'>
-                <CaseStatus caseAddress={this.props.match.params.caseAddress}/>
+                <Diagnosis
+                  title='Initial Diagnosis'
+                  caseAddress={this.props.match.params.caseAddress}
+                  caseKey={caseKey}
+                />
               </div>
-            ) : null}
+          }
 
-            {diagnosis}
-            {challenge}
+          if (this.props.challengeHash) {
+            var challenge =
+              <div className='col-xs-12'>
+                <ChallengedDiagnosis
+                  title='Second Diagnosis'
+                  caseAddress={this.props.match.params.caseAddress}
+                  caseKey={caseKey}
+                />
+              </div>
+          }
 
-            <div className='col-xs-12'>
-              <CaseDetails
-                caseAddress={this.props.match.params.caseAddress}
-                caseKey={caseKey}
-              />
+          var caseDetails =
+            <CaseDetails
+              caseAddress={this.props.match.params.caseAddress}
+              caseKey={caseKey}
+            />
+        }
+
+        return (
+          <div>
+            <ScrollToTop />
+            <PageTitle renderTitle={(t) => t('pageTitles.patientCase', { caseId: ('' + this.props.match.params.caseAddress).substring(0, 10) + ' ...'})} />
+            <div className='container'>
+              <div className="row">
+                {caseKey ? (
+                  <div className='col-xs-12'>
+                    <CaseStatus caseAddress={this.props.match.params.caseAddress}/>
+                  </div>
+                ) : null}
+
+                {diagnosis}
+                {challenge}
+
+                <div className='col-xs-12'>
+                  {caseDetails}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    )
-  }
-})))
+        )
+      }
+    }
+  )
+)
