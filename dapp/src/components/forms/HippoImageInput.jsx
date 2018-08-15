@@ -40,9 +40,9 @@ export const HippoImageInput = class _HippoImageInput extends Component {
       return 'cancelling ...'
     } else if (percent < 9) {
       return 'reading file ...'
-    } else if (percent > 9 && percent < 25) {
+    } else if (percent > 9 && percent <= 25) {
       return 'compressing ...'
-    } else if (percent > 25 && percent < 50) {
+    } else if (percent > 25 && percent <= 50) {
       return 'encrypting ...'
     } else if (percent > 50 && percent < 90) {
       return 'uploading ...'

@@ -42,12 +42,12 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                 <div className="form-wrapper--body">
                   <h3 className="text-center">
                     Welcome to Hippocrates!
-                    <br /><small>The first dApp in the MedCredits Health System</small>
+                    <br /><small>The first DApp in the MedX Health System</small>
                     <br /><small className="text-gray">Ask a board-certified specialist about your skin ailment today</small>
                   </h3>
                   <hr />
                   <p>
-                    It takes under <strong>2 minutes</strong> to submit your case. Seriously, <em>it’s that easy</em>.
+                    Submit your case in under 2 minutes.
                   </p>
                   <ol>
                     <li>
@@ -63,12 +63,12 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                       Sign up and submit your skin ailment
                     </li>
                     <li>
-                      Earn <strong>0.5 MEDX</strong> for every case submitted during our trial period (<a target='_blank' rel="noopener noreferrer"  href="https://medium.com/medcredits/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
+                      Earn <strong>0.5 MEDX</strong> for every case submitted or diagnosed during our trial period (<a target='_blank' rel="noopener noreferrer"  href="https://medium.com/medcredits/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
                     </li>
                   </ol>
                   <hr />
                   <p className="text-danger small">
-                    NOTE: This is the public Beta 2.3 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for October 2018.
+                    NOTE: This is the public Beta 2.3 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for September 2018.
                   </p>
                 </div>
 

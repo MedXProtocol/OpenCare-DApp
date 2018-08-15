@@ -16,6 +16,12 @@ body {
   }
 }
 
+.container {
+  @media (min-width: 768px) and (max-width: 992px) {
+    width: 768px;
+  }
+}
+
 // Forces everything to fit within browser window on mobile
 .content .container,
 .navbar-header {

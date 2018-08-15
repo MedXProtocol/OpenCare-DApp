@@ -348,7 +348,7 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
                     </div>
 
                     <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-                      <label className="label text-gray">On birth control:</label>
+                      <label className="label text-gray">Taking birth control:</label>
                       <p>{details.onBirthControl}</p>
                     </div>
                   </div>

@@ -615,14 +615,12 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                           className="form-group form-group--logical-grouping"
                           key={`key-noFurtherTreatment`}
                         >
-                          <div className={classnames('form-group')}>
-                            <label className="checkbox-inline">
-                              <input type="checkbox" onClick={(event) =>
-                                this.setState({ 'noFurtherTreatment': !this.state.noFurtherTreatment })
-                              } /> &nbsp;
-                              No Further Treatment Necessary
-                            </label>
-                          </div>
+                          <label className="checkbox-inline">
+                            <input type="checkbox" onClick={(event) =>
+                              this.setState({ 'noFurtherTreatment': !this.state.noFurtherTreatment })
+                            } /> &nbsp;
+                            No Further Treatment Necessary
+                          </label>
                         </div>
                       )
                     }

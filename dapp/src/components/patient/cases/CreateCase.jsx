@@ -713,7 +713,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                       Tell your physician about your problem by answering the questions below.
                     </p>
                     <p className="text-gray">
-                      All information is encrypted and visible to only you and your physician. <a onClick={(e) => this.setState({ showDisclaimerModal: true })}>Read Disclaimer</a>
+                      All information is encrypted and visible to only you and the dermatologist. By submitting a case on Hippocrates, you agree to the terms in our disclaimer: <a onClick={(e) => this.setState({ showDisclaimerModal: true })}>Read Disclaimer</a>
                     </p>
                   </div>
                 </div>
@@ -746,6 +746,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         <div key="imagery-key">
                           <div className="form-group--heading">
                             Imagery:
+                          </div>
+                          <div className="form-group--heading form-group--heading__help">
+                            An evaluation is only as good as the photos provided. So be sure the photos are high quality!
                           </div>
                           <HippoImageInput
                             name='firstImage'
@@ -918,13 +921,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
            </Modal.Header>
           <Modal.Body>
             <p>
-              The MedCredits Health System is a decentralized platform that connects patients
-              and doctors globally. The MedCredits team does not have access to any patient
-              information, and does not guarantee any outcome on behalf of the doctors or
-              patients. For all evaluated cases, there is an option for a discounted second
-              opinion. However, patients should see a local medical provider if there is a
-              degree of concern. Lastly, an evaluation on Hippocrates is only as good as the
-              photos provided. So be sure the photos are high quality!
+              The MedX Health System is a decentralized platform that connects patients,
+              consulting providers and specialists globally. The MedX team does not have access
+              to any patient information, and does not guarantee any outcome on behalf of the
+              doctors or patients. For all evaluated cases, there is an option for a discounted
+              second opinion. However, patients should see a specialist if there is a degree of
+              concern. Lastly, an evaluation is only as good as the photos provided. So be sure
+              the photos are high quality.
             </p>
           </Modal.Body>
           <Modal.Footer>
