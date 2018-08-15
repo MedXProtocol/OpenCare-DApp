@@ -79,7 +79,7 @@ function* saga({ address, CaseStatusManager, start, end }) {
   if (!address || !CaseStatusManager) { return }
   yield cacheCall(CaseStatusManager, 'closedCaseCount', address)
 
-  const openAddresses = yield openCaseAddressesSaga(CaseStatusManager, address)
+  yield openCaseAddressesSaga(CaseStatusManager, address)
 
   yield range(start, end).map(function* (index) {
     yield cacheCall(CaseStatusManager, 'closedCaseAtIndex', address, index - 1)

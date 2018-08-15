@@ -1,13 +1,15 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
-import PropTypes from 'prop-types'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import { all } from 'redux-saga/effects'
-import { cacheCall } from '~/saga-genesis/sagas'
-import { withSaga } from '~/saga-genesis/components'
-import { cacheCallValue, contractByName } from '~/saga-genesis/state-finders'
-import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
+import {
+  cacheCall,
+  withSaga,
+  cacheCallValue,
+  cacheCallValueInt,
+  contractByName
+} from '~/saga-genesis'
 import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
 import { isCaseRequiringDoctorsAttention } from '~/utils/isCaseRequiringDoctorsAttention'
 
@@ -19,12 +21,12 @@ function mapStateToProps (state) {
   const openAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
 
   openAddresses.forEach(caseAddress => {
-    const status = cacheCallValue(state, caseAddress, 'status')
+    const status = cacheCallValueInt(state, caseAddress, 'status')
     const updatedAt = cacheCallValue(state, caseAddress, 'updatedAt')
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
     const isFirstDoc = diagnosingDoctor === address
 
-    if (isCaseRequiringDoctorsAttention(isFirstDoc)) {
+    if (isCaseRequiringDoctorsAttention(isFirstDoc, status, updatedAt)) {
       casesRequiringAttentionCount++
     }
   })
