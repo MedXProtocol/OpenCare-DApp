@@ -7,7 +7,7 @@ function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component'
 }
 
-export function withSaga(saga, { propTriggers, storeKey } = { storeKey: 'store' }) {
+export function withSaga(saga) {
   return function (WrappedComponent) {
     function mapDispatchToProps(dispatch, props) {
       return {

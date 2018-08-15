@@ -123,7 +123,7 @@ function mapDispatchToProps (dispatch) {
 }
 
 export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['caseAddress', 'status', 'updatedAt'] })(
+  withSaga(saga)(
     class _CaseRow extends Component {
 
   static propTypes = {

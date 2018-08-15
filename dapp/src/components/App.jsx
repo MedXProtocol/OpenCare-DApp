@@ -83,7 +83,7 @@ function* saga({ address, CaseManager, CaseStatusManager, DoctorManager }) {
 }
 
 const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
-  withSaga(saga, { propTriggers: ['address', 'doctorCasesCount', 'openCaseCount', 'CaseManager', 'DoctorManager', 'isDoctor'] })(
+  withSaga(saga)(
     class _App extends Component {
 
   componentDidMount () {

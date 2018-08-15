@@ -36,7 +36,7 @@ function* saga({ address, MedXToken }) {
   ])
 }
 
-export const WalletContainer = connect(mapStateToProps)(withSaga(saga, { propTriggers: ['address', 'MedXToken'] })(class _Wallet extends Component {
+export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(class _Wallet extends Component {
   render() {
     return (
       <div>
