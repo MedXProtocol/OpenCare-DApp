@@ -1,4 +1,4 @@
-import { promisify } from '~/utils/common-util'
+import { promisify } from '~/utils/promisify'
 
 // https://stackoverflow.com/questions/7584794/accessing-jpeg-exif-rotation-data-in-javascript-on-the-client-side
 // -2: not jpeg

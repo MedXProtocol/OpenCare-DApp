@@ -17,7 +17,7 @@ import PropTypes from 'prop-types'
 import ReactTooltip from 'react-tooltip'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle';
-import logo from '../assets/img/logo.png'
+import logo from '~/assets/img/logo.png'
 import get from 'lodash.get'
 import networkIdToName from '~/utils/network-id-to-name'
 import { connect } from 'react-redux'
@@ -28,6 +28,7 @@ import {
   cacheCallValue,
   contractByName
 } from '~/saga-genesis'
+import { HippoCasesRequiringAttention } from './HippoCasesRequiringAttention'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import { weiToMedX } from '~/utils/weiToMedX'
 import * as routes from '~/config/routes'
@@ -110,7 +111,7 @@ export const HippoNavbar = withContractRegistry(
   }
 
   render() {
-    const { isDoctor, openCasesLength } = this.props
+    const { isDoctor } = this.props
     const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
 
     if (this.props.signedIn && this.props.address) {
@@ -172,16 +173,7 @@ export const HippoNavbar = withContractRegistry(
         var openCasesItem =
           <LinkContainer to={routes.DOCTORS_CASES_OPEN}>
             <NavItem href={routes.DOCTORS_CASES_OPEN}>
-              Diagnose Cases
-              <span className={classnames(
-                'nav--open-cases__circle',
-                {
-                  'nav--open-cases__not-zero': (openCasesLength > 0),
-                  'nav--open-cases__zero': (openCasesLength === 0),
-                }
-              )}> &nbsp;
-                {openCasesLength} &nbsp;
-              </span>
+              <HippoCasesRequiringAttention /> Diagnose Cases
             </NavItem>
           </LinkContainer>
       }
