@@ -41,7 +41,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
               <div className="form-wrapper form-wrapper--inverse">
                 <div className="form-wrapper--body">
                   <h3 className="text-center">
-                    Welcome to DermX!
+                    Welcome to EyeX!
                     <br /><small>The first DApp in the MedX Health System</small>
                     <br /><small className="text-gray">Ask a board-certified specialist about your skin ailment today</small>
                   </h3>
@@ -68,7 +68,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                   </ol>
                   <hr />
                   <p className="text-danger small">
-                    NOTE: This is the public Beta 2.3 of DermX and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for September 2018.
+                    NOTE: This is the public Beta 2.3 of EyeX and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for September 2018.
                   </p>
                 </div>
 
@@ -77,7 +77,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                     <Link
                       className="btn btn-lg btn-success"
                       to={launchLink}>
-                        Launch DermX
+                        Launch EyeX
                     </Link>
                   </div>
                 </div>

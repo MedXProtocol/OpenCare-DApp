@@ -18,8 +18,8 @@ import ReactTooltip from 'react-tooltip'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle';
 // import logo from '~/assets/img/logo.png'
-import dermXLogoImg from '~/assets/img/dermx-logo-white.png'
-import dermXLogoImg2x from '~/assets/img/dermx-logo-white@2x.png'
+import eyeXLogoImg from '~/assets/img/eyex-logo-white.png'
+import eyeXLogoImg2x from '~/assets/img/eyex-logo-white@2x.png'
 import get from 'lodash.get'
 import networkIdToName from '~/utils/network-id-to-name'
 import { connect } from 'react-redux'
@@ -192,6 +192,7 @@ export const HippoNavbar = withContractRegistry(
 
     let navbarClassName = classnames(
       'navbar',
+      'navbar-fixed-top',
       'container--nav',
       {
         'navbar-transparent': this.props.transparent,
@@ -210,9 +211,9 @@ export const HippoNavbar = withContractRegistry(
           <Navbar.Brand>
             <Link to={routes.HOME} className="navbar-brand">
               <img
-                src={dermXLogoImg}
-                alt="DermX Logo"
-                srcSet={`${dermXLogoImg} 1x, ${dermXLogoImg2x} 2x`}
+                src={eyeXLogoImg}
+                alt="EyeX Logo"
+                srcSet={`${eyeXLogoImg} 1x, ${eyeXLogoImg2x} 2x`}
                 width="110"
               />
             </Link>

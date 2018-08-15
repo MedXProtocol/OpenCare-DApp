@@ -1,5 +1,5 @@
 {
-  "name": "DermX",
+  "name": "EyeX",
   "version": "0.0.1",
   "scripts": {
     "start": "./scripts/ganache.sh",

@@ -253,7 +253,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
                 You're all set!
               </h2>
               <p>
-                There is nothing more to do to start using DermX.
+                There is nothing more to do to start using EyeX.
               </p>
               <hr />
               <p>
@@ -278,7 +278,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
             <Modal.Header>
               <div className="row">
                 <div className="col-xs-12 text-center">
-                  <h4>Welcome to the DermX Beta
+                  <h4>Welcome to the EyeX Beta
                     <br className="visible-xs hidden-sm hidden-md hidden-lg" />
                     {stepText}
                   </h4>

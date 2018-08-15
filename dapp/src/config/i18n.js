@@ -39,22 +39,22 @@ i18next
             replacementTransactionUnderpriced: 'The replacement transaction is underpriced (need to provide a higher gas limit)'
           },
           pageTitles: {
-            welcome: 'Welcome | DermX',
-            loginToMetaMask: 'Login to MetaMask | DermX',
-            tryMetaMask: 'Try MetaMask | DermX',
-            emergencyKit: 'Emergency Kit | DermX',
-            changePassword: 'Change Password | DermX',
-            mint: 'Mint | DermX',
-            balance: 'Balance | DermX',
-            signIn: 'Sign In | DermX',
-            signUp: 'Sign Up | DermX',
-            diagnoseCases: 'Diagnose Cases | DermX',
-            diagnoseCase: 'Diagnose Case {{caseId}} | DermX',
-            addDoctor: 'Doctors | DermX',
-            newCase: 'New Case | DermX',
-            patientCases: 'My Cases | DermX',
-            patientCase: 'Case {{caseId}} | DermX',
-            fourOhFour: '404 | DermX'
+            welcome: 'Welcome | EyeX',
+            loginToMetaMask: 'Login to MetaMask | EyeX',
+            tryMetaMask: 'Try MetaMask | EyeX',
+            emergencyKit: 'Emergency Kit | EyeX',
+            changePassword: 'Change Password | EyeX',
+            mint: 'Mint | EyeX',
+            balance: 'Balance | EyeX',
+            signIn: 'Sign In | EyeX',
+            signUp: 'Sign Up | EyeX',
+            diagnoseCases: 'Diagnose Cases | EyeX',
+            diagnoseCase: 'Diagnose Case {{caseId}} | EyeX',
+            addDoctor: 'Doctors | EyeX',
+            newCase: 'New Case | EyeX',
+            patientCases: 'My Cases | EyeX',
+            patientCase: 'Case {{caseId}} | EyeX',
+            fourOhFour: '404 | EyeX'
           }
         }
       }

@@ -4,7 +4,7 @@
 
 Smart contracts used by MedCredits.
 
-DermX Dapp readme is location [here](dapp/README.md)
+EyeX Dapp readme is location [here](dapp/README.md)
 
 ### Setup
 

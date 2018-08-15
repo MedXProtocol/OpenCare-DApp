@@ -82,20 +82,7 @@ export const ScrollyFeedbackLink = class _ScrollyFeedbackLink extends Component 
 
     return (
       <div className="scroll-in-nav" ref="scrollnav">
-        <a
-          target="_blank"
-          href="https://t.me/MedCredits"
-          className="floating-feedback-link text-center"
-          rel="noopener noreferrer"
-          style={renderStyle}
-        >
-          <FontAwesomeIcon
-            icon={faTelegramPlane}
-            size='sm' />
-          <span>
-            Give Feedback
-          </span>
-        </a>
+
       </div>
     )
   }
