@@ -715,15 +715,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                             onClick={this.handleCounselingChecked}
                             value={0}
                           >
-                            Melanoma
-                          </Checkbox>
-
-                          <Checkbox
-                            inline
-                            onClick={this.handleCounselingChecked}
-                            value={1}
-                          >
-                            Benign Lesions
+                            Dry Eye
                           </Checkbox>
                         </div>
                       </div>
