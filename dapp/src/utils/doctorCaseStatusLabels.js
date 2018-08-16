@@ -15,11 +15,11 @@ var statusClasses = {
   1: 'info',
   2: 'warning',
   3: 'default',
-  4: 'success',
+  4: 'default',
   5: 'default',
   6: 'warning',
   7: 'default',
-  8: 'success'
+  8: 'default'
 }
 
 // This is context specific, and will say what state the case is in depending on
