@@ -21,6 +21,7 @@ import { HippoTimestamp } from '~/components/HippoTimestamp'
 import { txErrorMessage } from '~/services/txErrorMessage'
 import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
 import { updatePendingTx } from '~/services/pendingTxs'
+import { transactionErrorToCode } from '~/services/transactionErrorToCode'
 import { patientCaseStatusToName, patientCaseStatusToClass } from '~/utils/patientCaseStatusLabels'
 import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctorCaseStatusLabels'
 import { defined } from '~/utils/defined'
@@ -77,19 +78,24 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   }
 
   // If this caseRowObject has an ongoing blockchain transaction this will update
-  const caseRowTransactions = transactions.filter(transaction => {
+  const reversedTransactions = transactions.reverse().filter(transaction => {
     const { call, confirmed, error, address } = transaction
     return (
-      call && (!confirmed || defined(error))
-        && (caseRowObject.caseAddress === address)
+      call
+      && (
+        (!confirmed && !error)
+        || (error && transactionErrorToCode(error) !== 'userRevert')
+      )
+      && (caseRowObject.caseAddress === address)
     )
   })
 
-  caseRowTransactions.forEach(transaction => {
-    if (caseRowObject.caseAddress === transaction.address) {
-      caseRowObject = updatePendingTx(caseRowObject, transaction)
+  for (let i = 0; i < reversedTransactions.length; i++) {
+    if (caseRowObject.caseAddress === reversedTransactions[i].address) {
+      caseRowObject = updatePendingTx(caseRowObject, reversedTransactions[i])
+      break
     }
-  })
+  }
 
   return {
     CaseManager,
