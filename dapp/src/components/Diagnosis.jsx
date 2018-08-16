@@ -287,7 +287,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                 onClick={this.handleAcceptDiagnosis}
                 type="button"
                 className="btn btn-success"
-              >Accept</button>
+              >Accept and Withdraw (5 MEDT)</button>
             </div>
           </div>
         </div>
