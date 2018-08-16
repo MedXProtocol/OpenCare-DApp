@@ -10,6 +10,7 @@ import {
   END
 } from 'redux-saga'
 import { contractKeyByAddress } from '../state-finders'
+import { defined } from '~/utils/defined'
 
 function createTransactionEventChannel (web3, call, transactionId, send, options) {
   return eventChannel(emit => {
@@ -78,6 +79,25 @@ export function* web3Send({ transactionId, call, options }) {
   }
 }
 
+export function* clearErroredTransactions({ transactionId, call, options }) {
+  const { address } = call
+  try {
+    let transactions = yield select(state => state.sagaGenesis.transactions)
+    transactions = Object.values(transactions)
+
+    yield transactions.map(function* (transaction) {
+      const { error, transactionId } = transaction
+      if ((address === transaction.address) && defined(error)) {
+        yield put({ type: 'REMOVE_TRANSACTION', transactionId })
+      }
+    })
+  } catch (error) {
+    console.warn('There was a problem removing the previous transactions with errors for this case')
+    console.error(error)
+  }
+}
+
 export default function* () {
+  yield takeEvery('SEND_TRANSACTION', clearErroredTransactions)
   yield takeEvery('SEND_TRANSACTION', web3Send)
 }
