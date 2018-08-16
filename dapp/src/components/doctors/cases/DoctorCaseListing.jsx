@@ -73,7 +73,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
         <div className="row">
           <div className='col-xs-12'>
             <div className="card">
-              <div className='card-body'>
+              <div className='card-body card-body--closed-cases'>
                 <h5 className="title subtitle">
                   Historical Cases:
                 </h5>

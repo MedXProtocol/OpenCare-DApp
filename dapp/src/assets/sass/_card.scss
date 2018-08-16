@@ -363,3 +363,7 @@ $card-columns-margin:               $card-spacer-y;
     margin-bottom: 2rem;
   }
 }
+
+.card-body--closed-cases {
+  min-height: 400px;
+}
