@@ -96,11 +96,16 @@
   font-weight: bold;
   height: 18px;
   position: absolute;
-  right: 0;
-  top: 15px;
+  left: 130px;
+  top: 12px;
   text-align: center;
   width: 18px;
   z-index: 1;
+
+  @media (max-width: 768px) {
+    left: 132px;
+    top: 4px;
+  }
 }
 
 .nav--open-cases__circle:after {
