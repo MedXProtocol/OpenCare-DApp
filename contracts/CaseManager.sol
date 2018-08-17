@@ -180,13 +180,17 @@ contract CaseManager is Ownable, Pausable, Initializable {
       bytes _doctorEncryptedKey
     ) public onlyThis {
       ICase newCase = ICase(new Delegate(registry, keccak256("Case")));
-      newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
+
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
+      newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
+
       patientCases[_patient].push(address(newCase));
       doctorCases[_doctor].push(newCase);
       medXToken.transferFrom(_patient, newCase, createCaseCost());
+
       newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
+
       emit NewCase(newCase, caseIndex);
     }
 

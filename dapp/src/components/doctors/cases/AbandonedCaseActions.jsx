@@ -57,7 +57,7 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
     }
 
     handleForceAcceptDiagnosis = () => {
-      const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptAsDoctorAfterADay')()
+      const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptAsDoctor')()
       this.setState({
         acceptTransactionId,
         forceAcceptDiagnosisHandler: new TransactionStateHandler(),

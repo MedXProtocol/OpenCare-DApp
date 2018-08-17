@@ -12,7 +12,7 @@ i18next
         translation: {
           transactions: {
             acceptDiagnosis: 'Accepting Diagnosis',
-            acceptAsDoctorAfterADay: 'Accepting Diagnosis',
+            acceptAsDoctor: 'Accepting Diagnosis',
             addOrReactivateDoctor: 'Adding / Reactivating Doctor',
             deactivateDoctor: 'Deactivating Doctor',
             approveAndCall: 'Sending Case Info',

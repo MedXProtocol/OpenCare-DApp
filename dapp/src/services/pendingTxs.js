@@ -24,7 +24,7 @@ export const addPendingTx = function(transaction, objIndex) {
 // tx's for this Case
 export const updatePendingTx = function(caseRowObject, transaction) {
   const method = transaction.call.method
-  const isAccepting = (method === 'acceptDiagnosis' || method === 'acceptAsDoctorAfterADay')
+  const isAccepting = (method === 'acceptDiagnosis' || method === 'acceptAsDoctor')
   const isSecondOpinion = (method === 'challengeWithDoctor')
   const isDiagnosis = (method === 'diagnoseCase' || method === 'diagnoseChallengedCase')
 

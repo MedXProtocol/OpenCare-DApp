@@ -18,6 +18,7 @@ contract('Case', function (accounts) {
   before(async () => {
     env = await createEnvironment(artifacts)
     await env.medXToken.mint(patient, web3.toWei(1000, 'ether'))
+    console.log('environment created')
 
     await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc')
 
@@ -26,21 +27,36 @@ contract('Case', function (accounts) {
 
     doctorAddress2 = accounts[2]
     await env.doctorManager.addOrReactivateDoctor(doctorAddress2, 'Dr. Hibbert')
+
+    console.log('here')
   })
 
   beforeEach(async () => {
+    console.log('and each')
+
     await resetCaseManager(artifacts, env)
+    console.log('b sde tune')
+
     caseInstance = await Case.at(await createCase(env, patient, doctorAddress))
+
+    console.log('shiiiaaaaat')
+
+
+    console.log('await')
     const diagnosingDoctor = await caseInstance.diagnosingDoctor.call()
     assert.equal(diagnosingDoctor, doctorAddress)
     assert.equal((await env.caseStatusManager.openCaseCount.call(doctorAddress)).toString(), '1')
+    console.log('yo')
   })
 
   describe('initialize()', () => {
     it('should not work twice', async () => {
+      console.log('and here')
       assert.equal(await caseInstance.patient.call(), accounts[0])
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
       assert.equal(await caseInstance.diagnosingDoctor.call(), doctorAddress)
+
+      console.log('waat')
       await expectThrow(async () => {
         await caseInstance.initialize(
           accounts[0], 'alaksefj', 'caseKeySalt', [1, 2], caseFee, env.medXToken.address, env.registry.address
@@ -111,7 +127,7 @@ contract('Case', function (accounts) {
             assert(await caseInstance.challengeHash.call())
             assert.equal((await env.medXToken.balanceOf(doctorAddress)).toString(), doctorBalance.plus(caseFee).toString())
             assert.equal((await env.medXToken.balanceOf(doctorAddress2)).toString(), doctorBalance2.plus(caseFee / 2).toString())
-            assert.equal(result.logs[result.logs.length-1].event, 'CaseClosedConfirmed')
+            assert.equal(result.logs[result.logs.length-1].event, 'CaseDiagnosisConfirmed')
           })
 
           it('on rejecting original diagnosis should award the challenge doc', async () => {
@@ -120,7 +136,7 @@ contract('Case', function (accounts) {
             let result = await caseInstance.diagnoseChallengedCase('diagnosis hash', false, { from: doctorAddress2 })
             assert.equal((await env.medXToken.balanceOf(patient)).toString(), patientBalance.plus(caseFee).toString())
             assert.equal((await env.medXToken.balanceOf(doctorAddress2)).toString(), doctorBalance2.plus(caseFee / 2).toString())
-            assert.equal(result.logs[result.logs.length-1].event, 'CaseClosedRejected')
+            assert.equal(result.logs[result.logs.length-1].event, 'CaseDiagnosesDiffer')
           })
         })
       })
