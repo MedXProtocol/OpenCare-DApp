@@ -9,6 +9,7 @@ module.exports = async function createEnvironment(artifacts) {
   const AccountManager = artifacts.require('./AccountManager.sol')
   const Delegate = artifacts.require('./Delegate.sol')
   const CaseManager = artifacts.require('./CaseManager.sol')
+  const CaseScheduleManager = artifacts.require('./CaseScheduleManager.sol')
   const CaseStatusManager = artifacts.require('./CaseStatusManager.sol')
   const BetaFaucet = artifacts.require('./BetaFaucet.sol')
   const Registry = artifacts.require("./Registry.sol")
@@ -25,6 +26,9 @@ module.exports = async function createEnvironment(artifacts) {
   let caseStatusManager = await envDeployWithDelegate(registry, Delegate, CaseStatusManager, 'CaseStatusManager')
   await caseStatusManager.initialize(registry.address)
 
+  let caseScheduleManager = await envDeployWithDelegate(registry, Delegate, CaseScheduleManager, 'CaseScheduleManager')
+  await caseScheduleManager.initialize(registry.address)
+
   let doctorManager = await envDeployWithDelegate(registry, Delegate, DoctorManager, 'DoctorManager')
   await doctorManager.initialize()
 
@@ -39,6 +43,7 @@ module.exports = async function createEnvironment(artifacts) {
     registry,
     medXToken,
     caseManager,
+    caseScheduleManager,
     caseStatusManager,
     doctorManager,
     accountManager

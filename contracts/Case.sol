@@ -7,6 +7,7 @@ import "./IRegistry.sol";
 import "./Initializable.sol";
 import "./ICaseManager.sol";
 import "./CaseStatusManager.sol";
+import "./CaseScheduleManager.sol";
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -49,9 +50,11 @@ contract Case is Ownable, Initializable, ICase {
   uint public createdAt;
   uint public updatedAt;
 
+  event PatientWithdraw(address indexed patient, address indexed doctor);
+
   event CaseCreated(address indexed patient);
   event CaseEvaluated(address indexed patient, address indexed doctor);
-  event CaseClosed(address indexed patient, address indexed doctor);
+  event CaseClosed(address indexed patient, address indexed diagnosingDoctor, address indexed challengingDoctor);
   event CaseClosedRejected(address indexed patient, address indexed doctor);
   event CaseClosedConfirmed(address indexed patient, address indexed doctor);
   event CaseChallenged(address indexed patient, address indexed doctor);
@@ -99,6 +102,14 @@ contract Case is Ownable, Initializable, ICase {
   }
 
   /**
+   * @dev - throws if called by any account that is not the deployed case scheduler
+   */
+  modifier onlyCaseScheduleManager() {
+    require(msg.sender == address(caseScheduleManager()), 'Must be the Case Schedule Manager contract');
+    _;
+  }
+
+  /**
    * @dev - Creates a new case with the given parameters
    * @param _patient - the patient who created the case
    * @param _caseFee - fee for this particular case
@@ -137,6 +148,31 @@ contract Case is Ownable, Initializable, ICase {
    */
   function () public payable {
     revert();
+  }
+
+  function patientClose() external onlyCaseScheduleManager {
+    close();
+    emit PatientWithdraw(patient, diagnosingDoctor);
+  }
+
+  function close() internal {
+    require(
+         status != CaseStatus.Closed
+      || status != CaseStatus.ClosedRejected
+      || status != CaseStatus.ClosedConfirmed
+    );
+    status = CaseStatus.Closed;
+
+    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+
+    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
+    caseStatusManager().addClosedCase(diagnosingDoctor, this);
+
+    emit CaseClosed(patient, diagnosingDoctor, challengingDoctor);
+  }
+
+  function acceptDiagnosisAsDoctor() external onlyCaseScheduleManager {
+    accept();
   }
 
   function touchUpdatedAt() internal {
@@ -185,13 +221,10 @@ contract Case is Ownable, Initializable, ICase {
 
   function accept() internal {
     require(status == CaseStatus.Evaluated);
-    status = CaseStatus.Closed;
-    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
-    caseStatusManager().addClosedCase(diagnosingDoctor, this);
+
     medXToken.transfer(diagnosingDoctor, caseFee);
-    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
-    touchUpdatedAt();
-    emit CaseClosed(patient, diagnosingDoctor);
+
+    close();
   }
 
   function challengeWithDoctor(address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
@@ -266,6 +299,10 @@ contract Case is Ownable, Initializable, ICase {
 
   function caseStatusManager() internal view returns (CaseStatusManager) {
     return CaseStatusManager(registry.lookup(keccak256("CaseStatusManager")));
+  }
+
+  function caseScheduleManager() internal view returns (CaseScheduleManager) {
+    return CaseScheduleManager(registry.lookup(keccak256("CaseScheduleManager")));
   }
 
   function getDiagnosingDoctor() public view returns (address) {
