@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
 import { all } from 'redux-saga/effects'
+import { formatRoute } from 'react-router-named-routes'
 import {
   cacheCall,
   contractByName,
@@ -16,18 +17,25 @@ import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { addPendingTx } from '~/services/pendingTxs'
 import { defined } from '~/utils/defined'
+import { Pagination } from '~/components/Pagination'
 import range from 'lodash.range'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
 
-function mapStateToProps(state) {
+const MAX_CASES_PER_PAGE = 5
+
+function mapStateToProps(state, props) {
   let caseAddresses = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
   const transactions = Object.values(state.sagaGenesis.transactions)
   const caseCount = cacheCallValueInt(state, CaseManager, 'getPatientCaseListCount', address)
+  const currentPage = parseInt(props.match.params.currentPage)
 
-  caseAddresses = range(caseCount).reduce((accumulator, index) => {
+  const start = (caseCount - ((parseInt(currentPage, 10) - 1) * MAX_CASES_PER_PAGE))
+  const end = Math.max((start - MAX_CASES_PER_PAGE), 0)
+
+  caseAddresses = range(end, start).reduce((accumulator, index) => {
     const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, index)
     if (caseAddress) {
       accumulator.push(caseAddress)
@@ -40,6 +48,7 @@ function mapStateToProps(state) {
     caseCount,
     caseAddresses,
     CaseManager,
+    currentPage,
     transactions
   }
 }
@@ -58,7 +67,6 @@ function renderCaseRows(caseAddresses, transactions, caseCount) {
   let caseRows = caseAddresses.map((caseAddress, index) => {
     return (
       <CaseRow
-        objIndex={index+1}
         caseAddress={caseAddress}
         key={`open-case-row-${index}`}
         route={routes.PATIENTS_CASE}
@@ -66,7 +74,6 @@ function renderCaseRows(caseAddresses, transactions, caseCount) {
       />
     )
   })
-
 
   let objIndex = caseCount + 1
   transactions.forEach(transaction => {
@@ -96,6 +103,8 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
     let loadingLines, noCases, caseRows
     const { caseAddresses, caseCount, transactions } = this.props
     const loading = (this.props.caseCount === undefined)
+
+    const totalPages = Math.ceil(this.props.caseCount / MAX_CASES_PER_PAGE)
 
     if (loading) {
       loadingLines = (
@@ -137,6 +146,12 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
           {loadingLines}
           {noCases}
           {caseRows}
+
+          <Pagination
+            currentPage={this.props.currentPage}
+            totalPages={totalPages}
+            formatPageRoute={(number) => formatRoute(routes.PATIENTS_CASES_PAGE_NUMBER, { currentPage: number })}
+            />
         </div>
       </div>
     )

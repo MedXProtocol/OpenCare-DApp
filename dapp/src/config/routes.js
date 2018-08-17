@@ -18,6 +18,7 @@ export const DOCTORS_NEW = '/doctors/new'
 
 export const PATIENTS_CASES_NEW = '/patients/cases/new'
 export const PATIENTS_CASES ='/patients/cases'
+export const PATIENTS_CASES_PAGE_NUMBER = '/patients/cases/:currentPage'
 export const PATIENTS_CASE = '/patients/cases/:caseAddress'
 
 export const signedOutRoutes = [

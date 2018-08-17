@@ -5,6 +5,7 @@ import { formatRoute } from 'react-router-named-routes'
 import classnames from 'classnames'
 import { CaseRow } from '~/components/CaseRow'
 import * as routes from '~/config/routes'
+import { Pagination } from '~/components/Pagination'
 
 function renderCaseRows(caseAddresses, key) {
   const caseRows = caseAddresses.map((caseAddress, index) => {
@@ -24,7 +25,7 @@ function renderCaseRows(caseAddresses, key) {
 export const DoctorCaseListing = class _DoctorCaseListing extends Component {
 
   render() {
-    const { openCaseAddresses, closedCaseAddresses, currentPage, pageNumbers } = this.props
+    const { openCaseAddresses, closedCaseAddresses, currentPage, totalPages } = this.props
 
     return (
       <div className='container'>
@@ -94,27 +95,12 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                 }
               </div>
 
-              <nav aria-label="Page navigation" className="text-center">
-                <ul className="pagination">
-                  {pageNumbers.map(function(number) {
-                    const path = formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { currentPage: number })
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                formatPageRoute={(number) => formatRoute(routes.DOCTORS_CASES_OPEN_PAGE_NUMBER, { currentPage: number })}
+                />
 
-                    return (
-                      <li
-                        key={`page-number-${number}`}
-                        className={classnames(
-                          'pagination--page-number',
-                          { 'active': currentPage === number }
-                        )}
-                      >
-                        <Link to={path}>
-                          {number}
-                        </Link>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </nav>
             </div>
           </div>
         </div>
