@@ -217,9 +217,8 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
             <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
 
             <Redirect exact from={routes.PATIENTS_CASES} to={formatRoute(routes.PATIENTS_CASES_PAGE_NUMBER, { currentPage: 1 })} />
-            <SignedInRoute path={routes.PATIENTS_CASES_PAGE_NUMBER} component={PatientDashboard} />
-            
             <SignedInRoute path={routes.PATIENTS_CASE} component={PatientCaseContainer} />
+            <SignedInRoute path={routes.PATIENTS_CASES_PAGE_NUMBER} component={PatientDashboard} />
 
             <Redirect from={routes.HOME} exact to={routes.WELCOME} />
 

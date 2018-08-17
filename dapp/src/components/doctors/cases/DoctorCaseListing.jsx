@@ -13,7 +13,7 @@ function renderCaseRows(caseAddresses, key) {
       <CaseRow
         caseAddress={caseAddress}
         key={`${key}-case-row-${index}`}
-        route={routes.DOCTORS_CASES_DIAGNOSE_CASE}
+        path={formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress })}
         context='doctor'
       />
     )
