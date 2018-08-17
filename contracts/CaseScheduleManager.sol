@@ -22,7 +22,8 @@ contract CaseScheduleManager is Initializable, Ownable {
   }
 
   modifier onlyCaseManager () {
-    require(msg.sender == address(caseManager()));
+    // require(msg.sender == address(caseManager()));
+    require(msg.sender == address(0x0), "broken here and thats gold steven");
     _;
   }
 

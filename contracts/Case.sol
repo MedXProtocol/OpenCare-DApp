@@ -126,9 +126,9 @@ contract Case is Ownable, Initializable, ICase {
       address _registry
   ) external notInitialized {
     setInitialized();
-    require(_encryptedCaseKey.length != 0);
-    require(_caseKeySalt.length != 0);
-    require(_caseHash.length != 0);
+    require(_encryptedCaseKey.length != 0, 'encryptedCaseKey required');
+    require(_caseKeySalt.length != 0, 'caseKeySalt required');
+    require(_caseHash.length != 0, 'caseHash required');
     createdAt = block.timestamp;
     updatedAt = block.timestamp;
     owner = msg.sender;
@@ -159,7 +159,7 @@ contract Case is Ownable, Initializable, ICase {
     require(
          status != CaseStatus.Closed
       || status != CaseStatus.ClosedRejected
-      || status != CaseStatus.ClosedConfirmed
+      || status != CaseStatus.ClosedConfirmed, 'case must not be closed prior to closing'
     );
     status = CaseStatus.Closed;
 
@@ -180,9 +180,9 @@ contract Case is Ownable, Initializable, ICase {
   }
 
   function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyCaseManager isDoctor(_doctor) {
-    require(status == CaseStatus.Open);
-    require(diagnosingDoctor == address(0));
-    require(_doctor != patient);
+    require(status == CaseStatus.Open, 'case must be open to set the diagnosingDoctor');
+    require(diagnosingDoctor == address(0), 'the diagnosingDoctor must be a valid address');
+    require(_doctor != patient, 'the doctor cannot be the patient');
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
     caseStatusManager().addOpenCase(_doctor, this);
@@ -195,7 +195,7 @@ contract Case is Ownable, Initializable, ICase {
    * @param _diagnosisHash - Swarm hash of where the diagnosis data is stored
    */
   function diagnoseCase(bytes _diagnosisHash) external onlyDiagnosingDoctor {
-    require(status == CaseStatus.Evaluating);
+    require(status == CaseStatus.Evaluating, 'case must be in Evaluating state to diagnose');
     status = CaseStatus.Evaluated;
     diagnosisHash = _diagnosisHash;
     touchUpdatedAt();
@@ -214,13 +214,13 @@ contract Case is Ownable, Initializable, ICase {
    * @dev - The initial doctor accepts the evaluation and tokens are credited to them
    */
   function acceptAsDoctorAfterADay() external onlyDiagnosingDoctor {
-    require((block.timestamp - updatedAt) > 86400);
+    require((block.timestamp - updatedAt) > 86400, 'not enough time passed prior to doctor accept');
 
     accept();
   }
 
   function accept() internal {
-    require(status == CaseStatus.Evaluated);
+    require(status == CaseStatus.Evaluated, 'the case must be Evaluated to accept');
 
     medXToken.transfer(diagnosingDoctor, caseFee);
 
