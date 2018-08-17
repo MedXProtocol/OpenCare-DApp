@@ -14,6 +14,8 @@ contract('CaseScheduleManager', function (accounts) {
 
   before(async () => {
     env = await createEnvironment(artifacts)
+    await env.medXToken.mint(patient, web3.toWei(1000, 'ether'))
+    await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr Xavier')
   })
 
   describe('CaseScheduleManager', () => {
@@ -33,10 +35,11 @@ contract('CaseScheduleManager', function (accounts) {
   describe('initializeCase()', () => {
     it('should assign timestamps', async () => {
       await resetCaseManager(artifacts, env)
-
-      caseInstance = await Case.at(await createCase(env, patient, doctor))
-      // assert.equal(await env.caseScheduleManager.createdAt(caseInstance.address), 1)
+      const caseInstance = await Case.at(await createCase(env, patient, doctor))
+      const createdAt = await env.caseScheduleManager.createdAt(caseInstance.address)
+      const updatedAt = await env.caseScheduleManager.updatedAt(caseInstance.address)
+      assert.notEqual(createdAt, 0)
+      assert.equal(updatedAt.toString(), createdAt.toString())
     })
   })
-
 })
