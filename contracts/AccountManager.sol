@@ -17,7 +17,8 @@ contract AccountManager {
   function setPublicKey(address _address, bytes _publicKey) external {
     bool isSender = msg.sender == _address;
     bool isCaseManager = msg.sender == caseManager();
-    require(isSender || isCaseManager);
+    bool isOwner = msg.sender == owner;
+    require(isSender || isCaseManager || isOwner);
     publicKeys[_address] = _publicKey;
   }
 
