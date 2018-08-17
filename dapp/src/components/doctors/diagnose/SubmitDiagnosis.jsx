@@ -8,7 +8,6 @@ import { withRouter } from 'react-router-dom'
 import { Checkbox, Modal } from 'react-bootstrap'
 import FlipMove from 'react-flip-move'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 import { mixpanel } from '~/mixpanel'
 import hashToHex from '~/utils/hash-to-hex'
 import { cancelablePromise } from '~/utils/cancelablePromise'
@@ -16,16 +15,18 @@ import { uploadJson, downloadJson } from '~/utils/storage-util'
 import { isBlank } from '~/utils/isBlank'
 import { TransactionStateHandler, withSend } from '~/saga-genesis'
 import { customStyles } from '~/config/react-select-custom-styles'
-import { groupedRecommendationOptions } from './recommendationOptions'
 import { groupedDiagnosisOptions } from './diagnosisOptions'
 import { sideEffectValues, counselingValues } from '~/sideEffectsAndCounselingValues'
 import { HippoStringDisplay } from '~/components/HippoStringDisplay'
 import { HippoTextArea } from '~/components/forms/HippoTextArea'
-import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
 import { Loading } from '~/components/Loading'
 import { toastr } from '~/toastr'
 import pull from 'lodash.pull'
 import * as routes from '~/config/routes'
+import { PrescriptionMedication } from './PrescriptionMedication'
+
+//used to distinguish prescription components
+let medicationId = 1
 
 function mapStateToProps (state, ownProps) {
   return {
@@ -44,19 +45,21 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     super(props, context)
 
     this.state = {
-      overTheCounterUse: null,
-      overTheCounterMedication: [],
-      overTheCounterNotes: '',
-      overTheCounterFrequency: '',
-      overTheCounterDuration: '',
       overTheCounterRecommendation: '',
 
-      prescriptionUse: null,
-      prescriptionMedication: [],
-      prescriptionNotes: '',
-      prescriptionFrequency: '',
-      prescriptionDuration: '',
-      prescriptionRecommendation: '',
+      prescriptions: [
+        {
+          medicationId: ++medicationId
+        }
+      ],
+      prescriptionErrors: {},
+
+      overTheCounters: [
+        {
+          medicationId: ++medicationId
+        }
+      ],
+      overTheCounterErrors: {},
 
       noFurtherTreatment: false,
 
@@ -235,18 +238,43 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     // no-op
   }
 
-  recommendationSelectUpdated = (fieldGroup) => {
-    return (newValue) => {
-      const key = `${fieldGroup}Medication`
-
-      if (newValue.length === 0) {
-        this.resetFieldGroup(fieldGroup)
+  updateMedications = (array, errors, index, medication) => {
+    if (!medication.prescription) {
+      // if the prescription was removed
+      if (array.length === 1) {
+        // reset the value
+        array[index] = {
+          medicationId: medication.medicationId
+        }
+        errors[medicationId] = {}
+      } else {
+        // if we have more than one, remove it
+        array.splice(index, 1)
       }
-
-      this.setState({
-        [key]: newValue.map(option => option.value)
-      }, this.buildFinalRecommendation)
+    } else {
+      // if the medication was previously unset
+      if (!array[index].prescription) {
+        // make sure we have an empty one on the end
+        array.push({
+          medicationId: ++medicationId
+        })
+      }
+      array[index] = medication
     }
+  }
+
+  onChangePrescription = (index, medication) => {
+    const copy = [...this.state.prescriptions]
+    const errorsCopy = [...this.state.prescriptionErrors]
+    this.updateMedications(copy, errorsCopy, index, medication)
+    this.setState({ prescriptions: copy, prescriptionErrors: errorsCopy }, this.buildFinalRecommendation)
+  }
+
+  onChangeOverTheCounter = (index, medication) => {
+    const copy = [...this.state.overTheCounters]
+    const errorsCopy = [...this.state.overTheCounterErrors]
+    this.updateMedications(copy, errorsCopy, index, medication)
+    this.setState({ overTheCounters: copy, overTheCounterErrors: errorsCopy }, this.buildFinalRecommendation)
   }
 
   // This is the diagnosis chosen in the 'react-select' <Select> components
@@ -257,33 +285,67 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
   // Combines the selected overTheCounter* and prescription* values into their
   // respective React groups
   buildFinalRecommendation = () => {
-    this.buildRecommendation('overTheCounter')
-    this.buildRecommendation('prescription')
+    const overTheCounterRecommendation = this.renderMedications(this.state.overTheCounters)
+    const prescriptionRecommendation = this.renderMedications(this.state.prescriptions)
+
+    this.setState({
+      overTheCounterRecommendation,
+      prescriptionRecommendation
+    })
   }
 
-  buildRecommendation = (fieldGroup) => {
-    let recommendation = ''
-    let duration = ''
+  renderMedications (medications) {
+    if (!medications[0].prescription) {
+      return null
+    }
+    return ReactDOMServer.renderToStaticMarkup(
+      <div>
+        {medications.map(medication => this.renderMedicationSummary(medication))}
+      </div>
+    )
+  }
 
-    if (this.state[`${fieldGroup}Medication`].length > 0) {
-      if (this.state[`${fieldGroup}Duration`]) {
-        duration = `for ${this.state[`${fieldGroup}Duration`]}`
+  renderMedicationSummary = (medication) => {
+    let recommendation = <div key={medication.medicationId}></div>
+    let duration = <span></span>
+
+    if (medication.prescription) {
+      if (medication.duration) {
+        duration = `for ${medication.duration}`
       }
-      recommendation = <React.Fragment>
-        <strong>{this.state[`${fieldGroup}Medication`].join(', ')}</strong>
+      if (medication.notes) {
+        var notes = <p>
+          {medication.notes}
+        </p>
+      }
+      recommendation = <React.Fragment key={medication.medicationId}>
+        <strong>{medication.prescription.label}</strong>
         <br />
-        {this.state[`${fieldGroup}Use`]} {this.state[`${fieldGroup}Frequency`]} {duration}
-        <br />
-        {this.state[`${fieldGroup}Notes`]}
+        {medication.use} {medication.frequency} {duration}
+        {notes}
       </React.Fragment>
-      recommendation = ReactDOMServer.renderToStaticMarkup(recommendation)
     }
 
-    this.setState({ [`${fieldGroup}Recommendation`]: recommendation })
+    return recommendation
+  }
+
+  checkMedicationErrors (medications) {
+    const medicationErrors = []
+    for (var index in medications) {
+      const pErrors = {}
+      medicationErrors.push(pErrors)
+      const { prescription, frequency, duration } = medications[index]
+      pErrors.frequency = prescription && !frequency
+      pErrors.duration = prescription && !duration
+    }
+    return medicationErrors
   }
 
   runValidation = async () => {
     let errors = []
+    const prescriptionErrors = this.checkMedicationErrors(this.state.prescriptions)
+    const overTheCounterErrors = this.checkMedicationErrors(this.state.overTheCounters)
+
     await this.setState({ errors: [] })
 
     if (this.state.diagnosis === null) {
@@ -291,33 +353,11 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     }
 
     if (
-      this.state.overTheCounterRecommendation === ''
-      && this.state.prescriptionRecommendation === ''
+      this.state.prescriptions.prescription === ''
+      && this.state.overTheCounters.prescription === ''
       && this.state.noFurtherTreatment === false
     ) {
       errors.push('oneRecommendation')
-    }
-
-    if (
-      this.state.overTheCounterRecommendation !== ''
-    ) {
-      if (this.state.overTheCounterFrequency === '') {
-        errors.push('overTheCounterFrequency')
-      }
-      if (this.state.overTheCounterDuration === '') {
-        errors.push('overTheCounterDuration')
-      }
-    }
-
-    if (
-      this.state.prescriptionRecommendation !== ''
-    ) {
-      if (this.state.prescriptionFrequency === '') {
-        errors.push('prescriptionFrequency')
-      }
-      if (this.state.prescriptionDuration === '') {
-        errors.push('prescriptionDuration')
-      }
     }
 
     if (errors.length > 0) {
@@ -329,7 +369,11 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
       window.location.hash = `#${errors[0]}`;
     }
 
-    await this.setState({ errors: errors })
+    await this.setState({
+      errors,
+      prescriptionErrors,
+      overTheCounterErrors
+    })
   }
 
   handleSubmit = async (event) => {
@@ -410,6 +454,9 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
         </p>
     }
 
+    const prescriptions = this.state.prescriptions
+    const overTheCounters = this.state.overTheCounters
+
     return (
       <div>
         <div className="card">
@@ -451,76 +498,19 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                   >
                     {(this.state.noFurtherTreatment)
                       ? <span key={`key-overTheCounter-hidden`} />
-                      : (
-                        <div
-                          key={`key-overTheCounter`}
-                          className="form-group form-group--logical-grouping"
-                        >
-                          <label>Over-the-Counter Medication</label>
-
-                          <div className={classnames('form-group')}>
-                            <Select
-                              placeholder={groupedRecommendationOptions.overTheCounter.label}
-                              styles={customStyles}
-                              components={Animated}
-                              closeMenuOnSelect={true}
-                              options={groupedRecommendationOptions.overTheCounter.options}
-                              isMulti={true}
-                              onChange={this.recommendationSelectUpdated('overTheCounter')}
-                              selected={this.state.overTheCounterMedication}
-                              required
+                      :
+                      overTheCounters.map((overTheCounter, index) => {
+                        return (
+                          <PrescriptionMedication
+                            title='Over-the-Counter Medication'
+                            key={overTheCounter.medicationId}
+                            medication={overTheCounter}
+                            errors={this.state.overTheCounterErrors[overTheCounter.medicationId] || {}}
+                            onBlur={this.handleTextAreaOnBlur}
+                            onChange={(medication) => this.onChangeOverTheCounter(index, medication)}
                             />
-                          </div>
-
-                          <HippoToggleButtonGroup
-                            id='overTheCounterUse'
-                            name='overTheCounterUse'
-                            colClasses='col-xs-12'
-                            label=''
-                            formGroupClassNames=''
-                            buttonGroupOnChange={this.handleButtonGroupOnChange}
-                            values={['Apply', 'Wash', 'Take by mouth']}
-                            visible={this.state.overTheCounterMedication.length > 0 ? true : false}
-                          />
-
-                          <div className="row">
-                            <HippoTextArea
-                              id='overTheCounterFrequency'
-                              name="overTheCounterFrequency"
-                              rowClasses=''
-                              colClasses='col-xs-6'
-                              label='Frequency'
-                              error={errors['overTheCounterFrequency']}
-                              textAreaOnBlur={this.handleTextAreaOnBlur}
-                              textAreaOnChange={this.handleTextAreaOnChange}
-                              visible={this.state.overTheCounterMedication.length > 0 ? true : false}
-                            />
-
-                            <HippoTextArea
-                              id='overTheCounterDuration'
-                              name="overTheCounterDuration"
-                              rowClasses=''
-                              colClasses='col-xs-6'
-                              label='Duration'
-                              error={errors['overTheCounterDuration']}
-                              textAreaOnBlur={this.handleTextAreaOnBlur}
-                              textAreaOnChange={this.handleTextAreaOnChange}
-                              visible={this.state.overTheCounterMedication.length > 0 ? true : false}
-                            />
-                          </div>
-
-                          <HippoTextArea
-                            id='overTheCounterNotes'
-                            name="overTheCounterNotes"
-                            colClasses='col-xs-12'
-                            label='Notes'
-                            optional={true}
-                            textAreaOnBlur={this.handleTextAreaOnBlur}
-                            textAreaOnChange={this.handleTextAreaOnChange}
-                            visible={this.state.overTheCounterMedication.length > 0 ? true : false}
-                          />
-                        </div>
-                      )
+                        )
+                      })
                     }
                   </FlipMove>
 
@@ -530,76 +520,18 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                   >
                     {(this.state.noFurtherTreatment)
                       ? <span key={`key-prescriptionMedication-hidden`} />
-                      : (
-                        <div
-                          key={`key-prescriptionMedication`}
-                          className="form-group form-group--logical-grouping"
-                        >
-                          <label>Prescription Medication</label>
-
-                          <div className={classnames('form-group')}>
-                            <Select
-                              placeholder={groupedRecommendationOptions.prescriptionMedications.label}
-                              styles={customStyles}
-                              components={Animated}
-                              closeMenuOnSelect={true}
-                              options={groupedRecommendationOptions.prescriptionMedications.options}
-                              isMulti={true}
-                              onChange={this.recommendationSelectUpdated('prescription')}
-                              selected={this.state.prescriptionMedication}
-                              required
+                      :
+                      prescriptions.map((prescription, index) => {
+                        return (
+                          <PrescriptionMedication
+                            key={prescription.medicationId}
+                            medication={prescription}
+                            errors={this.state.prescriptionErrors[prescription.medicationId] || {}}
+                            onBlur={this.handleTextAreaOnBlur}
+                            onChange={(medication) => this.onChangePrescription(index, medication)}
                             />
-                          </div>
-
-                          <HippoToggleButtonGroup
-                            id='prescriptionUse'
-                            name='prescriptionUse'
-                            colClasses='col-xs-12'
-                            label=''
-                            formGroupClassNames=''
-                            buttonGroupOnChange={this.handleButtonGroupOnChange}
-                            values={['Apply', 'Wash', 'Take by mouth']}
-                            visible={this.state.prescriptionMedication.length > 0 ? true : false}
-                          />
-
-                          <div className="row">
-                            <HippoTextArea
-                              id='prescriptionFrequency'
-                              name="prescriptionFrequency"
-                              rowClasses=''
-                              colClasses='col-xs-6'
-                              label='Frequency'
-                              error={errors['prescriptionFrequency']}
-                              textAreaOnBlur={this.handleTextAreaOnBlur}
-                              textAreaOnChange={this.handleTextAreaOnChange}
-                              visible={this.state.prescriptionMedication.length > 0 ? true : false}
-                            />
-
-                            <HippoTextArea
-                              id='prescriptionDuration'
-                              name="prescriptionDuration"
-                              rowClasses=''
-                              colClasses='col-xs-6'
-                              label='Duration'
-                              error={errors['prescriptionDuration']}
-                              textAreaOnBlur={this.handleTextAreaOnBlur}
-                              textAreaOnChange={this.handleTextAreaOnChange}
-                              visible={this.state.prescriptionMedication.length > 0 ? true : false}
-                            />
-                          </div>
-
-                          <HippoTextArea
-                            id='prescriptionNotes'
-                            name="prescriptionNotes"
-                            colClasses='col-xs-12'
-                            label='Notes'
-                            optional={true}
-                            textAreaOnBlur={this.handleTextAreaOnBlur}
-                            textAreaOnChange={this.handleTextAreaOnChange}
-                            visible={this.state.prescriptionMedication.length > 0 ? true : false}
-                          />
-                        </div>
-                      )
+                        )
+                      })
                     }
                   </FlipMove>
 
@@ -771,13 +703,13 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                     <HippoStringDisplay
                       label="Over-the-Counter Medication:"
                       value={this.state.overTheCounterRecommendation}
-                      visibleIf={this.state.overTheCounterMedication.length > 0}
+                      visibleIf={!!this.state.overTheCounterRecommendation}
                     />
 
                     <HippoStringDisplay
                       label="Prescription Medication:"
                       value={this.state.prescriptionRecommendation}
-                      visibleIf={this.state.prescriptionMedication.length > 0}
+                      visibleIf={!!this.state.prescriptionRecommendation}
                     />
 
                     <HippoStringDisplay
