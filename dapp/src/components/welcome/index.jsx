@@ -66,6 +66,9 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                       Earn <strong>0.5 MEDX</strong> for every case submitted or diagnosed during our trial period (<a target='_blank' rel="noopener noreferrer"  href="https://medium.com/medcredits/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
                     </li>
                   </ol>
+                  <p>
+                    As the beta development progresses your cases may be reset from time to time.  If you see all of your cases vanish don't worry: your case count will be based on your complete history.
+                  </p>
                   <hr />
                   <p className="text-danger small">
                     NOTE: This is the public Beta 2.3 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for September 2018.
