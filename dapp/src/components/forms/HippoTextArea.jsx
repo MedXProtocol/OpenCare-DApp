@@ -48,6 +48,12 @@ export const HippoTextArea = class _HippoTextArea extends Component {
       {label}
     </label>
 
+    if (this.props.value) {
+      var valueProp = {
+        value: this.props.value
+      }
+    }
+
     return (
       <React.Fragment>
         <FlipMove
@@ -70,6 +76,7 @@ export const HippoTextArea = class _HippoTextArea extends Component {
                       onChange={this.handleChange}
                       onBlur={this.handleBlur}
                       className="form-control"
+                      {...valueProp}
                     />
                     {error}
                   </div>
@@ -82,4 +89,3 @@ export const HippoTextArea = class _HippoTextArea extends Component {
     )
   }
 }
-

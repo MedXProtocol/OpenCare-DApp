@@ -21,6 +21,12 @@ contract CaseScheduleManager is Initializable, Ownable {
     _;
   }
 
+  modifier onlyCaseManager () {
+    require(msg.sender == address(caseManager()));
+    require(msg.sender == address(0x0), "broken here and thats gold steven");
+    _;
+  }
+
   modifier onlyPatient(address _caseAddress) {
     Case _case = Case(_caseAddress);
     require(msg.sender == _case.patient());
@@ -45,9 +51,9 @@ contract CaseScheduleManager is Initializable, Ownable {
     setInitialized();
   }
 
-  function initializeCase() external onlyCase() {
-    createdAt[msg.sender] = block.timestamp;
-    updatedAt[msg.sender] = block.timestamp;
+  function initializeCase(Case _case) external onlyCaseManager() {
+    createdAt[_case] = block.timestamp;
+    updatedAt[_case] = block.timestamp;
   }
 
   function touchUpdatedAt() public onlyCase() {

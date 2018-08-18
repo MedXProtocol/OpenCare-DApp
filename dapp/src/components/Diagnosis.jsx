@@ -135,7 +135,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
             const diagnosis = JSON.parse(diagnosisJson)
             return resolve({ diagnosis })
           } else {
-            console.log(diagnosisJson)
             return reject('There was an error')
           }
         })
@@ -152,7 +151,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
           })
         })
         .catch((reason) => {
-          console.log('isCanceled', reason.isCanceled)
+          // console.log('isCanceled', reason.isCanceled)
         })
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')
@@ -287,7 +286,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                 onClick={this.handleAcceptDiagnosis}
                 type="button"
                 className="btn btn-success"
-              >Accept</button>
+              >Accept and Withdraw (5 MEDT)</button>
             </div>
           </div>
         </div>

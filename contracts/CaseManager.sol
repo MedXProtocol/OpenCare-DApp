@@ -1,11 +1,12 @@
 pragma solidity ^0.4.23;
 
-import "./ICase.sol";
+import "./Case.sol";
 import "./IMedXToken.sol";
 import "./IRegistry.sol";
 import "./IAccountManager.sol";
 import "./Delegate.sol";
 import "./Initializable.sol";
+import './CaseScheduleManager.sol';
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
@@ -179,17 +180,18 @@ contract CaseManager is Ownable, Pausable, Initializable {
       address _doctor,
       bytes _doctorEncryptedKey
     ) public onlyThis {
-      ICase newCase = ICase(new Delegate(registry, keccak256("Case")));
+      Case newCase = Case(new Delegate(registry, keccak256("Case")));
+      newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
 
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
-      newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
 
       patientCases[_patient].push(address(newCase));
       doctorCases[_doctor].push(newCase);
       medXToken.transferFrom(_patient, newCase, createCaseCost());
 
       newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
+      caseScheduleManager().initializeCase(newCase);
 
       emit NewCase(newCase, caseIndex);
     }
@@ -212,5 +214,9 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
     function accountManager() internal view returns (IAccountManager) {
       return IAccountManager(registry.lookup(keccak256('AccountManager')));
+    }
+
+    function caseScheduleManager() internal view returns (CaseScheduleManager) {
+      return CaseScheduleManager(registry.lookup(keccak256('CaseScheduleManager')));
     }
 }

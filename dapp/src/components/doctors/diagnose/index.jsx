@@ -54,7 +54,6 @@ function mapStateToProps(state, { match }) {
 function* saga({ match, address, AccountManager }) {
   if (!AccountManager || isEmptyObject(match.params)) { return }
   const caseAddress = match.params.caseAddress
-  // console.log('called by doctors/diagnose.js saga')
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield all([

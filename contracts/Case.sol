@@ -8,6 +8,7 @@ import "./Initializable.sol";
 import "./ICaseManager.sol";
 import "./CaseScheduleManager.sol";
 import "./CaseStatusManager.sol";
+import "./CaseScheduleManager.sol";
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -55,6 +56,7 @@ contract Case is Ownable, Initializable, ICase {
 
   event CaseDiagnosesDiffer(address indexed patient, address indexed doctor);
   event CaseDiagnosisConfirmed(address indexed patient, address indexed doctor);
+  event PatientWithdraw(address indexed patient, address indexed doctor);
 
   event CaseChallenged(address indexed patient, address indexed doctor);
 
@@ -126,12 +128,11 @@ contract Case is Ownable, Initializable, ICase {
       address _registry
   ) external notInitialized {
     setInitialized();
-    require(_encryptedCaseKey.length != 0);
-    require(_caseKeySalt.length != 0);
-    require(_caseHash.length != 0);
-
-    caseScheduleManager().initializeCase();
-
+    require(_encryptedCaseKey.length != 0, 'encryptedCaseKey required');
+    require(_caseKeySalt.length != 0, 'caseKeySalt required');
+    require(_caseHash.length != 0, 'caseHash required');
+    createdAt = block.timestamp;
+    updatedAt = block.timestamp;
     owner = msg.sender;
     status = CaseStatus.Open;
     encryptedCaseKey = _encryptedCaseKey; // don't need to store this
@@ -151,10 +152,39 @@ contract Case is Ownable, Initializable, ICase {
     revert();
   }
 
+  function patientClose() external onlyCaseScheduleManager {
+    close();
+    emit PatientWithdraw(patient, diagnosingDoctor);
+  }
+
+  function close() internal {
+    require(
+         status != CaseStatus.Closed
+      || status != CaseStatus.ClosedRejected
+      || status != CaseStatus.ClosedConfirmed, 'case must not be closed prior to closing'
+    );
+    status = CaseStatus.Closed;
+
+    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+
+    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
+    caseStatusManager().addClosedCase(diagnosingDoctor, this);
+
+    emit CaseClosed(patient, diagnosingDoctor, challengingDoctor);
+  }
+
+  function acceptDiagnosisAsDoctor() external onlyCaseScheduleManager {
+    accept();
+  }
+
+  function touchUpdatedAt() internal {
+    updatedAt = block.timestamp;
+  }
+
   function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyCaseManager isDoctor(_doctor) {
-    require(status == CaseStatus.Open);
-    require(diagnosingDoctor == address(0));
-    require(_doctor != patient);
+    require(status == CaseStatus.Open, 'case must be open to set the diagnosingDoctor');
+    require(diagnosingDoctor == address(0), 'the diagnosingDoctor must be a valid address');
+    require(_doctor != patient, 'the doctor cannot be the patient');
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
     caseStatusManager().addOpenCase(_doctor, this);
@@ -167,7 +197,7 @@ contract Case is Ownable, Initializable, ICase {
    * @param _diagnosisHash - Swarm hash of where the diagnosis data is stored
    */
   function diagnoseCase(bytes _diagnosisHash) external onlyDiagnosingDoctor {
-    require(status == CaseStatus.Evaluating);
+    require(status == CaseStatus.Evaluating, 'case must be in Evaluating state to diagnose');
     status = CaseStatus.Evaluated;
     diagnosisHash = _diagnosisHash;
     caseScheduleManager().touchUpdatedAt();
@@ -189,41 +219,17 @@ contract Case is Ownable, Initializable, ICase {
   /**
    * @dev - allows the patient to withdraw funds after 1 day if the initial doc didn't respond
    */
-  // function patientWithdrawFunds() external onlyPatient {
-  //   caseScheduleManager().patientWithdrawFunds(this);
-  //   close();
-  // }
 
   function patientClose() external onlyCaseScheduleManager {
-    close(true);
-  }
-
-  function close(bool _closedByPatient) internal {
-    require(
-         status != CaseStatus.Closed
-      || status != CaseStatus.ClosedRejected
-      || status != CaseStatus.ClosedConfirmed
-    );
-    status = CaseStatus.Closed;
-
-    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
-
-    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
-    caseStatusManager().addClosedCase(diagnosingDoctor, this);
-
-    emit CaseClosed(patient, diagnosingDoctor, challengingDoctor);
-
-    if (_closedByPatient) {
-      emit PatientWithdraw(patient, diagnosingDoctor);
-    }
+    close();
   }
 
   function accept() internal {
-    require(status == CaseStatus.Evaluated);
+    require(status == CaseStatus.Evaluated, 'the case must be Evaluated to accept');
 
     medXToken.transfer(diagnosingDoctor, caseFee);
 
-    close(false);
+    close();
   }
 
   function challengeWithDoctor(address _doctor, bytes _doctorEncryptedKey) external onlyPatient {

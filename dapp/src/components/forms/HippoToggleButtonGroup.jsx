@@ -1,10 +1,23 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
 import { defined } from '~/utils/defined'
+import PropTypes from 'prop-types'
 import { ControlLabel, ToggleButtonGroup, ToggleButton, ButtonToolbar } from 'react-bootstrap'
 import FlipMove from 'react-flip-move'
 
 export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Component {
+  static propTypes = {
+    visible: PropTypes.any,
+    onChange: PropTypes.any,
+    selectedValues: PropTypes.any,
+    formGroupClassNames: PropTypes.any,
+    id: PropTypes.any,
+    name: PropTypes.any,
+    error: PropTypes.any,
+    label: PropTypes.any,
+    values: PropTypes.any,
+    colClasses: PropTypes.any
+  }
 
   constructor(props) {
     super(props)
@@ -32,6 +45,13 @@ export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Comp
 
     let formGroupClasses = classnames('form-group', { 'has-error': error }, this.props.formGroupClassNames)
 
+    if (this.props.selectedValues) {
+      var selectedValues = {
+        value: this.props.selectedValues,
+        onChange: this.props.onChange
+      }
+    }
+
     return (
       <React.Fragment>
         <FlipMove
@@ -48,7 +68,10 @@ export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Comp
                 <div id={id} className={formGroupClasses}>
                   {controlLabel}
                   <ButtonToolbar>
-                    <ToggleButtonGroup name={name} type="radio">
+                    <ToggleButtonGroup
+                      name={name}
+                      type="radio"
+                      {...selectedValues}>
                       {
                         values.map((value) => {
                           return <ToggleButton

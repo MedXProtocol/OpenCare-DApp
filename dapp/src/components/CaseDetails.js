@@ -97,8 +97,6 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
               secondImageUrl
             })
           } else {
-            console.log('rejecting')
-            console.log(detailsJson)
             return reject('There was an error')
           }
         })

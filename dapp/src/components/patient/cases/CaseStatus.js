@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
   withSaga,
   cacheCallValue,
+  cacheCallValueInt,
   contractByName,
   cacheCall,
   addContract
@@ -12,7 +13,7 @@ import { isBlank } from '~/utils/isBlank'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress }) {
-  const status = (cacheCallValue(state, caseAddress, 'status') || '0')
+  const status = (cacheCallValueInt(state, caseAddress, 'status') || 0)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
 

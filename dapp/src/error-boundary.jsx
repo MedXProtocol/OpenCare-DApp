@@ -1,20 +1,15 @@
 import React from 'react'
-import bugsnag from 'bugsnag-js'
 import createPlugin from 'bugsnag-react'
+import { bugsnagClient } from '~/bugsnagClient'
 
 let boundary
 
 if (process.env.REACT_APP_BUGSNAG_API_KEY && process.env.REACT_APP_ENV) {
-  const bugsnagClient = bugsnag({
-    apiKey: process.env.REACT_APP_BUGSNAG_API_KEY,
-    notifyReleaseStages: ['production', 'staging'],
-    releaseStage: process.env.REACT_APP_ENV
-  })
   boundary = bugsnagClient.use(createPlugin(React))
 } else {
   boundary = class ErrorBoundary extends React.Component {
     componentDidCatch(error, errorInfo) {
-      console.error(error, errorInfo)
+      bugsnagClient.notify(error, errorInfo)
     }
 
     render() {
