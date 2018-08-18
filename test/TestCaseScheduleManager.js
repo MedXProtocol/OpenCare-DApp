@@ -4,7 +4,11 @@ const Case = artifacts.require("./Case.sol")
 const CaseScheduleManager = artifacts.require("./CaseScheduleManager.sol")
 const createEnvironment = require('./helpers/create-environment')
 const createCase = require('./helpers/create-case')
+const increaseTime = require('./helpers/increaseTime')
+const caseStatus = require('./helpers/case-status')
 const resetCaseManager = require('./helpers/reset-case-manager')
+
+const SECONDS_IN_A_DAY = 86400
 
 contract('CaseScheduleManager', function (accounts) {
   let patient = accounts[0]
@@ -16,6 +20,10 @@ contract('CaseScheduleManager', function (accounts) {
     env = await createEnvironment(artifacts)
     await env.medXToken.mint(patient, web3.toWei(1000, 'ether'))
     await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr Xavier')
+  })
+
+  beforeEach(async () => {
+    await resetCaseManager(artifacts, env)
   })
 
   describe('CaseScheduleManager', () => {
@@ -34,7 +42,6 @@ contract('CaseScheduleManager', function (accounts) {
 
   describe('initializeCase()', () => {
     it('should assign timestamps', async () => {
-      await resetCaseManager(artifacts, env)
       const caseInstance = await Case.at(await createCase(env, patient, doctor))
       const createdAt = await env.caseScheduleManager.createdAt(caseInstance.address)
       const updatedAt = await env.caseScheduleManager.updatedAt(caseInstance.address)
@@ -42,4 +49,18 @@ contract('CaseScheduleManager', function (accounts) {
       assert.equal(updatedAt.toString(), createdAt.toString())
     })
   })
+
+  describe('patientWithdrawFunds()', () => {
+    it('should close the case and refund the patient', async () => {
+      const increaseTime = require('./helpers/increaseTime')
+
+      const caseInstance = await Case.at(await createCase(env, patient, doctor))
+
+      increaseTime(SECONDS_IN_A_DAY * 3)
+
+      env.caseScheduleManager.patientWithdrawFunds(caseInstance.address)
+      assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
+    })
+  })
+
 })

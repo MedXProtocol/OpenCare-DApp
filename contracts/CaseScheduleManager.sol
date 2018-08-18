@@ -22,8 +22,7 @@ contract CaseScheduleManager is Initializable, Ownable {
   }
 
   modifier onlyCaseManager () {
-    require(msg.sender == address(caseManager()), 'sender needs to be the case manager');
-    require(msg.sender == address(0x0), 'msg sender cannot be blank and thats gold, Steven!');
+    require(msg.sender == address(caseManager()), 'sender needs to be the case manager ... and thats gold, Steven!');
     _;
   }
 
@@ -59,7 +58,10 @@ contract CaseScheduleManager is Initializable, Ownable {
    * @dev - allows the patient to withdraw funds after 1 day if the initial doc didn't respond
    */
   function patientWithdrawFunds(address _caseAddress) external onlyPatient(_caseAddress) {
-    require((block.timestamp - updatedAt[_caseAddress]) > secondsInADay, 'not enough time has passed');
+    require(
+      (block.timestamp - updatedAt[_caseAddress]) > secondsInADay,
+      'not enough time has passed'
+    );
 
     updatedAt[_caseAddress] = block.timestamp;
 
@@ -71,7 +73,10 @@ contract CaseScheduleManager is Initializable, Ownable {
    * @dev - The initial doctor accepting their evaluation and getting the tokens owing to them
    */
   function acceptAsDoctor(address _caseAddress) external onlyDiagnosingDoctor(_caseAddress) {
-    require((block.timestamp - updatedAt[_caseAddress]) > (secondsInADay * 2), 'not enough time has passed');
+    require(
+      (block.timestamp - updatedAt[_caseAddress]) > (secondsInADay * 2),
+      'not enough time has passed'
+    );
 
     Case _case = Case(_caseAddress);
     _case.acceptDiagnosisAsDoctor();
