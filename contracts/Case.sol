@@ -50,13 +50,12 @@ contract Case is Ownable, Initializable, ICase {
 
   event CaseCreated(address indexed patient);
   event CaseEvaluated(address indexed patient, address indexed doctor);
-  event PatientWithdraw(address indexed patient, address indexed doctor);
 
+  event PatientWithdraw(address indexed patient, address indexed doctor);
   event CaseClosed(address indexed patient, address indexed diagnosingDoctor, address indexed challengingDoctor);
 
   event CaseDiagnosesDiffer(address indexed patient, address indexed doctor);
   event CaseDiagnosisConfirmed(address indexed patient, address indexed doctor);
-  event PatientWithdraw(address indexed patient, address indexed doctor);
 
   event CaseChallenged(address indexed patient, address indexed doctor);
 
@@ -131,8 +130,6 @@ contract Case is Ownable, Initializable, ICase {
     require(_encryptedCaseKey.length != 0, 'encryptedCaseKey required');
     require(_caseKeySalt.length != 0, 'caseKeySalt required');
     require(_caseHash.length != 0, 'caseHash required');
-    createdAt = block.timestamp;
-    updatedAt = block.timestamp;
     owner = msg.sender;
     status = CaseStatus.Open;
     encryptedCaseKey = _encryptedCaseKey; // don't need to store this
@@ -152,6 +149,52 @@ contract Case is Ownable, Initializable, ICase {
     revert();
   }
 
+  function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyCaseManager isDoctor(_doctor) {
+    require(status == CaseStatus.Open, 'case must be open to set the diagnosingDoctor');
+    require(diagnosingDoctor == address(0), 'the diagnosingDoctor must be a valid address');
+    require(_doctor != patient, 'the doctor cannot be the patient');
+    diagnosingDoctor = _doctor;
+    status = CaseStatus.Evaluating;
+    caseStatusManager().addOpenCase(_doctor, this);
+    doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
+    emit SetDiagnosingDoctor(patient, msg.sender, _doctorEncryptedKey);
+  }
+
+  /**
+   * @dev - doctor submits diagnosis for case. Patient must have approved the doctor in order for them to decrypt the case files
+   * @param _diagnosisHash - Swarm hash of where the diagnosis data is stored
+   */
+  function diagnoseCase(bytes _diagnosisHash) external onlyDiagnosingDoctor {
+    // require(status == CaseStatus.Evaluating, 'case must be in Evaluating state to diagnose');
+    // status = CaseStatus.Evaluated;
+    // diagnosisHash = _diagnosisHash;
+    // caseScheduleManager().touchUpdatedAt();
+    // emit CaseEvaluated(patient, diagnosingDoctor);
+  }
+
+  /**
+   * @dev - The patient accepts the evaluation and tokens are credited to doctor
+   * and rest is returned to the patient
+   */
+  function acceptDiagnosis() external onlyPatient {
+    accept();
+  }
+
+  function acceptDiagnosisAsDoctor() external onlyCaseScheduleManager {
+    accept();
+  }
+
+  function accept() internal {
+    require(status == CaseStatus.Evaluated, 'the case must be Evaluated to accept');
+
+    medXToken.transfer(diagnosingDoctor, caseFee);
+
+    close();
+  }
+
+  /**
+   * @dev - allows the patient to withdraw funds after 1 day if the initial doc didn't respond
+   */
   function patientClose() external onlyCaseScheduleManager {
     close();
     emit PatientWithdraw(patient, diagnosingDoctor);
@@ -173,82 +216,23 @@ contract Case is Ownable, Initializable, ICase {
     emit CaseClosed(patient, diagnosingDoctor, challengingDoctor);
   }
 
-  function acceptDiagnosisAsDoctor() external onlyCaseScheduleManager {
-    accept();
-  }
-
-  function touchUpdatedAt() internal {
-    updatedAt = block.timestamp;
-  }
-
-  function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyCaseManager isDoctor(_doctor) {
-    require(status == CaseStatus.Open, 'case must be open to set the diagnosingDoctor');
-    require(diagnosingDoctor == address(0), 'the diagnosingDoctor must be a valid address');
-    require(_doctor != patient, 'the doctor cannot be the patient');
-    diagnosingDoctor = _doctor;
-    status = CaseStatus.Evaluating;
-    caseStatusManager().addOpenCase(_doctor, this);
-    doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
-    emit SetDiagnosingDoctor(patient, msg.sender, _doctorEncryptedKey);
-  }
-
-  /**
-   * @dev - doctor submits diagnosis for case. Patient must have approved the doctor in order for them to decrypt the case files
-   * @param _diagnosisHash - Swarm hash of where the diagnosis data is stored
-   */
-  function diagnoseCase(bytes _diagnosisHash) external onlyDiagnosingDoctor {
-    require(status == CaseStatus.Evaluating, 'case must be in Evaluating state to diagnose');
-    status = CaseStatus.Evaluated;
-    diagnosisHash = _diagnosisHash;
-    caseScheduleManager().touchUpdatedAt();
-    emit CaseEvaluated(patient, diagnosingDoctor);
-  }
-
-  /**
-   * @dev - The patient accepts the evaluation and tokens are credited to doctor
-   * and rest is returned to the patient
-   */
-  function acceptDiagnosis() external onlyPatient {
-    accept();
-  }
-
-  function acceptDiagnosisAsDoctor() external onlyCaseScheduleManager {
-    accept();
-  }
-
-  /**
-   * @dev - allows the patient to withdraw funds after 1 day if the initial doc didn't respond
-   */
-
-  function patientClose() external onlyCaseScheduleManager {
-    close();
-  }
-
-  function accept() internal {
-    require(status == CaseStatus.Evaluated, 'the case must be Evaluated to accept');
-
-    medXToken.transfer(diagnosingDoctor, caseFee);
-
-    close();
-  }
-
   function challengeWithDoctor(address _doctor, bytes _doctorEncryptedKey) external onlyPatient {
-    require(status == CaseStatus.Evaluated, 'Status must match');
-    status = CaseStatus.Challenging;
-    setChallengingDoctor(_doctor, _doctorEncryptedKey);
-    caseManager().addChallengeDoctor(_doctor);
-    caseScheduleManager().touchUpdatedAt();
+    // require(status == CaseStatus.Evaluated, 'Status must match');
+    // status = CaseStatus.Challenging;
+    // setChallengingDoctor(_doctor, _doctorEncryptedKey);
+    // caseManager().addChallengeDoctor(_doctor);
+    // caseScheduleManager().touchUpdatedAt();
 
-    emit CaseChallenged(patient, _doctor);
+    // emit CaseChallenged(patient, _doctor);
   }
 
   function setChallengingDoctor (address _doctor, bytes _doctorEncryptedKey) internal isDoctor(_doctor) {
-    require(_doctor != patient);
-    require(_doctor != diagnosingDoctor);
-    challengingDoctor = _doctor;
-    caseStatusManager().addOpenCase(challengingDoctor, this);
-    doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
-    emit SetChallengingDoctor(patient, msg.sender, _doctorEncryptedKey);
+    // require(_doctor != patient, 'doctor cannot also be patient');
+    // require(_doctor != diagnosingDoctor, 'challenge doctor cannot be diagnosing doctor');
+    // challengingDoctor = _doctor;
+    // caseStatusManager().addOpenCase(challengingDoctor, this);
+    // doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
+    // emit SetChallengingDoctor(patient, msg.sender, _doctorEncryptedKey);
   }
 
   /**
@@ -257,18 +241,18 @@ contract Case is Ownable, Initializable, ICase {
    * @param _accept - diagnosis the same as the original
    */
   function diagnoseChallengedCase(bytes _secondaryDiagnosisHash, bool _accept) external onlyChallengeDoctor {
-    require(status == CaseStatus.Challenging);
-    caseStatusManager().removeOpenCase(challengingDoctor, this);
-    caseStatusManager().addClosedCase(challengingDoctor, this);
-    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
-    caseStatusManager().addClosedCase(diagnosingDoctor, this);
-    challengeHash = _secondaryDiagnosisHash;
-    caseScheduleManager().touchUpdatedAt();
+    // require(status == CaseStatus.Challenging, 'case needs to be challenged for a challenge diagnosis');
+    // caseStatusManager().removeOpenCase(challengingDoctor, this);
+    // caseStatusManager().addClosedCase(challengingDoctor, this);
+    // caseStatusManager().removeOpenCase(diagnosingDoctor, this);
+    // caseStatusManager().addClosedCase(diagnosingDoctor, this);
+    // challengeHash = _secondaryDiagnosisHash;
+    // caseScheduleManager().touchUpdatedAt();
 
-    if (_accept)
-        confirmChallengedDiagnosis();
-    else
-        rejectChallengedDiagnosis();
+    // if (_accept)
+    //     confirmChallengedDiagnosis();
+    // else
+    //     rejectChallengedDiagnosis();
   }
 
   /**

@@ -7,8 +7,8 @@ contract Delegate {
   bytes32 private constant delegateKeyPosition = keccak256("org.medcredits.delegate.key");
 
   constructor (address _registry, bytes32 _key) public {
-    require(_registry != address(0));
-    require(_key != bytes32(0));
+    require(_registry != address(0), 'registry address cannot be blank');
+    require(_key != bytes32(0), '_key cannot be blank');
     _setDelegateRegistry(_registry);
     _setDelegateKey(_key);
   }
@@ -56,7 +56,7 @@ contract Delegate {
   */
   function () payable public {
     address _impl = implementation();
-    require(_impl != address(0));
+    require(_impl != address(0), '_impl cannot be blank');
 
     assembly {
       let ptr := mload(0x40)

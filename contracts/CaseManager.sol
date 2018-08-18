@@ -33,13 +33,13 @@ contract CaseManager is Ownable, Pausable, Initializable {
     }
 
     modifier onlyThis() {
-      require(this == msg.sender);
+      require(this == msg.sender, 'must be called by the same contract');
       _;
     }
 
     function isCase(address _case) {
-      require(_case != address(0));
-      require(caseIndices[_case] != uint256(0));
+      require(_case != address(0), 'case address cannot be blank');
+      require(caseIndices[_case] != uint256(0), 'case was not found in casedIndices');
     }
 
     /**
@@ -48,9 +48,9 @@ contract CaseManager is Ownable, Pausable, Initializable {
      * @param _medXToken - the MedX token
      */
     function initialize(uint256 _baseCaseFee, address _medXToken, address _registry) external notInitialized {
-        require(_baseCaseFee > 0);
-        require(_medXToken != 0x0);
-        require(_registry != 0x0);
+        require(_baseCaseFee > 0, '_baseCaseFee is too low');
+        require(_medXToken != 0x0, 'medxtoken address cannot be blank');
+        require(_registry != 0x0, 'registry address cannot be blank');
         setInitialized();
 
         owner = msg.sender;
@@ -109,7 +109,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
         bool sig2matches =
           sig == bytes4(keccak256('createAndAssignCaseWithPublicKey(address,bytes,bytes,bytes,address,bytes,bytes)'));
 
-        require(sig1matches || sig2matches);
+        require(sig1matches || sig2matches, 'signatures do not match');
 
         address _this = address(this);
         uint256 inputSize = _extraData.length;
@@ -133,7 +133,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
      * @dev - sets the base case fee - only affects new cases
      */
     function setBaseCaseFee(uint256 _newCaseFee) public onlyOwner {
-        require(_newCaseFee > 0);
+        require(_newCaseFee > 0, '_newCaseFee is too low');
         caseFee = _newCaseFee;
     }
 
@@ -161,7 +161,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       bytes _patientPublicKey
     ) public onlyThis {
       IAccountManager am = accountManager();
-      require(am.publicKeys(_patient).length == 0);
+      require(am.publicKeys(_patient).length == 0, 'patient publicKey not set');
       am.setPublicKey(_patient, _patientPublicKey);
       createAndAssignCase(
         _patient,

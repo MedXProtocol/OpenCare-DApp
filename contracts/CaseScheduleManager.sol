@@ -22,30 +22,25 @@ contract CaseScheduleManager is Initializable, Ownable {
   }
 
   modifier onlyCaseManager () {
-    require(msg.sender == address(caseManager()));
-    require(msg.sender == address(0x0), "broken here and thats gold steven");
+    require(msg.sender == address(caseManager()), 'sender needs to be the case manager');
+    require(msg.sender == address(0x0), 'msg sender cannot be blank and thats gold, Steven!');
     _;
   }
 
   modifier onlyPatient(address _caseAddress) {
     Case _case = Case(_caseAddress);
-    require(msg.sender == _case.patient());
+    require(msg.sender == _case.patient(), 'sender needs to be the patient');
     _;
   }
 
   modifier onlyDiagnosingDoctor(address _caseAddress) {
     Case _case = Case(_caseAddress);
-    require(msg.sender == _case.diagnosingDoctor());
+    require(msg.sender == _case.diagnosingDoctor(), 'sender needs to be the diagnosis doctor');
     _;
   }
 
-  // modifier isDoctorCase(address _doctor, ICase _case) {
-  //   require(_doctor == _case.getDiagnosingDoctor() || _doctor == _case.getChallengingDoctor());
-  //   _;
-  // }
-
-  function initialize (Registry _registry) public notInitialized {
-    require(_registry != address(0));
+  function initialize(Registry _registry) public notInitialized {
+    require(_registry != address(0), 'registry is not blank');
     registry = _registry;
     owner = msg.sender;
     setInitialized();
@@ -64,7 +59,7 @@ contract CaseScheduleManager is Initializable, Ownable {
    * @dev - allows the patient to withdraw funds after 1 day if the initial doc didn't respond
    */
   function patientWithdrawFunds(address _caseAddress) external onlyPatient(_caseAddress) {
-    require((block.timestamp - updatedAt[_caseAddress]) > (secondsInADay));
+    require((block.timestamp - updatedAt[_caseAddress]) > secondsInADay, 'not enough time has passed');
 
     updatedAt[_caseAddress] = block.timestamp;
 
@@ -76,7 +71,7 @@ contract CaseScheduleManager is Initializable, Ownable {
    * @dev - The initial doctor accepting their evaluation and getting the tokens owing to them
    */
   function acceptAsDoctor(address _caseAddress) external onlyDiagnosingDoctor(_caseAddress) {
-    require((block.timestamp - updatedAt[_caseAddress]) > (secondsInADay * 2));
+    require((block.timestamp - updatedAt[_caseAddress]) > (secondsInADay * 2), 'not enough time has passed');
 
     Case _case = Case(_caseAddress);
     _case.acceptDiagnosisAsDoctor();
