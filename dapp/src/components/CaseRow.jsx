@@ -19,7 +19,8 @@ import { EthAddress } from '~/components/EthAddress'
 import { LoadingLines } from '~/components/LoadingLines'
 import { HippoTimestamp } from '~/components/HippoTimestamp'
 import { txErrorMessage } from '~/services/txErrorMessage'
-import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
+import { secondsInADay } from '~/config/constants'
+import { caseStale } from '~/services/caseStale'
 import { updatePendingTx } from '~/services/pendingTxs'
 import { transactionErrorToCode } from '~/services/transactionErrorToCode'
 import { patientCaseStatusToName, patientCaseStatusToClass } from '~/utils/patientCaseStatusLabels'
@@ -73,7 +74,8 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
     caseRowObject['statusLabel'] = doctorCaseStatusToName(caseRowObject)
     caseRowObject['statusClass'] = doctorCaseStatusToClass(caseRowObject)
 
-    if (caseStaleForOneDay(caseRowObject.updatedAt, caseRowObject.status)) {
+    // Intial doc can take action after 2 days
+    if (caseStale(secondsInADay * 2, caseRowObject.updatedAt, caseRowObject.status)) {
       caseRowObject['statusLabel'] = 'Requires Attention'
       caseRowObject['statusClass'] = 'warning'
     }

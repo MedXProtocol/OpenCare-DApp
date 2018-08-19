@@ -161,18 +161,6 @@ contract Case is Ownable, Initializable, ICase {
   }
 
   /**
-   * @dev - doctor submits diagnosis for case. Patient must have approved the doctor in order for them to decrypt the case files
-   * @param _diagnosisHash - Swarm hash of where the diagnosis data is stored
-   */
-  function diagnoseCase(bytes _diagnosisHash) external onlyDiagnosingDoctor {
-    // require(status == CaseStatus.Evaluating, 'case must be in Evaluating state to diagnose');
-    // status = CaseStatus.Evaluated;
-    // diagnosisHash = _diagnosisHash;
-    // caseScheduleManager().touchUpdatedAt(address(this));
-    // emit CaseEvaluated(patient, diagnosingDoctor);
-  }
-
-  /**
    * @dev - The patient accepts the evaluation and tokens are credited to doctor
    * and rest is returned to the patient
    */
@@ -278,6 +266,10 @@ contract Case is Ownable, Initializable, ICase {
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
     emit CaseDiagnosesDiffer(patient, challengingDoctor);
+  }
+
+  function updateStatus(Case.CaseStatus _status) external onlyCaseScheduleManager {
+    status = _status;
   }
 
   function doctorManager() internal view returns (IDoctorManager) {

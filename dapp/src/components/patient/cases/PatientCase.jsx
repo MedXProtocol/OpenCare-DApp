@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import CaseStatus from './CaseStatus'
+import PatientTimeActions from '~/components/patient/cases/PatientTimeActions'
 import Diagnosis from '~/components/Diagnosis'
 import { CaseDetails } from '~/components/CaseDetails'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
@@ -9,19 +10,31 @@ import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { decryptCaseKeyAsync } from '~/services/decrypt-case-key'
 import { currentAccount } from '~/services/sign-in'
-import { withSaga, cacheCallValue, cacheCall, addContract } from '~/saga-genesis'
+import { withSaga,
+  cacheCallValue,
+  cacheCall,
+  addContract,
+  contractByName,
+  cacheCallValueInt
+} from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { match }) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const caseAddress = match.params.caseAddress
+
+  const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
+  const status = cacheCallValueInt(state, CaseScheduleManager, 'status', caseAddress)
+  const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
+
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
 
   return {
+    CaseScheduleManager,
     challengeHash,
     diagnosisHash,
     encryptedCaseKey,
@@ -30,13 +43,15 @@ function mapStateToProps(state, { match }) {
   }
 }
 
-function* saga({ match, networkId }) {
+function* saga({ CaseScheduleManager, match, networkId }) {
   if (!networkId) { return }
 
   const caseAddress = match.params.caseAddress
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
+    cacheCall(CaseScheduleManager, 'status', caseAddress),
+    cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
     cacheCall(caseAddress, 'encryptedCaseKey'),
     cacheCall(caseAddress, 'caseKeySalt'),
     cacheCall(caseAddress, 'diagnosisHash'),
@@ -113,6 +128,8 @@ export const PatientCaseContainer = connect(mapStateToProps)(
                     <CaseStatus caseAddress={this.props.match.params.caseAddress}/>
                   </div>
                 ) : null}
+
+                <PatientTimeActions caseAddress={caseAddress} status={status} updatedAt={updatedAt} />
 
                 {diagnosis}
                 {challenge}

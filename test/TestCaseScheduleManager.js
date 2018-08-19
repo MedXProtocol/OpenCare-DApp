@@ -13,6 +13,7 @@ const SECONDS_IN_A_DAY = 86400
 contract('CaseScheduleManager', function (accounts) {
   let patient = accounts[0]
   let doctor = accounts[1]
+  let doctor2 = accounts[2]
 
   let env
 
@@ -27,13 +28,13 @@ contract('CaseScheduleManager', function (accounts) {
   })
 
   describe('CaseScheduleManager', () => {
-    it("should work", async () => {
+    xit("should work", async () => {
       const caseScheduleManager = await CaseScheduleManager.new()
     })
   })
 
   describe('initialize()', () => {
-    it('should not be called again', async () => {
+    xit('should not be called again', async () => {
       await expectThrow(async () => {
         await env.caseScheduleManager.initialize(env.registry.address)
       })
@@ -41,7 +42,7 @@ contract('CaseScheduleManager', function (accounts) {
   })
 
   describe('initializeCase()', () => {
-    it('should assign timestamps', async () => {
+    xit('should assign timestamps', async () => {
       const caseInstance = await Case.at(await createCase(env, patient, doctor))
       const createdAt = await env.caseScheduleManager.createdAt(caseInstance.address)
       const updatedAt = await env.caseScheduleManager.updatedAt(caseInstance.address)
@@ -51,15 +52,34 @@ contract('CaseScheduleManager', function (accounts) {
   })
 
   describe('patientWithdrawFunds()', () => {
-    it('should close the case and refund the patient', async () => {
-      const increaseTime = require('./helpers/increaseTime')
-
+    xit('should close the case and refund the patient', async () => {
       const caseInstance = await Case.at(await createCase(env, patient, doctor))
 
       increaseTime(SECONDS_IN_A_DAY * 3)
 
       env.caseScheduleManager.patientWithdrawFunds(caseInstance.address)
       assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
+    })
+  })
+
+  describe('patientRequestNewDoctor()', () => {
+    it('should set the case to open and update the doc', async () => {
+      const caseInstance = await Case.at(await createCase(env, patient, doctor))
+      console.log(caseInstance.diagnosingDoctor.call())
+      assert.equal(await caseInstance.diagnosingDoctor.call(), doctor)
+
+      increaseTime(SECONDS_IN_A_DAY * 3)
+
+      env.caseScheduleManager.patientRequestNewDoctor(
+        caseInstance.address,
+        doctor2,
+        'a diff doc encrypted case key'
+      )
+      console.log('patient', patient)
+      console.log('doctor', doctor)
+        console.log('doctor2', doctor2)
+      assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
+      assert.equal(await caseInstance.diagnosingDoctor.call(), doctor2)
     })
   })
 

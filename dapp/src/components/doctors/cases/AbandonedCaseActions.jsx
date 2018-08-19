@@ -11,9 +11,10 @@ import {
   withSend,
   TransactionStateHandler
 } from '~/saga-genesis'
-import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
+import { caseStale } from '~/services/caseStale'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
+import { secondsInADay } from '~/config/constants'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
@@ -79,14 +80,14 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
           })
           .onTxHash(() => {
             toastr.success('Your accept diagnosis transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your MEDX.')
-            mixpanel.track('Doctor Force Accepting After 24 Hours')
+            mixpanel.track('Doctor Force Accepting After 48+ Hours')
             this.props.history.push(routes.DOCTORS_CASES_OPEN)
           })
       }
     }
 
     render () {
-      if (!this.props.updatedAt || !caseStaleForOneDay(this.props.updatedAt, this.props.status)) {
+      if (!this.props.updatedAt || !caseStale(secondsInADay * 2, this.props.updatedAt, this.props.status)) {
         return null
       } else {
         return (

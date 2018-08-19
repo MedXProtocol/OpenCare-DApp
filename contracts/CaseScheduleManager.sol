@@ -70,6 +70,25 @@ contract CaseScheduleManager is Initializable, Ownable {
   }
 
   /**
+   * @dev - allows the patient to choose another doc if the first doc hasn't responded after 24 hours
+   */
+  function patientRequestNewDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
+    external
+    onlyPatient(_caseAddress)
+  {
+    require(
+      (block.timestamp - updatedAt[_caseAddress]) > secondsInADay,
+      'not enough time has passed'
+    );
+
+    updatedAt[_caseAddress] = block.timestamp;
+
+    Case _case = Case(_caseAddress);
+    _case.updateStatus(Case.CaseStatus.Open);
+    _case.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
+  }
+
+  /**
    * @dev - The initial doctor accepting their evaluation and getting the tokens owing to them
    */
   function acceptAsDoctor(address _caseAddress) external onlyDiagnosingDoctor(_caseAddress) {
