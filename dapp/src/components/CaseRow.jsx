@@ -34,14 +34,16 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   let status, createdAt, updatedAt
   if (caseRowObject === undefined) { caseRowObject = {} }
 
-  const transactions = Object.values(state.sagaGenesis.transactions)
   const CaseManager = contractByName(state, 'CaseManager')
+  const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
+
+  const transactions = Object.values(state.sagaGenesis.transactions)
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   if (caseAddress) {
     status = cacheCallValueInt(state, caseAddress, 'status')
-    createdAt = cacheCallValueInt(state, caseAddress, 'createdAt')
-    updatedAt = cacheCallValueInt(state, caseAddress, 'updatedAt')
+    createdAt = cacheCallValueInt(state, CaseScheduleManager, 'createdAt', caseAddress)
+    updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
 
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
 
@@ -98,20 +100,21 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   }
 
   return {
+    CaseScheduleManager,
     CaseManager,
     caseRowObject,
     address
   }
 }
 
-function* saga({ CaseManager, caseAddress }) {
+function* saga({ CaseManager, CaseScheduleManager, caseAddress }) {
   if (!CaseManager || !caseAddress) { return }
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
     cacheCall(caseAddress, 'status'),
-    cacheCall(caseAddress, 'createdAt'),
-    cacheCall(caseAddress, 'updatedAt'),
+    cacheCall(CaseScheduleManager, 'createdAt', caseAddress),
+    cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(CaseManager, 'caseIndices', caseAddress)
   ])

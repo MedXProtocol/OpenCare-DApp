@@ -168,7 +168,7 @@ contract Case is Ownable, Initializable, ICase {
     // require(status == CaseStatus.Evaluating, 'case must be in Evaluating state to diagnose');
     // status = CaseStatus.Evaluated;
     // diagnosisHash = _diagnosisHash;
-    // caseScheduleManager().touchUpdatedAt();
+    // caseScheduleManager().touchUpdatedAt(address(this));
     // emit CaseEvaluated(patient, diagnosingDoctor);
   }
 
@@ -221,7 +221,7 @@ contract Case is Ownable, Initializable, ICase {
     // status = CaseStatus.Challenging;
     // setChallengingDoctor(_doctor, _doctorEncryptedKey);
     // caseManager().addChallengeDoctor(_doctor);
-    // caseScheduleManager().touchUpdatedAt();
+    // caseScheduleManager().touchUpdatedAt(address(this));
 
     // emit CaseChallenged(patient, _doctor);
   }
@@ -247,7 +247,7 @@ contract Case is Ownable, Initializable, ICase {
     // caseStatusManager().removeOpenCase(diagnosingDoctor, this);
     // caseStatusManager().addClosedCase(diagnosingDoctor, this);
     // challengeHash = _secondaryDiagnosisHash;
-    // caseScheduleManager().touchUpdatedAt();
+    // caseScheduleManager().touchUpdatedAt(address(this));
 
     // if (_accept)
     //     confirmChallengedDiagnosis();

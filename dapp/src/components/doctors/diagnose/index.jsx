@@ -59,7 +59,6 @@ function* saga({ match, address, AccountManager }) {
   yield all([
     cacheCall(AccountManager, 'publicKeys', patientAddress),
     cacheCall(caseAddress, 'status'),
-    cacheCall(caseAddress, 'updatedAt'),
     cacheCall(caseAddress, 'doctorEncryptedCaseKeys', address),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(caseAddress, 'diagnosisHash'),

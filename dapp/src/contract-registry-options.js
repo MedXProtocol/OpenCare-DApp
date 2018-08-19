@@ -1,6 +1,7 @@
 import betaFaucetContractConfig from '#/BetaFaucet.json'
 import medXTokenContractConfig from '#/MedXToken.json'
 import caseManagerContractConfig from '#/CaseManager.json'
+import caseScheduleManagerContractConfig from '#/CaseScheduleManager.json'
 import caseStatusManagerContractConfig from '#/CaseStatusManager.json'
 import caseContractConfig from '#/Case.json'
 import doctorManagerContractConfig from '#/DoctorManager.json'
@@ -13,6 +14,7 @@ export default {
   contractFactories: {
     AccountManager: abiFactory(accountManagerConfig.abi),
     CaseManager: abiFactory(caseManagerContractConfig.abi),
+    CaseScheduleManager: abiFactory(caseScheduleManagerContractConfig.abi),
     CaseStatusManager: abiFactory(caseStatusManagerContractConfig.abi),
     BetaFaucet: abiFactory(betaFaucetContractConfig.abi),
     MedXToken: abiFactory(medXTokenContractConfig.abi),

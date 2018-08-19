@@ -17,9 +17,11 @@ import { mixpanel } from '~/mixpanel'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
+  const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
+
   const transactions = state.sagaGenesis.transactions
   const status = cacheCallValueInt(state, caseAddress, 'status')
-  const updatedAt = cacheCallValueInt(state, caseAddress, 'updatedAt')
+  const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
 
   return {
     transactions,
@@ -28,10 +30,10 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   }
 }
 
-function* saga({ caseAddress }) {
+function* saga({ CaseScheduleManager, caseAddress }) {
   yield all([
     cacheCall(caseAddress, 'status'),
-    cacheCall(caseAddress, 'updatedAt')
+    cacheCall(CaseScheduleManager, 'updatedAt', caseAddress)
   ])
 }
 

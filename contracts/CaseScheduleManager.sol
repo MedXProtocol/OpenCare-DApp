@@ -45,13 +45,13 @@ contract CaseScheduleManager is Initializable, Ownable {
     setInitialized();
   }
 
-  function initializeCase(Case _case) external onlyCaseManager() {
-    createdAt[_case] = block.timestamp;
-    updatedAt[_case] = block.timestamp;
+  function initializeCase(Case _caseAddress) external onlyCaseManager() {
+    createdAt[_caseAddress] = block.timestamp;
+    updatedAt[_caseAddress] = block.timestamp;
   }
 
-  function touchUpdatedAt() public onlyCase() {
-    updatedAt[msg.sender] = block.timestamp;
+  function touchUpdatedAt(Case _caseAddress) public onlyCase() {
+    updatedAt[_caseAddress] = block.timestamp;
   }
 
   /**
