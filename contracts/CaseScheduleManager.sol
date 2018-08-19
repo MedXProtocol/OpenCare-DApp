@@ -84,7 +84,7 @@ contract CaseScheduleManager is Initializable, Ownable {
     updatedAt[_caseAddress] = block.timestamp;
 
     Case _case = Case(_caseAddress);
-    _case.updateStatus(Case.CaseStatus.Open);
+    _case.clearDiagnosingDoctor();
     _case.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
   }
 

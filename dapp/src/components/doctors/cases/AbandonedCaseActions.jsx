@@ -5,6 +5,7 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
 import {
+  contractByName,
   cacheCall,
   cacheCallValueInt,
   withSaga,

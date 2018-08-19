@@ -41,8 +41,8 @@ function mapStateToProps (state) {
   }
 }
 
-function* saga({ address, CaseStatusManager }) {
-  if (!address || !CaseStatusManager) { return }
+function* saga({ address, CaseStatusManager, CaseScheduleManager }) {
+  if (!address || !CaseStatusManager || !CaseScheduleManager) { return }
 
   const openAddresses = yield openCaseAddressesSaga(CaseStatusManager, address)
 

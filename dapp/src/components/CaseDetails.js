@@ -10,6 +10,7 @@ import { cancelablePromise } from '~/utils/cancelablePromise'
 import { downloadJson, downloadImage } from '../utils/storage-util'
 import { all } from 'redux-saga/effects'
 import {
+  contractByName,
   withContractRegistry,
   withSaga,
   cacheCallValue,

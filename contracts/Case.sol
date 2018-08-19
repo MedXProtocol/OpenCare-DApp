@@ -62,6 +62,9 @@ contract Case is Ownable, Initializable, ICase {
   event SetDiagnosingDoctor(address indexed patient, address indexed doctor, bytes doctorEncryptedKey);
   event SetChallengingDoctor(address indexed patient, address indexed doctor, bytes doctorEncryptedKey);
 
+  // do we need to include the case address if this is the case contract?
+  event ClearDiagnosingDoctor(address indexed patient, address indexed clearedDoctor);
+
   /**
    * @dev - throws if called by any account other than the patient.
    */
@@ -74,7 +77,7 @@ contract Case is Ownable, Initializable, ICase {
    * @dev - throws if called by any account other than a doctor.
    */
   modifier isDoctor(address _doctor) {
-    require(doctorManager().isDoctor(_doctor), 'Sender must be a Doctor');
+    require(doctorManager().isDoctor(_doctor), '_doctor address must be a Doctor');
     _;
   }
 
@@ -107,6 +110,16 @@ contract Case is Ownable, Initializable, ICase {
    */
   modifier onlyCaseScheduleManager() {
     require(msg.sender == address(caseScheduleManager()), 'Must be the Case Schedule Manager contract');
+    _;
+  }
+
+  /**
+   * @dev - either Case strategy manager
+   */
+  modifier onlyCaseStrategyManagers() {
+    require((msg.sender == address(caseScheduleManager()) || (msg.sender == address(caseManager()))),
+      'must be one of the Case Schedule Manager or Case Manager contracts'
+    );
     _;
   }
 
@@ -149,15 +162,26 @@ contract Case is Ownable, Initializable, ICase {
     revert();
   }
 
-  function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyCaseManager isDoctor(_doctor) {
+  function setDiagnosingDoctor(address _doctor, bytes _doctorEncryptedKey)
+    external
+    onlyCaseStrategyManagers isDoctor(_doctor)
+  {
     require(status == CaseStatus.Open, 'case must be open to set the diagnosingDoctor');
-    require(diagnosingDoctor == address(0), 'the diagnosingDoctor must be a valid address');
+    require(diagnosingDoctor == address(0), 'the diagnosingDoctor must be empty');
     require(_doctor != patient, 'the doctor cannot be the patient');
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
     caseStatusManager().addOpenCase(_doctor, this);
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit SetDiagnosingDoctor(patient, msg.sender, _doctorEncryptedKey);
+  }
+
+  function clearDiagnosingDoctor() external onlyCaseScheduleManager {
+    require(diagnosingDoctor != address(0), 'the diagnosingDoctor must be set');
+    emit ClearDiagnosingDoctor(patient, diagnosingDoctor);
+    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
+    diagnosingDoctor = 0x0;
+    status = CaseStatus.Open;
   }
 
   /**
@@ -266,10 +290,6 @@ contract Case is Ownable, Initializable, ICase {
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
 
     emit CaseDiagnosesDiffer(patient, challengingDoctor);
-  }
-
-  function updateStatus(Case.CaseStatus _status) external onlyCaseScheduleManager {
-    status = _status;
   }
 
   function doctorManager() internal view returns (IDoctorManager) {
