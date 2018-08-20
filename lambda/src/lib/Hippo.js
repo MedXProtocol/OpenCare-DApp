@@ -6,7 +6,7 @@ const privateToAccount = require('ethjs-account').privateToAccount
 
 const betaFaucetArtifact = require("../../../build/contracts/BetaFaucet.json")
 const doctorManagerArtifact = require("../../../build/contracts/DoctorManager.json")
-const accountManagerArtifact = require("../../../build/contracts/DoctorManager.json")
+const accountManagerArtifact = require("../../../build/contracts/AccountManager.json")
 const registryArtifact = require("../../../build/contracts/Registry.json")
 
 function fail(msg) {
@@ -44,8 +44,12 @@ export class Hippo {
 
   lookupAccountManager () {
     return this.lookupContractAddress('AccountManager')
-      .then((address) => {
-        return new this._eth.contract(accountManagerArtifact.abi).at(address)
+      .then((addresses) => {
+        return new this._eth.contract(accountManagerArtifact.abi, accountManagerArtifact.bytecode, {
+          from: this.ownerAddress(),
+          gas: 4000000,
+          gasPrice: Eth.toWei(20, 'gwei').toString()
+        }).at(addresses[0])
       })
       .catch(error => fail(error.message))
   }
@@ -115,23 +119,11 @@ export class Hippo {
   async addOrReactivateDoctor (ethAddress, name, publicKey) {
     const accountManager = await this.lookupAccountManager()
     const existingPublicKey = await accountManager.publicKeys(ethAddress)
-    if (!existingPublicKey) {
-      await this.lookupContractAddress('AccountManager')
-        .then((accountManagerAddress) => {
-          const method = accountManagerArtifact.abi.find((obj) => obj.name === 'setPublicKey')
-          var data = abi.encodeMethod(method, [ethAddress, publicKey])
-          const tx = {
-            from: this.ownerAddress(),
-            to: doctorManagerAddress[0],
-            gas: 4000000,
-            gasPrice: Eth.toWei(20, 'gwei').toString(),
-            data
-          }
-          console.info('setPublicKey tx: ', tx)
-          return this.sendTransaction(tx)
-        })
+
+    if (existingPublicKey[0] === '0x') {
+      await accountManager.setPublicKey(ethAddress, publicKey)
     }
-    this.lookupContractAddress('DoctorManager').then((doctorManagerAddress) => {
+    return this.lookupContractAddress('DoctorManager').then((doctorManagerAddress) => {
       const method = doctorManagerArtifact.abi.find((obj) => obj.name === 'addOrReactivateDoctor')
       var data = abi.encodeMethod(method, [ethAddress, name])
       const tx = {

@@ -15,7 +15,7 @@ exports.handler = function (event, context, callback) {
   }
 
   try {
-    let ethAddress, name
+    let ethAddress, name, publicKey
 
     if (event.queryStringParameters !== null && event.queryStringParameters !== undefined) {
       if (event.queryStringParameters.ethAddress !== undefined &&
