@@ -50,6 +50,17 @@ contract Case is Ownable, Initializable, ICase {
   event CaseCreated(address indexed patient);
 
   /**
+   * @dev - throws if called by anything not an instance of the lifecycle manager contract
+   */
+  modifier onlyCaseLifecycleManager() {
+    require(
+      msg.sender == address(caseLifecycleManager()),
+      'Must be an instance of Case lifecycle Manager contract'
+    );
+    _;
+  }
+
+  /**
    * @dev - Creates a new case with the given parameters
    * @param _patient - the patient who created the case
    * @param _caseFee - fee for this particular case
@@ -81,11 +92,42 @@ contract Case is Ownable, Initializable, ICase {
     emit CaseCreated(patient);
   }
 
+  function setDiagnosingDoctor(address _doctorAddress) external onlyCaseLifecycleManager {
+    diagnosingDoctor = _doctorAddress;
+  }
+
+  function setChallengingDoctor(address _doctorAddress) external onlyCaseLifecycleManager {
+    challengingDoctor = _doctorAddress;
+  }
+
+  function setStatus(enum _status) external onlyCaseLifecycleManager {
+    status = _status;
+  }
+
+  function setDoctorEncryptedCaseKeys(address _doctor, bytes _doctorEncryptedKey)
+    external
+    onlyCaseLifecycleManager
+  {
+    doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
+  }
+
   /**
    * @dev - Contract should not accept any ether
    */
   function () public payable {
     revert();
   }
+
+  function caseLifecycleManager() internal view returns (CaseLifecycleManager) {
+    return CaseLifecycleManager(registry.lookup(keccak256("CaseLifecycleManager")));
+  }
+
+  // function getDiagnosingDoctor() public view returns (address) {
+  //   return diagnosingDoctor;
+  // }
+
+  // function getChallengingDoctor() public view returns (address) {
+  //   return challengingDoctor;
+  // }
 
 }

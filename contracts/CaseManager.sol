@@ -29,8 +29,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
   event NewCase(address indexed caseAddress, uint256 indexed index);
 
-  modifier onlyIsCase(address _case) {
-    isCase(_case);
+  modifier onlyIsCase(address _caseAddress) {
+    isCase(_caseAddress);
     _;
   }
 
@@ -39,9 +39,9 @@ contract CaseManager is Ownable, Pausable, Initializable {
     _;
   }
 
-  function isCase(address _case) {
-    require(_case != address(0), 'case address cannot be blank');
-    require(caseIndices[_case] != uint256(0), 'case was not found in casedIndices');
+  function isCase(address _caseAddress) {
+    require(_caseAddress != address(0), 'case address cannot be blank');
+    require(caseIndices[_caseAddress] != uint256(0), 'case was not found in casedIndices');
   }
 
   /**

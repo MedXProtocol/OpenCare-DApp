@@ -26,23 +26,20 @@ contract CaseStatusManager is Initializable, Pausable, Ownable {
   event CaseStatusOpened(address indexed doctor, address indexed caseAddress);
   event CaseStatusClosed(address indexed doctor, address indexed caseAddress);
 
-  modifier onlyCase(address _case) {
+  modifier onlyCase(address _caseAddress) {
     if (msg.sender != owner) {
-      isCase(_case);
-      require(msg.sender == _case, 'sender needs to be the case');
+      caseManager().isCase(_caseAddress);
+      require(msg.sender == _caseAddress, 'sender needs to be the case');
     }
     _;
   }
 
-  function isCase(address _case) {
-    require(_case != address(0), 'case address is blank');
-    require(caseManager().caseIndices(_case) != uint256(0), 'case not found in caseManager caseIndices');
-  }
-
   modifier isDoctorCase(address _doctor, ICase _case) {
     require(
-         _doctor == _case.getDiagnosingDoctor()
-      || _doctor == _case.getChallengingDoctor(), 'doctor needs to be diagnosingDoctor or challengingDoctor'
+      _doctor == _case.diagnosingDoctor() || _doctor == _case.challengingDoctor()),
+        //    _doctor == _case.getDiagnosingDoctor()
+        // || _doctor == _case.getChallengingDoctor()
+      'doctor needs to be diagnosingDoctor or challengingDoctor'
     );
     _;
   }
