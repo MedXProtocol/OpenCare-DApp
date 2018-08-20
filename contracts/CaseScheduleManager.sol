@@ -26,7 +26,7 @@ contract CaseScheduleManager is Initializable, Pausable, Ownable {
     _;
   }
 
-  modifier onlyCaseManager () {
+  modifier onlyCaseManager() {
     require(
       msg.sender == address(caseManager()),
       'sender needs to be the case manager ... and thats gold, Steven!'
@@ -82,23 +82,6 @@ contract CaseScheduleManager is Initializable, Pausable, Ownable {
 
   function touchUpdatedAt(Case _caseAddress) public onlyCaseLifecycleManager() {
     updatedAt[_caseAddress] = block.timestamp;
-  }
-
-  /**
-   * @dev - The initial doctor accepting their evaluation and getting the tokens owing to them
-   */
-  function acceptAsDoctor(address _caseAddress) external onlyDiagnosingDoctor(_caseAddress) {
-    require(
-      (block.timestamp - updatedAt[_caseAddress]) > (secondsInADay * 2),
-      'not enough time has passed'
-    );
-
-    Case _case = Case(_caseAddress);
-    _case.acceptDiagnosisAsDoctor();
-  }
-
-  function caseStatusManager() internal view returns (CaseStatusManager) {
-    return CaseStatusManager(registry.lookup(keccak256('CaseStatusManager')));
   }
 
   function caseManager() internal view returns (CaseManager) {

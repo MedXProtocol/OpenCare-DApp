@@ -104,6 +104,20 @@ contract Case is Ownable, Initializable, ICase {
     status = _status;
   }
 
+  function setDiagnosisHash(bytes _diagnosisHash)
+    external
+    onlyCaseLifecycleManager
+  {
+    diagnosisHash = _diagnosisHash;
+  }
+
+  function setChallengeHash(bytes _secondaryDiagnosisHash)
+    external
+    onlyCaseLifecycleManager
+  {
+    challengeHash = _secondaryDiagnosisHash;
+  }
+
   function setDoctorEncryptedCaseKeys(address _doctor, bytes _doctorEncryptedKey)
     external
     onlyCaseLifecycleManager

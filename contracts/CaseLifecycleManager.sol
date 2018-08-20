@@ -15,7 +15,7 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
 
   event CaseEvaluated(address indexed case, address indexed patient, address indexed doctor);
 
-  event PatientWithdrew(address indexed case, address indexed patient, address indexed doctor);
+  event PatientWithdrewFunds(address indexed case, address indexed patient, address indexed doctor);
   event CaseClosed(address indexed case, address indexed patient, address indexed diagnosingDoctor, address challengingDoctor);
 
   event CaseDiagnosesDiffer(address indexed case, address indexed patient, address indexed doctor);
@@ -130,12 +130,7 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
     emit DiagnosingDoctorSet(patient, _doctor, _doctorEncryptedKey);
   }
 
-  function clearDiagnosingDoctor(address _caseAddress)
-    external
-    isCase(_caseAddress)
-    onlyCaseScheduleManager
-  {
-    Case _case = Case(_caseAddress);
+  function clearDiagnosingDoctor(Case _case) internal {
     memory patient = _case.patient()
     memory diagnosingDoctor = _case.diagnosingDoctor()
 
@@ -177,21 +172,6 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
     medXToken.transfer(_case.diagnosingDoctor(), _case.caseFee());
 
     close(_case);
-  }
-
-  /**
-   * @dev - allows the patient to withdraw funds after 1 day if the initial doc didn't respond
-   */
-  function patientClose(address _caseAddress)
-    external
-    onlyCaseScheduleManager
-    isCase(_caseAddress)
-  {
-    Case _case = Case(_caseAddress);
-
-    close(_case);
-
-    emit PatientWithdrew(_case.patient(), _case.diagnosingDoctor());
   }
 
   function close(Case _case) internal {
@@ -246,6 +226,23 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
   }
 
   /**
+     * @dev - doctor submits diagnosis for case. Patient must have approved the doctor in order for them to decrypt the case files
+     * @param _diagnosisHash - Swarm hash of where the diagnosis data is stored
+     */
+  function diagnoseCase(address _caseAddress, bytes _diagnosisHash)
+    external
+    onlyDiagnosingDoctor
+    isCase(_caseAddress)
+  {
+    Case _case = Case(_caseAddress);
+    require(_case.status() == CaseStatus.Evaluating, 'case must be in evaluating state to diagnose');
+    _case.setStatus(CaseStatus.Evaluated);
+    _case.setDiagnosisHash(_diagnosisHash);
+    caseScheduleManager().touchUpdatedAt(_caseAddress)
+    emit CaseEvaluated(_case.patient(), _case.diagnosingDoctor());
+  }
+
+  /**
    * @dev - Submit a diagnosis for a challenged case, must be a different doctor to the first
    * @param _secondaryDiagnosisHash - Location of the diagnosis
    * @param _accept - diagnosis the same as the original
@@ -262,46 +259,47 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(
-      status == Case.CaseStatus.Challenging,
+      _case.status() == Case.CaseStatus.Challenging,
       'case needs to be challenged for a challenge diagnosis'
     );
 
-    caseStatusManager().removeOpenCase(challengingDoctor, this);
-    caseStatusManager().addClosedCase(challengingDoctor, this);
-    caseStatusManager().removeOpenCase(diagnosingDoctor, this);
-    caseStatusManager().addClosedCase(diagnosingDoctor, this);
-    challengeHash = _secondaryDiagnosisHash;
+    caseStatusManager().removeOpenCase(_case.challengingDoctor(), this);
+    caseStatusManager().addClosedCase(_case.challengingDoctor(), this);
+    caseStatusManager().removeOpenCase(_case.diagnosingDoctor(), this);
+    caseStatusManager().addClosedCase(_case.diagnosingDoctor(), this);
+
+    _case.setChallengeHash(_secondaryDiagnosisHash);
     caseScheduleManager().touchUpdatedAt(_caseAddress);
 
     if (_accept)
-        confirmChallengedDiagnosis();
+      confirmChallengedDiagnosis(_case);
     else
-        rejectChallengedDiagnosis();
+      rejectChallengedDiagnosis(_case);
   }
 
   /**
    * @dev - The second doctor confirms the diagnosis. Patient must have approved second doctor in order for them to have viewed the case files
    */
   function confirmChallengedDiagnosis(Case _case) internal {
-    status = Case.CaseStatus.ClosedConfirmed;
+    _case.setStatus(Case.CaseStatus.ClosedConfirmed);
 
-    medXToken.transfer(diagnosingDoctor, caseFee);
-    medXToken.transfer(challengingDoctor, caseFee.mul(50).div(100));
-    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+    medXToken.transfer(_case.diagnosingDoctor(), _case.caseFee());
+    medXToken.transfer(_case.challengingDoctor(), caseFee.mul(50).div(100));
+    medXToken.transfer(_case.patient(), medXToken.balanceOf(address(_case)));
 
-    emit CaseDiagnosisConfirmed(patient, challengingDoctor);
+    emit CaseDiagnosisConfirmed(_case.patient(), _case.challengingDoctor());
   }
 
   /**
    * @dev - The second doctor rejects the diagnosis
    */
   function rejectChallengedDiagnosis(Case _case) internal {
-    status = Case.CaseStatus.ClosedRejected;
+    _case.setStatus(Case.CaseStatus.ClosedRejected);
 
-    medXToken.transfer(challengingDoctor, caseFee.mul(50).div(100));
-    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+    medXToken.transfer(_case.challengingDoctor(), _case.caseFee().mul(50).div(100));
+    medXToken.transfer(_case.patient(), medXToken.balanceOf(address(_case)));
 
-    emit CaseDiagnosesDiffer(patient, challengingDoctor);
+    emit CaseDiagnosesDiffer(_case.patient(), _case.challengingDoctor());
   }
 
   /**
@@ -314,10 +312,11 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
     patientWaitedOneDay(_caseAddress)
   {
     Case _case = Case(_caseAddress);
-    caseScheduleManager().touchUpdatedAt(_caseAddress)
 
-    Case _case = Case(_caseAddress);
-    _case.patientClose();
+    caseScheduleManager().touchUpdatedAt(_caseAddress)
+    close(_case);
+
+    emit PatientWithdrewFunds(_case.patient(), _case.diagnosingDoctor());
   }
 
   /**
@@ -333,8 +332,8 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
 
     caseScheduleManager().touchUpdatedAt(_caseAddress)
 
-    _case.clearDiagnosingDoctor();
-    _case.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
+    clearDiagnosingDoctor(_case);
+    setDiagnosingDoctor(_caseAddress, _doctor, _doctorEncryptedKey);
   }
 
   /**
