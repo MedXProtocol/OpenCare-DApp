@@ -134,7 +134,7 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
 
   static propTypes = {
     caseAddress: PropTypes.string,
-    route: PropTypes.string,
+    path: PropTypes.string,
     context: PropTypes.string.isRequired,
   }
 
@@ -222,7 +222,7 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   render () {
-    const { caseRowObject, route } = this.props
+    const { caseRowObject } = this.props
 
     let remove
     let style = { zIndex: 950 }
@@ -238,7 +238,7 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
       || caseRowObject.status === PENDING_TX_STATUS
     )
     const number = pendingTransaction ? '...' : objIndex
-    const path = caseAddress ? formatRoute(route, { caseAddress }) : routes.PATIENTS_CASES
+    const path = this.props.path || routes.PATIENTS_CASES
     const ethAddress = caseAddress ? <EthAddress address={caseAddress} /> : null
 
     const action = this.caseRowAction(caseRowObject, pendingTransaction)
