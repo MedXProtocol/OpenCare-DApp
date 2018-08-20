@@ -41,7 +41,6 @@ export const AddDoctorAPI = ReactTimeout(
         const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/addOrReactivateDoctor`
         const publicKey = '0x' + this.props.account.hexPublicKey()
         const url = `${faucetLambdaURI}?ethAddress=${this.props.address}&name=${this.state.name}&publicKey=${publicKey}`
-        console.log(publicKey, url)
 
         try {
           const response = await axiosInstance.get(url)
