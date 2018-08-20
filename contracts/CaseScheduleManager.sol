@@ -9,7 +9,8 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract CaseScheduleManager is Initializable, Ownable {
 
-  uint constant secondsInADay = 86400;
+  uint constant secondsInADay = 40;
+  // uint constant secondsInADay = 86400;
 
   mapping(address => uint) public createdAt;
   mapping(address => uint) public updatedAt;
