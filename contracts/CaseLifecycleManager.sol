@@ -15,7 +15,7 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
 
   event CaseEvaluated(address indexed case, address indexed patient, address indexed doctor);
 
-  event PatientWithdraw(address indexed case, address indexed patient, address indexed doctor);
+  event PatientWithdrew(address indexed case, address indexed patient, address indexed doctor);
   event CaseClosed(address indexed case, address indexed patient, address indexed diagnosingDoctor, address challengingDoctor);
 
   event CaseDiagnosesDiffer(address indexed case, address indexed patient, address indexed doctor);
@@ -23,8 +23,8 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
 
   event CaseChallenged(address indexed case, address indexed patient, address indexed doctor);
 
-  event SetDiagnosingDoctor(address indexed case, address indexed patient, address indexed doctor, bytes doctorEncryptedKey);
-  event SetChallengingDoctor(address indexed case, address indexed patient, address indexed doctor, bytes doctorEncryptedKey);
+  event DiagnosingDoctorSet(address indexed case, address indexed patient, address indexed doctor, bytes doctorEncryptedKey);
+  event ChallengeDoctorSet(address indexed case, address indexed patient, address indexed doctor, bytes doctorEncryptedKey);
 
   event ClearDiagnosingDoctor(address indexed case, address indexed patient, address indexed clearedDoctor);
 
@@ -127,7 +127,7 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
     _case.setDoctorEncryptedCaseKeys(_doctor, _doctorEncryptedKey);
 
     caseStatusManager().addOpenCase(_doctor, this);
-    emit SetDiagnosingDoctor(patient, _doctor, _doctorEncryptedKey);
+    emit DiagnosingDoctorSet(patient, _doctor, _doctorEncryptedKey);
   }
 
   function clearDiagnosingDoctor(address _caseAddress)
@@ -140,12 +140,13 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
     memory diagnosingDoctor = _case.diagnosingDoctor()
 
     require(diagnosingDoctor != address(0), 'the diagnosingDoctor must be already set in the Case contract');
-    emit ClearDiagnosingDoctor(patient, diagnosingDoctor);
 
     caseStatusManager().removeOpenCase(diagnosingDoctor, this);
 
     _case.setDiagnosingDoctor(0x0);
     _case.setStatus(Case.CaseStatus.Open);
+
+    emit ClearDiagnosingDoctor(patient, diagnosingDoctor);
   }
 
   /**
@@ -190,7 +191,7 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
 
     close(_case);
 
-    emit PatientWithdraw(patient, diagnosingDoctor);
+    emit PatientWithdrew(_case.patient(), _case.diagnosingDoctor());
   }
 
   function close(Case _case) internal {
@@ -221,27 +222,27 @@ contract CaseLifecycleManager is Ownable, Pausable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(_case.status() == Case.CaseStatus.Evaluated, 'Status must match');
-    status = Case.CaseStatus.Challenging;
-    setChallengingDoctor(_doctor, _doctorEncryptedKey);
+    _case.setStatus(Case.CaseStatus.Challenging);
+    setChallengingDoctor(_case, _doctor, _doctorEncryptedKey);
     caseManager().addChallengeDoctor(_doctor);
     caseScheduleManager().touchUpdatedAt(_caseAddress);
 
-    emit CaseChallenged(patient, _doctor);
+    emit CaseChallenged(_case.patient(), _doctor);
   }
 
-  function setChallengingDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
+  function setChallengingDoctor(Case _case, address _doctor, bytes _doctorEncryptedKey)
     internal
     isDoctor(_doctor)
     isCase(_caseAddress)
   {
-    Case _case = Case(_caseAddress);
+    require(_doctor != _case.patient(), 'doctor cannot also be patient');
+    require(_doctor != _case.diagnosingDoctor(), 'challenge doctor cannot be diagnosing doctor');
+    _case.setChallengingDoctor(_doctor);
+    _case.setDoctorEncryptedCaseKeys(_doctor, _doctorEncryptedKey);
 
-    require(_doctor != patient, 'doctor cannot also be patient');
-    require(_doctor != diagnosingDoctor, 'challenge doctor cannot be diagnosing doctor');
-    challengingDoctor = _doctor;
-    caseStatusManager().addOpenCase(challengingDoctor, this);
-    doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
-    emit SetChallengingDoctor(patient, msg.sender, _doctorEncryptedKey);
+    caseStatusManager().addOpenCase(_doctor, this);
+
+    emit ChallengeDoctorSet(_case.patient(), _doctor, _doctorEncryptedKey);
   }
 
   /**
