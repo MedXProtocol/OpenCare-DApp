@@ -5,7 +5,7 @@ export function caseStale(duration, caseTime, status) {
   if (!caseTime || !status) {
     return false
   } else {
-    const waitingOnDoctor = (status === 1)
+    const waitingOnDoctor = (status === 2)
     const waitingOnPatient = (status === 3)
     const durationHasPassed = (
       (Math.floor(Date.now() / 1000) - caseTime) > duration

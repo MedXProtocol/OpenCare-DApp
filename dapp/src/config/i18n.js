@@ -22,6 +22,8 @@ i18next
             diagnoseChallengedCase: 'Sending Diagnosis', // don't let the 2nd doctor know it's a second opinion
             publicKeys: 'Retrieving Account',
             mint: 'Mint {{mintMedxCount}} MEDT (Test MEDX)',
+            patientWithdrawFunds: 'Withdrawing Funds',
+            patientRequestNewDoctor: 'Requesting New Doctor',
             setPublicKey: 'Registering Account',
             sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',

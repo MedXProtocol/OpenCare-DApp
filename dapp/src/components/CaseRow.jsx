@@ -70,6 +70,12 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   if (context === 'patient') {
     caseRowObject['statusLabel'] = patientCaseStatusToName(status)
     caseRowObject['statusClass'] = patientCaseStatusToClass(status)
+
+    // Patient can take action after 1 day
+    if (caseStale(40, caseRowObject.updatedAt, caseRowObject.status)) {
+      caseRowObject['statusLabel'] = 'Requires Attention'
+      caseRowObject['statusClass'] = 'warning'
+    }
   } else {
     caseRowObject['statusLabel'] = doctorCaseStatusToName(caseRowObject)
     caseRowObject['statusClass'] = doctorCaseStatusToClass(caseRowObject)
