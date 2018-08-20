@@ -5,9 +5,11 @@ import './Registry.sol';
 import "./LinkedList.sol";
 import './Initializable.sol';
 import './CaseManager.sol';
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract CaseStatusManager is Initializable, Ownable {
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
+
+contract CaseStatusManager is Initializable, Pausable, Ownable {
   using LinkedList for LinkedList.UInt256;
 
   Registry registry;
@@ -21,8 +23,8 @@ contract CaseStatusManager is Initializable, Ownable {
   mapping (address => address[]) public doctorClosedCases;
   mapping (address => mapping(address => bool)) closedCases;
 
-  event CaseOpened(address indexed doctor, address indexed caseAddress);
-  event CaseClosed(address indexed doctor, address indexed caseAddress);
+  event CaseStatusOpened(address indexed doctor, address indexed caseAddress);
+  event CaseStatusClosed(address indexed doctor, address indexed caseAddress);
 
   modifier onlyCase(address _case) {
     if (msg.sender != owner) {
@@ -59,7 +61,7 @@ contract CaseStatusManager is Initializable, Ownable {
     uint256 nodeIndex = openDoctorCasesList[_doctor].enqueue(caseIndex);
     require(nodeIndex != 0, 'linked list did not return a nodeIndex');
     doctorOpenCaseNodeIndices[_doctor][_case] = nodeIndex;
-    emit CaseOpened(_doctor, _case);
+    emit CaseStatusOpened(_doctor, _case);
   }
 
   function removeOpenCase(address _doctor, ICase _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
@@ -101,7 +103,7 @@ contract CaseStatusManager is Initializable, Ownable {
     require(closedCases[_doctor][_case] == false, "closed cases for this doctor's case was not false");
     doctorClosedCases[_doctor].push(address(_case));
     closedCases[_doctor][_case] = true;
-    emit CaseClosed(_doctor, _case);
+    emit CaseStatusClosed(_doctor, _case);
   }
 
   /**

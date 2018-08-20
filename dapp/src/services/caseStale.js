@@ -1,16 +1,17 @@
-// duration is the amount of time we want to wait before returns true
-// caseTime would be createdAt or updatedAt
-// status is CaseStatus
-export function caseStale(duration, caseTime, status) {
-  if (!caseTime || !status) {
+// secondsElapsed is the amount of time we want to compare by
+//   (eg. 86400 seconds will evaluate to true 1 day after the compareTime)
+// compareTime would typically be a record's createdAt or updatedAt unix timestamp (UTC)
+// status is CaseStatus (Open, Closed, Evaluated, etc)
+export function caseStale(secondsElapsed, compareTime, status) {
+  if (!compareTime || !status) {
     return false
   } else {
     const waitingOnDoctor = (status === 2)
     const waitingOnPatient = (status === 3)
-    const durationHasPassed = (
-      (Math.floor(Date.now() / 1000) - caseTime) > duration
+    const enoughTimeHasPassed = (
+      (Math.floor(Date.now() / 1000) - compareTime) > secondsElapsed
     )
 
-    return (waitingOnDoctor || waitingOnPatient) && durationHasPassed
+    return enoughTimeHasPassed && (waitingOnDoctor || waitingOnPatient)
   }
 }

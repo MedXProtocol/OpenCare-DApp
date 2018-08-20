@@ -66,25 +66,16 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
     }
   }
 
+  caseRowObject['statusLabel'] = this.caseStatusToName(caseRowObject, context)
+  caseRowObject['statusClass'] = this.caseStatusToClass(caseRowObject, context)
 
-  if (context === 'patient') {
-    caseRowObject['statusLabel'] = patientCaseStatusToName(status)
-    caseRowObject['statusClass'] = patientCaseStatusToClass(status)
+  // Intial doc can take action after 2 days
+  // Patient after 1 day
+  const secondsElapsed = (context === 'patient') ? secondsInADay : (secondsInADay * 2)
 
-    // Patient can take action after 1 day
-    if (caseStale(40, caseRowObject.updatedAt, caseRowObject.status)) {
-      caseRowObject['statusLabel'] = 'Requires Attention'
-      caseRowObject['statusClass'] = 'warning'
-    }
-  } else {
-    caseRowObject['statusLabel'] = doctorCaseStatusToName(caseRowObject)
-    caseRowObject['statusClass'] = doctorCaseStatusToClass(caseRowObject)
-
-    // Intial doc can take action after 2 days
-    if (caseStale(secondsInADay * 2, caseRowObject.updatedAt, caseRowObject.status)) {
-      caseRowObject['statusLabel'] = 'Requires Attention'
-      caseRowObject['statusClass'] = 'warning'
-    }
+  if (caseStale(secondsElapsed, caseRowObject.updatedAt, caseRowObject.status)) {
+    caseRowObject['statusLabel'] = 'Requires Attention'
+    caseRowObject['statusClass'] = 'warning'
   }
 
   // If this caseRowObject has an ongoing blockchain transaction this will update
@@ -189,6 +180,28 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     return labelClass
+  }
+
+  caseStatusToName = (caseRowObject, context) => {
+    let name
+    if (context === 'patient') {
+      name = patientCaseStatusToName(caseRowObject)
+    } else {
+      name = doctorCaseStatusToName(caseRowObject)
+    }
+
+    return name
+  }
+
+  caseStatusToClass = (caseRowObject, context) => {
+    let cssClass
+    if (context === 'patient') {
+      cssClass = patientCaseStatusToClass(caseRowObject)
+    } else {
+      cssClass = doctorCaseStatusToClass(caseRowObject)
+    }
+
+    return cssClass
   }
 
   caseRowAction(caseRowObject, pendingTransaction) {

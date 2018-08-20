@@ -5,25 +5,32 @@ import './Registry.sol';
 import './Initializable.sol';
 import './CaseManager.sol';
 import './CaseStatusManager.sol';
+
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
-contract CaseScheduleManager is Initializable, Ownable {
+contract CaseScheduleManager is Initializable, Pausable, Ownable {
 
-  uint constant secondsInADay = 40;
-  // uint constant secondsInADay = 86400;
+  uint constant secondsInADay = 86400;
 
   mapping(address => uint) public createdAt;
   mapping(address => uint) public updatedAt;
 
   Registry registry;
 
-  modifier onlyCase() {
-    caseManager().isCase(msg.sender);
+  modifier onlyCaseLifecycleManager() {
+    require(
+      msg.sender == address(caseLifecycleManager()),
+      'sender needs to be the case lifecycle manager'
+    );
     _;
   }
 
   modifier onlyCaseManager () {
-    require(msg.sender == address(caseManager()), 'sender needs to be the case manager ... and thats gold, Steven!');
+    require(
+      msg.sender == address(caseManager()),
+      'sender needs to be the case manager ... and thats gold, Steven!'
+    );
     _;
   }
 
@@ -39,6 +46,28 @@ contract CaseScheduleManager is Initializable, Ownable {
     _;
   }
 
+  function patientWaitedOneDay(address _caseAddress) {
+    require(
+      (block.timestamp - updatedAt[_caseAddress]) > secondsInADay,
+      'not enough time has passed'
+    );
+  }
+
+  function doctorWaitedTwoDays(address _caseAddress) {
+    require(
+      (block.timestamp - updatedAt[_caseAddress]) > (secondsInADay * 2),
+      'not enough time has passed'
+    );
+  }
+
+
+  /**
+   * @dev - Contract should not accept any ether
+   */
+  function () public payable {
+    revert();
+  }
+
   function initialize(Registry _registry) public notInitialized {
     require(_registry != address(0), 'registry is not blank');
     registry = _registry;
@@ -51,42 +80,8 @@ contract CaseScheduleManager is Initializable, Ownable {
     updatedAt[_caseAddress] = block.timestamp;
   }
 
-  function touchUpdatedAt(Case _caseAddress) public onlyCase() {
+  function touchUpdatedAt(Case _caseAddress) public onlyCaseLifecycleManager() {
     updatedAt[_caseAddress] = block.timestamp;
-  }
-
-  /**
-   * @dev - allows the patient to withdraw funds after 1 day if the initial doc didn't respond
-   */
-  function patientWithdrawFunds(address _caseAddress) external onlyPatient(_caseAddress) {
-    require(
-      (block.timestamp - updatedAt[_caseAddress]) > secondsInADay,
-      'not enough time has passed'
-    );
-
-    updatedAt[_caseAddress] = block.timestamp;
-
-    Case _case = Case(_caseAddress);
-    _case.patientClose();
-  }
-
-  /**
-   * @dev - allows the patient to choose another doc if the first doc hasn't responded after 24 hours
-   */
-  function patientRequestNewDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
-    external
-    onlyPatient(_caseAddress)
-  {
-    require(
-      (block.timestamp - updatedAt[_caseAddress]) > secondsInADay,
-      'not enough time has passed'
-    );
-
-    updatedAt[_caseAddress] = block.timestamp;
-
-    Case _case = Case(_caseAddress);
-    _case.clearDiagnosingDoctor();
-    _case.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
   }
 
   /**

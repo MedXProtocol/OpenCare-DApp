@@ -217,7 +217,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     render () {
-      if (!this.props.updatedAt || !caseStale(40, this.props.updatedAt, this.props.status)) {
+      if (!this.props.updatedAt || !caseStale(secondsInADay, this.props.updatedAt, this.props.status)) {
         return null
       } else {
         return (
