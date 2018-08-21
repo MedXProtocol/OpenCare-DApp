@@ -112,7 +112,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
       var challenge =
         <div className='col-xs-12'>
           <ChallengedDiagnosis
-            caseAddress={this.props.match.params.caseAddress}
+            caseAddress={caseAddress}
             caseKey={caseKey}
             title='Your Diagnosis'
             challengingDoctorAddress={challengingDoctor}
@@ -174,7 +174,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             {challenge}
             <div id="view-case-details" className='col-xs-12'>
               <CaseDetails
-                caseAddress={this.props.match.params.caseAddress}
+                caseAddress={caseAddress}
                 caseKey={caseKey}
                 caseIsOpenForDoctor={caseIsOpenForDoctor}
                 isDoctor={true} />

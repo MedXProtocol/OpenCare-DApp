@@ -23,6 +23,8 @@ import { toastr } from '~/toastr'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress }) {
+  if (caseAddress === undefined) { return {} }
+
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
@@ -38,7 +40,7 @@ function mapStateToProps(state, { caseAddress }) {
 }
 
 function* saga({ CaseScheduleManager, caseAddress, networkId }) {
-  if (!networkId || !caseAddress) { return }
+  if (!networkId || !CaseScheduleManager || !caseAddress) { return }
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([

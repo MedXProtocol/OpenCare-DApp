@@ -33,7 +33,7 @@ import { PrescriptionMedication } from './PrescriptionMedication'
 let medicationId = 1
 
 function mapStateToProps (state, ownProps) {
-  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager'),
+  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
 
   return {
     CaseLifecycleManager,

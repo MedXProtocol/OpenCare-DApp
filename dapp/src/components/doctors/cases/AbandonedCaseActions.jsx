@@ -19,7 +19,7 @@ import { secondsInADay } from '~/config/constants'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
-  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager'),
+  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
   const transactions = state.sagaGenesis.transactions

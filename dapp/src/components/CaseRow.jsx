@@ -31,6 +31,28 @@ import * as routes from '~/config/routes'
 
 const PENDING_TX_STATUS = -1
 
+const caseStatusToName = (caseRowObject, context) => {
+  let name
+  if (context === 'patient') {
+    name = patientCaseStatusToName(caseRowObject)
+  } else {
+    name = doctorCaseStatusToName(caseRowObject)
+  }
+
+  return name
+}
+
+const caseStatusToClass = (caseRowObject, context) => {
+  let cssClass
+  if (context === 'patient') {
+    cssClass = patientCaseStatusToClass(caseRowObject)
+  } else {
+    cssClass = doctorCaseStatusToClass(caseRowObject)
+  }
+
+  return cssClass
+}
+
 function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex }) {
   let status, createdAt, updatedAt
   if (caseRowObject === undefined) { caseRowObject = {} }
@@ -66,8 +88,8 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
     }
   }
 
-  caseRowObject['statusLabel'] = this.caseStatusToName(caseRowObject, context)
-  caseRowObject['statusClass'] = this.caseStatusToClass(caseRowObject, context)
+  caseRowObject['statusLabel'] = caseStatusToName(caseRowObject, context)
+  caseRowObject['statusClass'] = caseStatusToClass(caseRowObject, context)
 
   // Intial doc can take action after 2 days
   // Patient after 1 day
@@ -107,7 +129,7 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
 }
 
 function* saga({ CaseManager, CaseScheduleManager, caseAddress }) {
-  if (!CaseManager || !caseAddress) { return }
+  if (!CaseScheduleManager || !CaseManager || !caseAddress) { return }
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
@@ -180,28 +202,6 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     return labelClass
-  }
-
-  caseStatusToName = (caseRowObject, context) => {
-    let name
-    if (context === 'patient') {
-      name = patientCaseStatusToName(caseRowObject)
-    } else {
-      name = doctorCaseStatusToName(caseRowObject)
-    }
-
-    return name
-  }
-
-  caseStatusToClass = (caseRowObject, context) => {
-    let cssClass
-    if (context === 'patient') {
-      cssClass = patientCaseStatusToClass(caseRowObject)
-    } else {
-      cssClass = doctorCaseStatusToClass(caseRowObject)
-    }
-
-    return cssClass
   }
 
   caseRowAction(caseRowObject, pendingTransaction) {
