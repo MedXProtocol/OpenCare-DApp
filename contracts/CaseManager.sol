@@ -29,19 +29,19 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
   event NewCase(address indexed caseAddress, uint256 indexed index);
 
-  modifier onlyIsCase(address _caseAddress) {
-    isCase(_caseAddress);
-    _;
-  }
-
   modifier onlyThis() {
     require(this == msg.sender, 'must be called by the same contract');
     _;
   }
 
-  function isCase(address _caseAddress) {
+  function isCase(address _caseAddress) external view {
     require(_caseAddress != address(0), 'case address cannot be blank');
     require(caseIndices[_caseAddress] != uint256(0), 'case was not found in casedIndices');
+  }
+
+  modifier onlyCaseLifecycleManager() {
+    require(msg.sender == address(caseLifecycleManager()));
+    _;
   }
 
   /**
@@ -199,7 +199,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
     emit NewCase(newCase, caseIndex);
   }
 
-  function addChallengeDoctor(address _doctor) external onlyIsCase(msg.sender) {
+  function addChallengeDoctor(address _doctor) external onlyCaseLifecycleManager {
     doctorCases[_doctor].push(msg.sender);
   }
 

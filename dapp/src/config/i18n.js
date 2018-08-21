@@ -23,7 +23,7 @@ i18next
             publicKeys: 'Retrieving Account',
             mint: 'Mint {{mintMedxCount}} MEDT (Test MEDX)',
             patientWithdrawFunds: 'Withdrawing Funds',
-            patientRequestNewDoctor: 'Requesting New Doctor',
+            patientRequestNewInitialDoctor: 'Requesting New Doctor',
             setPublicKey: 'Registering Account',
             sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',

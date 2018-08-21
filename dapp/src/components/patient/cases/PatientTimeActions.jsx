@@ -166,7 +166,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
 
         const requestNewDocTransactionId = this.props.send(
           this.props.CaseScheduleManager,
-          'patientRequestNewDoctor',
+          'patientRequestNewInitialDoctor',
           this.props.caseAddress,
           this.state.selectedDoctor.value,
           '0x' + doctorEncryptedCaseKey

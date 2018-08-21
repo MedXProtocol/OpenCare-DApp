@@ -1,15 +1,14 @@
 pragma solidity ^0.4.23;
 
-import './ICase.sol';
+import './Case.sol';
 import './Registry.sol';
 import "./LinkedList.sol";
 import './Initializable.sol';
 import './CaseManager.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
-import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
-contract CaseStatusManager is Initializable, Pausable, Ownable {
+contract CaseStatusManager is Initializable, Ownable {
   using LinkedList for LinkedList.UInt256;
 
   Registry registry;
@@ -34,9 +33,9 @@ contract CaseStatusManager is Initializable, Pausable, Ownable {
     _;
   }
 
-  modifier isDoctorCase(address _doctor, ICase _case) {
+  modifier isDoctorCase(address _doctor, Case _case) {
     require(
-      _doctor == _case.diagnosingDoctor() || _doctor == _case.challengingDoctor()),
+      (_doctor == _case.diagnosingDoctor() || _doctor == _case.challengingDoctor()),
         //    _doctor == _case.getDiagnosingDoctor()
         // || _doctor == _case.getChallengingDoctor()
       'doctor needs to be diagnosingDoctor or challengingDoctor'
@@ -51,7 +50,7 @@ contract CaseStatusManager is Initializable, Pausable, Ownable {
     setInitialized();
   }
 
-  function addOpenCase(address _doctor, ICase _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+  function addOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
     require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0, 'case is already in open state for this doc');
     uint256 caseIndex = caseManager().caseIndices(_case);
     require(caseIndex != 0, "case not found in caseManager's caseIndices");
@@ -61,7 +60,7 @@ contract CaseStatusManager is Initializable, Pausable, Ownable {
     emit CaseStatusOpened(_doctor, _case);
   }
 
-  function removeOpenCase(address _doctor, ICase _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+  function removeOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
     uint256 nodeIndex = doctorOpenCaseNodeIndices[_doctor][address(_case)];
     require(nodeIndex != 0, 'nodeIndex not found in doctorOpenCase linked list');
     doctorOpenCaseNodeIndices[_doctor][_case] = 0;
@@ -96,7 +95,7 @@ contract CaseStatusManager is Initializable, Pausable, Ownable {
     return caseManager().caseList(openDoctorCasesList[_doctor].value(nodeId));
   }
 
-  function addClosedCase(address _doctor, ICase _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+  function addClosedCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
     require(closedCases[_doctor][_case] == false, "closed cases for this doctor's case was not false");
     doctorClosedCases[_doctor].push(address(_case));
     closedCases[_doctor][_case] = true;

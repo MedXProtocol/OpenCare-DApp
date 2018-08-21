@@ -12,5 +12,5 @@ contract ICase {
       address _token,
       address _registry
   ) external;
-  function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external;
+  // function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external;
 }

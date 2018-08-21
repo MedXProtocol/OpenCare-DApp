@@ -63,14 +63,14 @@ contract('CaseScheduleManager', function (accounts) {
     })
   })
 
-  describe('patientRequestNewDoctor()', () => {
+  describe('patientRequestNewInitialDoctor()', () => {
     it('should set the case to open and update the doc', async () => {
       const caseInstance = await Case.at(await createCase(env, patient, doctor))
       assert.equal(await caseInstance.diagnosingDoctor.call(), doctor)
 
       increaseTime(SECONDS_IN_A_DAY * 3)
 
-      env.caseScheduleManager.patientRequestNewDoctor(
+      env.caseScheduleManager.patientRequestNewInitialDoctor(
         caseInstance.address,
         doctor2,
         'a diff doc encrypted case key'

@@ -2,7 +2,6 @@ pragma solidity ^0.4.23;
 
 import "./ICase.sol";
 import "./IMedXToken.sol";
-import "./IDoctorManager.sol";
 import "./IRegistry.sol";
 import "./Initializable.sol";
 import "./ICaseManager.sol";
@@ -100,7 +99,7 @@ contract Case is Ownable, Initializable, ICase {
     challengingDoctor = _doctorAddress;
   }
 
-  function setStatus(enum _status) external onlyCaseLifecycleManager {
+  function setStatus(CaseStatus _status) external onlyCaseLifecycleManager {
     status = _status;
   }
 
@@ -132,16 +131,24 @@ contract Case is Ownable, Initializable, ICase {
     revert();
   }
 
+  function transferCaseFeeToDiagnosingDoctor() external onlyCaseLifecycleManager {
+    medXToken.transfer(diagnosingDoctor, caseFee);
+  }
+
+  function transferBalanceToPatient() external onlyCaseLifecycleManager {
+    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+  }
+
+  function transferChallengingDoctorFee() external onlyCaseLifecycleManager {
+    medXToken.transfer(challengingDoctor, caseFee.mul(50).div(100));
+  }
+
+  function caseStatusManager() external view returns (CaseStatusManager) {
+    return CaseStatusManager(registry.lookup(keccak256("CaseStatusManager")));
+  }
+
   function caseLifecycleManager() internal view returns (CaseLifecycleManager) {
     return CaseLifecycleManager(registry.lookup(keccak256("CaseLifecycleManager")));
   }
-
-  // function getDiagnosingDoctor() public view returns (address) {
-  //   return diagnosingDoctor;
-  // }
-
-  // function getChallengingDoctor() public view returns (address) {
-  //   return challengingDoctor;
-  // }
 
 }
