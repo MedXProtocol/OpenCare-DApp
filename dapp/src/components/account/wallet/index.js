@@ -9,8 +9,15 @@ import { EthAddress } from '~/components/EthAddress'
 import { PageTitle } from '~/components/PageTitle'
 import { weiToEther } from '~/utils/weiToEther'
 import { EtherscanLink } from '~/components/EtherscanLink'
+import { toastr } from '~/toastr'
+import { mixpanel } from '~/mixpanel'
+import {
+  withSend,
+  TransactionStateHandler
+} from '~/saga-genesis'
 
 function mapStateToProps (state) {
+  const transactions = get(state, 'sagaGenesis.transactions')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const WrappedEther = contractByName(state, 'WrappedEther')
   let balance = '' + cacheCallValue(state, WrappedEther, 'balanceOf', address)
@@ -19,6 +26,7 @@ function mapStateToProps (state) {
     balance = 0
 
   return {
+    transactions,
     address,
     WrappedEther,
     balance
@@ -30,7 +38,37 @@ function* saga({ address, WrappedEther }) {
   yield cacheCall(WrappedEther, 'balanceOf', address)
 }
 
-export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(class _Wallet extends Component {
+export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(class _Wallet extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {}
+  }
+
+  doWithdraw = () => {
+    const withdrawTransactionId = this.props.send(this.props.WrappedEther, 'withdraw', this.props.balance)()
+    this.setState({
+      withdrawHandler: new TransactionStateHandler(),
+      withdrawTransactionId
+    })
+  }
+
+  componentWillReceiveProps (props) {
+    if (this.state.withdrawHandler) {
+      this.state.withdrawHandler.handle(props.transactions[this.state.withdrawTransactionId])
+        .onError((error) => {
+          toastr.transactionError(error)
+          this.setState({ withdrawHandler: null })
+        })
+        .onConfirmed(() => {
+          this.setState({ withdrawHandler: null })
+        })
+        .onTxHash(() => {
+          toastr.success('Withdraw successful')
+          mixpanel.track('W-ETH Withdrawn')
+        })
+    }
+  }
+
   render() {
     return (
       <div>
@@ -59,6 +97,12 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(class _Wa
                         icon={faHeartbeat} />
                       &nbsp; {weiToEther(this.props.balance)} W-ETH
                     </p>
+
+                    <div className="text-center">
+                      <button onClick={this.doWithdraw} className="btn btn-primary btn-lg" disabled={!!this.props.withdrawTransactionId}>
+                        Withdraw
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -68,4 +112,4 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(class _Wa
       </div>
     )
   }
-}))
+})))
