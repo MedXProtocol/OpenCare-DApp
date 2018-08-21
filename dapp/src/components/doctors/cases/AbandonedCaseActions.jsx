@@ -35,6 +35,8 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
 }
 
 function* saga({ CaseScheduleManager, caseAddress }) {
+  if (!CaseScheduleManager || !caseAddress) { return }
+
   yield all([
     cacheCall(caseAddress, 'status'),
     cacheCall(CaseScheduleManager, 'updatedAt', caseAddress)

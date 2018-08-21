@@ -29,7 +29,9 @@ import { isTrue } from '~/utils/isTrue'
 import isEqual from 'lodash.isequal'
 import * as routes from '~/config/routes'
 
-function mapStateToProps(state, { caseAddress, caseKey }) {
+function mapStateToProps(state, { caseAddress }) {
+  if (!caseAddress) { return {} }
+
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
@@ -55,14 +57,6 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    dispatchExcludedDoctors: (addresses) => {
-      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
-    }
-  }
-}
-
 function* saga({ CaseScheduleManager, caseAddress }) {
   if (!caseAddress || !CaseScheduleManager) { return }
   yield addContract({ address: caseAddress, contractKey: 'Case' })
@@ -74,6 +68,14 @@ function* saga({ CaseScheduleManager, caseAddress }) {
     cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
     cacheCall(caseAddress, 'diagnosingDoctor')
   ])
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchExcludedDoctors: (addresses) => {
+      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
+    }
+  }
 }
 
 const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
@@ -97,10 +99,10 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     componentWillReceiveProps (nextProps) {
-      this.requestNewDocTransactionStateHandler(nextProps)
-      this.withdrawTransactionStateHandler(nextProps)
+      // this.requestNewDocTransactionStateHandler(nextProps)
+      // this.withdrawTransactionStateHandler(nextProps)
 
-      this.setExcludedDoctorAddresses(nextProps)
+      // this.setExcludedDoctorAddresses(nextProps)
     }
 
     onChangeDoctor = (option) => {

@@ -12,6 +12,7 @@ import {
   withSaga,
   cacheCall,
   cacheCallValue,
+  cacheCallValueInt,
   withSend,
   addContract,
   TransactionStateHandler
@@ -37,7 +38,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
 
   const account = state.sagaGenesis.accounts[0]
-  const status = cacheCallValue(state, caseAddress, 'status')
+  const status = cacheCallValueInt(state, caseAddress, 'status')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
@@ -279,7 +280,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
   render() {
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
-    const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== '3'
+    const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== 3
 
     if (!buttonsHidden) {
       var buttons =
