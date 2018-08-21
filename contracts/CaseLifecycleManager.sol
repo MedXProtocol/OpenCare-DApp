@@ -1,7 +1,13 @@
+// This is the contract with mainly external method definitions to receive calls from web3 / etc
+// It does the require / guard checks to ensure the incoming requests are coming from the correct
+// user, and acts as the interface to update the state of a case
+
 pragma solidity ^0.4.23;
 
 import './Case.sol';
 import './CaseManager.sol';
+import './CaseFirstPhaseManager.sol';
+import './CaseSecondPhaseManager.sol';
 import './CaseScheduleManager.sol';
 import './CaseStatusManager.sol';
 import './DoctorManager.sol';
@@ -13,22 +19,6 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 contract CaseLifecycleManager is Ownable, Initializable {
 
   Registry registry;
-
-  event CaseEvaluated(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor);
-
-  event PatientWithdrewFunds(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor);
-  event DoctorForceAcceptedDiagnosis(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor);
-  event CaseClosed(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, address _challengingDoctor);
-
-  event CaseDiagnosesDiffer(address indexed _case, address indexed _patient, address indexed _challengingDoctor);
-  event CaseDiagnosisConfirmed(address indexed _case, address indexed _patient, address indexed _challengingDoctor);
-
-  event CaseChallenged(address indexed _case, address indexed _patient, address indexed _challengingDoctor);
-
-  event DiagnosingDoctorSet(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, bytes doctorEncryptedKey);
-  event ChallengeDoctorSet(address indexed _case, address indexed _patient, address indexed _challengingDoctor, bytes doctorEncryptedKey);
-
-  event ClearDiagnosingDoctor(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor);
 
   /**
    * @dev - throws unless the patient has waited 24 hours
@@ -83,6 +73,20 @@ contract CaseLifecycleManager is Ownable, Initializable {
          (msg.sender == _case.patient())
       || (msg.sender == address(caseManager())),
       'must be one of the Case Schedule Manager or Case Manager contracts'
+    );
+    _;
+  }
+
+  /**
+   * @dev - throws unless either first (initial diagnosis) or second (challenge/second opinion)
+            Case phase manager
+   */
+  modifier onlyCasePhaseManagers(address _caseAddress) {
+    Case _case = Case(_caseAddress);
+    require(
+         (msg.sender == address(caseFirstPhaseManager()))
+      || (msg.sender == address(caseSecondPhaseManager())),
+      'must be one of the Case Phase Manager contracts'
     );
     _;
   }
@@ -143,27 +147,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
     require(_case.diagnosingDoctor() == address(0), 'the diagnosingDoctor must be empty');
     require(_doctor != _case.patient(), 'the doctor cannot be the patient');
 
-    _case.setDiagnosingDoctor(_doctor);
-    _case.setStatus(Case.CaseStatus.Evaluating);
-    _case.setDoctorEncryptedCaseKeys(_doctor, _doctorEncryptedKey);
-
-    caseStatusManager().addOpenCase(_doctor, _case);
-
-    emit DiagnosingDoctorSet(_case, _case.patient(), _doctor, _doctorEncryptedKey);
-  }
-
-  function clearDiagnosingDoctor(Case _case) internal {
-    address patient = _case.patient();
-    address diagnosingDoctor = _case.diagnosingDoctor();
-
-    require(diagnosingDoctor != address(0), 'the diagnosingDoctor must be already set in the Case contract');
-
-    caseStatusManager().removeOpenCase(diagnosingDoctor, _case);
-
-    _case.setDiagnosingDoctor(0x0);
-    _case.setStatus(Case.CaseStatus.Open);
-
-    emit ClearDiagnosingDoctor(_case, patient, diagnosingDoctor);
+    caseFirstPhaseManager().setDiagnosingDoctor(_caseAddress, _doctor, _doctorEncryptedKey);
   }
 
   /**
@@ -175,67 +159,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
     isCase(_caseAddress)
     onlyPatient(_caseAddress)
   {
-    Case _case = Case(_caseAddress);
-    accept(_case);
-  }
-
-  function accept(Case _case) internal {
-    require(_case.status() == Case.CaseStatus.Evaluated, 'the case must be Evaluated to accept');
-
-    _case.transferCaseFeeToDiagnosingDoctor();
-
-    close(_case);
-  }
-
-  function close(Case _case) internal {
-    require(
-         (_case.status() != Case.CaseStatus.Closed
-       || _case.status() != Case.CaseStatus.ClosedRejected
-       || _case.status() != Case.CaseStatus.ClosedConfirmed),
-      'case must not be closed when trying to close'
-    );
-    _case.setStatus(Case.CaseStatus.Closed);
-    address patient = _case.patient();
-    address diagnosingDoctor = _case.diagnosingDoctor();
-    address challengingDoctor = _case.challengingDoctor();
-
-    _case.transferBalanceToPatient();
-
-    caseStatusManager().removeOpenCase(diagnosingDoctor, _case);
-    caseStatusManager().addClosedCase(diagnosingDoctor, _case);
-
-    emit CaseClosed(_case, patient, diagnosingDoctor, challengingDoctor);
-  }
-
-  function challengeWithDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
-    external
-    onlyPatient(_caseAddress)
-    isCase(_caseAddress)
-  {
-    Case _case = Case(_caseAddress);
-
-    require(_case.status() == Case.CaseStatus.Evaluated, 'Status must match');
-    _case.setStatus(Case.CaseStatus.Challenging);
-    setChallengingDoctor(_case, _doctor, _doctorEncryptedKey);
-    caseManager().addChallengeDoctor(_doctor);
-    caseScheduleManager().touchUpdatedAt(_caseAddress);
-
-    emit CaseChallenged(_case, _case.patient(), _doctor);
-  }
-
-  function setChallengingDoctor(Case _case, address _doctor, bytes _doctorEncryptedKey)
-    internal
-    isDoctor(_doctor)
-    isCase(address(_case))
-  {
-    require(_doctor != _case.patient(), 'doctor cannot also be patient');
-    require(_doctor != _case.diagnosingDoctor(), 'challenge doctor cannot be diagnosing doctor');
-    _case.setChallengingDoctor(_doctor);
-    _case.setDoctorEncryptedCaseKeys(_doctor, _doctorEncryptedKey);
-
-    caseStatusManager().addOpenCase(_doctor, _case);
-
-    emit ChallengeDoctorSet(_case, _case.patient(), _doctor, _doctorEncryptedKey);
+    caseFirstPhaseManager().acceptDiagnosis(_caseAddress);
   }
 
   /**
@@ -248,14 +172,64 @@ contract CaseLifecycleManager is Ownable, Initializable {
     isCase(_caseAddress)
   {
     Case _case = Case(_caseAddress);
+
     require(
       _case.status() == Case.CaseStatus.Evaluating,
       'case must be in evaluating state to diagnose'
     );
-    _case.setStatus(Case.CaseStatus.Evaluated);
-    _case.setDiagnosisHash(_diagnosisHash);
-    caseScheduleManager().touchUpdatedAt(_caseAddress);
-    emit CaseEvaluated(_case, _case.patient(), _case.diagnosingDoctor());
+
+    caseFirstPhaseManager().diagnoseCase(_caseAddress, _diagnosisHash);
+  }
+
+  /**
+   * @dev - allows the patient to withdraw funds after 1 day if the initial doc didn't respond
+   */
+  function patientWithdrawFunds(address _caseAddress)
+    external
+    isCase(_caseAddress)
+    onlyPatient(_caseAddress)
+    patientWaitedOneDay(_caseAddress)
+  {
+    Case _case = Case(_caseAddress);
+
+    caseFirstPhaseManager().patientWithdrawFunds(_caseAddress);
+  }
+
+  /**
+   * @dev - allows the patient to choose another doc if the first doc hasn't responded after 24 hours
+   */
+  function patientRequestNewInitialDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
+    external
+    isCase(_caseAddress)
+    onlyPatient(_caseAddress)
+    patientWaitedOneDay(_caseAddress)
+  {
+    Case _case = Case(_caseAddress);
+
+    caseFirstPhaseManager().patientRequestNewInitialDoctor(_caseAddress, _doctor, _doctorEncryptedKey);
+  }
+
+  /**
+   * @dev - The initial doctor can accept their evaluation after 48 hours and get tokens owing to them
+   */
+  function acceptAsDoctor(address _caseAddress)
+    external
+    isCase(_caseAddress)
+    onlyDiagnosingDoctor(_caseAddress)
+    doctorWaitedTwoDays(_caseAddress)
+  {
+    caseFirstPhaseManager().acceptAsDoctor(_caseAddress);
+  }
+
+  function challengeWithDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
+    external
+    onlyPatient(_caseAddress)
+    isCase(_caseAddress)
+  {
+    Case _case = Case(_caseAddress);
+    require(_case.status() == Case.CaseStatus.Evaluated, 'Status must match');
+
+    caseSecondPhaseManager().challengeWithDoctor(_caseAddress, _doctor, _doctorEncryptedKey);
   }
 
   /**
@@ -279,97 +253,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
       'case needs to be challenged for a challenge diagnosis'
     );
 
-    caseStatusManager().removeOpenCase(_case.challengingDoctor(), _case);
-    caseStatusManager().addClosedCase(_case.challengingDoctor(), _case);
-    caseStatusManager().removeOpenCase(_case.diagnosingDoctor(), _case);
-    caseStatusManager().addClosedCase(_case.diagnosingDoctor(), _case);
-
-    _case.setChallengeHash(_secondaryDiagnosisHash);
-    caseScheduleManager().touchUpdatedAt(_caseAddress);
-
-    if (_accept)
-      confirmChallengedDiagnosis(_case);
-    else
-      rejectChallengedDiagnosis(_case);
-  }
-
-  /**
-   * @dev - The second doctor confirms the diagnosis. Patient must have approved second doctor in order for them to have viewed the case files
-   */
-  function confirmChallengedDiagnosis(Case _case) internal {
-    _case.setStatus(Case.CaseStatus.ClosedConfirmed);
-
-    _case.transferCaseFeeToDiagnosingDoctor();
-    _case.transferChallengingDoctorFee();
-    _case.transferBalanceToPatient();
-
-    emit CaseDiagnosisConfirmed(_case, _case.patient(), _case.challengingDoctor());
-  }
-
-  /**
-   * @dev - The second doctor rejects the diagnosis
-   */
-  function rejectChallengedDiagnosis(Case _case) internal {
-    _case.setStatus(Case.CaseStatus.ClosedRejected);
-
-    _case.transferChallengingDoctorFee();
-    _case.transferBalanceToPatient();
-
-    emit CaseDiagnosesDiffer(_case, _case.patient(), _case.challengingDoctor());
-  }
-
-  /**
-   * @dev - allows the patient to withdraw funds after 1 day if the initial doc didn't respond
-   */
-  function patientWithdrawFunds(address _caseAddress)
-    external
-    isCase(_caseAddress)
-    onlyPatient(_caseAddress)
-    patientWaitedOneDay(_caseAddress)
-  {
-    Case _case = Case(_caseAddress);
-
-    caseScheduleManager().touchUpdatedAt(_caseAddress);
-    close(_case);
-
-    emit PatientWithdrewFunds(_case, _case.patient(), _case.diagnosingDoctor());
-  }
-
-  /**
-   * @dev - allows the patient to choose another doc if the first doc hasn't responded after 24 hours
-   */
-  function patientRequestNewInitialDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
-    external
-    isCase(_caseAddress)
-    onlyPatient(_caseAddress)
-    patientWaitedOneDay(_caseAddress)
-  {
-    Case _case = Case(_caseAddress);
-
-    caseScheduleManager().touchUpdatedAt(_caseAddress);
-
-    clearDiagnosingDoctor(_case);
-
-    _case.setDiagnosingDoctor(_doctor);
-    _case.setDoctorEncryptedCaseKeys(_doctor, _doctorEncryptedKey);
-  }
-
-  /**
-   * @dev - The initial doctor can accept their evaluation after 48 hours and get tokens owing to them
-   */
-  function acceptAsDoctor(address _caseAddress)
-    external
-    isCase(_caseAddress)
-    onlyDiagnosingDoctor(_caseAddress)
-    doctorWaitedTwoDays(_caseAddress)
-  {
-    Case _case = Case(_caseAddress);
-
-    caseScheduleManager().touchUpdatedAt(_caseAddress);
-
-    accept(_case);
-
-    emit DoctorForceAcceptedDiagnosis(_case, _case.patient(), _case.diagnosingDoctor());
+    caseSecondPhaseManager().diagnoseChallengedCase(_caseAddress, _secondaryDiagnosisHash, _accept);
   }
 
   function doctorManager() internal view returns (DoctorManager) {
@@ -386,6 +270,14 @@ contract CaseLifecycleManager is Ownable, Initializable {
 
   function caseScheduleManager() internal view returns (CaseScheduleManager) {
     return CaseScheduleManager(registry.lookup(keccak256("CaseScheduleManager")));
+  }
+
+  function caseFirstPhaseManager() internal view returns (CaseFirstPhaseManager) {
+    return CaseFirstPhaseManager(registry.lookup(keccak256("CaseFirstPhaseManager")));
+  }
+
+  function caseSecondPhaseManager() internal view returns (CaseSecondPhaseManager) {
+    return CaseSecondPhaseManager(registry.lookup(keccak256("CaseSecondPhaseManager")));
   }
 
 }
