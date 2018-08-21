@@ -29,9 +29,16 @@ contract CaseStatusManager is Initializable, Ownable {
    * @dev - throws unless is instance of either the first (initial diagnosis)
             or the second (challenge/second opinion) CasePhaseManager
    */
-  modifier onlyCasePhaseManagers(Case _case) {
-    require(_case.isCasePhaseManager(), 'must be an instance of a Case Phase Manager contract');
+  modifier onlyCasePhaseManagers() {
+    require(isCasePhaseManager(), 'must be an instance of a Case Phase Manager contract');
     _;
+  }
+
+  function isCasePhaseManager() internal view returns (bool) {
+    return (
+         (msg.sender == address(registry.caseFirstPhaseManager()))
+      || (msg.sender == address(registry.caseSecondPhaseManager()))
+    );
   }
 
   modifier isDoctorCase(address _doctor, Case _case) {
@@ -51,7 +58,7 @@ contract CaseStatusManager is Initializable, Ownable {
 
   function addOpenCase(address _doctor, Case _case)
     external
-    onlyCasePhaseManagers(_case)
+    onlyCasePhaseManagers
     isDoctorCase(_doctor, _case)
   {
     require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0, 'case is already in open state for this doc');
@@ -65,7 +72,7 @@ contract CaseStatusManager is Initializable, Ownable {
 
   function removeOpenCase(address _doctor, Case _case)
     external
-    onlyCasePhaseManagers(_case)
+    onlyCasePhaseManagers
     isDoctorCase(_doctor, _case)
   {
     uint256 nodeIndex = doctorOpenCaseNodeIndices[_doctor][address(_case)];
@@ -104,7 +111,7 @@ contract CaseStatusManager is Initializable, Ownable {
 
   function addClosedCase(address _doctor, Case _case)
     external
-    onlyCasePhaseManagers(_case)
+    onlyCasePhaseManagers
     isDoctorCase(_doctor, _case)
   {
     require(closedCases[_doctor][_case] == false, "closed cases for this doctor's case was not false");

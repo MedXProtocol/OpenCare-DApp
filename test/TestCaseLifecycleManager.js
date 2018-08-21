@@ -17,7 +17,9 @@ contract('CaseLifecycleManager', function (accounts) {
   let caseFee = web3.toWei(10, 'ether')
 
   before(async () => {
+    console.log('creating env')
     env = await createEnvironment(artifacts)
+    console.log('env created')
     await env.medXToken.mint(patient, web3.toWei(1000, 'ether'))
     await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc')
 
@@ -27,18 +29,15 @@ contract('CaseLifecycleManager', function (accounts) {
 
   beforeEach(async () => {
     await resetCaseManager(artifacts, env)
+    console.log('reset case man')
 
     caseInstance = await Case.at(await createCase(env, patient, doctor))
   })
 
   describe('initialize()', () => {
     it('should not work twice', async () => {
-      assert.equal(await caseInstance.patient.call(), false)
-
       await expectThrow(async () => {
-        await caseInstance.initialize(
-
-        )
+        await env.caseLifecycleManager.initialize(env.registry.address)
       })
     })
   })
@@ -59,7 +58,7 @@ contract('CaseLifecycleManager', function (accounts) {
 
     describe('acceptDiagnosis()', () => {
       it('should allow the patient to accept the diagnosis', async () => {
-        await env.caseLifecycleManager.acceptDiagnosis(caseInstance.address, { from: patientAddress })
+        await env.caseLifecycleManager.acceptDiagnosis(caseInstance.address, { from: patient })
         assert.equal(await env.caseStatusManager.openCaseCount.call(doctor), 0)
         assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor), 1)
         assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
@@ -71,20 +70,20 @@ contract('CaseLifecycleManager', function (accounts) {
     describe('challengeWithDoctor()', () => {
       it('should not allow the patient to challenge their own case', async () => {
         await expectThrow(async () => {
-          await env.caseLifecycleManager.challengeWithDoctor(caseInstance, patient, 'patient encrypted case key')
+          await env.caseLifecycleManager.challengeWithDoctor(caseInstance.address, patient, 'patient encrypted case key')
         })
       })
 
       describe('has been set', () => {
         beforeEach(async () => {
-          await env.caseLifecycleManager.challengeWithDoctor(caseInstance, doctor2, 'doctor 2 encrypted case key')
+          await env.caseLifecycleManager.challengeWithDoctor(caseInstance.address, doctor2, 'doctor 2 encrypted case key')
           assert.equal(await env.caseStatusManager.openCaseCount.call(doctor2), 1)
           assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor2), 0)
         })
 
         it('should not be called twice', async () => {
           await expectThrow(async () => {
-            await env.caseLifecycleManager.challengeWithDoctor(caseInstance, doctor2, 'doctor 2 encrypted case key')
+            await env.caseLifecycleManager.challengeWithDoctor(caseInstance.address, doctor2, 'doctor 2 encrypted case key')
           })
         })
 
@@ -98,7 +97,7 @@ contract('CaseLifecycleManager', function (accounts) {
             let doctorBalance = await env.medXToken.balanceOf(doctor)
             let doctorBalance2 = await env.medXToken.balanceOf(doctor2)
             let result = await env.caseLifecycleManager.diagnoseChallengedCase(
-              caseInstance,
+              caseInstance.address,
               'diagnosis hash',
               true,
               { from: doctor2 }
@@ -117,7 +116,7 @@ contract('CaseLifecycleManager', function (accounts) {
             let patientBalance = await env.medXToken.balanceOf(patient)
             let doctorBalance2 = await env.medXToken.balanceOf(doctor2)
             let result = await env.caseLifecycleManager.diagnoseChallengedCase(
-              caseInstance,
+              caseInstance.address,
               'diagnosis hash',
               false,
               { from: doctor2 }

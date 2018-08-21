@@ -20,14 +20,6 @@ contract CaseLifecycleManager is Ownable, Initializable {
   Registry registry;
 
   /**
-   * @dev - throws unless the patient has waited 24 hours
-   */
-  modifier patientWaitedOneDay(address _caseAddress) {
-    registry.caseScheduleManager().patientWaitedOneDay(_caseAddress);
-    _;
-  }
-
-  /**
    * @dev - throws if the sender is not the case's patient
    */
   modifier onlyPatient(address _caseAddress) {
@@ -37,10 +29,24 @@ contract CaseLifecycleManager is Ownable, Initializable {
   }
 
   /**
+   * @dev - throws unless the patient has waited 24 hours
+   */
+  modifier patientWaitedOneDay(address _caseAddress) {
+    require(
+      registry.caseScheduleManager().patientWaitedOneDay(_caseAddress),
+      'patient must wait at one day to call this function'
+    );
+    _;
+  }
+
+  /**
    * @dev - throws unless the Doctor has waited 48 hours
    */
   modifier doctorWaitedTwoDays(address _caseAddress) {
-    registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress);
+    require(
+      registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress),
+      'doctor needs to wait at least two days to call this function'
+    );
     _;
   }
 
@@ -48,7 +54,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
    * @dev - throws if called by any account that is not a case
    */
   modifier isCase(address _caseAddress) {
-    registry.caseManager().isCase(_caseAddress);
+    require(registry.caseManager().isCase(_caseAddress), 'case not found');
     _;
   }
 
@@ -225,6 +231,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
 
     registry.caseFirstPhaseManager().acceptAsDoctor(_case);
   }
+
+
 
   function challengeWithDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
     external

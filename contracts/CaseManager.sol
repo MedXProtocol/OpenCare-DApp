@@ -34,9 +34,10 @@ contract CaseManager is Ownable, Pausable, Initializable {
     _;
   }
 
-  function isCase(address _caseAddress) external view {
-    require(_caseAddress != address(0), 'case address cannot be blank');
-    require(caseIndices[_caseAddress] != uint256(0), 'case was not found in casedIndices');
+  function isCase(address _caseAddress) external view returns (bool) {
+    return (
+      (_caseAddress != address(0)) && (caseIndices[_caseAddress] != uint256(0))
+    );
   }
 
   modifier onlyCaseLifecycleManager() {

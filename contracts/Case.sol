@@ -57,7 +57,7 @@ contract Case is Ownable, Initializable {
     _;
   }
 
-  function isCasePhaseManager() public view returns (bool) {
+  function isCasePhaseManager() internal view returns (bool) {
     return (senderIsCaseFirstPhaseManager() || senderIsCaseSecondPhaseManager());
   }
 

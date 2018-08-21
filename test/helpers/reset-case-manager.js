@@ -10,10 +10,16 @@ module.exports = async function (artifacts, env) {
   let caseManager = await CaseManager.at(caseManagerDelegate.address)
   await caseManager.initialize(web3.toWei('10', 'ether'), env.medXToken.address, env.registry.address)
 
+    console.log('case man delegate')
+
+
   let caseStatusManagerDelegate = await Delegate.new(env.registry.address, toRegistryKey('CaseStatusManagerTarget'))
   await env.registry.register(toRegistryKey('CaseStatusManager'), caseStatusManagerDelegate.address)
   let caseStatusManager = await CaseStatusManager.at(caseStatusManagerDelegate.address)
   await caseStatusManager.initialize(env.registry.address)
+
+    console.log('case status delegate')
+
 
   env.caseManager = caseManager
   env.caseStatusManager = caseStatusManager

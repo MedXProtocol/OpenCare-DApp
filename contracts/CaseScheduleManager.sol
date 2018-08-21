@@ -23,18 +23,28 @@ contract CaseScheduleManager is Initializable, Ownable {
     _;
   }
 
-  function patientWaitedOneDay(address _caseAddress) external view {
-    require(
-      (block.timestamp - updatedAt[_caseAddress]) > secondsInADay,
-      'not enough time has passed'
+  /**
+   * @dev - throws unless is instance of either the first (initial diagnosis)
+            or the second (challenge/second opinion) CasePhaseManager
+   */
+  modifier onlyCasePhaseManagers() {
+    require(isCasePhaseManager(), 'must be one of the Case Phase Manager contracts');
+    _;
+  }
+
+  function isCasePhaseManager() internal view returns (bool) {
+    return (
+         (msg.sender == address(registry.caseFirstPhaseManager()))
+      || (msg.sender == address(registry.caseSecondPhaseManager()))
     );
   }
 
-  function doctorWaitedTwoDays(address _caseAddress) external view {
-    require(
-      (block.timestamp - updatedAt[_caseAddress]) > (secondsInADay * 2),
-      'not enough time has passed'
-    );
+  function patientWaitedOneDay(address _caseAddress) external view returns (bool) {
+    return (block.timestamp - updatedAt[_caseAddress]) > secondsInADay;
+  }
+
+  function doctorWaitedTwoDays(address _caseAddress) external view returns (bool) {
+    return (block.timestamp - updatedAt[_caseAddress]) > (secondsInADay * 2);
   }
 
 
@@ -57,12 +67,8 @@ contract CaseScheduleManager is Initializable, Ownable {
     updatedAt[_caseAddress] = block.timestamp;
   }
 
-  function touchUpdatedAt(address _caseAddress) public {
+  function touchUpdatedAt(address _caseAddress) public onlyCasePhaseManagers {
     Case _case = Case(_caseAddress);
-    require(
-      _case.isCasePhaseManager(),
-      'Must be an instance of either the Case First or Second Phase Manager contracts'
-    );
 
     updatedAt[_caseAddress] = block.timestamp;
   }

@@ -1,6 +1,6 @@
 
 # See https://help.github.com/ignore-files/ for more about ignoring files.
-
+migrations_null
 # dependencies
 *node_modules
 
