@@ -24,7 +24,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier onlyPatient(address _caseAddress) {
     Case _case = Case(_caseAddress);
-    require(msg.sender == _case.patient(), 'sender needs to be the patient');
+    require(msg.sender == _case.patient()/*, 'sender needs to be the patient'*/);
     _;
   }
 
@@ -44,8 +44,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier doctorWaitedTwoDays(address _caseAddress) {
     require(
-      registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress),
-      'doctor needs to wait at least two days to call this function'
+      registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress)//,
+      //'doctor needs to wait at least two days to call this function'
     );
     _;
   }
@@ -54,7 +54,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
    * @dev - throws if called by any account that is not a case
    */
   modifier isCase(address _caseAddress) {
-    require(registry.caseManager().isCase(_caseAddress), 'case not found');
+    require(registry.caseManager().isCase(_caseAddress)/*, 'case not found'*/);
     _;
   }
 
@@ -63,8 +63,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier onlyCaseScheduleManager() {
     require(
-      msg.sender == address(registry.caseScheduleManager()),
-      'Must be the Case Schedule Manager contract'
+      msg.sender == address(registry.caseScheduleManager())//,
+      //'Must be the Case Schedule Manager contract'
     );
     _;
   }
@@ -76,8 +76,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
     Case _case = Case(_caseAddress);
     require(
          (msg.sender == _case.patient())
-      || (msg.sender == address(registry.caseManager())),
-      'must be one of the Case Schedule Manager or Case Manager contracts'
+      || (msg.sender == address(registry.caseManager()))//,
+      //'must be one of the Case Schedule Manager or Case Manager contracts'
     );
     _;
   }
@@ -89,8 +89,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(
-      msg.sender == _case.challengingDoctor(),
-      'Must be the second opinion challenging doctor'
+      msg.sender == _case.challengingDoctor()//,
+      //'Must be the second opinion challenging doctor'
     );
     _;
   }
@@ -99,7 +99,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
    * @dev - throws if called by any account other than a doctor.
    */
   modifier isDoctor(address _doctor) {
-    require(registry.doctorManager().isDoctor(_doctor), '_doctor address must be a Doctor');
+    require(registry.doctorManager().isDoctor(_doctor)/*, '_doctor address must be a Doctor'*/);
     _;
   }
 
@@ -108,7 +108,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier onlyDiagnosingDoctor(address _caseAddress) {
     Case _case = Case(_caseAddress);
-    require(msg.sender == _case.diagnosingDoctor(), 'sender needs to be the diagnosis doctor');
+    require(msg.sender == _case.diagnosingDoctor()/*, 'sender needs to be the diagnosis doctor'*/);
     _;
   }
 
@@ -120,7 +120,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
   }
 
   function initialize(Registry _registry) public notInitialized {
-    require(_registry != address(0), 'registry is not blank');
+    require(_registry != address(0)/*, 'registry is not blank'*/);
     registry = _registry;
     owner = msg.sender;
     setInitialized();
@@ -134,9 +134,9 @@ contract CaseLifecycleManager is Ownable, Initializable {
   {
     Case _case = Case(_caseAddress);
 
-    require(_case.status() == Case.CaseStatus.Open, 'case must be open to set the Diagnosing Doctor');
-    require(_case.diagnosingDoctor() == address(0), 'the Diagnosing Doctor must be blank');
-    require(_doctor != _case.patient(), 'the doctor cannot be the patient');
+    require(_case.status() == Case.CaseStatus.Open/*, 'case must be open to set the Diagnosing Doctor'*/);
+    require(_case.diagnosingDoctor() == address(0)/*, 'the Diagnosing Doctor must be blank'*/);
+    require(_doctor != _case.patient()/*, 'the doctor cannot be the patient'*/);
 
     registry.caseFirstPhaseManager().setDiagnosingDoctor(_case, _doctor, _doctorEncryptedKey);
   }
@@ -153,8 +153,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(
-      _case.status() == Case.CaseStatus.Evaluated,
-      'case must be in evaluated state to accept the diagnosis'
+      _case.status() == Case.CaseStatus.Evaluated/*,
+      'case must be in evaluated state to accept the diagnosis'*/
     );
 
     registry.caseFirstPhaseManager().acceptDiagnosis(_case);
@@ -172,8 +172,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(
-      _case.status() == Case.CaseStatus.Evaluating,
-      'case must be in evaluating state to diagnose'
+      _case.status() == Case.CaseStatus.Evaluating/*,
+      'case must be in evaluating state to diagnose'*/
     );
 
     registry.caseFirstPhaseManager().diagnoseCase(_caseAddress, _diagnosisHash);
@@ -191,8 +191,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(
-      _case.status() == Case.CaseStatus.Evaluating,
-      'case must be in evaluating state to close and withdraw funds'
+      _case.status() == Case.CaseStatus.Evaluating/*,
+      'case must be in evaluating state to close and withdraw funds'*/
     );
 
     registry.caseFirstPhaseManager().patientWithdrawFunds(_caseAddress);
@@ -210,8 +210,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(
-      _case.status() == Case.CaseStatus.Evaluating,
-      'case must be in evaluating state to choose a different doctor'
+      _case.status() == Case.CaseStatus.Evaluating/*,
+      'case must be in evaluating state to choose a different doctor'*/
     );
 
     registry.caseFirstPhaseManager().patientRequestNewInitialDoctor(_caseAddress, _doctor, _doctorEncryptedKey);
@@ -227,7 +227,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
     doctorWaitedTwoDays(_caseAddress)
   {
     Case _case = Case(_caseAddress);
-    require(_case.status() == Case.CaseStatus.Evaluated, 'Case must be in Evaluated state');
+    require(_case.status() == Case.CaseStatus.Evaluated/*, 'Case must be in Evaluated state'*/);
 
     registry.caseFirstPhaseManager().acceptAsDoctor(_case);
   }
@@ -240,7 +240,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
     isCase(_caseAddress)
   {
     Case _case = Case(_caseAddress);
-    require(_case.status() == Case.CaseStatus.Evaluated, 'Case must be in Evaluated state');
+    require(_case.status() == Case.CaseStatus.Evaluated/*, 'Case must be in Evaluated state'*/);
 
     registry.caseSecondPhaseManager().challengeWithDoctor(_caseAddress, _doctor, _doctorEncryptedKey);
   }
@@ -262,8 +262,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(
-      _case.status() == Case.CaseStatus.Challenging,
-      'case needs to be challenged for a challenge diagnosis'
+      _case.status() == Case.CaseStatus.Challenging/*,
+      'case needs to be challenged for a challenge diagnosis'*/
     );
 
     registry.caseSecondPhaseManager().diagnoseChallengedCase(_case, _secondaryDiagnosisHash, _accept);
