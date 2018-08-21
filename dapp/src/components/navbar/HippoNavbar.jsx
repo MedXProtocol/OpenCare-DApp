@@ -30,17 +30,17 @@ import {
 } from '~/saga-genesis'
 import { HippoCasesRequiringAttention } from './HippoCasesRequiringAttention'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
-import { weiToMedX } from '~/utils/weiToMedX'
+import { weiToEther } from '~/utils/weiToEther'
 import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
   let doctorName
   const address = get(state, 'sagaGenesis.accounts[0]')
   const DoctorManager = contractByName(state, 'DoctorManager')
-  const MedXToken = contractByName(state, 'MedXToken')
+  const WrappedEther = contractByName(state, 'WrappedEther')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
   const canRegister = cacheCallValue(state, DoctorManager, 'owner') === address
-  const balance = cacheCallValue(state, MedXToken, 'balanceOf', address)
+  const balance = cacheCallValue(state, WrappedEther, 'balanceOf', address)
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const signedIn = state.account.signedIn
 
@@ -55,7 +55,7 @@ function mapStateToProps (state) {
     isDoctor,
     networkId,
     DoctorManager,
-    MedXToken,
+    WrappedEther,
     signedIn,
     canRegister
   }
@@ -72,10 +72,10 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
-function* saga({ address, DoctorManager, MedXToken }) {
-  if (!address || !DoctorManager || !MedXToken) { return }
+function* saga({ address, DoctorManager, WrappedEther }) {
+  if (!address || !DoctorManager || !WrappedEther) { return }
   yield all([
-    cacheCall(MedXToken, 'balanceOf', address),
+    cacheCall(WrappedEther, 'balanceOf', address),
     cacheCall(DoctorManager, 'owner'),
     cacheCall(DoctorManager, 'isDoctor', address),
     cacheCall(DoctorManager, 'name', address)
@@ -127,7 +127,7 @@ export const HippoNavbar = withContractRegistry(
 
           <LinkContainer to={routes.ACCOUNT_WALLET}>
             <MenuItem href={routes.ACCOUNT_WALLET}>
-              MEDT Balance
+              W-ETH Balance
             </MenuItem>
           </LinkContainer>
 
@@ -155,10 +155,10 @@ export const HippoNavbar = withContractRegistry(
           </MenuItem>
         </NavDropdown>
 
-      var medXBalance =
+      var wrappedEtherBalance =
         <LinkContainer to={routes.ACCOUNT_WALLET}>
           <NavItem href={routes.ACCOUNT_WALLET}>
-            {this.props.balance ? weiToMedX(this.props.balance) : 0} MEDT
+            {this.props.balance ? weiToEther(this.props.balance) : 0} W-ETH
           </NavItem>
         </LinkContainer>
 
@@ -230,7 +230,7 @@ export const HippoNavbar = withContractRegistry(
         <Navbar.Collapse>
           <Nav pullRight>
             <CurrentTransactionsList />
-            {medXBalance}
+            {wrappedEtherBalance}
             {myCasesItem}
             {openCasesItem}
             {doctorsItem}

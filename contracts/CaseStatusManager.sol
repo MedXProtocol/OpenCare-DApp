@@ -50,11 +50,11 @@ contract CaseStatusManager is Initializable, Ownable {
   }
 
   function addOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
-    require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0);
+    require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0, 'this case has not been added for this doctor');
     uint256 caseIndex = caseManager().caseIndices(_case);
-    require(caseIndex != 0);
+    require(caseIndex != 0, 'addOpenCase: caseIndex exists');
     uint256 nodeIndex = openDoctorCasesList[_doctor].enqueue(caseIndex);
-    require(nodeIndex != 0);
+    require(nodeIndex != 0, 'addOpenCase: nodeIndex exists');
     doctorOpenCaseNodeIndices[_doctor][_case] = nodeIndex;
     emit CaseOpened(_doctor, _case);
   }

@@ -18,7 +18,7 @@ module.exports = async function createEnvironment(artifacts) {
   let medXToken = await MedXToken.new()
 
   let weth9 = await WETH9.new()
-  await registry.register(toRegistryKey('WETH9'), weth9.address)
+  await registry.register(toRegistryKey('WrappedEther'), weth9.address)
 
   let caseInstance = await Case.new()
   await registry.register(toRegistryKey('Case'), caseInstance.address)

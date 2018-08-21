@@ -9,7 +9,7 @@ module.exports = function(deployer) {
   deployer.then(async () => {
     const registryInstance = await Registry.deployed()
     const networkId = await promisify(cb => web3.version.getNetwork(cb))
-    const key = toRegistryKey('WETH9')
+    const key = 'WrappedEther'
     switch(networkId) {
       case '1': //mainnet
         return registryInstance.register(key, '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2')

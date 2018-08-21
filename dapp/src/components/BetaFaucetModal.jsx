@@ -9,7 +9,7 @@ import get from 'lodash.get'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
 import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
-import { weiToMedX } from '~/utils/weiToMedX'
+import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps (state) {
   let dontShowEther, dontShowMedX, dontShowAddDoctor
@@ -124,14 +124,11 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         let step
         const needEth = (
           !props.hasBeenSentEther
-          && props.ethBalance < 0.7
+          && weiToEther(props.ethBalance) < 0.7
           && !props.dontShowEther
         )
 
-        const needMedX = (
-          weiToMedX(props.medXBalance) < 15
-          && !props.dontShowMedX
-        )
+        const needMedX = false
         const canBeDoctor = (!props.isDoctor && !props.dontShowAddDoctor)
 
 
@@ -162,7 +159,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
       determineNextStep = () => {
         let nextStep = 1
         if (this.state.step === 1) {
-          nextStep = 2
+          nextStep = 3 // skip MedX
         } else if (this.state.step === 2) {
           nextStep = 3
         } else if (this.state.step === 3) {

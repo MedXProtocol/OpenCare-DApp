@@ -111,9 +111,9 @@ contract Case is Ownable, Initializable {
       address _registry
   ) external notInitialized {
     setInitialized();
-    require(_encryptedCaseKey.length != 0);
-    require(_caseKeySalt.length != 0);
-    require(_caseHash.length != 0);
+    require(_encryptedCaseKey.length != 0, 'missing encrypted case key');
+    require(_caseKeySalt.length != 0, 'missing case key salt');
+    require(_caseHash.length != 0, 'no case hash given');
     createdAt = block.timestamp;
     updatedAt = block.timestamp;
     owner = msg.sender;
@@ -128,7 +128,7 @@ contract Case is Ownable, Initializable {
   }
 
   function deposit() external payable {
-    require(msg.value == createCaseCost(), 'Not enough ether to create case');
+    require(msg.value >= createCaseCost(), 'Not enough ether to create case');
     lookupWeth9().deposit.value(msg.value)();
   }
 
@@ -144,9 +144,9 @@ contract Case is Ownable, Initializable {
   }
 
   function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyCaseManager isDoctor(_doctor) {
-    require(status == CaseStatus.Open);
-    require(diagnosingDoctor == address(0));
-    require(_doctor != patient);
+    require(status == CaseStatus.Open, 'Case status is not open');
+    require(diagnosingDoctor == address(0), 'diagnosing doctor is zero');
+    require(_doctor != patient, 'doctor cannot be the patient');
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
     caseStatusManager().addOpenCase(_doctor, this);
@@ -275,7 +275,7 @@ contract Case is Ownable, Initializable {
   }
 
   function lookupWeth9() internal view returns (WETH9) {
-    return WETH9(registry.lookup(keccak256("WETH9")));
+    return WETH9(registry.lookup(keccak256("WrappedEther")));
   }
 
   function getDiagnosingDoctor() public view returns (address) {

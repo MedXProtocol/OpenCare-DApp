@@ -12,10 +12,7 @@ import { isNotEmptyString } from '~/utils/isNotEmptyString'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { uploadJson, uploadFile } from '~/utils/storage-util'
 import hashToHex from '~/utils/hash-to-hex'
-import { weiToMedX } from '~/utils/weiToMedX'
-import { medXToWei } from '~/utils/medXToWei'
 import get from 'lodash.get'
-import getWeb3 from '~/get-web3'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
 import { jicImageCompressor } from '~/services/jicImageCompressor'
@@ -43,13 +40,17 @@ import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
 import { promisify } from '~/utils/promisify'
+import {
+  TOTAL_WEI,
+  CHALLENGE_FEE_ETHER,
+  TOTAL_ETHER
+} from '~/constants'
 
 function mapStateToProps (state) {
   let medXBeingSent
   const account = get(state, 'sagaGenesis.accounts[0]')
-  const MedXToken = contractByName(state, 'MedXToken')
   const CaseManager = contractByName(state, 'CaseManager')
-  const balance = cacheCallValue(state, MedXToken, 'balanceOf', account)
+  const balance = get(state, 'sagaGenesis.ethBalance.balance')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
@@ -68,7 +69,6 @@ function mapStateToProps (state) {
     AccountManager,
     account,
     transactions: state.sagaGenesis.transactions,
-    MedXToken,
     CaseManager,
     publicKey,
     balance,
@@ -89,9 +89,8 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ account, AccountManager, MedXToken }) {
-  if (!MedXToken || !account || !AccountManager) { return }
-  yield cacheCall(MedXToken, 'balanceOf', account)
+function* saga({ account, AccountManager }) {
+  if (!account || !AccountManager) { return }
   yield cacheCall(AccountManager, 'publicKeys', account)
 }
 
@@ -486,11 +485,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     if (this.state.errors.length === 0) {
-      if (weiToMedX(this.props.balance) < 15) {
+      if (TOTAL_WEI.greaterThan(this.props.balance)) {
         if (this.props.previousCase) {
           this.setState({ showBalanceTooLowModal: true })
         } else if (this.props.medXBeingSent) {
-          toastr.warning('Your MEDT (Test MEDX) is on the way. Please wait for the transaction to finish prior to submitting your case.')
+          toastr.warning('Your Ether is on the way. Please wait for the transaction to finish prior to submitting your case.')
         } else {
           this.props.showBetaFaucetModal()
         }
@@ -576,7 +575,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
   }
 
   createNewCase = async () => {
-    const { send, MedXToken, CaseManager } = this.props
+    const { send, CaseManager } = this.props
     const caseInformation = {
       firstImageHash: this.state.firstImageHash,
       secondImageHash: this.state.secondImageHash,
@@ -612,11 +611,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
     let hashHex = hashToHex(hash)
 
-    let CaseManagerContract = this.props.contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
+    const value = TOTAL_WEI
 
-    let data = null
+    let result = null
     if (!this.props.publicKey) {
-      data = CaseManagerContract.methods.createAndAssignCaseWithPublicKey(
+      result = await send(CaseManager, 'createAndAssignCaseWithPublicKey',
         this.props.account,
         '0x' + encryptedCaseKey,
         '0x' + caseKeySalt,
@@ -624,19 +623,24 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         this.state.selectedDoctor.value,
         '0x' + doctorEncryptedCaseKey,
         '0x' + account.hexPublicKey()
-      ).encodeABI()
+      )({
+        value,
+        from: this.props.account
+      })
     } else {
-      data = CaseManagerContract.methods.createAndAssignCase(
+      result = await send(CaseManager, 'createAndAssignCase',
         this.props.account,
         '0x' + encryptedCaseKey,
         '0x' + caseKeySalt,
         '0x' + hashHex,
         this.state.selectedDoctor.value,
         '0x' + doctorEncryptedCaseKey
-      ).encodeABI()
+      )({
+        value,
+        from: this.props.account
+      })
     }
-
-    return await send(MedXToken, 'approveAndCall', CaseManager, medXToWei('15'), data)({ gas: 1600000 })
+    return result
   }
 
   fileUploadActive = (percent) => {
@@ -874,7 +878,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>You need 15 MEDT (Test MEDX) to submit a case.</h4>
+                <h4>You need {TOTAL_ETHER.toString()} Ether to submit a case.</h4>
               </div>
             </div>
           </Modal.Body>
@@ -895,7 +899,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                   Are you sure?
                 </h4>
                 <h5>
-                  This will cost you between 5 - 15 MEDT (Test MEDX).
+                  This will cost you between {CHALLENGE_FEE_ETHER.toString()} - {TOTAL_ETHER.toString()} Ether.
                   <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
                 </h5>
               </div>

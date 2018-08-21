@@ -30,13 +30,13 @@ contract CaseManager is Ownable, Pausable, Initializable {
     }
 
     modifier onlyPatient(address _patient) {
-      require(_patient == msg.sender);
+      require(_patient == msg.sender, 'only the patient');
       _;
     }
 
     function isCase(address _case) {
-      require(_case != address(0));
-      require(caseIndices[_case] != uint256(0));
+      require(_case != address(0), 'case address is zero');
+      require(caseIndices[_case] != uint256(0), 'case is not part of case manager');
     }
 
     /**
@@ -44,8 +44,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
      * @param _baseCaseFee - initial case fee
      */
     function initialize(uint256 _baseCaseFee, address _registry) external notInitialized {
-        require(_baseCaseFee > 0);
-        require(_registry != 0x0);
+        require(_baseCaseFee > 0, 'base case fee is lt eq zero');
+        require(_registry != 0x0, 'registry is zero');
         setInitialized();
 
         owner = msg.sender;
@@ -93,7 +93,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       bytes _patientPublicKey
     ) public payable onlyPatient(_patient) {
       IAccountManager am = accountManager();
-      require(am.publicKeys(_patient).length == 0);
+      require(am.publicKeys(_patient).length == 0, 'patient already has a public key');
       am.setPublicKey(_patient, _patientPublicKey);
       createCase(
         _patient,
