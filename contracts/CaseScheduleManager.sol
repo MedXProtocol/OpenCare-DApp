@@ -3,8 +3,6 @@ pragma solidity ^0.4.23;
 import './Case.sol';
 import './Registry.sol';
 import './Initializable.sol';
-import './CaseManager.sol';
-import './CaseStatusManager.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -17,17 +15,9 @@ contract CaseScheduleManager is Initializable, Ownable {
 
   Registry registry;
 
-  modifier onlyCaseLifecycleManager() {
-    require(
-      msg.sender == address(caseLifecycleManager()),
-      'sender needs to be the case lifecycle manager'
-    );
-    _;
-  }
-
   modifier onlyCaseManager() {
     require(
-      msg.sender == address(caseManager()),
+      msg.sender == address(registry.caseManager()),
       'sender needs to be the case manager ... and thats gold, Steven!'
     );
     _;
@@ -67,16 +57,14 @@ contract CaseScheduleManager is Initializable, Ownable {
     updatedAt[_caseAddress] = block.timestamp;
   }
 
-  function touchUpdatedAt(address _caseAddress) public onlyCaseLifecycleManager() {
+  function touchUpdatedAt(address _caseAddress) public {
+    Case _case = Case(_caseAddress);
+    require(
+      _case.isCasePhaseManager(),
+      'Must be an instance of either the Case First or Second Phase Manager contracts'
+    );
+
     updatedAt[_caseAddress] = block.timestamp;
-  }
-
-  function caseManager() internal view returns (CaseManager) {
-    return CaseManager(registry.lookup(keccak256('CaseManager')));
-  }
-
-  function caseLifecycleManager() internal view returns (CaseLifecycleManager) {
-    return CaseLifecycleManager(registry.lookup(keccak256('CaseLifecycleManager')));
   }
 
 }

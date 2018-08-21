@@ -9,6 +9,9 @@ module.exports = async function createEnvironment(artifacts) {
   const AccountManager = artifacts.require('./AccountManager.sol')
   const Delegate = artifacts.require('./Delegate.sol')
   const CaseManager = artifacts.require('./CaseManager.sol')
+  const CaseLifecycleManager = artifacts.require('./CaseLifecycleManager.sol')
+  const CaseFirstPhaseManager = artifacts.require('./CaseFirstPhaseManager.sol')
+  const CaseSecondPhaseManager = artifacts.require('./CaseSecondPhaseManager.sol')
   const CaseScheduleManager = artifacts.require('./CaseScheduleManager.sol')
   const CaseStatusManager = artifacts.require('./CaseStatusManager.sol')
   const BetaFaucet = artifacts.require('./BetaFaucet.sol')
@@ -29,6 +32,15 @@ module.exports = async function createEnvironment(artifacts) {
   let caseScheduleManager = await envDeployWithDelegate(registry, Delegate, CaseScheduleManager, 'CaseScheduleManager')
   await caseScheduleManager.initialize(registry.address)
 
+  let caseLifecycleManager = await envDeployWithDelegate(registry, Delegate, CaseLifecycleManager, 'CaseLifecycleManager')
+  await caseLifecycleManager.initialize(registry.address)
+
+  let caseFirstPhaseManager = await envDeployWithDelegate(registry, Delegate, CaseFirstPhaseManager, 'CaseFirstPhaseManager')
+  await caseFirstPhaseManager.initialize(registry.address)
+
+  let caseSecondPhaseManager = await envDeployWithDelegate(registry, Delegate, CaseSecondPhaseManager, 'CaseSecondPhaseManager')
+  await caseSecondPhaseManager.initialize(registry.address)
+
   let doctorManager = await envDeployWithDelegate(registry, Delegate, DoctorManager, 'DoctorManager')
   await doctorManager.initialize()
 
@@ -43,6 +55,9 @@ module.exports = async function createEnvironment(artifacts) {
     registry,
     medXToken,
     caseManager,
+    caseLifecycleManager,
+    caseFirstPhaseManager,
+    caseSecondPhaseManager,
     caseScheduleManager,
     caseStatusManager,
     doctorManager,

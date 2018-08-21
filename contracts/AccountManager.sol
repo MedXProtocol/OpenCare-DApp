@@ -15,13 +15,10 @@ contract AccountManager {
   }
 
   function setPublicKey(address _address, bytes _publicKey) external {
-    bool isSender = msg.sender == _address;
-    bool isCaseManager = msg.sender == caseManager();
+    bool isSender = (msg.sender == _address);
+    bool isCaseManager = (msg.sender == address(registry.caseManager()));
     require(isSender || isCaseManager, 'must be a sender or case manager');
     publicKeys[_address] = _publicKey;
   }
 
-  function caseManager() internal returns (address) {
-    return registry.lookup(keccak256('CaseManager'));
-  }
 }

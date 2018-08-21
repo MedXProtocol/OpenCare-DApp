@@ -1,17 +1,16 @@
 pragma solidity ^0.4.23;
 
-import "./ICase.sol";
-import "./IMedXToken.sol";
-import "./IRegistry.sol";
+import "./Case.sol";
+import "./MedXToken.sol";
+import "./Registry.sol";
 import "./Initializable.sol";
-import "./ICaseManager.sol";
 import "./CaseScheduleManager.sol";
 import "./CaseStatusManager.sol";
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract Case is Ownable, Initializable, ICase {
+contract Case is Ownable, Initializable {
   using SafeMath for uint256;
 
   uint256 public caseFee;
@@ -24,8 +23,8 @@ contract Case is Ownable, Initializable, ICase {
   bytes public diagnosisHash;
   bytes public challengeHash;
 
-  IRegistry public registry;
-  IMedXToken public medXToken;
+  Registry public registry;
+  MedXToken public medXToken;
 
   CaseStatus public status;
 
@@ -46,16 +45,37 @@ contract Case is Ownable, Initializable, ICase {
     ClosedConfirmed
   }
 
-  event CaseCreated(address indexed patient);
+  event CaseCreated(address indexed _patient);
+  event CaseClosed(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, address _challengingDoctor);
 
   /**
-   * @dev - throws if called by anything not an instance of the lifecycle manager contract
+   * @dev - throws unless is instance of either the first (initial diagnosis)
+            or the second (challenge/second opinion) CasePhaseManager
    */
-  modifier onlyCaseLifecycleManager() {
-    require(
-      msg.sender == address(caseLifecycleManager()),
-      'Must be an instance of Case lifecycle Manager contract'
-    );
+  modifier onlyCasePhaseManagers() {
+    require(isCasePhaseManager(), 'must be one of the Case Phase Manager contracts');
+    _;
+  }
+
+  function isCasePhaseManager() public view returns (bool) {
+    return (senderIsCaseFirstPhaseManager() || senderIsCaseSecondPhaseManager());
+  }
+
+  function senderIsCaseFirstPhaseManager() internal view returns(bool) {
+    return msg.sender == address(registry.caseFirstPhaseManager());
+  }
+
+  function senderIsCaseSecondPhaseManager() internal view returns(bool) {
+    return msg.sender == address(registry.caseSecondPhaseManager());
+  }
+
+  modifier onlyCaseFirstPhaseManager() {
+    require(senderIsCaseFirstPhaseManager(), 'Must be an instance of the Case First Phase Manager contract');
+    _;
+  }
+
+  modifier onlyCaseSecondPhaseManager() {
+    require(senderIsCaseSecondPhaseManager(), 'Must be an instance of the Case Second Phase Manager contract');
     _;
   }
 
@@ -86,42 +106,48 @@ contract Case is Ownable, Initializable, ICase {
     patient = _patient;
     caseDataHash = _caseHash;
     caseFee = _caseFee;
-    medXToken = IMedXToken(_token);
-    registry = IRegistry(_registry);
+    medXToken = MedXToken(_token);
+    registry = Registry(_registry);
     emit CaseCreated(patient);
   }
 
-  function setDiagnosingDoctor(address _doctorAddress) external onlyCaseLifecycleManager {
+  function setDiagnosingDoctor(address _doctorAddress) external onlyCaseFirstPhaseManager {
     diagnosingDoctor = _doctorAddress;
   }
 
-  function setChallengingDoctor(address _doctorAddress) external onlyCaseLifecycleManager {
+  function setChallengingDoctor(address _doctorAddress) external onlyCaseSecondPhaseManager {
     challengingDoctor = _doctorAddress;
   }
 
-  function setStatus(CaseStatus _status) external onlyCaseLifecycleManager {
+  function setStatus(CaseStatus _status) external {
+    require(isCasePhaseManager(), 'Must be an instance of either the Case First or Second Phase Manager contracts');
+
     status = _status;
   }
 
   function setDiagnosisHash(bytes _diagnosisHash)
     external
-    onlyCaseLifecycleManager
+    onlyCaseFirstPhaseManager
   {
     diagnosisHash = _diagnosisHash;
   }
 
   function setChallengeHash(bytes _secondaryDiagnosisHash)
     external
-    onlyCaseLifecycleManager
+    onlyCaseSecondPhaseManager
   {
     challengeHash = _secondaryDiagnosisHash;
   }
 
-  function setDoctorEncryptedCaseKeys(address _doctor, bytes _doctorEncryptedKey)
-    external
-    onlyCaseLifecycleManager
-  {
+  function setDoctorEncryptedCaseKeys(address _doctor, bytes _doctorEncryptedKey) external {
+    require(isCasePhaseManager(), 'Must be an instance of either the Case First or Second Phase Manager contracts');
+
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
+  }
+
+  function close() external onlyCasePhaseManagers {
+    status = Case.CaseStatus.Closed;
+    emit CaseClosed(address(this), patient, diagnosingDoctor, challengingDoctor);
   }
 
   /**
@@ -131,24 +157,16 @@ contract Case is Ownable, Initializable, ICase {
     revert();
   }
 
-  function transferCaseFeeToDiagnosingDoctor() external onlyCaseLifecycleManager {
+  function transferCaseFeeToDiagnosingDoctor() external onlyCasePhaseManagers {
     medXToken.transfer(diagnosingDoctor, caseFee);
   }
 
-  function transferBalanceToPatient() external onlyCaseLifecycleManager {
+  function transferRemainingBalanceToPatient() external onlyCasePhaseManagers {
     medXToken.transfer(patient, medXToken.balanceOf(address(this)));
   }
 
-  function transferChallengingDoctorFee() external onlyCaseLifecycleManager {
+  function transferChallengingDoctorFee() external onlyCaseSecondPhaseManager {
     medXToken.transfer(challengingDoctor, caseFee.mul(50).div(100));
-  }
-
-  function caseStatusManager() external view returns (CaseStatusManager) {
-    return CaseStatusManager(registry.lookup(keccak256("CaseStatusManager")));
-  }
-
-  function caseLifecycleManager() internal view returns (CaseLifecycleManager) {
-    return CaseLifecycleManager(registry.lookup(keccak256("CaseLifecycleManager")));
   }
 
 }

@@ -10,7 +10,7 @@ import './Registry.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract CaseLifecycleManager is Ownable, Initializable {
+contract CaseSecondPhaseManager is Ownable, Initializable {
 
   Registry registry;
 
@@ -18,91 +18,16 @@ contract CaseLifecycleManager is Ownable, Initializable {
   event CaseDiagnosisConfirmed(address indexed _case, address indexed _patient, address indexed _challengingDoctor);
   event CaseChallenged(address indexed _case, address indexed _patient, address indexed _challengingDoctor);
   event ChallengeDoctorSet(address indexed _case, address indexed _patient, address indexed _challengingDoctor, bytes doctorEncryptedKey);
+  event ChallengedCaseClosed(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, address _challengingDoctor);
 
   /**
-   * @dev - throws unless the patient has waited 24 hours
+   * @dev - throws if called by anything not an instance of the lifecycle manager contract
    */
-  modifier patientWaitedOneDay(address _caseAddress) {
-    caseScheduleManager().patientWaitedOneDay(_caseAddress);
-    _;
-  }
-
-  /**
-   * @dev - throws if the sender is not the case's patient
-   */
-  modifier onlyPatient(address _caseAddress) {
-    Case _case = Case(_caseAddress);
-    require(msg.sender == _case.patient(), 'sender needs to be the patient');
-    _;
-  }
-
-  /**
-   * @dev - throws unless the Doctor has waited 48 hours
-   */
-  modifier doctorWaitedTwoDays(address _caseAddress) {
-    caseScheduleManager().doctorWaitedTwoDays(_caseAddress);
-    _;
-  }
-
-  /**
-   * @dev - throws if called by any account that is not a case
-   */
-  modifier isCase(address _caseAddress) {
-    caseManager().isCase(_caseAddress);
-    _;
-  }
-
-  /**
-   * @dev - throws if called by any account that is not the deployed case scheduler
-   */
-  modifier onlyCaseScheduleManager() {
+  modifier onlyCaseLifecycleManager() {
     require(
-      msg.sender == address(caseScheduleManager()),
-      'Must be the Case Schedule Manager contract'
+      msg.sender == address(registry.caseLifecycleManager()),
+      'Must be an instance of Case lifecycle Manager contract'
     );
-    _;
-  }
-
-  /**
-   * @dev - either Case strategy manager
-   */
-  modifier onlyCaseManagerOrPatient(address _caseAddress) {
-    Case _case = Case(_caseAddress);
-    require(
-         (msg.sender == _case.patient())
-      || (msg.sender == address(caseManager())),
-      'must be one of the Case Schedule Manager or Case Manager contracts'
-    );
-    _;
-  }
-
-  /**
-   * @dev - throws if called by any account that is not the challenging doctor.
-   */
-  modifier onlyChallengeDoctor(address _caseAddress) {
-    Case _case = Case(_caseAddress);
-
-    require(
-      msg.sender == _case.challengingDoctor(),
-      'Must be the second opinion challenging doctor'
-    );
-    _;
-  }
-
-  /**
-   * @dev - throws if called by any account other than a doctor.
-   */
-  modifier isDoctor(address _doctor) {
-    require(doctorManager().isDoctor(_doctor), '_doctor address must be a Doctor');
-    _;
-  }
-
-  /**
-   * @dev - throws if called by any account other than the diagnosing doctor
-   */
-  modifier onlyDiagnosingDoctor(address _caseAddress) {
-    Case _case = Case(_caseAddress);
-    require(msg.sender == _case.diagnosingDoctor(), 'sender needs to be the diagnosis doctor');
     _;
   }
 
@@ -126,26 +51,19 @@ contract CaseLifecycleManager is Ownable, Initializable {
   {
     Case _case = Case(_caseAddress);
 
-    require(_case.status() == Case.CaseStatus.Evaluated, 'Status must match');
     _case.setStatus(Case.CaseStatus.Challenging);
     setChallengingDoctor(_case, _doctor, _doctorEncryptedKey);
-    caseManager().addChallengeDoctor(_doctor);
-    caseScheduleManager().touchUpdatedAt(_caseAddress);
+    registry.caseManager().addChallengeDoctor(_doctor);
+    registry.caseScheduleManager().touchUpdatedAt(address(_case));
 
     emit CaseChallenged(_case, _case.patient(), _doctor);
   }
 
-  function setChallengingDoctor(Case _case, address _doctor, bytes _doctorEncryptedKey)
-    internal
-    isDoctor(_doctor)
-    isCase(address(_case))
-  {
-    require(_doctor != _case.patient(), 'doctor cannot also be patient');
-    require(_doctor != _case.diagnosingDoctor(), 'challenge doctor cannot be diagnosing doctor');
+  function setChallengingDoctor(Case _case, address _doctor, bytes _doctorEncryptedKey) internal {
     _case.setChallengingDoctor(_doctor);
     _case.setDoctorEncryptedCaseKeys(_doctor, _doctorEncryptedKey);
 
-    caseStatusManager().addOpenCase(_doctor, _case);
+    registry.caseStatusManager().addOpenCase(_doctor, _case);
 
     emit ChallengeDoctorSet(_case, _case.patient(), _doctor, _doctorEncryptedKey);
   }
@@ -156,33 +74,30 @@ contract CaseLifecycleManager is Ownable, Initializable {
    * @param _secondaryDiagnosisHash - Location of the diagnosis
    * @param _accept - diagnosis the same as the original
    */
-  function diagnoseChallengedCase(
-    address _caseAddress,
-    bytes _secondaryDiagnosisHash,
-    bool _accept
-  )
+  function diagnoseChallengedCase(Case _case, bytes _secondaryDiagnosisHash, bool _accept)
     external
     onlyCaseLifecycleManager
   {
-    Case _case = Case(_caseAddress);
-
-    require(
-      _case.status() == Case.CaseStatus.Challenging,
-      'case needs to be challenged for a challenge diagnosis'
-    );
-
-    caseStatusManager().removeOpenCase(_case.challengingDoctor(), _case);
-    caseStatusManager().addClosedCase(_case.challengingDoctor(), _case);
-    caseStatusManager().removeOpenCase(_case.diagnosingDoctor(), _case);
-    caseStatusManager().addClosedCase(_case.diagnosingDoctor(), _case);
-
     _case.setChallengeHash(_secondaryDiagnosisHash);
-    caseScheduleManager().touchUpdatedAt(_caseAddress);
 
     if (_accept)
       confirmChallengedDiagnosis(_case);
     else
       rejectChallengedDiagnosis(_case);
+
+    finalize(_case);
+  }
+
+  function finalize(Case _case) internal {
+    registry.caseStatusManager().removeOpenCase(_case.challengingDoctor(), _case);
+    registry.caseStatusManager().addClosedCase(_case.challengingDoctor(), _case);
+    registry.caseStatusManager().removeOpenCase(_case.diagnosingDoctor(), _case);
+    registry.caseStatusManager().addClosedCase(_case.diagnosingDoctor(), _case);
+
+    registry.caseScheduleManager().touchUpdatedAt(address(_case));
+
+    emit ChallengedCaseClosed(_case, _case.patient(), _case.diagnosingDoctor(), _case.challengingDoctor());
+    _case.close();
   }
 
   /**
@@ -193,7 +108,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
 
     _case.transferCaseFeeToDiagnosingDoctor();
     _case.transferChallengingDoctorFee();
-    _case.transferBalanceToPatient();
+    _case.transferRemainingBalanceToPatient();
 
     emit CaseDiagnosisConfirmed(_case, _case.patient(), _case.challengingDoctor());
   }
@@ -205,25 +120,9 @@ contract CaseLifecycleManager is Ownable, Initializable {
     _case.setStatus(Case.CaseStatus.ClosedRejected);
 
     _case.transferChallengingDoctorFee();
-    _case.transferBalanceToPatient();
+    _case.transferRemainingBalanceToPatient();
 
     emit CaseDiagnosesDiffer(_case, _case.patient(), _case.challengingDoctor());
-  }
-
-  function doctorManager() internal view returns (DoctorManager) {
-    return DoctorManager(registry.lookup(keccak256("DoctorManager")));
-  }
-
-  function caseManager() internal view returns (CaseManager) {
-    return CaseManager(registry.lookup(keccak256("CaseManager")));
-  }
-
-  function caseStatusManager() internal view returns (CaseStatusManager) {
-    return CaseStatusManager(registry.lookup(keccak256("CaseStatusManager")));
-  }
-
-  function caseScheduleManager() internal view returns (CaseScheduleManager) {
-    return CaseScheduleManager(registry.lookup(keccak256("CaseScheduleManager")));
   }
 
 }

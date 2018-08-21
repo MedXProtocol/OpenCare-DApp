@@ -1,9 +1,9 @@
 pragma solidity ^0.4.23;
 
 import "./Case.sol";
-import "./IMedXToken.sol";
-import "./IRegistry.sol";
-import "./IAccountManager.sol";
+import "./MedXToken.sol";
+import "./Registry.sol";
+import "./AccountManager.sol";
 import "./Delegate.sol";
 import "./Initializable.sol";
 import './CaseLifecycleManager.sol';
@@ -22,8 +22,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
   mapping (address => uint256) public caseIndices;
   mapping (address => address[]) public patientCases;
 
-  IMedXToken public medXToken;
-  IRegistry public registry;
+  MedXToken public medXToken;
+  Registry public registry;
 
   mapping (address => address[]) public doctorCases;
 
@@ -57,8 +57,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
       owner = msg.sender;
       caseFee = _baseCaseFee;
-      medXToken = IMedXToken(_medXToken);
-      registry = IRegistry(_registry);
+      medXToken = MedXToken(_medXToken);
+      registry = Registry(_registry);
       caseList.push(address(0));
   }
 
@@ -162,7 +162,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
     bytes _doctorEncryptedKey,
     bytes _patientPublicKey
   ) public onlyThis {
-    IAccountManager am = accountManager();
+    AccountManager am = accountManager();
     require(am.publicKeys(_patient).length == 0, 'patient publicKey not set');
     am.setPublicKey(_patient, _patientPublicKey);
     createAndAssignCase(
@@ -215,8 +215,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
     }
   }
 
-  function accountManager() internal view returns (IAccountManager) {
-    return IAccountManager(registry.lookup(keccak256('AccountManager')));
+  function accountManager() internal view returns (AccountManager) {
+    return AccountManager(registry.lookup(keccak256('AccountManager')));
   }
 
   function caseScheduleManager() internal view returns (CaseScheduleManager) {

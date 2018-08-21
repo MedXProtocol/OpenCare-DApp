@@ -25,19 +25,18 @@ contract CaseStatusManager is Initializable, Ownable {
   event CaseStatusOpened(address indexed doctor, address indexed caseAddress);
   event CaseStatusClosed(address indexed doctor, address indexed caseAddress);
 
-  modifier onlyCase(address _caseAddress) {
-    if (msg.sender != owner) {
-      caseManager().isCase(_caseAddress);
-      require(msg.sender == _caseAddress, 'sender needs to be the case');
-    }
+  /**
+   * @dev - throws unless is instance of either the first (initial diagnosis)
+            or the second (challenge/second opinion) CasePhaseManager
+   */
+  modifier onlyCasePhaseManagers(Case _case) {
+    require(_case.isCasePhaseManager(), 'must be an instance of a Case Phase Manager contract');
     _;
   }
 
   modifier isDoctorCase(address _doctor, Case _case) {
     require(
-      (_doctor == _case.diagnosingDoctor() || _doctor == _case.challengingDoctor()),
-        //    _doctor == _case.getDiagnosingDoctor()
-        // || _doctor == _case.getChallengingDoctor()
+      _doctor == _case.diagnosingDoctor() || _doctor == _case.challengingDoctor(),
       'doctor needs to be diagnosingDoctor or challengingDoctor'
     );
     _;
@@ -50,7 +49,11 @@ contract CaseStatusManager is Initializable, Ownable {
     setInitialized();
   }
 
-  function addOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+  function addOpenCase(address _doctor, Case _case)
+    external
+    onlyCasePhaseManagers(_case)
+    isDoctorCase(_doctor, _case)
+  {
     require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0, 'case is already in open state for this doc');
     uint256 caseIndex = caseManager().caseIndices(_case);
     require(caseIndex != 0, "case not found in caseManager's caseIndices");
@@ -60,7 +63,11 @@ contract CaseStatusManager is Initializable, Ownable {
     emit CaseStatusOpened(_doctor, _case);
   }
 
-  function removeOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+  function removeOpenCase(address _doctor, Case _case)
+    external
+    onlyCasePhaseManagers(_case)
+    isDoctorCase(_doctor, _case)
+  {
     uint256 nodeIndex = doctorOpenCaseNodeIndices[_doctor][address(_case)];
     require(nodeIndex != 0, 'nodeIndex not found in doctorOpenCase linked list');
     doctorOpenCaseNodeIndices[_doctor][_case] = 0;
@@ -95,7 +102,11 @@ contract CaseStatusManager is Initializable, Ownable {
     return caseManager().caseList(openDoctorCasesList[_doctor].value(nodeId));
   }
 
-  function addClosedCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+  function addClosedCase(address _doctor, Case _case)
+    external
+    onlyCasePhaseManagers(_case)
+    isDoctorCase(_doctor, _case)
+  {
     require(closedCases[_doctor][_case] == false, "closed cases for this doctor's case was not false");
     doctorClosedCases[_doctor].push(address(_case));
     closedCases[_doctor][_case] = true;
