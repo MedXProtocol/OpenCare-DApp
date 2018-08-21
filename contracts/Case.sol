@@ -1,16 +1,19 @@
 pragma solidity ^0.4.23;
 
 import "./Case.sol";
-import "./MedXToken.sol";
-import "./Registry.sol";
-import "./Initializable.sol";
 import "./CaseScheduleManager.sol";
 import "./CaseStatusManager.sol";
+import "./Initializable.sol";
+import "./MedXToken.sol";
+import './Registry.sol';
+import './RegistryLookup.sol';
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract Case is Ownable, Initializable {
+
+  using RegistryLookup for Registry;
   using SafeMath for uint256;
 
   uint256 public caseFee;
@@ -58,25 +61,33 @@ contract Case is Ownable, Initializable {
   }
 
   function isCasePhaseManager() internal view returns (bool) {
-    return (senderIsCaseFirstPhaseManager() || senderIsCaseSecondPhaseManager());
-  }
-
-  function senderIsCaseFirstPhaseManager() internal view returns(bool) {
-    return msg.sender == address(registry.caseFirstPhaseManager());
-  }
-
-  function senderIsCaseSecondPhaseManager() internal view returns(bool) {
-    return msg.sender == address(registry.caseSecondPhaseManager());
+    return (
+         (msg.sender == address(registry.caseFirstPhaseManager()))
+      || (msg.sender == address(registry.caseSecondPhaseManager()))
+    );
   }
 
   modifier onlyCaseFirstPhaseManager() {
-    require(senderIsCaseFirstPhaseManager(), 'Must be an instance of the Case First Phase Manager contract');
+    require(
+      msg.sender == address(registry.caseFirstPhaseManager()),
+      'Must be an instance of the Case First Phase Manager contract'
+    );
     _;
   }
 
   modifier onlyCaseSecondPhaseManager() {
-    require(senderIsCaseSecondPhaseManager(), 'Must be an instance of the Case Second Phase Manager contract');
+    require(
+      (msg.sender == address(registry.caseSecondPhaseManager())),
+      'Must be an instance of the Case Second Phase Manager contract'
+    );
     _;
+  }
+
+  /**
+   * @dev - Contract should not accept any ether
+   */
+  function () public payable {
+    revert();
   }
 
   /**
@@ -148,13 +159,6 @@ contract Case is Ownable, Initializable {
   function close() external onlyCasePhaseManagers {
     status = Case.CaseStatus.Closed;
     emit CaseClosed(address(this), patient, diagnosingDoctor, challengingDoctor);
-  }
-
-  /**
-   * @dev - Contract should not accept any ether
-   */
-  function () public payable {
-    revert();
   }
 
   function transferCaseFeeToDiagnosingDoctor() external onlyCasePhaseManagers {

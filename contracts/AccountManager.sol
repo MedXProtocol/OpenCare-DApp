@@ -1,8 +1,12 @@
 pragma solidity ^0.4.23;
 
-import "./Registry.sol";
+import './Registry.sol';
+import './RegistryLookup.sol';
 
 contract AccountManager {
+
+  using RegistryLookup for Registry;
+
   mapping(address => bytes) public publicKeys;
 
   Registry public registry;

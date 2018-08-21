@@ -1,19 +1,22 @@
 pragma solidity ^0.4.23;
 
-import "./Case.sol";
-import "./MedXToken.sol";
-import "./Registry.sol";
 import "./AccountManager.sol";
-import "./Delegate.sol";
-import "./Initializable.sol";
+import "./Case.sol";
 import './CaseLifecycleManager.sol';
 import './CaseScheduleManager.sol';
+import "./Delegate.sol";
+import "./MedXToken.sol";
+import "./Initializable.sol";
+import './Registry.sol';
+import './RegistryLookup.sol';
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
 contract CaseManager is Ownable, Pausable, Initializable {
+
+  using RegistryLookup for Registry;
   using SafeMath for uint256;
 
   uint256 public caseFee;
@@ -29,6 +32,22 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
   event NewCase(address indexed caseAddress, uint256 indexed index);
 
+  /**
+   * @dev - throws unless is instance of either the first (initial diagnosis)
+            or the second (challenge/second opinion) CasePhaseManager
+   */
+  modifier onlyCasePhaseManagers() {
+    require(isCasePhaseManager(), 'must be one of the Case Phase Manager contracts');
+    _;
+  }
+
+  function isCasePhaseManager() internal view returns (bool) {
+    return (
+         (msg.sender == address(registry.caseFirstPhaseManager()))
+      || (msg.sender == address(registry.caseSecondPhaseManager()))
+    );
+  }
+
   modifier onlyThis() {
     require(this == msg.sender, 'must be called by the same contract');
     _;
@@ -38,11 +57,6 @@ contract CaseManager is Ownable, Pausable, Initializable {
     return (
       (_caseAddress != address(0)) && (caseIndices[_caseAddress] != uint256(0))
     );
-  }
-
-  modifier onlyCaseLifecycleManager() {
-    require(msg.sender == address(caseLifecycleManager()));
-    _;
   }
 
   /**
@@ -200,7 +214,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
     emit NewCase(newCase, caseIndex);
   }
 
-  function addChallengeDoctor(address _doctor) external onlyCaseLifecycleManager {
+  function addChallengeDoctor(address _doctor) external onlyCasePhaseManagers {
     doctorCases[_doctor].push(msg.sender);
   }
 

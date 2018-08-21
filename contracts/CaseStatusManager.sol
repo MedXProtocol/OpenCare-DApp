@@ -1,14 +1,17 @@
 pragma solidity ^0.4.23;
 
 import './Case.sol';
-import './Registry.sol';
+import './CaseManager.sol';
 import "./LinkedList.sol";
 import './Initializable.sol';
-import './CaseManager.sol';
+import './Registry.sol';
+import './RegistryLookup.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract CaseStatusManager is Initializable, Ownable {
+
+  using RegistryLookup for Registry;
   using LinkedList for LinkedList.UInt256;
 
   Registry registry;

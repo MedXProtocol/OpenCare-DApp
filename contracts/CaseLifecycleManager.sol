@@ -12,10 +12,13 @@ import './CaseScheduleManager.sol';
 import './DoctorManager.sol';
 import "./Initializable.sol";
 import './Registry.sol';
+import './RegistryLookup.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract CaseLifecycleManager is Ownable, Initializable {
+
+  using RegistryLookup for Registry;
 
   Registry registry;
 
@@ -24,7 +27,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier onlyPatient(address _caseAddress) {
     Case _case = Case(_caseAddress);
-    require(msg.sender == _case.patient()/*, 'sender needs to be the patient'*/);
+    require(msg.sender == _case.patient(), 'sender needs to be the patient');
     _;
   }
 
@@ -33,8 +36,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier patientWaitedOneDay(address _caseAddress) {
     require(
-      registry.caseScheduleManager().patientWaitedOneDay(_caseAddress),
-      'patient must wait at one day to call this function'
+      registry.caseScheduleManager().patientWaitedOneDay(_caseAddress)//,
+      //'patient must wait at one day to call this function'
     );
     _;
   }
@@ -54,7 +57,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
    * @dev - throws if called by any account that is not a case
    */
   modifier isCase(address _caseAddress) {
-    require(registry.caseManager().isCase(_caseAddress)/*, 'case not found'*/);
+    require(registry.caseManager().isCase(_caseAddress), 'case not found');
     _;
   }
 
@@ -240,7 +243,10 @@ contract CaseLifecycleManager is Ownable, Initializable {
     isCase(_caseAddress)
   {
     Case _case = Case(_caseAddress);
-    require(_case.status() == Case.CaseStatus.Evaluated/*, 'Case must be in Evaluated state'*/);
+
+    require(_case.challengingDoctor() == address(0)/*, 'the Diagnosing Doctor must be blank'*/);
+    require(_doctor != _case.patient()/*, 'the doctor cannot be the patient'*/);
+    require(_case.status() == Case.CaseStatus.Evaluated, 'Case must be in Evaluated state');
 
     registry.caseSecondPhaseManager().challengeWithDoctor(_caseAddress, _doctor, _doctorEncryptedKey);
   }

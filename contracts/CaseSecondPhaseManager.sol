@@ -7,10 +7,13 @@ import './CaseStatusManager.sol';
 import './DoctorManager.sol';
 import "./Initializable.sol";
 import './Registry.sol';
+import './RegistryLookup.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract CaseSecondPhaseManager is Ownable, Initializable {
+
+  using RegistryLookup for Registry;
 
   Registry registry;
 
@@ -53,10 +56,12 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
 
     _case.setStatus(Case.CaseStatus.Challenging);
     setChallengingDoctor(_case, _doctor, _doctorEncryptedKey);
-    registry.caseManager().addChallengeDoctor(_doctor);
-    registry.caseScheduleManager().touchUpdatedAt(address(_case));
 
-    emit CaseChallenged(_case, _case.patient(), _doctor);
+    registry.caseManager().addChallengeDoctor(_doctor);
+
+    registry.caseScheduleManager().touchUpdatedAt(_caseAddress);
+
+    emit CaseChallenged(_caseAddress, _case.patient(), _doctor);
   }
 
   function setChallengingDoctor(Case _case, address _doctor, bytes _doctorEncryptedKey) internal {

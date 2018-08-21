@@ -4,11 +4,8 @@ const Case = artifacts.require("./Case.sol")
 const CaseScheduleManager = artifacts.require("./CaseScheduleManager.sol")
 const createEnvironment = require('./helpers/create-environment')
 const createCase = require('./helpers/create-case')
-const increaseTime = require('./helpers/increaseTime')
 const caseStatus = require('./helpers/case-status')
 const resetCaseManager = require('./helpers/reset-case-manager')
-
-const SECONDS_IN_A_DAY = 86400
 
 contract('CaseScheduleManager', function (accounts) {
   let patient = accounts[0]
@@ -49,34 +46,6 @@ contract('CaseScheduleManager', function (accounts) {
       const updatedAt = await env.caseScheduleManager.updatedAt(caseInstance.address)
       assert.notEqual(createdAt, 0)
       assert.equal(updatedAt.toString(), createdAt.toString())
-    })
-  })
-
-  describe('patientWithdrawFunds()', () => {
-    it('should close the case and refund the patient', async () => {
-      const caseInstance = await Case.at(await createCase(env, patient, doctor))
-
-      increaseTime(SECONDS_IN_A_DAY * 3)
-
-      env.caseScheduleManager.patientWithdrawFunds(caseInstance.address)
-      assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
-    })
-  })
-
-  describe('patientRequestNewInitialDoctor()', () => {
-    it('should set the case to open and update the doc', async () => {
-      const caseInstance = await Case.at(await createCase(env, patient, doctor))
-      assert.equal(await caseInstance.diagnosingDoctor.call(), doctor)
-
-      increaseTime(SECONDS_IN_A_DAY * 3)
-
-      env.caseScheduleManager.patientRequestNewInitialDoctor(
-        caseInstance.address,
-        doctor2,
-        'a diff doc encrypted case key'
-      )
-      assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
-      assert.equal(await caseInstance.diagnosingDoctor.call(), doctor2)
     })
   })
 

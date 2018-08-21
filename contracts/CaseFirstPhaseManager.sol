@@ -1,16 +1,15 @@
 pragma solidity ^0.4.23;
 
 import './Case.sol';
-// import './CaseLifecycleManager.sol';
-// import './CaseManager.sol';
-// import './CaseScheduleManager.sol';
-// import './CaseStatusManager.sol';
 import "./Initializable.sol";
 import './Registry.sol';
+import './RegistryLookup.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract CaseFirstPhaseManager is Ownable, Initializable {
+
+  using RegistryLookup for Registry;
 
   Registry registry;
 
@@ -163,7 +162,12 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
     clearDiagnosingDoctor(_case);
 
     _case.setDiagnosingDoctor(_doctor);
+    _case.setStatus(Case.CaseStatus.Evaluating);
     _case.setDoctorEncryptedCaseKeys(_doctor, _doctorEncryptedKey);
+
+    registry.caseStatusManager().addOpenCase(_doctor, _case);
+
+    emit DiagnosingDoctorSet(_case, _case.patient(), _doctor, _doctorEncryptedKey);
   }
 
 }

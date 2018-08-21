@@ -1,12 +1,15 @@
 pragma solidity ^0.4.23;
 
 import './Case.sol';
-import './Registry.sol';
 import './Initializable.sol';
+import './Registry.sol';
+import './RegistryLookup.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract CaseScheduleManager is Initializable, Ownable {
+
+  using RegistryLookup for Registry;
 
   uint constant secondsInADay = 86400;
 
@@ -68,8 +71,6 @@ contract CaseScheduleManager is Initializable, Ownable {
   }
 
   function touchUpdatedAt(address _caseAddress) public onlyCasePhaseManagers {
-    Case _case = Case(_caseAddress);
-
     updatedAt[_caseAddress] = block.timestamp;
   }
 
