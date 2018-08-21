@@ -8,6 +8,7 @@ import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
 import { Loading } from '~/components/Loading'
 import {
+  contractByName,
   withSaga,
   cacheCall,
   cacheCallValue,
@@ -33,6 +34,8 @@ import isEqual from 'lodash.isequal'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
+  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
+
   const account = state.sagaGenesis.accounts[0]
   const status = cacheCallValue(state, caseAddress, 'status')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
@@ -47,6 +50,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
   return {
+    CaseLifecycleManager,
     account,
     currentlyExcludedDoctors,
     status,
@@ -215,7 +219,11 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   handleAcceptDiagnosis = () => {
-    const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptDiagnosis')()
+    const acceptTransactionId = this.props.send(
+      this.props.CaseLifecycleManager,
+      'acceptDiagnosis',
+      this.props.caseAddress
+    )()
     this.setState({
       acceptTransactionId,
       acceptHandler: new TransactionStateHandler(),
@@ -252,9 +260,13 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         doctorPublicKey,
         caseKeySalt
       })
-      const challengeTransactionId = this.props.send(this.props.caseAddress, 'challengeWithDoctor',
+      const challengeTransactionId = this.props.send(
+        this.props.CaseLifecycleManager,
+        'challengeWithDoctor',
+        this.props.caseAddress,
         this.state.selectedDoctor.value,
-        '0x' + doctorEncryptedCaseKey)()
+        '0x' + doctorEncryptedCaseKey
+      )()
 
       this.setState({
         showChallengeModal: false,

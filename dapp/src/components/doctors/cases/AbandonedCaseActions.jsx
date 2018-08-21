@@ -19,6 +19,7 @@ import { secondsInADay } from '~/config/constants'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
+  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager'),
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
   const transactions = state.sagaGenesis.transactions
@@ -26,6 +27,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
 
   return {
+    CaseLifecycleManager,
     transactions,
     status,
     updatedAt
@@ -61,7 +63,11 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
     }
 
     handleForceAcceptDiagnosis = () => {
-      const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptAsDoctor')()
+      const acceptTransactionId = this.props.send(
+        this.props.CaseLifecycleManager,
+        'acceptAsDoctor',
+        this.props.caseAddress
+      )()
       this.setState({
         acceptTransactionId,
         forceAcceptDiagnosisHandler: new TransactionStateHandler(),

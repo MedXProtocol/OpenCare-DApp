@@ -30,6 +30,7 @@ import isEqual from 'lodash.isequal'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
+  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
   const status = cacheCallValueInt(state, caseAddress, 'status')
@@ -42,6 +43,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
 
   return {
+    CaseLifecycleManager,
     CaseScheduleManager,
     currentlyExcludedDoctors,
     diagnosingDoctor,
@@ -132,7 +134,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
 
     handlePatientWithdraw = () => {
       const withdrawTransactionId = this.props.send(
-        this.props.CaseScheduleManager,
+        this.props.CaseLifecycleManager,
         'patientWithdrawFunds',
         this.props.caseAddress
       )()
@@ -165,7 +167,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         })
 
         const requestNewDocTransactionId = this.props.send(
-          this.props.CaseScheduleManager,
+          this.props.CaseLifecycleManager,
           'patientRequestNewInitialDoctor',
           this.props.caseAddress,
           this.state.selectedDoctor.value,

@@ -13,7 +13,11 @@ import hashToHex from '~/utils/hash-to-hex'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { uploadJson, downloadJson } from '~/utils/storage-util'
 import { isBlank } from '~/utils/isBlank'
-import { TransactionStateHandler, withSend } from '~/saga-genesis'
+import {
+  contractByName,
+  TransactionStateHandler,
+  withSend
+} from '~/saga-genesis'
 import { customStyles } from '~/config/react-select-custom-styles'
 import { groupedDiagnosisOptions } from './diagnosisOptions'
 import { sideEffectValues, counselingValues } from '~/sideEffectsAndCounselingValues'
@@ -29,7 +33,10 @@ import { PrescriptionMedication } from './PrescriptionMedication'
 let medicationId = 1
 
 function mapStateToProps (state, ownProps) {
+  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager'),
+
   return {
+    CaseLifecycleManager,
     transactions: state.sagaGenesis.transactions
   }
 }
@@ -416,10 +423,21 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     let transactionId
     if(!isBlank(this.props.diagnosisHash)) {
       const accept = this.state.originalDiagnosis.diagnosis === this.state.diagnosis
-      transactionId = this.props.send(this.props.caseAddress, 'diagnoseChallengedCase', hashHex, accept)()
+      transactionId = this.props.send(
+        this.props.CaseLifecycleManager,
+        'diagnoseChallengedCase',
+        this.props.caseAddress,
+        hashHex,
+        accept
+      )()
       mixpanel.track('Submit Challenged Case Diagnosis')
     } else {
-      transactionId = this.props.send(this.props.caseAddress, 'diagnoseCase', hashHex)()
+      transactionId = this.props.send(
+        this.props.CaseLifecycleManager,
+        'diagnoseCase',
+        this.props.caseAddress,
+        hashHex
+      )()
       mixpanel.track('Submit Case Diagnosis')
     }
     this.setState({
