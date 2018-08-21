@@ -1,7 +1,6 @@
 pragma solidity ^0.4.23;
 
-import "./ICase.sol";
-import "./IMedXToken.sol";
+import "./Case.sol";
 import "./IRegistry.sol";
 import "./IAccountManager.sol";
 import "./Delegate.sol";
@@ -19,7 +18,6 @@ contract CaseManager is Ownable, Pausable, Initializable {
     mapping (address => uint256) public caseIndices;
     mapping (address => address[]) public patientCases;
 
-    IMedXToken public medXToken;
     IRegistry public registry;
 
     mapping (address => address[]) public doctorCases;
@@ -31,8 +29,8 @@ contract CaseManager is Ownable, Pausable, Initializable {
       _;
     }
 
-    modifier onlyThis() {
-      require(this == msg.sender);
+    modifier onlyPatient(address _patient) {
+      require(_patient == msg.sender);
       _;
     }
 
@@ -44,17 +42,14 @@ contract CaseManager is Ownable, Pausable, Initializable {
     /**
      * @dev - Constructor
      * @param _baseCaseFee - initial case fee
-     * @param _medXToken - the MedX token
      */
-    function initialize(uint256 _baseCaseFee, address _medXToken, address _registry) external notInitialized {
+    function initialize(uint256 _baseCaseFee, address _registry) external notInitialized {
         require(_baseCaseFee > 0);
-        require(_medXToken != 0x0);
         require(_registry != 0x0);
         setInitialized();
 
         owner = msg.sender;
         caseFee = _baseCaseFee;
-        medXToken = IMedXToken(_medXToken);
         registry = IRegistry(_registry);
         caseList.push(address(0));
     }
@@ -64,68 +59,6 @@ contract CaseManager is Ownable, Pausable, Initializable {
      */
     function () payable public {
         revert();
-    }
-
-    function createCaseCost () internal view returns (uint256) {
-      return caseFee.add(caseFee.mul(50).div(100));
-    }
-
-    /**
-     * @dev - initial payment it 150% of the fee, 50% refunded if first diagnosis accepted
-     * @param _from - owner of the tokens
-     * @param _value - number of tokens allowed to spend
-     * @param _token - unused
-     * @param _extraData - unused
-     */
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external whenNotPaused {
-        require(_value == createCaseCost(), "value of MedX does not match cost to create case");
-        require(medXToken.balanceOf(_from) >= _value, "MedXToken balance too low");
-
-        /**
-
-        Call data will be structured:
-
-        4 bytes: sig
-        32 bytes: _from
-        32 bytes: _value
-        32 bytes: _token
-        32 bytes: _extraData offset
-        32 bytes: _extraData length
-        X bytes: _extraData
-        Y bytes: 32 - (_extraData.length % 32)
-
-         */
-
-        bytes4 sig;
-
-        uint256 i;
-        for (i = 0; i < 4; i++) {
-          sig |= bytes4(_extraData[i]) >> 8*i;
-        }
-
-        bool sig1matches =
-          sig == bytes4(keccak256('createAndAssignCase(address,bytes,bytes,bytes,address,bytes)'));
-        bool sig2matches =
-          sig == bytes4(keccak256('createAndAssignCaseWithPublicKey(address,bytes,bytes,bytes,address,bytes,bytes)'));
-
-        require(sig1matches || sig2matches);
-
-        address _this = address(this);
-        uint256 inputSize = _extraData.length;
-
-        assembly {
-          let ptr := mload(0x40)
-          calldatacopy(ptr, 164, inputSize) // copy extraData
-          let ptrAtPatient := add(ptr, 4) // skip signature
-          calldatacopy(ptrAtPatient, 4, 32) // overwrite _from onto patient
-          let result := call(gas, _this, 0, ptr, inputSize, 0, 0)
-          let size := returndatasize
-          returndatacopy(ptr, 0, size)
-
-          switch result
-          case 0 { revert(ptr, size) }
-          default { return(ptr, size) }
-        }
     }
 
     /**
@@ -158,11 +91,11 @@ contract CaseManager is Ownable, Pausable, Initializable {
       address _doctor,
       bytes _doctorEncryptedKey,
       bytes _patientPublicKey
-    ) public onlyThis {
+    ) public payable onlyPatient(_patient) {
       IAccountManager am = accountManager();
       require(am.publicKeys(_patient).length == 0);
       am.setPublicKey(_patient, _patientPublicKey);
-      createAndAssignCase(
+      createCase(
         _patient,
         _encryptedCaseKey,
         _caseKeySalt,
@@ -178,15 +111,32 @@ contract CaseManager is Ownable, Pausable, Initializable {
       bytes _ipfsHash,
       address _doctor,
       bytes _doctorEncryptedKey
-    ) public onlyThis {
-      ICase newCase = ICase(new Delegate(registry, keccak256("Case")));
-      newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, medXToken, registry);
+    ) public payable onlyPatient(_patient) {
+      createCase(
+        _patient,
+        _encryptedCaseKey,
+        _caseKeySalt,
+        _ipfsHash,
+        _doctor,
+        _doctorEncryptedKey);
+    }
+
+    function createCase(
+      address _patient,
+      bytes _encryptedCaseKey,
+      bytes _caseKeySalt,
+      bytes _ipfsHash,
+      address _doctor,
+      bytes _doctorEncryptedKey
+    ) internal {
+      Case newCase = Case(new Delegate(registry, keccak256("Case")));
+      newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, registry);
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
       patientCases[_patient].push(address(newCase));
       doctorCases[_doctor].push(newCase);
-      medXToken.transferFrom(_patient, newCase, createCaseCost());
       newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
+      newCase.deposit.value(msg.value)();
       emit NewCase(newCase, caseIndex);
     }
 
