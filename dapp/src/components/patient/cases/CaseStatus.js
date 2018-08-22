@@ -10,16 +10,16 @@ import {
 } from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
+import { computeTotalFee } from '~/utils/computeTotalFee'
+import { computeChallengeFee } from '~/utils/computeChallengeFee'
+import { weiToEther } from '~/utils/weiToEther'
 import get from 'lodash.get'
-import {
-  CASE_FEE_ETHER,
-  TOTAL_ETHER
-} from '~/constants'
 
 function mapStateToProps(state, { caseAddress }) {
   const status = (cacheCallValueInt(state, caseAddress, 'status') || 0)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
+  const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
 
   const DoctorManager = contractByName(state, 'DoctorManager')
   const diagnosingDoctorName = cacheCallValue(state, DoctorManager, 'name', diagnosingDoctor)
@@ -30,6 +30,7 @@ function mapStateToProps(state, { caseAddress }) {
   return {
     status,
     DoctorManager,
+    caseFeeWei,
     diagnosingDoctor,
     diagnosingDoctorName,
     challengingDoctor,
@@ -43,6 +44,7 @@ function* saga({ caseAddress, DoctorManager, networkId }) {
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'status')
+  yield cacheCall(caseAddress, 'caseFee')
   let diagnosingDoctor = yield cacheCall(caseAddress, 'diagnosingDoctor')
   let challengingDoctor = yield cacheCall(caseAddress, 'challengingDoctor')
   yield cacheCall(DoctorManager, 'name', diagnosingDoctor)
@@ -114,13 +116,13 @@ const CaseStatus = connect(mapStateToProps)(
         case 7:
           alert =
             <div className="alert alert-success">
-              You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded {CASE_FEE_ETHER.toString()} Ether and may consider re-submitting your case to the network or visiting your local dermatologist.
+              You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded {weiToEther(this.props.caseFeeWei).toString()} Ether and may consider re-submitting your case to the network or visiting your local dermatologist.
             </div>
           break
         case 8:
           alert =
             <div className="alert alert-success">
-              You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of {TOTAL_ETHER.toString()} Ether was charged for your first opinion and discounted second opinion.
+              You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of {weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()} Ether was charged for your first opinion and discounted second opinion.
             </div>
           break
         default:
