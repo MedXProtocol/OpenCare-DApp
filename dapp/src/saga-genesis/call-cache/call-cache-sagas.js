@@ -10,7 +10,10 @@ import {
 } from 'redux-saga/effects'
 import { registerCall, callCount } from '../cache-scope/cache-scope-sagas'
 import { createCall } from '../utils/create-call'
-import { contractKeyByAddress } from '../state-finders'
+import {
+  contractKeyByAddress,
+  contractByName
+} from '../state-finders'
 
 const callsInFlight = new Set()
 
@@ -68,7 +71,24 @@ export function* executeWeb3Call(call) {
 /**
   Calls web3Call and increments the call count
 */
-export function* cacheCall(address, method, ...args) {
+export function* cacheCall(addressOrName, method, ...args) {
+  if (addressOrName.startsWith('0x')) {
+    return yield cacheCallByAddress(addressOrName, method, ...args)
+  } else {
+    return yield cacheCallByName(addressOrName, method, ...args)
+  }
+}
+
+export function* cacheCallByName(name, method, ...args) {
+  const address = yield select(contractByName, name)
+  if (!address) {
+    console.error('cacheCallByName: no contract address for name: ', name, method, ...args)
+    throw new Error(`cacheCallByName: no contract address for name: ${name} ${method}`, args)
+  }
+  return yield cacheCallByAddress(address, method, ...args)
+}
+
+export function* cacheCallByAddress(address, method, ...args) {
   const call = createCall(address, method, ...args)
   const cacheActive = yield isCacheActive(call)
   yield registerCall(call)

@@ -51,6 +51,8 @@ function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
   const balance = get(state, 'sagaGenesis.ethBalance.balance')
+  const caseFeeUsd = cacheCallValue(state, CaseManager, 'caseFeeUsd')
+  const caseFeeWei = cacheCallValue(state, CaseManager, 'caseFeeWei')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
