@@ -17,6 +17,9 @@ import {
 } from '~/saga-genesis'
 import { connect } from 'react-redux'
 import { cancelablePromise } from '~/utils/cancelablePromise'
+import { computeTotalFee } from '~/utils/computeTotalFee'
+import { computeChallengeFee } from '~/utils/computeChallengeFee'
+import { weiToEther } from '~/utils/weiToEther'
 import { isTrue } from '~/utils/isTrue'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { isBlank } from '~/utils/isBlank'
@@ -31,10 +34,6 @@ import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import isEqual from 'lodash.isequal'
 import get from 'lodash.get'
-import {
-  CHALLENGE_FEE_ETHER,
-  TOTAL_ETHER
-} from '~/constants'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const account = state.sagaGenesis.accounts[0]
@@ -44,6 +43,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
+  const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
   const transactions = state.sagaGenesis.transactions
   const isPatient = account === patientAddress
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
@@ -54,6 +54,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
     account,
     currentlyExcludedDoctors,
     status,
+    caseFeeWei,
     diagnosisHash,
     transactions,
     isPatient,
@@ -75,6 +76,7 @@ function* saga({ caseAddress, networkId }) {
     cacheCall(caseAddress, 'diagnosisHash'),
     cacheCall(caseAddress, 'encryptedCaseKey'),
     cacheCall(caseAddress, 'caseKeySalt'),
+    cacheCall(caseAddress, 'caseFee'),
     cacheCall(caseAddress, 'diagnosingDoctor')
   ])
 }
@@ -273,6 +275,8 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   render() {
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
     const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== '3'
+    const challengeFeeEther = weiToEther(computeChallengeFee(this.props.caseFeeWei)).toString()
+    const totalFeeEther = weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()
 
     if (!buttonsHidden) {
       var buttons =
@@ -291,14 +295,11 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                 onClick={this.handleAcceptDiagnosis}
                 type="button"
                 className="btn btn-success"
-              >Accept and Withdraw ({CHALLENGE_FEE_ETHER.toString()} W-ETH)</button>
+              >Accept and Withdraw ({challengeFeeEther} W-ETH)</button>
             </div>
           </div>
         </div>
     }
-
-    const challengeFee = CHALLENGE_FEE_ETHER.toString()
-    const totalFee = TOTAL_ETHER.toString()
 
     return (
       isEmptyObject(this.state.diagnosis)
@@ -328,7 +329,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                       Challenge the diagnosis by having another doctor look at your case.
                     </p>
                     <p>
-                      If the diagnosis is the same, you will be charged {totalFee} W-ETH.  If the diagnosis is different than the original then you'll be charged {challengeFee} W-ETH and refunded the remainder.
+                      If the diagnosis is the same, you will be charged {totalFeeEther} W-ETH.  If the diagnosis is different than the original then you'll be charged {challengeFeeEther} W-ETH and refunded the remainder.
                     </p>
                     <hr />
                     <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>
