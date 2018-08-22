@@ -7,7 +7,7 @@ export function caseStale(secondsElapsed, compareTime, status, isPatient) {
   if (!compareTime || !status) {
     return false
   } else {
-    const waitingOnDoctor = (status === 2)
+    const waitingOnDoctor = (status === 2 || status === 6)
     const waitingOnPatient = (status === 3)
     const enoughTimeHasPassed = (
       (Math.floor(Date.now() / 1000) - compareTime) > secondsElapsed

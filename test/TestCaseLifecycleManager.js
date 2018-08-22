@@ -176,4 +176,38 @@ contract('CaseLifecycleManager', function (accounts) {
     })
   })
 
+  describe('patientRequestNewChallengeDoctor()', () => {
+    it('should set the case to open and update the doc', async () => {
+      const caseInstance = await Case.at(await createCase(env, patient, doctor))
+      assert.equal(await caseInstance.diagnosingDoctor.call(), doctor)
+
+      increaseTime(SECONDS_IN_A_DAY * 3)
+
+      env.caseLifecycleManager.patientRequestNewInitialDoctor(
+        caseInstance.address,
+        doctor2,
+        'a diff doc encrypted case key'
+      )
+      assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
+      assert.equal(await caseInstance.diagnosingDoctor.call(), doctor2)
+    })
+  })
+
+  describe('acceptDiagnosis()', () => {
+    it('should allow the patient to accept diagnosis 24 hours after choosing a challenge doc', async () => {
+      const caseInstance = await Case.at(await createCase(env, patient, doctor))
+      assert.equal(await caseInstance.diagnosingDoctor.call(), doctor)
+
+      increaseTime(SECONDS_IN_A_DAY * 3)
+
+      env.caseLifecycleManager.patientRequestNewInitialDoctor(
+        caseInstance.address,
+        doctor2,
+        'a diff doc encrypted case key'
+      )
+      assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
+      assert.equal(await caseInstance.diagnosingDoctor.call(), doctor2)
+    })
+  })
+
 })

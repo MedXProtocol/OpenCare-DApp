@@ -38,7 +38,7 @@ contract Case is Ownable, Initializable {
     Evaluating,
     Evaluated,
     Closed,
-    Challenged,
+    Challenged, // unused?
     Challenging,
     ClosedRejected,
     ClosedConfirmed

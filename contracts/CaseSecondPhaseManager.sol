@@ -17,11 +17,14 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
 
   Registry registry;
 
+  event ChallengeDoctorSet(address indexed _case, address indexed _patient, address indexed _challengingDoctor, bytes doctorEncryptedKey);
+  event ChallengingDoctorCleared(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor);
+
+  event CaseChallenged(address indexed _case, address indexed _patient, address indexed _challengingDoctor);
+  event ChallengedCaseClosed(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, address _challengingDoctor);
+
   event CaseDiagnosesDiffer(address indexed _case, address indexed _patient, address indexed _challengingDoctor);
   event CaseDiagnosisConfirmed(address indexed _case, address indexed _patient, address indexed _challengingDoctor);
-  event CaseChallenged(address indexed _case, address indexed _patient, address indexed _challengingDoctor);
-  event ChallengeDoctorSet(address indexed _case, address indexed _patient, address indexed _challengingDoctor, bytes doctorEncryptedKey);
-  event ChallengedCaseClosed(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, address _challengingDoctor);
 
   /**
    * @dev - throws if called by anything not an instance of the lifecycle manager contract
@@ -129,6 +132,33 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
     _case.transferRemainingBalanceToPatient();
 
     emit CaseDiagnosesDiffer(_case, _case.patient(), _case.challengingDoctor());
+  }
+
+  /**
+   * @dev - allows the patient to choose another doc if the first doc hasn't responded after 24 hours
+   */
+  function patientRequestNewChallengeDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
+    external
+    onlyCaseLifecycleManager
+  {
+    Case _case = Case(_caseAddress);
+
+    registry.caseScheduleManager().touchUpdatedAt(_caseAddress);
+
+    clearChallengingDoctor(_case);
+
+    setChallengingDoctor(_case, _doctor, _doctorEncryptedKey);
+  }
+
+  function clearChallengingDoctor(Case _case) internal {
+    address patient = _case.patient();
+    address challengingDoctor = _case.challengingDoctor();
+
+    require(challengingDoctor != address(0), 'the challengingDoctor must be already set in the Case contract');
+
+    registry.caseStatusManager().removeOpenCase(challengingDoctor, _case);
+
+    emit ChallengingDoctorCleared(_case, patient, challengingDoctor);
   }
 
 }
