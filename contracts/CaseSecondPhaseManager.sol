@@ -150,7 +150,7 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
     setChallengingDoctor(_case, _doctor, _doctorEncryptedKey);
   }
 
-  function clearChallengingDoctor(Case _case) internal {
+  function clearChallengingDoctor(Case _case) public onlyCaseLifecycleManager {
     address patient = _case.patient();
     address challengingDoctor = _case.challengingDoctor();
 

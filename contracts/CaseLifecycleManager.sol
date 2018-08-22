@@ -162,6 +162,11 @@ contract CaseLifecycleManager is Ownable, Initializable {
     );
 
     registry.caseFirstPhaseManager().acceptDiagnosis(_case);
+
+    // If this case had been challenged, clear the case for that doc
+    if (_case.challengingDoctor() != address(0)) {
+      registry.caseSecondPhaseManager().clearChallengingDoctor(_case);
+    }
   }
 
   /**
@@ -253,9 +258,12 @@ contract CaseLifecycleManager is Ownable, Initializable {
     require(_case.status() == Case.CaseStatus.Evaluated/*, 'Case must be in Evaluated state'*/);
 
     registry.caseFirstPhaseManager().acceptAsDoctor(_case);
+
+    // If this case had been challenged, clear the case for that doc
+    if (_case.challengingDoctor() != address(0)) {
+      registry.caseSecondPhaseManager().clearChallengingDoctor(_case);
+    }
   }
-
-
 
   function challengeWithDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
     external
