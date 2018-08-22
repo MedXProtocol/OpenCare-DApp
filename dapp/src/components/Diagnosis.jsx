@@ -33,6 +33,10 @@ import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import isEqual from 'lodash.isequal'
 import get from 'lodash.get'
+import {
+  CHALLENGE_FEE_ETHER,
+  TOTAL_ETHER
+} from '~/constants'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
@@ -299,11 +303,14 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                 onClick={this.handleAcceptDiagnosis}
                 type="button"
                 className="btn btn-success"
-              >Accept and Withdraw (5 MEDT)</button>
+              >Accept and Withdraw ({CHALLENGE_FEE_ETHER.toString()} W-ETH)</button>
             </div>
           </div>
         </div>
     }
+
+    const challengeFee = CHALLENGE_FEE_ETHER.toString()
+    const totalFee = TOTAL_ETHER.toString()
 
     return (
       isEmptyObject(this.state.diagnosis)
@@ -333,7 +340,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                       Challenge the diagnosis by having another doctor look at your case.
                     </p>
                     <p>
-                      If the diagnosis is the same, you will be charged 15 MEDT (Test MEDX).  If the diagnosis is different than the original then you'll be charged 5 MEDT (Test MEDX) and refunded the remainder.
+                      If the diagnosis is the same, you will be charged {totalFee} W-ETH.  If the diagnosis is different than the original then you'll be charged {challengeFee} W-ETH and refunded the remainder.
                     </p>
                     <hr />
                     <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>

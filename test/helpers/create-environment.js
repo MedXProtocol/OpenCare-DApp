@@ -5,6 +5,7 @@ const envDeployWithDelegate = require('./env-deploy-with-delegate')
 module.exports = async function createEnvironment(artifacts) {
   const Case = artifacts.require("./Case.sol")
   const MedXToken = artifacts.require("./MedXToken.sol")
+  const WETH9 = artifacts.require("./WETH9.sol")
   const DoctorManager = artifacts.require('./DoctorManager.sol')
   const AccountManager = artifacts.require('./AccountManager.sol')
   const Delegate = artifacts.require('./Delegate.sol')
@@ -20,11 +21,14 @@ module.exports = async function createEnvironment(artifacts) {
   let registry = await Registry.new()
   let medXToken = await MedXToken.new()
 
+  let weth9 = await WETH9.new()
+  await registry.register(toRegistryKey('WrappedEther'), weth9.address)
+
   let caseInstance = await Case.new()
   await registry.register(toRegistryKey('Case'), caseInstance.address)
 
   let caseManager = await envDeployWithDelegate(registry, Delegate, CaseManager, 'CaseManager')
-  await caseManager.initialize(web3.toWei('10', 'ether'), medXToken.address, registry.address)
+  await caseManager.initialize(web3.toWei('10', 'ether'), registry.address)
 
   let caseStatusManager = await envDeployWithDelegate(registry, Delegate, CaseStatusManager, 'CaseStatusManager')
   await caseStatusManager.initialize(registry.address)
@@ -54,6 +58,7 @@ module.exports = async function createEnvironment(artifacts) {
     betaFaucet,
     registry,
     medXToken,
+    weth9,
     caseManager,
     caseLifecycleManager,
     caseFirstPhaseManager,

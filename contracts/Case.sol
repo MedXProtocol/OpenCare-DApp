@@ -1,12 +1,9 @@
 pragma solidity ^0.4.23;
 
-import "./Case.sol";
-import "./CaseScheduleManager.sol";
-import "./CaseStatusManager.sol";
 import "./Initializable.sol";
-import "./MedXToken.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
+import "./WETH9.sol";
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -27,7 +24,6 @@ contract Case is Ownable, Initializable {
   bytes public challengeHash;
 
   Registry public registry;
-  MedXToken public medXToken;
 
   CaseStatus public status;
 
@@ -94,7 +90,6 @@ contract Case is Ownable, Initializable {
    * @dev - Creates a new case with the given parameters
    * @param _patient - the patient who created the case
    * @param _caseFee - fee for this particular case
-   * @param _token - the MedX token
    * @param _registry - the registry contract
    */
   function initialize (
@@ -103,7 +98,6 @@ contract Case is Ownable, Initializable {
       bytes _caseKeySalt,
       bytes _caseHash,
       uint256 _caseFee,
-      address _token,
       address _registry
   ) external notInitialized {
     setInitialized();
@@ -117,13 +111,17 @@ contract Case is Ownable, Initializable {
     patient = _patient;
     caseDataHash = _caseHash;
     caseFee = _caseFee;
-    medXToken = MedXToken(_token);
     registry = Registry(_registry);
     emit CaseCreated(patient);
   }
 
   function setDiagnosingDoctor(address _doctorAddress) external onlyCaseFirstPhaseManager {
     diagnosingDoctor = _doctorAddress;
+  }
+
+  function deposit() external payable {
+    require(msg.value >= createCaseCost(), 'Not enough ether to create case');
+    lookupWeth9().deposit.value(msg.value)();
   }
 
   function setChallengingDoctor(address _doctorAddress) external onlyCaseSecondPhaseManager {
@@ -161,15 +159,26 @@ contract Case is Ownable, Initializable {
   }
 
   function transferCaseFeeToDiagnosingDoctor() external onlyCasePhaseManagers {
-    medXToken.transfer(diagnosingDoctor, caseFee);
+    WETH9 weth9 = lookupWeth9();
+    weth9.transfer(diagnosingDoctor, caseFee);
   }
 
   function transferRemainingBalanceToPatient() external onlyCasePhaseManagers {
-    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+    WETH9 weth9 = lookupWeth9();
+    weth9.transfer(patient, weth9.balanceOf(address(this)));
   }
 
   function transferChallengingDoctorFee() external onlyCaseSecondPhaseManager {
-    medXToken.transfer(challengingDoctor, caseFee.mul(50).div(100));
+    WETH9 weth9 = lookupWeth9();
+    weth9.transfer(challengingDoctor, caseFee.mul(50).div(100));
+  }
+
+  function createCaseCost() internal view returns (uint256) {
+    return caseFee.add(caseFee.mul(50).div(100));
+  }
+
+  function lookupWeth9() internal view returns (WETH9) {
+    return WETH9(registry.lookup(keccak256("WrappedEther")));
   }
 
 }

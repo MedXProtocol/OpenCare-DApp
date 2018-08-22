@@ -9,9 +9,7 @@ function* getEthBalance() {
     return
   }
 
-  const balance = yield web3.eth.getBalance(address).then(weiBalance => {
-    return parseFloat(web3.utils.fromWei(weiBalance, 'ether'))
-  })
+  const balance = yield web3.eth.getBalance(address)
 
   const oldBalance = yield select(state => state.sagaGenesis.ethBalance.balance)
 

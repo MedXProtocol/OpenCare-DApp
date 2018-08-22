@@ -1,5 +1,6 @@
 import betaFaucetContractConfig from '#/BetaFaucet.json'
 import medXTokenContractConfig from '#/MedXToken.json'
+import weth9ContractConfig from '#/WETH9.json'
 import caseManagerContractConfig from '#/CaseManager.json'
 import caseLifecycleManagerContractConfig from '#/CaseLifecycleManager.json'
 import caseFirstPhaseManagerContractConfig from '#/CaseFirstPhaseManager.json'
@@ -26,6 +27,7 @@ export default {
     MedXToken: abiFactory(medXTokenContractConfig.abi),
     DoctorManager: abiFactory(doctorManagerContractConfig.abi),
     Case: abiFactory(caseContractConfig.abi),
-    Registry: abiFactory(registryConfig.abi)
+    Registry: abiFactory(registryConfig.abi),
+    WrappedEther: abiFactory(weth9ContractConfig.abi)
   }
 }

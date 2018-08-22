@@ -16,7 +16,6 @@ contract('Case', function (accounts) {
 
   before(async () => {
     env = await createEnvironment(artifacts)
-    await env.medXToken.mint(patient, web3.toWei(1000, 'ether'))
 
     await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc')
     await env.doctorManager.addOrReactivateDoctor(doctor, 'Doogie')
@@ -44,11 +43,9 @@ contract('Case', function (accounts) {
           'caseKeySalt',
           [1, 2],
           caseFee,
-          env.medXToken.address,
           env.registry.address
         )
       })
     })
   })
-
 })

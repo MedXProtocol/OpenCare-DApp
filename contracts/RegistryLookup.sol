@@ -1,5 +1,6 @@
 pragma solidity ^0.4.23;
 
+import './AccountManager.sol';
 import './Case.sol';
 import './CaseManager.sol';
 import './CaseLifecycleManager.sol';
@@ -11,6 +12,10 @@ import './DoctorManager.sol';
 import './Registry.sol';
 
 library RegistryLookup {
+
+  function accountManager(Registry self) internal view returns (AccountManager) {
+    return AccountManager(self.lookup(keccak256("AccountManager")));
+  }
 
   function caseManager(Registry self) internal view returns (CaseManager) {
     return CaseManager(self.lookup(keccak256("CaseManager")));

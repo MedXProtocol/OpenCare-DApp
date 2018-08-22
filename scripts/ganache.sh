@@ -1,7 +1,6 @@
 #! /bin/sh
 mkdir -p .ganache
 ganache-cli \
-  --noVMErrorsOnRPCResponse=false \
   --db .ganache \
   -l 4700038 \
   -i 1234 \

@@ -1,7 +1,6 @@
 pragma solidity ^0.4.23;
 
 import './Case.sol';
-import './CaseManager.sol';
 import "./LinkedList.sol";
 import './Initializable.sol';
 import './Registry.sol';
@@ -65,7 +64,7 @@ contract CaseStatusManager is Initializable, Ownable {
     isDoctorCase(_doctor, _case)
   {
     require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0, 'case is already in open state for this doc');
-    uint256 caseIndex = caseManager().caseIndices(_case);
+    uint256 caseIndex = registry.caseManager().caseIndices(_case);
     require(caseIndex != 0, "case not found in caseManager's caseIndices");
     uint256 nodeIndex = openDoctorCasesList[_doctor].enqueue(caseIndex);
     require(nodeIndex != 0, 'linked list did not return a nodeIndex');
@@ -109,7 +108,7 @@ contract CaseStatusManager is Initializable, Ownable {
     * @return The address of the case for the given node
     */
   function openCaseAddress(address _doctor, uint256 nodeId) external view returns (address) {
-    return caseManager().caseList(openDoctorCasesList[_doctor].value(nodeId));
+    return registry.caseManager().caseList(openDoctorCasesList[_doctor].value(nodeId));
   }
 
   function addClosedCase(address _doctor, Case _case)
@@ -138,7 +137,4 @@ contract CaseStatusManager is Initializable, Ownable {
     }
   }
 
-  function caseManager() internal view returns (CaseManager) {
-    return CaseManager(registry.lookup(keccak256('CaseManager')));
-  }
 }

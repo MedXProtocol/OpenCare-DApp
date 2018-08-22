@@ -24,7 +24,7 @@ const MAX_CASES_PER_PAGE = 5
 function mapStateToProps(state, { match }) {
   let start = 0
   let end = 0
-  let pageNumbers = []
+  let totalPages = 0
 
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
@@ -45,8 +45,7 @@ function mapStateToProps(state, { match }) {
 
   let closedCaseAddresses = []
   if (closedCaseCount) {
-    const totalPages = Math.ceil(closedCaseCount / MAX_CASES_PER_PAGE)
-    pageNumbers = range(1, totalPages + 1)
+    totalPages = Math.ceil(closedCaseCount / MAX_CASES_PER_PAGE)
 
     start = (closedCaseCount - ((parseInt(currentPage, 10) - 1) * MAX_CASES_PER_PAGE))
     end = Math.max((start - MAX_CASES_PER_PAGE), 0)
@@ -67,7 +66,7 @@ function mapStateToProps(state, { match }) {
     CaseStatusManager,
     openCaseAddresses,
     closedCaseAddresses,
-    pageNumbers,
+    totalPages,
     currentPage,
     start,
     end
@@ -111,7 +110,7 @@ export const OpenCasesContainer = connect(mapStateToProps)(
           openCaseAddresses,
           match,
           currentPage,
-          pageNumbers
+          totalPages
         } = this.props
 
         if (match.params.caseAddress) {
@@ -122,7 +121,7 @@ export const OpenCasesContainer = connect(mapStateToProps)(
               key="doctor-case-listing"
               openCaseAddresses={openCaseAddresses}
               closedCaseAddresses={closedCaseAddresses}
-              pageNumbers={pageNumbers}
+              totalPages={totalPages}
               currentPage={currentPage}
             />
           )

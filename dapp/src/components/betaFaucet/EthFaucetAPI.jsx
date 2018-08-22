@@ -4,6 +4,7 @@ import { EthAddress } from '~/components/EthAddress'
 import PropTypes from 'prop-types'
 import { axiosInstance } from '~/config/hippoAxios'
 import { LoadingLines } from '~/components/LoadingLines'
+import { weiToEther } from '~/utils/weiToEther'
 
 export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
 
@@ -117,7 +118,7 @@ export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
       <div className="col-xs-12 text-center">
         <strong>Current Balance:</strong>
         <h2 className="header--no-top-margin">
-          {this.props.ethBalance} Ξ
+          {weiToEther(this.props.ethBalance)} Ξ
         </h2>
         <p className="small text-center">
           <span className="eth-address text-gray">For address:&nbsp;
@@ -147,6 +148,6 @@ export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
 })
 
 EthFaucetAPI.propTypes = {
-  ethBalance: PropTypes.number,
+  ethBalance: PropTypes.string,
   address: PropTypes.string
 }
