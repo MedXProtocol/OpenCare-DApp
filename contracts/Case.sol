@@ -1,17 +1,16 @@
 pragma solidity ^0.4.23;
 
-import "./ICase.sol";
-import "./IMedXToken.sol";
-import "./IDoctorManager.sol";
+import "./DoctorManager.sol";
 import "./IRegistry.sol";
 import "./Initializable.sol";
 import "./ICaseManager.sol";
 import "./CaseStatusManager.sol";
+import "./WETH9.sol";
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract Case is Ownable, Initializable, ICase {
+contract Case is Ownable, Initializable {
   using SafeMath for uint256;
 
   uint256 public caseFee;
@@ -25,7 +24,6 @@ contract Case is Ownable, Initializable, ICase {
   bytes public challengeHash;
 
   IRegistry public registry;
-  IMedXToken public medXToken;
 
   CaseStatus public status;
 
@@ -102,7 +100,6 @@ contract Case is Ownable, Initializable, ICase {
    * @dev - Creates a new case with the given parameters
    * @param _patient - the patient who created the case
    * @param _caseFee - fee for this particular case
-   * @param _token - the MedX token
    * @param _registry - the registry contract
    */
   function initialize (
@@ -111,13 +108,12 @@ contract Case is Ownable, Initializable, ICase {
       bytes _caseKeySalt,
       bytes _caseHash,
       uint256 _caseFee,
-      address _token,
       address _registry
   ) external notInitialized {
     setInitialized();
-    require(_encryptedCaseKey.length != 0);
-    require(_caseKeySalt.length != 0);
-    require(_caseHash.length != 0);
+    require(_encryptedCaseKey.length != 0, 'missing encrypted case key');
+    require(_caseKeySalt.length != 0, 'missing case key salt');
+    require(_caseHash.length != 0, 'no case hash given');
     createdAt = block.timestamp;
     updatedAt = block.timestamp;
     owner = msg.sender;
@@ -127,9 +123,13 @@ contract Case is Ownable, Initializable, ICase {
     patient = _patient;
     caseDataHash = _caseHash; // don't need to store this
     caseFee = _caseFee;
-    medXToken = IMedXToken(_token);
     registry = IRegistry(_registry);
     emit CaseCreated(patient);
+  }
+
+  function deposit() external payable {
+    require(msg.value >= createCaseCost(), 'Not enough ether to create case');
+    lookupWeth9().deposit.value(msg.value)();
   }
 
   /**
@@ -144,9 +144,9 @@ contract Case is Ownable, Initializable, ICase {
   }
 
   function setDiagnosingDoctor (address _doctor, bytes _doctorEncryptedKey) external onlyCaseManager isDoctor(_doctor) {
-    require(status == CaseStatus.Open);
-    require(diagnosingDoctor == address(0));
-    require(_doctor != patient);
+    require(status == CaseStatus.Open, 'Case status is not open');
+    require(diagnosingDoctor == address(0), 'diagnosing doctor is zero');
+    require(_doctor != patient, 'doctor cannot be the patient');
     diagnosingDoctor = _doctor;
     status = CaseStatus.Evaluating;
     caseStatusManager().addOpenCase(_doctor, this);
@@ -188,8 +188,9 @@ contract Case is Ownable, Initializable, ICase {
     status = CaseStatus.Closed;
     caseStatusManager().removeOpenCase(diagnosingDoctor, this);
     caseStatusManager().addClosedCase(diagnosingDoctor, this);
-    medXToken.transfer(diagnosingDoctor, caseFee);
-    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+    WETH9 weth9 = lookupWeth9();
+    weth9.transfer(diagnosingDoctor, caseFee);
+    weth9.transfer(patient, weth9.balanceOf(address(this)));
     touchUpdatedAt();
     emit CaseClosed(patient, diagnosingDoctor);
   }
@@ -237,9 +238,10 @@ contract Case is Ownable, Initializable, ICase {
   function confirmChallengedDiagnosis() internal {
     status = CaseStatus.ClosedConfirmed;
 
-    medXToken.transfer(diagnosingDoctor, caseFee);
-    medXToken.transfer(challengingDoctor, caseFee.mul(50).div(100));
-    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+    WETH9 weth9 = lookupWeth9();
+    weth9.transfer(diagnosingDoctor, caseFee);
+    weth9.transfer(challengingDoctor, caseFee.mul(50).div(100));
+    weth9.transfer(patient, weth9.balanceOf(address(this)));
 
     emit CaseClosedConfirmed(patient, challengingDoctor);
   }
@@ -249,15 +251,19 @@ contract Case is Ownable, Initializable, ICase {
    */
   function rejectChallengedDiagnosis() internal {
     status = CaseStatus.ClosedRejected;
-
-    medXToken.transfer(challengingDoctor, caseFee.mul(50).div(100));
-    medXToken.transfer(patient, medXToken.balanceOf(address(this)));
+    WETH9 weth9 = lookupWeth9();
+    weth9.transfer(challengingDoctor, caseFee.mul(50).div(100));
+    weth9.transfer(patient, weth9.balanceOf(address(this)));
 
     emit CaseClosedRejected(patient, challengingDoctor);
   }
 
-  function doctorManager() internal view returns (IDoctorManager) {
-    return IDoctorManager(registry.lookup(keccak256("DoctorManager")));
+  function createCaseCost () internal view returns (uint256) {
+    return caseFee.add(caseFee.mul(50).div(100));
+  }
+
+  function doctorManager() internal view returns (DoctorManager) {
+    return DoctorManager(registry.lookup(keccak256("DoctorManager")));
   }
 
   function caseManager() internal view returns (ICaseManager) {
@@ -266,6 +272,10 @@ contract Case is Ownable, Initializable, ICase {
 
   function caseStatusManager() internal view returns (CaseStatusManager) {
     return CaseStatusManager(registry.lookup(keccak256("CaseStatusManager")));
+  }
+
+  function lookupWeth9() internal view returns (WETH9) {
+    return WETH9(registry.lookup(keccak256("WrappedEther")));
   }
 
   function getDiagnosingDoctor() public view returns (address) {

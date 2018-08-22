@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import FlipMove from 'react-flip-move'
-import { Link } from 'react-router-dom'
 import { formatRoute } from 'react-router-named-routes'
-import classnames from 'classnames'
 import { CaseRow } from '~/components/CaseRow'
 import * as routes from '~/config/routes'
 import { Pagination } from '~/components/Pagination'

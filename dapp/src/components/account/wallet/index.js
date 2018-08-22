@@ -1,42 +1,74 @@
 import React, { Component } from 'react'
-import { all } from 'redux-saga/effects'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faHeartbeat from '@fortawesome/fontawesome-free-solid/faHeartbeat';
+import faExternalLinkAlt from '@fortawesome/fontawesome-free-solid/faExternalLinkAlt';
 import { cacheCall, withSaga, cacheCallValue, contractByName } from '~/saga-genesis'
 import { EthAddress } from '~/components/EthAddress'
-import * as routes from '~/config/routes'
 import { PageTitle } from '~/components/PageTitle'
-import { weiToMedX } from '~/utils/weiToMedX'
+import { weiToEther } from '~/utils/weiToEther'
+import { EtherscanLink } from '~/components/EtherscanLink'
+import { toastr } from '~/toastr'
+import { mixpanel } from '~/mixpanel'
+import {
+  withSend,
+  TransactionStateHandler
+} from '~/saga-genesis'
 
 function mapStateToProps (state) {
+  const transactions = get(state, 'sagaGenesis.transactions')
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const MedXToken = contractByName(state, 'MedXToken')
-  let balance = '' + cacheCallValue(state, MedXToken, 'balanceOf', address)
+  const WrappedEther = contractByName(state, 'WrappedEther')
+  let balance = '' + cacheCallValue(state, WrappedEther, 'balanceOf', address)
   // avoid NaN
   if (balance === 'undefined')
     balance = 0
 
-  const canMint = cacheCallValue(state, MedXToken, 'owner') === address
   return {
+    transactions,
     address,
-    MedXToken,
-    balance,
-    canMint
+    WrappedEther,
+    balance
   }
 }
 
-function* saga({ address, MedXToken }) {
-  if (!address || !MedXToken) { return }
-  yield all([
-    cacheCall(MedXToken, 'balanceOf', address),
-    cacheCall(MedXToken, 'owner')
-  ])
+function* saga({ address, WrappedEther }) {
+  if (!address || !WrappedEther) { return }
+  yield cacheCall(WrappedEther, 'balanceOf', address)
 }
 
-export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(class _Wallet extends Component {
+export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(class _Wallet extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {}
+  }
+
+  doWithdraw = () => {
+    const withdrawTransactionId = this.props.send(this.props.WrappedEther, 'withdraw', this.props.balance)()
+    this.setState({
+      withdrawHandler: new TransactionStateHandler(),
+      withdrawTransactionId
+    })
+  }
+
+  componentWillReceiveProps (props) {
+    if (this.state.withdrawHandler) {
+      this.state.withdrawHandler.handle(props.transactions[this.state.withdrawTransactionId])
+        .onError((error) => {
+          toastr.transactionError(error)
+          this.setState({ withdrawHandler: null })
+        })
+        .onConfirmed(() => {
+          this.setState({ withdrawHandler: null })
+        })
+        .onTxHash(() => {
+          toastr.success('Withdraw successful')
+          mixpanel.track('W-ETH Withdrawn')
+        })
+    }
+  }
+
   render() {
     return (
       <div>
@@ -47,7 +79,14 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(class _Wa
               <div className="card">
                 <div className="card-header">
                   <h3 className="title">
-                    MEDT (Test MEDX) Balance
+                    W-ETH Balance
+                    &nbsp;
+                    <small>
+                      <EtherscanLink address={this.props.WrappedEther}>
+                        <FontAwesomeIcon
+                          icon={faExternalLinkAlt} />
+                      </EtherscanLink>
+                    </small>
                     <br /><small className="eth-address text-gray">ethereum address: <EthAddress address={this.props.address} /></small>
                   </h3>
                 </div>
@@ -56,16 +95,14 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(class _Wa
                     <p className='lead text-center'>
                       <FontAwesomeIcon
                         icon={faHeartbeat} />
-                      &nbsp; {weiToMedX(this.props.balance)} MEDT
+                      &nbsp; {weiToEther(this.props.balance)} W-ETH
                     </p>
 
-                    {this.props.canMint &&
-                      <div className="text-right">
-                        <Link to={routes.ACCOUNT_MINT} className="btn btn-primary btn-lg">
-                          Buy MEDX
-                        </Link>
-                      </div>
-                    }
+                    <div className="text-center">
+                      <button onClick={this.doWithdraw} className="btn btn-primary btn-lg" disabled={!!this.props.withdrawTransactionId}>
+                        Withdraw
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -75,4 +112,4 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(class _Wa
       </div>
     )
   }
-}))
+})))

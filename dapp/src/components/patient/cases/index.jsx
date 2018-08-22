@@ -30,7 +30,7 @@ function mapStateToProps(state, props) {
   const CaseManager = contractByName(state, 'CaseManager')
   const transactions = Object.values(state.sagaGenesis.transactions)
   const caseCount = cacheCallValueInt(state, CaseManager, 'getPatientCaseListCount', address)
-  const currentPage = parseInt(props.match.params.currentPage)
+  const currentPage = parseInt(props.match.params.currentPage, 10)
 
   const start = (caseCount - ((parseInt(currentPage, 10) - 1) * MAX_CASES_PER_PAGE))
   const end = Math.max((start - MAX_CASES_PER_PAGE), 0)

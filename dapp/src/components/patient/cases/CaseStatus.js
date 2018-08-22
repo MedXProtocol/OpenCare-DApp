@@ -11,6 +11,10 @@ import {
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
 import get from 'lodash.get'
+import {
+  CASE_FEE_ETHER,
+  TOTAL_ETHER
+} from '~/constants'
 
 function mapStateToProps(state, { caseAddress }) {
   const status = (cacheCallValueInt(state, caseAddress, 'status') || 0)
@@ -110,13 +114,13 @@ const CaseStatus = connect(mapStateToProps)(
         case 7:
           alert =
             <div className="alert alert-success">
-              You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded 10 MEDT (Test MEDX) and may consider re-submitting your case to the network or visiting your local dermatologist.
+              You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded {CASE_FEE_ETHER.toString()} Ether and may consider re-submitting your case to the network or visiting your local dermatologist.
             </div>
           break
         case 8:
           alert =
             <div className="alert alert-success">
-              You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of 15 MEDT (Test MEDX) was charged for your first opinion and discounted second opinion.
+              You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of {TOTAL_ETHER.toString()} Ether was charged for your first opinion and discounted second opinion.
             </div>
           break
         default:

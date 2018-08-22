@@ -27,8 +27,6 @@ contract('CaseManager', function (accounts) {
 
   before(async () => {
     env = await createEnvironment(artifacts)
-    await env.medXToken.mint(patient, web3.toWei('500', 'ether'))
-    await env.medXToken.mint(patient2, web3.toWei('500', 'ether'))
     await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr. Octagon')
     await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Zaius')
   })
@@ -46,24 +44,24 @@ contract('CaseManager', function (accounts) {
   describe('initialize()', () => {
     it('should not be called again', async () => {
       await expectThrow(async () => {
-        await env.caseManager.initialize(web3.toWei('10', 'ether'), env.medXToken.address, env.registry.address)
+        await env.caseManager.initialize(web3.toWei('10', 'ether'), env.registry.address)
       })
     })
   })
 
   describe('createAndAssignCase()', () => {
     it('should work', async () => {
-      var hexData = env.caseManager.contract.createAndAssignCase.getData(
+      assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
+      await env.caseManager.createAndAssignCase(
         patient,
         encryptedCaseKey,
         caseKeySalt,
         ipfsHash,
         doctor,
-        'doctor encrypted case key'
+        'doctor encrypted case key',
+        { from: patient, value: caseCharge }
       )
 
-      assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
-      await env.medXToken.approveAndCall(env.caseManager.address, caseCharge, hexData, { from: patient })
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
       assert.equal(await env.caseManager.getPatientCaseListCount(patient), 1)
       assert.equal(await env.caseManager.doctorCasesCount(doctor), 1)
@@ -80,18 +78,19 @@ contract('CaseManager', function (accounts) {
 
   describe('createAndAssignCaseWithPublicKey()', () => {
     it('should work', async () => {
-      var hexData = env.caseManager.contract.createAndAssignCaseWithPublicKey.getData(
+      assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
+
+      await env.caseManager.createAndAssignCaseWithPublicKey(
         patient2,
         encryptedCaseKey,
         caseKeySalt,
         ipfsHash,
         doctor,
         'doctor encrypted case key',
-        '0xea1234'
+        '0xea1234',
+        { from: patient2, value: caseCharge }
       )
 
-      assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
-      await env.medXToken.approveAndCall(env.caseManager.address, caseCharge, hexData, { from: patient2 })
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
       assert.equal(await env.caseManager.getPatientCaseListCount(patient2), 1)
       assert.equal(await env.caseManager.doctorCasesCount(doctor), 1)

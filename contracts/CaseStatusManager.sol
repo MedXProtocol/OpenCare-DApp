@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import './ICase.sol';
+import './Case.sol';
 import './Registry.sol';
 import "./LinkedList.sol";
 import './Initializable.sol';
@@ -37,7 +37,7 @@ contract CaseStatusManager is Initializable, Ownable {
     require(caseManager().caseIndices(_case) != uint256(0));
   }
 
-  modifier isDoctorCase(address _doctor, ICase _case) {
+  modifier isDoctorCase(address _doctor, Case _case) {
     require(_doctor == _case.getDiagnosingDoctor() || _doctor == _case.getChallengingDoctor());
     _;
   }
@@ -49,17 +49,17 @@ contract CaseStatusManager is Initializable, Ownable {
     setInitialized();
   }
 
-  function addOpenCase(address _doctor, ICase _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
-    require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0);
+  function addOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+    require(doctorOpenCaseNodeIndices[_doctor][address(_case)] == 0, 'this case has not been added for this doctor');
     uint256 caseIndex = caseManager().caseIndices(_case);
-    require(caseIndex != 0);
+    require(caseIndex != 0, 'addOpenCase: caseIndex exists');
     uint256 nodeIndex = openDoctorCasesList[_doctor].enqueue(caseIndex);
-    require(nodeIndex != 0);
+    require(nodeIndex != 0, 'addOpenCase: nodeIndex exists');
     doctorOpenCaseNodeIndices[_doctor][_case] = nodeIndex;
     emit CaseOpened(_doctor, _case);
   }
 
-  function removeOpenCase(address _doctor, ICase _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+  function removeOpenCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
     uint256 nodeIndex = doctorOpenCaseNodeIndices[_doctor][address(_case)];
     require(nodeIndex != 0);
     doctorOpenCaseNodeIndices[_doctor][_case] = 0;
@@ -94,7 +94,7 @@ contract CaseStatusManager is Initializable, Ownable {
     return caseManager().caseList(openDoctorCasesList[_doctor].value(nodeId));
   }
 
-  function addClosedCase(address _doctor, ICase _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
+  function addClosedCase(address _doctor, Case _case) external onlyCase(_case) isDoctorCase(_doctor, _case) {
     require(closedCases[_doctor][_case] == false);
     doctorClosedCases[_doctor].push(address(_case));
     closedCases[_doctor][_case] = true;

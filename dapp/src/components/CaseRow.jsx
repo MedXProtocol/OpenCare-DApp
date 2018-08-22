@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { formatRoute } from 'react-router-named-routes'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
