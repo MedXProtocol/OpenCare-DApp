@@ -37,7 +37,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
   modifier patientWaitedOneDay(address _caseAddress) {
     require(
       registry.caseScheduleManager().patientWaitedOneDay(_caseAddress)//,
-      //'patient must wait at one day to call this function'
+      //'patient must wait at least one day to call this'
     );
     _;
   }
@@ -48,7 +48,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
   modifier doctorWaitedTwoDays(address _caseAddress) {
     require(
       registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress)//,
-      //'doctor needs to wait at least two days to call this function'
+      //'doctor needs to wait at least two days to call this'
     );
     _;
   }

@@ -221,7 +221,11 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     render () {
-      if (!this.props.updatedAt || !caseStale(secondsInADay, this.props.updatedAt, this.props.status)) {
+      const isPatient = true
+      if (
+        !this.props.updatedAt
+        || !caseStale(secondsInADay, this.props.updatedAt, this.props.status, isPatient)
+      ) {
         return null
       } else {
         return (
@@ -231,7 +235,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
                 <div className='col-xs-12'>
                   <div className="alert alert-warning text-center">
                     <br />
-                    24 hours has passed and the Doctor has yet to respond to your case.
+                    24+ hours have passed and the Doctor has yet to respond to your case.
                     <br />You can close the case and withdraw your deposit:
 
                     <div className="button-set__btn-clear">

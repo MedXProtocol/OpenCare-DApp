@@ -49,7 +49,7 @@ contract Case is Ownable, Initializable {
   }
 
   event CaseCreated(address indexed _patient);
-  event CaseClosed(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, address _challengingDoctor);
+  event CaseFinalized(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, address _challengingDoctor);
 
   /**
    * @dev - throws unless is instance of either the first (initial diagnosis)
@@ -156,9 +156,8 @@ contract Case is Ownable, Initializable {
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
   }
 
-  function close() external onlyCasePhaseManagers {
-    status = Case.CaseStatus.Closed;
-    emit CaseClosed(address(this), patient, diagnosingDoctor, challengingDoctor);
+  function finalize() external onlyCasePhaseManagers {
+    emit CaseFinalized(address(this), patient, diagnosingDoctor, challengingDoctor);
   }
 
   function transferCaseFeeToDiagnosingDoctor() external onlyCasePhaseManagers {

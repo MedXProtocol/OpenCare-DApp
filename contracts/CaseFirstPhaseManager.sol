@@ -14,7 +14,7 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
   Registry registry;
 
   event DiagnosingDoctorSet(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, bytes doctorEncryptedKey);
-  event ClearDiagnosingDoctor(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor);
+  event DiagnosingDoctorCleared(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor);
   event PatientWithdrewFunds(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor);
   event InitialDiagnosisReceived(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor);
   event PatientAcceptedDiagnosis(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor);
@@ -67,10 +67,7 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
 
     registry.caseStatusManager().removeOpenCase(diagnosingDoctor, _case);
 
-    _case.setDiagnosingDoctor(0x0);
-    _case.setStatus(Case.CaseStatus.Open);
-
-    emit ClearDiagnosingDoctor(_case, patient, diagnosingDoctor);
+    emit DiagnosingDoctorCleared(_case, patient, diagnosingDoctor);
   }
 
   /**
@@ -95,6 +92,8 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
   function accept(Case _case) internal {
     _case.transferCaseFeeToDiagnosingDoctor();
 
+    registry.caseStatusManager().addClosedCase(_case.diagnosingDoctor(), _case);
+
     finalize(_case);
   }
 
@@ -106,10 +105,11 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
     registry.caseScheduleManager().touchUpdatedAt(address(_case));
 
     registry.caseStatusManager().removeOpenCase(diagnosingDoctor, _case);
-    registry.caseStatusManager().addClosedCase(diagnosingDoctor, _case);
 
     emit InitialCaseClosed(_case, _case.patient(), diagnosingDoctor);
-    _case.close();
+
+    _case.setStatus(Case.CaseStatus.Closed);
+    _case.finalize();
   }
 
   /**
@@ -143,9 +143,9 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
 
     registry.caseScheduleManager().touchUpdatedAt(_caseAddress);
 
-    finalize(_case);
-
     emit PatientWithdrewFunds(_case, _case.patient(), _case.diagnosingDoctor());
+
+    finalize(_case);
   }
 
   /**
@@ -161,13 +161,7 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
 
     clearDiagnosingDoctor(_case);
 
-    _case.setDiagnosingDoctor(_doctor);
-    _case.setStatus(Case.CaseStatus.Evaluating);
-    _case.setDoctorEncryptedCaseKeys(_doctor, _doctorEncryptedKey);
-
-    registry.caseStatusManager().addOpenCase(_doctor, _case);
-
-    emit DiagnosingDoctorSet(_case, _case.patient(), _doctor, _doctorEncryptedKey);
+    setDiagnosingDoctor(_case, _doctor, _doctorEncryptedKey);
   }
 
 }

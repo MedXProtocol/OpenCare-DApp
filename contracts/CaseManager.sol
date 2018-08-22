@@ -202,9 +202,9 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
     uint256 caseIndex = caseList.push(newCase) - 1;
     caseIndices[newCase] = caseIndex;
+    patientCases[_patient].push(address(newCase));
+    doctorCases[_doctor].push(address(newCase)); // needs address() ?
 
-    patientCases[_patient].push(newCase);
-    doctorCases[_doctor].push(newCase);
     medXToken.transferFrom(_patient, newCase, createCaseCost());
 
     caseLifecycleManager().setDiagnosingDoctor(newCase, _doctor, _doctorEncryptedKey);
@@ -214,17 +214,17 @@ contract CaseManager is Ownable, Pausable, Initializable {
     emit NewCase(newCase, caseIndex);
   }
 
-  function addChallengeDoctor(address _doctor) external onlyCasePhaseManagers {
-    doctorCases[_doctor].push(msg.sender);
+  function addChallengeDoctor(address _doctor, address _caseAddress) external onlyCasePhaseManagers {
+    doctorCases[_doctor].push(_caseAddress);
   }
 
   function doctorCasesCount(address _doctor) external view returns (uint256) {
     return doctorCases[_doctor].length;
   }
 
-  function doctorCaseAtIndex(address _doctor, uint256 _doctorAuthIndex) external view returns (address) {
-    if (_doctorAuthIndex < doctorCases[_doctor].length) {
-      return doctorCases[_doctor][_doctorAuthIndex];
+  function doctorCaseAtIndex(address _doctor, uint256 _caseIndex) external view returns (address) {
+    if (_caseIndex < doctorCases[_doctor].length) {
+      return doctorCases[_doctor][_caseIndex];
     } else {
       return 0;
     }

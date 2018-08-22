@@ -96,13 +96,16 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
     }
 
     render () {
-      if (!this.props.updatedAt || !caseStale(secondsInADay * 2, this.props.updatedAt, this.props.status)) {
+      const isPatient = false
+      if (
+        !this.props.updatedAt
+        || !caseStale(secondsInADay * 2, this.props.updatedAt, this.props.status, isPatient)) {
         return null
       } else {
         return (
           <div className="alert alert-warning text-center">
             <br />
-            24 hours has passed and the patient has yet to respond to your diagnosis.
+            48+ hours have passed and the patient has yet to respond to your diagnosis.
             <br />You can close the case on their behalf to earn your MEDX:
             <br />
             <Button

@@ -2,7 +2,8 @@
 //   (eg. 86400 seconds will evaluate to true 1 day after the compareTime)
 // compareTime would typically be a record's createdAt or updatedAt unix timestamp (UTC)
 // status is CaseStatus (Open, Closed, Evaluated, etc)
-export function caseStale(secondsElapsed, compareTime, status) {
+// isPatient is true if this is the patient context, false if from the doctor's point of view
+export function caseStale(secondsElapsed, compareTime, status, isPatient) {
   if (!compareTime || !status) {
     return false
   } else {
@@ -12,6 +13,6 @@ export function caseStale(secondsElapsed, compareTime, status) {
       (Math.floor(Date.now() / 1000) - compareTime) > secondsElapsed
     )
 
-    return enoughTimeHasPassed && (waitingOnDoctor || waitingOnPatient)
+    return enoughTimeHasPassed && ((isPatient && waitingOnDoctor) || (!isPatient && waitingOnPatient))
   }
 }

@@ -95,7 +95,7 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   // Patient after 1 day
   const secondsElapsed = (context === 'patient') ? secondsInADay : (secondsInADay * 2)
 
-  if (caseStale(secondsElapsed, caseRowObject.updatedAt, caseRowObject.status)) {
+  if (caseStale(secondsElapsed, caseRowObject.updatedAt, caseRowObject.status, (context === 'patient'))) {
     caseRowObject['statusLabel'] = 'Requires Attention'
     caseRowObject['statusClass'] = 'warning'
   }
