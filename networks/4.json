@@ -216,6 +216,10 @@
     {
       "contractName": "CaseManager",
       "address": "0xa3b15940aa9bab9227f87a1535fefa4f544ee9dd"
+    },
+    {
+      "contractName": "WETH9",
+      "address": "0xc778417e063141139fce010982780140aa0cd5ab"
     }
   ]
 }
