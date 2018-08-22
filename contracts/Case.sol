@@ -128,29 +128,19 @@ contract Case is Ownable, Initializable {
     challengingDoctor = _doctorAddress;
   }
 
-  function setStatus(CaseStatus _status) external {
-    require(isCasePhaseManager(), 'Must be an instance of either the Case First or Second Phase Manager contracts');
-
+  function setStatus(CaseStatus _status) external onlyCasePhaseManagers {
     status = _status;
   }
 
-  function setDiagnosisHash(bytes _diagnosisHash)
-    external
-    onlyCaseFirstPhaseManager
-  {
+  function setDiagnosisHash(bytes _diagnosisHash) external onlyCaseFirstPhaseManager {
     diagnosisHash = _diagnosisHash;
   }
 
-  function setChallengeHash(bytes _secondaryDiagnosisHash)
-    external
-    onlyCaseSecondPhaseManager
-  {
+  function setChallengeHash(bytes _secondaryDiagnosisHash) external onlyCaseSecondPhaseManager {
     challengeHash = _secondaryDiagnosisHash;
   }
 
-  function setDoctorEncryptedCaseKeys(address _doctor, bytes _doctorEncryptedKey) external {
-    require(isCasePhaseManager(), 'Must be an instance of either the Case First or Second Phase Manager contracts');
-
+  function setDoctorEncryptedCaseKeys(address _doctor, bytes _doctorEncryptedKey) external onlyCasePhaseManagers {
     doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
   }
 

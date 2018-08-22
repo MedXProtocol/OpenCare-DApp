@@ -83,6 +83,8 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
     external
     onlyCaseLifecycleManager
   {
+    CaseStatusManager caseStatusManager = registry.caseStatusManager();
+
     _case.setChallengeHash(_secondaryDiagnosisHash);
 
     if (_accept)
@@ -90,14 +92,10 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
     else
       rejectChallengedDiagnosis(_case);
 
-    finalize(_case);
-  }
-
-  function finalize(Case _case) internal {
-    registry.caseStatusManager().removeOpenCase(_case.challengingDoctor(), _case);
-    registry.caseStatusManager().addClosedCase(_case.challengingDoctor(), _case);
-    registry.caseStatusManager().removeOpenCase(_case.diagnosingDoctor(), _case);
-    registry.caseStatusManager().addClosedCase(_case.diagnosingDoctor(), _case);
+    caseStatusManager.removeOpenCase(_case.challengingDoctor(), _case);
+    caseStatusManager.addClosedCase(_case.challengingDoctor(), _case);
+    caseStatusManager.removeOpenCase(_case.diagnosingDoctor(), _case);
+    caseStatusManager.addClosedCase(_case.diagnosingDoctor(), _case);
 
     registry.caseScheduleManager().touchUpdatedAt(address(_case));
 
