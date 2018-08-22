@@ -15,7 +15,7 @@ exports.handler = function (event, context, callback) {
   }
 
   try {
-    let ethAddress, name
+    let ethAddress, name, publicKey
 
     if (event.queryStringParameters !== null && event.queryStringParameters !== undefined) {
       if (event.queryStringParameters.ethAddress !== undefined &&
@@ -28,6 +28,11 @@ exports.handler = function (event, context, callback) {
         event.queryStringParameters.name !== "") {
         name = event.queryStringParameters.name;
       }
+      if (event.queryStringParameters.publicKey !== undefined &&
+        event.queryStringParameters.publicKey !== null &&
+        event.queryStringParameters.publicKey !== "") {
+        publicKey = event.queryStringParameters.publicKey;
+      }
     }
 
     console.log('Upgrading ' + ethAddress + 'to be a doctor named ' + name)
@@ -36,8 +41,10 @@ exports.handler = function (event, context, callback) {
       callback(`ethAddress is not a valid address: ${ethAddress}`)
     } else if (!name) {
       callback(`name is not valid, please enter a name`)
+    } else if (!publicKey) {
+      callback(`you must pass a publicKey`)
     } else {
-      hippo.addOrReactivateDoctor(ethAddress, name)
+      hippo.addOrReactivateDoctor(ethAddress, name, publicKey)
         .then((transactionHash) => {
           console.log('Successfully sent transaction with hash: ', transactionHash)
           callback(null, {

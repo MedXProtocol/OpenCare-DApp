@@ -8,6 +8,8 @@ contract AccountManager {
   Registry public registry;
   address owner;
 
+  event PublicKeySet(address indexed user, bytes publicKey);
+
   function setRegistry(Registry _registry) external {
     require(registry == address(0));
     owner = msg.sender;
@@ -17,8 +19,10 @@ contract AccountManager {
   function setPublicKey(address _address, bytes _publicKey) external {
     bool isSender = msg.sender == _address;
     bool isCaseManager = msg.sender == caseManager();
-    require(isSender || isCaseManager);
+    bool isOwner = msg.sender == owner;
+    require(isSender || isCaseManager || isOwner);
     publicKeys[_address] = _publicKey;
+    emit PublicKeySet(_address, _publicKey);
   }
 
   function caseManager() internal returns (address) {
