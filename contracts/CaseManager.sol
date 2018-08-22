@@ -5,6 +5,7 @@ import "./IRegistry.sol";
 import "./IAccountManager.sol";
 import "./Delegate.sol";
 import "./Initializable.sol";
+import "./IEtherPriceFeed.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
@@ -12,7 +13,7 @@ import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 contract CaseManager is Ownable, Pausable, Initializable {
     using SafeMath for uint256;
 
-    uint256 public caseFee;
+    uint256 public caseFeeUsd;
 
     address[] public caseList;
     mapping (address => uint256) public caseIndices;
@@ -49,7 +50,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
         setInitialized();
 
         owner = msg.sender;
-        caseFee = _baseCaseFee;
+        caseFeeUsd = _baseCaseFee;
         registry = IRegistry(_registry);
         caseList.push(address(0));
     }
@@ -66,7 +67,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
      */
     function setBaseCaseFee(uint256 _newCaseFee) public onlyOwner {
         require(_newCaseFee > 0);
-        caseFee = _newCaseFee;
+        caseFeeUsd = _newCaseFee;
     }
 
     /**
@@ -130,7 +131,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
       bytes _doctorEncryptedKey
     ) internal {
       Case newCase = Case(new Delegate(registry, keccak256("Case")));
-      newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, registry);
+      newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFeeWei(), registry);
       uint256 caseIndex = caseList.push(address(newCase)) - 1;
       caseIndices[address(newCase)] = caseIndex;
       patientCases[_patient].push(address(newCase));
@@ -138,6 +139,22 @@ contract CaseManager is Ownable, Pausable, Initializable {
       newCase.setDiagnosingDoctor(_doctor, _doctorEncryptedKey);
       newCase.deposit.value(msg.value)();
       emit NewCase(newCase, caseIndex);
+    }
+
+    function createCaseCostWei (uint256 _caseFeeUsd) public view returns (uint256) {
+      uint256 caseFee = calculateCaseFeeWei(_caseFeeUsd);
+      return caseFee.add(caseFee.mul(50).div(100));
+    }
+
+    function caseFeeWei() public view returns (uint256) {
+      return calculateCaseFeeWei(caseFeeUsd);
+    }
+
+    function calculateCaseFeeWei(uint256 _caseFeeUsd) public view returns (uint256) {
+      IEtherPriceFeed etherPriceFeed = IEtherPriceFeed(registry.lookup(keccak256('EtherPriceFeed')));
+      uint256 usdPerEth = uint256(etherPriceFeed.read());
+      uint256 usdPerWei = usdPerEth.div(1000000000000000000);
+      return _caseFeeUsd.div(usdPerWei);
     }
 
     function addChallengeDoctor(address _doctor) external onlyIsCase(msg.sender) {

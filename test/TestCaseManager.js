@@ -49,6 +49,20 @@ contract('CaseManager', function (accounts) {
     })
   })
 
+  describe('calculateCaseFeeWei(uint256)', () => {
+    it('should dynamically calculate the case fee', async () => {
+      assert.equal((web3.toDecimal(await env.etherPriceFeed.read())), web3.toWei('300', 'ether'))
+      assert.equal((await env.caseManager.calculateCaseFeeWei(web3.toWei('15', 'ether'))).toString(), web3.toWei('0.05', 'ether').toString())
+    })
+  })
+
+  describe('createCaseCostWei(uint256)', () => {
+    it('should dynamically calculate the case fee', async () => {
+      const totalFeeWei = await env.caseManager.createCaseCostWei(web3.toWei('10', 'ether'))
+      assert.equal(totalFeeWei.toString(), '49999999999999999')
+    })
+  })
+
   describe('createAndAssignCase()', () => {
     it('should work', async () => {
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)

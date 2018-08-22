@@ -13,10 +13,12 @@ contract('Case', function (accounts) {
   let patient = accounts[0]
   let doctorAddress
   let doctorAddress2
-  let caseFee = web3.toWei(10, 'ether')
+  let caseFeeWei
 
   before(async () => {
     env = await createEnvironment(artifacts)
+
+    caseFeeWei = await env.caseManager.caseFeeWei()
 
     await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc')
 
@@ -42,7 +44,7 @@ contract('Case', function (accounts) {
       assert.equal(await caseInstance.diagnosingDoctor.call(), doctorAddress)
       await expectThrow(async () => {
         await caseInstance.initialize(
-          accounts[0], 'alaksefj', 'caseKeySalt', [1, 2], caseFee, env.registry.address
+          accounts[0], 'alaksefj', 'caseKeySalt', [1, 2], caseFeeWei, env.registry.address
         )
       })
     })
@@ -69,7 +71,7 @@ contract('Case', function (accounts) {
         assert.equal(await env.caseStatusManager.closedCaseCount.call(doctorAddress), 1)
         assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
         let doctorBalance = await env.weth9.balanceOf(doctorAddress)
-        assert.equal(doctorBalance, caseFee)
+        assert.equal(doctorBalance.toString(), caseFeeWei.toString())
       })
     })
 
@@ -108,8 +110,8 @@ contract('Case', function (accounts) {
             assert.equal(await env.caseStatusManager.openCaseCount.call(doctorAddress2), 0)
             assert.equal(await env.caseStatusManager.closedCaseCount.call(doctorAddress2), 1)
             assert(await caseInstance.challengeHash.call())
-            assert.equal((await env.weth9.balanceOf(doctorAddress)).toString(), doctorBalance.plus(caseFee).toString())
-            assert.equal((await env.weth9.balanceOf(doctorAddress2)).toString(), doctorBalance2.plus(caseFee / 2).toString())
+            assert.equal((await env.weth9.balanceOf(doctorAddress)).toString(), doctorBalance.plus(caseFeeWei).toString())
+            assert.equal((await env.weth9.balanceOf(doctorAddress2)).toString(), doctorBalance2.plus(caseFeeWei.div(2).floor()).toString())
             assert.equal(result.logs[result.logs.length-1].event, 'CaseClosedConfirmed')
           })
 
@@ -117,8 +119,8 @@ contract('Case', function (accounts) {
             let patientBalance = await env.weth9.balanceOf(patient)
             let doctorBalance2 = await env.weth9.balanceOf(doctorAddress2)
             let result = await caseInstance.diagnoseChallengedCase('diagnosis hash', false, { from: doctorAddress2 })
-            assert.equal((await env.weth9.balanceOf(patient)).toString(), patientBalance.plus(caseFee).toString())
-            assert.equal((await env.weth9.balanceOf(doctorAddress2)).toString(), doctorBalance2.plus(caseFee / 2).toString())
+            assert.equal((await env.weth9.balanceOf(patient)).toString(), patientBalance.plus(caseFeeWei).toString())
+            assert.equal((await env.weth9.balanceOf(doctorAddress2)).toString(), doctorBalance2.plus(caseFeeWei.div(2).floor()).toString())
             assert.equal(result.logs[result.logs.length-1].event, 'CaseClosedRejected')
           })
         })
