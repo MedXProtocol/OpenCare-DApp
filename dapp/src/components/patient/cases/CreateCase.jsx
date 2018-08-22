@@ -16,6 +16,9 @@ import get from 'lodash.get'
 import { genKey } from '~/services/gen-key'
 import { currentAccount } from '~/services/sign-in'
 import { jicImageCompressor } from '~/services/jicImageCompressor'
+import { computeChallengeFee } from '~/utils/computeChallengeFee'
+import { computeTotalFee } from '~/utils/computeTotalFee'
+import { weiToEther } from '~/utils/weiToEther'
 import {
   contractByName,
   withContractRegistry,
@@ -40,16 +43,13 @@ import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
 import { promisify } from '~/utils/promisify'
-import {
-  TOTAL_WEI,
-  CHALLENGE_FEE_ETHER,
-  TOTAL_ETHER
-} from '~/constants'
 
 function mapStateToProps (state) {
   let medXBeingSent
   const account = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
+  const caseFeeWei = cacheCallValue(state, CaseManager, 'caseFee')
+
   const balance = get(state, 'sagaGenesis.ethBalance.balance')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
@@ -68,6 +68,7 @@ function mapStateToProps (state) {
   return {
     AccountManager,
     account,
+    caseFeeWei,
     transactions: state.sagaGenesis.transactions,
     CaseManager,
     publicKey,
@@ -89,9 +90,10 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ account, AccountManager }) {
-  if (!account || !AccountManager) { return }
+function* saga({ account, AccountManager, CaseManager }) {
+  if (!account || !AccountManager || !CaseManager) { return }
   yield cacheCall(AccountManager, 'publicKeys', account)
+  yield cacheCall(CaseManager, 'caseFee')
 }
 
 const requiredFields = [
@@ -485,7 +487,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
 
     if (this.state.errors.length === 0) {
-      if (TOTAL_WEI.greaterThan(this.props.balance)) {
+      if (computeTotalFee(this.props.caseFeeWei).greaterThan(this.props.balance)) {
         if (this.props.previousCase) {
           this.setState({ showBalanceTooLowModal: true })
         } else if (this.props.medXBeingSent) {
@@ -611,7 +613,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
     let hashHex = hashToHex(hash)
 
-    const value = TOTAL_WEI
+    const value = computeTotalFee(this.props.caseFeeWei)
 
     let result = null
     if (!this.props.publicKey) {
@@ -878,7 +880,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>You need {TOTAL_ETHER.toString()} Ether to submit a case.</h4>
+                <h4>You need {weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()} Ether to submit a case.</h4>
               </div>
             </div>
           </Modal.Body>
@@ -899,7 +901,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                   Are you sure?
                 </h4>
                 <h5>
-                  This will cost you between {CHALLENGE_FEE_ETHER.toString()} - {TOTAL_ETHER.toString()} Ether.
+                  This will cost you between {weiToEther(computeChallengeFee(this.props.caseFeeWei)).toString()} - {weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()} Ether.
                   <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
                 </h5>
               </div>
