@@ -1,5 +1,5 @@
 {
-  "migrationVersion": 1534869525,
+  "migrationVersion": 1534869526,
   "contracts": [
     {
       "contractName": "Migrations",
