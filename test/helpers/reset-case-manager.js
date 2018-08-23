@@ -4,6 +4,7 @@ module.exports = async function (artifacts, env) {
   const Delegate = artifacts.require('Delegate.sol')
   const CaseManager = artifacts.require('CaseManager.sol')
   const CaseStatusManager = artifacts.require('CaseStatusManager.sol')
+  const WETH9 = artifacts.require('WETH9.sol')
 
   let caseManagerDelegate = await Delegate.new(env.registry.address, toRegistryKey('CaseManagerTarget'))
   await env.registry.register(toRegistryKey('CaseManager'), caseManagerDelegate.address)
@@ -15,6 +16,10 @@ module.exports = async function (artifacts, env) {
   let caseStatusManager = await CaseStatusManager.at(caseStatusManagerDelegate.address)
   await caseStatusManager.initialize(env.registry.address)
 
+  let wrappedEther = await WETH9.new()
+  await env.registry.register(toRegistryKey('WrappedEther'), wrappedEther.address)
+
   env.caseManager = caseManager
   env.caseStatusManager = caseStatusManager
+  env.weth9 = wrappedEther
 }

@@ -62,14 +62,14 @@ contract CaseManager is Ownable, Pausable, Initializable {
    * @param _baseCaseFee - initial case fee
    */
   function initialize(uint256 _baseCaseFee, address _registry) external notInitialized {
-      require(_baseCaseFee > 0, '_baseCaseFee is too low');
-      require(_registry != 0x0, 'registry address cannot be blank');
-      setInitialized();
+    require(_baseCaseFee > 0, 'base case fee is lt eq zero');
+    require(_registry != 0x0, 'registry is zero');
+    setInitialized();
 
-      owner = msg.sender;
-      caseFee = _baseCaseFee;
-      registry = Registry(_registry);
-      caseList.push(address(0));
+    owner = msg.sender;
+    caseFee = _baseCaseFee;
+    registry = Registry(_registry);
+    caseList.push(address(0));
   }
 
   /**
@@ -79,8 +79,30 @@ contract CaseManager is Ownable, Pausable, Initializable {
     revert();
   }
 
-  function createCaseCost () internal view returns (uint256) {
+  /**
+   * @dev - sets the base case fee - only affects new cases
+   */
+  function setBaseCaseFee(uint256 _newCaseFee) public onlyOwner {
+    require(_newCaseFee > 0);
+    caseFee = _newCaseFee;
+  }
+
+  function createCaseCost () public view returns (uint256) {
     return caseFee.add(caseFee.mul(50).div(100));
+  }
+
+  /**
+   * @dev - returns the length of the "all" case list
+   */
+  function getAllCaseListCount() public constant returns (uint256) {
+    return caseList.length - 1;
+  }
+
+  /**
+   * @dev - returns the length of the patient specific case list
+   */
+  function getPatientCaseListCount(address _patient) constant public returns (uint256) {
+    return patientCases[_patient].length;
   }
 
   function createAndAssignCaseWithPublicKey(
@@ -144,28 +166,6 @@ contract CaseManager is Ownable, Pausable, Initializable {
     newCase.deposit.value(msg.value)();
 
     emit NewCase(newCase, caseIndex);
-  }
-
-  /**
-   * @dev - sets the base case fee - only affects new cases
-   */
-  function setBaseCaseFee(uint256 _newCaseFee) public onlyOwner {
-      require(_newCaseFee > 0, '_newCaseFee is too low');
-      caseFee = _newCaseFee;
-  }
-
-  /**
-   * @dev - returns the length of the "all" case list
-   */
-  function getAllCaseListCount() public constant returns (uint256) {
-    return caseList.length - 1;
-  }
-
-  /**
-   * @dev - returns the length of the patient specific case list
-   */
-  function getPatientCaseListCount(address _patient) constant public returns (uint256) {
-    return patientCases[_patient].length;
   }
 
   function addChallengeDoctor(address _doctor, address _caseAddress) external onlyCasePhaseManagers {

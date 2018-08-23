@@ -12,7 +12,7 @@ contract('Case', function (accounts) {
 
   let patient = accounts[0]
   let doctor = accounts[1]
-  let caseFee = web3.toWei(10, 'ether')
+  let caseFee
 
   before(async () => {
     env = await createEnvironment(artifacts)
@@ -23,6 +23,8 @@ contract('Case', function (accounts) {
 
   beforeEach(async () => {
     await resetCaseManager(artifacts, env)
+
+    caseFee = await env.caseManager.caseFee()
     caseInstance = await Case.at(await createCase(env, patient, doctor))
 
     const diagnosingDoctor = await caseInstance.diagnosingDoctor.call()
@@ -48,4 +50,5 @@ contract('Case', function (accounts) {
       })
     })
   })
+
 })
