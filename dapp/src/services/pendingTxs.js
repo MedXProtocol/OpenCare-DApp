@@ -7,7 +7,10 @@ const PENDING_TX_STATUS = -1
 export const addPendingTx = function(transaction, objIndex) {
   let caseRowObject
   const { confirmed, error, call } = transaction
-  const isNewPatientCase = (call.method === 'approveAndCall')
+  const isNewPatientCase = (
+       call.method === 'createAndAssignCaseWithPublicKey'
+    || call.method === 'createAndAssignCase'
+  )
 
   // TODO: Find a way to only fade this out after a few seconds
   // A tx we care about
