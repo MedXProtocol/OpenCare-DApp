@@ -19,6 +19,10 @@ export default function* ({ web3 }) {
   yield all([
     lookupAndAddContract(web3, 'WrappedEther'),
     lookupAndAddContract(web3, 'CaseManager'),
+    lookupAndAddContract(web3, 'CaseLifecycleManager'),
+    lookupAndAddContract(web3, 'CaseScheduleManager'),
+    lookupAndAddContract(web3, 'CaseFirstPhaseManager'),
+    lookupAndAddContract(web3, 'CaseSecondPhaseManager'),
     lookupAndAddContract(web3, 'CaseStatusManager'),
     lookupAndAddContract(web3, 'DoctorManager'),
     lookupAndAddContract(web3, 'AccountManager'),

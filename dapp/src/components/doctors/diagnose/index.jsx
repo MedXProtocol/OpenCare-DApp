@@ -54,13 +54,11 @@ function mapStateToProps(state, { match }) {
 function* saga({ match, address, AccountManager }) {
   if (!AccountManager || isEmptyObject(match.params)) { return }
   const caseAddress = match.params.caseAddress
-  // console.log('called by doctors/diagnose.js saga')
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield all([
     cacheCall(AccountManager, 'publicKeys', patientAddress),
     cacheCall(caseAddress, 'status'),
-    cacheCall(caseAddress, 'updatedAt'),
     cacheCall(caseAddress, 'doctorEncryptedCaseKeys', address),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(caseAddress, 'diagnosisHash'),
@@ -114,7 +112,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
       var challenge =
         <div className='col-xs-12'>
           <ChallengedDiagnosis
-            caseAddress={this.props.match.params.caseAddress}
+            caseAddress={caseAddress}
             caseKey={caseKey}
             title='Your Diagnosis'
             challengingDoctorAddress={challengingDoctor}
@@ -176,7 +174,7 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
             {challenge}
             <div id="view-case-details" className='col-xs-12'>
               <CaseDetails
-                caseAddress={this.props.match.params.caseAddress}
+                caseAddress={caseAddress}
                 caseKey={caseKey}
                 caseIsOpenForDoctor={caseIsOpenForDoctor}
                 isDoctor={true} />

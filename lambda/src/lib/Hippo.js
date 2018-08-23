@@ -62,8 +62,6 @@ export class Hippo {
     }
 
     for (let i = 0; i < 20; i++) {
-      console.log('running sendTransaction')
-
       try {
         return await this._eth.sendRawTransaction(sign(tx, this._account.privateKey))
       } catch (error) {

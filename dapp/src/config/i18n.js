@@ -12,7 +12,8 @@ i18next
         translation: {
           transactions: {
             acceptDiagnosis: 'Accepting Diagnosis',
-            acceptAsDoctorAfterADay: 'Accepting Diagnosis',
+            acceptAsDoctor: 'Accepting Diagnosis',
+            addDoctor: 'Upgrading to Doctor',
             addOrReactivateDoctor: 'Adding / Reactivating Doctor',
             deactivateDoctor: 'Deactivating Doctor',
             createAndAssignCaseWithPublicKey: 'Sending Case Info',
@@ -23,10 +24,12 @@ i18next
             diagnoseChallengedCase: 'Sending Diagnosis', // don't let the 2nd doctor know it's a second opinion
             publicKeys: 'Retrieving Account',
             mint: 'Mint {{mintMedxCount}} MEDT (Test MEDX)',
+            patientWithdrawFunds: 'Withdrawing Funds',
+            patientRequestNewInitialDoctor: 'Requesting New Doctor',
+            patientRequestNewChallengeDoctor: 'Requesting New Doctor',
             setPublicKey: 'Registering Account',
             sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',
-            addDoctor: 'Upgrading to Doctor',
             withdraw: 'Withdrawing W-ETH'
           },
           transactionErrors: {

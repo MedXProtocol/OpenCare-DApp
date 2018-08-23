@@ -86,7 +86,6 @@ const ChallengedDiagnosis = connect(mapStateToProps)(
             const diagnosis = JSON.parse(diagnosisJson)
             return resolve({ diagnosis })
           } else {
-            console.log(diagnosisJson)
             return reject('There was an error')
           }
         })
@@ -103,7 +102,7 @@ const ChallengedDiagnosis = connect(mapStateToProps)(
           })
         })
         .catch((reason) => {
-          console.log('isCanceled', reason.isCanceled)
+          // console.log('isCanceled', reason.isCanceled)
         })
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')

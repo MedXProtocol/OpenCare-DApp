@@ -8,9 +8,11 @@ import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
 import { Loading } from '~/components/Loading'
 import {
+  contractByName,
   withSaga,
   cacheCall,
   cacheCallValue,
+  cacheCallValueInt,
   withSend,
   addContract,
   TransactionStateHandler
@@ -32,27 +34,31 @@ import { mixpanel } from '~/mixpanel'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
-import isEqual from 'lodash.isequal'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
-  const account = state.sagaGenesis.accounts[0]
-  const status = cacheCallValue(state, caseAddress, 'status')
+  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
+
+  const address = state.sagaGenesis.accounts[0]
+  const status = cacheCallValueInt(state, caseAddress, 'status')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
+  const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
   const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
   const transactions = state.sagaGenesis.transactions
-  const isPatient = account === patientAddress
+  const isPatient = address === patientAddress
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
   return {
-    account,
+    CaseLifecycleManager,
+    address,
     currentlyExcludedDoctors,
+    challengingDoctor,
     status,
     caseFeeWei,
     diagnosisHash,
@@ -77,7 +83,8 @@ function* saga({ caseAddress, networkId }) {
     cacheCall(caseAddress, 'encryptedCaseKey'),
     cacheCall(caseAddress, 'caseKeySalt'),
     cacheCall(caseAddress, 'caseFee'),
-    cacheCall(caseAddress, 'diagnosingDoctor')
+    cacheCall(caseAddress, 'diagnosingDoctor'),
+    cacheCall(caseAddress, 'challengingDoctor')
   ])
 }
 
@@ -141,7 +148,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
             const diagnosis = JSON.parse(diagnosisJson)
             return resolve({ diagnosis })
           } else {
-            console.log(diagnosisJson)
             return reject('There was an error')
           }
         })
@@ -158,7 +164,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
           })
         })
         .catch((reason) => {
-          console.log('isCanceled', reason.isCanceled)
+          // console.log('isCanceled', reason.isCanceled)
         })
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')
@@ -167,12 +173,20 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   setExcludedDoctorAddresses = (props) => {
-    if (props.diagnosingDoctor && props.currentlyExcludedDoctors) {
-      const excludeAddresses = [props.diagnosingDoctor, props.account]
+    if (!props.address || !props.status || !props.currentlyExcludedDoctors) { return }
 
-      if (!isEqual(excludeAddresses, props.currentlyExcludedDoctors)) {
-        props.dispatchExcludedDoctors(excludeAddresses)
-      }
+    let excludeAddresses = []
+
+    if ((props.status === 3) && props.diagnosingDoctor) {
+      excludeAddresses = [props.address, props.diagnosingDoctor]
+    }
+
+    if ((props.status === 6) && props.diagnosingDoctor && props.challengingDoctor) {
+      excludeAddresses = [props.address, props.diagnosingDoctor, props.challengingDoctor]
+    }
+
+    if (props.currentlyExcludedDoctors.length < excludeAddresses.length) {
+      props.dispatchExcludedDoctors(excludeAddresses)
     }
   }
 
@@ -222,7 +236,11 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   handleAcceptDiagnosis = () => {
-    const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptDiagnosis')()
+    const acceptTransactionId = this.props.send(
+      this.props.CaseLifecycleManager,
+      'acceptDiagnosis',
+      this.props.caseAddress
+    )()
     this.setState({
       acceptTransactionId,
       acceptHandler: new TransactionStateHandler(),
@@ -259,9 +277,13 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         doctorPublicKey,
         caseKeySalt
       })
-      const challengeTransactionId = this.props.send(this.props.caseAddress, 'challengeWithDoctor',
+      const challengeTransactionId = this.props.send(
+        this.props.CaseLifecycleManager,
+        'challengeWithDoctor',
+        this.props.caseAddress,
         this.state.selectedDoctor.value,
-        '0x' + doctorEncryptedCaseKey)()
+        '0x' + doctorEncryptedCaseKey
+      )()
 
       this.setState({
         showChallengeModal: false,
@@ -274,7 +296,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
   render() {
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
-    const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== '3'
+    const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== 3
     const challengeFeeEther = weiToEther(computeChallengeFee(this.props.caseFeeWei)).toString()
     const totalFeeEther = weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()
 
@@ -338,7 +360,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                         <div>
                           <label className='control-label'>Select Another Doctor</label>
                           <DoctorSelect
-                            excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
+                            excludeAddresses={[this.props.diagnosingDoctor, this.props.address]}
                             value={this.state.selectedDoctor}
                             isClearable={false}
                             onChange={this.onChangeDoctor} />
@@ -350,9 +372,9 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                         </div>
                         :
                         <AvailableDoctorSelect
-                          excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
                           value={this.state.selectedDoctor}
-                          onChange={this.onChangeDoctor} />
+                          onChange={this.onChangeDoctor}
+                        />
                        }
                     </div>
                   </div>

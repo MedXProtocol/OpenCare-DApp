@@ -3,25 +3,35 @@ import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import CaseStatus from './CaseStatus'
 import Diagnosis from '~/components/Diagnosis'
+import { PatientTimeActionsContainer } from '~/components/patient/cases/PatientTimeActions'
 import { CaseDetails } from '~/components/CaseDetails'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { decryptCaseKeyAsync } from '~/services/decrypt-case-key'
 import { currentAccount } from '~/services/sign-in'
-import { withSaga, cacheCallValue, cacheCall, addContract } from '~/saga-genesis'
+import { withSaga,
+  cacheCallValue,
+  cacheCall,
+  addContract,
+  contractByName
+} from '~/saga-genesis'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { match }) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const caseAddress = match.params.caseAddress
+
+  const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
+
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
   const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
 
   return {
+    CaseScheduleManager,
     challengeHash,
     diagnosisHash,
     encryptedCaseKey,
@@ -30,7 +40,7 @@ function mapStateToProps(state, { match }) {
   }
 }
 
-function* saga({ match, networkId }) {
+function* saga({ CaseScheduleManager, match, networkId }) {
   if (!networkId) { return }
 
   const caseAddress = match.params.caseAddress
@@ -71,25 +81,27 @@ export const PatientCaseContainer = connect(mapStateToProps)(
 
       render() {
         const caseKey = this.state.caseKey
+        const caseAddress = this.props.match.params.caseAddress
+        const { diagnosisHash, challengeHash } = this.props
 
         if (caseKey) {
-          if (this.props.diagnosisHash) {
+          if (diagnosisHash) {
             var diagnosis =
               <div className='col-xs-12'>
                 <Diagnosis
                   title='Initial Diagnosis'
-                  caseAddress={this.props.match.params.caseAddress}
+                  caseAddress={caseAddress}
                   caseKey={caseKey}
                 />
               </div>
           }
 
-          if (this.props.challengeHash) {
+          if (challengeHash) {
             var challenge =
               <div className='col-xs-12'>
                 <ChallengedDiagnosis
                   title='Second Diagnosis'
-                  caseAddress={this.props.match.params.caseAddress}
+                  caseAddress={caseAddress}
                   caseKey={caseKey}
                 />
               </div>
@@ -97,7 +109,7 @@ export const PatientCaseContainer = connect(mapStateToProps)(
 
           var caseDetails =
             <CaseDetails
-              caseAddress={this.props.match.params.caseAddress}
+              caseAddress={caseAddress}
               caseKey={caseKey}
             />
         }
@@ -105,14 +117,16 @@ export const PatientCaseContainer = connect(mapStateToProps)(
         return (
           <div>
             <ScrollToTop />
-            <PageTitle renderTitle={(t) => t('pageTitles.patientCase', { caseId: ('' + this.props.match.params.caseAddress).substring(0, 10) + ' ...'})} />
+            <PageTitle renderTitle={(t) => t('pageTitles.patientCase', { caseId: ('' + caseAddress).substring(0, 10) + ' ...'})} />
             <div className='container'>
               <div className="row">
                 {caseKey ? (
                   <div className='col-xs-12'>
-                    <CaseStatus caseAddress={this.props.match.params.caseAddress}/>
+                    <CaseStatus caseAddress={caseAddress}/>
                   </div>
                 ) : null}
+
+                <PatientTimeActionsContainer caseAddress={caseAddress} />
 
                 {diagnosis}
                 {challenge}

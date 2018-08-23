@@ -1,4 +1,4 @@
-export function patientCaseStatusToName(status) {
+export function patientCaseStatusToName(caseRowObject) {
   var statuses = {
     0: 'None',
     1: 'Open',
@@ -10,10 +10,10 @@ export function patientCaseStatusToName(status) {
     7: 'Diagnosis Received',
     8: 'Diagnosis Confirmed'
   }
-  return statuses[status]
+  return statuses[caseRowObject.status]
 }
 
-export function patientCaseStatusToClass(status) {
+export function patientCaseStatusToClass(caseRowObject) {
   var statuses = {
     0: 'default',
     1: 'info',
@@ -25,5 +25,5 @@ export function patientCaseStatusToClass(status) {
     7: 'success',
     8: 'success'
   }
-  return statuses[status]
+  return statuses[caseRowObject.status]
 }

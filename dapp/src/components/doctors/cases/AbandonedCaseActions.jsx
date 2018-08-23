@@ -5,33 +5,41 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
 import {
+  contractByName,
   cacheCall,
   cacheCallValueInt,
   withSaga,
   withSend,
   TransactionStateHandler
 } from '~/saga-genesis'
-import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
+import { caseStale } from '~/services/caseStale'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
+import { secondsInADay } from '~/config/constants'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
+  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
+  const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
+
   const transactions = state.sagaGenesis.transactions
   const status = cacheCallValueInt(state, caseAddress, 'status')
-  const updatedAt = cacheCallValueInt(state, caseAddress, 'updatedAt')
+  const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
 
   return {
+    CaseLifecycleManager,
     transactions,
     status,
     updatedAt
   }
 }
 
-function* saga({ caseAddress }) {
+function* saga({ CaseScheduleManager, caseAddress }) {
+  if (!CaseScheduleManager || !caseAddress) { return }
+
   yield all([
     cacheCall(caseAddress, 'status'),
-    cacheCall(caseAddress, 'updatedAt')
+    cacheCall(CaseScheduleManager, 'updatedAt', caseAddress)
   ])
 }
 
@@ -57,7 +65,11 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
     }
 
     handleForceAcceptDiagnosis = () => {
-      const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptAsDoctorAfterADay')()
+      const acceptTransactionId = this.props.send(
+        this.props.CaseLifecycleManager,
+        'acceptAsDoctor',
+        this.props.caseAddress
+      )()
       this.setState({
         acceptTransactionId,
         forceAcceptDiagnosisHandler: new TransactionStateHandler(),
@@ -77,20 +89,23 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
           })
           .onTxHash(() => {
             toastr.success('Your accept diagnosis transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your MEDX.')
-            mixpanel.track('Doctor Force Accepting After 24 Hours')
+            mixpanel.track('Doctor Force Accepting After 48+ Hours')
             this.props.history.push(routes.DOCTORS_CASES_OPEN)
           })
       }
     }
 
     render () {
-      if (!this.props.updatedAt || !caseStaleForOneDay(this.props.updatedAt, this.props.status)) {
+      const isPatient = false
+      if (
+        !this.props.updatedAt
+        || !caseStale(secondsInADay * 2, this.props.updatedAt, this.props.status, isPatient)) {
         return null
       } else {
         return (
           <div className="alert alert-warning text-center">
             <br />
-            24 hours has passed and the patient has yet to respond to your diagnosis.
+            48+ hours have passed and the patient has yet to respond to your diagnosis.
             <br />You can close the case on their behalf to earn your MEDX:
             <br />
             <Button

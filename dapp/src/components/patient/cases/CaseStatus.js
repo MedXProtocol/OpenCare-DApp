@@ -89,7 +89,7 @@ const CaseStatus = connect(mapStateToProps)(
         case 4:
           alert =
             <div className="alert alert-success">
-              Your case has been successfully diagnosed and closed.
+              This case is closed.
             </div>
           break
         case 5:

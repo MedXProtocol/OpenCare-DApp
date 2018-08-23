@@ -4,6 +4,7 @@ import { bugsnagClient } from '~/bugsnagClient'
 
 function logError({ transactionId, error }) {
   const errorCode = transactionErrorToCode(error)
+
   if (errorCode !== 'userRevert') {
     bugsnagClient.notify({
       transactionId,

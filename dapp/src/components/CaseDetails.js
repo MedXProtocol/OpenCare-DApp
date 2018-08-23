@@ -10,9 +10,11 @@ import { cancelablePromise } from '~/utils/cancelablePromise'
 import { downloadJson, downloadImage } from '../utils/storage-util'
 import { all } from 'redux-saga/effects'
 import {
+  contractByName,
   withContractRegistry,
   withSaga,
   cacheCallValue,
+  cacheCallValueInt,
   cacheCall,
   addContract
 } from '~/saga-genesis'
@@ -21,25 +23,32 @@ import { toastr } from '~/toastr'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress }) {
+  if (caseAddress === undefined) { return {} }
+
   const networkId = get(state, 'sagaGenesis.network.networkId')
+  const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
   const caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
-  const createdAt = cacheCallValue(state, caseAddress, 'createdAt')
+  const createdAt = cacheCallValueInt(state, CaseScheduleManager, 'createdAt', caseAddress)
+  const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
 
   return {
     caseDetailsHash: getFileHashFromBytes(caseDataHash),
-    createdAt: createdAt,
+    createdAt,
+    updatedAt,
+    CaseScheduleManager,
     networkId
   }
 }
 
-function* saga({ caseAddress, networkId }) {
-  if (!networkId || !caseAddress) { return }
+function* saga({ CaseScheduleManager, caseAddress, networkId }) {
+  if (!networkId || !CaseScheduleManager || !caseAddress) { return }
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
-    cacheCall(caseAddress, 'caseDataHash'),
-    cacheCall(caseAddress, 'createdAt')
+    yield cacheCall(caseAddress, 'caseDataHash'),
+    yield cacheCall(CaseScheduleManager, 'createdAt', caseAddress),
+    yield cacheCall(CaseScheduleManager, 'updatedAt', caseAddress)
   ])
 }
 
@@ -97,8 +106,6 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
               secondImageUrl
             })
           } else {
-            console.log('rejecting')
-            console.log(detailsJson)
             return reject('There was an error')
           }
         })
@@ -157,7 +164,7 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
   }
 
   render() {
-    const { caseKey, caseAddress, caseIsOpenForDoctor } = this.props
+    const { createdAt, updatedAt, caseKey, caseAddress, caseIsOpenForDoctor } = this.props
     const details = this.state.details || {}
     let jsx
 
@@ -382,9 +389,11 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
             <div className="row">
               <div className="col-xs-12">
                 <p className="text-gray small text-center">
-                  <strong>Case Address:</strong> {this.props.caseAddress}
+                  <strong>Case Address:</strong> {caseAddress}
                   <br />
-                  <HippoTimestamp timeInUtcSecondsSinceEpoch={this.props.createdAt} />
+                  <strong>Created:</strong> <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
+                  <br />
+                  <strong>Last Updated:</strong> <HippoTimestamp timeInUtcSecondsSinceEpoch={updatedAt} />
                 </p>
               </div>
             </div>

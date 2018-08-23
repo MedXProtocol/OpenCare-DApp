@@ -45,7 +45,6 @@ import FlipMove from 'react-flip-move'
 import { promisify } from '~/utils/promisify'
 
 function mapStateToProps (state) {
-  let medXBeingSent
   const account = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
 
@@ -57,14 +56,6 @@ function mapStateToProps (state) {
   const previousCase = (caseListCount > 0)
   const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
 
-  const externalTransactions = get(state, 'externalTransactions.transactions')
-  for (let i = 0; i < externalTransactions.length; i++) {
-    const { inFlight, txType } = externalTransactions[i]
-    if (txType === 'sendMedX' && inFlight) {
-      medXBeingSent = true
-    }
-  }
-
   return {
     AccountManager,
     account,
@@ -74,8 +65,7 @@ function mapStateToProps (state) {
     publicKey,
     balance,
     noDoctorsAvailable,
-    previousCase,
-    medXBeingSent
+    previousCase
   }
 }
 
@@ -162,9 +152,21 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     this.setRegionRef = element => { this.regionInput = element }
   }
 
-  componentWillReceiveProps (props) {
+  componentDidMount() {
+    // This ensures we attempt to randomly find a different doctor for the next
+    // case this patient may submit
+    this.props.dispatchExcludedDoctors([ this.props.account ])
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (this.props.account !== nextProps.account) {
+      // This ensures we attempt to randomly find a different doctor if the current eth address
+      // was undefined on mount or changes mid-session
+      this.props.dispatchExcludedDoctors([ nextProps.account ])
+    }
+
     if (this.state.createCaseEvents) {
-      this.state.createCaseEvents.handle(props.transactions[this.state.transactionId])
+      this.state.createCaseEvents.handle(nextProps.transactions[this.state.transactionId])
         .onError((error) => {
           toastr.transactionError(error)
           this.setState({
@@ -181,7 +183,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
           // This ensures we attempt to randomly find a different doctor for the next
           // case this patient may submit
-          this.props.dispatchExcludedDoctors([this.props.account])
+          // this.props.dispatchExcludedDoctors([ this.props.account ])
         })
     }
   }
@@ -486,12 +488,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       toastr.warning('There are no Doctors currently available. Please try again later.')
     }
 
+
     if (this.state.errors.length === 0) {
       if (computeTotalFee(this.props.caseFeeWei).greaterThan(this.props.balance)) {
         if (this.props.previousCase) {
           this.setState({ showBalanceTooLowModal: true })
-        } else if (this.props.medXBeingSent) {
-          toastr.warning('Your Ether is on the way. Please wait for the transaction to finish prior to submitting your case.')
         } else {
           this.props.showBetaFaucetModal()
         }
@@ -829,9 +830,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                           </div>
                           :
                           <AvailableDoctorSelect
-                            excludeAddresses={[this.props.account]}
                             value={this.state.selectedDoctor}
-                            onChange={this.onChangeDoctor} />
+                            onChange={this.onChangeDoctor}
+                          />
                          }
 
                         {errors['selectedDoctor']}
@@ -843,7 +844,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                   <button
                     type="submit"
                     className="btn btn-lg btn-success"
-                    data-tip={this.props.medXBeingSent ? "Your MedX transaction needs to complete, please wait ..." : ""}
                   >
                     Submit Case
                   </button>
