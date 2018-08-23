@@ -70,10 +70,18 @@ export function* latestBlock({ block }) {
   // contract in the block's transaction's log's topics which we care about
   if (addressSetAsArray.length > 0) {
     const caseScheduleManagerAddress = yield select(contractByName, 'CaseScheduleManager')
+    let contractKey = yield select(contractKeyByAddress, caseScheduleManagerAddress)
+    if (contractKey) {
+      console.log('contractKey for address: ', contractKey, caseScheduleManagerAddress)
+    }
     console.log('invalidating: ' + caseScheduleManagerAddress)
     yield fork(put, { type: 'CACHE_INVALIDATE_ADDRESS', caseScheduleManagerAddress })
 
     const caseManagerAddress = yield select(contractByName, 'CaseManager')
+    contractKey = yield select(contractKeyByAddress, caseManagerAddress)
+    if (contractKey) {
+      console.log('contractKey for address: ', contractKey, caseManagerAddress)
+    }
     console.log('invalidating: ' + caseManagerAddress)
     yield fork(put, { type: 'CACHE_INVALIDATE_ADDRESS', caseManagerAddress })
   }

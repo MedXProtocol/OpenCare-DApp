@@ -59,7 +59,7 @@ function* addAddressIfExists(addressSet, address) {
   address = address.toLowerCase()
   const contractKey = yield select(contractKeyByAddress, address)
   if (contractKey) {
-    // console.log('contractKey for address: ', contractKey, address)
+    console.log('contractKey for address: ', contractKey, address)
     addressSet.add(address)
     return true
   }
@@ -93,6 +93,13 @@ export function* collectAllTransactionAddresses(transactions) {
 export function* latestBlock({block}) {
   const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
   yield* Array.from(addressSet).map(function* (address) {
+
+    let contractKey = yield select(contractKeyByAddress, address)
+    if (contractKey) {
+      console.log('contractKey for address: ', contractKey, address)
+    }
+    console.log('invalidating: ' + address)
+
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   })
 }
