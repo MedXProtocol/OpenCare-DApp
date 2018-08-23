@@ -124,7 +124,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         let step
         const needEth = (
           !props.hasBeenSentEther
-          && weiToEther(props.ethBalance) < 0.7
+          && weiToEther(props.ethBalance) < 0.1
           && !props.dontShowEther
         )
 
