@@ -73,14 +73,12 @@ contract CaseLifecycleManager is Ownable, Initializable {
   }
 
   /**
-   * @dev - either Case strategy manager
+   * @dev - Throws if not instance of CaseManager
    */
-  modifier onlyCaseManagerOrPatient(address _caseAddress) {
+  modifier onlyCaseManager(address _caseAddress) {
     Case _case = Case(_caseAddress);
-    require(
-         (msg.sender == _case.patient())
-      || (msg.sender == address(registry.caseManager()))//,
-      //'must be one of the Case Schedule Manager or Case Manager contracts'
+    require(msg.sender == address(registry.caseManager())//,
+      //'must be the Case Manager contract'
     );
     _;
   }
@@ -132,7 +130,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
   function setDiagnosingDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
     public
     isCase(_caseAddress)
-    onlyCaseManagerOrPatient(_caseAddress)
+    onlyCaseManager(_caseAddress)
     isDoctor(_doctor)
   {
     Case _case = Case(_caseAddress);
