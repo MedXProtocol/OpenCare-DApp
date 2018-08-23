@@ -49,10 +49,10 @@ contract('CaseManager', function (accounts) {
     })
   })
 
-  describe('calculateCaseFeeWei(uint256)', () => {
+  describe('usdToWei(uint256)', () => {
     it('should dynamically calculate the case fee', async () => {
       assert.equal((web3.toDecimal(await env.etherPriceFeed.read())), web3.toWei('300', 'ether'))
-      assert.equal((await env.caseManager.calculateCaseFeeWei(web3.toWei('15', 'ether'))).toString(), web3.toWei('0.05', 'ether').toString())
+      assert.equal((await env.caseManager.usdToWei(web3.toWei('15', 'ether'))).toString(), web3.toWei('0.05', 'ether').toString())
     })
   })
 

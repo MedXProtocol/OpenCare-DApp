@@ -7,7 +7,7 @@ import faExternalLinkAlt from '@fortawesome/fontawesome-free-solid/faExternalLin
 import { cacheCall, withSaga, cacheCallValue, contractByName } from '~/saga-genesis'
 import { EthAddress } from '~/components/EthAddress'
 import { PageTitle } from '~/components/PageTitle'
-import { weiToEther } from '~/utils/weiToEther'
+import { EtherFlip } from '~/components/EtherFlip'
 import { EtherscanLink } from '~/components/EtherscanLink'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
@@ -99,7 +99,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                     <p className='lead text-center'>
                       <FontAwesomeIcon
                         icon={faHeartbeat} />
-                      &nbsp; {weiToEther(this.props.balance)} W-ETH
+                      &nbsp; <EtherFlip wei={this.props.balance} />
                     </p>
 
                     <div className="text-center">

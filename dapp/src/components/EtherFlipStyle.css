@@ -1,0 +1,8 @@
+.ether-flip {
+  transition: 0.25s;
+  cursor: pointer;
+}
+
+.ether-flip:hover {
+  color: #888;
+}

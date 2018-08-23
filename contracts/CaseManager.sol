@@ -165,19 +165,22 @@ contract CaseManager is Ownable, Pausable, Initializable {
   }
 
   function createCaseCostWei (uint256 _caseFeeUsd) public view returns (uint256) {
-    uint256 caseFee = calculateCaseFeeWei(_caseFeeUsd);
+    uint256 caseFee = usdToWei(_caseFeeUsd);
     return caseFee.add(caseFee.mul(50).div(100));
   }
 
   function caseFeeWei() public view returns (uint256) {
-    return calculateCaseFeeWei(caseFeeUsd);
+    return usdToWei(caseFeeUsd);
   }
 
-  function calculateCaseFeeWei(uint256 _caseFeeUsd) public view returns (uint256) {
+  function usdToWei(uint256 _caseFeeUsd) public view returns (uint256) {
+    return _caseFeeUsd.div(usdPerWei());
+  }
+
+  function usdPerWei() public view returns (uint256) {
     IEtherPriceFeed etherPriceFeed = IEtherPriceFeed(registry.lookup(keccak256('EtherPriceFeed')));
     uint256 usdPerEth = uint256(etherPriceFeed.read());
-    uint256 usdPerWei = usdPerEth.div(1000000000000000000);
-    return _caseFeeUsd.div(usdPerWei);
+    return usdPerEth.div(1000000000000000000);
   }
 
   function addChallengeDoctor(address _doctor, address _caseAddress) external onlyCasePhaseManagers {

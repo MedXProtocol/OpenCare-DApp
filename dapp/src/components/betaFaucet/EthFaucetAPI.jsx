@@ -4,7 +4,7 @@ import { EthAddress } from '~/components/EthAddress'
 import PropTypes from 'prop-types'
 import { axiosInstance } from '~/config/hippoAxios'
 import { LoadingLines } from '~/components/LoadingLines'
-import { weiToEther } from '~/utils/weiToEther'
+import { EtherFlip } from '~/components/EtherFlip'
 
 export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
 
@@ -118,7 +118,7 @@ export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
       <div className="col-xs-12 text-center">
         <strong>Current Balance:</strong>
         <h2 className="header--no-top-margin">
-          {weiToEther(this.props.ethBalance)} Ξ
+          <EtherFlip wei={this.props.ethBalance} />
         </h2>
         <p className="small text-center">
           <span className="eth-address text-gray">For address:&nbsp;

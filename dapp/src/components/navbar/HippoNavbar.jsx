@@ -30,7 +30,7 @@ import {
 } from '~/saga-genesis'
 import { HippoCasesRequiringAttention } from './HippoCasesRequiringAttention'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
-import { weiToEther } from '~/utils/weiToEther'
+import { Ether } from '~/components/Ether'
 import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
@@ -158,7 +158,7 @@ export const HippoNavbar = withContractRegistry(
       var wrappedEtherBalance =
         <LinkContainer to={routes.ACCOUNT_WALLET}>
           <NavItem href={routes.ACCOUNT_WALLET}>
-            {this.props.balance ? weiToEther(this.props.balance) : 0} W-ETH
+            <Ether wei={this.props.balance} />
           </NavItem>
         </LinkContainer>
 

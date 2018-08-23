@@ -11,7 +11,7 @@ import {
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
 import { computeTotalFee } from '~/utils/computeTotalFee'
-import { weiToEther } from '~/utils/weiToEther'
+import { EtherFlip } from '~/components/EtherFlip'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress }) {
@@ -115,13 +115,13 @@ const CaseStatus = connect(mapStateToProps)(
         case 7:
           alert =
             <div className="alert alert-success">
-              You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded {weiToEther(this.props.caseFeeWei).toString()} Ether and may consider re-submitting your case to the network or visiting your local dermatologist.
+              You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded <EtherFlip wei={this.props.caseFeeWei} /> and may consider re-submitting your case to the network or visiting your local dermatologist.
             </div>
           break
         case 8:
           alert =
             <div className="alert alert-success">
-              You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of {weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()} Ether was charged for your first opinion and discounted second opinion.
+              You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} /> was charged for your first opinion and discounted second opinion.
             </div>
           break
         default:

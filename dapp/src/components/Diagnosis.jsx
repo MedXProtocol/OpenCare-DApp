@@ -21,7 +21,8 @@ import { connect } from 'react-redux'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { computeTotalFee } from '~/utils/computeTotalFee'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
-import { weiToEther } from '~/utils/weiToEther'
+import { EtherFlip } from '~/components/EtherFlip'
+import { Ether } from '~/components/Ether'
 import { isTrue } from '~/utils/isTrue'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { isBlank } from '~/utils/isBlank'
@@ -297,8 +298,9 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   render() {
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
     const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== 3
-    const challengeFeeEther = weiToEther(computeChallengeFee(this.props.caseFeeWei)).toString()
-    const totalFeeEther = weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()
+    const challengeFeeEtherNoFlip = <Ether wei={computeChallengeFee(this.props.caseFeeWei)} />
+    const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
+    const totalFeeEther = <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} />
 
     if (!buttonsHidden) {
       var buttons =
@@ -317,7 +319,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                 onClick={this.handleAcceptDiagnosis}
                 type="button"
                 className="btn btn-success"
-              >Accept and Withdraw ({challengeFeeEther} W-ETH)</button>
+              >Accept and Withdraw ({challengeFeeEtherNoFlip})</button>
             </div>
           </div>
         </div>
@@ -351,7 +353,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                       Challenge the diagnosis by having another doctor look at your case.
                     </p>
                     <p>
-                      If the diagnosis is the same, you will be charged {totalFeeEther} W-ETH.  If the diagnosis is different than the original then you'll be charged {challengeFeeEther} W-ETH and refunded the remainder.
+                      If the diagnosis is the same, you will be charged {totalFeeEther}.  If the diagnosis is different than the original then you'll be charged {challengeFeeEther} and refunded the remainder.
                     </p>
                     <hr />
                     <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>
