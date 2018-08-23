@@ -11,7 +11,6 @@ import {
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
 import { computeTotalFee } from '~/utils/computeTotalFee'
-import { computeChallengeFee } from '~/utils/computeChallengeFee'
 import { weiToEther } from '~/utils/weiToEther'
 import get from 'lodash.get'
 

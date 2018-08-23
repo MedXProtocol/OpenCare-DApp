@@ -13,6 +13,7 @@ i18next
           transactions: {
             acceptDiagnosis: 'Accepting Diagnosis',
             acceptAsDoctor: 'Accepting Diagnosis',
+            addDoctor: 'Upgrading to Doctor',
             addOrReactivateDoctor: 'Adding / Reactivating Doctor',
             deactivateDoctor: 'Deactivating Doctor',
             createAndAssignCaseWithPublicKey: 'Sending Case Info',
@@ -25,10 +26,11 @@ i18next
             mint: 'Mint {{mintMedxCount}} MEDT (Test MEDX)',
             patientWithdrawFunds: 'Withdrawing Funds',
             patientRequestNewInitialDoctor: 'Requesting New Doctor',
+            patientRequestNewChallengeDoctor: 'Requesting New Doctor',
             setPublicKey: 'Registering Account',
             sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',
-            addDoctor: 'Upgrading to Doctor'
+            withdraw: 'Withdrawing ETH'
           },
           transactionErrors: {
             userRevert: 'You rejected the transaction',

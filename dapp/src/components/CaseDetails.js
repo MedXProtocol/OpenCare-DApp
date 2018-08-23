@@ -30,10 +30,12 @@ function mapStateToProps(state, { caseAddress }) {
 
   const caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
   const createdAt = cacheCallValueInt(state, CaseScheduleManager, 'createdAt', caseAddress)
+  const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
 
   return {
     caseDetailsHash: getFileHashFromBytes(caseDataHash),
     createdAt,
+    updatedAt,
     CaseScheduleManager,
     networkId
   }
@@ -44,8 +46,9 @@ function* saga({ CaseScheduleManager, caseAddress, networkId }) {
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
-    cacheCall(caseAddress, 'caseDataHash'),
-    cacheCall(CaseScheduleManager, 'createdAt', caseAddress)
+    yield cacheCall(caseAddress, 'caseDataHash'),
+    yield cacheCall(CaseScheduleManager, 'createdAt', caseAddress),
+    yield cacheCall(CaseScheduleManager, 'updatedAt', caseAddress)
   ])
 }
 
@@ -161,7 +164,7 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
   }
 
   render() {
-    const { caseKey, caseAddress, caseIsOpenForDoctor } = this.props
+    const { createdAt, updatedAt, caseKey, caseAddress, caseIsOpenForDoctor } = this.props
     const details = this.state.details || {}
     let jsx
 
@@ -386,9 +389,11 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
             <div className="row">
               <div className="col-xs-12">
                 <p className="text-gray small text-center">
-                  <strong>Case Address:</strong> {this.props.caseAddress}
+                  <strong>Case Address:</strong> {caseAddress}
                   <br />
-                  <HippoTimestamp timeInUtcSecondsSinceEpoch={this.props.createdAt} />
+                  <strong>Created:</strong> <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
+                  <br />
+                  <strong>Last Updated:</strong> <HippoTimestamp timeInUtcSecondsSinceEpoch={updatedAt} />
                 </p>
               </div>
             </div>

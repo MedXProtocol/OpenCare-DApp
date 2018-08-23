@@ -102,6 +102,9 @@ contract('CaseLifecycleManager', function (accounts) {
       })
 
       it('should allow the patient to accept diagnosis 24 hours after choosing a challenge doc', async () => {
+        let patientBalance = await env.weth9.balanceOf(patient)
+        assert.equal(patientBalance, 0)
+
         assert.equal(await caseInstance.status.call(), caseStatus('Evaluated'))
         await env.caseLifecycleManager.challengeWithDoctor(
           caseInstance.address,
@@ -119,6 +122,9 @@ contract('CaseLifecycleManager', function (accounts) {
         assert.equal(await env.caseStatusManager.openCaseCount.call(doctor2), 0)
         assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor2), 0)
         assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
+
+        // patientBalance = await env.weth9.balanceOf(patient)
+        // assert.equal(patientBalance, caseFee / 3)
 
         let doctorBalance = await env.weth9.balanceOf(doctor)
         assert.equal(doctorBalance, caseFee)

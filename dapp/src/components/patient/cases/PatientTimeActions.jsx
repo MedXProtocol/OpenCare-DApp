@@ -25,12 +25,16 @@ import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
 import { secondsInADay } from '~/config/constants'
+import { computeChallengeFee } from '~/utils/computeChallengeFee'
+import { weiToEther } from '~/utils/weiToEther'
 import { isTrue } from '~/utils/isTrue'
-import isEqual from 'lodash.isequal'
+import get from 'lodash.get'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress }) {
   if (!caseAddress) { return {} }
+
+  const address = get(state, 'sagaGenesis.accounts[0]')
 
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
@@ -38,16 +42,21 @@ function mapStateToProps(state, { caseAddress }) {
   const status = cacheCallValueInt(state, caseAddress, 'status')
   const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
+  const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
+  const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
 
   const transactions = state.sagaGenesis.transactions
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
 
   return {
+    address,
+    caseFeeWei,
     CaseLifecycleManager,
     CaseScheduleManager,
     currentlyExcludedDoctors,
+    challengingDoctor,
     diagnosingDoctor,
     encryptedCaseKey,
     caseKeySalt,
@@ -66,7 +75,9 @@ function* saga({ CaseScheduleManager, caseAddress }) {
     cacheCall(caseAddress, 'caseKeySalt'),
     cacheCall(caseAddress, 'status'),
     cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
-    cacheCall(caseAddress, 'diagnosingDoctor')
+    cacheCall(caseAddress, 'diagnosingDoctor'),
+    cacheCall(caseAddress, 'challengingDoctor'),
+    cacheCall(caseAddress, 'caseFee')
   ])
 }
 
@@ -99,10 +110,11 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     componentWillReceiveProps (nextProps) {
-      // this.requestNewDocTransactionStateHandler(nextProps)
-      // this.withdrawTransactionStateHandler(nextProps)
+      this.acceptDiagnosisTransactionStateHandler(nextProps)
+      this.requestNewDocTransactionStateHandler(nextProps)
+      this.withdrawTransactionStateHandler(nextProps)
 
-      // this.setExcludedDoctorAddresses(nextProps)
+      this.setExcludedDoctorAddresses(nextProps)
     }
 
     onChangeDoctor = (option) => {
@@ -113,12 +125,20 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     setExcludedDoctorAddresses = (props) => {
-      if (props.diagnosingDoctor && props.currentlyExcludedDoctors) {
-        const excludeAddresses = [props.diagnosingDoctor, props.account]
+      if (!props.address || !props.status || !props.currentlyExcludedDoctors) { return }
 
-        if (!isEqual(excludeAddresses, props.currentlyExcludedDoctors)) {
-          props.dispatchExcludedDoctors(excludeAddresses)
-        }
+      let excludeAddresses = []
+
+      if ((props.status === 3) && props.diagnosingDoctor) {
+        excludeAddresses = [props.address, props.diagnosingDoctor]
+      }
+
+      if ((props.status === 6) && props.diagnosingDoctor && props.challengingDoctor) {
+        excludeAddresses = [props.address, props.diagnosingDoctor, props.challengingDoctor]
+      }
+
+      if (props.currentlyExcludedDoctors.length < excludeAddresses.length) {
+        props.dispatchExcludedDoctors(excludeAddresses)
       }
     }
 
@@ -132,6 +152,20 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
 
     handleShowRequestNewDoctorModal = () => {
       this.setState({ showRequestNewDoctorModal: true })
+    }
+
+    handlePatientAcceptDiagnosis = () => {
+      const acceptDiagnosisTransactionId = this.props.send(
+        this.props.CaseLifecycleManager,
+        'acceptDiagnosis',
+        this.props.caseAddress
+      )()
+
+      this.setState({
+        acceptDiagnosisTransactionId,
+        acceptDiagnosisTransactionStateHandler: new TransactionStateHandler(),
+        loading: true
+      })
     }
 
     handlePatientWithdraw = () => {
@@ -168,9 +202,14 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
           caseKeySalt
         })
 
+        let contractMethod = 'patientRequestNewInitialDoctor'
+        if (this.props.status === 6) {
+          contractMethod = 'patientRequestNewChallengeDoctor'
+        }
+
         const requestNewDocTransactionId = this.props.send(
           this.props.CaseLifecycleManager,
-          'patientRequestNewInitialDoctor',
+          contractMethod,
           this.props.caseAddress,
           this.state.selectedDoctor.value,
           '0x' + doctorEncryptedCaseKey
@@ -184,6 +223,21 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       }
     }
 
+    acceptDiagnosisTransactionStateHandler = (props) => {
+      if (this.state.acceptDiagnosisTransactionStateHandler) {
+        this.state.acceptDiagnosisTransactionStateHandler.handle(props.transactions[this.state.acceptDiagnosisTransactionId])
+          .onError((error) => {
+            toastr.transactionError(error)
+            this.setState({ acceptDiagnosisTransactionStateHandler: null, loading: false })
+          })
+          .onTxHash(() => {
+            toastr.success("Your 'Accept Diagnosis' transaction has been broadcast to the network. It will take a few moments to be confirmed and then you will receive your deposit back.")
+            mixpanel.track('Patient Accepted Diagnosis After 24+ Hours')
+            this.props.history.push(routes.PATIENTS_CASES)
+          })
+      }
+    }
+
     withdrawTransactionStateHandler = (props) => {
       if (this.state.withdrawTransactionStateHandler) {
         this.state.withdrawTransactionStateHandler.handle(props.transactions[this.state.withdrawTransactionId])
@@ -191,11 +245,8 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
             toastr.transactionError(error)
             this.setState({ withdrawTransactionStateHandler: null, loading: false })
           })
-          .onConfirmed(() => {
-            this.setState({ withdrawTransactionStateHandler: null, loading: false })
-          })
           .onTxHash(() => {
-            toastr.success('Your patient withdraw funds transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your deposit back.')
+            toastr.success("Your 'Withdraw Funds' transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your deposit back.")
             mixpanel.track('Patient Withdrew Funds After 24+ Hours')
             this.props.history.push(routes.PATIENTS_CASES)
           })
@@ -209,11 +260,8 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
             toastr.transactionError(error)
             this.setState({ requestNewDocTransactionStateHandler: null, loading: false })
           })
-          .onConfirmed(() => {
-            this.setState({ requestNewDocTransactionStateHandler: null, loading: false })
-          })
           .onTxHash(() => {
-            toastr.success('Your request for a new Doctor transaction has been broadcast to the network. It will take a few moments to confirm.')
+            toastr.success("Your 'New Doctor Request' transaction has been broadcast to the network. It will take a few moments to confirm.")
             mixpanel.track('Patient Request New Doc After 24+ Hours')
             this.props.history.push(routes.PATIENTS_CASES)
           })
@@ -222,9 +270,53 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
 
     render () {
       const isPatient = true
+      const { diagnosingDoctor, account, updatedAt, status } = this.props
+      const challengeFeeEther = weiToEther(computeChallengeFee(this.props.caseFeeWei)).toString()
+      let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
+
+      let buttons = (
+        <div className="button-set__btn-clear">
+          <Button
+            disabled={this.state.loading}
+            onClick={this.handlePatientWithdraw}
+            className="btn btn-sm btn-clear"
+          >
+            Close Case &amp; Withdraw Funds
+          </Button>
+          <Button
+            disabled={this.state.loading}
+            onClick={this.handleShowRequestNewDoctorModal}
+            className="btn btn-sm btn-clear"
+          >
+            Assign to Another Doctor
+          </Button>
+        </div>
+      )
+
+      if (status === 6) {
+        followUpText = 'You can accept the initial diagnosis or assign to a different doctor:'
+        buttons = (
+          <div className="button-set__btn-clear">
+            <Button
+              disabled={this.state.loading}
+              onClick={this.handlePatientAcceptDiagnosis}
+              className="btn btn-sm btn-clear"
+            >
+              Accept Initial Diagnosis<br /> (Withdraw {challengeFeeEther} W-ETH)
+            </Button>
+            <Button
+              disabled={this.state.loading}
+              onClick={this.handleShowRequestNewDoctorModal}
+              className="btn btn-sm btn-clear"
+            >
+              Assign Second Opinion to<br /> Another Doctor
+            </Button>
+          </div>
+        )
+      }
       if (
-        !this.props.updatedAt
-        || !caseStale(secondsInADay, this.props.updatedAt, this.props.status, isPatient)
+        !updatedAt
+        || !caseStale(secondsInADay, updatedAt, status, isPatient)
       ) {
         return null
       } else {
@@ -236,24 +328,9 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
                   <div className="alert alert-warning text-center">
                     <br />
                     24+ hours have passed and the Doctor has yet to respond to your case.
-                    <br />You can close the case and withdraw your deposit:
+                    <br />{followUpText}
 
-                    <div className="button-set__btn-clear">
-                      <Button
-                        disabled={this.state.loading}
-                        onClick={this.handlePatientWithdraw}
-                        className="btn btn-sm btn-clear"
-                      >
-                        Close Case &amp; Withdraw Funds
-                      </Button>
-                      <Button
-                        disabled={this.state.loading}
-                        onClick={this.handleShowRequestNewDoctorModal}
-                        className="btn btn-sm btn-clear"
-                      >
-                        Assign to Another Doctor
-                      </Button>
-                    </div>
+                    {buttons}
                   </div>
                 </div>
               </div>
@@ -276,7 +353,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
                           <div>
                             <label className='control-label'>Select Another Doctor</label>
                             <DoctorSelect
-                              excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
+                              excludeAddresses={[diagnosingDoctor, account]}
                               value={this.state.selectedDoctor}
                               isClearable={false}
                               onChange={this.onChangeDoctor} />
@@ -288,9 +365,9 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
                           </div>
                           :
                           <AvailableDoctorSelect
-                            excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
                             value={this.state.selectedDoctor}
-                            onChange={this.onChangeDoctor} />
+                            onChange={this.onChangeDoctor}
+                          />
                          }
                       </div>
                     </div>
