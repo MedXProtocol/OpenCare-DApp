@@ -6,9 +6,9 @@ import './CaseLifecycleManager.sol';
 import './CaseScheduleManager.sol';
 import "./Delegate.sol";
 import "./Initializable.sol";
+import "./MedXToken.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
-
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
@@ -24,6 +24,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
   mapping (address => uint256) public caseIndices;
   mapping (address => address[]) public patientCases;
 
+  MedXToken _;
   Registry public registry;
 
   mapping (address => address[]) public doctorCases;
