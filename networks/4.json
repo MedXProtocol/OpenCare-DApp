@@ -1,5 +1,5 @@
 {
-  "migrationVersion": 1535045887,
+  "migrationVersion": 1535045889,
   "contracts": [
     {
       "contractName": "Migrations",
@@ -232,6 +232,10 @@
     {
       "contractName": "AccountManager",
       "address": "0x6379dea15a658be7127b9cb9ca370821a68c6dbb"
+    },
+    {
+      "contractName": "Case",
+      "address": "0x4d94b8eb07622e62ed4368feaa9ddbcbb1662752"
     }
   ]
 }
