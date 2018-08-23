@@ -30,7 +30,7 @@ i18next
             setPublicKey: 'Registering Account',
             sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',
-            withdraw: 'Withdrawing ETH'
+            withdraw: 'Withdrawing W-ETH'
           },
           transactionErrors: {
             userRevert: 'You rejected the transaction',

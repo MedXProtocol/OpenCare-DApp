@@ -1,6 +1,7 @@
 pragma solidity ^0.4.23;
 
 import "./Initializable.sol";
+import "./MedXToken.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
 import "./WETH9.sol";
@@ -24,6 +25,7 @@ contract Case is Ownable, Initializable {
   bytes public challengeHash;
 
   Registry public registry;
+  MedXToken public _;
 
   CaseStatus public status;
 
