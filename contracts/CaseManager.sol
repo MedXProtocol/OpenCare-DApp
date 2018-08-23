@@ -6,6 +6,7 @@ import "./IAccountManager.sol";
 import "./Delegate.sol";
 import "./Initializable.sol";
 import "./IEtherPriceFeed.sol";
+import "./MedXToken.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
@@ -19,6 +20,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
     mapping (address => uint256) public caseIndices;
     mapping (address => address[]) public patientCases;
 
+    MedXToken _;
     IRegistry public registry;
 
     mapping (address => address[]) public doctorCases;
@@ -68,6 +70,10 @@ contract CaseManager is Ownable, Pausable, Initializable {
     function setBaseCaseFee(uint256 _newCaseFee) public onlyOwner {
         require(_newCaseFee > 0);
         caseFeeUsd = _newCaseFee;
+    }
+
+    function createCaseCost () public view returns (uint256) {
+      return caseFee.add(caseFee.mul(50).div(100));
     }
 
     /**

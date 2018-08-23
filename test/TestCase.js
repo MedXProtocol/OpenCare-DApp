@@ -18,8 +18,6 @@ contract('Case', function (accounts) {
   before(async () => {
     env = await createEnvironment(artifacts)
 
-    caseFeeWei = await env.caseManager.caseFeeWei()
-
     await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc')
 
     doctorAddress = accounts[1]
@@ -31,6 +29,7 @@ contract('Case', function (accounts) {
 
   beforeEach(async () => {
     await resetCaseManager(artifacts, env)
+    caseFeeWei = await env.caseManager.caseFeeWei()
     caseInstance = await Case.at(await createCase(env, patient, doctorAddress))
     const diagnosingDoctor = await caseInstance.diagnosingDoctor.call()
     assert.equal(diagnosingDoctor, doctorAddress)

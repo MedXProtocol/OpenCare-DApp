@@ -79,7 +79,6 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
           // what is actually wrong with call being undefined sometimes:
           // (same applies to Line 93's if (call !== undefined) {})
           if (call === undefined) {
-            debugger
             name = '???'
           } else {
             name = call.method

@@ -4,6 +4,7 @@ import "./DoctorManager.sol";
 import "./IRegistry.sol";
 import "./Initializable.sol";
 import "./ICaseManager.sol";
+import "./MedXToken.sol";
 import "./CaseStatusManager.sol";
 import "./WETH9.sol";
 
@@ -24,6 +25,7 @@ contract Case is Ownable, Initializable {
   bytes public challengeHash;
 
   IRegistry public registry;
+  MedXToken public _;
 
   CaseStatus public status;
 
