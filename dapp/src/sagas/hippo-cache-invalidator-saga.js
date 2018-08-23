@@ -69,6 +69,15 @@ export function* latestBlock({ block }) {
   // Include any other contracts who's cache values we should invalidate if we have a
   // contract in the block's transaction's log's topics which we care about
   if (addressSetAsArray.length > 0) {
+    const caseManagerAddress = yield select(contractByName, 'CaseManager')
+    contractKey = yield select(contractKeyByAddress, caseManagerAddress)
+    if (contractKey) {
+      console.log('contractKey for address: ', contractKey, caseManagerAddress)
+    }
+    console.log('invalidating: ' + caseManagerAddress)
+    yield fork(put, { type: 'CACHE_INVALIDATE_ADDRESS', caseManagerAddress })
+
+
     const caseScheduleManagerAddress = yield select(contractByName, 'CaseScheduleManager')
     let contractKey = yield select(contractKeyByAddress, caseScheduleManagerAddress)
     if (contractKey) {
@@ -77,13 +86,14 @@ export function* latestBlock({ block }) {
     console.log('invalidating: ' + caseScheduleManagerAddress)
     yield fork(put, { type: 'CACHE_INVALIDATE_ADDRESS', caseScheduleManagerAddress })
 
-    const caseManagerAddress = yield select(contractByName, 'CaseManager')
-    contractKey = yield select(contractKeyByAddress, caseManagerAddress)
+
+    const caseStatusManager = yield select(contractByName, 'CaseStatusManager')
+    contractKey = yield select(contractKeyByAddress, caseStatusManager)
     if (contractKey) {
-      console.log('contractKey for address: ', contractKey, caseManagerAddress)
+      console.log('contractKey for address: ', contractKey, caseStatusManager)
     }
-    console.log('invalidating: ' + caseManagerAddress)
-    yield fork(put, { type: 'CACHE_INVALIDATE_ADDRESS', caseManagerAddress })
+    console.log('invalidating: ' + caseStatusManager)
+    yield fork(put, { type: 'CACHE_INVALIDATE_ADDRESS', caseStatusManager })
   }
 }
 
