@@ -1,5 +1,5 @@
 {
-  "migrationVersion": 1534869526,
+  "migrationVersion": 1535045887,
   "contracts": [
     {
       "contractName": "Migrations",
@@ -220,6 +220,18 @@
     {
       "contractName": "WETH9",
       "address": "0xc778417e063141139fce010982780140aa0cd5ab"
+    },
+    {
+      "contractName": "CaseManager",
+      "address": "0x348ba4db6360d57e82f0e195ef3edb477cdc9fe4"
+    },
+    {
+      "contractName": "Case",
+      "address": "0xacb8368f96807e10a7407517b066d0919ad9150e"
+    },
+    {
+      "contractName": "AccountManager",
+      "address": "0x6379dea15a658be7127b9cb9ca370821a68c6dbb"
     }
   ]
 }

@@ -13,7 +13,7 @@ contract('Case', function (accounts) {
   let patient = accounts[0]
   let doctorAddress
   let doctorAddress2
-  let caseFee = web3.toWei(10, 'ether')
+  let caseFee
 
   before(async () => {
     env = await createEnvironment(artifacts)
@@ -29,6 +29,7 @@ contract('Case', function (accounts) {
 
   beforeEach(async () => {
     await resetCaseManager(artifacts, env)
+    caseFee = await env.caseManager.caseFee()
     caseInstance = await Case.at(await createCase(env, patient, doctorAddress))
     const diagnosingDoctor = await caseInstance.diagnosingDoctor.call()
     assert.equal(diagnosingDoctor, doctorAddress)
@@ -69,7 +70,7 @@ contract('Case', function (accounts) {
         assert.equal(await env.caseStatusManager.closedCaseCount.call(doctorAddress), 1)
         assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
         let doctorBalance = await env.weth9.balanceOf(doctorAddress)
-        assert.equal(doctorBalance, caseFee)
+        assert.equal(doctorBalance.toString(), caseFee)
       })
     })
 

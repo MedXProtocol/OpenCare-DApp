@@ -69,6 +69,10 @@ contract CaseManager is Ownable, Pausable, Initializable {
         caseFee = _newCaseFee;
     }
 
+    function createCaseCost () public view returns (uint256) {
+      return caseFee.add(caseFee.mul(50).div(100));
+    }
+
     /**
      * @dev - returns the length of the "all" case list
      */
