@@ -48,10 +48,8 @@ function mapStateToProps (state) {
   let medXBeingSent
   const account = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-  const caseFeeWei = cacheCallValue(state, CaseManager, 'caseFee')
 
   const balance = get(state, 'sagaGenesis.ethBalance.balance')
-  const caseFeeUsd = cacheCallValue(state, CaseManager, 'caseFeeUsd')
   const caseFeeWei = cacheCallValue(state, CaseManager, 'caseFeeWei')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)

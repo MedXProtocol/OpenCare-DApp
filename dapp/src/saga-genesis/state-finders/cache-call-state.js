@@ -2,9 +2,9 @@ import hashCall from '../utils/hash-call'
 import { contractByName } from '~/saga-genesis/state-finders'
 
 export default function(state, addressOrName, method, ...args) {
-  if (!addressOrName.startsWith('0x')) {
+  if (addressOrName && !addressOrName.startsWith('0x')) {
     addressOrName = contractByName(state, addressOrName)
   }
-  const hash = hashCall.apply(null, addressOrName, method, ...args)
+  const hash = hashCall.apply(null, [addressOrName, method, ...args])
   return state.sagaGenesis.callCache[hash] || {}
 }
