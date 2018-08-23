@@ -27,6 +27,7 @@ i18next
             sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',
             addDoctor: 'Upgrading to Doctor'
+            withdraw: 'Withdrawing W-ETH'
           },
           transactionErrors: {
             userRevert: 'You rejected the transaction',
