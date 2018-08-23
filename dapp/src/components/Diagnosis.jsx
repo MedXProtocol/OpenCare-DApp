@@ -34,30 +34,31 @@ import { mixpanel } from '~/mixpanel'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
-import isEqual from 'lodash.isequal'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
 
-  const account = state.sagaGenesis.accounts[0]
+  const address = state.sagaGenesis.accounts[0]
   const status = cacheCallValueInt(state, caseAddress, 'status')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
+  const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
   const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
   const transactions = state.sagaGenesis.transactions
-  const isPatient = account === patientAddress
+  const isPatient = address === patientAddress
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
   return {
     CaseLifecycleManager,
-    account,
+    address,
     currentlyExcludedDoctors,
+    challengingDoctor,
     status,
     caseFeeWei,
     diagnosisHash,
@@ -82,7 +83,8 @@ function* saga({ caseAddress, networkId }) {
     cacheCall(caseAddress, 'encryptedCaseKey'),
     cacheCall(caseAddress, 'caseKeySalt'),
     cacheCall(caseAddress, 'caseFee'),
-    cacheCall(caseAddress, 'diagnosingDoctor')
+    cacheCall(caseAddress, 'diagnosingDoctor'),
+    cacheCall(caseAddress, 'challengingDoctor')
   ])
 }
 
@@ -171,12 +173,20 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   setExcludedDoctorAddresses = (props) => {
-    if (props.diagnosingDoctor && props.currentlyExcludedDoctors) {
-      const excludeAddresses = [props.diagnosingDoctor, props.account]
+    if (!props.address || !props.status || !props.currentlyExcludedDoctors) { return }
 
-      if (!isEqual(excludeAddresses, props.currentlyExcludedDoctors)) {
-        props.dispatchExcludedDoctors(excludeAddresses)
-      }
+    let excludeAddresses = []
+
+    if ((props.status === 3) && props.diagnosingDoctor) {
+      excludeAddresses = [props.address, props.diagnosingDoctor]
+    }
+
+    if ((props.status === 6) && props.diagnosingDoctor && props.challengingDoctor) {
+      excludeAddresses = [props.address, props.diagnosingDoctor, props.challengingDoctor]
+    }
+
+    if (props.currentlyExcludedDoctors.length < excludeAddresses.length) {
+      props.dispatchExcludedDoctors(excludeAddresses)
     }
   }
 
@@ -350,7 +360,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                         <div>
                           <label className='control-label'>Select Another Doctor</label>
                           <DoctorSelect
-                            excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
+                            excludeAddresses={[this.props.diagnosingDoctor, this.props.address]}
                             value={this.state.selectedDoctor}
                             isClearable={false}
                             onChange={this.onChangeDoctor} />
@@ -362,9 +372,9 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                         </div>
                         :
                         <AvailableDoctorSelect
-                          excludeAddresses={[this.props.diagnosingDoctor, this.props.account]}
                           value={this.state.selectedDoctor}
-                          onChange={this.onChangeDoctor} />
+                          onChange={this.onChangeDoctor}
+                        />
                        }
                     </div>
                   </div>

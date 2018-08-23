@@ -27,7 +27,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier onlyPatient(address _caseAddress) {
     Case _case = Case(_caseAddress);
-    require(msg.sender == _case.patient(), 'sender needs to be the patient');
+    require(msg.sender == _case.patient()/*, 'sender needs to be the patient'*/);
     _;
   }
 
@@ -144,7 +144,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
 
   /**
    * @dev - The patient accepts the evaluation and tokens are credited to doctor
-   * and rest is returned to the patient
+   * and rest is returned to the patient (can also happen 24 hours after the patient
+   * chooses a challenge doc)
    */
   function acceptDiagnosis(address _caseAddress)
     external
@@ -154,11 +155,16 @@ contract CaseLifecycleManager is Ownable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(
-      _case.status() == Case.CaseStatus.Evaluated/*,
-      'case must be in evaluated state to accept the diagnosis'*/
+      (_case.status() == Case.CaseStatus.Evaluated) || (_case.status() == Case.CaseStatus.Challenging),
+      'must be in evaluated or challenging state'
     );
 
     registry.caseFirstPhaseManager().acceptDiagnosis(_case);
+
+    // If this case had been challenged, clear the case for that doc
+    if (_case.challengingDoctor() != address(0)) {
+      registry.caseSecondPhaseManager().clearChallengingDoctor(_case);
+    }
   }
 
   /**
@@ -219,6 +225,25 @@ contract CaseLifecycleManager is Ownable, Initializable {
   }
 
   /**
+   * @dev - allows the patient to choose another challenge doc if the second doc hasn't responded after 24 hours
+   */
+  function patientRequestNewChallengeDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
+    external
+    isCase(_caseAddress)
+    onlyPatient(_caseAddress)
+    patientWaitedOneDay(_caseAddress)
+  {
+    Case _case = Case(_caseAddress);
+
+    require(
+      _case.status() == Case.CaseStatus.Challenging//,
+      // 'case must be in evaluating state to choose a different doctor'
+    );
+
+    registry.caseSecondPhaseManager().patientRequestNewChallengeDoctor(_caseAddress, _doctor, _doctorEncryptedKey);
+  }
+
+  /**
    * @dev - The initial doctor can accept their evaluation after 48 hours and get tokens owing to them
    */
   function acceptAsDoctor(address _caseAddress)
@@ -231,9 +256,12 @@ contract CaseLifecycleManager is Ownable, Initializable {
     require(_case.status() == Case.CaseStatus.Evaluated/*, 'Case must be in Evaluated state'*/);
 
     registry.caseFirstPhaseManager().acceptAsDoctor(_case);
+
+    // If this case had been challenged, clear the case for that doc
+    if (_case.challengingDoctor() != address(0)) {
+      registry.caseSecondPhaseManager().clearChallengingDoctor(_case);
+    }
   }
-
-
 
   function challengeWithDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
     external
@@ -244,7 +272,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
 
     require(_case.challengingDoctor() == address(0)/*, 'the Diagnosing Doctor must be blank'*/);
     require(_doctor != _case.patient()/*, 'the doctor cannot be the patient'*/);
-    require(_case.status() == Case.CaseStatus.Evaluated, 'Case must be in Evaluated state');
+    require(_case.status() == Case.CaseStatus.Evaluated/*, 'Case must be in Evaluated state'*/);
 
     registry.caseSecondPhaseManager().challengeWithDoctor(_caseAddress, _doctor, _doctorEncryptedKey);
   }
