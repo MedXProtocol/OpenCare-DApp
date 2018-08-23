@@ -98,7 +98,7 @@ contract('CaseLifecycleManager', function (accounts) {
         assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
 
         let doctorBalance = await env.weth9.balanceOf(doctor)
-        assert.equal(doctorBalance, caseFee)
+        assert.equal(doctorBalance.toString(), caseFee.toString())
 
         // Deposit afterwards to clean up this test
         env.weth9.withdraw(caseFee, { from: doctor })
@@ -130,7 +130,7 @@ contract('CaseLifecycleManager', function (accounts) {
         // assert.equal(patientBalance, caseFee / 3)
 
         let doctorBalance = await env.weth9.balanceOf(doctor)
-        assert.equal(doctorBalance.toString(), caseFee)
+        assert.equal(doctorBalance.toString(), caseFee.toString())
       })
     })
 
