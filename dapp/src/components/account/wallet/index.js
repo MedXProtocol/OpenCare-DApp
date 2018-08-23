@@ -70,6 +70,13 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
   }
 
   render() {
+    if (this.props.WrappedEther) {
+      var etherscanLink =
+        <EtherscanLink address={this.props.WrappedEther}>
+          <FontAwesomeIcon
+            icon={faExternalLinkAlt} />
+        </EtherscanLink>
+    }
     return (
       <div>
         <PageTitle renderTitle={(t) => t('pageTitles.balance')} />
@@ -82,10 +89,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                     W-ETH Balance
                     &nbsp;
                     <small>
-                      <EtherscanLink address={this.props.WrappedEther}>
-                        <FontAwesomeIcon
-                          icon={faExternalLinkAlt} />
-                      </EtherscanLink>
+                      {etherscanLink}
                     </small>
                     <br /><small className="eth-address text-gray">ethereum address: <EthAddress address={this.props.address} /></small>
                   </h3>

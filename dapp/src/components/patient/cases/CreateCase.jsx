@@ -83,7 +83,7 @@ function mapDispatchToProps(dispatch) {
 function* saga({ account, AccountManager, CaseManager }) {
   if (!account || !AccountManager || !CaseManager) { return }
   yield cacheCall(AccountManager, 'publicKeys', account)
-  yield cacheCall(CaseManager, 'caseFee')
+  yield cacheCall(CaseManager, 'caseFeeWei')
 }
 
 const requiredFields = [
