@@ -96,6 +96,9 @@ contract('CaseLifecycleManager', function (accounts) {
 
         let doctorBalance = await env.weth9.balanceOf(doctor)
         assert.equal(doctorBalance, caseFee)
+
+        // Deposit afterwards to clean up this test
+        env.weth9.withdraw(caseFee, { from: doctor })
       })
 
       it('should allow the patient to accept diagnosis 24 hours after choosing a challenge doc', async () => {
