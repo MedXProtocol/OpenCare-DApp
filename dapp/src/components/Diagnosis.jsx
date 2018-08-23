@@ -287,6 +287,8 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   render() {
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
     const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== 3
+    const challengeFeeEther = weiToEther(computeChallengeFee(this.props.caseFeeWei)).toString()
+    const totalFeeEther = weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()
 
     if (!buttonsHidden) {
       var buttons =
