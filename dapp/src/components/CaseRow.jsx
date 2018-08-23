@@ -18,7 +18,8 @@ import { EthAddress } from '~/components/EthAddress'
 import { LoadingLines } from '~/components/LoadingLines'
 import { HippoTimestamp } from '~/components/HippoTimestamp'
 import { txErrorMessage } from '~/services/txErrorMessage'
-import { caseStaleForOneDay } from '~/services/caseStaleForOneDay'
+import { secondsInADay } from '~/config/constants'
+import { caseStale } from '~/services/caseStale'
 import { updatePendingTx } from '~/services/pendingTxs'
 import { transactionErrorToCode } from '~/services/transactionErrorToCode'
 import { patientCaseStatusToName, patientCaseStatusToClass } from '~/utils/patientCaseStatusLabels'
@@ -29,18 +30,42 @@ import * as routes from '~/config/routes'
 
 const PENDING_TX_STATUS = -1
 
+const caseStatusToName = (caseRowObject, context) => {
+  let name
+  if (context === 'patient') {
+    name = patientCaseStatusToName(caseRowObject)
+  } else {
+    name = doctorCaseStatusToName(caseRowObject)
+  }
+
+  return name
+}
+
+const caseStatusToClass = (caseRowObject, context) => {
+  let cssClass
+  if (context === 'patient') {
+    cssClass = patientCaseStatusToClass(caseRowObject)
+  } else {
+    cssClass = doctorCaseStatusToClass(caseRowObject)
+  }
+
+  return cssClass
+}
+
 function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex }) {
   let status, createdAt, updatedAt
   if (caseRowObject === undefined) { caseRowObject = {} }
 
-  const transactions = Object.values(state.sagaGenesis.transactions)
   const CaseManager = contractByName(state, 'CaseManager')
+  const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
+
+  const transactions = Object.values(state.sagaGenesis.transactions)
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   if (caseAddress) {
     status = cacheCallValueInt(state, caseAddress, 'status')
-    createdAt = cacheCallValueInt(state, caseAddress, 'createdAt')
-    updatedAt = cacheCallValueInt(state, caseAddress, 'updatedAt')
+    createdAt = cacheCallValueInt(state, CaseScheduleManager, 'createdAt', caseAddress)
+    updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
 
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
 
@@ -62,18 +87,16 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
     }
   }
 
+  caseRowObject['statusLabel'] = caseStatusToName(caseRowObject, context)
+  caseRowObject['statusClass'] = caseStatusToClass(caseRowObject, context)
 
-  if (context === 'patient') {
-    caseRowObject['statusLabel'] = patientCaseStatusToName(status)
-    caseRowObject['statusClass'] = patientCaseStatusToClass(status)
-  } else {
-    caseRowObject['statusLabel'] = doctorCaseStatusToName(caseRowObject)
-    caseRowObject['statusClass'] = doctorCaseStatusToClass(caseRowObject)
+  // Intial doc can take action after 2 days
+  // Patient after 1 day
+  const secondsElapsed = (context === 'patient') ? secondsInADay : (secondsInADay * 2)
 
-    if (caseStaleForOneDay(caseRowObject.updatedAt, caseRowObject.status)) {
-      caseRowObject['statusLabel'] = 'Requires Attention'
-      caseRowObject['statusClass'] = 'warning'
-    }
+  if (caseStale(secondsElapsed, caseRowObject.updatedAt, caseRowObject.status, (context === 'patient'))) {
+    caseRowObject['statusLabel'] = 'Requires Attention'
+    caseRowObject['statusClass'] = 'warning'
   }
 
   // If this caseRowObject has an ongoing blockchain transaction this will update
@@ -97,20 +120,21 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   }
 
   return {
+    CaseScheduleManager,
     CaseManager,
     caseRowObject,
     address
   }
 }
 
-function* saga({ CaseManager, caseAddress }) {
-  if (!CaseManager || !caseAddress) { return }
+function* saga({ CaseManager, CaseScheduleManager, caseAddress }) {
+  if (!CaseScheduleManager || !CaseManager || !caseAddress) { return }
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
     cacheCall(caseAddress, 'status'),
-    cacheCall(caseAddress, 'createdAt'),
-    cacheCall(caseAddress, 'updatedAt'),
+    cacheCall(CaseScheduleManager, 'createdAt', caseAddress),
+    cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(CaseManager, 'caseIndices', caseAddress)
   ])
@@ -148,7 +172,7 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
         label = txErrorMessage(error)
       } else if (method === 'diagnoseCase' || method === 'diagnoseChallengedCase') {
         label = 'Submitting Diagnosis'
-      } else if (method === 'acceptDiagnosis' || method === 'acceptAsDoctorAfterADay') {
+      } else if (method === 'acceptDiagnosis' || method === 'acceptAsDoctor') {
         label = 'Accepting Diagnosis'
       } else if (method === 'challengeWithDoctor') {
         label = 'Getting Second Opinion'

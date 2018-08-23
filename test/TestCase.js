@@ -11,119 +11,44 @@ contract('Case', function (accounts) {
   let env
 
   let patient = accounts[0]
-  let doctorAddress
-  let doctorAddress2
+  let doctor = accounts[1]
   let caseFee
 
   before(async () => {
     env = await createEnvironment(artifacts)
 
     await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc')
-
-    doctorAddress = accounts[1]
-    await env.doctorManager.addOrReactivateDoctor(doctorAddress, 'Doogie')
-
-    doctorAddress2 = accounts[2]
-    await env.doctorManager.addOrReactivateDoctor(doctorAddress2, 'Dr. Hibbert')
+    await env.doctorManager.addOrReactivateDoctor(doctor, 'Doogie')
   })
 
   beforeEach(async () => {
     await resetCaseManager(artifacts, env)
+
     caseFee = await env.caseManager.caseFee()
-    caseInstance = await Case.at(await createCase(env, patient, doctorAddress))
+    caseInstance = await Case.at(await createCase(env, patient, doctor))
+
     const diagnosingDoctor = await caseInstance.diagnosingDoctor.call()
-    assert.equal(diagnosingDoctor, doctorAddress)
-    assert.equal((await env.caseStatusManager.openCaseCount.call(doctorAddress)).toString(), '1')
+    assert.equal(diagnosingDoctor, doctor)
+    assert.equal((await env.caseStatusManager.openCaseCount.call(doctor)).toString(), '1')
   })
 
   describe('initialize()', () => {
     it('should not work twice', async () => {
       assert.equal(await caseInstance.patient.call(), accounts[0])
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
-      assert.equal(await caseInstance.diagnosingDoctor.call(), doctorAddress)
+      assert.equal(await caseInstance.diagnosingDoctor.call(), doctor)
+
       await expectThrow(async () => {
         await caseInstance.initialize(
-          accounts[0], 'alaksefj', 'caseKeySalt', [1, 2], caseFee, env.registry.address
+          accounts[0],
+          'alaksefj',
+          'caseKeySalt',
+          [1, 2],
+          caseFee,
+          env.registry.address
         )
       })
     })
   })
 
-  describe('diagnoseCase()', () => {
-    it('should allow the diagnosing doctor to submit the diagnosis', async () => {
-      assert.equal(await env.caseStatusManager.openCaseCount.call(doctorAddress), 1)
-      await caseInstance.diagnoseCase('diagnosis hash', { from: doctorAddress })
-      assert.equal(await caseInstance.status.call(), caseStatus('Evaluated'))
-      assert(await caseInstance.diagnosisHash.call())
-    })
-  })
-
-  context('is diagnosed', () => {
-    beforeEach(async () => {
-      await caseInstance.diagnoseCase('diagnosis hash', { from: doctorAddress })
-    })
-
-    describe('acceptDiagnosis()', () => {
-      it('should allow the patient to accept the diagnosis', async () => {
-        await caseInstance.acceptDiagnosis()
-        assert.equal(await env.caseStatusManager.openCaseCount.call(doctorAddress), 0)
-        assert.equal(await env.caseStatusManager.closedCaseCount.call(doctorAddress), 1)
-        assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
-        let doctorBalance = await env.weth9.balanceOf(doctorAddress)
-        assert.equal(doctorBalance.toString(), caseFee)
-      })
-    })
-
-    describe('challengeWithDoctor()', () => {
-      it('should not allow the patient to challenge their own case', async () => {
-        await expectThrow(async () => {
-          await caseInstance.challengeWithDoctor(patient, 'patient encrypted case key')
-        })
-      })
-
-      describe('has been set', () => {
-        beforeEach(async () => {
-          await caseInstance.challengeWithDoctor(doctorAddress2, 'doctor 2 encrypted case key')
-          assert.equal(await env.caseStatusManager.openCaseCount.call(doctorAddress2), 1)
-          assert.equal(await env.caseStatusManager.closedCaseCount.call(doctorAddress2), 0)
-        })
-
-        it('should not be called twice', async () => {
-          await expectThrow(async () => {
-            await caseInstance.challengeWithDoctor(doctorAddress2, 'doctor 2 encrypted case key')
-          })
-        })
-
-        it('should allow the patient to challenge a diagnosis', async () => {
-          assert.equal(await caseInstance.status.call(), caseStatus('Challenging'))
-          assert.equal(await caseInstance.challengingDoctor.call(), doctorAddress2)
-        })
-
-        describe('diagnoseChallengedCase()', () => {
-          it('on approval should award both doctors', async () => {
-            let doctorBalance = await env.weth9.balanceOf(doctorAddress)
-            let doctorBalance2 = await env.weth9.balanceOf(doctorAddress2)
-            let result = await caseInstance.diagnoseChallengedCase('diagnosis hash', true, { from: doctorAddress2 })
-            assert.equal(await env.caseStatusManager.openCaseCount.call(doctorAddress), 0)
-            assert.equal(await env.caseStatusManager.closedCaseCount.call(doctorAddress), 1)
-            assert.equal(await env.caseStatusManager.openCaseCount.call(doctorAddress2), 0)
-            assert.equal(await env.caseStatusManager.closedCaseCount.call(doctorAddress2), 1)
-            assert(await caseInstance.challengeHash.call())
-            assert.equal((await env.weth9.balanceOf(doctorAddress)).toString(), doctorBalance.plus(caseFee).toString())
-            assert.equal((await env.weth9.balanceOf(doctorAddress2)).toString(), doctorBalance2.plus(caseFee / 2).toString())
-            assert.equal(result.logs[result.logs.length-1].event, 'CaseClosedConfirmed')
-          })
-
-          it('on rejecting original diagnosis should award the challenge doc', async () => {
-            let patientBalance = await env.weth9.balanceOf(patient)
-            let doctorBalance2 = await env.weth9.balanceOf(doctorAddress2)
-            let result = await caseInstance.diagnoseChallengedCase('diagnosis hash', false, { from: doctorAddress2 })
-            assert.equal((await env.weth9.balanceOf(patient)).toString(), patientBalance.plus(caseFee).toString())
-            assert.equal((await env.weth9.balanceOf(doctorAddress2)).toString(), doctorBalance2.plus(caseFee / 2).toString())
-            assert.equal(result.logs[result.logs.length-1].event, 'CaseClosedRejected')
-          })
-        })
-      })
-    })
-  })
 })

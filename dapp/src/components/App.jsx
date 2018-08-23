@@ -31,10 +31,11 @@ import { Web3Route } from '~/components/Web3Route'
 import { connect } from 'react-redux'
 import {
   cacheCall,
-  withSaga,
   cacheCallValue,
-  withContractRegistry,
-  contractByName
+  cacheCallValueInt,
+  contractByName,
+  withSaga,
+  withContractRegistry
 } from '~/saga-genesis'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
@@ -45,7 +46,7 @@ function mapStateToProps (state) {
   const CaseManager = contractByName(state, 'CaseManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const doctorCasesCount = cacheCallValue(state, CaseManager, 'doctorCasesCount', address)
+  const doctorCasesCount = cacheCallValueInt(state, CaseManager, 'doctorCasesCount', address)
   const openCaseCount = cacheCallValue(state, CaseStatusManager, 'openCaseCount', address)
   const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
@@ -118,7 +119,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
     CaseManagerInstance.methods
-      .doctorCaseAtIndex(address, nextProps.doctorCasesCount)
+      .doctorCaseAtIndex(address, nextProps.doctorCasesCount - 1)
       .call().then(caseAddress => {
         const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress })
 

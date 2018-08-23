@@ -5,7 +5,8 @@ import {
   cacheCallState,
   cacheCallValue,
   cacheCallValueInt,
-  contractByName
+  contractByName,
+  contractKeyByAddress
 } from './state-finders'
 import {
   ContractRegistryProvider,
@@ -28,6 +29,7 @@ export {
   cacheCallValue,
   cacheCallValueInt,
   contractByName,
+  contractKeyByAddress,
   ContractRegistry,
   ContractRegistryProvider
 }

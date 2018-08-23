@@ -8,9 +8,11 @@ import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
 import { Loading } from '~/components/Loading'
 import {
+  contractByName,
   withSaga,
   cacheCall,
   cacheCallValue,
+  cacheCallValueInt,
   withSend,
   addContract,
   TransactionStateHandler
@@ -36,8 +38,10 @@ import isEqual from 'lodash.isequal'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
+  const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
+
   const account = state.sagaGenesis.accounts[0]
-  const status = cacheCallValue(state, caseAddress, 'status')
+  const status = cacheCallValueInt(state, caseAddress, 'status')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
   const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
@@ -51,6 +55,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
   return {
+    CaseLifecycleManager,
     account,
     currentlyExcludedDoctors,
     status,
@@ -141,7 +146,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
             const diagnosis = JSON.parse(diagnosisJson)
             return resolve({ diagnosis })
           } else {
-            console.log(diagnosisJson)
             return reject('There was an error')
           }
         })
@@ -158,7 +162,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
           })
         })
         .catch((reason) => {
-          console.log('isCanceled', reason.isCanceled)
+          // console.log('isCanceled', reason.isCanceled)
         })
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')
@@ -222,7 +226,11 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   handleAcceptDiagnosis = () => {
-    const acceptTransactionId = this.props.send(this.props.caseAddress, 'acceptDiagnosis')()
+    const acceptTransactionId = this.props.send(
+      this.props.CaseLifecycleManager,
+      'acceptDiagnosis',
+      this.props.caseAddress
+    )()
     this.setState({
       acceptTransactionId,
       acceptHandler: new TransactionStateHandler(),
@@ -259,9 +267,13 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         doctorPublicKey,
         caseKeySalt
       })
-      const challengeTransactionId = this.props.send(this.props.caseAddress, 'challengeWithDoctor',
+      const challengeTransactionId = this.props.send(
+        this.props.CaseLifecycleManager,
+        'challengeWithDoctor',
+        this.props.caseAddress,
         this.state.selectedDoctor.value,
-        '0x' + doctorEncryptedCaseKey)()
+        '0x' + doctorEncryptedCaseKey
+      )()
 
       this.setState({
         showChallengeModal: false,
@@ -274,7 +286,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
   render() {
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
-    const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== '3'
+    const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== 3
     const challengeFeeEther = weiToEther(computeChallengeFee(this.props.caseFeeWei)).toString()
     const totalFeeEther = weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()
 

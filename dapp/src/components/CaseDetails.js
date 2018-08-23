@@ -10,9 +10,11 @@ import { cancelablePromise } from '~/utils/cancelablePromise'
 import { downloadJson, downloadImage } from '../utils/storage-util'
 import { all } from 'redux-saga/effects'
 import {
+  contractByName,
   withContractRegistry,
   withSaga,
   cacheCallValue,
+  cacheCallValueInt,
   cacheCall,
   addContract
 } from '~/saga-genesis'
@@ -21,25 +23,29 @@ import { toastr } from '~/toastr'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress }) {
+  if (caseAddress === undefined) { return {} }
+
   const networkId = get(state, 'sagaGenesis.network.networkId')
+  const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
   const caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
-  const createdAt = cacheCallValue(state, caseAddress, 'createdAt')
+  const createdAt = cacheCallValueInt(state, CaseScheduleManager, 'createdAt', caseAddress)
 
   return {
     caseDetailsHash: getFileHashFromBytes(caseDataHash),
-    createdAt: createdAt,
+    createdAt,
+    CaseScheduleManager,
     networkId
   }
 }
 
-function* saga({ caseAddress, networkId }) {
-  if (!networkId || !caseAddress) { return }
+function* saga({ CaseScheduleManager, caseAddress, networkId }) {
+  if (!networkId || !CaseScheduleManager || !caseAddress) { return }
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
     cacheCall(caseAddress, 'caseDataHash'),
-    cacheCall(caseAddress, 'createdAt')
+    cacheCall(CaseScheduleManager, 'createdAt', caseAddress)
   ])
 }
 
@@ -97,8 +103,6 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
               secondImageUrl
             })
           } else {
-            console.log('rejecting')
-            console.log(detailsJson)
             return reject('There was an error')
           }
         })
