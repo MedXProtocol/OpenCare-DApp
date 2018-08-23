@@ -26,7 +26,7 @@ i18next
             setPublicKey: 'Registering Account',
             sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',
-            addDoctor: 'Upgrading to Doctor'
+            addDoctor: 'Upgrading to Doctor',
             withdraw: 'Withdrawing W-ETH'
           },
           transactionErrors: {
