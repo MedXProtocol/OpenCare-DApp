@@ -21,7 +21,7 @@ jobs:
       - setup_remote_docker
       - checkout
 
-      - run: docker run --rm --name testrpc `docker build -qf scripts/Dockerfile.ganache scripts`
+      - run: docker run -d -p 8545:8545 --rm --name testrpc `docker build -qf scripts/Dockerfile.ganache scripts`
 
       # Download and cache dependencies
       - restore_cache:
