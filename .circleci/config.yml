@@ -41,7 +41,7 @@ jobs:
             - dapp/node_modules
           key: v1-dapp-dependencies-{{ checksum "dapp/package.json" }}
 
-      - run: docker run -d -p 8545:8545 --rm --name testrpc `docker build -qf scripts/Dockerfile.ganache scripts` && truffle test
+      - run: docker run -d -p 8545:8545 --rm --name testrpc trufflesuite/ganache-cli && npm test
 
       - run: docker stop testrpc
 
