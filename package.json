@@ -4,6 +4,8 @@
   "scripts": {
     "start": "./scripts/ganache.sh",
     "test": "truffle compile && truffle test",
+    "docker-test": "docker run -d -p 8545:8545 --rm --name testrpc3 trufflesuite/ganache-cli && truffle compile && truffle test",
+    "docker-posttest": "docker stop testrpc3",
     "test-watch": "./scripts/watch-tests.sh",
     "netlify-build": "./scripts/staging-build.sh",
     "staging-build": "./scripts/staging-build.sh",
