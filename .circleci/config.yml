@@ -21,25 +21,29 @@ jobs:
       - setup_remote_docker
       - checkout
 
-      - run: docker run -d -p 8545:8545 --rm --name testrpc `docker build -qf scripts/Dockerfile.ganache scripts`
-
       # Download and cache dependencies
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
+          - v1-dapp-dependencies-{{ checksum "dapp/package.json" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: npm i && cd dapp && npm i && cd ..
+      - run: npm i && cd dapp && npm i
 
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: npm test
+      - save_cache:
+          paths:
+            - dapp/node_modules
+          key: v1-dapp-dependencies-{{ checksum "dapp/package.json" }}
+
+      - run: docker run -d -p 8545:8545 --rm --name testrpc `docker build -qf scripts/Dockerfile.ganache scripts` && truffle test
+
+      - run: docker stop testrpc
 
       # Test!
       - run: cd dapp && $(npm bin)/eslint src && npm test
-
-      - run: docker stop testrpc
