@@ -364,6 +364,11 @@ $card-columns-margin:               $card-spacer-y;
   }
 }
 
-.card-body--closed-cases {
-  min-height: 400px;
+.card-body--cases__has-pagination {
+  min-height: 566px;
+  padding-bottom: 0;
+
+  @media (max-width: 768px) {
+    min-height: 440px;
+  }
 }

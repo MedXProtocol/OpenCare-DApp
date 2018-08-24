@@ -13,6 +13,8 @@ export class Pagination extends Component {
     formatPageRoute: PropTypes.func.isRequired
   }
   render () {
+    if (this.props.totalPages <= 1) { return null }
+
     return (
       <nav aria-label="Page navigation" className="text-center">
         <ul className="pagination">

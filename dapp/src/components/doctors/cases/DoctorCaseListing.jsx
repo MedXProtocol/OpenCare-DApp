@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import classnames from 'classnames'
 import FlipMove from 'react-flip-move'
 import { formatRoute } from 'react-router-named-routes'
 import { CaseRow } from '~/components/CaseRow'
@@ -45,7 +46,10 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
         <div className="row">
           <div className='col-xs-12'>
             <div className="card">
-              <div className='card-body'>
+              <div className={classnames(
+                'card-body',
+                /*{ 'card-body--cases__has-pagination': (totalPages > 1) }*/
+              )}>
                 <h5 className="title subtitle">
                   Open Cases:
                 </h5>
@@ -72,7 +76,10 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
         <div className="row">
           <div className='col-xs-12'>
             <div className="card">
-              <div className='card-body card-body--closed-cases'>
+              <div className={classnames(
+                'card-body',
+                { 'card-body--cases__has-pagination': (totalPages > 1) }
+              )}>
                 <h5 className="title subtitle">
                   Historical Cases:
                 </h5>
