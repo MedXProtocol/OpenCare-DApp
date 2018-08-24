@@ -8,15 +8,15 @@ import classnames from 'classnames'
 import Select from 'react-select'
 import { HippoTextArea } from '~/components/forms/HippoTextArea'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
-import { groupedRecommendationOptions } from './recommendationOptions'
 
-export const PrescriptionMedication = class _PrescriptionMedication extends Component {
+export const Medication = class _Medication extends Component {
   static propTypes = {
     medication: PropTypes.object.isRequired,
     errors: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     onBlur: PropTypes.func,
-    title: PropTypes.string
+    title: PropTypes.string,
+    recommendationOptions: PropTypes.object.isRequired
   }
 
   static defaultProps = {
@@ -66,11 +66,11 @@ export const PrescriptionMedication = class _PrescriptionMedication extends Comp
 
         <div className={classnames('form-group')}>
           <Select
-            placeholder={groupedRecommendationOptions.prescriptionMedications.label}
+            placeholder={this.props.recommendationOptions.label}
             styles={customStyles}
             components={Animated}
             closeMenuOnSelect={true}
-            options={groupedRecommendationOptions.prescriptionMedications.options}
+            options={this.props.recommendationOptions.options}
             isMulti={false}
             isClearable
             onChange={this.onChangePrescription}
