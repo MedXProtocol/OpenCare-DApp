@@ -67,7 +67,7 @@ export class Hippo {
       } catch (error) {
         if (error.message.match(/known transaction|transaction underpriced/)) {
           tx.nonce++
-          console.log(`retry: ${i+1}`)
+          console.info(`retry: ${i+1}`)
         } else {
           console.error(error)
           throw error
@@ -90,7 +90,7 @@ export class Hippo {
       console.info('sendEther tx: ', tx)
       return this.sendTransaction(tx)
     }).catch(error => {
-      console.log(error.message)
+      console.info(error.message)
       fail(error.message)
     })
   }
@@ -109,7 +109,7 @@ export class Hippo {
       console.info('sendMedX tx: ', tx)
       return this.sendTransaction(tx)
     }).catch(error => {
-      console.log(error.message)
+      console.info(error.message)
       fail(error.message)
     })
   }
@@ -117,16 +117,16 @@ export class Hippo {
   async addOrReactivateDoctor (ethAddress, name, publicKey) {
     const accountManager = await this.lookupAccountManager()
     const existingPublicKey = await accountManager.publicKeys(ethAddress)
-    console.log('accountManager: ', accountManager)
+    console.info('accountManager: ', accountManager)
     if (existingPublicKey[0] === '0x') {
-      console.log('Setting public key ', ethAddress, publicKey)
+      console.info('Setting public key ', ethAddress, publicKey)
       await accountManager.setPublicKey(ethAddress, publicKey).catch((error) => {
         console.error(error)
         fail(error.message)
       })
     }
     const doctorManagerAddress = await this.lookupContractAddress('DoctorManager')
-    console.log('found doctor manager: ', doctorManagerAddress)
+    console.info('found doctor manager: ', doctorManagerAddress)
     const method = doctorManagerArtifact.abi.find((obj) => obj.name === 'addOrReactivateDoctor')
     var data = abi.encodeMethod(method, [ethAddress, name])
     const tx = {

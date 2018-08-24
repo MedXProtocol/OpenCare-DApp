@@ -35,7 +35,7 @@ exports.handler = function (event, context, callback) {
       }
     }
 
-    console.log('Upgrading ' + ethAddress + 'to be a doctor named ' + name)
+    console.info('Upgrading ' + ethAddress + 'to be a doctor named ' + name)
 
     if (!Eth.isAddress(ethAddress)) {
       callback(`ethAddress is not a valid address: ${ethAddress}`)
@@ -44,10 +44,10 @@ exports.handler = function (event, context, callback) {
     } else if (!publicKey) {
       callback(`you must pass a publicKey`)
     } else {
-      console.log('hippo.addOrReactivateDoctor ' + ethAddress + ' to be a doctor named ' + name + ' with public key ' + publicKey)
+      console.info('hippo.addOrReactivateDoctor ' + ethAddress + ' to be a doctor named ' + name + ' with public key ' + publicKey)
       hippo.addOrReactivateDoctor(ethAddress, name, publicKey)
         .then((transactionHash) => {
-          console.log('Successfully sent transaction with hash: ', transactionHash)
+          console.info('Successfully sent transaction with hash: ', transactionHash)
           callback(null, {
             statusCode: 200,
             body: JSON.stringify({ txHash: transactionHash }),
