@@ -12,16 +12,15 @@ function formatCreatedAt(time) {
   }
 }
 
-export const HippoTimestamp = ({ timeInUtcSecondsSinceEpoch }) => {
+export const HippoTimestamp = ({ timeInUtcSecondsSinceEpoch, delimiter }) => {
   if (!timeInUtcSecondsSinceEpoch || (timeInUtcSecondsSinceEpoch < 1)) { return null }
 
   const formattedCreatedAt = formatCreatedAt(timeInUtcSecondsSinceEpoch)
 
+  const entries = `${formattedCreatedAt.date} ${delimiter ? delimiter : `-`} ${formattedCreatedAt.time}`
+
   return (
-    <span className="text-gray">
-      {formattedCreatedAt.date}
-      &nbsp;- {formattedCreatedAt.time}
-      {/*&nbsp;<small>({formattedCreatedAt.timezoneOffset})</small>*/}
-    </span>
+    <span className="text-gray" dangerouslySetInnerHTML={{__html: entries}} />
   )
 }
+

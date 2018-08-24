@@ -1,1 +1,1 @@
-export const secondsInADay = 86400
+export const secondsInADay = 120

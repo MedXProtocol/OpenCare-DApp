@@ -1,6 +1,8 @@
+import ReactDOMServer from 'react-dom/server'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import ReactTooltip from 'react-tooltip'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
@@ -253,9 +255,13 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
 
     let remove
     let style = { zIndex: 950 }
-    let { caseAddress, objIndex, error, transactionId, createdAt } = caseRowObject
+    let { caseAddress, objIndex, error, transactionId, createdAt, updatedAt } = caseRowObject
 
-    const timestamp = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
+    const createdAtDisplay = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} delimiter={`<br />`} />
+    const loadingOrCreatedAtTimestamp = pendingTransaction ? '...' : createdAtDisplay
+
+    const createdAtTooltip = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} />
+    const updatedAtTooltip = <HippoTimestamp timeInUtcSecondsSinceEpoch={updatedAt} />
 
     if (objIndex) {
       style = { zIndex: 998 - objIndex }
@@ -264,9 +270,8 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
       !defined(caseRowObject.status)
       || caseRowObject.status === PENDING_TX_STATUS
     )
-    const number = pendingTransaction ? '...' : objIndex
     const path = this.props.path || routes.PATIENTS_CASES
-    const ethAddress = caseAddress ? <EthAddress address={caseAddress} /> : null
+    const ethAddress = caseAddress ? <EthAddress address={caseAddress} onlyAddress={true} /> : null
 
     const action = this.caseRowAction(caseRowObject, pendingTransaction)
     const label = this.caseRowLabel(caseRowObject, pendingTransaction)
@@ -292,8 +297,18 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
         'list',
         { 'case-list--item__pending': pendingTransaction }
       )}>
-        <span className="case-list--item__case-number text-center">
-          {number}
+        <span className="case-list--item__case-date text-center">
+          <span data-tip={`Created: ${ReactDOMServer.renderToStaticMarkup(createdAtTooltip)}
+              ${ReactDOMServer.renderToStaticMarkup(<br/>)}
+              Last Updated: ${ReactDOMServer.renderToStaticMarkup(updatedAtTooltip)}`}>
+            <ReactTooltip
+              html={true}
+              effect='solid'
+              place={'top'}
+              wrapper='span'
+            />
+            {loadingOrCreatedAtTimestamp}
+          </span>
         </span>
 
         <span className="case-list--item__status text-center">
@@ -304,7 +319,6 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
 
         <span className="case-list--item__eth-address text text-left">
           {ethAddress}
-          {timestamp}
         </span>
 
         <span className="case-list--item__view text-center">
