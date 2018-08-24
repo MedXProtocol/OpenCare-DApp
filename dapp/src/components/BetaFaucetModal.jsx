@@ -199,7 +199,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
 
       render() {
         let content
-        let totalSteps = '3'
+        let totalSteps = '2'
         const { showBetaFaucetModal, step } = this.state
         const {
           medXBalance,

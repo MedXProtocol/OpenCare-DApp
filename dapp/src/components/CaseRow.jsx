@@ -101,19 +101,23 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
 
   // If this caseRowObject has an ongoing blockchain transaction this will update
   const reversedTransactions = transactions.reverse().filter(transaction => {
-    const { call, confirmed, error, address } = transaction
+    const { call, confirmed, error } = transaction
+    const caseAddress = get(transaction, 'call.args[0]')
+
     return (
       call
       && (
         (!confirmed && !error)
         || (error && transactionErrorToCode(error) !== 'userRevert')
       )
-      && (caseRowObject.caseAddress === address)
+      && (caseRowObject.caseAddress === caseAddress)
     )
   })
 
   for (let i = 0; i < reversedTransactions.length; i++) {
-    if (caseRowObject.caseAddress === reversedTransactions[i].address) {
+    const caseAddress = get(reversedTransactions[i], 'call.args[0]')
+
+    if (caseRowObject.caseAddress === caseAddress) {
       caseRowObject = updatePendingTx(caseRowObject, reversedTransactions[i])
       break
     }
