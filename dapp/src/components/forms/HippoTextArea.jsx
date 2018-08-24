@@ -31,7 +31,9 @@ export const HippoTextArea = class _HippoTextArea extends Component {
 
   handleBlur = (event) => {
     event.persist()
-    this.props.textAreaOnBlur(event, this.props.name)
+    if (this.props.textAreaOnBlur) {
+      this.props.textAreaOnBlur(event, this.props.name)
+    }
   }
 
   handleChange = (event) => {
