@@ -110,6 +110,7 @@
     "babel-cli": "^6.26.0",
     "babel-eslint": "7.2.3",
     "babel-jest": "20.0.3",
+    "cypress": "^3.1.0",
     "dotenv": "4.0.0",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
@@ -127,6 +128,7 @@
     "libp2p-websocket-star-rendezvous": "^0.2.3",
     "react-dev-utils": "^4.2.1",
     "react-hot-loader": "^4.3.3",
+    "truffle-privatekey-provider": "^0.1.0",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-dev-server": "2.9.4"
   },
@@ -136,7 +138,9 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
-    "console": "NODE_ENV=development babel-node"
+    "console": "NODE_ENV=development babel-node",
+    "cypress:open": "cypress open",
+    "cypress": "cypress run"
   },
   "jest": {
     "verbose": true,
