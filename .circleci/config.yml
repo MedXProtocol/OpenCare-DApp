@@ -14,11 +14,11 @@ jobs:
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/mongo:3.4.4
+      - image: trufflesuite/ganache-cli
 
     working_directory: ~/repo
 
     steps:
-      - setup_remote_docker
       - checkout
 
       # Download and cache dependencies
@@ -41,9 +41,7 @@ jobs:
             - dapp/node_modules
           key: v1-dapp-dependencies-{{ checksum "dapp/package.json" }}
 
-      - run: npm run docker-test
-
-      - run: npm run docker-posttest
+      - run: npm test
 
       # Test!
       - run: cd dapp && $(npm bin)/eslint src && npm test
