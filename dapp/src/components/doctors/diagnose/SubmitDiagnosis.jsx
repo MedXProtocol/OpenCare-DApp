@@ -27,7 +27,8 @@ import { Loading } from '~/components/Loading'
 import { toastr } from '~/toastr'
 import pull from 'lodash.pull'
 import * as routes from '~/config/routes'
-import { PrescriptionMedication } from './PrescriptionMedication'
+import { Medication } from './Medication'
+import { groupedRecommendationOptions } from './recommendationOptions'
 
 //used to distinguish prescription components
 let medicationId = 1
@@ -519,13 +520,14 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                       :
                       overTheCounters.map((overTheCounter, index) => {
                         return (
-                          <PrescriptionMedication
+                          <Medication
                             title='Over-the-Counter Medication'
                             key={overTheCounter.medicationId}
                             medication={overTheCounter}
                             errors={this.state.overTheCounterErrors[overTheCounter.medicationId] || {}}
                             onBlur={this.handleTextAreaOnBlur}
                             onChange={(medication) => this.onChangeOverTheCounter(index, medication)}
+                            recommendationOptions={groupedRecommendationOptions.overTheCounter}
                             />
                         )
                       })
@@ -541,12 +543,13 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                       :
                       prescriptions.map((prescription, index) => {
                         return (
-                          <PrescriptionMedication
+                          <Medication
                             key={prescription.medicationId}
                             medication={prescription}
                             errors={this.state.prescriptionErrors[prescription.medicationId] || {}}
                             onBlur={this.handleTextAreaOnBlur}
                             onChange={(medication) => this.onChangePrescription(index, medication)}
+                            recommendationOptions={groupedRecommendationOptions.prescriptionMedications}
                             />
                         )
                       })

@@ -43,8 +43,6 @@ import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
 import { promisify } from '~/utils/promisify'
-import { weiToUsd } from '~/utils/weiToUsd'
-import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')

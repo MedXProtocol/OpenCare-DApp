@@ -13,7 +13,7 @@ import { weiToUsd } from '~/utils/weiToUsd'
 import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
 import { Ether } from './Ether'
 
-import EtherFlipStyle from './EtherFlipStyle.css'
+require('./EtherFlipStyle.css')
 
 function mapStateToProps(state) {
   const CaseManager = contractByName(state, 'CaseManager')
