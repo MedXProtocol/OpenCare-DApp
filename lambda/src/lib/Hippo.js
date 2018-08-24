@@ -133,6 +133,9 @@ export class Hippo {
       }
       console.info('addOrReactivateDoctor tx: ', tx)
       return this.sendTransaction(tx)
+    }).catch(error => {
+      console.error(error)
+      fail(error.message)
     })
   }
 }
