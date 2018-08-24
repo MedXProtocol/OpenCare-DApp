@@ -11,7 +11,7 @@ contract CaseScheduleManager is Initializable, Ownable {
 
   using RegistryLookup for Registry;
 
-  uint constant secondsInADay = 86400;
+  uint constant secondsInADay = 120;
 
   mapping(address => uint) public createdAt;
   mapping(address => uint) public updatedAt;
