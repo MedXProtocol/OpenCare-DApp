@@ -44,6 +44,7 @@ exports.handler = function (event, context, callback) {
     } else if (!publicKey) {
       callback(`you must pass a publicKey`)
     } else {
+      console.log('hippo.addOrReactivateDoctor ' + ethAddress + ' to be a doctor named ' + name + ' with public key ' + publicKey)
       hippo.addOrReactivateDoctor(ethAddress, name, publicKey)
         .then((transactionHash) => {
           console.log('Successfully sent transaction with hash: ', transactionHash)

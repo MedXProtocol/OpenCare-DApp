@@ -120,7 +120,10 @@ export class Hippo {
     console.log('accountManager: ', accountManager)
     if (existingPublicKey[0] === '0x') {
       console.log('Setting public key ', ethAddress, publicKey)
-      await accountManager.setPublicKey(ethAddress, publicKey)
+      await accountManager.setPublicKey(ethAddress, publicKey).catch((error) => {
+        console.error(error)
+        fail(error.message)
+      })
     }
     const doctorManagerAddress = await this.lookupContractAddress('DoctorManager')
     console.log('found doctor manager: ', doctorManagerAddress)
