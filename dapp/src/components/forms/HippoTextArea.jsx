@@ -13,8 +13,13 @@ export const HippoTextArea = class _HippoTextArea extends Component {
   constructor(props) {
     super(props)
 
+    let visible = true
+    if (typeof props.visible !== 'undefined') {
+      visible = props.visible
+    }
+
     this.state = {
-      visible: true
+      visible
     }
   }
 
