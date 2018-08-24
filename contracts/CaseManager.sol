@@ -6,6 +6,7 @@ import './CaseLifecycleManager.sol';
 import './CaseScheduleManager.sol';
 import "./Delegate.sol";
 import "./Initializable.sol";
+import "./IEtherPriceFeed.sol";
 import "./MedXToken.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
@@ -18,7 +19,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
   using RegistryLookup for Registry;
   using SafeMath for uint256;
 
-  uint256 public caseFee;
+  uint256 public caseFeeUsd;
 
   address[] public caseList;
   mapping (address => uint256) public caseIndices;
@@ -60,15 +61,15 @@ contract CaseManager is Ownable, Pausable, Initializable {
 
   /**
    * @dev - Constructor
-   * @param _baseCaseFee - initial case fee
+   * @param _baseCaseFeeUsd - initial case fee
    */
-  function initialize(uint256 _baseCaseFee, address _registry) external notInitialized {
-    require(_baseCaseFee > 0, 'base case fee is lt eq zero');
+  function initialize(uint256 _baseCaseFeeUsd, address _registry) external notInitialized {
+    require(_baseCaseFeeUsd > 0, 'base case fee is lt eq zero');
     require(_registry != 0x0, 'registry is zero');
     setInitialized();
 
     owner = msg.sender;
-    caseFee = _baseCaseFee;
+    caseFeeUsd = _baseCaseFeeUsd;
     registry = Registry(_registry);
     caseList.push(address(0));
   }
@@ -83,13 +84,9 @@ contract CaseManager is Ownable, Pausable, Initializable {
   /**
    * @dev - sets the base case fee - only affects new cases
    */
-  function setBaseCaseFee(uint256 _newCaseFee) public onlyOwner {
-    require(_newCaseFee > 0);
-    caseFee = _newCaseFee;
-  }
-
-  function createCaseCost () public view returns (uint256) {
-    return caseFee.add(caseFee.mul(50).div(100));
+  function setBaseCaseFee(uint256 _newCaseFeeUsd) public onlyOwner {
+    require(_newCaseFeeUsd > 0);
+    caseFeeUsd = _newCaseFeeUsd;
   }
 
   /**
@@ -153,11 +150,9 @@ contract CaseManager is Ownable, Pausable, Initializable {
     bytes _doctorEncryptedKey
   ) internal {
     Case newCase = Case(new Delegate(registry, keccak256("Case")));
-    newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFee, registry);
-
+    newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFeeWei(), registry);
     uint256 caseIndex = caseList.push(address(newCase)) - 1;
     caseIndices[address(newCase)] = caseIndex;
-
     patientCases[_patient].push(address(newCase));
     doctorCases[_doctor].push(address(newCase));
 
@@ -167,6 +162,25 @@ contract CaseManager is Ownable, Pausable, Initializable {
     newCase.deposit.value(msg.value)();
 
     emit NewCase(newCase, caseIndex);
+  }
+
+  function createCaseCostWei (uint256 _caseFeeUsd) public view returns (uint256) {
+    uint256 caseFee = usdToWei(_caseFeeUsd);
+    return caseFee.add(caseFee.mul(50).div(100));
+  }
+
+  function caseFeeWei() public view returns (uint256) {
+    return usdToWei(caseFeeUsd);
+  }
+
+  function usdToWei(uint256 _caseFeeUsd) public view returns (uint256) {
+    return _caseFeeUsd.div(usdPerWei());
+  }
+
+  function usdPerWei() public view returns (uint256) {
+    IEtherPriceFeed etherPriceFeed = IEtherPriceFeed(registry.lookup(keccak256('EtherPriceFeed')));
+    uint256 usdPerEth = uint256(etherPriceFeed.read());
+    return usdPerEth.div(1000000000000000000);
   }
 
   function addChallengeDoctor(address _doctor, address _caseAddress) external onlyCasePhaseManagers {
@@ -184,5 +198,4 @@ contract CaseManager is Ownable, Pausable, Initializable {
       return 0;
     }
   }
-
 }

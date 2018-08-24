@@ -6,6 +6,9 @@ module.exports = async function(env, patientAddress, doctorAddress) {
 
   let currentCount = await env.caseManager.getPatientCaseListCount(patientAddress)
   currentCount = parseInt(currentCount.toString())
+  let caseFeeWei = await env.caseManager.caseFeeWei()
+  let halfCaseFeeWei = caseFeeWei.mul(50).div(100).floor()
+  let totalCaseFee = caseFeeWei.plus(halfCaseFeeWei)
   await env.caseManager.createAndAssignCase(
     patientAddress,
     encryptedCaseKey,
@@ -15,7 +18,7 @@ module.exports = async function(env, patientAddress, doctorAddress) {
     'doctor encrypted case key',
     {
       from: patientAddress,
-      value: web3.toWei(15, 'ether')
+      value: totalCaseFee
     }
   )
   let nextCount = await env.caseManager.getPatientCaseListCount(patientAddress)

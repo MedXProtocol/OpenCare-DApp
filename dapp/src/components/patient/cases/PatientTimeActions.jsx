@@ -26,7 +26,7 @@ import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
 import { secondsInADay } from '~/config/constants'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
-import { weiToEther } from '~/utils/weiToEther'
+import { EtherFlip } from '~/components/EtherFlip'
 import { isTrue } from '~/utils/isTrue'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
@@ -271,7 +271,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     render () {
       const isPatient = true
       const { diagnosingDoctor, account, updatedAt, status } = this.props
-      const challengeFeeEther = weiToEther(computeChallengeFee(this.props.caseFeeWei)).toString()
+      const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
       let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
       let buttons = (
@@ -302,7 +302,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
               onClick={this.handlePatientAcceptDiagnosis}
               className="btn btn-sm btn-clear"
             >
-              Accept Initial Diagnosis<br /> (Withdraw {challengeFeeEther} W-ETH)
+              Accept Initial Diagnosis<br /> (Withdraw {challengeFeeEther})
             </Button>
             <Button
               disabled={this.state.loading}

@@ -18,7 +18,7 @@ export const EtherscanLink = connect(mapStateToProps)(class _EtherscanLink exten
   }
 
   render () {
-    var url = '#'
+    var url
 
     switch(this.props.networkId) {
       case '1':
@@ -36,10 +36,14 @@ export const EtherscanLink = connect(mapStateToProps)(class _EtherscanLink exten
       // no default
     }
 
-    return (
-      <a href={url} title='Etherscan' target="_blank" rel="noopener noreferrer">
-        {this.props.children}
-      </a>
-    )
+    var link = null
+    if (url) {
+      link =
+        <a href={url} title='Etherscan' target="_blank" rel="noopener noreferrer">
+          {this.props.children}
+        </a>
+    }
+
+    return link
   }
 })

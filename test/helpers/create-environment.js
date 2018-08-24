@@ -17,12 +17,17 @@ module.exports = async function createEnvironment(artifacts) {
   const CaseStatusManager = artifacts.require('./CaseStatusManager.sol')
   const BetaFaucet = artifacts.require('./BetaFaucet.sol')
   const Registry = artifacts.require("./Registry.sol")
+  const EtherPriceFeed = artifacts.require('./EtherPriceFeed.sol')
 
   let registry = await Registry.new()
   let medXToken = await MedXToken.new()
 
   let weth9 = await WETH9.new()
   await registry.register(toRegistryKey('WrappedEther'), weth9.address)
+
+  let etherPriceFeed = await EtherPriceFeed.new()
+  await registry.register(toRegistryKey('EtherPriceFeed'), etherPriceFeed.address)
+  await etherPriceFeed.set(web3.toWei('300', 'ether'))
 
   let caseInstance = await Case.new()
   await registry.register(toRegistryKey('Case'), caseInstance.address)
@@ -59,6 +64,7 @@ module.exports = async function createEnvironment(artifacts) {
     registry,
     medXToken,
     weth9,
+    etherPriceFeed,
     caseManager,
     caseLifecycleManager,
     caseFirstPhaseManager,

@@ -6,7 +6,7 @@ import { axiosInstance } from '~/config/hippoAxios'
 import { LoadingLines } from '~/components/LoadingLines'
 import medXLogoImg from '~/assets/img/medx-logo.png'
 import medXLogoImg2x from '~/assets/img/medx-logo@2x.png'
-import { weiToEther } from '~/utils/weiToEther'
+import { displayWeiToEther } from '~/utils/displayWeiToEther'
 
 export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component {
 
@@ -117,7 +117,7 @@ export const MedXFaucetAPI = ReactTimeout(class _MedXFaucetAPI extends Component
       <div className="col-xs-12 text-center">
         <strong>Current MEDT (Test MEDX) Balance:</strong>
         <h2 className="header--no-top-margin">
-          {weiToEther(this.props.medXBalance)}
+          {displayWeiToEther(this.props.medXBalance)}
           <img
             src={medXLogoImg}
             alt="MedX Logo"

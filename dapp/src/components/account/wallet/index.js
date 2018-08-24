@@ -7,7 +7,7 @@ import faExternalLinkAlt from '@fortawesome/fontawesome-free-solid/faExternalLin
 import { cacheCall, withSaga, cacheCallValue, contractByName } from '~/saga-genesis'
 import { EthAddress } from '~/components/EthAddress'
 import { PageTitle } from '~/components/PageTitle'
-import { weiToEther } from '~/utils/weiToEther'
+import { EtherFlip } from '~/components/EtherFlip'
 import { EtherscanLink } from '~/components/EtherscanLink'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
@@ -70,6 +70,13 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
   }
 
   render() {
+    if (this.props.WrappedEther) {
+      var etherscanLink =
+        <EtherscanLink address={this.props.WrappedEther}>
+          <FontAwesomeIcon
+            icon={faExternalLinkAlt} />
+        </EtherscanLink>
+    }
     return (
       <div>
         <PageTitle renderTitle={(t) => t('pageTitles.balance')} />
@@ -82,10 +89,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                     W-ETH Balance
                     &nbsp;
                     <small>
-                      <EtherscanLink address={this.props.WrappedEther}>
-                        <FontAwesomeIcon
-                          icon={faExternalLinkAlt} />
-                      </EtherscanLink>
+                      {etherscanLink}
                     </small>
                     <br /><small className="eth-address text-gray">ethereum address: <EthAddress address={this.props.address} /></small>
                   </h3>
@@ -95,7 +99,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                     <p className='lead text-center'>
                       <FontAwesomeIcon
                         icon={faHeartbeat} />
-                      &nbsp; {weiToEther(this.props.balance)} W-ETH
+                      &nbsp; <EtherFlip wei={this.props.balance} />
                     </p>
 
                     <div className="text-center">

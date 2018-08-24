@@ -18,7 +18,7 @@ import { currentAccount } from '~/services/sign-in'
 import { jicImageCompressor } from '~/services/jicImageCompressor'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
 import { computeTotalFee } from '~/utils/computeTotalFee'
-import { weiToEther } from '~/utils/weiToEther'
+import { EtherFlip } from '~/components/EtherFlip'
 import {
   contractByName,
   withContractRegistry,
@@ -43,13 +43,16 @@ import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
 import { promisify } from '~/utils/promisify'
+import { weiToUsd } from '~/utils/weiToUsd'
+import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-  const caseFeeWei = cacheCallValue(state, CaseManager, 'caseFee')
 
   const balance = get(state, 'sagaGenesis.ethBalance.balance')
+  const caseFeeWei = cacheCallValue(state, CaseManager, 'caseFeeWei')
+  const usdPerWei = cacheCallValue(state, CaseManager, 'usdPerWei')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
@@ -60,6 +63,7 @@ function mapStateToProps (state) {
     AccountManager,
     account,
     caseFeeWei,
+    usdPerWei,
     transactions: state.sagaGenesis.transactions,
     CaseManager,
     publicKey,
@@ -83,7 +87,7 @@ function mapDispatchToProps(dispatch) {
 function* saga({ account, AccountManager, CaseManager }) {
   if (!account || !AccountManager || !CaseManager) { return }
   yield cacheCall(AccountManager, 'publicKeys', account)
-  yield cacheCall(CaseManager, 'caseFee')
+  yield cacheCall(CaseManager, 'caseFeeWei')
 }
 
 const requiredFields = [
@@ -880,7 +884,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>You need {weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()} Ether to submit a case.</h4>
+                <h4>You need <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} /> to submit a case.</h4>
               </div>
             </div>
           </Modal.Body>
@@ -901,7 +905,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                   Are you sure?
                 </h4>
                 <h5>
-                  This will cost you between {weiToEther(computeChallengeFee(this.props.caseFeeWei)).toString()} - {weiToEther(computeTotalFee(this.props.caseFeeWei)).toString()} Ether.
+                  This will cost you between <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} /> - <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} />.
                   <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
                 </h5>
               </div>

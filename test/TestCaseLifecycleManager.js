@@ -18,7 +18,7 @@ contract('CaseLifecycleManager', function (accounts) {
   let doctor = accounts[1]
   let doctor2 = accounts[2]
   let doctor3 = accounts[3]
-  let caseFee
+  let caseFeeWei
 
   before(async () => {
     env = await createEnvironment(artifacts)
@@ -32,7 +32,7 @@ contract('CaseLifecycleManager', function (accounts) {
   beforeEach(async () => {
     await resetCaseManager(artifacts, env)
 
-    caseFee = await env.caseManager.caseFee()
+    caseFeeWei = await env.caseManager.caseFeeWei()
 
     caseInstance = await Case.at(await createCase(env, patient, doctor))
   })
@@ -98,10 +98,10 @@ contract('CaseLifecycleManager', function (accounts) {
         assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
 
         let doctorBalance = await env.weth9.balanceOf(doctor)
-        assert.equal(doctorBalance.toString(), caseFee.toString())
+        assert.equal(doctorBalance.toString(), caseFeeWei.toString())
 
         // Deposit afterwards to clean up this test
-        env.weth9.withdraw(caseFee, { from: doctor })
+        env.weth9.withdraw(caseFeeWei, { from: doctor })
       })
 
       it('should allow the patient to accept diagnosis 24 hours after choosing a challenge doc', async () => {
@@ -130,7 +130,7 @@ contract('CaseLifecycleManager', function (accounts) {
         // assert.equal(patientBalance, caseFee / 3)
 
         let doctorBalance = await env.weth9.balanceOf(doctor)
-        assert.equal(doctorBalance.toString(), caseFee.toString())
+        assert.equal(doctorBalance.toString(), caseFeeWei.toString())
       })
     })
 
@@ -205,8 +205,8 @@ contract('CaseLifecycleManager', function (accounts) {
 
             assert(await caseInstance.challengeHash.call())
 
-            assert.equal((await env.weth9.balanceOf(doctor)).toString(), doctorBalance.plus(caseFee).toString())
-            assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.plus(caseFee / 2).toString())
+            assert.equal((await env.weth9.balanceOf(doctor)).toString(), doctorBalance.plus(caseFeeWei).toString())
+            assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.plus(caseFeeWei).div(2).floor().toString())
 
             // console.log(result.logs)
             // assert.equal(result.logs[result.logs.length-1].event, 'CaseDiagnosisConfirmed')
@@ -231,8 +231,8 @@ contract('CaseLifecycleManager', function (accounts) {
 
             assert(await caseInstance.challengeHash.call())
 
-            assert.equal((await env.weth9.balanceOf(patient)).toString(), patientBalance.plus(caseFee).toString())
-            assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.plus(caseFee / 2).toString())
+            assert.equal((await env.weth9.balanceOf(patient)).toString(), patientBalance.plus(caseFeeWei).toString())
+            assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.plus(caseFeeWei).div(2).floor().toString())
             // assert.equal(result.receipt.logs[result.receipt.logs.length-1].event, 'CaseDiagnosesDiffer')
           })
         })
