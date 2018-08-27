@@ -47,6 +47,7 @@ exports.handler = function (event, context, callback) {
       console.info('hippo.addOrReactivateDoctor ' + ethAddress + ' to be a doctor named ' + name + ' with public key ' + publicKey)
       hippo.addOrReactivateDoctor(ethAddress, name, publicKey)
         .then((transactionHash) => {
+          console.info("YEZZZZ!")
           console.info('Successfully sent transaction with hash: ', transactionHash)
           callback(null, {
             statusCode: 200,
@@ -55,12 +56,14 @@ exports.handler = function (event, context, callback) {
           })
         })
         .catch(error => {
+          console.info('WHOA YEA')
           console.error('big ol error: ', error.message)
           console.error('ERROR: ', error)
           callback(error)
         })
     }
   } catch (error) {
+    console.info('?? ERRRRRRR')
     console.error('massive ol error: ', error.message)
     console.error('MASSIVE ERROR: ', error)
     callback(error)
