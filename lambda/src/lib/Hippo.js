@@ -117,21 +117,23 @@ export class Hippo {
 
   async addOrReactivateDoctor (ethAddress, name, publicKey) {
     const accountManager = await this.lookupAccountManager()
-    const existingPublicKey = await accountManager.publicKeys(ethAddress)
-    console.info('accountManager!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    console.info('this is new code??????????????????????????????????')
-    if (!existingPublicKey.length || existingPublicKey[0] === '0x') {
+    const existingPublicKeys = await accountManager.publicKeys(ethAddress)
+    console.info('accountManager!!!!!!!!!!!!!!!!!!!!!!!!!!!!', accountManager.address)
+    console.info('this is new code??????????????????????????????????', existingPublicKeys)
+    const existingPublicKey = existingPublicKeys['0']
+    console.info('existing public key: ', existingPublicKey)
+    if (!existingPublicKey || existingPublicKey === '0x') {
       console.info('Setting public key ', ethAddress, publicKey)
-      // return accountManager.setPublicKey(ethAddress, publicKey)
-      //   .then(() => {
-      //     console.log('calling _add')
+      return accountManager.setPublicKey(ethAddress, publicKey)
+        .then(() => {
+          console.log('calling _add')
           return this._addOrReactivateDoctor(ethAddress, name)
-        // })
-        // .catch((error) => {
-        //   console.error(' THIS IS THE ERROR RIGHT HERE', error.message)
-        //   console.info(' THIS IS THE INFO RIGHT HERE', error.message)
-        //   fail(error.message)
-        // })
+        })
+        .catch((error) => {
+          console.info(' THIS IS THE INFO RIGHT HERE', error.message)
+          console.error(' THIS IS THE ERROR RIGHT HERE', error.message)
+          fail(error.message)
+        })
     } else {
       return this._addOrReactivateDoctor(ethAddress, name)
     }
