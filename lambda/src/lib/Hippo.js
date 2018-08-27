@@ -123,8 +123,17 @@ export class Hippo {
     const existingPublicKey = existingPublicKeys['0']
     console.info('existing public key: ', existingPublicKey)
     if (!existingPublicKey || existingPublicKey === '0x') {
+      const method = accountManagerArtifact.abi.find((obj) => obj.name === 'setPublicKey')
+      var data = abi.encodeMethod(method, [ethAddress, publicKey])
+      const tx = {
+        from: this.ownerAddress(),
+        to: accountManager.address,
+        gas: 4000000,
+        gasPrice: Eth.toWei(20, 'gwei').toString(),
+        data
+      }
       console.info('Setting public key ', ethAddress, publicKey)
-      return accountManager.setPublicKey(ethAddress, publicKey)
+      return this.sendTransaction(tx)
         .then(() => {
           console.log('calling _add')
           return this._addOrReactivateDoctor(ethAddress, name)
