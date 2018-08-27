@@ -118,10 +118,7 @@ export class Hippo {
   async addOrReactivateDoctor (ethAddress, name, publicKey) {
     const accountManager = await this.lookupAccountManager()
     const existingPublicKeys = await accountManager.publicKeys(ethAddress)
-    console.info('accountManager!!!!!!!!!!!!!!!!!!!!!!!!!!!!', accountManager.address)
-    console.info('this is new code??????????????????????????????????', existingPublicKeys)
     const existingPublicKey = existingPublicKeys['0']
-    console.info('existing public key: ', existingPublicKey)
     if (!existingPublicKey || existingPublicKey === '0x') {
       const method = accountManagerArtifact.abi.find((obj) => obj.name === 'setPublicKey')
       var data = abi.encodeMethod(method, [ethAddress, publicKey])
@@ -132,15 +129,12 @@ export class Hippo {
         gasPrice: Eth.toWei(20, 'gwei').toString(),
         data
       }
-      console.info('Setting public key ', ethAddress, publicKey)
       return this.sendTransaction(tx)
         .then(() => {
-          console.log('calling _add')
           return this._addOrReactivateDoctor(ethAddress, name)
         })
         .catch((error) => {
-          console.info(' THIS IS THE INFO RIGHT HERE', error.message)
-          console.error(' THIS IS THE ERROR RIGHT HERE', error.message)
+          console.error('addOrReactivateDoctor: ', error.message)
           fail(error.message)
         })
     } else {
@@ -149,11 +143,8 @@ export class Hippo {
   }
 
   _addOrReactivateDoctor (ethAddress, name) {
-    console.info('_addOrReactivateDoctor')
     return this.lookupContractAddress('DoctorManager')
       .then((doctorManagerAddress) => {
-        console.info('found doctor manager: ', doctorManagerAddress)
-        console.info('test??????????000')
         const method = doctorManagerArtifact.abi.find((obj) => obj.name === 'addOrReactivateDoctor')
         var data = abi.encodeMethod(method, [ethAddress, name])
         const tx = {
@@ -163,12 +154,11 @@ export class Hippo {
           gasPrice: Eth.toWei(20, 'gwei').toString(),
           data
         }
-        console.info('test??????????')
-        console.info('addOrReactivateDoctor tx: ', tx)
         return this.sendTransaction(tx)
       })
       .catch((error) => {
         console.info('errorr !! ', error.message)
+        fail(error)
       })
   }
 }
