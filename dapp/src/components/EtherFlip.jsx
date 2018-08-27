@@ -56,7 +56,7 @@ export const EtherFlip = connect(mapStateToProps)(
 
         if (this.state.showUsd) {
           var value = (
-            <span>${displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</span>
+            <span>{displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</span>
           )
         } else {
           value = <Ether wei={wei} />
