@@ -50,7 +50,7 @@ exports.handler = function (event, context, callback) {
           console.info('Successfully sent transaction with hash: ', transactionHash)
           callback(null, {
             statusCode: 200,
-            body: JSON.stringify({ txHash: transactionHash }),
+            body: { txHash: transactionHash },
             headers: responseHeaders
           })
         })
