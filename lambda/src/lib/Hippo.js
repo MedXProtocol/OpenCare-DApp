@@ -118,7 +118,8 @@ export class Hippo {
     const accountManager = await this.lookupAccountManager()
     const existingPublicKey = await accountManager.publicKeys(ethAddress)
     console.info('accountManager!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    if (existingPublicKey[0] === '0x') {
+    console.info('this is new code??????????????????????????????????')
+    if (!existingPublicKey.length || existingPublicKey[0] === '0x') {
       console.info('Setting public key ', ethAddress, publicKey)
       await accountManager.setPublicKey(ethAddress, publicKey).catch((error) => {
         console.error(' THIS IS THE ERROR RIGHT HERE', error.message)
