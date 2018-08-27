@@ -45,6 +45,7 @@ export class Hippo {
   lookupAccountManager () {
     return this.lookupContractAddress('AccountManager')
       .then((addresses) => {
+        console.log('AccountManager located at ', addresses)
         return new this._eth.contract(accountManagerArtifact.abi, accountManagerArtifact.bytecode, {
           from: this.ownerAddress(),
           gas: 4000000,
@@ -121,16 +122,16 @@ export class Hippo {
     console.info('this is new code??????????????????????????????????')
     if (!existingPublicKey.length || existingPublicKey[0] === '0x') {
       console.info('Setting public key ', ethAddress, publicKey)
-      return accountManager.setPublicKey(ethAddress, publicKey)
-        .then(() => {
-          console.log('calling _add')
+      // return accountManager.setPublicKey(ethAddress, publicKey)
+      //   .then(() => {
+      //     console.log('calling _add')
           return this._addOrReactivateDoctor(ethAddress, name)
-        })
-        .catch((error) => {
-          console.error(' THIS IS THE ERROR RIGHT HERE', error.message)
-          console.info(' THIS IS THE INFO RIGHT HERE', error.message)
-          fail(error.message)
-        })
+        // })
+        // .catch((error) => {
+        //   console.error(' THIS IS THE ERROR RIGHT HERE', error.message)
+        //   console.info(' THIS IS THE INFO RIGHT HERE', error.message)
+        //   fail(error.message)
+        // })
     } else {
       return this._addOrReactivateDoctor(ethAddress, name)
     }
