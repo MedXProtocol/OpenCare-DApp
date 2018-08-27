@@ -121,29 +121,42 @@ export class Hippo {
     console.info('this is new code??????????????????????????????????')
     if (!existingPublicKey.length || existingPublicKey[0] === '0x') {
       console.info('Setting public key ', ethAddress, publicKey)
-      await accountManager.setPublicKey(ethAddress, publicKey).catch((error) => {
-        console.error(' THIS IS THE ERROR RIGHT HERE', error.message)
-        console.info(' THIS IS THE INFO RIGHT HERE', error.message)
-        fail(error.message)
+      return accountManager.setPublicKey(ethAddress, publicKey)
+        .then(() => {
+          console.log('calling _add')
+          return this._addOrReactivateDoctor(ethAddress, name)
+        })
+        .catch((error) => {
+          console.error(' THIS IS THE ERROR RIGHT HERE', error.message)
+          console.info(' THIS IS THE INFO RIGHT HERE', error.message)
+          fail(error.message)
+        })
+    } else {
+      return this._addOrReactivateDoctor(ethAddress, name)
+    }
+  }
+
+  _addOrReactivateDoctor (ethAddress, name) {
+    console.info('_addOrReactivateDoctor')
+    return this.lookupContractAddress('DoctorManager')
+      .then((doctorManagerAddress) => {
+        console.info('found doctor manager: ', doctorManagerAddress)
+        console.info('test??????????000')
+        const method = doctorManagerArtifact.abi.find((obj) => obj.name === 'addOrReactivateDoctor')
+        var data = abi.encodeMethod(method, [ethAddress, name])
+        const tx = {
+          from: this.ownerAddress(),
+          to: doctorManagerAddress[0],
+          gas: 4000000,
+          gasPrice: Eth.toWei(20, 'gwei').toString(),
+          data
+        }
+        console.info('test??????????')
+        console.info('addOrReactivateDoctor tx: ', tx)
+        return this.sendTransaction(tx)
       })
-    }
-    console.info('test??????????11111')
-    const doctorManagerAddress = await this.lookupContractAddress('DoctorManager').catch((error) => {
-      console.info('errorr !! ', error.message)
-    })
-    console.info('found doctor manager: ', doctorManagerAddress)
-    console.info('test??????????000')
-    const method = doctorManagerArtifact.abi.find((obj) => obj.name === 'addOrReactivateDoctor')
-    var data = abi.encodeMethod(method, [ethAddress, name])
-    const tx = {
-      from: this.ownerAddress(),
-      to: doctorManagerAddress[0],
-      gas: 4000000,
-      gasPrice: Eth.toWei(20, 'gwei').toString(),
-      data
-    }
-    console.info('test??????????')
-    console.info('addOrReactivateDoctor tx: ', tx)
-    return this.sendTransaction(tx)
+      .catch((error) => {
+        console.info('errorr !! ', error.message)
+      })
   }
 }
