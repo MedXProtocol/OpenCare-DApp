@@ -117,7 +117,7 @@ export class Hippo {
   async addOrReactivateDoctor (ethAddress, name, publicKey) {
     const accountManager = await this.lookupAccountManager()
     const existingPublicKey = await accountManager.publicKeys(ethAddress)
-    console.info('accountManager: ', accountManager)
+    console.info('accountManager!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     if (existingPublicKey[0] === '0x') {
       console.info('Setting public key ', ethAddress, publicKey)
       await accountManager.setPublicKey(ethAddress, publicKey).catch((error) => {

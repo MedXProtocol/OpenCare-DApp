@@ -55,12 +55,13 @@ exports.handler = function (event, context, callback) {
           })
         })
         .catch(error => {
+          console.error('big ol error: ', error.message)
           console.error('ERROR: ', error)
           callback(error)
         })
     }
-
   } catch (error) {
+    console.error('massive ol error: ', error.message)
     console.error('MASSIVE ERROR: ', error)
     callback(error)
   }
