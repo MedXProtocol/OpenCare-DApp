@@ -101,7 +101,7 @@ export function* blockContractAddresses(block) {
 }
 
 export function* latestBlock({block}) {
-  const addresses = yield blockContractAddresses(block)
+  const addresses = yield call(blockContractAddresses, block)
   yield* addresses.map(function* (address) {
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   })

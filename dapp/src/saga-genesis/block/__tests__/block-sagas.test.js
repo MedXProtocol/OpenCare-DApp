@@ -48,22 +48,23 @@ describe('blockSagas', () => {
       const block = WEB3_1_0_BLOCK
       const address = '0x8fa5944b15c1ab5db6bcfb0c888bdc6b242f0fa6'
       var generator = blockSagas.latestBlock({ block })
-      expect(generator.next().value).toEqual(call(blockSagas.collectAllTransactionAddresses, block.transactions))
+      expect(generator.next().value).toEqual(call(blockSagas.blockContractAddresses, block))
       let gens = generator.next([address]).value
       expect(gens.next().value).toEqual(fork(put, { type: 'CACHE_INVALIDATE_ADDRESS', address }))
     })
   })
 
-  describe('collectAllTransactionAddresses()', () => {
-    it('should call collectTransactionAddresses for each', () => {
+  describe('blockContractAddresses()', () => {
+    it('should call blockContractAddresses for each', () => {
       const transactions = [1]
-      var generator = blockSagas.collectAllTransactionAddresses(transactions)
-      let gens = generator.next().value
-      expect(gens.next().value).toEqual(call(blockSagas.collectTransactionAddresses, new Set(), 1))
-      expect(gens.next().done).toBeTruthy()
-      let lastCall = generator.next()
-      expect(lastCall.done).toBeTruthy()
-      expect(lastCall.value).toEqual(new Set())
+      const block = { transactions }
+      var generator = blockSagas.blockContractAddresses(block)
+      var nextGen = generator.next()
+      expect(nextGen.value).toEqual(call(blockSagas.collectAllTransactionAddresses, [1]))
+      expect(nextGen.done).toBeFalsy()
+      nextGen = generator.next(new Set())
+      expect(nextGen.done).toBeTruthy()
+      expect(nextGen.value).toEqual(new Array())
     })
   })
 })
