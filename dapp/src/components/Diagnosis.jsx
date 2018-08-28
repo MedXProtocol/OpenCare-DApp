@@ -53,6 +53,17 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const isPatient = address === patientAddress
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
 
+  const excludeAddresses = []
+  if (address) {
+    excludeAddresses.push(address)
+  }
+  if (diagnosingDoctor) {
+    excludeAddresses.push(diagnosingDoctor)
+  }
+  if (challengingDoctor) {
+    excludeAddresses.push(challengingDoctor)
+  }
+
   const networkId = get(state, 'sagaGenesis.network.networkId')
 
   return {
@@ -60,6 +71,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
     address,
     currentlyExcludedDoctors,
     challengingDoctor,
+    excludeAddresses,
     status,
     caseFeeWei,
     diagnosisHash,
@@ -91,8 +103,8 @@ function* saga({ caseAddress, networkId }) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatchExcludedDoctors: (addresses) => {
-      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
+    dispatchExcludedDoctors: (excludedAddresses) => {
+      dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
     }
   }
 }
@@ -101,8 +113,8 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     withSend(class _Diagnosis extends Component {
 
-  constructor(){
-    super()
+  constructor(props){
+    super(props)
 
     this.state = {
       diagnosis: {},
@@ -111,6 +123,8 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
       loading: false,
       cancelableDownloadPromise: undefined
     }
+
+    this.props.dispatchExcludedDoctors(props.excludeAddresses)
   }
 
   componentDidMount () {
@@ -120,7 +134,9 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   componentWillReceiveProps (nextProps) {
     this.getInitialDiagnosis(nextProps)
 
-    this.setExcludedDoctorAddresses(nextProps)
+    if (nextProps.excludeAddresses.length !== this.props.excludeAddresses.length) {
+      this.props.dispatchExcludedDoctors(nextProps.excludeAddresses)
+    }
 
     this.subscribeChallengeHandler(nextProps)
     this.acceptChallengeHandler(nextProps)
@@ -170,24 +186,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')
       console.warn(error)
-    }
-  }
-
-  setExcludedDoctorAddresses = (props) => {
-    if (!props.address || !props.status || !props.currentlyExcludedDoctors) { return }
-
-    let excludeAddresses = []
-
-    if ((props.status === 3) && props.diagnosingDoctor) {
-      excludeAddresses = [props.address, props.diagnosingDoctor]
-    }
-
-    if ((props.status === 6) && props.diagnosingDoctor && props.challengingDoctor) {
-      excludeAddresses = [props.address, props.diagnosingDoctor, props.challengingDoctor]
-    }
-
-    if (props.currentlyExcludedDoctors.length < excludeAddresses.length) {
-      props.dispatchExcludedDoctors(excludeAddresses)
     }
   }
 
