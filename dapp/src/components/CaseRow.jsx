@@ -261,7 +261,7 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
       !defined(caseRowObject.status)
       || caseRowObject.status === PENDING_TX_STATUS
     )
-    
+
     const createdAtDisplay = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} delimiter={`<br />`} />
     const loadingOrCreatedAtTimestamp = pendingTransaction ? '...' : createdAtDisplay
 

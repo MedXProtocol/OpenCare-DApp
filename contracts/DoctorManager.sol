@@ -17,6 +17,8 @@ contract DoctorManager is Ownable, Initializable {
   uint256 public doctorCount;
 
   mapping (uint256 => bool) public doctorDeactivated;
+  mapping (uint256 => string) public doctorCountries;
+  mapping (uint256 => string) public doctorRegions;
   /*
     MEMORY END
     It is safe to add new data definitions here
@@ -36,29 +38,47 @@ contract DoctorManager is Ownable, Initializable {
     doctorCount += 1;
   }
 
-  function addOrReactivateDoctor(address _doctor, string _name) public onlyOwner {
+  function addOrReactivateDoctor(
+    address _doctor,
+    string _name,
+    string _country,
+    string _region
+  ) public onlyOwner {
     address doctorAddress = doctorAddresses[doctorIndex(_doctor)];
     if (_doctor == doctorAddress) {
-      reactivateDoctor(_doctor, _name);
+      reactivateDoctor(_doctor, _name, _country, _region);
     } else {
-      addDoctor(_doctor, _name);
+      addDoctor(_doctor, _name, _country, _region);
     }
   }
 
-  function addDoctor(address _doctor, string _name) private onlyOwner {
+  function addDoctor(
+    address _doctor,
+    string _name,
+    string _country,
+    string _region
+  ) private onlyOwner {
     require(!isDoctor(_doctor), "Address provided is already a doctor");
     doctorIndices[_doctor] = doctorCount;
     doctorAddresses[doctorCount] = _doctor;
     doctorNames[doctorCount] = _name;
+    doctorCountries[doctorCount] = _country;
+    doctorRegions[doctorCount] = _region;
     doctorCount += 1;
     emit AddDoctor(_doctor);
   }
 
-  function reactivateDoctor(address _doctor, string _name) private onlyOwner {
+  function reactivateDoctor(address _doctor,
+    string _name,
+    string _country,
+    string _region
+  ) private onlyOwner {
     require(!isActive(_doctor), "Address provided is already activated, cannot reactivate");
     uint256 index = doctorIndex(_doctor);
     doctorDeactivated[index] = false;
     doctorNames[index] = _name;
+    doctorCountries[index] = _country;
+    doctorRegions[index] = _region;
     emit DoctorReactivated(_doctor);
   }
 

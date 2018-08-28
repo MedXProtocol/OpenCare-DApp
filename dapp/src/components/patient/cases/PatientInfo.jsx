@@ -5,8 +5,8 @@ import classnames from 'classnames'
 import Select from 'react-select'
 import * as Animated from 'react-select/lib/animated';
 import { customStyles } from '~/config/react-select-custom-styles'
-import { countries } from './countries'
-import { regions } from './regions'
+import { countries } from '~/lib/countries'
+import { regions } from '~/lib/regions'
 
 export const PatientInfo = class _PatientInfo extends Component {
 

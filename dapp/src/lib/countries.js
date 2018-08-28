@@ -133,7 +133,7 @@ export const countries = [
   {"value":"MK", "label":"Macedonia, The Former Yugoslav Republic of"},
   {"value":"MG", "label":"Madagascar"},
   {"value":"MW", "label":"Malawi"},
-  {"value":"MY", "label":"Malaysia"},
+  // {"value":"MY", "label":"Malaysia"}, // removed due to telemedecine restrictions
   {"value":"MV", "label":"Maldives"},
   {"value":"ML", "label":"Mali"},
   {"value":"MT", "label":"Malta"},
