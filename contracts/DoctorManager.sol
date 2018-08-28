@@ -111,4 +111,12 @@ contract DoctorManager is Ownable, Initializable {
   function name(address _doctor) public view returns (string) {
     return doctorNames[doctorIndex(_doctor)];
   }
+
+  function country(address _doctor) public view returns (string) {
+    return doctorCountries[doctorIndex(_doctor)];
+  }
+
+  function region(address _doctor) public view returns (string) {
+    return doctorRegions[doctorIndex(_doctor)];
+  }
 }

@@ -123,9 +123,10 @@ export const RegisterDoctorContainer =
           }
 
           const existingDoc = this.props.doctors.find((doctor) => {
-            if (doctor.isActive && doctor.address.toLowerCase() === this.state.address.toLowerCase()) {
-              return true
-            }
+            return (
+              doctor.isActive
+              && doctor.address.toLowerCase() === this.state.address.toLowerCase()
+            )
           })
 
           if (existingDoc) {

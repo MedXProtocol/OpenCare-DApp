@@ -34,7 +34,9 @@ contract('DoctorManager', function (accounts) {
       assert.equal(await doctorManager.doctorNames.call(1), 'Doogie')
       assert.equal(await doctorManager.name.call(doctor), 'Doogie')
       assert.equal(await doctorManager.doctorCountries.call(1), 'CA')
+      assert.equal(await doctorManager.country.call(doctor), 'CA')
       assert.equal(await doctorManager.doctorRegions.call(1), 'BC')
+      assert.equal(await doctorManager.region.call(doctor), 'BC')
 
       await doctorManager.addOrReactivateDoctor(doctor2, 'General Major', 'US', 'DC')
       assert.equal(await doctorManager.doctorCount.call(), 3)
@@ -42,7 +44,9 @@ contract('DoctorManager', function (accounts) {
       assert.equal(await doctorManager.doctorNames.call(2), 'General Major')
       assert.equal(await doctorManager.name.call(doctor2), 'General Major')
       assert.equal(await doctorManager.doctorCountries.call(2), 'US')
+      assert.equal(await doctorManager.country.call(doctor2), 'US')
       assert.equal(await doctorManager.doctorRegions.call(2), 'DC')
+      assert.equal(await doctorManager.region.call(doctor2), 'DC')
     })
 
     it('should work without a country or region assigned', async () => {

@@ -41,6 +41,19 @@ function* fetchDoctorCredentials(address) {
   const publicKey = yield web3Call(yield accountManager(), 'publicKeys', address)
   if (isBlank(publicKey)) { return null }
 
+  // Check to see if the patient is a Doctor or not, and if they are in the same region
+  // as the current doctor we're iterating over
+  const patientAddress = yield select(state => state.nextAvailableDoctor.patientAddress)
+  const patientCountry = yield select(state => state.nextAvailableDoctor.patientCountry)
+  const patientRegion = yield select(state => state.nextAvailableDoctor.patientRegion)
+
+  const country = yield web3Call(yield doctorManager(), 'country', address)
+  const region = yield web3Call(yield doctorManager(), 'region', address)
+
+  const patientIsAlsoDoctor = yield web3Call(yield doctorManager(), 'isDoctor', patientAddress)
+  const patientInSameRegion = (patientCountry === country && patientRegion === region)
+  if (!patientIsAlsoDoctor && patientInSameRegion) { return null }
+
   credentials = {
     address,
     isActive,

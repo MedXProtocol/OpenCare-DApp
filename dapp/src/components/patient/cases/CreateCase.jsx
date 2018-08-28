@@ -79,6 +79,9 @@ function mapDispatchToProps(dispatch) {
     },
     dispatchExcludedDoctors: (excludedAddresses) => {
       dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
+    },
+    dispatchPatientInfo: (patientAddress, patientCountry, patientRegion) => {
+      dispatch({ type: 'PATIENT_INFO', patientAddress, patientCountry, patientRegion })
     }
   }
 }
@@ -415,7 +418,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
   checkCountry = () => {
     this.validateField('country')
 
-    if (this.state.country === 'US') {
+    if (this.isCanadaOrUSA()) {
       requiredFields.push('region')
     } else {
       pull(requiredFields, 'region')
@@ -571,8 +574,14 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
   handleRegionChange = (newValue) => {
     this.setState({ region: newValue ? newValue.value : '' }, () => {
-      if (this.state.country === 'US') {
+      if (this.isCanadaOrUSA()) {
         this.validateField('region')
+        this.props.dispatchPatientInfo(
+          this.props.account,
+          this.state.country,
+          this.state.region
+        )
+        this.props.dispatchExcludedDoctors([ this.props.account ])
       }
     })
   }
