@@ -43,7 +43,6 @@ export function* callCount(call) {
 export function* invalidateAddress({ address }) {
   let callCountRegistry = yield getContext('callCountRegistry')
   let contractCalls = Object.values(callCountRegistry.getContractCalls(address))
-  console.log(`invalidateAddress ${address} contractCalls: `, contractCalls)
   if (!contractCalls) { return }
   yield* contractCalls.map(function* (callState) {
     if (callState.count > 0) {
