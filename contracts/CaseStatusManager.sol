@@ -13,6 +13,11 @@ contract CaseStatusManager is Initializable, Ownable {
   using RegistryLookup for Registry;
   using LinkedList for LinkedList.UInt256;
 
+  /*
+    MEMORY START
+    _do not_ remove any of these once they are deployed to a network (Ropsten,
+    Mainnet, etc.) and only append to the bottom (before the END comment)
+  */
   Registry registry;
 
   /**
@@ -23,6 +28,10 @@ contract CaseStatusManager is Initializable, Ownable {
 
   mapping (address => address[]) public doctorClosedCases;
   mapping (address => mapping(address => bool)) closedCases;
+  /*
+    MEMORY END
+    It is safe to add new data definitions here
+  */
 
   event CaseStatusOpened(address indexed doctor, address indexed caseAddress);
   event CaseStatusClosed(address indexed doctor, address indexed caseAddress);

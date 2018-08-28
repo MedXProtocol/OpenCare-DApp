@@ -4,6 +4,12 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Initializable.sol";
 
 contract DoctorManager is Ownable, Initializable {
+
+  /*
+    MEMORY START
+    _do not_ remove any of these once they are deployed to a network (Ropsten,
+    Mainnet, etc.) and only append to the bottom (before the END comment)
+  */
   mapping (address => uint256) public doctorIndices;
   mapping (uint256 => address) public doctorAddresses;
   mapping (uint256 => string) public doctorNames;
@@ -11,6 +17,10 @@ contract DoctorManager is Ownable, Initializable {
   uint256 public doctorCount;
 
   mapping (uint256 => bool) public doctorDeactivated;
+  /*
+    MEMORY END
+    It is safe to add new data definitions here
+  */
 
   event AddDoctor(address indexed doctor);
   event DoctorDeactivated(address indexed doctor);

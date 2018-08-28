@@ -11,12 +11,21 @@ contract CaseScheduleManager is Initializable, Ownable {
 
   using RegistryLookup for Registry;
 
+  /*
+    MEMORY START
+    _do not_ remove any of these once they are deployed to a network (Ropsten,
+    Mainnet, etc.) and only append to the bottom (before the END comment)
+  */
   uint constant secondsInADay = 120;
 
   mapping(address => uint) public createdAt;
   mapping(address => uint) public updatedAt;
 
   Registry registry;
+  /*
+    MEMORY END
+    It is safe to add new data definitions here
+  */
 
   modifier onlyCaseManager() {
     require(

@@ -5,21 +5,30 @@ import "./Initializable.sol";
 import "./MedXToken.sol";
 
 contract BetaFaucet is Ownable, Initializable {
-  mapping (address => bool) public sentAddresses;
-  mapping (address => bool) public sentMedXAddresses;
 
-  event EtherSent(address indexed recipient, uint256 value);
-  event MedXSent(address indexed recipient, uint256 value);
-
-  MedXToken public medXToken;
-
+  using SafeMath for uint256;
   using SafeMath for uint128;
   using SafeMath for uint32;
 
+  /*
+    MEMORY START
+    _do not_ remove any of these once they are deployed to a network (Ropsten,
+    Mainnet, etc.) and only append to the bottom (before the END comment)
+  */
+  mapping (address => bool) public sentAddresses;
+  mapping (address => bool) public sentMedXAddresses;
+
+  MedXToken public medXToken;
+
   uint128 public constant etherToTransfer = 100000000000000000;
   uint32 public constant gasAmount = 1000000;
+  /*
+    MEMORY END
+    It is safe to add new data definitions here
+  */
 
-  using SafeMath for uint256;
+  event EtherSent(address indexed recipient, uint256 value);
+  event MedXSent(address indexed recipient, uint256 value);
 
   // Constructor which allows us to fund contract on creation
   constructor() public payable {

@@ -19,6 +19,11 @@ contract CaseManager is Ownable, Pausable, Initializable {
   using RegistryLookup for Registry;
   using SafeMath for uint256;
 
+  /*
+    MEMORY START
+    _do not_ remove any of these once they are deployed to a network (Ropsten,
+    Mainnet, etc.) and only append to the bottom (before the END comment)
+  */
   uint256 public caseFeeUsd;
 
   address[] public caseList;
@@ -29,6 +34,10 @@ contract CaseManager is Ownable, Pausable, Initializable {
   Registry public registry;
 
   mapping (address => address[]) public doctorCases;
+  /*
+    MEMORY END
+    It is safe to add new data definitions here
+  */
 
   event NewCase(address indexed caseAddress, uint256 indexed index);
 
