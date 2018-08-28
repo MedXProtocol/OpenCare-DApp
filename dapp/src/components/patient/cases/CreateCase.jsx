@@ -43,6 +43,7 @@ import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
 import { promisify } from '~/utils/promisify'
+import { regions } from '~/lib/regions'
 
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
@@ -135,8 +136,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       acneDoesItInclude: [],
       sexuallyActive: null,
       age: null,
-      country: null,
-      region: null,
+      country: '',
+      region: '',
       prevTreatment: null,
       description: null,
       onBirthControl: null,
@@ -147,7 +148,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       showPublicKeyModal: false,
       showTermsModal: false,
       isSubmitting: false,
-      errors: []
+      errors: [],
+      regionOptions: []
     }
 
     this.setCountryRef = element => { this.countryInput = element }
@@ -416,15 +418,17 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     if (this.state.country === 'US') {
       requiredFields.push('region')
     } else {
-      // if region is in the required fields array, remove it
-      let index = requiredFields.indexOf('region')
-      if (index > -1) {
-        requiredFields.splice(index, 1)
-      }
+      pull(requiredFields, 'region')
 
       this.setState({ region: '' })
       this.regionInput.select.clearValue()
     }
+
+    this.setState({ regionOptions: this.isCanadaOrUSA() ? regions[this.state.country] : [] })
+  }
+
+  isCanadaOrUSA = () => {
+    return this.state.country === 'US' || this.state.country === 'CA'
   }
 
   validateField = (fieldName) => {
@@ -743,6 +747,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                     region={this.state.region}
                     handleCountryChange={this.handleCountryChange}
                     handleRegionChange={this.handleRegionChange}
+                    isCanadaOrUSA={this.isCanadaOrUSA}
+                    regionOptions={this.state.regionOptions}
                   />
 
                   <FlipMove

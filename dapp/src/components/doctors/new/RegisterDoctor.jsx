@@ -14,6 +14,7 @@ import { customStyles } from '~/config/react-select-custom-styles'
 import { isNotEmptyString } from '~/utils/isNotEmptyString'
 import { countries } from '~/lib/countries'
 import { regions } from '~/lib/regions'
+import { toastr } from '~/toastr'
 import pull from 'lodash.pull'
 
 require('./RegisterDoctor.css')
@@ -56,7 +57,7 @@ export const RegisterDoctorContainer =
           }
         }
 
-        handleActivate = (name, country, region, address) => {
+        handleActivate = (address, name, country, region) => {
           this.setState({
             address: address,
             name: name,
@@ -65,7 +66,7 @@ export const RegisterDoctorContainer =
           }, this.addOrReactivateDoctor)
         }
 
-        handleDeactivate = (name, country, region, address) => {
+        handleDeactivate = (address, name, country, region) => {
           this.setState({
             address: address,
             name: name,
@@ -121,6 +122,17 @@ export const RegisterDoctorContainer =
             }
           }
 
+          const existingDoc = this.props.doctors.find((doctor) => {
+            if (doctor.isActive && doctor.address.toLowerCase() === this.state.address.toLowerCase()) {
+              return true
+            }
+          })
+
+          if (existingDoc) {
+            errors.push('address')
+            toastr.error('This address is already registered to another doctor.')
+          }
+
           await this.setState({ errors: errors })
 
           if (errors.length > 0) {
@@ -170,14 +182,9 @@ export const RegisterDoctorContainer =
           return msg
         }
 
-        isCanadaOrUSA() {
+        isCanadaOrUSA = () => {
           return this.state.country === 'US' || this.state.country === 'CA'
         }
-
-        // getOptions() {
-        //   options={regions[this.state.country]}
-        //
-        // }
 
         render() {
           const doctors = sortBy(this.props.doctors, ['isActive']).reverse()
@@ -298,6 +305,11 @@ export const RegisterDoctorContainer =
                               doctorIndex,
                               online
                             }) => {
+                              const countryAndRegion = <React.Fragment>
+                                <br />
+                                {region ? `${region}, ` : ''}{country}
+                              </React.Fragment>
+
                               return (
                                 <CSSTransition
                                   key={`doctor-row-transition-${doctorIndex}`}
@@ -320,7 +332,8 @@ export const RegisterDoctorContainer =
                                         </span>
                                       </td>
                                       <td width="20%" className="td--status">
-                                        {name} ({country}, {region})
+                                        {name}
+                                        {countryAndRegion}
                                       </td>
                                       <td width="14%">
                                         {isBlank(publicKey) ? 'No' : 'Yes'}
@@ -328,14 +341,14 @@ export const RegisterDoctorContainer =
                                       <td width="15%" className="td-actions text-right">
                                         { isActive ? (
                                             <a
-                                              onClick={() => { this.handleDeactivate(name, address) }}
+                                              onClick={() => { this.handleDeactivate(address, name, country, region) }}
                                               className="btn btn-xs btn-info"
                                             >
                                               Deactivate
                                             </a>
                                           ) : (
                                             <a
-                                              onClick={() => { this.handleActivate(name, address) }}
+                                              onClick={() => { this.handleActivate(address, name, country, region) }}
                                               className="btn btn-xs btn-default"
                                             >
                                               Reactivate
