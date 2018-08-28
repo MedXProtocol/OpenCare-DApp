@@ -10,6 +10,7 @@ export default function (state, { type, doctor, addresses }) {
     case 'NEXT_AVAILABLE_DOCTOR':
       state = {
         ...state,
+        noDoctorsAvailable: false,
         doctor
       }
       break
@@ -21,21 +22,14 @@ export default function (state, { type, doctor, addresses }) {
       }
       break
 
-    case 'FORGET_NEXT_DOCTOR':
-      state = {
-        ...state,
-        noDoctorsAvailable: false
-      }
-
-      delete state['doctor']
-
-      break
-
     case 'NO_DOCTORS_AVAILABLE':
       state = {
         ...state,
         noDoctorsAvailable: true
       }
+
+      delete state['doctor']
+
       break
 
     // no default

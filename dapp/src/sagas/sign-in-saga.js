@@ -54,7 +54,7 @@ export function* signInOkSaga({ account, masterPassword, address }) {
   signIn(account)
   mixpanel.identify(account.address())
   yield put({ type: 'SIGNED_IN' })
-  yield put({ type: 'EXCLUDED_DOCTORS', addresses: [] })
+  yield put({ type: 'NEXT_AVAILABLE_DOCTOR', addresses: [] })
 }
 
 export default function* rootSaga() {

@@ -27,6 +27,7 @@ import { mixpanel } from '~/mixpanel'
 import { secondsInADay } from '~/config/constants'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
 import { EtherFlip } from '~/components/EtherFlip'
+import { isBlank } from '~/utils/isBlank'
 import { isTrue } from '~/utils/isTrue'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
@@ -107,6 +108,8 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         showRequestNewDoctorModal: false,
         doctorPublicKey: '',
       }
+
+      this.setExcludedDoctorAddresses(props)
     }
 
     componentWillReceiveProps (nextProps) {
@@ -125,19 +128,21 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     setExcludedDoctorAddresses = (props) => {
-      if (!props.address || !props.status || !props.currentlyExcludedDoctors) { return }
-
       let excludeAddresses = []
 
-      if ((props.status === 3) && props.diagnosingDoctor) {
-        excludeAddresses = [props.address, props.diagnosingDoctor]
+      if (props.address) {
+        excludeAddresses.push(props.address)
       }
 
-      if ((props.status === 6) && props.diagnosingDoctor && props.challengingDoctor) {
-        excludeAddresses = [props.address, props.diagnosingDoctor, props.challengingDoctor]
+      if (!isBlank(props.diagnosingDoctor)) {
+        excludeAddresses.push(props.diagnosingDoctor)
       }
 
-      if (props.currentlyExcludedDoctors.length < excludeAddresses.length) {
+      if (!isBlank(props.challengingDoctor)) {
+        excludeAddresses.push(props.challengingDoctor)
+      }
+
+      if (excludeAddresses.length) {
         props.dispatchExcludedDoctors(excludeAddresses)
       }
     }
