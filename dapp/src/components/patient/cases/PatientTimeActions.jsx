@@ -273,6 +273,8 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
       let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
+      const isCaseNotStale = !updatedAt || !caseStale(secondsInADay, updatedAt, status, isPatient)
+
       let buttons = (
         <div className="button-set__btn-clear">
           <Button
@@ -313,10 +315,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
           </div>
         )
       }
-      if (
-        !updatedAt
-        || !caseStale(secondsInADay, updatedAt, status, isPatient)
-      ) {
+      if (isCaseNotStale) {
         return null
       } else {
         return (

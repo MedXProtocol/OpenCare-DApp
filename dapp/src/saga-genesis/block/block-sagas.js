@@ -66,18 +66,23 @@ function* addAddressIfExists(addressSet, address) {
   return false
 }
 
-export function* collectTransactionAddresses(addressSet, transaction) {
+function* collectTransactionAddresses(addressSet, transaction) {
   const web3 = yield getContext('web3')
   const to = yield call(addAddressIfExists, addressSet, transaction.to)
   const from = yield call(addAddressIfExists, addressSet, transaction.from)
   if (to || from) {
     const receipt = yield web3.eth.getTransactionReceipt(transaction.hash)
-    // if (receipt) {
-    //   console.log('receipt logs: ')
-    //   console.log(receipt.logs)
-    // }
     yield* receipt.logs.map(function* (log) {
       yield call(addAddressIfExists, addressSet, log.address)
+      if (log.topics) {
+        yield* log.topics.map(function* (topic) {
+          if (topic) {
+            // topics are 32 bytes and will have leading 0's padded for typical Eth addresses, ignore them
+            const actualAddress = '0x' + topic.substr(26)
+            yield call(addAddressIfExists, addressSet, actualAddress)
+          }
+        })
+      }
     })
   }
 }
@@ -90,9 +95,14 @@ export function* collectAllTransactionAddresses(transactions) {
   return addressSet
 }
 
-export function* latestBlock({block}) {
+export function* blockContractAddresses(block) {
   const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
-  yield* Array.from(addressSet).map(function* (address) {
+  return Array.from(addressSet)
+}
+
+export function* latestBlock({block}) {
+  const addresses = yield call(blockContractAddresses, block)
+  yield* addresses.map(function* (address) {
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   })
 }
