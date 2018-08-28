@@ -129,7 +129,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       this.requestNewDocTransactionStateHandler(nextProps)
       this.withdrawTransactionStateHandler(nextProps)
 
-      if (nextProps.excludeAddresses.length != this.props.excludeAddresses.length) {
+      if (nextProps.excludeAddresses.length !== this.props.excludeAddresses.length) {
         this.props.dispatchExcludedDoctors(nextProps.excludeAddresses)
       }
     }

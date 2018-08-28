@@ -257,6 +257,11 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
     let style = { zIndex: 950 }
     let { caseAddress, objIndex, error, transactionId, createdAt, updatedAt } = caseRowObject
 
+    const pendingTransaction = (
+      !defined(caseRowObject.status)
+      || caseRowObject.status === PENDING_TX_STATUS
+    )
+    
     const createdAtDisplay = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} delimiter={`<br />`} />
     const loadingOrCreatedAtTimestamp = pendingTransaction ? '...' : createdAtDisplay
 
@@ -266,10 +271,6 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
     if (objIndex) {
       style = { zIndex: 998 - objIndex }
     }
-    const pendingTransaction = (
-      !defined(caseRowObject.status)
-      || caseRowObject.status === PENDING_TX_STATUS
-    )
     const path = this.props.path || routes.PATIENTS_CASES
     const ethAddress = caseAddress ? <EthAddress address={caseAddress} onlyAddress={true} /> : null
 

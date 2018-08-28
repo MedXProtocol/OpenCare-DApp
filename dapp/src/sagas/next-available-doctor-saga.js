@@ -19,10 +19,6 @@ function* accountManager() {
   return yield select(state => contractByName(state, 'AccountManager'))
 }
 
-function* nextAvailableDoctor () {
-  return yield select((state) => state.nextAvailableDoctor.doctor)
-}
-
 function* thisAccount () {
   return yield select((state) => state.sagaGenesis.accounts[0])
 }

@@ -31,7 +31,7 @@ export default function (state, { type, doctor, excludedAddresses }) {
         excludedAddresses
       }
 
-      if (state.excludedAddresses.indexOf(state.doctor) !== -1) {
+      if (state.doctor && state.excludedAddresses.indexOf(state.doctor.address) !== -1) {
         delete state['doctor']
       }
 

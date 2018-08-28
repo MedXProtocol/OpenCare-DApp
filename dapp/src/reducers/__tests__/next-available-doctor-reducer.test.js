@@ -20,9 +20,9 @@ describe('nextAvailableDoctor reducer', () => {
   })
 
   test('EXCLUDED_DOCTORS', () => {
-    let state = nextAvailableDoctor({ doctor: 1 }, { type: 'EXCLUDED_DOCTORS', excludedAddresses: [2, 3]})
+    let state = nextAvailableDoctor({ doctor: { address: 1 } }, { type: 'EXCLUDED_DOCTORS', excludedAddresses: [2, 3]})
     expect(state.excludedAddresses).toEqual([2, 3])
-    expect(state.doctor).toEqual(1)
+    expect(state.doctor.address).toEqual(1)
     state = nextAvailableDoctor(state, { type: 'EXCLUDED_DOCTORS', excludedAddresses: [1, 2]})
     expect(state.excludedAddresses).toEqual([1, 2])
     expect(state.doctor).toEqual(undefined)
