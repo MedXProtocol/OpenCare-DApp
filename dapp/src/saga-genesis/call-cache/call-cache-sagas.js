@@ -82,8 +82,7 @@ export function* cacheCall(addressOrName, method, ...args) {
 export function* cacheCallByName(name, method, ...args) {
   const address = yield select(contractByName, name)
   if (!address) {
-    console.error('cacheCallByName: no contract address for name: ', name, method, ...args)
-    throw new Error(`cacheCallByName: no contract address for name: ${name} ${method}`, args)
+    return null
   }
   return yield cacheCallByAddress(address, method, ...args)
 }
