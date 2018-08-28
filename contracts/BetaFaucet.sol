@@ -19,13 +19,13 @@ contract BetaFaucet is Ownable, Initializable {
   mapping (address => bool) public sentMedXAddresses;
 
   MedXToken public medXToken;
-
-  uint128 public constant etherToTransfer = 100000000000000000;
-  uint32 public constant gasAmount = 1000000;
   /*
     MEMORY END
     It is safe to add new data definitions here
   */
+
+  uint128 public constant etherToTransfer = 100000000000000000;
+  uint32 public constant gasAmount = 1000000;
 
   event EtherSent(address indexed recipient, uint256 value);
   event MedXSent(address indexed recipient, uint256 value);
