@@ -18,6 +18,9 @@ contract CaseScheduleManager is Initializable, Ownable {
 
   Registry registry;
 
+  event CaseInitializedAt(address caseAddress, uint256 timestamp);
+  event CaseUpdatedAt(address caseAddress, uint256 timestamp);
+
   modifier onlyCaseManager() {
     require(
       msg.sender == address(registry.caseManager()),
@@ -68,10 +71,11 @@ contract CaseScheduleManager is Initializable, Ownable {
   function initializeCase(address _caseAddress) external onlyCaseManager() {
     createdAt[_caseAddress] = block.timestamp;
     updatedAt[_caseAddress] = block.timestamp;
+    emit CaseInitializedAt(_caseAddress, block.timestamp);
   }
 
   function touchUpdatedAt(address _caseAddress) public onlyCasePhaseManagers {
     updatedAt[_caseAddress] = block.timestamp;
+    emit CaseUpdatedAt(_caseAddress, block.timestamp);
   }
-
 }
