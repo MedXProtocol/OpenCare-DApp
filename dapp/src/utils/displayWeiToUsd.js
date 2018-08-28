@@ -6,5 +6,5 @@ import BigNumber from 'bignumber.js'
 export function displayWeiToUsd(usdWei) {
   const ether = new BigNumber(weiToEther(usdWei))
   const rounded = ether.toFixed(2)
-  return "$" + rounded.replace(/\d(?=(\d{3})+\.)/g, '$&,')
+  return rounded.replace(/\d(?=(\d{3})+\.)/g, '$&,')
 }
