@@ -50,9 +50,11 @@ function* fetchDoctorCredentials(address) {
   const country = yield web3Call(yield doctorManager(), 'country', address)
   const region = yield web3Call(yield doctorManager(), 'region', address)
 
+  // this should be if the patient is in canada and the same province then ok, or if canada != USA
+  // and vice versa
   const patientIsAlsoDoctor = yield web3Call(yield doctorManager(), 'isDoctor', patientAddress)
   const patientInSameRegion = (patientCountry === country && patientRegion === region)
-  if (!patientIsAlsoDoctor && patientInSameRegion) { return null }
+  if (!patientIsAlsoDoctor && !patientInSameRegion) { return null }
 
   credentials = {
     address,
