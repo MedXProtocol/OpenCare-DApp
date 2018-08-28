@@ -22,7 +22,7 @@ export const EthAddress = class _EthAddress extends Component {
     } else if (this.state.showFull) {
       displayed = <span className='tag address__full'>{address}</span>
     } else {
-      displayed = <span onClick={() => this.toggleFull()} className="address__short">
+      displayed = <span onClick={() => this.toggleFull()} className="flip-link">
         {address.substring(0, 10)} ...
       </span>
     }

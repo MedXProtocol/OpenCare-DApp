@@ -2,13 +2,6 @@
   position: relative;
 }
 
-/* find way to tap into defined vars in component scss files */
-.address__short {
-  color: #6bf;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
 .eth-address {
   font-family: "Space Mono", monospace;
   text-transform: lowercase;

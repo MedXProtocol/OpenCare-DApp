@@ -74,6 +74,21 @@ a {
   background: #051A38 !important;
 }
 
+/* find way to tap into defined vars in component scss files */
+.flip-link,
+.flip-link span {
+  border-bottom: 3px solid #c9eeff;
+  color: #6bf;
+  cursor: pointer;
+  line-height: 30px;
+  transition: color 50ms ease-in;
+}
+
+.flip-link:hover,
+.flip-link span:hover {
+  border-bottom: 3px solid #d9f4ff;
+}
+
 h1,
 h2,
 h3,
