@@ -91,8 +91,8 @@ function* saga({ caseAddress, networkId }) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatchExcludedDoctors: (addresses) => {
-      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
+    dispatchExcludedDoctors: (excludedAddresses) => {
+      dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
     }
   }
 }

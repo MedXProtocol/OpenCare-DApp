@@ -1,4 +1,4 @@
-export default function (state, { type, doctor, addresses }) {
+export default function (state, { type, doctor, excludedAddresses }) {
   if (typeof state === 'undefined') {
     state = {
       noDoctorsAvailable: false,
@@ -7,19 +7,34 @@ export default function (state, { type, doctor, addresses }) {
   }
 
   switch(type) {
+    case 'FIND_NEXT_AVAILABLE_DOCTOR':
+      state = {...state}
+      delete state['doctor']
+      if (excludedAddresses) {
+        state.excludedAddresses = excludedAddresses
+      }
+
+      break
+
     case 'NEXT_AVAILABLE_DOCTOR':
       state = {
         ...state,
         noDoctorsAvailable: false,
         doctor
       }
+
       break
 
     case 'EXCLUDED_DOCTORS':
       state = {
         ...state,
-        excludedAddresses: addresses
+        excludedAddresses
       }
+
+      if (state.excludedAddresses.indexOf(state.doctor) !== -1) {
+        delete state['doctor']
+      }
+
       break
 
     case 'NO_DOCTORS_AVAILABLE':

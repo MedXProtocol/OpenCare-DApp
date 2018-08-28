@@ -51,10 +51,22 @@ function mapStateToProps(state, { caseAddress }) {
   const transactions = state.sagaGenesis.transactions
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
 
+  const excludeAddresses = []
+  if (address) {
+    excludeAddresses.push(address)
+  }
+  if (!isBlank(diagnosingDoctor)) {
+    excludeAddresses.push(diagnosingDoctor)
+  }
+  if (!isBlank(challengingDoctor)) {
+    excludeAddresses.push(challengingDoctor)
+  }
+
   return {
     address,
     caseFeeWei,
     CaseLifecycleManager,
+    excludeAddresses,
     CaseScheduleManager,
     currentlyExcludedDoctors,
     challengingDoctor,
@@ -84,8 +96,8 @@ function* saga({ CaseScheduleManager, caseAddress }) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatchExcludedDoctors: (addresses) => {
-      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
+    dispatchExcludedDoctors: (excludedAddresses) => {
+      dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
     }
   }
 }
@@ -109,7 +121,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         doctorPublicKey: '',
       }
 
-      this.setExcludedDoctorAddresses(props)
+      props.dispatchExcludedDoctors(props.excludeAddresses)
     }
 
     componentWillReceiveProps (nextProps) {
@@ -117,7 +129,9 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       this.requestNewDocTransactionStateHandler(nextProps)
       this.withdrawTransactionStateHandler(nextProps)
 
-      this.setExcludedDoctorAddresses(nextProps)
+      if (nextProps.excludeAddresses.length != this.props.excludeAddresses.length) {
+        this.props.dispatchExcludedDoctors(nextProps.excludeAddresses)
+      }
     }
 
     onChangeDoctor = (option) => {
@@ -125,26 +139,6 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         selectedDoctor: option,
         doctorAddressError: ''
       })
-    }
-
-    setExcludedDoctorAddresses = (props) => {
-      let excludeAddresses = []
-
-      if (props.address) {
-        excludeAddresses.push(props.address)
-      }
-
-      if (!isBlank(props.diagnosingDoctor)) {
-        excludeAddresses.push(props.diagnosingDoctor)
-      }
-
-      if (!isBlank(props.challengingDoctor)) {
-        excludeAddresses.push(props.challengingDoctor)
-      }
-
-      if (excludeAddresses.length) {
-        props.dispatchExcludedDoctors(excludeAddresses)
-      }
     }
 
     handleCloseRequestNewDoctorModal = () => {

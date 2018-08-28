@@ -83,7 +83,7 @@ function* fetchDoctorByIndex(index) {
   return doctor
 }
 
-function* setNextAvailableDoctor() {
+function* findNextAvailableDoctor() {
   let doctor = yield findNextAvailableOnlineDoctor()
   if (!doctor) {
     doctor = yield findNextAvailableOfflineDoctor()
@@ -132,14 +132,12 @@ function* findNextAvailableOfflineDoctor() {
 
 function* checkExcludedDoctors() {
   const doctor = yield select(state => state.nextAvailableDoctor.doctor)
-  const excludedAddresses = yield select(state => state.nextAvailableDoctor.excludedAddresses)
-  if (excludedAddresses.indexOf(doctor) !== -1) {
-    yield put({ type: 'NEXT_AVAILABLE_DOCTOR' })
+  if (!doctor) {
+    yield put({ type: 'FIND_NEXT_AVAILABLE_DOCTOR' })
   }
 }
 
 export function* nextAvailableDoctorSaga() {
-  yield takeLatest('NEXT_AVAILABLE_DOCTOR', setNextAvailableDoctor)
+  yield takeLatest('FIND_NEXT_AVAILABLE_DOCTOR', findNextAvailableDoctor)
   yield takeLatest('EXCLUDED_DOCTORS', checkExcludedDoctors)
-  yield put({ type: 'EXCLUDED_DOCTORS', addresses: [] })
 }
