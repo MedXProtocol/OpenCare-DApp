@@ -28,6 +28,7 @@ import { ScrollyFeedbackLink } from '~/components/ScrollyFeedbackLink'
 import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
+import { AdminFees } from '~/components/AdminFees'
 import { connect } from 'react-redux'
 import {
   cacheCall,
@@ -212,6 +213,8 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
             <SignedInRoute exact path={routes.DOCTORS_CASES_DIAGNOSE_CASE}
               component={OpenCasesContainer}
             />
+
+            <SignedInRoute path={routes.ADMIN_FEES} component={AdminFees} />
 
             <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 

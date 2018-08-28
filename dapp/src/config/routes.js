@@ -6,6 +6,8 @@ export const SIGN_IN = '/sign-in'
 export const SIGN_UP = '/sign-up'
 export const HOME = '/'
 
+export const ADMIN_FEES = '/admin/fees'
+
 export const ACCOUNT_EMERGENCY_KIT = '/account/emergency-kit'
 export const ACCOUNT_CHANGE_PASSWORD = '/account/change-password'
 export const ACCOUNT_MINT = '/account/mint'
