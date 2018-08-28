@@ -91,7 +91,8 @@ export const HippoNavbar = withContractRegistry(
     super(props)
 
     this.state = {
-      profileMenuOpen: false
+      profileMenuOpen: false,
+      adminMenuOpen: false
     }
   }
 
@@ -179,12 +180,24 @@ export const HippoNavbar = withContractRegistry(
       }
 
       if (this.props.canRegister) {
-        var doctorsItem =
-          <LinkContainer to={routes.DOCTORS_NEW}>
-            <NavItem href={routes.DOCTORS_NEW}>
-              Doctors
-            </NavItem>
-          </LinkContainer>
+        var adminItem =
+          <NavDropdown
+            title='Admin'
+            id='admin-dropdown'
+            open={this.state.adminMenuOpen}
+            onToggle={(value) => this.setState({adminMenuOpen: !this.state.adminMenuOpen})}
+          >
+            <LinkContainer to={routes.DOCTORS_NEW}>
+              <MenuItem href={routes.DOCTORS_NEW}>
+                Doctors
+              </MenuItem>
+            </LinkContainer>
+            <LinkContainer to={routes.ADMIN_FEES}>
+              <MenuItem href={routes.ADMIN_FEES}>
+                Fees
+              </MenuItem>
+            </LinkContainer>
+          </NavDropdown>
       }
     }
 
@@ -233,7 +246,7 @@ export const HippoNavbar = withContractRegistry(
             {wrappedEtherBalance}
             {myCasesItem}
             {openCasesItem}
-            {doctorsItem}
+            {adminItem}
             {profileMenu}
           </Nav>
         </Navbar.Collapse>

@@ -30,7 +30,8 @@ i18next
             setPublicKey: 'Registering Account',
             sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',
-            withdraw: 'Withdrawing W-ETH'
+            withdraw: 'Withdrawing W-ETH',
+            setBaseCaseFee: 'Updating case fee'
           },
           transactionErrors: {
             userRevert: 'You rejected the transaction',
@@ -59,7 +60,8 @@ i18next
             newCase: 'New Case | Hippocrates',
             patientCases: 'My Cases | Hippocrates',
             patientCase: 'Case {{caseId}} | Hippocrates',
-            fourOhFour: '404 | Hippocrates'
+            fourOhFour: '404 | Hippocrates',
+            adminFees: 'Fees | Hippocrates'
           }
         }
       }
