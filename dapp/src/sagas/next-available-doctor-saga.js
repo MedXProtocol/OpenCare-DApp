@@ -19,17 +19,9 @@ function* accountManager() {
   return yield select(state => contractByName(state, 'AccountManager'))
 }
 
-function* nextAvailableDoctor () {
-  return yield select((state) => state.nextAvailableDoctor.doctor)
-}
-
 function* thisAccount () {
   return yield select((state) => state.sagaGenesis.accounts[0])
 }
-
-// function* isOnline(address) {
-//   return yield select((state) => state.heartbeat[address])
-// }
 
 function* isExcluded(address) {
   let excludedAddresses = yield select(state => state.nextAvailableDoctor.excludedAddresses)
@@ -87,7 +79,7 @@ function* fetchDoctorByIndex(index) {
   return doctor
 }
 
-function* setNextAvailableDoctor() {
+function* findNextAvailableDoctor() {
   let doctor = yield findNextAvailableOnlineDoctor()
   if (!doctor) {
     doctor = yield findNextAvailableOfflineDoctor()
@@ -134,39 +126,14 @@ function* findNextAvailableOfflineDoctor() {
   return doctor
 }
 
-// function* checkDoctorOnline({ address }) {
-//   const nextDoctor = yield nextAvailableDoctor()
-//   if (!nextDoctor || !(yield isOnline(nextDoctor.address))) {
-//     const doctor = yield fetchDoctorByAddress(address)
-//     if (doctor) {
-//       yield put({ type: 'NEXT_AVAILABLE_DOCTOR', doctor })
-//     }
-//   }
-// }
-
-// function* checkDoctorOffline({ address }) {
-//   const nextDoctor = yield nextAvailableDoctor()
-
-//   if (!nextDoctor || nextDoctor.address === address) {
-//     yield setNextAvailableDoctor() // find another one
-//   }
-// }
-
-function* checkNextAvailableDoctor() {
-  const nextDoctor = yield nextAvailableDoctor()
-  if (!nextDoctor) {
-    yield setNextAvailableDoctor()
+function* checkExcludedDoctors() {
+  const doctor = yield select(state => state.nextAvailableDoctor.doctor)
+  if (!doctor) {
+    yield put({ type: 'FIND_NEXT_AVAILABLE_DOCTOR' })
   }
 }
 
-function* forgetAndFindNext() {
-  yield put({ type: 'FORGET_NEXT_DOCTOR' })
-  yield checkNextAvailableDoctor()
-}
-
 export function* nextAvailableDoctorSaga() {
-  // yield takeEvery('USER_ONLINE', checkDoctorOnline)
-  // yield takeEvery('USER_OFFLINE', checkDoctorOffline)
-  yield takeLatest('EXCLUDED_DOCTORS', forgetAndFindNext)
-  yield put({ type: 'EXCLUDED_DOCTORS', addresses: [] })
+  yield takeLatest('FIND_NEXT_AVAILABLE_DOCTOR', findNextAvailableDoctor)
+  yield takeLatest('EXCLUDED_DOCTORS', checkExcludedDoctors)
 }

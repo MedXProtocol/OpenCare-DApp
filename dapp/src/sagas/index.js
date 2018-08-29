@@ -10,7 +10,6 @@ import signInSaga from './sign-in-saga'
 import signOutSaga from './sign-out-saga'
 import signUpSaga from './sign-up-saga'
 // import heartbeatSaga from './heartbeat-saga'
-import { hippoCacheInvalidatorSaga } from './hippo-cache-invalidator-saga'
 import { nextAvailableDoctorSaga } from './next-available-doctor-saga'
 import { pollExternalTransactionsSaga } from './pollExternalTransactionsSaga'
 import { failedTransactionListener } from './failedTransactionListener'
@@ -25,7 +24,6 @@ export default function* () {
       signInSaga(),
       signOutSaga(),
       signUpSaga(),
-      hippoCacheInvalidatorSaga(),
       // heartbeatSaga(),
       nextAvailableDoctorSaga(),
       pollExternalTransactionsSaga(),

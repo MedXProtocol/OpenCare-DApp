@@ -14,6 +14,11 @@ contract Case is Ownable, Initializable {
   using RegistryLookup for Registry;
   using SafeMath for uint256;
 
+  /*
+    MEMORY START
+    _do not_ remove any of these once they are deployed to a network (Ropsten,
+    Mainnet, etc.) and only append to the bottom (before the END comment)
+  */
   uint256 public caseFee;
 
   address public patient;
@@ -33,6 +38,10 @@ contract Case is Ownable, Initializable {
   bytes caseKeySalt;
 
   mapping(address => bytes) public doctorEncryptedCaseKeys;
+  /*
+    MEMORY END
+    It is safe to add new data definitions here
+  */
 
   enum CaseStatus {
     None,

@@ -76,8 +76,8 @@ function mapDispatchToProps(dispatch) {
     showBetaFaucetModal: () => {
       dispatch({ type: 'SHOW_BETA_FAUCET_MODAL' })
     },
-    dispatchExcludedDoctors: (addresses) => {
-      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
+    dispatchExcludedDoctors: (excludedAddresses) => {
+      dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
     }
   }
 }

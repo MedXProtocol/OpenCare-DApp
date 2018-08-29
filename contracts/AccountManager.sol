@@ -7,10 +7,19 @@ contract AccountManager {
 
   using RegistryLookup for Registry;
 
+  /*
+    MEMORY START
+    _do not_ remove any of these once they are deployed to a network (Ropsten,
+    Mainnet, etc.) and only append to the bottom (before the END comment)
+  */
   mapping(address => bytes) public publicKeys;
 
   Registry public registry;
   address owner;
+  /*
+    MEMORY END
+    It is safe to add new data definitions here
+  */
 
   event PublicKeySet(address indexed user, bytes publicKey);
 

@@ -13,8 +13,6 @@ import { weiToUsd } from '~/utils/weiToUsd'
 import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
 import { Ether } from './Ether'
 
-require('./EtherFlipStyle.css')
-
 function mapStateToProps(state) {
   const CaseManager = contractByName(state, 'CaseManager')
   return {
@@ -56,13 +54,13 @@ export const EtherFlip = connect(mapStateToProps)(
 
         if (this.state.showUsd) {
           var value = (
-            <span>{displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</span>
+            <span>${displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</span>
           )
         } else {
           value = <Ether wei={wei} />
         }
 
-        return <span className='ether-flip' onClick={this.onFlip}>{value}</span>
+        return <span className='ether-flip flip-link' onClick={this.onFlip}>{value}</span>
       }
     }
   )

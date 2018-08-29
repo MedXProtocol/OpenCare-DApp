@@ -53,16 +53,17 @@ describe('blockSagas', () => {
     })
   })
 
-  describe('collectAllTransactionAddresses()', () => {
-    it('should call collectTransactionAddresses for each', () => {
+  describe('blockContractAddresses()', () => {
+    it('should call blockContractAddresses for each', () => {
       const transactions = [1]
-      var generator = blockSagas.collectAllTransactionAddresses(transactions)
-      let gens = generator.next().value
-      expect(gens.next().value).toEqual(call(blockSagas.collectTransactionAddresses, new Set(), 1))
-      expect(gens.next().done).toBeTruthy()
-      let lastCall = generator.next()
-      expect(lastCall.done).toBeTruthy()
-      expect(lastCall.value).toEqual(new Set())
+      const block = { transactions }
+      var generator = blockSagas.blockContractAddresses(block)
+      var nextGen = generator.next()
+      expect(nextGen.value).toEqual(call(blockSagas.collectAllTransactionAddresses, [1]))
+      expect(nextGen.done).toBeFalsy()
+      nextGen = generator.next(new Set())
+      expect(nextGen.done).toBeTruthy()
+      expect(nextGen.value).toEqual(new Array())
     })
   })
 })
