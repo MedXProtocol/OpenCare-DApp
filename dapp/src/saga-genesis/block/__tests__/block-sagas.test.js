@@ -49,8 +49,7 @@ describe('blockSagas', () => {
       const address = '0x8fa5944b15c1ab5db6bcfb0c888bdc6b242f0fa6'
       var generator = blockSagas.latestBlock({ block })
       expect(generator.next().value).toEqual(call(blockSagas.collectAllTransactionAddresses, block.transactions))
-      let gens = generator.next([address]).value
-      expect(gens.next().value).toEqual(fork(put, { type: 'CACHE_INVALIDATE_ADDRESS', address }))
+      expect(generator.next([address]).value).toEqual(call(blockSagas.invalidateAddressSet, [address]))
     })
   })
 

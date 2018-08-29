@@ -59,7 +59,6 @@ function* addAddressIfExists(addressSet, address) {
   address = address.toLowerCase()
   const contractKey = yield select(contractKeyByAddress, address)
   if (contractKey) {
-    console.log('contractKey for address: ', contractKey, address)
     addressSet.add(address)
     return true
   }
@@ -72,14 +71,22 @@ export function* collectTransactionAddresses(addressSet, transaction) {
   const from = yield call(addAddressIfExists, addressSet, transaction.from)
   if (to || from) {
     const receipt = yield web3.eth.getTransactionReceipt(transaction.hash)
-    // if (receipt) {
-    //   console.log('receipt logs: ')
-    //   console.log(receipt.logs)
-    // }
-    yield* receipt.logs.map(function* (log) {
-      yield call(addAddressIfExists, addressSet, log.address)
-    })
+    yield put({ type: 'BLOCK_TRANSACTION_RECEIPT', receipt })
   }
+}
+
+function* transactionReceipt({ receipt }) {
+  const addressSet = new Set()
+  yield* receipt.logs.map(function* (log) {
+    yield call(addAddressIfExists, addressSet, log.address)
+  })
+  yield invalidateAddressSet(addressSet)
+}
+
+export function* invalidateAddressSet(addressSet) {
+  yield* Array.from(addressSet).map(function* (address) {
+    yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
+  })
 }
 
 export function* collectAllTransactionAddresses(transactions) {
@@ -92,12 +99,11 @@ export function* collectAllTransactionAddresses(transactions) {
 
 export function* latestBlock({block}) {
   const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
-  yield* Array.from(addressSet).map(function* (address) {
-    yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
-  })
+  yield call(invalidateAddressSet, addressSet)
 }
 
 export default function* () {
   yield takeEvery('BLOCK_LATEST', latestBlock)
+  yield takeEvery('BLOCK_TRANSACTION_RECEIPT', transactionReceipt)
   yield fork(startBlockTracker)
 }

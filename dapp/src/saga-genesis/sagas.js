@@ -14,6 +14,7 @@ import networkSagas from './network/network-sagas'
 import ethBalanceSagas from './ethBalance/ethBalanceSagas'
 import transactionSagas, { web3Send } from './transaction/transaction-sagas'
 import web3Initialize from './web3/web3-sagas'
+import { logSaga } from './logs/logSaga'
 
 export * from './call-cache/call-cache-sagas'
 
@@ -32,7 +33,8 @@ export function* start({ web3 }) {
       blockSagas(),
       cacheScopeSagas(),
       transactionSagas(),
-      ethBalanceSagas()
+      ethBalanceSagas(),
+      logSaga()
     ]
   )
 }

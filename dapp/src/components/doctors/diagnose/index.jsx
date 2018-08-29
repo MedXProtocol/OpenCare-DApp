@@ -17,8 +17,10 @@ import {
   withContractRegistry,
   withSaga,
   cacheCallValue,
+  removeLogListener,
   contractByName
 } from '~/saga-genesis'
+import { caseFinders } from '~/finders/caseFinders'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
 import { PageTitle } from '~/components/PageTitle'
@@ -31,7 +33,7 @@ function mapStateToProps(state, { match }) {
   const AccountManager = contractByName(state, 'AccountManager')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
-  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'doctorEncryptedCaseKeys', address)
+  const encryptedCaseKey = caseFinders.doctorEncryptedCaseKey(state, caseAddress, address)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
   const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
@@ -51,6 +53,12 @@ function mapStateToProps(state, { match }) {
   }
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchRemoveLogListener: (address) => dispatch(removeLogListener(address))
+  }
+}
+
 function* saga({ match, address, AccountManager }) {
   if (!AccountManager || isEmptyObject(match.params)) { return }
   const caseAddress = match.params.caseAddress
@@ -59,7 +67,6 @@ function* saga({ match, address, AccountManager }) {
   yield all([
     cacheCall(AccountManager, 'publicKeys', patientAddress),
     cacheCall(caseAddress, 'status'),
-    cacheCall(caseAddress, 'doctorEncryptedCaseKeys', address),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(caseAddress, 'diagnosisHash'),
     cacheCall(caseAddress, 'challengingDoctor'),
@@ -67,7 +74,10 @@ function* saga({ match, address, AccountManager }) {
   ])
 }
 
-export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class _DiagnoseCase extends Component {
+export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga)(class _DiagnoseCase extends Component {
+  componentWillUnmount() {
+    this.props.dispatchRemoveLogListener(this.props.caseAddress)
+  }
   render () {
     if (isEmptyObject(this.props.match.params)) { return null }
 

@@ -20,17 +20,17 @@ contract Case is Ownable, Initializable {
   address public diagnosingDoctor;
   address public challengingDoctor;
 
-  bytes public caseDataHash;
-  bytes public diagnosisHash;
-  bytes public challengeHash;
+  bytes caseDataHash;
+  bytes diagnosisHash;
+  bytes challengeHash;
 
-  Registry public registry;
-  MedXToken public _;
+  Registry registry;
+  MedXToken _;
 
   CaseStatus public status;
 
-  bytes public encryptedCaseKey;
-  bytes public caseKeySalt;
+  bytes encryptedCaseKey;
+  bytes caseKeySalt;
 
   mapping(address => bytes) public doctorEncryptedCaseKeys;
 
@@ -46,7 +46,13 @@ contract Case is Ownable, Initializable {
     ClosedConfirmed
   }
 
-  event CaseCreated(address indexed _patient);
+  event CaseCreated(
+    address indexed patient,
+    bytes encryptedCaseKey,
+    bytes caseKeySalt,
+    bytes caseDataHash
+  );
+  event DoctorEncryptedCaseKeySet(address indexed doctor, bytes doctorEncryptedCaseKey);
   event CaseFinalized(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, address _challengingDoctor);
 
   /**
@@ -108,13 +114,10 @@ contract Case is Ownable, Initializable {
     require(_caseHash.length != 0, 'caseHash required');
     owner = msg.sender;
     status = CaseStatus.Open;
-    encryptedCaseKey = _encryptedCaseKey;
-    caseKeySalt = _caseKeySalt;
     patient = _patient;
-    caseDataHash = _caseHash;
     caseFee = _caseFee;
     registry = Registry(_registry);
-    emit CaseCreated(patient);
+    emit CaseCreated(patient, encryptedCaseKey, caseKeySalt, caseDataHash);
   }
 
   function setDiagnosingDoctor(address _doctorAddress) external onlyCaseFirstPhaseManager {
@@ -143,7 +146,8 @@ contract Case is Ownable, Initializable {
   }
 
   function setDoctorEncryptedCaseKeys(address _doctor, bytes _doctorEncryptedKey) external onlyCasePhaseManagers {
-    doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
+    // doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
+    emit DoctorEncryptedCaseKeySet(_doctor, _doctorEncryptedKey);
   }
 
   function finalize() external onlyCasePhaseManagers {

@@ -105,12 +105,16 @@ export function* web3Call(address, method, ...args) {
   return yield runCall(call)
 }
 
-function* findCallMethod(call) {
-  const { address, method, args } = call
+export function* findWeb3Contract(address) {
   const contractRegistry = yield getContext('contractRegistry')
   const web3 = yield getContext('web3')
   const contractKey = yield select(contractKeyByAddress, address)
-  const contract = contractRegistry.get(address, contractKey, web3)
+  return contractRegistry.get(address, contractKey, web3)
+}
+
+function* findCallMethod(call) {
+  const { address, method, args } = call
+  const contract = yield findWeb3Contract(address)
   const contractMethod = contract.methods[method]
   if (!contractMethod) {
     yield put({ type: 'WEB3_CALL_ERROR', call, error: `Address ${address} does not have method '${method}'` })

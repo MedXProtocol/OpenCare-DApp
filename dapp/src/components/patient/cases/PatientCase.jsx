@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { all } from 'redux-saga/effects'
+import { all, put } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import CaseStatus from './CaseStatus'
 import Diagnosis from '~/components/Diagnosis'
@@ -46,6 +46,7 @@ function* saga({ CaseScheduleManager, match, networkId }) {
   const caseAddress = match.params.caseAddress
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
+  yield put({ type: 'ADD_LOG_LISTENER', address: caseAddress })
   yield all([
     cacheCall(caseAddress, 'encryptedCaseKey'),
     cacheCall(caseAddress, 'caseKeySalt'),

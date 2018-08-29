@@ -18,6 +18,7 @@ export { TransactionStateHandler } from './TransactionStateHandler'
 export { nextId } from './transaction/transaction-factory'
 
 export * from './sagas'
+export * from './actions'
 
 export {
   CallCountRegistry,
