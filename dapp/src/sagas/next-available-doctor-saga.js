@@ -150,7 +150,7 @@ function* findNextAvailableOfflineDoctor() {
   return doctor
 }
 
-function* checkExcludedDoctors() {
+function* checkDoctorAvailable() {
   const doctor = yield select(state => state.nextAvailableDoctor.doctor)
   if (!doctor) {
     yield put({ type: 'FIND_NEXT_AVAILABLE_DOCTOR' })
@@ -159,6 +159,6 @@ function* checkExcludedDoctors() {
 
 export function* nextAvailableDoctorSaga() {
   yield takeLatest('FIND_NEXT_AVAILABLE_DOCTOR', findNextAvailableDoctor)
-  yield takeLatest('EXCLUDED_DOCTORS', checkExcludedDoctors)
-  yield takeLatest('PATIENT_INFO', checkExcludedDoctors)
+  yield takeLatest('EXCLUDED_DOCTORS', checkDoctorAvailable)
+  yield takeLatest('PATIENT_INFO', checkDoctorAvailable)
 }

@@ -21,7 +21,6 @@ export class Hippo {
     this._providerUrl = config.providerUrl || fail('You must pass a provider URL')
     this._networkId = config.networkId || fail('You must pass a network id')
     this._account = privateToAccount(this.privateKey)
-    console.log('+++++++++ Sender account: ' + this._account.address)
     // this._eth = new Eth(new SignerProvider(this._providerUrl, {
     //   signTransaction: (rawTx, cb) => cb(null, sign(rawTx, this._account.privateKey)),
     //   accounts: (cb) => cb(null, [this._account.address]),
