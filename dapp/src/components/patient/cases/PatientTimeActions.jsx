@@ -27,6 +27,7 @@ import { mixpanel } from '~/mixpanel'
 import { secondsInADay } from '~/config/constants'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
 import { EtherFlip } from '~/components/EtherFlip'
+import { isBlank } from '~/utils/isBlank'
 import { isTrue } from '~/utils/isTrue'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
@@ -50,10 +51,22 @@ function mapStateToProps(state, { caseAddress }) {
   const transactions = state.sagaGenesis.transactions
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
 
+  const excludeAddresses = []
+  if (address) {
+    excludeAddresses.push(address)
+  }
+  if (!isBlank(diagnosingDoctor)) {
+    excludeAddresses.push(diagnosingDoctor)
+  }
+  if (!isBlank(challengingDoctor)) {
+    excludeAddresses.push(challengingDoctor)
+  }
+
   return {
     address,
     caseFeeWei,
     CaseLifecycleManager,
+    excludeAddresses,
     CaseScheduleManager,
     currentlyExcludedDoctors,
     challengingDoctor,
@@ -83,8 +96,8 @@ function* saga({ CaseScheduleManager, caseAddress }) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatchExcludedDoctors: (addresses) => {
-      dispatch({ type: 'EXCLUDED_DOCTORS', addresses })
+    dispatchExcludedDoctors: (excludedAddresses) => {
+      dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
     }
   }
 }
@@ -107,6 +120,8 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         showRequestNewDoctorModal: false,
         doctorPublicKey: '',
       }
+
+      props.dispatchExcludedDoctors(props.excludeAddresses)
     }
 
     componentWillReceiveProps (nextProps) {
@@ -114,7 +129,9 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       this.requestNewDocTransactionStateHandler(nextProps)
       this.withdrawTransactionStateHandler(nextProps)
 
-      this.setExcludedDoctorAddresses(nextProps)
+      if (nextProps.excludeAddresses.length !== this.props.excludeAddresses.length) {
+        this.props.dispatchExcludedDoctors(nextProps.excludeAddresses)
+      }
     }
 
     onChangeDoctor = (option) => {
@@ -122,24 +139,6 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         selectedDoctor: option,
         doctorAddressError: ''
       })
-    }
-
-    setExcludedDoctorAddresses = (props) => {
-      if (!props.address || !props.status || !props.currentlyExcludedDoctors) { return }
-
-      let excludeAddresses = []
-
-      if ((props.status === 3) && props.diagnosingDoctor) {
-        excludeAddresses = [props.address, props.diagnosingDoctor]
-      }
-
-      if ((props.status === 6) && props.diagnosingDoctor && props.challengingDoctor) {
-        excludeAddresses = [props.address, props.diagnosingDoctor, props.challengingDoctor]
-      }
-
-      if (props.currentlyExcludedDoctors.length < excludeAddresses.length) {
-        props.dispatchExcludedDoctors(excludeAddresses)
-      }
     }
 
     handleCloseRequestNewDoctorModal = () => {
@@ -274,6 +273,8 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
       let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
+      const isCaseNotStale = !updatedAt || !caseStale(secondsInADay, updatedAt, status, isPatient)
+
       let buttons = (
         <div className="button-set__btn-clear">
           <Button
@@ -314,10 +315,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
           </div>
         )
       }
-      if (
-        !updatedAt
-        || !caseStale(secondsInADay, updatedAt, status, isPatient)
-      ) {
+      if (isCaseNotStale) {
         return null
       } else {
         return (

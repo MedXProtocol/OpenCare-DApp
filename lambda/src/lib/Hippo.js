@@ -45,6 +45,7 @@ export class Hippo {
   lookupAccountManager () {
     return this.lookupContractAddress('AccountManager')
       .then((addresses) => {
+        console.log('AccountManager located at ', addresses)
         return new this._eth.contract(accountManagerArtifact.abi, accountManagerArtifact.bytecode, {
           from: this.ownerAddress(),
           gas: 4000000,
@@ -67,7 +68,7 @@ export class Hippo {
       } catch (error) {
         if (error.message.match(/known transaction|transaction underpriced/)) {
           tx.nonce++
-          console.log(`retry: ${i+1}`)
+          console.info(`retry: ${i+1}`)
         } else {
           console.error(error)
           throw error
@@ -90,7 +91,7 @@ export class Hippo {
       console.info('sendEther tx: ', tx)
       return this.sendTransaction(tx)
     }).catch(error => {
-      console.log(error.message)
+      console.info(error.message)
       fail(error.message)
     })
   }
@@ -109,30 +110,55 @@ export class Hippo {
       console.info('sendMedX tx: ', tx)
       return this.sendTransaction(tx)
     }).catch(error => {
-      console.log(error.message)
+      console.info(error.message)
       fail(error.message)
     })
   }
 
-  async addOrReactivateDoctor (ethAddress, name, publicKey) {
+  async addOrReactivateDoctor (ethAddress, name, country, region, publicKey) {
     const accountManager = await this.lookupAccountManager()
-    const existingPublicKey = await accountManager.publicKeys(ethAddress)
-
-    if (existingPublicKey[0] === '0x') {
-      await accountManager.setPublicKey(ethAddress, publicKey)
-    }
-    return this.lookupContractAddress('DoctorManager').then((doctorManagerAddress) => {
-      const method = doctorManagerArtifact.abi.find((obj) => obj.name === 'addOrReactivateDoctor')
-      var data = abi.encodeMethod(method, [ethAddress, name])
+    const existingPublicKeys = await accountManager.publicKeys(ethAddress)
+    const existingPublicKey = existingPublicKeys['0']
+    if (!existingPublicKey || existingPublicKey === '0x') {
+      const method = accountManagerArtifact.abi.find((obj) => obj.name === 'setPublicKey')
+      var data = abi.encodeMethod(method, [ethAddress, publicKey])
       const tx = {
         from: this.ownerAddress(),
-        to: doctorManagerAddress[0],
+        to: accountManager.address,
         gas: 4000000,
         gasPrice: Eth.toWei(20, 'gwei').toString(),
         data
       }
-      console.info('addOrReactivateDoctor tx: ', tx)
       return this.sendTransaction(tx)
-    })
+        .then(() => {
+          return this._addOrReactivateDoctor(ethAddress, name, country, region)
+        })
+        .catch((error) => {
+          console.error('addOrReactivateDoctor: ', error.message)
+          fail(error.message)
+        })
+    } else {
+      return this._addOrReactivateDoctor(ethAddress, name, country, region)
+    }
+  }
+
+  _addOrReactivateDoctor (ethAddress, name, country, region) {
+    return this.lookupContractAddress('DoctorManager')
+      .then((doctorManagerAddress) => {
+        const method = doctorManagerArtifact.abi.find((obj) => obj.name === 'addOrReactivateDoctor')
+        var data = abi.encodeMethod(method, [ethAddress, name, country, region])
+        const tx = {
+          from: this.ownerAddress(),
+          to: doctorManagerAddress[0],
+          gas: 4000000,
+          gasPrice: Eth.toWei(20, 'gwei').toString(),
+          data
+        }
+        return this.sendTransaction(tx)
+      })
+      .catch((error) => {
+        console.info('errorr !! ', error.message)
+        fail(error)
+      })
   }
 }

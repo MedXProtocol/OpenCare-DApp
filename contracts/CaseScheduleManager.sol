@@ -11,12 +11,24 @@ contract CaseScheduleManager is Initializable, Ownable {
 
   using RegistryLookup for Registry;
 
-  uint constant secondsInADay = 86400;
+  uint constant secondsInADay = 120;
 
+  /*
+    MEMORY START
+    _do not_ remove any of these once they are deployed to a network (Ropsten,
+    Mainnet, etc.) and only append to the bottom (before the END comment)
+  */
   mapping(address => uint) public createdAt;
   mapping(address => uint) public updatedAt;
 
   Registry registry;
+  /*
+    MEMORY END
+    It is safe to add new data definitions here
+  */
+
+  event CaseInitializedAt(address caseAddress, uint256 timestamp);
+  event CaseUpdatedAt(address caseAddress, uint256 timestamp);
 
   modifier onlyCaseManager() {
     require(
@@ -68,10 +80,11 @@ contract CaseScheduleManager is Initializable, Ownable {
   function initializeCase(address _caseAddress) external onlyCaseManager() {
     createdAt[_caseAddress] = block.timestamp;
     updatedAt[_caseAddress] = block.timestamp;
+    emit CaseInitializedAt(_caseAddress, block.timestamp);
   }
 
   function touchUpdatedAt(address _caseAddress) public onlyCasePhaseManagers {
     updatedAt[_caseAddress] = block.timestamp;
+    emit CaseUpdatedAt(_caseAddress, block.timestamp);
   }
-
 }

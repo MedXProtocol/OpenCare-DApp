@@ -1,4 +1,10 @@
-export default function (state, { type, doctor, addresses }) {
+export default function (state, {
+  type,
+  doctor,
+  excludedAddresses,
+  patientCountry,
+  patientRegion
+}) {
   if (typeof state === 'undefined') {
     state = {
       noDoctorsAvailable: false,
@@ -7,27 +13,33 @@ export default function (state, { type, doctor, addresses }) {
   }
 
   switch(type) {
+    case 'FIND_NEXT_AVAILABLE_DOCTOR':
+      state = {...state}
+      delete state['doctor']
+      if (excludedAddresses) {
+        state.excludedAddresses = excludedAddresses
+      }
+
+      break
+
     case 'NEXT_AVAILABLE_DOCTOR':
       state = {
         ...state,
+        noDoctorsAvailable: false,
         doctor
       }
+
       break
 
     case 'EXCLUDED_DOCTORS':
       state = {
         ...state,
-        excludedAddresses: addresses
-      }
-      break
-
-    case 'FORGET_NEXT_DOCTOR':
-      state = {
-        ...state,
-        noDoctorsAvailable: false
+        excludedAddresses
       }
 
-      delete state['doctor']
+      if (state.doctor && state.excludedAddresses.indexOf(state.doctor.address) !== -1) {
+        delete state['doctor']
+      }
 
       break
 
@@ -36,6 +48,22 @@ export default function (state, { type, doctor, addresses }) {
         ...state,
         noDoctorsAvailable: true
       }
+
+      delete state['doctor']
+
+      break
+
+    case 'PATIENT_INFO':
+      // This works when we delete the doctor from the state prior to setting it
+      // to a new object, but not afterwards
+      delete state['doctor']
+
+      state = {
+        ...state,
+        patientCountry,
+        patientRegion
+      }
+
       break
 
     // no default

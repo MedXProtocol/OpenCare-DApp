@@ -22,8 +22,13 @@ export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Comp
   constructor(props) {
     super(props)
 
+    let visible = true
+    if (typeof props.visible !== 'undefined') {
+      visible = props.visible
+    }
+
     this.state = {
-      visible: true
+      visible
     }
   }
 

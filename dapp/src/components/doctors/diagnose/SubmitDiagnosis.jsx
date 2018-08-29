@@ -27,7 +27,8 @@ import { Loading } from '~/components/Loading'
 import { toastr } from '~/toastr'
 import pull from 'lodash.pull'
 import * as routes from '~/config/routes'
-import { PrescriptionMedication } from './PrescriptionMedication'
+import { Medication } from './Medication'
+import { groupedRecommendationOptions } from './recommendationOptions'
 
 //used to distinguish prescription components
 let medicationId = 1
@@ -241,10 +242,6 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     }, this.buildFinalRecommendation)
   }
 
-  handleTextAreaOnBlur = (event) => {
-    // no-op
-  }
-
   updateMedications = (array, errors, index, medication) => {
     if (!medication.prescription) {
       // if the prescription was removed
@@ -270,16 +267,24 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     }
   }
 
+  onChangeNoFurtherTreatment = (event) => {
+    this.setState({
+      noFurtherTreatment: !this.state.noFurtherTreatment,
+      overTheCounterRecommendation: '',
+      prescriptionRecommendation: ''
+    })
+  }
+
   onChangePrescription = (index, medication) => {
     const copy = [...this.state.prescriptions]
-    const errorsCopy = [...this.state.prescriptionErrors]
+    const errorsCopy = {...this.state.prescriptionErrors}
     this.updateMedications(copy, errorsCopy, index, medication)
     this.setState({ prescriptions: copy, prescriptionErrors: errorsCopy }, this.buildFinalRecommendation)
   }
 
   onChangeOverTheCounter = (index, medication) => {
     const copy = [...this.state.overTheCounters]
-    const errorsCopy = [...this.state.overTheCounterErrors]
+    const errorsCopy = {...this.state.overTheCounterErrors}
     this.updateMedications(copy, errorsCopy, index, medication)
     this.setState({ overTheCounters: copy, overTheCounterErrors: errorsCopy }, this.buildFinalRecommendation)
   }
@@ -320,54 +325,71 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
       if (medication.duration) {
         duration = `for ${medication.duration}`
       }
-      if (medication.notes) {
-        var notes = <p>
-          {medication.notes}
-        </p>
-      }
-      recommendation = <React.Fragment key={medication.medicationId}>
-        <strong>{medication.prescription.label}</strong>
-        <br />
-        {medication.use} {medication.frequency} {duration}
-        {notes}
-      </React.Fragment>
+      recommendation =
+        <React.Fragment key={medication.medicationId}>
+          <p>
+            <strong>{medication.prescription.label}</strong>
+            <br />
+            {medication.use} {medication.frequency} {duration}
+            {medication.notes ? <br /> : ''}
+            {medication.notes}
+          </p>
+        </React.Fragment>
     }
 
     return recommendation
   }
 
   checkMedicationErrors (medications) {
-    const medicationErrors = []
+    const medicationErrors = {}
+    let isError = false
     for (var index in medications) {
       const pErrors = {}
-      medicationErrors.push(pErrors)
-      const { prescription, frequency, duration } = medications[index]
+      const { prescription, frequency, duration, medicationId } = medications[index]
+      medicationErrors[medicationId] = pErrors
       pErrors.frequency = prescription && !frequency
       pErrors.duration = prescription && !duration
+      isError = isError || pErrors.frequency || pErrors.duration
     }
-    return medicationErrors
+    return [medicationErrors, isError]
   }
 
   runValidation = async () => {
-    let errors = []
-    const prescriptionErrors = this.checkMedicationErrors(this.state.prescriptions)
-    const overTheCounterErrors = this.checkMedicationErrors(this.state.overTheCounters)
+    await this.setState({
+      errors: [],
+      prescriptionErrors: {},
+      overTheCounterErrors: {},
+      isError: false
+    })
 
-    await this.setState({ errors: [] })
+    let errors = []
+
+    const [ prescriptionErrors, isPrescriptionError ] = this.checkMedicationErrors(this.state.prescriptions)
+    const [ overTheCounterErrors, isOverTheCounterError ] = this.checkMedicationErrors(this.state.overTheCounters)
+
+    if (isOverTheCounterError) {
+      errors.push('over-the-counter')
+    }
+
+    if (isPrescriptionError) {
+      errors.push('prescriptions')
+    }
 
     if (this.state.diagnosis === null) {
       errors.push('diagnosis')
     }
 
     if (
-      this.state.prescriptions.prescription === ''
-      && this.state.overTheCounters.prescription === ''
-      && this.state.noFurtherTreatment === false
+      !this.state.prescriptions[0].prescription
+      && !this.state.overTheCounters[0].prescription
+      && !this.state.noFurtherTreatment
     ) {
       errors.push('oneRecommendation')
     }
 
-    if (errors.length > 0) {
+    const isError = errors.length || isPrescriptionError || isOverTheCounterError
+
+    if (errors.length) {
       // First reset it so it will still take the user to the anchor even if
       // we already took them there before (still error on same field)
       window.location.hash = `#`;
@@ -379,7 +401,8 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     await this.setState({
       errors,
       prescriptionErrors,
-      overTheCounterErrors
+      overTheCounterErrors,
+      isError
     })
   }
 
@@ -388,7 +411,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
     await this.runValidation()
 
-    if (this.state.errors.length === 0) {
+    if (!this.state.isError) {
       this.setState({
         showConfirmationModal: true
       })
@@ -475,6 +498,8 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     const prescriptions = this.state.prescriptions
     const overTheCounters = this.state.overTheCounters
 
+    const showDiagnosisSummary = this.state.diagnosis !== null || this.state.overTheCounterRecommendation || this.state.prescriptionRecommendation
+
     return (
       <div>
         <div className="card">
@@ -510,6 +535,24 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
                   {errors['oneRecommendation']}
 
+
+                  <FlipMove
+                    enterAnimation="accordionVertical"
+                    leaveAnimation="accordionVertical"
+                  >
+                    <div
+                      className="form-group form-group--logical-grouping"
+                      key={`key-noFurtherTreatment`}
+                    >
+                      <label className="checkbox-inline">
+                        <input type="checkbox" onClick={this.onChangeNoFurtherTreatment} /> &nbsp;
+                        No Further Treatment Necessary
+                      </label>
+                    </div>
+                  </FlipMove>
+
+
+                  <div id='over-the-counter' />
                   <FlipMove
                     enterAnimation="accordionVertical"
                     leaveAnimation="accordionVertical"
@@ -519,19 +562,20 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                       :
                       overTheCounters.map((overTheCounter, index) => {
                         return (
-                          <PrescriptionMedication
+                          <Medication
                             title='Over-the-Counter Medication'
                             key={overTheCounter.medicationId}
                             medication={overTheCounter}
                             errors={this.state.overTheCounterErrors[overTheCounter.medicationId] || {}}
-                            onBlur={this.handleTextAreaOnBlur}
                             onChange={(medication) => this.onChangeOverTheCounter(index, medication)}
+                            recommendationOptions={groupedRecommendationOptions.overTheCounter}
                             />
                         )
                       })
                     }
                   </FlipMove>
 
+                  <div id='prescriptions' />
                   <FlipMove
                     enterAnimation="accordionVertical"
                     leaveAnimation="accordionVertical"
@@ -541,12 +585,12 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                       :
                       prescriptions.map((prescription, index) => {
                         return (
-                          <PrescriptionMedication
+                          <Medication
                             key={prescription.medicationId}
                             medication={prescription}
                             errors={this.state.prescriptionErrors[prescription.medicationId] || {}}
-                            onBlur={this.handleTextAreaOnBlur}
                             onChange={(medication) => this.onChangePrescription(index, medication)}
+                            recommendationOptions={groupedRecommendationOptions.prescriptionMedications}
                             />
                         )
                       })
@@ -557,32 +601,9 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                     enterAnimation="accordionVertical"
                     leaveAnimation="accordionVertical"
                   >
-                    {(this.state.overTheCounterRecommendation !== ''
-                      || this.state.prescriptionRecommendation !== '')
-                      ? <span key={`key-noFurtherTreatment-hidden`} />
-                      : (
-                        <div
-                          className="form-group form-group--logical-grouping"
-                          key={`key-noFurtherTreatment`}
-                        >
-                          <label className="checkbox-inline">
-                            <input type="checkbox" onClick={(event) =>
-                              this.setState({ 'noFurtherTreatment': !this.state.noFurtherTreatment })
-                            } /> &nbsp;
-                            No Further Treatment Necessary
-                          </label>
-                        </div>
-                      )
-                    }
-                  </FlipMove>
-
-                  <FlipMove
-                    enterAnimation="accordionVertical"
-                    leaveAnimation="accordionVertical"
-                  >
                     {(
-                      this.state.overTheCounterRecommendation === ''
-                      && this.state.prescriptionRecommendation === ''
+                      prescriptions[0].prescription !== ''
+                      || overTheCounters[0].prescription !== ''
                      )
                       ? <span key={`key-sideEffects-hidden`} />
                       : (
@@ -632,7 +653,6 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                               colClasses='col-xs-12 col-sm-12 col-md-12'
                               label='Additional Side Effects'
                               optional={true}
-                              textAreaOnBlur={this.handleTextAreaOnBlur}
                               textAreaOnChange={this.handleTextAreaOnChange}
                             />
                           </div>
@@ -687,7 +707,6 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                       colClasses='col-xs-12 col-sm-12 col-md-12'
                       label='Additional Counseling'
                       optional={true}
-                      textAreaOnBlur={this.handleTextAreaOnBlur}
                       textAreaOnChange={this.handleTextAreaOnChange}
                     />
                   </div>
@@ -702,14 +721,13 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
                     colClasses='col-xs-12 col-sm-12 col-md-12'
                     label='Personal Message'
                     optional={true}
-                    textAreaOnBlur={this.handleTextAreaOnBlur}
                     textAreaOnChange={this.handleTextAreaOnChange}
                   />
                 </div>
 
                 <div
                   className="col-xs-12 col-md-4"
-                  style={{display: (this.state.diagnosis !== null) ? 'block' : 'none' }}
+                  style={{display: (showDiagnosisSummary) ? 'block' : 'none' }}
                 >
                   <div className="well">
                     <HippoStringDisplay

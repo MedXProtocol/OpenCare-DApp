@@ -15,12 +15,14 @@ export const EthAddress = class _EthAddress extends Component {
 
   render () {
     var address = (this.props.address === undefined) ? '?' : this.props.address.toString()
+    let displayed
 
-    if (this.state.showFull) {
-      var displayed =
-        <span className='tag address__full'>{address}</span>
+    if (this.props.onlyAddress) {
+      return <span title={address} className='address'>{address.substring(0, 10)} ...</span>
+    } else if (this.state.showFull) {
+      displayed = <span className='tag address__full'>{address}</span>
     } else {
-      displayed = <span onClick={() => this.toggleFull()} className="address__short">
+      displayed = <span onClick={() => this.toggleFull()} className="flip-link">
         {address.substring(0, 10)} ...
       </span>
     }

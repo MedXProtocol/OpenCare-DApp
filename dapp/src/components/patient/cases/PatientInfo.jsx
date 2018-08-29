@@ -5,8 +5,7 @@ import classnames from 'classnames'
 import Select from 'react-select'
 import * as Animated from 'react-select/lib/animated';
 import { customStyles } from '~/config/react-select-custom-styles'
-import { countries } from './countries'
-import { regions } from './regions'
+import { countries } from '~/lib/countries'
 
 export const PatientInfo = class _PatientInfo extends Component {
 
@@ -86,13 +85,13 @@ export const PatientInfo = class _PatientInfo extends Component {
             <div className={classnames('form-group', { 'has-error': errors['region'] })}>
               <label className="control-label">State</label>
               <Select
-                isDisabled={country !== 'US'}
+                isDisabled={!this.props.isCanadaOrUSA()}
                 placeholder='Please select your State'
                 styles={customStyles}
                 components={Animated}
                 closeMenuOnSelect={true}
                 ref={this.props.setRegionRef}
-                options={regions}
+                options={this.props.regionOptions}
                 onChange={this.props.handleRegionChange}
                 selected={region}
               />

@@ -4,6 +4,12 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Initializable.sol";
 
 contract DoctorManager is Ownable, Initializable {
+
+  /*
+    MEMORY START
+    _do not_ remove any of these once they are deployed to a network (Ropsten,
+    Mainnet, etc.) and only append to the bottom (before the END comment)
+  */
   mapping (address => uint256) public doctorIndices;
   mapping (uint256 => address) public doctorAddresses;
   mapping (uint256 => string) public doctorNames;
@@ -11,6 +17,12 @@ contract DoctorManager is Ownable, Initializable {
   uint256 public doctorCount;
 
   mapping (uint256 => bool) public doctorDeactivated;
+  mapping (uint256 => string) public doctorCountries;
+  mapping (uint256 => string) public doctorRegions;
+  /*
+    MEMORY END
+    It is safe to add new data definitions here
+  */
 
   event AddDoctor(address indexed doctor);
   event DoctorDeactivated(address indexed doctor);
@@ -26,29 +38,47 @@ contract DoctorManager is Ownable, Initializable {
     doctorCount += 1;
   }
 
-  function addOrReactivateDoctor(address _doctor, string _name) public onlyOwner {
+  function addOrReactivateDoctor(
+    address _doctor,
+    string _name,
+    string _country,
+    string _region
+  ) public onlyOwner {
     address doctorAddress = doctorAddresses[doctorIndex(_doctor)];
     if (_doctor == doctorAddress) {
-      reactivateDoctor(_doctor, _name);
+      reactivateDoctor(_doctor, _name, _country, _region);
     } else {
-      addDoctor(_doctor, _name);
+      addDoctor(_doctor, _name, _country, _region);
     }
   }
 
-  function addDoctor(address _doctor, string _name) private onlyOwner {
+  function addDoctor(
+    address _doctor,
+    string _name,
+    string _country,
+    string _region
+  ) private onlyOwner {
     require(!isDoctor(_doctor), "Address provided is already a doctor");
     doctorIndices[_doctor] = doctorCount;
     doctorAddresses[doctorCount] = _doctor;
     doctorNames[doctorCount] = _name;
+    doctorCountries[doctorCount] = _country;
+    doctorRegions[doctorCount] = _region;
     doctorCount += 1;
     emit AddDoctor(_doctor);
   }
 
-  function reactivateDoctor(address _doctor, string _name) private onlyOwner {
+  function reactivateDoctor(address _doctor,
+    string _name,
+    string _country,
+    string _region
+  ) private onlyOwner {
     require(!isActive(_doctor), "Address provided is already activated, cannot reactivate");
     uint256 index = doctorIndex(_doctor);
     doctorDeactivated[index] = false;
     doctorNames[index] = _name;
+    doctorCountries[index] = _country;
+    doctorRegions[index] = _region;
     emit DoctorReactivated(_doctor);
   }
 
@@ -80,5 +110,13 @@ contract DoctorManager is Ownable, Initializable {
 
   function name(address _doctor) public view returns (string) {
     return doctorNames[doctorIndex(_doctor)];
+  }
+
+  function country(address _doctor) public view returns (string) {
+    return doctorCountries[doctorIndex(_doctor)];
+  }
+
+  function region(address _doctor) public view returns (string) {
+    return doctorRegions[doctorIndex(_doctor)];
   }
 }

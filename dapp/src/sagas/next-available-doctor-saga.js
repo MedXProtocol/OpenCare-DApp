@@ -19,17 +19,9 @@ function* accountManager() {
   return yield select(state => contractByName(state, 'AccountManager'))
 }
 
-function* nextAvailableDoctor () {
-  return yield select((state) => state.nextAvailableDoctor.doctor)
-}
-
 function* thisAccount () {
   return yield select((state) => state.sagaGenesis.accounts[0])
 }
-
-// function* isOnline(address) {
-//   return yield select((state) => state.heartbeat[address])
-// }
 
 function* isExcluded(address) {
   let excludedAddresses = yield select(state => state.nextAvailableDoctor.excludedAddresses)
@@ -49,12 +41,36 @@ function* fetchDoctorCredentials(address) {
   const publicKey = yield web3Call(yield accountManager(), 'publicKeys', address)
   if (isBlank(publicKey)) { return null }
 
+  const patientAddress = yield select(state => state.sagaGenesis.accounts[0])
+  if (patientAddress === undefined) { return null }
+
+  const patientIsDoctor = yield web3Call(yield doctorManager(), 'isDoctor', patientAddress)
+  const patientUSOrCADifferentRegion = yield sameCountryDifferentRegion(address)
+  if (!patientIsDoctor && patientUSOrCADifferentRegion) { return null }
+
   credentials = {
     address,
     isActive,
     publicKey
   }
   return credentials
+}
+
+// When the patient is in Canada and the same province then it's ok, but if other
+// province then it's not okay. Same goes for USA
+function* sameCountryDifferentRegion(address) {
+  const patientCountry = yield select(state => state.nextAvailableDoctor.patientCountry)
+  const patientRegion = yield select(state => state.nextAvailableDoctor.patientRegion)
+  const doctorCountry = yield web3Call(yield doctorManager(), 'country', address)
+  const doctorRegion = yield web3Call(yield doctorManager(), 'region', address)
+
+  if (
+    patientCountry === doctorCountry
+    && (patientCountry === 'US' || patientCountry === 'CA')
+    && patientRegion !== doctorRegion
+  ) {
+    return true
+  }
 }
 
 function* fetchDoctorByAddress(address) {
@@ -87,7 +103,7 @@ function* fetchDoctorByIndex(index) {
   return doctor
 }
 
-function* setNextAvailableDoctor() {
+function* findNextAvailableDoctor() {
   let doctor = yield findNextAvailableOnlineDoctor()
   if (!doctor) {
     doctor = yield findNextAvailableOfflineDoctor()
@@ -134,39 +150,15 @@ function* findNextAvailableOfflineDoctor() {
   return doctor
 }
 
-// function* checkDoctorOnline({ address }) {
-//   const nextDoctor = yield nextAvailableDoctor()
-//   if (!nextDoctor || !(yield isOnline(nextDoctor.address))) {
-//     const doctor = yield fetchDoctorByAddress(address)
-//     if (doctor) {
-//       yield put({ type: 'NEXT_AVAILABLE_DOCTOR', doctor })
-//     }
-//   }
-// }
-
-// function* checkDoctorOffline({ address }) {
-//   const nextDoctor = yield nextAvailableDoctor()
-
-//   if (!nextDoctor || nextDoctor.address === address) {
-//     yield setNextAvailableDoctor() // find another one
-//   }
-// }
-
-function* checkNextAvailableDoctor() {
-  const nextDoctor = yield nextAvailableDoctor()
-  if (!nextDoctor) {
-    yield setNextAvailableDoctor()
+function* checkDoctorAvailable() {
+  const doctor = yield select(state => state.nextAvailableDoctor.doctor)
+  if (!doctor) {
+    yield put({ type: 'FIND_NEXT_AVAILABLE_DOCTOR' })
   }
 }
 
-function* forgetAndFindNext() {
-  yield put({ type: 'FORGET_NEXT_DOCTOR' })
-  yield checkNextAvailableDoctor()
-}
-
 export function* nextAvailableDoctorSaga() {
-  // yield takeEvery('USER_ONLINE', checkDoctorOnline)
-  // yield takeEvery('USER_OFFLINE', checkDoctorOffline)
-  yield takeLatest('EXCLUDED_DOCTORS', forgetAndFindNext)
-  yield put({ type: 'EXCLUDED_DOCTORS', addresses: [] })
+  yield takeLatest('FIND_NEXT_AVAILABLE_DOCTOR', findNextAvailableDoctor)
+  yield takeLatest('EXCLUDED_DOCTORS', checkDoctorAvailable)
+  yield takeLatest('PATIENT_INFO', checkDoctorAvailable)
 }

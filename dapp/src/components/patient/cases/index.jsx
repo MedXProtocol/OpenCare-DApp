@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
@@ -142,17 +143,20 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
     return (
       <div className="card">
         <ScrollToTop />
-        <div className="card-body">
+        <div className={classnames(
+          'card-body',
+          { 'card-body--cases__has-pagination': (totalPages > 1) }
+        )}>
           {loadingLines}
           {noCases}
           {caseRows}
-
-          <Pagination
-            currentPage={this.props.currentPage}
-            totalPages={totalPages}
-            formatPageRoute={(number) => formatRoute(routes.PATIENTS_CASES_PAGE_NUMBER, { currentPage: number })}
-            />
         </div>
+
+        <Pagination
+          currentPage={this.props.currentPage}
+          totalPages={totalPages}
+          formatPageRoute={(number) => formatRoute(routes.PATIENTS_CASES_PAGE_NUMBER, { currentPage: number })}
+        />
       </div>
     )
   }

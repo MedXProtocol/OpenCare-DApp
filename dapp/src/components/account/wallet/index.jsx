@@ -77,6 +77,16 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
             icon={faExternalLinkAlt} />
         </EtherscanLink>
     }
+
+    if (this.props.balance > 0) {
+      var withdraw =
+        <div className="text-center">
+          <button onClick={this.doWithdraw} className="btn btn-primary btn-lg" disabled={!!this.props.withdrawTransactionId}>
+            Withdraw
+          </button>
+        </div>
+    }
+    
     return (
       <div>
         <PageTitle renderTitle={(t) => t('pageTitles.balance')} />
@@ -102,11 +112,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                       &nbsp; <EtherFlip wei={this.props.balance} />
                     </p>
 
-                    <div className="text-center">
-                      <button onClick={this.doWithdraw} className="btn btn-primary btn-lg" disabled={!!this.props.withdrawTransactionId}>
-                        Withdraw
-                      </button>
-                    </div>
+                    {withdraw}
                   </div>
                 </div>
               </div>
