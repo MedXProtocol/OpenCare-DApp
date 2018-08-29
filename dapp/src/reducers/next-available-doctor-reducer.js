@@ -57,7 +57,7 @@ export default function (state, {
       // This works when we delete the doctor from the state prior to setting it
       // to a new object, but not afterwards
       delete state['doctor']
-      
+
       state = {
         ...state,
         patientCountry,

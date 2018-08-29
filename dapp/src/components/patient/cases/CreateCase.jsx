@@ -415,12 +415,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
   }
 
-  reRunExcludeDoctors = () => {
-    this.props.dispatchPatientInfo(
-      this.state.country,
-      this.state.region
-    )
-    this.props.dispatchExcludedDoctors([ this.props.account ])
+  findNewDoctor = () => {
+    this.props.dispatchPatientInfo(this.state.country, this.state.region)
   }
 
   checkCountry = () => {
@@ -435,7 +431,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       this.regionInput.select.clearValue()
     }
 
-    this.reRunExcludeDoctors()
+    this.findNewDoctor()
 
     this.setState({ regionOptions: this.isCanadaOrUSA() ? regions[this.state.country] : [] })
   }
@@ -587,7 +583,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       if (this.isCanadaOrUSA()) {
         this.validateField('region')
 
-        this.reRunExcludeDoctors()
+        this.findNewDoctor()
       }
     })
   }

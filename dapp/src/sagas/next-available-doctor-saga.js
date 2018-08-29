@@ -160,4 +160,5 @@ function* checkExcludedDoctors() {
 export function* nextAvailableDoctorSaga() {
   yield takeLatest('FIND_NEXT_AVAILABLE_DOCTOR', findNextAvailableDoctor)
   yield takeLatest('EXCLUDED_DOCTORS', checkExcludedDoctors)
+  yield takeLatest('PATIENT_INFO', checkExcludedDoctors)
 }
