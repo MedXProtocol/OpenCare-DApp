@@ -27,4 +27,20 @@ describe('nextAvailableDoctor reducer', () => {
     expect(state.excludedAddresses).toEqual([1, 2])
     expect(state.doctor).toEqual(undefined)
   })
+
+  test('PATIENT_INFO', () => {
+    let state = nextAvailableDoctor({ doctor: { address: 1 } }, {})
+    expect(state.doctor.address).toEqual(1)
+
+    const patientCountry = 'CA'
+    const patientRegion = 'BC'
+    let newState = nextAvailableDoctor(state, {
+      type: 'PATIENT_INFO',
+      patientCountry,
+      patientRegion
+    })
+    expect(newState.patientCountry).toEqual('CA')
+    expect(newState.patientRegion).toEqual('BC')
+    expect(state.doctor).toEqual(undefined)
+  })
 })

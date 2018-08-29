@@ -7,7 +7,6 @@ import { cacheCall, withSaga, cacheCallValue, contractByName, nextId } from '~/s
 import { Modal } from 'react-bootstrap'
 import get from 'lodash.get'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
-import { MedXFaucetAPI } from '~/components/betaFaucet/MedXFaucetAPI'
 import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
 import { weiToEther } from '~/utils/weiToEther'
 
@@ -19,11 +18,8 @@ function mapStateToProps (state) {
   const manuallyOpened = get(state, 'betaFaucet.manuallyOpened')
   const MedXToken = contractByName(state, 'MedXToken')
   const DoctorManager = contractByName(state, 'DoctorManager')
-  const medXBalance = cacheCallValue(state, MedXToken, 'balanceOf', address)
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
   const CaseManager = contractByName(state, 'CaseManager')
-  const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
-  const previousCase = (caseListCount > 0)
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
   const BetaFaucet = contractByName(state, 'BetaFaucet')
   const hasBeenSentEther = cacheCallValue(state, BetaFaucet, 'sentAddresses', address)
@@ -46,12 +42,10 @@ function mapStateToProps (state) {
     betaFaucetModalDismissed,
     CaseManager,
     ethBalance,
-    medXBalance,
     hasBeenSentEther,
     DoctorManager,
     MedXToken,
     isOwner,
-    previousCase,
     isDoctor,
     dontShowEther,
     dontShowMedX,
@@ -108,11 +102,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
       }
 
       init(props) {
-        if (
-          props.ethBalance === undefined
-          || props.hasBeenSentEther === undefined
-          || props.medXBalance === undefined
-        ) {
+        if (props.ethBalance === undefined || props.hasBeenSentEther === undefined) {
           return
         }
 
@@ -128,7 +118,6 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
           && !props.dontShowEther
         )
 
-        const needMedX = false
         const canBeDoctor = (!props.isDoctor && !props.dontShowAddDoctor)
 
 
@@ -136,10 +125,8 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
 
         if (needEth) {
           step = 1
-        } else if (needMedX) {
-          step = 2
         } else if (canBeDoctor) {
-          step = 3
+          step = 2
         } else if (props.manuallyOpened) {
           step = -1
         } else {
@@ -159,10 +146,8 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
       determineNextStep = () => {
         let nextStep = 1
         if (this.state.step === 1) {
-          nextStep = 3 // skip MedX
+          nextStep = 2
         } else if (this.state.step === 2) {
-          nextStep = 3
-        } else if (this.state.step === 3) {
           nextStep = -1
         }
 
@@ -202,8 +187,6 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         let totalSteps = '2'
         const { showBetaFaucetModal, step } = this.state
         const {
-          medXBalance,
-          previousCase,
           ethBalance,
           isOwner,
           address,
@@ -215,8 +198,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         if (isOwner) { return null }
 
         // Don't show this if they've already been onboarded
-        if (step === 2 && (medXBalance > 0 || previousCase)) { return null }
-        if (step === 3 && isDoctor) { return null }
+        if (step === 2 && isDoctor) { return null }
 
         if (step === 1) {
           content = <EthFaucetAPI
@@ -227,14 +209,6 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
             addExternalTransaction={this.addExternalTransaction}
             handleMoveToNextStep={this.handleMoveToNextStep} />
         } else if (step === 2) {
-          content = <MedXFaucetAPI
-            key="medXFaucet"
-            address={address}
-            medXBalance={medXBalance}
-            moveToNextStep={this.moveToNextStep}
-            addExternalTransaction={this.addExternalTransaction}
-            handleMoveToNextStep={this.handleMoveToNextStep} />
-        } else if (step === 3) {
           content = <AddDoctorAPI
             key="addDoctorAPI"
             address={address}

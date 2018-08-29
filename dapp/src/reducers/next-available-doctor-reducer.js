@@ -1,4 +1,10 @@
-export default function (state, { type, doctor, excludedAddresses }) {
+export default function (state, {
+  type,
+  doctor,
+  excludedAddresses,
+  patientCountry,
+  patientRegion
+}) {
   if (typeof state === 'undefined') {
     state = {
       noDoctorsAvailable: false,
@@ -44,6 +50,19 @@ export default function (state, { type, doctor, excludedAddresses }) {
       }
 
       delete state['doctor']
+
+      break
+
+    case 'PATIENT_INFO':
+      // This works when we delete the doctor from the state prior to setting it
+      // to a new object, but not afterwards
+      delete state['doctor']
+
+      state = {
+        ...state,
+        patientCountry,
+        patientRegion
+      }
 
       break
 

@@ -19,6 +19,8 @@ function mapStateToProps(state, ownProps) {
     if (address) {
       doctors.push({
         doctorIndex: i,
+        country: cacheCallValue(state, DoctorManager, 'doctorCountries', i),
+        region: cacheCallValue(state, DoctorManager, 'doctorRegions', i),
         name: cacheCallValue(state, DoctorManager, 'doctorNames', i),
         address,
         isActive: cacheCallValue(state, DoctorManager, 'isActive', address),
@@ -47,6 +49,8 @@ function* saga({ DoctorManager, AccountManager }) {
     indices.map(function* (i) {
       const address = yield cacheCall(DoctorManager, 'doctorAddresses', i)
       yield all([
+        cacheCall(DoctorManager, 'doctorCountries', i),
+        cacheCall(DoctorManager, 'doctorRegions', i),
         cacheCall(DoctorManager, 'doctorNames', i),
         cacheCall(DoctorManager, 'isActive', address),
         cacheCall(AccountManager, 'publicKeys', address)
