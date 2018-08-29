@@ -68,6 +68,7 @@ export function* invalidateTransaction({ transactionId, call, receipt }) {
 }
 
 export function* runSaga({saga, props, key}) {
+  yield put({type: 'RUNNING SAGA', key })
   try {
     yield setContext({ key })
     const callCountRegistry = yield getContext('callCountRegistry')
@@ -83,8 +84,11 @@ export function* runSaga({saga, props, key}) {
   } catch (error) {
     if (!(yield cancelled())) {
       throw error
+    } else {
+      yield put({type: 'SAGA_CANCELLED', key})
     }
   }
+  yield put({type: 'SAGA_COMPLETE', key})
 }
 
 function* prepareSaga({ saga, props, key }) {

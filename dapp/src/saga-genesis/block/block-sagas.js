@@ -102,7 +102,7 @@ export function* collectAllTransactionAddresses(transactions) {
   return addressSet
 }
 
-export function* blockContractAddresses(block) {
+export function* latestBlock({ block }) {
   const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
   yield call(invalidateAddressSet, addressSet)
 }

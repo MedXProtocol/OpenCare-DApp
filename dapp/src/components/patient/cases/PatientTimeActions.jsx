@@ -6,7 +6,7 @@ import { withRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
-import { all } from 'redux-saga/effects'
+import { all, put } from 'redux-saga/effects'
 import {
   addContract,
   contractByName,
@@ -14,6 +14,8 @@ import {
   cacheCallValue,
   cacheCallValueInt,
   withSaga,
+  addLogListener,
+  removeLogListener,
   withSend,
   TransactionStateHandler
 } from '~/saga-genesis'
@@ -30,6 +32,7 @@ import { EtherFlip } from '~/components/EtherFlip'
 import { isBlank } from '~/utils/isBlank'
 import { isTrue } from '~/utils/isTrue'
 import get from 'lodash.get'
+import { caseFinders } from '~/finders/caseFinders'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress }) {
@@ -44,8 +47,8 @@ function mapStateToProps(state, { caseAddress }) {
   const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
-  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
-  const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
+  const encryptedCaseKey = caseFinders.encryptedCaseKey(state, caseAddress)
+  const caseKeySalt = caseFinders.caseKeySalt(state, caseAddress)
   const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
 
   const transactions = state.sagaGenesis.transactions
@@ -82,10 +85,8 @@ function mapStateToProps(state, { caseAddress }) {
 function* saga({ CaseScheduleManager, caseAddress }) {
   if (!caseAddress || !CaseScheduleManager) { return }
   yield addContract({ address: caseAddress, contractKey: 'Case' })
-
+  yield put(addLogListener(caseAddress))
   yield all([
-    cacheCall(caseAddress, 'encryptedCaseKey'),
-    cacheCall(caseAddress, 'caseKeySalt'),
     cacheCall(caseAddress, 'status'),
     cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
     cacheCall(caseAddress, 'diagnosingDoctor'),
@@ -98,6 +99,9 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatchExcludedDoctors: (excludedAddresses) => {
       dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
+    },
+    dispatchRemoveLogListener: (address) => {
+      dispatch(removeLogListener(address))
     }
   }
 }
@@ -132,6 +136,10 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       if (nextProps.excludeAddresses.length !== this.props.excludeAddresses.length) {
         this.props.dispatchExcludedDoctors(nextProps.excludeAddresses)
       }
+    }
+
+    componentWillUnmount () {
+      this.props.dispatchRemoveLogListener(this.props.caseAddress)
     }
 
     onChangeDoctor = (option) => {

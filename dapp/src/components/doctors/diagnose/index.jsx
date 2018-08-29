@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { all } from 'redux-saga/effects'
+import { all, put } from 'redux-saga/effects'
 import { CaseDetails } from '~/components/CaseDetails'
 import { AbandonedCaseActionsContainer } from '~/components/doctors/cases/AbandonedCaseActions'
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
@@ -17,6 +17,7 @@ import {
   withContractRegistry,
   withSaga,
   cacheCallValue,
+  addLogListener,
   removeLogListener,
   contractByName
 } from '~/saga-genesis'
@@ -36,8 +37,8 @@ function mapStateToProps(state, { match }) {
   const encryptedCaseKey = caseFinders.doctorEncryptedCaseKey(state, caseAddress, address)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
-  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
-  const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
+  const diagnosisHash = getFileHashFromBytes(caseFinders.diagnosisHash(state, caseAddress))
+  const challengeHash = getFileHashFromBytes(caseFinders.challengeHash(state, caseAddress))
 
   return {
     address,
@@ -65,12 +66,11 @@ function* saga({ match, address, AccountManager }) {
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield all([
+    put(addLogListener(caseAddress)),
     cacheCall(AccountManager, 'publicKeys', patientAddress),
     cacheCall(caseAddress, 'status'),
     cacheCall(caseAddress, 'diagnosingDoctor'),
-    cacheCall(caseAddress, 'diagnosisHash'),
-    cacheCall(caseAddress, 'challengingDoctor'),
-    cacheCall(caseAddress, 'challengeHash')
+    cacheCall(caseAddress, 'challengingDoctor')
   ])
 }
 

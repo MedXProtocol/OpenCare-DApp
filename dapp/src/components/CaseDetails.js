@@ -8,16 +8,18 @@ import { HippoTimestamp } from '~/components/HippoTimestamp'
 import { LoadingLines } from '~/components/LoadingLines'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { downloadJson, downloadImage } from '../utils/storage-util'
-import { all } from 'redux-saga/effects'
+import { all, put } from 'redux-saga/effects'
 import {
   contractByName,
   withContractRegistry,
   withSaga,
-  cacheCallValue,
   cacheCallValueInt,
   cacheCall,
+  addLogListener,
+  removeLogListener,
   addContract
 } from '~/saga-genesis'
+import { caseFinders } from '~/finders/caseFinders'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { toastr } from '~/toastr'
 import get from 'lodash.get'
@@ -28,7 +30,7 @@ function mapStateToProps(state, { caseAddress }) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
-  const caseDataHash = cacheCallValue(state, caseAddress, 'caseDataHash')
+  const caseDataHash = caseFinders.caseDataHash(state, caseAddress)
   const createdAt = cacheCallValueInt(state, CaseScheduleManager, 'createdAt', caseAddress)
   const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
 
@@ -41,18 +43,24 @@ function mapStateToProps(state, { caseAddress }) {
   }
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchRemoveLogListener: (address) => dispatch(removeLogListener(address))
+  }
+}
+
 function* saga({ CaseScheduleManager, caseAddress, networkId }) {
   if (!networkId || !CaseScheduleManager || !caseAddress) { return }
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
-    yield cacheCall(caseAddress, 'caseDataHash'),
+    yield put(addLogListener(caseAddress)),
     yield cacheCall(CaseScheduleManager, 'createdAt', caseAddress),
     yield cacheCall(CaseScheduleManager, 'updatedAt', caseAddress)
   ])
 }
 
-export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
+export const CaseDetails = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     class _CaseDetails extends Component {
 
@@ -78,6 +86,7 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
     if (this.state.cancelableDownloadPromise) {
       this.state.cancelableDownloadPromise.cancel()
     }
+    this.props.dispatchRemoveLogListener(this.props.caseAddress)
   }
 
   getCaseDetails (props) {
@@ -91,7 +100,6 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps)(
       const cancelableDownloadPromise = cancelablePromise(
         new Promise(async (resolve, reject) => {
           const detailsJson = await downloadJson(props.caseDetailsHash, props.caseKey)
-
           if (detailsJson) {
             const details = JSON.parse(detailsJson)
 

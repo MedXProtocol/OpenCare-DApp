@@ -1,5 +1,6 @@
 import { sha3 } from '~/saga-genesis/utils/sha3'
 import { decode } from '~/saga-genesis/utils/decode'
+import abi from 'ethjs-abi'
 
 export class ABIHelper {
   constructor (abi) {
@@ -7,7 +8,7 @@ export class ABIHelper {
     this._topic0Lookup = {}
     abi.forEach((definition) => {
       this._lookup[definition.name] = definition
-      if (definition.type === 'Event') {
+      if (definition.type === 'event') {
         const topic0 = this.topic0(definition)
         this._topic0Lookup[topic0] = definition
       }
@@ -31,6 +32,6 @@ export class ABIHelper {
 
   decodeLogParameters (log) {
     const definition = this._topic0Lookup[log.topics[0]]
-    return decode.log(definition.inputs, log.data, log.topics)
+    return abi.decodeEvent(definition, log.data, log.topics)
   }
 }

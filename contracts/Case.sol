@@ -25,17 +25,9 @@ contract Case is Ownable, Initializable {
   address public diagnosingDoctor;
   address public challengingDoctor;
 
-  bytes caseDataHash;
-  bytes diagnosisHash;
-  bytes challengeHash;
-
   Registry registry;
-  MedXToken _;
 
   CaseStatus public status;
-
-  bytes encryptedCaseKey;
-  bytes caseKeySalt;
 
   mapping(address => bytes) public doctorEncryptedCaseKeys;
   /*
@@ -62,6 +54,8 @@ contract Case is Ownable, Initializable {
     bytes caseDataHash
   );
   event DoctorEncryptedCaseKeySet(address indexed doctor, bytes doctorEncryptedCaseKey);
+  event DiagnosisHash(bytes diagnosisHash);
+  event ChallengeHash(bytes challengeHash);
   event CaseFinalized(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, address _challengingDoctor);
 
   /**
@@ -126,7 +120,7 @@ contract Case is Ownable, Initializable {
     patient = _patient;
     caseFee = _caseFee;
     registry = Registry(_registry);
-    emit CaseCreated(patient, encryptedCaseKey, caseKeySalt, caseDataHash);
+    emit CaseCreated(patient, _encryptedCaseKey, _caseKeySalt, _caseHash);
   }
 
   function setDiagnosingDoctor(address _doctorAddress) external onlyCaseFirstPhaseManager {
@@ -147,11 +141,11 @@ contract Case is Ownable, Initializable {
   }
 
   function setDiagnosisHash(bytes _diagnosisHash) external onlyCaseFirstPhaseManager {
-    diagnosisHash = _diagnosisHash;
+    emit DiagnosisHash(_diagnosisHash);
   }
 
   function setChallengeHash(bytes _secondaryDiagnosisHash) external onlyCaseSecondPhaseManager {
-    challengeHash = _secondaryDiagnosisHash;
+    emit ChallengeHash(_secondaryDiagnosisHash);
   }
 
   function setDoctorEncryptedCaseKeys(address _doctor, bytes _doctorEncryptedKey) external onlyCasePhaseManagers {

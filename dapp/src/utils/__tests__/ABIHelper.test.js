@@ -5,7 +5,7 @@ describe('ABIHelper', () => {
   let abiHelper
   const CASE_CREATED_DEFINITION = {
     name: 'CaseCreated',
-    type: 'Event',
+    type: 'event',
     inputs: [
       {
         "name": "patient",

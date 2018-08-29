@@ -11,7 +11,11 @@ export const decode = {
     return web3.eth.abi.decodeParameter('uint256', value)
   },
 
+  bytes (value) {
+    return web3.eth.abi.decodeParameter('bytes', value)
+  },
+
   log (inputs, hexData, topics) {
-    return web3.eth.abi.decodeLog(inputs, hexData, topics)
+    return web3.eth.abi.decodeParameters(inputs, hexData)
   }
 }

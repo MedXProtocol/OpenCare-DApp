@@ -1,23 +1,51 @@
 import caseContractConfig from '#/Case.json'
 import { ABIHelper } from '~/utils/ABIHelper'
+import { decode } from '~/saga-genesis/utils/decode'
 
 const caseAbi = new ABIHelper(caseContractConfig.abi)
 const CASE_CREATED = caseAbi.topic0('CaseCreated')
 const DOCTOR_ENCRYPTED_CASE_KEY_SET = caseAbi.topic0('DoctorEncryptedCaseKeySet')
+const DIAGNOSIS_HASH = caseAbi.topic0('DiagnosisHash')
+const CHALLENGE_HASH = caseAbi.topic0('ChallengeHash')
 
 function applyLog(state, log) {
-  let params
+  let params, caseAddress
   switch(log.topics[0]) {
     case CASE_CREATED:
       params = caseAbi.decodeLogParameters(log)
-
-      state[log.address] = params
+      caseAddress = log.address
+      state[caseAddress] = {
+        caseDataHash: params.caseDataHash,
+        encryptedCaseKey: params.encryptedCaseKey,
+        caseKeySalt: params.caseKeySalt
+      }
       break
 
     case DOCTOR_ENCRYPTED_CASE_KEY_SET:
       params = caseAbi.decodeLogParameters(log)
+      caseAddress = log.address
+      state[caseAddress] = {
+        ...state[caseAddress],
+        [params.doctor.toLowerCase()]: params.doctorEncryptedCaseKey
+      }
+      break
 
-      state[log.address][params.doctor] = params.doctorEncryptedCaseKey
+    case DIAGNOSIS_HASH:
+      params = caseAbi.decodeLogParameters(log)
+      caseAddress = log.address
+      state[caseAddress] = {
+        ...state[caseAddress],
+        diagnosisHash: params.diagnosisHash
+      }
+      break
+
+    case CHALLENGE_HASH:
+      params = caseAbi.decodeLogParameters(log)
+      caseAddress = log.address
+      state[caseAddress] = {
+        ...state[caseAddress],
+        challengeHash: params.challengeHash
+      }
       break
 
     //no default

@@ -14,7 +14,8 @@ import {
   cacheCallValue,
   cacheCallValueInt,
   withSend,
-  actions,
+  addLogListener,
+  removeLogListener,
   addContract,
   TransactionStateHandler
 } from '~/saga-genesis'
@@ -47,7 +48,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const encryptedCaseKey = caseFinders.encryptedCaseKey(state, caseAddress)
   const caseKeySalt = caseFinders.caseKeySalt(state, caseAddress)
-  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
+  const diagnosisHash = getFileHashFromBytes(caseFinders.diagnosisHash(state, caseAddress))
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
   const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
@@ -94,7 +95,6 @@ function* saga({ caseAddress, networkId }) {
   yield all([
     cacheCall(caseAddress, 'status'),
     cacheCall(caseAddress, 'patient'),
-    cacheCall(caseAddress, 'diagnosisHash'),
     cacheCall(caseAddress, 'caseFee'),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(caseAddress, 'challengingDoctor')
@@ -107,10 +107,10 @@ function mapDispatchToProps(dispatch) {
       dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
     },
     dispatchAddLogListener: (address) => {
-      dispatch(actions.addLogListener(address))
+      dispatch(addLogListener(address))
     },
     dispatchRemoveLogListener: (address) => {
-      dispatch(actions.removeLogListener(address))
+      dispatch(removeLogListener(address))
     }
   }
 }

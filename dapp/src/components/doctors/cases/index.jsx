@@ -61,7 +61,7 @@ function mapStateToProps(state, { match }) {
     }
   }
 
-  return {
+  const props = {
     address,
     CaseStatusManager,
     openCaseAddresses,
@@ -71,6 +71,8 @@ function mapStateToProps(state, { match }) {
     start,
     end
   }
+
+  return props
 }
 
 function* saga({ address, CaseStatusManager, start, end }) {
