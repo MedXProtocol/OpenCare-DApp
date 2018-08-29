@@ -40,7 +40,7 @@ export const RegisterDoctorContainer =
             country: '',
             region: '',
             errors: [],
-            options: [],
+            regionOptions: [],
             submitInProgress: false
           }
 
@@ -162,7 +162,7 @@ export const RegisterDoctorContainer =
             this.regionInput.select.clearValue()
           }
 
-          this.setState({ options: this.isCanadaOrUSA() ? regions[this.state.country] : [] })
+          this.setState({ regionOptions: this.isCanadaOrUSA() ? regions[this.state.country] : [] })
         }
 
         handleRegionChange = (newValue) => {
@@ -230,7 +230,7 @@ export const RegisterDoctorContainer =
                             <input
                               className="form-control"
                               value={this.state.name}
-                              placeholder='Dr. Wexler'
+                              placeholder='Dr. Hibbert'
                               onChange={(e) => this.setState({name: e.target.value})}
                               id="name"
                             />
@@ -261,7 +261,7 @@ export const RegisterDoctorContainer =
                               components={Animated}
                               closeMenuOnSelect={true}
                               ref={this.setRegionRef}
-                              options={this.state.options}
+                              options={this.state.regionOptions}
                               onChange={this.handleRegionChange}
                               selected={this.state.region}
                             />

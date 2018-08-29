@@ -21,6 +21,7 @@ export class Hippo {
     this._providerUrl = config.providerUrl || fail('You must pass a provider URL')
     this._networkId = config.networkId || fail('You must pass a network id')
     this._account = privateToAccount(this.privateKey)
+    console.log('+++++++++ Sender account: ' + this._account.address)
     // this._eth = new Eth(new SignerProvider(this._providerUrl, {
     //   signTransaction: (rawTx, cb) => cb(null, sign(rawTx, this._account.privateKey)),
     //   accounts: (cb) => cb(null, [this._account.address]),
@@ -115,7 +116,7 @@ export class Hippo {
     })
   }
 
-  async addOrReactivateDoctor (ethAddress, name, publicKey) {
+  async addOrReactivateDoctor (ethAddress, name, country, region, publicKey) {
     const accountManager = await this.lookupAccountManager()
     const existingPublicKeys = await accountManager.publicKeys(ethAddress)
     const existingPublicKey = existingPublicKeys['0']
@@ -131,22 +132,22 @@ export class Hippo {
       }
       return this.sendTransaction(tx)
         .then(() => {
-          return this._addOrReactivateDoctor(ethAddress, name)
+          return this._addOrReactivateDoctor(ethAddress, name, country, region)
         })
         .catch((error) => {
           console.error('addOrReactivateDoctor: ', error.message)
           fail(error.message)
         })
     } else {
-      return this._addOrReactivateDoctor(ethAddress, name)
+      return this._addOrReactivateDoctor(ethAddress, name, country, region)
     }
   }
 
-  _addOrReactivateDoctor (ethAddress, name) {
+  _addOrReactivateDoctor (ethAddress, name, country, region) {
     return this.lookupContractAddress('DoctorManager')
       .then((doctorManagerAddress) => {
         const method = doctorManagerArtifact.abi.find((obj) => obj.name === 'addOrReactivateDoctor')
-        var data = abi.encodeMethod(method, [ethAddress, name])
+        var data = abi.encodeMethod(method, [ethAddress, name, country, region])
         const tx = {
           from: this.ownerAddress(),
           to: doctorManagerAddress[0],
