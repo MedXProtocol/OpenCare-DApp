@@ -17,8 +17,8 @@ contract('CaseScheduleManager', function (accounts) {
   before(async () => {
     env = await createEnvironment(artifacts)
     await env.medXToken.mint(patient, web3.toWei(1000, 'ether'))
-    await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr Xavier')
-    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr Hibbert')
+    await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr Xavier', 'CA', 'AB')
+    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr Hibbert', 'US', 'CO')
   })
 
   beforeEach(async () => {
