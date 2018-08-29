@@ -3,8 +3,7 @@ export default function (state, {
   doctor,
   excludedAddresses,
   patientCountry,
-  patientRegion,
-  patientAddress
+  patientRegion
 }) {
   if (typeof state === 'undefined') {
     state = {
@@ -55,13 +54,15 @@ export default function (state, {
       break
 
     case 'PATIENT_INFO':
+      // This works when we delete the doctor from the state prior to setting it
+      // to a new object, but not afterwards
+      delete state['doctor']
+      
       state = {
         ...state,
         patientCountry,
-        patientRegion,
-        patientAddress
+        patientRegion
       }
-      delete state['doctor']
 
       break
 

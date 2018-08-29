@@ -80,8 +80,8 @@ function mapDispatchToProps(dispatch) {
     dispatchExcludedDoctors: (excludedAddresses) => {
       dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
     },
-    dispatchPatientInfo: (patientAddress, patientCountry, patientRegion) => {
-      dispatch({ type: 'PATIENT_INFO', patientAddress, patientCountry, patientRegion })
+    dispatchPatientInfo: (patientCountry, patientRegion) => {
+      dispatch({ type: 'PATIENT_INFO', patientCountry, patientRegion })
     }
   }
 }
@@ -415,6 +415,14 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     }
   }
 
+  reRunExcludeDoctors = () => {
+    this.props.dispatchPatientInfo(
+      this.state.country,
+      this.state.region
+    )
+    this.props.dispatchExcludedDoctors([ this.props.account ])
+  }
+
   checkCountry = () => {
     this.validateField('country')
 
@@ -426,6 +434,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       this.setState({ region: '' })
       this.regionInput.select.clearValue()
     }
+
+    this.reRunExcludeDoctors()
 
     this.setState({ regionOptions: this.isCanadaOrUSA() ? regions[this.state.country] : [] })
   }
@@ -576,12 +586,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     this.setState({ region: newValue ? newValue.value : '' }, () => {
       if (this.isCanadaOrUSA()) {
         this.validateField('region')
-        this.props.dispatchPatientInfo(
-          this.props.account,
-          this.state.country,
-          this.state.region
-        )
-        this.props.dispatchExcludedDoctors([ this.props.account ])
+
+        this.reRunExcludeDoctors()
       }
     })
   }
