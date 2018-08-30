@@ -1,5 +1,6 @@
-module.exports = function (statusString) {
+export const caseStatus = function (statusString) {
   var statusMap = {
+    Pending: -1,
     None: 0,
     Open: 1,
     Evaluating: 2,

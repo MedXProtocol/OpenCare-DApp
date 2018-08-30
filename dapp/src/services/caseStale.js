@@ -1,6 +1,11 @@
-import { SECONDS_IN_A_DAY } from '~/config/constants'
+// import { secondsInADay } from '~/config/constants'
+import { caseStatus } from '~/utils/caseStatus'
 
-const staleStatuses = [2, 3, 6]
+const staleStatuses = [
+  caseStatus('Evaluating'),
+  caseStatus('Evaluated'),
+  caseStatus('Challenging')
+]
 
 // Intial doc can take action after 2 days
 // Intial doc can take action after 4 days when the case has been challenged
@@ -11,25 +16,39 @@ const staleStatuses = [2, 3, 6]
 // compareTime would typically be a record's createdAt or updatedAt unix timestamp (UTC)
 // status is CaseStatus (Open, Closed, Evaluated, etc)
 // context is 'patient' or 'doctor'
-export function caseStale(compareTime, status, context) {
+export function caseStale(compareTime, status, context, secondsInADay) {
   if (!compareTime || !status) {
     return false
   } else if (!staleStatuses.includes(status)) {
     return false
   } else {
-    let secondsElapsed = SECONDS_IN_A_DAY
+    console.log('wtf')
+    let secondsElapsed = secondsInADay
+    console.log(secondsElapsed)
 
     const isPatient = (context === 'patient')
-    const waitingOnDoctor = (status === 2 || status === 6)
-    const waitingOnPatient = (status === 3)
+    const waitingOnDoctor = (
+         status === caseStatus('Evaluating')
+      || status === caseStatus('Challenging')
+    )
+    const waitingOnPatient = (
+        status === caseStatus('Evaluated')
+     || status === caseStatus('Challenging')
+    )
+    console.log(waitingOnPatient)
 
     if (!isPatient) {
-      secondsElapsed = (status === 6) ? (SECONDS_IN_A_DAY * 4) : (SECONDS_IN_A_DAY * 2)
+      if (status === caseStatus('Challenging')) {
+        secondsElapsed = (secondsInADay * 4)
+      } else {
+        secondsElapsed = (secondsInADay * 2)
+      }
     }
 
     const enoughTimeHasPassed = (
       (Math.floor(Date.now() / 1000) - compareTime) > secondsElapsed
     )
+    console.log(enoughTimeHasPassed)
 
     return enoughTimeHasPassed && ((isPatient && waitingOnDoctor) || (!isPatient && waitingOnPatient))
   }

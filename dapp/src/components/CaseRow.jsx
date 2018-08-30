@@ -15,14 +15,14 @@ import {
   cacheCall
 } from '~/saga-genesis'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight';
-import { PENDING_TX_STATUS } from '~/config/constants'
+import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight'
 import { AbandonedCaseActionsContainer } from '~/components/doctors/cases/AbandonedCaseActions'
 import { EthAddress } from '~/components/EthAddress'
 import { LoadingLines } from '~/components/LoadingLines'
 import { HippoTimestamp } from '~/components/HippoTimestamp'
 import { txErrorMessage } from '~/services/txErrorMessage'
 import { caseStale } from '~/services/caseStale'
+import { caseStatus } from '~/utils/caseStatus'
 import { updatePendingTx } from '~/services/pendingTxs'
 import { transactionErrorToCode } from '~/services/transactionErrorToCode'
 import { patientCaseStatusToName, patientCaseStatusToClass } from '~/utils/patientCaseStatusLabels'
@@ -54,7 +54,7 @@ const caseStatusToClass = (caseRowObject, context) => {
 }
 
 function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex }) {
-  let status, createdAt, updatedAt
+  let status, createdAt, updatedAt, secondsInADay
   let caseIsStale = false
   if (caseRowObject === undefined) { caseRowObject = {} }
 
@@ -68,6 +68,7 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
     status = cacheCallValueInt(state, caseAddress, 'status')
     createdAt = cacheCallValueInt(state, CaseScheduleManager, 'createdAt', caseAddress)
     updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
+    secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'SECONDS_IN_A_DAY')
 
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
 
@@ -92,7 +93,7 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   caseRowObject['statusLabel'] = caseStatusToName(caseRowObject, context)
   caseRowObject['statusClass'] = caseStatusToClass(caseRowObject, context)
 
-  if (caseStale(updatedAt, status, context)) {
+  if (caseStale(updatedAt, status, context, secondsInADay)) {
     caseIsStale = true
   }
 
@@ -136,6 +137,7 @@ function* saga({ CaseManager, CaseScheduleManager, caseAddress }) {
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
     cacheCall(caseAddress, 'status'),
+    cacheCall(CaseScheduleManager, 'SECONDS_IN_A_DAY'),
     cacheCall(CaseScheduleManager, 'createdAt', caseAddress),
     cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
     cacheCall(caseAddress, 'diagnosingDoctor'),
@@ -255,8 +257,8 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
     let { caseAddress, objIndex, error, transactionId, createdAt, updatedAt } = caseRowObject
 
     const pendingTransaction = (
-      !defined(caseRowObject.status)
-      || caseRowObject.status === PENDING_TX_STATUS
+         !defined(caseRowObject.status)
+      || (caseRowObject.status === caseStatus('Pending'))
     )
 
     const createdAtDisplay = <HippoTimestamp timeInUtcSecondsSinceEpoch={createdAt} delimiter={`<br />`} />
@@ -286,7 +288,7 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
       </label>
     )
 
-    if (caseRowObject.status !== PENDING_TX_STATUS && caseIsStale && context === 'doctor') {
+    if (caseRowObject.status !== caseStatus('Pending') && caseIsStale && context === 'doctor') {
       label = <AbandonedCaseActionsContainer caseAddress={caseAddress} />
     }
 

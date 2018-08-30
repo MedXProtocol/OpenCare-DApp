@@ -1,9 +1,15 @@
 import { caseStale } from '~/services/caseStale'
+import { caseStatus } from '~/utils/caseStatus'
 
-export const isCaseRequiringDoctorsAttention = function(isFirstDoc, updatedAt, status) {
+export const isCaseRequiringDoctorsAttention = function(
+  isFirstDoc,
+  updatedAt,
+  status,
+  secondsInADay
+) {
   return (
-    (isFirstDoc && status === 2)
-    || (!isFirstDoc && status === 6)
-    || (isFirstDoc && caseStale(updatedAt, status, 'doctor'))
+       (isFirstDoc && status === caseStatus('Closed'))
+    || (!isFirstDoc && status === caseStatus('Challenging'))
+    || (isFirstDoc && caseStale(updatedAt, status, 'doctor', secondsInADay))
   )
 }

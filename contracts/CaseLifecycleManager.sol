@@ -242,11 +242,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
     onlyDiagnosingDoctor(_caseAddress)
   {
     Case _case = Case(_caseAddress);
-    require(
-      (
-        _case.status() == Case.CaseStatus.Evaluated
-        || _case.status() == Case.CaseStatus.Challenging
-      )//, 'Case must be in Evaluated or Challenged state'
+    require(_case.evaluatedOrChallenging()
+      //, 'Case must be in Evaluated or Challenged state'
     );
 
     if (_case.status() == Case.CaseStatus.Evaluated) {

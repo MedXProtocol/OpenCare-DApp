@@ -25,12 +25,14 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const transactions = state.sagaGenesis.transactions
   const status = cacheCallValueInt(state, caseAddress, 'status')
   const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
+  const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'SECONDS_IN_A_DAY')
 
   return {
     CaseLifecycleManager,
     transactions,
     status,
-    updatedAt
+    updatedAt,
+    secondsInADay
   }
 }
 
@@ -39,7 +41,8 @@ function* saga({ CaseScheduleManager, caseAddress }) {
 
   yield all([
     cacheCall(caseAddress, 'status'),
-    cacheCall(CaseScheduleManager, 'updatedAt', caseAddress)
+    cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
+    cacheCall(CaseScheduleManager, 'SECONDS_IN_A_DAY')
   ])
 }
 
@@ -95,7 +98,9 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
     }
 
     render () {
-      if (!caseStale(this.props.updatedAt, this.props.status, 'doctor')) {
+      const { updatedAt, status, secondsInADay } = this.props
+      if (!caseStale(updatedAt, status, 'doctor', secondsInADay)
+      ) {
         return null
       } else {
         return (
