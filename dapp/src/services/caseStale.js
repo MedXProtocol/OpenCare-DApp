@@ -22,9 +22,7 @@ export function caseStale(compareTime, status, context, secondsInADay) {
   } else if (!staleStatuses.includes(status)) {
     return false
   } else {
-    console.log('wtf')
     let secondsElapsed = secondsInADay
-    console.log(secondsElapsed)
 
     const isPatient = (context === 'patient')
     const waitingOnDoctor = (
@@ -35,7 +33,6 @@ export function caseStale(compareTime, status, context, secondsInADay) {
         status === caseStatus('Evaluated')
      || status === caseStatus('Challenging')
     )
-    console.log(waitingOnPatient)
 
     if (!isPatient) {
       if (status === caseStatus('Challenging')) {
@@ -48,7 +45,6 @@ export function caseStale(compareTime, status, context, secondsInADay) {
     const enoughTimeHasPassed = (
       (Math.floor(Date.now() / 1000) - compareTime) > secondsElapsed
     )
-    console.log(enoughTimeHasPassed)
 
     return enoughTimeHasPassed && ((isPatient && waitingOnDoctor) || (!isPatient && waitingOnPatient))
   }
