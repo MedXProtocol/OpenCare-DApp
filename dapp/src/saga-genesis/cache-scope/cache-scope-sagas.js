@@ -4,7 +4,6 @@ import {
   takeEvery,
   takeLatest,
   fork,
-  spawn,
   getContext,
   setContext,
   call as callSaga,

@@ -1,5 +1,4 @@
 import { sha3 } from '~/saga-genesis/utils/sha3'
-import { decode } from '~/saga-genesis/utils/decode'
 import abi from 'ethjs-abi'
 
 export class ABIHelper {

@@ -1,6 +1,5 @@
 import caseContractConfig from '#/Case.json'
 import { ABIHelper } from '~/utils/ABIHelper'
-import { decode } from '~/saga-genesis/utils/decode'
 
 const caseAbi = new ABIHelper(caseContractConfig.abi)
 const CASE_CREATED = caseAbi.topic0('CaseCreated')
