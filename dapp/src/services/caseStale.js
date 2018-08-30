@@ -1,5 +1,7 @@
 import { SECONDS_IN_A_DAY } from '~/config/constants'
 
+const staleStatuses = [2, 3, 6]
+
 // Intial doc can take action after 2 days
 // Intial doc can take action after 4 days when the case has been challenged
 // Patient after 1 day
@@ -11,6 +13,8 @@ import { SECONDS_IN_A_DAY } from '~/config/constants'
 // context is 'patient' or 'doctor'
 export function caseStale(compareTime, status, context) {
   if (!compareTime || !status) {
+    return false
+  } else if (!staleStatuses.includes(status)) {
     return false
   } else {
     let secondsElapsed = SECONDS_IN_A_DAY
