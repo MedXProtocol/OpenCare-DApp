@@ -1,6 +1,5 @@
 import {
-  all,
-  setContext
+  all
 } from 'redux-saga/effects'
 
 import { createStore, applyMiddleware } from 'redux'
