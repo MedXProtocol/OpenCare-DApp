@@ -1,11 +1,6 @@
-import Web3 from 'web3'
+import { sha3 } from './sha3'
 
 export default function () {
   let digest = "NotAHex" + Array.from(arguments).join('-')
-  const web3 = new Web3()
-  if (web3.utils) {
-    return web3.utils.sha3(digest)
-  } else {
-    return web3.sha3(digest)
-  }
+  return sha3(digest)
 }

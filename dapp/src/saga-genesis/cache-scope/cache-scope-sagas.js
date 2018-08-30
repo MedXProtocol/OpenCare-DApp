@@ -44,7 +44,7 @@ export function* invalidateAddress({ address }) {
   let callCountRegistry = yield getContext('callCountRegistry')
   let contractCalls = Object.values(callCountRegistry.getContractCalls(address))
   if (!contractCalls) { return }
-  yield* contractCalls.map(function* (callState) {
+  yield contractCalls.map(function* (callState) {
     if (callState.count > 0) {
       const { call } = callState
       yield executeWeb3Call(call)
@@ -59,7 +59,7 @@ export function* invalidateTransaction({ transactionId, call, receipt }) {
 
   contractAddresses.add(call.address)
 
-  yield* Array.from(contractAddresses).map(function* (address) {
+  yield Array.from(contractAddresses).map(function* (address) {
     const contractKey = yield select(contractKeyByAddress, address)
     if (contractKey) {
       yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
@@ -75,22 +75,21 @@ export function* runSaga({saga, props, key}) {
     yield callSaga(saga, props)
     const emptyCalls = callCountRegistry.decrementCalls(oldCalls)
     if (emptyCalls.length) {
-      // console.log('in runSaga emptyCalls.length')
-      // console.log(emptyCalls)
-
       yield put({ type: 'WEB3_STALE_CALLS', calls: emptyCalls })
     }
   } catch (error) {
     if (!(yield cancelled())) {
       throw error
+    } else {
+      yield put({type: 'SAGA_CANCELLED', key})
     }
   }
 }
 
 function* prepareSaga({ saga, props, key }) {
   const action = `RUN_SAGA_${key}`
-  yield runSaga({ saga, props, key })
   const task = yield takeLatest(action, runSaga)
+  yield runSaga({ saga, props, key })
   yield take(`END_SAGA_${key}`)
   yield deregisterKey(key)
   yield cancel(task)
