@@ -28,8 +28,6 @@ contract Case is Ownable, Initializable {
   Registry registry;
 
   CaseStatus public status;
-
-  mapping(address => bytes) public doctorEncryptedCaseKeys;
   /*
     MEMORY END
     It is safe to add new data definitions here
@@ -149,7 +147,6 @@ contract Case is Ownable, Initializable {
   }
 
   function setDoctorEncryptedCaseKeys(address _doctor, bytes _doctorEncryptedKey) external onlyCasePhaseManagers {
-    // doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
     emit DoctorEncryptedCaseKeySet(_doctor, _doctorEncryptedKey);
   }
 
