@@ -143,9 +143,7 @@ contract CaseLifecycleManager is Ownable, Initializable {
   {
     Case _case = Case(_caseAddress);
 
-    require(
-         (_case.status() == Case.CaseStatus.Evaluated)
-      || (_case.status() == Case.CaseStatus.Challenging)//,
+    require(_case.evaluatedOrChallenging()//,
       //'must be in evaluated or challenging state'
     );
 
