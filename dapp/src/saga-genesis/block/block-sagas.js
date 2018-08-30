@@ -73,10 +73,10 @@ function* collectTransactionAddresses(addressSet, transaction) {
 
 function* transactionReceipt({ receipt }) {
   const addressSet = new Set()
-  yield* receipt.logs.map(function* (log) {
+  yield receipt.logs.map(function* (log) {
     yield call(addAddressIfExists, addressSet, log.address)
     if (log.topics) {
-      yield* log.topics.map(function* (topic) {
+      yield log.topics.map(function* (topic) {
         if (topic) {
           // topics are 32 bytes and will have leading 0's padded for typical Eth addresses, ignore them
           const actualAddress = '0x' + topic.substr(26)
@@ -89,14 +89,14 @@ function* transactionReceipt({ receipt }) {
 }
 
 export function* invalidateAddressSet(addressSet) {
-  yield* Array.from(addressSet).map(function* (address) {
+  yield Array.from(addressSet).map(function* (address) {
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   })
 }
 
 export function* collectAllTransactionAddresses(transactions) {
   const addressSet = new Set()
-  yield* transactions.map(function* (transaction) {
+  yield transactions.map(function* (transaction) {
     yield call(collectTransactionAddresses, addressSet, transaction)
   })
   return addressSet

@@ -16,7 +16,7 @@ function* addSubscription({ address }) {
 }
 
 function* checkReceiptForEvents({ receipt }) {
-  yield* receipt.logs.map(function* (log) {
+  yield receipt.logs.map(function* (log) {
     const logs = yield select(state => state.sagaGenesis.logs[log.address])
     if (logs) {
       yield put({ type: 'NEW_LOGS', address: log.address, log })
