@@ -50,20 +50,7 @@ describe('blockSagas', () => {
       var generator = blockSagas.latestBlock({ block })
       expect(generator.next().value).toEqual(call(blockSagas.collectAllTransactionAddresses, block.transactions))
       expect(generator.next([address]).value).toEqual(call(blockSagas.invalidateAddressSet, [address]))
-    })
-  })
-
-  describe('blockContractAddresses()', () => {
-    it('should call blockContractAddresses for each', () => {
-      const transactions = [1]
-      const block = { transactions }
-      var generator = blockSagas.blockContractAddresses(block)
-      var nextGen = generator.next()
-      expect(nextGen.value).toEqual(call(blockSagas.collectAllTransactionAddresses, [1]))
-      expect(nextGen.done).toBeFalsy()
-      nextGen = generator.next(new Set())
-      expect(nextGen.done).toBeTruthy()
-      expect(nextGen.value).toEqual(new Array())
+      expect(generator.next().done).toBeTruthy()
     })
   })
 })
