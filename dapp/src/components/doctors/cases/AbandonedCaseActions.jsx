@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Button } from 'react-bootstrap'
 import { withRouter } from 'react-router-dom'
+import ReactTooltip from 'react-tooltip'
 import PropTypes from 'prop-types'
 import { all } from 'redux-saga/effects'
 import {
@@ -15,7 +16,6 @@ import {
 import { caseStale } from '~/services/caseStale'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
-import { secondsInADay } from '~/config/constants'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
@@ -25,12 +25,14 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const transactions = state.sagaGenesis.transactions
   const status = cacheCallValueInt(state, caseAddress, 'status')
   const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
+  const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
 
   return {
     CaseLifecycleManager,
     transactions,
     status,
-    updatedAt
+    updatedAt,
+    secondsInADay
   }
 }
 
@@ -39,7 +41,8 @@ function* saga({ CaseScheduleManager, caseAddress }) {
 
   yield all([
     cacheCall(caseAddress, 'status'),
-    cacheCall(CaseScheduleManager, 'updatedAt', caseAddress)
+    cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
+    cacheCall(CaseScheduleManager, 'secondsInADay')
   ])
 }
 
@@ -48,8 +51,8 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
 
     static propTypes = {
       updatedAt: PropTypes.number,
-      caseAddress: PropTypes.string.isRequired,
-      status: PropTypes.number.isRequired
+      caseAddress: PropTypes.string,
+      status: PropTypes.number
     }
 
     constructor(props) {
@@ -64,7 +67,9 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
       this.forceAcceptDiagnosisHandler(nextProps)
     }
 
-    handleForceAcceptDiagnosis = () => {
+    handleForceAcceptDiagnosis = (e) => {
+      e.preventDefault()
+
       const acceptTransactionId = this.props.send(
         this.props.CaseLifecycleManager,
         'acceptAsDoctor',
@@ -84,9 +89,6 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
             toastr.transactionError(error)
             this.setState({ forceAcceptDiagnosisHandler: null, loading: false })
           })
-          .onConfirmed(() => {
-            this.setState({ forceAcceptDiagnosisHandler: null, loading: false })
-          })
           .onTxHash(() => {
             toastr.success('Your accept diagnosis transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your MEDX.')
             mixpanel.track('Doctor Force Accepting After 48+ Hours')
@@ -96,28 +98,36 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
     }
 
     render () {
-      const isPatient = false
-      if (
-        !this.props.updatedAt
-        || !caseStale(secondsInADay * 2, this.props.updatedAt, this.props.status, isPatient)) {
+      const { updatedAt, status, secondsInADay } = this.props
+      if (!caseStale(updatedAt, status, 'doctor', secondsInADay)
+      ) {
         return null
       } else {
         return (
-          <div className="alert alert-warning text-center">
-            <br />
-            48+ hours have passed and the patient has yet to respond to your diagnosis.
-            <br />You can close the case on their behalf to earn your MEDX:
-            <br />
-            <Button
-              disabled={this.state.loading}
-              onClick={this.handleForceAcceptDiagnosis}
-              className="btn btn-sm btn-clear"
+          <React.Fragment>
+            <span
+              className="abandoned-case-actions__tooltip"
+              data-for="abandoned-tooltip"
+              data-tip="Enough time has passed without a response from the patient.
+              <br />You can close the case on their behalf to earn your MEDX:"
             >
-              Close Case
-            </Button>
-            <br />
-            <br />
-          </div>
+              <Button
+                disabled={this.state.loading}
+                onClick={this.handleForceAcceptDiagnosis}
+                className="btn btn-sm btn-success"
+              >
+                Get Funds
+              </Button>
+            </span>
+            <ReactTooltip
+              className="abandoned-case-actions__tooltip"
+              id="abandoned-tooltip"
+              html={true}
+              effect='solid'
+              place={'top'}
+              wrapper='div'
+            />
+          </React.Fragment>
         )
       }
     }

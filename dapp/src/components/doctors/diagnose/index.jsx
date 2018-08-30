@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { all, put } from 'redux-saga/effects'
 import { CaseDetails } from '~/components/CaseDetails'
-import { AbandonedCaseActionsContainer } from '~/components/doctors/cases/AbandonedCaseActions'
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
 import Diagnosis from '~/components/Diagnosis'
@@ -131,7 +130,6 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
     } else if (!isBlank(diagnosisHash) && diagnosingDoc) {
       var diagnosis =
         <div className='col-xs-12'>
-          <AbandonedCaseActionsContainer caseAddress={caseAddress} />
           <Diagnosis
             title='Your Diagnosis'
             caseAddress={caseAddress}

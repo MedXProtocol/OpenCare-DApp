@@ -11,7 +11,7 @@ contract CaseScheduleManager is Initializable, Ownable {
 
   using RegistryLookup for Registry;
 
-  uint constant secondsInADay = 120;
+  uint public constant SECONDS_IN_A_DAY = 120;
 
   /*
     MEMORY START
@@ -55,13 +55,16 @@ contract CaseScheduleManager is Initializable, Ownable {
   }
 
   function patientWaitedOneDay(address _caseAddress) external view returns (bool) {
-    return (block.timestamp - updatedAt[_caseAddress]) > secondsInADay;
+    return (block.timestamp - updatedAt[_caseAddress]) > SECONDS_IN_A_DAY;
   }
 
   function doctorWaitedTwoDays(address _caseAddress) external view returns (bool) {
-    return (block.timestamp - updatedAt[_caseAddress]) > (secondsInADay * 2);
+    return (block.timestamp - updatedAt[_caseAddress]) > (SECONDS_IN_A_DAY * 2);
   }
 
+  function doctorWaitedFourDays(address _caseAddress) external view returns (bool) {
+    return (block.timestamp - updatedAt[_caseAddress]) > (SECONDS_IN_A_DAY * 4);
+  }
 
   /**
    * @dev - Contract should not accept any ether
@@ -87,4 +90,9 @@ contract CaseScheduleManager is Initializable, Ownable {
     updatedAt[_caseAddress] = block.timestamp;
     emit CaseUpdatedAt(_caseAddress, block.timestamp);
   }
+
+  function secondsInADay() public view returns (uint) {
+    return SECONDS_IN_A_DAY;
+  }
+
 }

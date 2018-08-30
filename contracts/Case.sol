@@ -34,15 +34,14 @@ contract Case is Ownable, Initializable {
   */
 
   enum CaseStatus {
-    None,
-    Open,
-    Evaluating,
-    Evaluated,
-    Closed,
-    Challenged, // unused?
-    Challenging,
-    ClosedRejected,
-    ClosedConfirmed
+    None,            // 0
+    Open,            // 1
+    Evaluating,      // 2
+    Evaluated,       // 3
+    Closed,          // 4
+    Challenging,     // 5
+    ClosedRejected,  // 6
+    ClosedConfirmed  // 7
   }
 
   event CaseCreated(
@@ -70,6 +69,10 @@ contract Case is Ownable, Initializable {
          (msg.sender == address(registry.caseFirstPhaseManager()))
       || (msg.sender == address(registry.caseSecondPhaseManager()))
     );
+  }
+
+  function evaluatedOrChallenging() public view returns (bool) {
+    return (status == Case.CaseStatus.Evaluated || status == Case.CaseStatus.Challenging);
   }
 
   modifier onlyCaseFirstPhaseManager() {

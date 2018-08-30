@@ -97,28 +97,18 @@ const CaseStatus = connect(mapStateToProps)(
             <div className="alert alert-info">
               {
                 this.props.challengingDoctorName
-                ? `You challenged the case. The case has been submitted for review to ${this.props.challengingDoctorName}.`
+                ? `Your case is under challenge review by ${this.props.challengingDoctorName}.`
                 : `Loading ...`
               }
             </div>
           break
         case 6:
           alert =
-            <div className="alert alert-info">
-              {
-                this.props.challengingDoctorName
-                ? `Your case is under challenge review by ${this.props.challengingDoctorName}.`
-                : `Loading ...`
-              }
-            </div>
-          break
-        case 7:
-          alert =
             <div className="alert alert-success">
               You have received two different diagnoses from separate doctors. Please review both diagnoses and recommendations below. You have been refunded <EtherFlip wei={this.props.caseFeeWei} /> and may consider re-submitting your case to the network or visiting your local dermatologist.
             </div>
           break
-        case 8:
+        case 7:
           alert =
             <div className="alert alert-success">
               You have received the same diagnosis from separate doctors. Please review both recommendations below. A total of <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} /> was charged for your first opinion and discounted second opinion.

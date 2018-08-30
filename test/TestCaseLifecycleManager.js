@@ -132,6 +132,20 @@ contract('CaseLifecycleManager', function (accounts) {
       })
     })
 
+    describe('acceptAsDoctor()', () => {
+      it('after 2 days it should close the case and pay the doctor', async () => {
+        assert.equal(await caseInstance.status.call(), caseStatus('Evaluated'))
+
+        increaseTime(SECONDS_IN_A_DAY * 3)
+
+        env.caseLifecycleManager.acceptAsDoctor(caseInstance.address, { from: doctor })
+        assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
+
+        let doctorBalance = await env.weth9.balanceOf(doctor)
+        assert.equal(doctorBalance.toString(), caseFeeWei.toString())
+      })
+    })
+
     describe('challengeWithDoctor()', () => {
       it('should not allow the patient to challenge their own case', async () => {
         await expectThrow(async () => {
@@ -183,6 +197,21 @@ contract('CaseLifecycleManager', function (accounts) {
 
             assert.equal(await caseInstance.status.call(), caseStatus('Challenging'))
             assert.equal(await caseInstance.challengingDoctor.call(), doctor3)
+          })
+        })
+
+        describe('acceptAsDoctor()', () => {
+          it('after 4 days it should close the case and pay the doctor', async () => {
+            assert.equal(await caseInstance.status.call(), caseStatus('Challenging'))
+
+            increaseTime(SECONDS_IN_A_DAY * 5)
+
+            env.caseLifecycleManager.acceptAsDoctor(caseInstance.address, { from: doctor })
+
+            assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
+
+            let doctorBalance = await env.weth9.balanceOf(doctor)
+            assert.equal(doctorBalance.toString(), caseFeeWei.toString())
           })
         })
 

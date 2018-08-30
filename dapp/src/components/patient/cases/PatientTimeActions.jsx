@@ -26,11 +26,11 @@ import { caseStale } from '~/services/caseStale'
 import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
-import { secondsInADay } from '~/config/constants'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
 import { EtherFlip } from '~/components/EtherFlip'
 import { isBlank } from '~/utils/isBlank'
 import { isTrue } from '~/utils/isTrue'
+import { caseStatus } from '~/utils/caseStatus'
 import get from 'lodash.get'
 import { caseFinders } from '~/finders/caseFinders'
 import * as routes from '~/config/routes'
@@ -43,6 +43,7 @@ function mapStateToProps(state, { caseAddress }) {
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
+  const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
   const status = cacheCallValueInt(state, caseAddress, 'status')
   const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
@@ -67,6 +68,7 @@ function mapStateToProps(state, { caseAddress }) {
 
   return {
     address,
+    secondsInADay,
     caseFeeWei,
     CaseLifecycleManager,
     excludeAddresses,
@@ -88,6 +90,7 @@ function* saga({ CaseScheduleManager, caseAddress }) {
   yield put(addLogListener(caseAddress))
   yield all([
     cacheCall(caseAddress, 'status'),
+    cacheCall(CaseScheduleManager, 'secondsInADay'),
     cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(caseAddress, 'challengingDoctor'),
@@ -210,7 +213,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         })
 
         let contractMethod = 'patientRequestNewInitialDoctor'
-        if (this.props.status === 6) {
+        if (this.props.status === caseStatus('Challenging')) {
           contractMethod = 'patientRequestNewChallengeDoctor'
         }
 
@@ -276,12 +279,11 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     render () {
-      const isPatient = true
-      const { diagnosingDoctor, account, updatedAt, status } = this.props
+      const { diagnosingDoctor, account, updatedAt, status, secondsInADay } = this.props
       const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
       let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
-      const isCaseNotStale = !updatedAt || !caseStale(secondsInADay, updatedAt, status, isPatient)
+      const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient', secondsInADay)
 
       let buttons = (
         <div className="button-set__btn-clear">
@@ -302,7 +304,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         </div>
       )
 
-      if (status === 6) {
+      if (status === caseStatus('Challenging')) {
         followUpText = 'You can accept the initial diagnosis or assign to a different doctor:'
         buttons = (
           <div className="button-set__btn-clear">

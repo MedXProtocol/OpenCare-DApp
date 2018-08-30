@@ -1,6 +1,5 @@
 import { defined } from '~/utils/defined'
-
-const PENDING_TX_STATUS = -1
+import { caseStatus } from '~/utils/caseStatus'
 
 // Adds cases not yet committed to the blockchain to the cases array set in the mapStateToProps
 // Contains info about pending tx's
@@ -38,11 +37,12 @@ const pendingTxTypes = [
 export const updatePendingTx = function(caseRowObject, transaction) {
   const method = transaction.call.method
 
+  // 'pending' tx state is -1, before it's confirmed on the blockchain
   if (pendingTxTypes.includes(method)) {
     return {
       ...caseRowObject,
       ...transaction,
-      status: PENDING_TX_STATUS // 'pending' tx state, before it's confirmed on the blockchain
+      status: caseStatus('Pending')
     }
   } else {
     return caseRowObject
