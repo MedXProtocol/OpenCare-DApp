@@ -41,12 +41,36 @@ function* fetchDoctorCredentials(address) {
   const publicKey = yield web3Call(yield accountManager(), 'publicKeys', address)
   if (isBlank(publicKey)) { return null }
 
+  const patientAddress = yield select(state => state.sagaGenesis.accounts[0])
+  if (patientAddress === undefined) { return null }
+
+  const patientIsDoctor = yield web3Call(yield doctorManager(), 'isDoctor', patientAddress)
+  const patientUSOrCADifferentRegion = yield sameCountryDifferentRegion(address)
+  if (!patientIsDoctor && patientUSOrCADifferentRegion) { return null }
+
   credentials = {
     address,
     isActive,
     publicKey
   }
   return credentials
+}
+
+// When the patient is in Canada and the same province then it's ok, but if other
+// province then it's not okay. Same goes for USA
+function* sameCountryDifferentRegion(address) {
+  const patientCountry = yield select(state => state.nextAvailableDoctor.patientCountry)
+  const patientRegion = yield select(state => state.nextAvailableDoctor.patientRegion)
+  const doctorCountry = yield web3Call(yield doctorManager(), 'country', address)
+  const doctorRegion = yield web3Call(yield doctorManager(), 'region', address)
+
+  if (
+    patientCountry === doctorCountry
+    && (patientCountry === 'US' || patientCountry === 'CA')
+    && patientRegion !== doctorRegion
+  ) {
+    return true
+  }
 }
 
 function* fetchDoctorByAddress(address) {
@@ -126,7 +150,7 @@ function* findNextAvailableOfflineDoctor() {
   return doctor
 }
 
-function* checkExcludedDoctors() {
+function* checkDoctorAvailable() {
   const doctor = yield select(state => state.nextAvailableDoctor.doctor)
   if (!doctor) {
     yield put({ type: 'FIND_NEXT_AVAILABLE_DOCTOR' })
@@ -135,5 +159,6 @@ function* checkExcludedDoctors() {
 
 export function* nextAvailableDoctorSaga() {
   yield takeLatest('FIND_NEXT_AVAILABLE_DOCTOR', findNextAvailableDoctor)
-  yield takeLatest('EXCLUDED_DOCTORS', checkExcludedDoctors)
+  yield takeLatest('EXCLUDED_DOCTORS', checkDoctorAvailable)
+  yield takeLatest('PATIENT_INFO', checkDoctorAvailable)
 }

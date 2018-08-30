@@ -19,7 +19,8 @@ export const customStyles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    width: '100%'
+    width: '100%',
+    textAlign: 'left'
   }),
   multiValue: (base, state) => ({
     ...base,

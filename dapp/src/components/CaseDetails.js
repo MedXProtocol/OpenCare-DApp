@@ -45,7 +45,10 @@ function mapStateToProps(state, { caseAddress }) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatchRemoveLogListener: (address) => dispatch(removeLogListener(address))
+    dispatchRemoveLogListener: (address) => dispatch(removeLogListener(address)),
+    dispatchPatientInfo: (patientCountry, patientRegion) => {
+      dispatch({ type: 'PATIENT_INFO', patientCountry, patientRegion })
+    }
   }
 }
 
@@ -107,6 +110,8 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps, mapDisp
               downloadImage(details.firstImageHash, props.caseKey),
               downloadImage(details.secondImageHash, props.caseKey)
             ])
+
+            this.props.dispatchPatientInfo(details.country, details.region)
 
             return resolve({
               details,
@@ -292,7 +297,7 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps, mapDisp
                   <p>{details.country}</p>
                 </div>
 
-                {details.country === 'US' ? (
+                {(details.country === 'US' || details.country === 'CA') ? (
                   <div className="col-xs-12 col-sm-6 col-md-4 col-lg-3">
                     <label className="label text-gray">Region:</label>
                     <p>{details.region}</p>

@@ -28,27 +28,42 @@ contract('DoctorManager', function (accounts) {
 
   describe('addOrReactivateDoctor()', () => {
     it('should work', async () => {
-      await doctorManager.addOrReactivateDoctor(doctor, 'Doogie')
+      await doctorManager.addOrReactivateDoctor(doctor, 'Doogie', 'CA', 'BC')
       assert.equal(await doctorManager.doctorCount.call(), 2)
       assert.equal(await doctorManager.isDoctor(doctor), true)
       assert.equal(await doctorManager.doctorNames.call(1), 'Doogie')
       assert.equal(await doctorManager.name.call(doctor), 'Doogie')
+      assert.equal(await doctorManager.doctorCountries.call(1), 'CA')
+      assert.equal(await doctorManager.country.call(doctor), 'CA')
+      assert.equal(await doctorManager.doctorRegions.call(1), 'BC')
+      assert.equal(await doctorManager.region.call(doctor), 'BC')
 
-      await doctorManager.addOrReactivateDoctor(doctor2, 'General Major')
+      await doctorManager.addOrReactivateDoctor(doctor2, 'General Major', 'US', 'DC')
       assert.equal(await doctorManager.doctorCount.call(), 3)
       assert.equal(await doctorManager.isDoctor(doctor2), true)
       assert.equal(await doctorManager.doctorNames.call(2), 'General Major')
       assert.equal(await doctorManager.name.call(doctor2), 'General Major')
+      assert.equal(await doctorManager.doctorCountries.call(2), 'US')
+      assert.equal(await doctorManager.country.call(doctor2), 'US')
+      assert.equal(await doctorManager.doctorRegions.call(2), 'DC')
+      assert.equal(await doctorManager.region.call(doctor2), 'DC')
+    })
+
+    it('should work without a country or region assigned', async () => {
+      await doctorManager.addOrReactivateDoctor(doctor, 'Doogie', '', '')
+      assert.equal(await doctorManager.doctorCount.call(), 2)
+      assert.equal(await doctorManager.doctorCountries.call(1), '')
+      assert.equal(await doctorManager.doctorRegions.call(1), '')
     })
 
     describe('when doctor added', () => {
       beforeEach(async () => {
-        await doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Hibbert')
+        await doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Hibbert', 'CA', 'BC')
       })
 
       it('should not allow double adds', async () => {
         await expectThrow(async () => {
-          await doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Hibbert')
+          await doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Hibbert', 'CA', 'BC')
         })
       })
     })
@@ -56,7 +71,7 @@ contract('DoctorManager', function (accounts) {
 
   describe('deactivateDoctor()', () => {
     beforeEach(async () => {
-      await doctorManager.addOrReactivateDoctor(doctor3, 'Howser')
+      await doctorManager.addOrReactivateDoctor(doctor3, 'Howser', 'CA', 'BC')
       assert.equal(await doctorManager.isActive(doctor3), true)
       assert.equal(await doctorManager.isDoctor(doctor3), true)
       assert.equal(await doctorManager.doctorCount.call(), 2)
@@ -78,9 +93,11 @@ contract('DoctorManager', function (accounts) {
       await doctorManager.deactivateDoctor(doctor3)
       assert.equal(await doctorManager.isActive(doctor3), false)
 
-      await doctorManager.addOrReactivateDoctor(doctor3, 'Newby')
+      await doctorManager.addOrReactivateDoctor(doctor3, 'Newby', 'CA', 'BC')
       assert.equal(await doctorManager.doctorNames.call(1), 'Newby')
       assert.equal(await doctorManager.name.call(doctor3), 'Newby')
+      assert.equal(await doctorManager.doctorCountries.call(1), 'CA')
+      assert.equal(await doctorManager.doctorRegions.call(1), 'BC')
     })
   })
 
