@@ -1,4 +1,3 @@
-// import { secondsInADay } from '~/config/constants'
 import { caseStatus } from '~/utils/caseStatus'
 
 const staleStatuses = [
