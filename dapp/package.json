@@ -125,6 +125,7 @@
     "eslint-plugin-react": "7.4.0",
     "jasmine-enzyme": "^6.0.1",
     "jest": "20.0.4",
+    "jest-junit": "^5.1.0",
     "libp2p-websocket-star-rendezvous": "^0.2.3",
     "react-dev-utils": "^4.2.1",
     "react-hot-loader": "^4.3.3",
@@ -139,10 +140,18 @@
     "test": "node scripts/test.js --env=jsdom",
     "console": "NODE_ENV=development babel-node"
   },
+  "jest-junit": {
+    "output": "../test-results/jest/results.xml"
+  },
   "jest": {
     "verbose": true,
+    "collectCoverage": true,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,mjs}"
+    ],
+    "reporters": [
+      "default",
+      "jest-junit"
     ],
     "snapshotSerializers": [
       "enzyme-to-json/serializer"
