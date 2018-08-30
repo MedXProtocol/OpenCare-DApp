@@ -6,22 +6,20 @@ const statusNames = {
   2: 'Requires Evaluation',
   3: 'Awaiting Patient',
   4: 'Closed',
-  5: 'Awaiting Patient',
-  6: 'Requires Evaluation',
-  7: 'Diagnosis Rejected',
-  8: 'Diagnosis Confirmed'
+  5: 'Requires Evaluation',
+  6: 'Diagnosis Rejected',
+  7: 'Diagnosis Confirmed'
 }
 
-var statusClasses = {
+const statusClasses = {
   0: 'default',
   1: 'info',
   2: 'warning',
   3: 'default',
   4: 'default',
-  5: 'default',
-  6: 'warning',
-  7: 'default',
-  8: 'default'
+  5: 'warning',
+  6: 'default',
+  7: 'default'
 }
 
 // This is context specific, and will say what state the case is in depending on

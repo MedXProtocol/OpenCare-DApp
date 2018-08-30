@@ -288,7 +288,11 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
       </label>
     )
 
-    if (caseRowObject.status !== caseStatus('Pending') && caseIsStale && context === 'doctor') {
+    if (
+      caseRowObject.status !== caseStatus('Pending')
+      && caseRowObject.isFirstDoc
+      && caseIsStale
+    ) {
       label = <AbandonedCaseActionsContainer caseAddress={caseAddress} />
     }
 
