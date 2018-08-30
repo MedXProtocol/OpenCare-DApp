@@ -51,5 +51,8 @@ jobs:
 
       - run: npm test
 
+      - store_artifacts:
+          path: ./test-results
+          destination: tr1
       - store_test_results:
           path: ./test-results
