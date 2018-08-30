@@ -12,10 +12,15 @@ import {
 export function* refreshNetwork() {
   const web3 = yield getContext('web3')
   const existingNetworkId = yield select((state) => state.sagaGenesis.network.networkId)
-  let networkId = yield web3.eth.net.getId()
-  if (existingNetworkId !== networkId) {
-    // console.log('FINALLY HAVE NETWORK ID!')
-    yield put({type: 'WEB3_NETWORK_ID', web3, networkId})
+
+  try {
+    let networkId = yield web3.eth.net.getId()
+    if (existingNetworkId !== networkId) {
+      // console.log('FINALLY HAVE NETWORK ID!')
+      yield put({type: 'WEB3_NETWORK_ID', web3, networkId})
+    }
+  } catch(e) {
+    console.log('Network request failed: ' + e.message)
   }
 }
 
