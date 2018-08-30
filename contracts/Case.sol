@@ -25,19 +25,9 @@ contract Case is Ownable, Initializable {
   address public diagnosingDoctor;
   address public challengingDoctor;
 
-  bytes public caseDataHash;
-  bytes public diagnosisHash;
-  bytes public challengeHash;
-
-  Registry public registry;
-  MedXToken public _;
+  Registry registry;
 
   CaseStatus public status;
-
-  bytes public encryptedCaseKey;
-  bytes public caseKeySalt;
-
-  mapping(address => bytes) public doctorEncryptedCaseKeys;
   /*
     MEMORY END
     It is safe to add new data definitions here
@@ -55,7 +45,15 @@ contract Case is Ownable, Initializable {
     ClosedConfirmed
   }
 
-  event CaseCreated(address indexed _patient);
+  event CaseCreated(
+    address indexed patient,
+    bytes encryptedCaseKey,
+    bytes caseKeySalt,
+    bytes caseDataHash
+  );
+  event DoctorEncryptedCaseKeySet(address indexed doctor, bytes doctorEncryptedCaseKey);
+  event DiagnosisHash(bytes diagnosisHash);
+  event ChallengeHash(bytes challengeHash);
   event CaseFinalized(address indexed _case, address indexed _patient, address indexed _diagnosingDoctor, address _challengingDoctor);
 
   /**
@@ -117,13 +115,10 @@ contract Case is Ownable, Initializable {
     require(_caseHash.length != 0, 'caseHash required');
     owner = msg.sender;
     status = CaseStatus.Open;
-    encryptedCaseKey = _encryptedCaseKey;
-    caseKeySalt = _caseKeySalt;
     patient = _patient;
-    caseDataHash = _caseHash;
     caseFee = _caseFee;
     registry = Registry(_registry);
-    emit CaseCreated(patient);
+    emit CaseCreated(patient, _encryptedCaseKey, _caseKeySalt, _caseHash);
   }
 
   function setDiagnosingDoctor(address _doctorAddress) external onlyCaseFirstPhaseManager {
@@ -144,15 +139,15 @@ contract Case is Ownable, Initializable {
   }
 
   function setDiagnosisHash(bytes _diagnosisHash) external onlyCaseFirstPhaseManager {
-    diagnosisHash = _diagnosisHash;
+    emit DiagnosisHash(_diagnosisHash);
   }
 
   function setChallengeHash(bytes _secondaryDiagnosisHash) external onlyCaseSecondPhaseManager {
-    challengeHash = _secondaryDiagnosisHash;
+    emit ChallengeHash(_secondaryDiagnosisHash);
   }
 
   function setDoctorEncryptedCaseKeys(address _doctor, bytes _doctorEncryptedKey) external onlyCasePhaseManagers {
-    doctorEncryptedCaseKeys[_doctor] = _doctorEncryptedKey;
+    emit DoctorEncryptedCaseKeySet(_doctor, _doctorEncryptedKey);
   }
 
   function finalize() external onlyCasePhaseManagers {

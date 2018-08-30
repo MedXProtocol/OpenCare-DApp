@@ -14,6 +14,8 @@ import {
   cacheCallValue,
   cacheCallValueInt,
   withSend,
+  addLogListener,
+  removeLogListener,
   addContract,
   TransactionStateHandler
 } from '~/saga-genesis'
@@ -35,6 +37,7 @@ import { mixpanel } from '~/mixpanel'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
+import { caseFinders } from '~/finders/caseFinders'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
@@ -43,9 +46,9 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const address = state.sagaGenesis.accounts[0]
   const status = cacheCallValueInt(state, caseAddress, 'status')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
-  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
-  const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
-  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
+  const encryptedCaseKey = caseFinders.encryptedCaseKey(state, caseAddress)
+  const caseKeySalt = caseFinders.caseKeySalt(state, caseAddress)
+  const diagnosisHash = getFileHashFromBytes(caseFinders.diagnosisHash(state, caseAddress))
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
   const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
@@ -92,9 +95,6 @@ function* saga({ caseAddress, networkId }) {
   yield all([
     cacheCall(caseAddress, 'status'),
     cacheCall(caseAddress, 'patient'),
-    cacheCall(caseAddress, 'diagnosisHash'),
-    cacheCall(caseAddress, 'encryptedCaseKey'),
-    cacheCall(caseAddress, 'caseKeySalt'),
     cacheCall(caseAddress, 'caseFee'),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(caseAddress, 'challengingDoctor')
@@ -105,6 +105,12 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatchExcludedDoctors: (excludedAddresses) => {
       dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
+    },
+    dispatchAddLogListener: (address) => {
+      dispatch(addLogListener(address))
+    },
+    dispatchRemoveLogListener: (address) => {
+      dispatch(removeLogListener(address))
     }
   }
 }
@@ -129,6 +135,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
   componentDidMount () {
     this.getInitialDiagnosis(this.props)
+    this.props.dispatchAddLogListener(this.props.caseAddress)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -146,6 +153,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
     if (this.state.cancelableDownloadPromise) {
       this.state.cancelableDownloadPromise.cancel()
     }
+    this.props.dispatchRemoveLogListener(this.props.caseAddress)
   }
 
   async getInitialDiagnosis (props) {

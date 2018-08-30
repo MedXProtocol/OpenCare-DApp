@@ -78,7 +78,6 @@ contract('CaseLifecycleManager', function (accounts) {
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
       await env.caseLifecycleManager.diagnoseCase(caseInstance.address, 'diagnosis hash', { from: doctor })
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluated'))
-      assert(await caseInstance.diagnosisHash.call())
     })
   })
 
@@ -231,8 +230,6 @@ contract('CaseLifecycleManager', function (accounts) {
             assert.equal(await env.caseStatusManager.openCaseCount.call(doctor2), 0)
             assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor2), 1)
 
-            assert(await caseInstance.challengeHash.call())
-
             assert.equal((await env.weth9.balanceOf(doctor)).toString(), doctorBalance.plus(caseFeeWei).toString())
             assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.plus(caseFeeWei).div(2).floor().toString())
 
@@ -256,8 +253,6 @@ contract('CaseLifecycleManager', function (accounts) {
             assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor), 1)
             assert.equal(await env.caseStatusManager.openCaseCount.call(doctor2), 0)
             assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor2), 1)
-
-            assert(await caseInstance.challengeHash.call())
 
             assert.equal((await env.weth9.balanceOf(patient)).toString(), patientBalance.plus(caseFeeWei).toString())
             assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.plus(caseFeeWei).div(2).floor().toString())

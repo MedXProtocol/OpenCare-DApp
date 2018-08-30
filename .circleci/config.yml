@@ -42,7 +42,17 @@ jobs:
             - dapp/node_modules
           key: v1-dapp-dependencies-{{ checksum "dapp/package.json" }}
 
+      # Test!
+      - run: mkdir -p ./test-results/eslint
+      - run: cd dapp && $(npm bin)/eslint src --format junit --output-file ../test-results/eslint/results.xml
+
+      - run: mkdir -p ./test-results/jest
+      - run: cd dapp && npm test
+
       - run: npm test
 
-      # Test!
-      - run: cd dapp && $(npm bin)/eslint src && npm test
+      - store_artifacts:
+          path: ./test-results
+          destination: tr1
+      - store_test_results:
+          path: ./test-results

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { all } from 'redux-saga/effects'
+import { put } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import CaseStatus from './CaseStatus'
 import Diagnosis from '~/components/Diagnosis'
@@ -10,12 +10,14 @@ import { PageTitle } from '~/components/PageTitle'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { decryptCaseKeyAsync } from '~/services/decrypt-case-key'
 import { currentAccount } from '~/services/sign-in'
-import { withSaga,
-  cacheCallValue,
-  cacheCall,
+import {
+  withSaga,
+  addLogListener,
+  removeLogListener,
   addContract,
   contractByName
 } from '~/saga-genesis'
+import { caseFinders } from '~/finders/caseFinders'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import get from 'lodash.get'
 
@@ -25,18 +27,25 @@ function mapStateToProps(state, { match }) {
 
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
-  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'encryptedCaseKey')
-  const caseKeySalt = cacheCallValue(state, caseAddress, 'caseKeySalt')
-  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
-  const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
+  const encryptedCaseKey = caseFinders.encryptedCaseKey(state, caseAddress)
+  const caseKeySalt = caseFinders.caseKeySalt(state, caseAddress)
+  const diagnosisHash = getFileHashFromBytes(caseFinders.diagnosisHash(state, caseAddress))
+  const challengeHash = getFileHashFromBytes(caseFinders.challengeHash(state, caseAddress))
 
   return {
     CaseScheduleManager,
+    caseAddress,
     challengeHash,
     diagnosisHash,
     encryptedCaseKey,
     caseKeySalt,
     networkId
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchRemoveLogListener: (address) => dispatch(removeLogListener(address))
   }
 }
 
@@ -46,15 +55,10 @@ function* saga({ CaseScheduleManager, match, networkId }) {
   const caseAddress = match.params.caseAddress
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
-  yield all([
-    cacheCall(caseAddress, 'encryptedCaseKey'),
-    cacheCall(caseAddress, 'caseKeySalt'),
-    cacheCall(caseAddress, 'diagnosisHash'),
-    cacheCall(caseAddress, 'challengeHash')
-  ])
+  yield put(addLogListener(caseAddress))
 }
 
-export const PatientCaseContainer = connect(mapStateToProps)(
+export const PatientCaseContainer = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     class _PatientCase extends Component {
       constructor (props) {
@@ -68,6 +72,10 @@ export const PatientCaseContainer = connect(mapStateToProps)(
 
       componentWillReceiveProps (props) {
         this.decryptCaseKey(props)
+      }
+
+      componentWillUnmount () {
+        this.props.dispatchRemoveLogListener(this.props.caseAddress)
       }
 
       decryptCaseKey (props) {

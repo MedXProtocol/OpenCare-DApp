@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { all } from 'redux-saga/effects'
+import { all, put } from 'redux-saga/effects'
 import { CaseDetails } from '~/components/CaseDetails'
 import { SubmitDiagnosisContainer } from './SubmitDiagnosis'
 import ChallengedDiagnosis from '~/components/ChallengedDiagnosis'
@@ -16,8 +16,11 @@ import {
   withContractRegistry,
   withSaga,
   cacheCallValue,
+  addLogListener,
+  removeLogListener,
   contractByName
 } from '~/saga-genesis'
+import { caseFinders } from '~/finders/caseFinders'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
 import { PageTitle } from '~/components/PageTitle'
@@ -30,11 +33,11 @@ function mapStateToProps(state, { match }) {
   const AccountManager = contractByName(state, 'AccountManager')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
-  const encryptedCaseKey = cacheCallValue(state, caseAddress, 'doctorEncryptedCaseKeys', address)
+  const encryptedCaseKey = caseFinders.doctorEncryptedCaseKey(state, caseAddress, address)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
-  const diagnosisHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'diagnosisHash'))
-  const challengeHash = getFileHashFromBytes(cacheCallValue(state, caseAddress, 'challengeHash'))
+  const diagnosisHash = getFileHashFromBytes(caseFinders.diagnosisHash(state, caseAddress))
+  const challengeHash = getFileHashFromBytes(caseFinders.challengeHash(state, caseAddress))
 
   return {
     address,
@@ -50,23 +53,30 @@ function mapStateToProps(state, { match }) {
   }
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatchRemoveLogListener: (address) => dispatch(removeLogListener(address))
+  }
+}
+
 function* saga({ match, address, AccountManager }) {
   if (!AccountManager || isEmptyObject(match.params)) { return }
   const caseAddress = match.params.caseAddress
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield all([
+    put(addLogListener(caseAddress)),
     cacheCall(AccountManager, 'publicKeys', patientAddress),
     cacheCall(caseAddress, 'status'),
-    cacheCall(caseAddress, 'doctorEncryptedCaseKeys', address),
     cacheCall(caseAddress, 'diagnosingDoctor'),
-    cacheCall(caseAddress, 'diagnosisHash'),
-    cacheCall(caseAddress, 'challengingDoctor'),
-    cacheCall(caseAddress, 'challengeHash')
+    cacheCall(caseAddress, 'challengingDoctor')
   ])
 }
 
-export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class _DiagnoseCase extends Component {
+export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga)(class _DiagnoseCase extends Component {
+  componentWillUnmount() {
+    this.props.dispatchRemoveLogListener(this.props.caseAddress)
+  }
   render () {
     if (isEmptyObject(this.props.match.params)) { return null }
 
