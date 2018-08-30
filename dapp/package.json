@@ -140,7 +140,7 @@
     "console": "NODE_ENV=development babel-node"
   },
   "jest-junit": {
-    "output": "../reports/dapp-junit.xml"
+    "output": "../test-results/jest/results.xml"
   },
   "jest": {
     "verbose": true,
