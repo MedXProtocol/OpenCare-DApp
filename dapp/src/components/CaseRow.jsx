@@ -16,11 +16,12 @@ import {
 } from '~/saga-genesis'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight';
+import { PENDING_TX_STATUS } from '~/config/constants'
+import { AbandonedCaseActionsContainer } from '~/components/doctors/cases/AbandonedCaseActions'
 import { EthAddress } from '~/components/EthAddress'
 import { LoadingLines } from '~/components/LoadingLines'
 import { HippoTimestamp } from '~/components/HippoTimestamp'
 import { txErrorMessage } from '~/services/txErrorMessage'
-import { secondsInADay } from '~/config/constants'
 import { caseStale } from '~/services/caseStale'
 import { updatePendingTx } from '~/services/pendingTxs'
 import { transactionErrorToCode } from '~/services/transactionErrorToCode'
@@ -29,8 +30,6 @@ import { doctorCaseStatusToName, doctorCaseStatusToClass } from '~/utils/doctorC
 import { defined } from '~/utils/defined'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
-
-const PENDING_TX_STATUS = -1
 
 const caseStatusToName = (caseRowObject, context) => {
   let name
@@ -56,6 +55,7 @@ const caseStatusToClass = (caseRowObject, context) => {
 
 function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex }) {
   let status, createdAt, updatedAt
+  let caseIsStale = false
   if (caseRowObject === undefined) { caseRowObject = {} }
 
   const CaseManager = contractByName(state, 'CaseManager')
@@ -92,13 +92,8 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   caseRowObject['statusLabel'] = caseStatusToName(caseRowObject, context)
   caseRowObject['statusClass'] = caseStatusToClass(caseRowObject, context)
 
-  // Intial doc can take action after 2 days
-  // Patient after 1 day
-  const secondsElapsed = (context === 'patient') ? secondsInADay : (secondsInADay * 2)
-
-  if (caseStale(secondsElapsed, caseRowObject.updatedAt, caseRowObject.status, (context === 'patient'))) {
-    caseRowObject['statusLabel'] = 'Requires Attention'
-    caseRowObject['statusClass'] = 'warning'
+  if (caseStale(updatedAt, status, context)) {
+    caseIsStale = true
   }
 
   // If this caseRowObject has an ongoing blockchain transaction this will update
@@ -129,7 +124,9 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
     CaseScheduleManager,
     CaseManager,
     caseRowObject,
-    address
+    address,
+    caseIsStale,
+    context
   }
 }
 
@@ -251,9 +248,9 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   render () {
-    const { caseRowObject } = this.props
+    const { caseRowObject, caseIsStale, context } = this.props
 
-    let remove
+    let remove, label
     let style = { zIndex: 950 }
     let { caseAddress, objIndex, error, transactionId, createdAt, updatedAt } = caseRowObject
 
@@ -269,14 +266,29 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
     const updatedAtTooltip = <HippoTimestamp timeInUtcSecondsSinceEpoch={updatedAt} />
 
     if (objIndex) {
-      style = { zIndex: 998 - objIndex }
+      style = { zIndex: 901 + objIndex }
     }
     const path = this.props.path || routes.PATIENTS_CASES
     const ethAddress = caseAddress ? <EthAddress address={caseAddress} onlyAddress={true} /> : null
 
     const action = this.caseRowAction(caseRowObject, pendingTransaction)
-    const label = this.caseRowLabel(caseRowObject, pendingTransaction)
+
+    if (caseIsStale && context === 'patient') {
+      caseRowObject['statusLabel'] = 'Requires Attention'
+      caseRowObject['statusClass'] = 'warning'
+    }
+
+
     const labelClass = this.caseRowLabelClass(caseRowObject)
+    label = (
+      <label className={`label label-${labelClass}`}>
+        {this.caseRowLabel(caseRowObject, pendingTransaction)}
+      </label>
+    )
+
+    if (caseRowObject.status !== PENDING_TX_STATUS && caseIsStale && context === 'doctor') {
+      label = <AbandonedCaseActionsContainer caseAddress={caseAddress} />
+    }
 
     if (error) {
       remove = (
@@ -313,9 +325,7 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
         </span>
 
         <span className="case-list--item__status text-center">
-          <label className={`label label-${labelClass}`}>
-            {label}
-          </label>
+          {label}
         </span>
 
         <span className="case-list--item__eth-address text text-left">

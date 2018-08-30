@@ -1,6 +1,5 @@
 import { defined } from '~/utils/defined'
-
-const PENDING_TX_STATUS = -1
+import { PENDING_TX_STATUS } from '~/config/constants'
 
 // Adds cases not yet committed to the blockchain to the cases array set in the mapStateToProps
 // Contains info about pending tx's

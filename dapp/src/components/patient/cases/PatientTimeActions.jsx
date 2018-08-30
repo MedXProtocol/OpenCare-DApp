@@ -24,7 +24,6 @@ import { caseStale } from '~/services/caseStale'
 import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
-import { secondsInADay } from '~/config/constants'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
 import { EtherFlip } from '~/components/EtherFlip'
 import { isBlank } from '~/utils/isBlank'
@@ -268,12 +267,11 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     render () {
-      const isPatient = true
       const { diagnosingDoctor, account, updatedAt, status } = this.props
       const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
       let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
-      const isCaseNotStale = !updatedAt || !caseStale(secondsInADay, updatedAt, status, isPatient)
+      const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient')
 
       let buttons = (
         <div className="button-set__btn-clear">
