@@ -9,8 +9,18 @@ export default function (state, { type, address, logs, log }) {
         state = {
           ...state,
           [address]: {
-            pastLogsLoaded: false
+            logsFetched: false
           }
+        }
+      }
+      break
+
+    case 'FETCH_PAST_LOGS':
+      state = {
+        ...state,
+        [address]: {
+          ...state[address],
+          logsFetched: true
         }
       }
       break
@@ -20,7 +30,6 @@ export default function (state, { type, address, logs, log }) {
         ...state,
         [address]: {
           ...state[address],
-          pastLogsLoaded: true,
           logs
         }
       }
