@@ -58,6 +58,7 @@ export default function(state, { type, logs, log }) {
 
   switch(type) {
     case 'PAST_LOGS':
+      console.log('case logs reducers applying ', logs)
       state = {...state}
       logs.forEach((log) => {
         applyLog(state, log)
