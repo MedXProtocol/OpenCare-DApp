@@ -23,7 +23,7 @@ function mapStateToProps (state) {
   const openAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
 
   openAddresses.forEach(caseAddress => {
-    const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'SECONDS_IN_A_DAY')
+    const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
     const status = cacheCallValueInt(state, caseAddress, 'status')
     const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
@@ -50,7 +50,7 @@ function* saga({ address, CaseStatusManager, CaseScheduleManager }) {
   yield openAddresses.map(function* (caseAddress) {
     yield addContract({ address: caseAddress, contractKey: 'Case' })
     yield all([
-      cacheCall(CaseScheduleManager, 'SECONDS_IN_A_DAY'),
+      cacheCall(CaseScheduleManager, 'secondsInADay'),
       cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
       cacheCall(caseAddress, 'status'),
       cacheCall(caseAddress, 'diagnosingDoctor')

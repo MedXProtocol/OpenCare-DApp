@@ -68,7 +68,7 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
     status = cacheCallValueInt(state, caseAddress, 'status')
     createdAt = cacheCallValueInt(state, CaseScheduleManager, 'createdAt', caseAddress)
     updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
-    secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'SECONDS_IN_A_DAY')
+    secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
 
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
 
@@ -137,7 +137,7 @@ function* saga({ CaseManager, CaseScheduleManager, caseAddress }) {
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
     cacheCall(caseAddress, 'status'),
-    cacheCall(CaseScheduleManager, 'SECONDS_IN_A_DAY'),
+    cacheCall(CaseScheduleManager, 'secondsInADay'),
     cacheCall(CaseScheduleManager, 'createdAt', caseAddress),
     cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
     cacheCall(caseAddress, 'diagnosingDoctor'),

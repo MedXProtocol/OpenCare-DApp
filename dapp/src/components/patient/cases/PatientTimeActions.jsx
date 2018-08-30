@@ -43,7 +43,7 @@ function mapStateToProps(state, { caseAddress }) {
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
-  const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'SECONDS_IN_A_DAY')
+  const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
   const status = cacheCallValueInt(state, caseAddress, 'status')
   const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
@@ -90,7 +90,7 @@ function* saga({ CaseScheduleManager, caseAddress }) {
   yield put(addLogListener(caseAddress))
   yield all([
     cacheCall(caseAddress, 'status'),
-    cacheCall(CaseScheduleManager, 'SECONDS_IN_A_DAY'),
+    cacheCall(CaseScheduleManager, 'secondsInADay'),
     cacheCall(CaseScheduleManager, 'updatedAt', caseAddress),
     cacheCall(caseAddress, 'diagnosingDoctor'),
     cacheCall(caseAddress, 'challengingDoctor'),

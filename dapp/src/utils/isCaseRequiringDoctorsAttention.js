@@ -8,7 +8,7 @@ export const isCaseRequiringDoctorsAttention = function(
   secondsInADay
 ) {
   return (
-       (isFirstDoc && status === caseStatus('Closed'))
+       (isFirstDoc && status === caseStatus('Evaluating'))
     || (!isFirstDoc && status === caseStatus('Challenging'))
     || (isFirstDoc && caseStale(updatedAt, status, 'doctor', secondsInADay))
   )

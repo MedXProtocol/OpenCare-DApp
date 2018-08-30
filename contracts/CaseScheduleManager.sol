@@ -90,4 +90,9 @@ contract CaseScheduleManager is Initializable, Ownable {
     updatedAt[_caseAddress] = block.timestamp;
     emit CaseUpdatedAt(_caseAddress, block.timestamp);
   }
+
+  function secondsInADay() public view returns (uint) {
+    return SECONDS_IN_A_DAY;
+  }
+
 }
