@@ -5,7 +5,7 @@ module.exports = function (statusString) {
     Evaluating: 2,
     Evaluated: 3,
     Closed: 4,
-    Challenged: 5,
+    Challenged: 5, // unused
     Challenging: 6,
     ClosedRejected: 7,
     ClosedConfirmed: 8

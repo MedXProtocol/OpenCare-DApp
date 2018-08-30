@@ -43,21 +43,10 @@ contract CaseLifecycleManager is Ownable, Initializable {
   }
 
   /**
-   * @dev - throws unless the Doctor has waited 48 hours
-   */
-  modifier doctorWaitedTwoDays(address _caseAddress) {
-    require(
-      registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress)//,
-      //'doctor needs to wait at least two days to call this'
-    );
-    _;
-  }
-
-  /**
    * @dev - throws if called by any account that is not a case
    */
   modifier isCase(address _caseAddress) {
-    require(registry.caseManager().isCase(_caseAddress), 'case not found');
+    require(registry.caseManager().isCase(_caseAddress)/*, 'case not found'*/);
     _;
   }
 
@@ -155,8 +144,9 @@ contract CaseLifecycleManager is Ownable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(
-      (_case.status() == Case.CaseStatus.Evaluated) || (_case.status() == Case.CaseStatus.Challenging),
-      'must be in evaluated or challenging state'
+         (_case.status() == Case.CaseStatus.Evaluated)
+      || (_case.status() == Case.CaseStatus.Challenging)//,
+      //'must be in evaluated or challenging state'
     );
 
     registry.caseFirstPhaseManager().acceptDiagnosis(_case);
@@ -250,10 +240,26 @@ contract CaseLifecycleManager is Ownable, Initializable {
     external
     isCase(_caseAddress)
     onlyDiagnosingDoctor(_caseAddress)
-    doctorWaitedTwoDays(_caseAddress)
   {
     Case _case = Case(_caseAddress);
-    require(_case.status() == Case.CaseStatus.Evaluated/*, 'Case must be in Evaluated state'*/);
+    require(
+      (
+        _case.status() == Case.CaseStatus.Evaluated
+        || _case.status() == Case.CaseStatus.Challenging
+      )//, 'Case must be in Evaluated or Challenged state'
+    );
+
+    if (_case.status() == Case.CaseStatus.Evaluated) {
+      require(
+        registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress)//,
+        //'Must wait 2 days'
+      );
+    } else if (_case.status() == Case.CaseStatus.Challenging) {
+      require(
+        registry.caseScheduleManager().doctorWaitedFourDays(_caseAddress)//,
+        //'Must wait 4 days'
+      );
+    }
 
     registry.caseFirstPhaseManager().acceptAsDoctor(_case);
 
