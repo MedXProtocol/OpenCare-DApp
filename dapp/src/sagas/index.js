@@ -9,11 +9,10 @@ import addRegistryContracts from './add-registry-contracts-saga'
 import signInSaga from './sign-in-saga'
 import signOutSaga from './sign-out-saga'
 import signUpSaga from './sign-up-saga'
-// import heartbeatSaga from './heartbeat-saga'
+import heartbeatSaga from './heartbeat-saga'
 import { nextAvailableDoctorSaga } from './next-available-doctor-saga'
 import { pollExternalTransactionsSaga } from './pollExternalTransactionsSaga'
 import { failedTransactionListener } from './failedTransactionListener'
-
 
 export default function* () {
   yield fork(takeOnceAndRun, 'WEB3_NETWORK_ID', function* ({ web3, networkId }) {
@@ -24,7 +23,7 @@ export default function* () {
       signInSaga(),
       signOutSaga(),
       signUpSaga(),
-      // heartbeatSaga(),
+      heartbeatSaga(),
       nextAvailableDoctorSaga(),
       pollExternalTransactionsSaga(),
       failedTransactionListener()
