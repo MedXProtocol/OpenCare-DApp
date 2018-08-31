@@ -136,6 +136,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
           <p>
             You have a previous beta account that no longer works. &nbsp;
             <InfoQuestionMark
+              key="sign-in-info"
               place="bottom"
               tooltipText="We have made changes that break compatibility with old cases.<br />Your account needs to be reset before submitting or diagnosing new cases." />
           </p>

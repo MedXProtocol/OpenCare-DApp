@@ -1,6 +1,5 @@
 import { cacheCall } from '~/saga-genesis/sagas'
 import { cacheCallValue } from '~/saga-genesis/state-finders'
-import { isBlank } from '~/utils/isBlank'
 
 export const mapOpenCaseAddresses = function(state, CaseStatusManager, address) {
   const openAddresses = []
