@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { put } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import CaseStatus from './CaseStatus'
 import Diagnosis from '~/components/Diagnosis'
@@ -12,12 +11,14 @@ import { decryptCaseKeyAsync } from '~/services/decrypt-case-key'
 import { currentAccount } from '~/services/sign-in'
 import {
   withSaga,
-  addLogListener,
-  removeLogListener,
+  LogListener,
   addContract,
   contractByName
 } from '~/saga-genesis'
-import { caseFinders } from '~/finders/caseFinders'
+import {
+  caseFinders,
+  caseManagerFinders
+} from '~/finders'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import get from 'lodash.get'
 
@@ -31,8 +32,10 @@ function mapStateToProps(state, { match }) {
   const caseKeySalt = caseFinders.caseKeySalt(state, caseAddress)
   const diagnosisHash = getFileHashFromBytes(caseFinders.diagnosisHash(state, caseAddress))
   const challengeHash = getFileHashFromBytes(caseFinders.challengeHash(state, caseAddress))
+  const fromBlock = caseManagerFinders.caseFromBlock(state, caseAddress)
 
   return {
+    fromBlock,
     CaseScheduleManager,
     caseAddress,
     challengeHash,
@@ -43,22 +46,15 @@ function mapStateToProps(state, { match }) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    dispatchRemoveLogListener: (address) => dispatch(removeLogListener(address))
-  }
-}
-
-function* saga({ CaseScheduleManager, match, networkId }) {
+function* saga({ CaseScheduleManager, match, networkId, fromBlock }) {
   if (!networkId) { return }
 
   const caseAddress = match.params.caseAddress
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
-  yield put(addLogListener(caseAddress))
 }
 
-export const PatientCaseContainer = connect(mapStateToProps, mapDispatchToProps)(
+export const PatientCaseContainer = connect(mapStateToProps)(
   withSaga(saga)(
     class _PatientCase extends Component {
       constructor (props) {
@@ -72,10 +68,6 @@ export const PatientCaseContainer = connect(mapStateToProps, mapDispatchToProps)
 
       componentWillReceiveProps (props) {
         this.decryptCaseKey(props)
-      }
-
-      componentWillUnmount () {
-        this.props.dispatchRemoveLogListener(this.props.caseAddress)
       }
 
       decryptCaseKey (props) {
@@ -124,6 +116,7 @@ export const PatientCaseContainer = connect(mapStateToProps, mapDispatchToProps)
 
         return (
           <div>
+            <LogListener address={caseAddress} fromBlock={this.props.fromBlock} />
             <ScrollToTop />
             <PageTitle renderTitle={(t) => t('pageTitles.patientCase', { caseId: ('' + caseAddress).substring(0, 10) + ' ...'})} />
             <div className='container'>

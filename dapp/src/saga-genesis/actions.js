@@ -1,7 +1,8 @@
-export function addLogListener(address) {
+export function addLogListener(address, fromBlock) {
   return {
     type: 'ADD_LOG_LISTENER',
-    address
+    address,
+    fromBlock
   }
 }
 

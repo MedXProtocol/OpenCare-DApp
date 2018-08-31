@@ -6,7 +6,8 @@ import { betaFaucet } from './betaFaucetReducer'
 import { reducer as toastr } from 'react-redux-toastr'
 import nextAvailableDoctor from './next-available-doctor-reducer'
 import externalTransactions from './externalTransactionsReducer'
-import caseLogs from './case-logs-reducer'
+import caseLogs from './caseLogsReducer'
+import caseManagerLogs from './caseManagerLogsReducer'
 
 export default combineReducers({
   sagaGenesis,
@@ -16,5 +17,6 @@ export default combineReducers({
   betaFaucet,
   nextAvailableDoctor,
   externalTransactions,
-  caseLogs
+  caseLogs,
+  caseManagerLogs
 })

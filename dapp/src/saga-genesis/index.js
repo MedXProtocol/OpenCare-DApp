@@ -8,29 +8,21 @@ import {
   contractByName,
   contractKeyByAddress
 } from './state-finders'
-import {
-  ContractRegistryProvider,
-  withContractRegistry,
-  withSend,
-  withSaga
-} from './components'
+export * from './components'
 export { TransactionStateHandler } from './TransactionStateHandler'
 export { nextId } from './transaction/transaction-factory'
-
+export * from './logReducerFactory'
 export * from './sagas'
 export * from './actions'
+export { ABIHelper } from './utils/ABIHelper'
 
 export {
   CallCountRegistry,
-  withSaga,
-  withSend,
-  withContractRegistry,
   rootSagaGenesis,
   cacheCallState,
   cacheCallValue,
   cacheCallValueInt,
   contractByName,
   contractKeyByAddress,
-  ContractRegistry,
-  ContractRegistryProvider
+  ContractRegistry
 }

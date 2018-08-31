@@ -6,10 +6,13 @@ import {
   put
 } from 'redux-saga/effects'
 
-function* addSubscription({ address }) {
+function* addSubscription({ address, fromBlock }) {
+  yield put({ type: 'LOG_LISTENER_ADDED', address })
   const listener = yield select(state => state.sagaGenesis.logs[address])
-  if (!listener.logsFetched) {
-    yield put({ type: 'FETCH_PAST_LOGS', address })
+  if (listener.count === 1) {
+    const web3 = yield getContext('web3')
+    const pastLogs = yield call([web3.eth, 'getPastLogs'], { fromBlock: fromBlock || '0', toBlock: 'latest', address })
+    yield put({ type: 'PAST_LOGS', address, logs: pastLogs })
   }
 }
 
@@ -22,14 +25,7 @@ function* checkReceiptForEvents({ receipt }) {
   })
 }
 
-function* fetchPastLogs({ address }) {
-  const web3 = yield getContext('web3')
-  const pastLogs = yield call([web3.eth, 'getPastLogs'], { fromBlock: '0', toBlock: 'latest', address })
-  yield put({ type: 'PAST_LOGS', address, logs: pastLogs })
-}
-
 export function* logSaga() {
   yield takeEvery('ADD_LOG_LISTENER', addSubscription)
   yield takeEvery('BLOCK_TRANSACTION_RECEIPT', checkReceiptForEvents)
-  yield takeEvery('FETCH_PAST_LOGS', fetchPastLogs)
 }

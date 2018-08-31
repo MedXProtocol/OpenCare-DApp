@@ -1,5 +1,6 @@
 pragma solidity ^0.4.23;
 
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Initializable.sol";
 import "./MedXToken.sol";
@@ -74,16 +75,16 @@ contract BetaFaucet is Ownable, Initializable {
     _recipient.transfer(_amount);
   }
 
-  function sendMedX(address _recipient, uint256 _amount) public onlyOwner {
-    require(_recipient != address(0), "recipient address is empty");
-    require(!sentMedXAddresses[_recipient], "recipient has already received MedX");
-    require(_amount > 0, "amount must be positive");
-    require(_amount < 501 ether, "amount must be below the upper limit");
-    require(medXToken.balanceOf(address(this)) >= _amount, "contract is out of MedX!");
-
-    sentMedXAddresses[_recipient] = true;
-    emit MedXSent(_recipient, _amount);
-
-    medXToken.transfer(_recipient, _amount);
-  }
+  // function sendMedX(address _recipient, uint256 _amount) public onlyOwner {
+  //   require(_recipient != address(0), "recipient address is empty");
+  //   require(!sentMedXAddresses[_recipient], "recipient has already received MedX");
+  //   require(_amount > 0, "amount must be positive");
+  //   require(_amount < 501 ether, "amount must be below the upper limit");
+  //   require(medXToken.balanceOf(address(this)) >= _amount, "contract is out of MedX!");
+  //
+  //   sentMedXAddresses[_recipient] = true;
+  //   emit MedXSent(_recipient, _amount);
+  //
+  //   medXToken.transfer(_recipient, _amount);
+  // }
 }

@@ -1,5 +1,8 @@
 import caseContractConfig from '#/Case.json'
-import { ABIHelper } from '~/utils/ABIHelper'
+import {
+  ABIHelper,
+  logReducerFactory
+} from '~/saga-genesis'
 
 const caseAbi = new ABIHelper(caseContractConfig.abi)
 const CASE_CREATED = caseAbi.topic0('CaseCreated')
@@ -51,27 +54,4 @@ function applyLog(state, log) {
   }
 }
 
-export default function(state, { type, logs, log }) {
-  if (typeof state === 'undefined') {
-    state = {}
-  }
-
-  switch(type) {
-    case 'PAST_LOGS':
-      console.log('case logs reducers applying ', logs)
-      state = {...state}
-      logs.forEach((log) => {
-        applyLog(state, log)
-      })
-      break
-
-    case 'NEW_LOG':
-      state = {...state}
-      applyLog(state, log)
-      break
-
-    //no default
-  }
-
-  return state
-}
+export default logReducerFactory(applyLog)

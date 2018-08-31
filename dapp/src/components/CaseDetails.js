@@ -8,18 +8,20 @@ import { HippoTimestamp } from '~/components/HippoTimestamp'
 import { LoadingLines } from '~/components/LoadingLines'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { downloadJson, downloadImage } from '../utils/storage-util'
-import { all, put } from 'redux-saga/effects'
+import { all } from 'redux-saga/effects'
 import {
   contractByName,
   withContractRegistry,
   withSaga,
   cacheCallValueInt,
   cacheCall,
-  addLogListener,
-  removeLogListener,
+  LogListener,
   addContract
 } from '~/saga-genesis'
-import { caseFinders } from '~/finders/caseFinders'
+import {
+  caseFinders,
+  caseManagerFinders
+} from '~/finders'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { toastr } from '~/toastr'
 import get from 'lodash.get'
@@ -33,31 +35,30 @@ function mapStateToProps(state, { caseAddress }) {
   const caseDataHash = caseFinders.caseDataHash(state, caseAddress)
   const createdAt = cacheCallValueInt(state, CaseScheduleManager, 'createdAt', caseAddress)
   const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
-
+  const fromBlock = caseManagerFinders.caseFromBlock(state, caseAddress)
   return {
     caseDetailsHash: getFileHashFromBytes(caseDataHash),
     createdAt,
     updatedAt,
     CaseScheduleManager,
-    networkId
+    networkId,
+    fromBlock
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatchRemoveLogListener: (address) => dispatch(removeLogListener(address)),
     dispatchPatientInfo: (patientCountry, patientRegion) => {
       dispatch({ type: 'PATIENT_INFO', patientCountry, patientRegion })
     }
   }
 }
 
-function* saga({ CaseScheduleManager, caseAddress, networkId }) {
+function* saga({ CaseScheduleManager, caseAddress, networkId, fromBlock }) {
   if (!networkId || !CaseScheduleManager || !caseAddress) { return }
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield all([
-    yield put(addLogListener(caseAddress)),
     yield cacheCall(CaseScheduleManager, 'createdAt', caseAddress),
     yield cacheCall(CaseScheduleManager, 'updatedAt', caseAddress)
   ])
@@ -89,7 +90,6 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps, mapDisp
     if (this.state.cancelableDownloadPromise) {
       this.state.cancelableDownloadPromise.cancel()
     }
-    this.props.dispatchRemoveLogListener(this.props.caseAddress)
   }
 
   getCaseDetails (props) {
@@ -415,7 +415,7 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps, mapDisp
         </div>
       )
     }
-    return jsx
+    return <LogListener address={caseAddress} fromBlock={this.props.fromBlock}>{jsx}</LogListener>
   }
 })))
 

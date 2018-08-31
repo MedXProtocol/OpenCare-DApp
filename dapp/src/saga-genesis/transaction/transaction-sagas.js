@@ -28,7 +28,7 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
         emit({ type: 'TRANSACTION_RECEIPT', transactionId, receipt })
       })
       .on('error', error => {
-        const txObject = { type: 'TRANSACTION_ERROR', transactionId, call, error }
+        const txObject = { type: 'TRANSACTION_ERROR', transactionId, call, error: error.toString() }
         const gasUsed = error.message.match(/"gasUsed": ([0-9]*)/)
 
         if (gasUsed)
@@ -74,7 +74,7 @@ export function* web3Send({ transactionId, call, options }) {
     }
   } catch (error) {
     console.error(error)
-    yield put({type: 'TRANSACTION_ERROR', transactionId, call, error})
+    yield put({type: 'TRANSACTION_ERROR', transactionId, call, error: error.message})
   }
 }
 

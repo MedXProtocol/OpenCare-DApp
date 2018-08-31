@@ -1,20 +1,21 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { put } from 'redux-saga/effects'
 import PropTypes from 'prop-types'
 import {
   cacheCallValue,
   withSaga,
   cacheCall,
   addContract,
-  addLogListener,
-  removeLogListener
+  LogListener
 } from '~/saga-genesis'
 import { currentAccount } from '~/services/sign-in'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { isBlank } from '~/utils/isBlank'
-import { caseFinders } from '~/finders/caseFinders'
+import {
+  caseFinders,
+  caseManagerFinders
+} from '~/finders'
 import { downloadJson } from '~/utils/storage-util'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { DiagnosisDisplay } from '~/components/DiagnosisDisplay'
@@ -29,30 +30,25 @@ function mapStateToProps(state, { caseAddress, challengingDoctorAddress }) {
   const isChallengingDoctor = account.address() === challengingDoctorAddress
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
+  const fromBlock = caseManagerFinders.caseFromBlock(state, caseAddress)
 
   return {
     isChallengingDoctor,
     challengeHash,
     isPatient,
-    networkId
+    networkId,
+    fromBlock
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    dispatchRemoveLogListener: (address) => dispatch(removeLogListener(address))
-  }
-}
-
-function* saga({ caseAddress, networkId }) {
+function* saga({ caseAddress, networkId, fromBlock }) {
   if (!networkId) { return }
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
   yield cacheCall(caseAddress, 'patient')
-  yield put(addLogListener(caseAddress))
 }
 
-const ChallengedDiagnosis = connect(mapStateToProps, mapDispatchToProps)(
+const ChallengedDiagnosis = connect(mapStateToProps)(
   withSaga(saga)(
     class _ChallengedDiagnosis extends Component {
 
@@ -78,7 +74,6 @@ const ChallengedDiagnosis = connect(mapStateToProps, mapDispatchToProps)(
     if (this.state.cancelableDownloadPromise) {
       this.state.cancelableDownloadPromise.cancel()
     }
-    this.props.dispatchRemoveLogListener(this.props.caseAddress)
   }
 
   async getSecondDiagnosis (props) {
@@ -127,7 +122,7 @@ const ChallengedDiagnosis = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   render () {
-    return (
+    const result = (
       isEmptyObject(this.state.diagnosis) ?
       <div /> : (
         <div className="card">
@@ -140,6 +135,8 @@ const ChallengedDiagnosis = connect(mapStateToProps, mapDispatchToProps)(
         </div>
       )
     )
+
+    return <LogListener address={this.props.caseAddress} fromBlock={this.props.fromBlock}>{result}</LogListener>
   }
 }))
 

@@ -70,6 +70,7 @@ export class CallCountRegistry {
       }
       this.getContractCalls(call.address)[call.hash] = callState
     }
+    return callState.count
   }
 
   _decrement (call) {

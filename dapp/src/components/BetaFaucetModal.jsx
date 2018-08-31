@@ -59,7 +59,6 @@ function* saga({ BetaFaucet, CaseManager, MedXToken, DoctorManager, address }) {
 
   yield all([
     cacheCall(CaseManager, 'getPatientCaseListCount', address),
-    cacheCall(MedXToken, 'balanceOf', address),
     cacheCall(DoctorManager, 'owner'),
     cacheCall(BetaFaucet, 'sentAddresses', address),
     yield cacheCall(DoctorManager, 'isDoctor', address)
