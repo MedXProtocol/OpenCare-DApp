@@ -14,7 +14,7 @@ export class CallCountRegistry {
   }
 
   register (call, key) {
-    this.increment(call)
+    this._increment(call)
     this._getKeyCalls(key).push(call)
   }
 
@@ -26,7 +26,7 @@ export class CallCountRegistry {
 
   decrementCalls (calls) {
     return calls.reduce((accumulator, call) => {
-      if (!this.decrement(call)) {
+      if (!this._decrement(call)) {
         accumulator.push(call)
       }
       return accumulator
@@ -59,7 +59,7 @@ export class CallCountRegistry {
     return keyCalls
   }
 
-  increment (call) {
+  _increment (call) {
     let callState = this._getContractCallState(call)
     if (callState) {
       callState.count += 1
@@ -73,7 +73,7 @@ export class CallCountRegistry {
     return callState.count
   }
 
-  decrement (call) {
+  _decrement (call) {
     let callState = this._getContractCallState(call)
     let result = 0
     if (callState) {
