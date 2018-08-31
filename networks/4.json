@@ -1,5 +1,5 @@
 {
-  "migrationVersion": 1534963030,
+  "migrationVersion": 1535750231,
   "contracts": [
     {
       "contractName": "Migrations",
@@ -344,6 +344,14 @@
     {
       "contractName": "EtherPriceFeed",
       "address": "0x86543a55dce93d165079903c43a25dc74b8db7c5"
+    },
+    {
+      "contractName": "FromBlockNumber",
+      "address": "0x7060770a02550b33f3ffd02b4b933145e9759af8"
+    },
+    {
+      "contractName": "Delegate",
+      "address": "0xc7919c7c35e1e02f6702133c492566ed3df43310"
     }
   ]
 }
