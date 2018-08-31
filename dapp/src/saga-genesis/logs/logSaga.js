@@ -11,6 +11,7 @@ function* addSubscription({ address, fromBlock }) {
   const listener = yield select(state => state.sagaGenesis.logs[address])
   if (listener.count === 1) {
     const web3 = yield getContext('web3')
+    console.log('from block: ', fromBlock.toString())
     const fromBlockHex = web3.utils.toHex(fromBlock || 0)
     const pastLogs = yield call([web3.eth, 'getPastLogs'], { fromBlock: fromBlockHex, toBlock: 'latest', address })
     yield put({ type: 'PAST_LOGS', address, logs: pastLogs })

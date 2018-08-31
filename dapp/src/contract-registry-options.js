@@ -10,6 +10,7 @@ import caseStatusManagerContractConfig from '#/CaseStatusManager.json'
 import caseContractConfig from '#/Case.json'
 import doctorManagerContractConfig from '#/DoctorManager.json'
 import accountManagerConfig from '#/AccountManager.json'
+import fromBlockNumberConfig from '#/FromBlockNumber.json'
 import registryConfig from '#/Registry.json'
 
 import { abiFactory } from '~/saga-genesis/utils'
@@ -24,6 +25,7 @@ export default {
     CaseScheduleManager: abiFactory(caseScheduleManagerContractConfig.abi),
     CaseStatusManager: abiFactory(caseStatusManagerContractConfig.abi),
     BetaFaucet: abiFactory(betaFaucetContractConfig.abi),
+    FromBlockNumber: abiFactory(fromBlockNumberConfig.abi),
     MedXToken: abiFactory(medXTokenContractConfig.abi),
     DoctorManager: abiFactory(doctorManagerContractConfig.abi),
     Case: abiFactory(caseContractConfig.abi),

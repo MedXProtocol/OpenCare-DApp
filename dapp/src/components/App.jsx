@@ -33,6 +33,7 @@ import {
   cacheCall,
   cacheCallValue,
   cacheCallValueInt,
+  cacheCallValueBigNumber,
   contractByName,
   LogListener,
   withSaga,
@@ -51,6 +52,8 @@ function mapStateToProps (state) {
   const CaseManager = contractByName(state, 'CaseManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
   const DoctorManager = contractByName(state, 'DoctorManager')
+  const FromBlockNumber = contractByName(state, 'FromBlockNumber')
+  const fromBlock = cacheCallValueBigNumber(state, FromBlockNumber, 'blockNumber')
 
   const isSignedIn = get(state, 'account.signedIn')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
@@ -66,6 +69,8 @@ function mapStateToProps (state) {
   return {
     address,
     isDoctor,
+    FromBlockNumber,
+    fromBlock,
     DoctorManager,
     isSignedIn,
     doctorCasesCount,
@@ -85,8 +90,9 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ address, CaseManager, CaseStatusManager, DoctorManager, doctorCasesCount }) {
-  if (!address || !CaseManager || !DoctorManager || !CaseStatusManager) { return }
+function* saga({ address, CaseManager, CaseStatusManager, DoctorManager, doctorCasesCount, FromBlockNumber }) {
+  if (!address || !CaseManager || !DoctorManager || !CaseStatusManager || !FromBlockNumber) { return }
+  yield cacheCall(FromBlockNumber, 'blockNumber')
   const isDoctor = yield cacheCall(DoctorManager, 'isDoctor', address)
   if (isDoctor) {
     yield cacheCall(CaseManager, 'doctorCasesCount', address)
@@ -191,7 +197,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     return (
       <React.Fragment>
-        <LogListener address={this.props.CaseManager} fromBlock={0} />
+        <LogListener address={this.props.CaseManager} fromBlock={this.props.fromBlock} />
         <HippoNavbarContainer openCasesLength={this.props.openCaseCount} />
         {ownerWarning}
         {publicKeyCheck}
