@@ -52,15 +52,23 @@ export const EtherFlip = connect(mapStateToProps)(
       render () {
         const wei = this.props.wei || 0
 
+        const usd = <React.Fragment>${displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</React.Fragment>
+        const ether = <Ether wei={wei} />
+
+        let firstValue = ether
+        let secondValue = usd
+
         if (this.state.showUsd) {
-          var value = (
-            <span>${displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</span>
-          )
-        } else {
-          value = <Ether wei={wei} />
+          firstValue = usd
+          secondValue = ether
         }
 
-        return <span className='ether-flip flip-link' onClick={this.onFlip}>{value}</span>
+        return (
+          <span className='ether-flip flip-link' onClick={this.onFlip}>
+            <span className='ether-flip--first-value'>{firstValue}</span>
+            <span className='ether-flip--second-value'>{secondValue}</span>
+          </span>
+        )
       }
     }
   )

@@ -13,6 +13,8 @@ function mapStateToProps(state, ownProps) {
 
 export const NetworkCheckModal = connect(mapStateToProps)(function({ networkId }) {
   const requiredNetworkId = process.env.REACT_APP_REQUIRED_NETWORK_ID
+  console.log(networkId)
+  console.log(requiredNetworkId)
   if (requiredNetworkId &&
       networkId &&
       networkId !== parseInt(requiredNetworkId, 10)) {

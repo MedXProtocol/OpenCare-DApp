@@ -12,10 +12,14 @@
   padding: 10px 8px 3px;
 }
 
+.table > tr > th,
 .table > thead > tr > th,
 .table > tbody > tr > th,
 .table > tfoot > tr > th {
-  color: #aaa;
+  font-weight: 700;
+}
+
+.table > tr > th .hint {
   font-weight: 400;
 }
 
@@ -44,4 +48,63 @@
 
 .deactivated .address__full {
   text-decoration: line-through;
+}
+
+.table--invoice .flip-link span {
+  color: lighten($brand-dark-blue, 50%);
+  // border-color: $medcredits-text-gold;
+}
+
+.table--invoice .flip-link .ether-flip--second-value {
+  color: lighten($brand-dark-blue, 70%);
+}
+
+.table--invoice .flip-link:hover span {
+  color: lighten($brand-dark-blue, 60%);
+  // border-color: lighten($medcredits-text-gold, 10%);
+}
+
+.table--invoice .ether-flip--first-value {
+  border-color: transparent;
+  display: inline-block;
+  text-align: right;
+  min-width: 110px;
+}
+
+.table--invoice .ether-flip--second-value {
+  display: inline-block;
+  text-align: right;
+  min-width: 110px;
+}
+
+.table--invoice td {
+  text-align: right;
+}
+
+.table--invoice th,
+.table--invoice td {
+  @media screen and (max-width: 767px) {
+    display: block;
+    margin: 10px 0;
+    text-align: left;
+  }
+}
+
+.table--invoice th {
+  @media screen and (max-width: 767px) {
+    margin-top: 10px;
+  }
+}
+
+.table--invoice td {
+  @media screen and (max-width: 767px) {
+    margin-bottom: 10px;
+  }
+}
+
+.table--invoice .ether-flip--first-value,
+.table--invoice .ether-flip--second-value {
+  @media screen and (max-width: 767px) {
+    text-align: left;
+  }
 }

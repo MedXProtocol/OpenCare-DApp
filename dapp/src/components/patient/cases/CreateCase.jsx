@@ -859,6 +859,41 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                     </div>
                   </div>
                 </div>
+
+                <div className="card-footer card-footer--invoice">
+                  <table className="table table--invoice">
+                    <tr>
+                      <th>
+                        Fee:
+                      </th>
+                      <td>
+                        <EtherFlip wei={computeTotalFee(this.props.caseFeeWei) - computeChallengeFee(this.props.caseFeeWei)} />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>
+                        Deposit for Second Opinion:
+                        <br />
+                        <span className="text-gray hint">
+                          If you do not require a second opinion <br />this deposit will be refunded.
+                        </span>
+                      </th>
+                      <td>
+                        <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>
+                        Total:
+                      </th>
+                      <td>
+                        <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} />
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+
                 <div className="card-footer text-right">
                   <button
                     type="submit"
@@ -909,32 +944,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
               type="button"
               className="btn btn-primary"
             >Close</button>
-          </Modal.Footer>
-        </Modal>
-
-        <Modal show={this.state.showConfirmSubmissionModal}>
-          <Modal.Body>
-            <div className="row">
-              <div className="col-xs-12 text-center">
-                <h4>
-                  Are you sure?
-                </h4>
-                <h5>
-                  This will cost you between <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} /> - <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} />.
-                  <br /><span className="text-gray">(depending on if you require a second opinion or not)</span>
-                </h5>
-              </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button onClick={this.handleCancelConfirmSubmissionModal} type="button" className="btn btn-link">No</button>
-            <button
-              disabled={this.state.isSubmitting}
-              onClick={this.handleAcceptConfirmSubmissionModal}
-              type="button"
-              className="btn btn-primary">
-              Yes
-            </button>
           </Modal.Footer>
         </Modal>
 

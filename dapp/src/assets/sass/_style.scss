@@ -75,18 +75,29 @@ a {
 }
 
 /* find way to tap into defined vars in component scss files */
-.flip-link,
+.flip-link {
+  cursor: pointer;
+}
+
 .flip-link span {
   border-bottom: 3px solid #c9eeff;
   color: #6bf;
   cursor: pointer;
-  line-height: 30px;
+  font-weight: bold;
+  line-height: 24px;
+  text-decoration: none;
   transition: color 50ms ease-in;
 }
 
-.flip-link:hover,
 .flip-link span:hover {
   border-bottom: 3px solid #d9f4ff;
+}
+
+.flip-link .ether-flip--second-value,
+.flip-link .ether-flip--second-value:hover {
+  border-bottom: none;
+  font-weight: normal;
+  margin-left: 10px;
 }
 
 .alert .flip-link,
