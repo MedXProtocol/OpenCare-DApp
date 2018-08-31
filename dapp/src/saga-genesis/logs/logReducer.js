@@ -4,23 +4,21 @@ export default function (state, { type, address, logs, log }) {
   }
 
   switch (type) {
-    case 'ADD_LOG_LISTENER':
+    case 'LOG_LISTENER_ADDED':
       if (!state[address]) {
         state = {
           ...state,
           [address]: {
-            logsFetched: false
+            count: 1
           }
         }
-      }
-      break
-
-    case 'FETCH_PAST_LOGS':
-      state = {
-        ...state,
-        [address]: {
-          ...state[address],
-          logsFetched: true
+      } else {
+        state = {
+          ...state,
+          [address]: {
+            ...state[address],
+            count: (state[address].count + 1)
+          }
         }
       }
       break
@@ -42,8 +40,9 @@ export default function (state, { type, address, logs, log }) {
       break
 
     case 'REMOVE_LOG_LISTENER':
-      if (state[address]) {
-        state = {...state}
+      state = {...state}
+      state[address].count -= 1
+      if (state[address].count === 0) {
         delete state[address]
       }
       break

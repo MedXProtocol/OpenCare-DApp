@@ -35,6 +35,7 @@ import {
   cacheCallValue,
   cacheCallValueInt,
   contractByName,
+  LogListener,
   withSaga,
   withContractRegistry
 } from '~/saga-genesis'
@@ -178,6 +179,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     return (
       <React.Fragment>
+        <LogListener address={this.props.CaseManager} fromBlock={0} />
         <HippoNavbarContainer openCasesLength={this.props.openCaseCount} />
         {ownerWarning}
         {publicKeyCheck}
