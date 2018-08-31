@@ -73,7 +73,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
         transactions = this.props.pendingOrErrorTransactions.reverse().map(tx => {
           const key   = tx[0]
           const { call, error, confirmed, gasUsed, address } = tx[1]
-          let name
+          let name = call.method
           let mintMedxCount = 500 // these numbers could be pulled from the tx's call args
 
           if (error) {
