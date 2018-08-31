@@ -12,15 +12,10 @@
   padding: 10px 8px 3px;
 }
 
-.table > tr > th,
 .table > thead > tr > th,
 .table > tbody > tr > th,
 .table > tfoot > tr > th {
   font-weight: 700;
-}
-
-.table > tr > th .hint {
-  font-weight: 400;
 }
 
 .table td.text {
@@ -52,7 +47,6 @@
 
 .table--invoice .flip-link span {
   color: lighten($brand-dark-blue, 50%);
-  // border-color: $medcredits-text-gold;
 }
 
 .table--invoice .flip-link .ether-flip--second-value {
@@ -61,7 +55,6 @@
 
 .table--invoice .flip-link:hover span {
   color: lighten($brand-dark-blue, 60%);
-  // border-color: lighten($medcredits-text-gold, 10%);
 }
 
 .table--invoice .ether-flip--first-value {
@@ -90,15 +83,15 @@
   }
 }
 
-.table--invoice th {
+.table--invoice > tbody > tr > th {
   @media screen and (max-width: 767px) {
-    margin-top: 10px;
+    padding-bottom: 0;
   }
 }
 
-.table--invoice td {
+.table--invoice > tbody > tr > td {
   @media screen and (max-width: 767px) {
-    margin-bottom: 10px;
+    padding-top: 0;
   }
 }
 

@@ -19,6 +19,7 @@ import { jicImageCompressor } from '~/services/jicImageCompressor'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
 import { computeTotalFee } from '~/utils/computeTotalFee'
 import { EtherFlip } from '~/components/EtherFlip'
+import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 import {
   contractByName,
   withContractRegistry,
@@ -147,7 +148,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       worseWithPeriod: null,
       caseEncryptionKey: genKey(32),
       showBalanceTooLowModal: false,
-      showConfirmSubmissionModal: false,
       showPublicKeyModal: false,
       showTermsModal: false,
       isSubmitting: false,
@@ -179,7 +179,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           this.setState({
             createCaseEvents: null,
             transactionId: '',
-            showConfirmSubmissionModal: true,
             isSubmitting: false
           })
         })
@@ -512,7 +511,9 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           this.props.showBetaFaucetModal()
         }
       } else {
-        this.setState({ showConfirmSubmissionModal: true })
+        this.setState({
+          isSubmitting: true
+        }, this.doCreateCase)
       }
     }
   }
@@ -527,20 +528,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       event.preventDefault()
     }
     this.setState({ showDisclaimerModal: false });
-  }
-
-  handleCancelConfirmSubmissionModal = (event) => {
-    event.preventDefault()
-    this.setState({ showConfirmSubmissionModal: false })
-  }
-
-  handleAcceptConfirmSubmissionModal = (event) => {
-    event.preventDefault()
-
-    this.setState({
-      showConfirmSubmissionModal: false,
-      isSubmitting: true
-    }, this.doCreateCase)
   }
 
   doCreateCase = async () => {
@@ -564,7 +551,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         if (++retries === maxRetries) {
           toastr.error('There was an issue creating your case, please try again.')
           this.setState({
-            showConfirmSubmissionModal: true,
             isSubmitting: false
           })
           console.error(error)
@@ -862,34 +848,37 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
                 <div className="card-footer card-footer--invoice">
                   <table className="table table--invoice">
-                    <tr>
-                      <th>
-                        Fee:
-                      </th>
-                      <td>
-                        <EtherFlip wei={computeTotalFee(this.props.caseFeeWei) - computeChallengeFee(this.props.caseFeeWei)} />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>
-                        Deposit for Second Opinion:
-                        <br />
-                        <span className="text-gray hint">
-                          If you do not require a second opinion <br />this deposit will be refunded.
-                        </span>
-                      </th>
-                      <td>
-                        <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>
-                        Total:
-                      </th>
-                      <td>
-                        <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} />
-                      </td>
-                    </tr>
+                    <tbody>
+                      <tr>
+                        <th>
+                          Fee:
+                        </th>
+                        <td>
+                          <EtherFlip wei={computeTotalFee(this.props.caseFeeWei) - computeChallengeFee(this.props.caseFeeWei)} />
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>
+                          Deposit for Second Opinion:
+                          &nbsp;<InfoQuestionMark
+                            key="deposit"
+                            place="bottom"
+                            tooltipText="If you do not require a second opinion <br />this deposit will be refunded."
+                          />
+                        </th>
+                        <td>
+                          <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>
+                          Total:
+                        </th>
+                        <td>
+                          <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} />
+                        </td>
+                      </tr>
+                    </tbody>
                   </table>
                 </div>
 
