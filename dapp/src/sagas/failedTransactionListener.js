@@ -6,11 +6,14 @@ function logError({ transactionId, error }) {
   const errorCode = transactionErrorToCode(error)
 
   if (errorCode !== 'userRevert') {
-    bugsnagClient.notify({
-      transactionId,
-      errorCode,
-      error
-    })
+    bugsnagClient.notify(
+      {
+        name: `TransactionError`,
+        message: `${errorCode}: ${error}`,
+        transactionId,
+        error
+      }
+    )
   }
 }
 
