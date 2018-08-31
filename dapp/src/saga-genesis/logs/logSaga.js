@@ -7,6 +7,7 @@ import {
 } from 'redux-saga/effects'
 
 function* addSubscription({ address, fromBlock }) {
+  address = address.toLowerCase()
   yield put({ type: 'LOG_LISTENER_ADDED', address })
   const listener = yield select(state => state.sagaGenesis.logs[address])
   if (listener.count === 1) {
@@ -19,9 +20,10 @@ function* addSubscription({ address, fromBlock }) {
 
 function* checkReceiptForEvents({ receipt }) {
   yield receipt.logs.map(function* (log) {
-    const logs = yield select(state => state.sagaGenesis.logs[log.address])
+    const address = log.address.toLowerCase()
+    const logs = yield select(state => state.sagaGenesis.logs[address])
     if (logs) {
-      yield put({ type: 'NEW_LOGS', address: log.address, log })
+      yield put({ type: 'NEW_LOG', address, log })
     }
   })
 }
