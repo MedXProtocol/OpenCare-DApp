@@ -12,7 +12,7 @@ import {
   contractByName
 } from '~/saga-genesis'
 import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
-import { isCaseRequiringDoctorsAttention } from '~/utils/isCaseRequiringDoctorsAttention'
+import { doesNotRequireAttention } from '~/utils/doesNotRequireAttention'
 
 function mapStateToProps (state) {
   let casesRequiringAttentionCount = 0
@@ -23,14 +23,17 @@ function mapStateToProps (state) {
   const openAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
 
   openAddresses.forEach(caseAddress => {
+    // increment the open cases indicator even if we don't have the caseAddress yet
+    casesRequiringAttentionCount++
+
     const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
     const status = cacheCallValueInt(state, caseAddress, 'status')
     const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
-    const isFirstDoc = diagnosingDoctor === address
 
-    if (isCaseRequiringDoctorsAttention(isFirstDoc, updatedAt, status, secondsInADay)) {
-      casesRequiringAttentionCount++
+    // This case is actually on hold, waiting for action from another user so decrement the counter
+    if (doesNotRequireAttention(address, diagnosingDoctor, updatedAt, status, secondsInADay)) {
+      casesRequiringAttentionCount--
     }
   })
 
