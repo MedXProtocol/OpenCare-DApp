@@ -60,6 +60,7 @@ export default function (state, { type, transactionId, call, error, receipt, gas
           inFlight: false,
           complete: true,
           error,
+          call,
           gasUsed
         }
       }

@@ -74,18 +74,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
           const key   = tx[0]
           const { call, error, confirmed, gasUsed, address } = tx[1]
           let name
-
-          // This is a patch to prevent the page from crashing, we need to figure out
-          // what is actually wrong with call being undefined sometimes:
-          // (same applies to Line 93's if (call !== undefined) {})
-          if (call === undefined) {
-            name = '???'
-          } else {
-            name = call.method
-          }
-
           let mintMedxCount = 500 // these numbers could be pulled from the tx's call args
-
 
           if (error) {
             const options = {}
@@ -99,7 +88,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
               </p>
             )
 
-            if (call !== undefined && call.args) {
+            if (call.args) {
               var resendButton = (
                 <React.Fragment>
                   {errorMessage ? null : <br />}
