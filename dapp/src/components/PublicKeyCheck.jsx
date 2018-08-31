@@ -102,7 +102,7 @@ export const PublicKeyCheck = connect(mapStateToProps)(
               <br className="visible-xs hidden-sm hidden-md hidden-lg" />
               &nbsp;with the Ethereum network.
               &nbsp;<InfoQuestionMark
-                      key="public-key-check-info"
+                      name="public-key-check-info"
                       place="bottom"
                       tooltipText="This will allow you to share info with Doctors using your public key.<br />It needs to be set prior to submitting or diagnosing cases."
                     />

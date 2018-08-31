@@ -18,11 +18,11 @@ export const InfoQuestionMark = class _InfoQuestionMark extends Component {
       <span
         className='info-question-mark'
         data-tip={this.props.tooltipText}
-        data-for={`info-question-mark-${this.props.key}`}
+        data-for={`info-question-mark-${this.props.name}`}
       >
         {char}
         <ReactTooltip
-          id={`info-question-mark-${this.props.key}`}
+          id={`info-question-mark-${this.props.name}`}
           html={true}
           effect='solid'
           place={this.props.place || 'bottom'}
@@ -34,5 +34,6 @@ export const InfoQuestionMark = class _InfoQuestionMark extends Component {
 }
 
 InfoQuestionMark.propTypes = {
+  name: PropTypes.string.isRequired,
   tooltipText: PropTypes.string
 }

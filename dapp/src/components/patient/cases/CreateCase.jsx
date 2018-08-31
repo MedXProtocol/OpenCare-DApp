@@ -861,7 +861,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                         <th>
                           Deposit for Second Opinion:
                           &nbsp;<InfoQuestionMark
-                            key="deposit"
+                            name="deposit-info"
                             place="bottom"
                             tooltipText="If you do not require a second opinion <br />this deposit will be refunded."
                           />
