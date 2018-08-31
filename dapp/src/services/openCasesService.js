@@ -8,9 +8,8 @@ export const mapOpenCaseAddresses = function(state, CaseStatusManager, address) 
   let currentNodeId = cacheCallValue(state, CaseStatusManager, 'firstOpenCaseId', address)
   while (currentNodeId && currentNodeId !== '0') {
     const openCaseAddress = cacheCallValue(state, CaseStatusManager, 'openCaseAddress', address, currentNodeId)
-    if (openCaseAddress && !isBlank(openCaseAddress)) {
-      openAddresses.push(openCaseAddress)
-    }
+    openAddresses.push(openCaseAddress)
+
     currentNodeId = cacheCallValue(state, CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
   }
 
@@ -23,9 +22,7 @@ export const openCaseAddressesSaga = function* (CaseStatusManager, address) {
   let currentNodeId = yield cacheCall(CaseStatusManager, 'firstOpenCaseId', address)
   while (currentNodeId && currentNodeId !== '0') {
     const caseAddress = yield cacheCall(CaseStatusManager, 'openCaseAddress', address, currentNodeId)
-    if (caseAddress) {
-      yield openAddresses.push(caseAddress)
-    }
+    yield openAddresses.push(caseAddress)
 
     currentNodeId = yield cacheCall(CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
   }
