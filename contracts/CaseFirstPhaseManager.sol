@@ -54,6 +54,8 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
     _case.setStatus(Case.CaseStatus.Evaluating);
     _case.setDoctorEncryptedCaseKeys(_doctor, _doctorEncryptedKey);
 
+    registry.caseManager().addDoctorToDoctorCases(_doctor, _case);
+
     registry.caseStatusManager().addOpenCase(_doctor, _case);
 
     emit DiagnosingDoctorSet(_case, _case.patient(), _doctor, _doctorEncryptedKey);

@@ -163,7 +163,6 @@ contract CaseManager is Ownable, Pausable, Initializable {
     uint256 caseIndex = caseList.push(address(newCase)) - 1;
     caseIndices[address(newCase)] = caseIndex;
     patientCases[_patient].push(address(newCase));
-    doctorCases[_doctor].push(address(newCase));
 
     registry.caseLifecycleManager().setDiagnosingDoctor(newCase, _doctor, _doctorEncryptedKey);
     registry.caseScheduleManager().initializeCase(newCase);
@@ -192,7 +191,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
     return usdPerEth.div(1000000000000000000);
   }
 
-  function addChallengeDoctor(address _doctor, address _caseAddress) external onlyCasePhaseManagers {
+  function addDoctorToDoctorCases(address _doctor, address _caseAddress) public onlyCasePhaseManagers() {
     doctorCases[_doctor].push(_caseAddress);
   }
 

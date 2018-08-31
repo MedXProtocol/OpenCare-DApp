@@ -60,6 +60,9 @@ contract('CaseLifecycleManager', function (accounts) {
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
       assert.equal(await caseInstance.diagnosingDoctor.call(), doctor)
 
+      assert.equal(await env.caseManager.doctorCasesCount(doctor), 1)
+      assert.equal(await env.caseManager.doctorCaseAtIndex(doctor, 0), caseInstance.address)
+
       increaseTime(SECONDS_IN_A_DAY * 3)
 
       env.caseLifecycleManager.patientRequestNewInitialDoctor(
@@ -69,6 +72,9 @@ contract('CaseLifecycleManager', function (accounts) {
       )
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
       assert.equal(await caseInstance.diagnosingDoctor.call(), doctor2)
+
+      assert.equal(await env.caseManager.doctorCasesCount(doctor2), 1)
+      assert.equal(await env.caseManager.doctorCaseAtIndex(doctor2, 0), caseInstance.address)
     })
   })
 
@@ -170,6 +176,9 @@ contract('CaseLifecycleManager', function (accounts) {
           assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor2), 0)
           assert.equal(await caseInstance.status.call(), caseStatus('Challenging'))
           assert.equal(await caseInstance.challengingDoctor.call(), doctor2)
+
+          assert.equal(await env.caseManager.doctorCasesCount(doctor2), 1)
+          assert.equal(await env.caseManager.doctorCaseAtIndex(doctor2, 0), caseInstance.address)
         })
 
         it('should not be called twice', async () => {
@@ -197,6 +206,9 @@ contract('CaseLifecycleManager', function (accounts) {
 
             assert.equal(await caseInstance.status.call(), caseStatus('Challenging'))
             assert.equal(await caseInstance.challengingDoctor.call(), doctor3)
+
+            assert.equal(await env.caseManager.doctorCasesCount(doctor3), 1)
+            assert.equal(await env.caseManager.doctorCaseAtIndex(doctor3, 0), caseInstance.address)
           })
         })
 
