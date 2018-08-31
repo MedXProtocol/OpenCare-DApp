@@ -41,9 +41,11 @@ export default function (state, { type, address, logs, log }) {
 
     case 'REMOVE_LOG_LISTENER':
       state = {...state}
-      state[address].count -= 1
-      if (state[address].count === 0) {
-        delete state[address]
+      if (state[address]) {
+        state[address].count -= 1
+        if (state[address].count === 0) {
+          delete state[address]
+        }
       }
       break
 
