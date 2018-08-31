@@ -4,7 +4,6 @@ import ReduxToastr from 'react-redux-toastr'
 import ReactTimeout from 'react-timeout'
 import { hot } from 'react-hot-loader'
 import { formatRoute } from 'react-router-named-routes'
-import getWeb3 from '~/get-web3'
 import { SignUpContainer } from './sign-up'
 import { SignInContainer } from './sign-in'
 import { PatientDashboard } from './patient/dashboard'
@@ -45,14 +44,23 @@ import { toastr } from '~/toastr'
 import get from 'lodash.get'
 
 function mapStateToProps (state) {
+  let nextCaseAddress, doctorCasesCount, openCaseCount
+
+  const address = get(state, 'sagaGenesis.accounts[0]')
+
   const CaseManager = contractByName(state, 'CaseManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
-  const address = get(state, 'sagaGenesis.accounts[0]')
-  const doctorCasesCount = cacheCallValueInt(state, CaseManager, 'doctorCasesCount', address)
-  const openCaseCount = cacheCallValue(state, CaseStatusManager, 'openCaseCount', address)
-  const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
+
+  const isSignedIn = get(state, 'account.signedIn')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+
+  if (isDoctor) {
+    doctorCasesCount = cacheCallValueInt(state, CaseManager, 'doctorCasesCount', address)
+    openCaseCount = cacheCallValue(state, CaseStatusManager, 'openCaseCount', address)
+    nextCaseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, (doctorCasesCount - 1))
+  }
+
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
 
   return {
@@ -64,6 +72,7 @@ function mapStateToProps (state) {
     openCaseCount,
     CaseManager,
     CaseStatusManager,
+    nextCaseAddress,
     isOwner
   }
 }
@@ -76,12 +85,16 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ address, CaseManager, CaseStatusManager, DoctorManager }) {
+function* saga({ address, CaseManager, CaseStatusManager, DoctorManager, doctorCasesCount }) {
   if (!address || !CaseManager || !DoctorManager || !CaseStatusManager) { return }
   const isDoctor = yield cacheCall(DoctorManager, 'isDoctor', address)
   if (isDoctor) {
     yield cacheCall(CaseManager, 'doctorCasesCount', address)
     yield cacheCall(CaseStatusManager, 'openCaseCount', address)
+
+    if (doctorCasesCount) {
+      yield cacheCall(CaseManager, 'doctorCaseAtIndex', address, (doctorCasesCount - 1))
+    }
   }
 }
 
@@ -107,28 +120,27 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   componentWillReceiveProps (nextProps) {
     this.onAccountChangeSignOut(nextProps)
 
+    // We know new case data is incoming so mark it that we are ready to show it
     if (
-      nextProps.isSignedIn
-      && nextProps.isDoctor
-      && (nextProps.openCaseCount > this.props.openCaseCount)
+      !this.newCaseAssigned
+      && this.props.nextCaseAddress
+      && nextProps.nextCaseAddress === undefined
     ) {
+      this.newCaseAssigned = true
+    }
+
+    // We have a new case assigned and the new case address from the blockchain
+    if (nextProps.isSignedIn && nextProps.isDoctor && this.newCaseAssigned && nextProps.nextCaseAddress) {
       this.showNewCaseAssignedToast(nextProps)
     }
   }
 
   showNewCaseAssignedToast = (nextProps) => {
-    const { contractRegistry, CaseManager, address } = this.props
+    const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress: nextProps.nextCaseAddress })
 
-    const CaseManagerInstance = contractRegistry.get(CaseManager, 'CaseManager', getWeb3())
-    CaseManagerInstance.methods
-      .doctorCaseAtIndex(address, nextProps.doctorCasesCount - 1)
-      .call().then(caseAddress => {
-        const caseRoute = formatRoute(routes.DOCTORS_CASES_DIAGNOSE_CASE, { caseAddress })
+    toastr.success('You have been assigned a new case.', { path: caseRoute, text: 'View Case' })
 
-        toastr.success('You have been assigned a new case.', { path: caseRoute, text: 'View Case' })
-      }).catch(err => {
-        console.log(err.message);
-      });
+    this.newCaseAssigned = false
   }
 
   onAccountChangeSignOut (nextProps) {

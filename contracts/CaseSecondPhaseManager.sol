@@ -60,8 +60,6 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
     _case.setStatus(Case.CaseStatus.Challenging);
     setChallengingDoctor(_case, _doctor, _doctorEncryptedKey);
 
-    registry.caseManager().addChallengeDoctor(_doctor, _caseAddress);
-
     registry.caseScheduleManager().touchUpdatedAt(_caseAddress);
 
     emit CaseChallenged(_caseAddress, _case.patient(), _doctor);
@@ -70,6 +68,8 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
   function setChallengingDoctor(Case _case, address _doctor, bytes _doctorEncryptedKey) internal {
     _case.setChallengingDoctor(_doctor);
     _case.setDoctorEncryptedCaseKeys(_doctor, _doctorEncryptedKey);
+
+    registry.caseManager().addDoctorToDoctorCases(_doctor, _case);
 
     registry.caseStatusManager().addOpenCase(_doctor, _case);
 
