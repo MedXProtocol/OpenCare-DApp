@@ -14,8 +14,7 @@ import {
   cacheCallValue,
   cacheCallValueInt,
   withSend,
-  addLogListener,
-  removeLogListener,
+  LogListener,
   addContract,
   TransactionStateHandler
 } from '~/saga-genesis'
@@ -37,7 +36,10 @@ import { mixpanel } from '~/mixpanel'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
 import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
-import { caseFinders } from '~/finders/caseFinders'
+import {
+  caseFinders,
+  caseManagerFinders
+} from '~/finders'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
@@ -55,6 +57,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const transactions = state.sagaGenesis.transactions
   const isPatient = address === patientAddress
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
+  const fromBlock = caseManagerFinders.caseFromBlock(state, caseAddress)
 
   const excludeAddresses = []
   if (address) {
@@ -72,6 +75,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   return {
     CaseLifecycleManager,
     address,
+    fromBlock,
     currentlyExcludedDoctors,
     challengingDoctor,
     excludeAddresses,
@@ -105,12 +109,6 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatchExcludedDoctors: (excludedAddresses) => {
       dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
-    },
-    dispatchAddLogListener: (address) => {
-      dispatch(addLogListener(address))
-    },
-    dispatchRemoveLogListener: (address) => {
-      dispatch(removeLogListener(address))
     }
   }
 }
@@ -135,7 +133,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
   componentDidMount () {
     this.getInitialDiagnosis(this.props)
-    this.props.dispatchAddLogListener(this.props.caseAddress)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -153,7 +150,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
     if (this.state.cancelableDownloadPromise) {
       this.state.cancelableDownloadPromise.cancel()
     }
-    this.props.dispatchRemoveLogListener(this.props.caseAddress)
   }
 
   async getInitialDiagnosis (props) {
@@ -331,7 +327,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         </div>
     }
 
-    return (
+    const result = (
       isEmptyObject(this.state.diagnosis)
         ? <div />
         : (
@@ -415,6 +411,8 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         </div>
       )
     )
+
+    return <LogListener address={this.props.caseAddress} fromBlock={this.props.fromBlock}>{result}</LogListener>
   }
 })))
 

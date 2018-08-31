@@ -6,7 +6,7 @@ import { withRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { currentAccount } from '~/services/sign-in'
-import { all, put } from 'redux-saga/effects'
+import { all } from 'redux-saga/effects'
 import {
   addContract,
   contractByName,
@@ -14,8 +14,7 @@ import {
   cacheCallValue,
   cacheCallValueInt,
   withSaga,
-  addLogListener,
-  removeLogListener,
+  LogListener,
   withSend,
   TransactionStateHandler
 } from '~/saga-genesis'
@@ -32,7 +31,10 @@ import { isBlank } from '~/utils/isBlank'
 import { isTrue } from '~/utils/isTrue'
 import { caseStatus } from '~/utils/caseStatus'
 import get from 'lodash.get'
-import { caseFinders } from '~/finders/caseFinders'
+import {
+  caseFinders,
+  caseManagerFinders
+} from '~/finders'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress }) {
@@ -51,6 +53,7 @@ function mapStateToProps(state, { caseAddress }) {
   const encryptedCaseKey = caseFinders.encryptedCaseKey(state, caseAddress)
   const caseKeySalt = caseFinders.caseKeySalt(state, caseAddress)
   const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
+  const fromBlock = caseManagerFinders.caseFromBlock(state, caseAddress)
 
   const transactions = state.sagaGenesis.transactions
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
@@ -68,6 +71,7 @@ function mapStateToProps(state, { caseAddress }) {
 
   return {
     address,
+    fromBlock,
     secondsInADay,
     caseFeeWei,
     CaseLifecycleManager,
@@ -84,10 +88,9 @@ function mapStateToProps(state, { caseAddress }) {
   }
 }
 
-function* saga({ CaseScheduleManager, caseAddress }) {
+function* saga({ CaseScheduleManager, caseAddress, fromBlock }) {
   if (!caseAddress || !CaseScheduleManager) { return }
   yield addContract({ address: caseAddress, contractKey: 'Case' })
-  yield put(addLogListener(caseAddress))
   yield all([
     cacheCall(caseAddress, 'status'),
     cacheCall(CaseScheduleManager, 'secondsInADay'),
@@ -102,9 +105,6 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatchExcludedDoctors: (excludedAddresses) => {
       dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
-    },
-    dispatchRemoveLogListener: (address) => {
-      dispatch(removeLogListener(address))
     }
   }
 }
@@ -139,10 +139,6 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       if (nextProps.excludeAddresses.length !== this.props.excludeAddresses.length) {
         this.props.dispatchExcludedDoctors(nextProps.excludeAddresses)
       }
-    }
-
-    componentWillUnmount () {
-      this.props.dispatchRemoveLogListener(this.props.caseAddress)
     }
 
     onChangeDoctor = (option) => {
@@ -325,10 +321,9 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
           </div>
         )
       }
-      if (isCaseNotStale) {
-        return null
-      } else {
-        return (
+      let result = null
+      if (!isCaseNotStale) {
+        result = (
           <React.Fragment>
             <div className='container'>
               <div className='row'>
@@ -408,6 +403,8 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
           </React.Fragment>
         )
       }
+
+      return <LogListener address={this.props.caseAddress} fromBlock={this.props.fromBlock}>{result}</LogListener>
     }
   }
 )))

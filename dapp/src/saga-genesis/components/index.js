@@ -1,11 +1,5 @@
-import { ContractRegistryProvider } from './contract-registry-provider'
-import { withContractRegistry } from './with-contract-registry'
-import { withSaga } from './with-saga'
-import { withSend } from './with-send'
-
-export {
-  ContractRegistryProvider,
-  withContractRegistry,
-  withSaga,
-  withSend
-}
+export { ContractRegistryProvider } from './contract-registry-provider'
+export { withContractRegistry } from './with-contract-registry'
+export { withSaga } from './with-saga'
+export { withSend } from './with-send'
+export { LogListener } from './LogListener'

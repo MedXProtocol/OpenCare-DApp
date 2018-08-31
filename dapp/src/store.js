@@ -8,12 +8,14 @@ import { preloadedState } from '~/services/preloadedStateService'
 
 export const contractRegistry = new ContractRegistry(contractRegistryOptions)
 export const callCountRegistry = new CallCountRegistry()
+export const logRegistry = new CallCountRegistry()
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const sagaMiddleware = createSagaMiddleware({
   context: {
     contractRegistry,
-    callCountRegistry
+    callCountRegistry,
+    logRegistry
   }
 })
 
