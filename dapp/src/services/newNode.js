@@ -13,9 +13,9 @@ export async function newNode(_options) {
   const defaults = {
     modules: {
       transport: [
-        wrtcStar,
-        wsStar,
         new WebSockets()
+        // wrtcStar,
+        wsStar,
       ],
       streamMuxer: [
         Mplex
@@ -24,14 +24,14 @@ export async function newNode(_options) {
         SECIO
       ],
       peerDiscovery: [
-        wrtcStar.discovery,
+        // wrtcStar.discovery,
         wsStar.discovery
       ]
     },
     config: {
       peerDiscovery: {
         webRTCStar: {
-          enabled: true
+          enabled: false
         },
         websocketStar: {
           enabled: true
