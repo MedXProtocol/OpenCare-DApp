@@ -96,15 +96,16 @@ a {
 .flip-link .ether-flip--second-value,
 .flip-link .ether-flip--second-value:hover {
   border-bottom: none;
-  color: lighten(#6bf, 15%);
+  opacity: 0.8;
   font-weight: normal;
-  margin-left: 10px;
 }
 
+.button .flip-link,
+.button .flip-link span,
 .alert .flip-link,
 .alert .flip-link span {
-  border-color: #fff;
-  color: #fff;
+  border-color: inherit;
+  color: inherit;
 }
 
 h1,
