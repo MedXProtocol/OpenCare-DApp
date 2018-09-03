@@ -129,13 +129,15 @@ function* heartbeatMessage(lastHeartbeatTime, { message, dataJson, date }) {
 
 function* sendHeartbeat(node) {
   const address = yield select((state) => state.sagaGenesis.accounts[0])
-  node.pubsub.publish(
-    HEARTBEAT_SUBSCRIPTION_CHANNEL,
-    heartbeatBody(address),
-    (err) => {
-      if (err) { return console.error('Could not deliver message: ', err) }
-    }
-  )
+  if (address) {
+    node.pubsub.publish(
+      HEARTBEAT_SUBSCRIPTION_CHANNEL,
+      heartbeatBody(address),
+      (err) => {
+        if (err) { return console.error('Could not deliver message: ', err) }
+      }
+    )
+  }
 }
 
 function* startHeartbeat(node) {
