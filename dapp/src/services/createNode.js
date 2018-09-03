@@ -11,11 +11,11 @@ export async function createNode(callback) {
 
     const peerIdStr = peerInfo.id.toB58String()
 
-    // const webrtcMa = multiaddr(`${process.env.REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL}/${peerIdStr}`)
-    // peerInfo.multiaddrs.add(webrtcMa)
+    const webrtcMa = multiaddr(`${process.env.REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL}/${peerIdStr}`)
+    peerInfo.multiaddrs.add(webrtcMa)
 
-    const wsMa = multiaddr(`${process.env.REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL}/${peerIdStr}`)
-    peerInfo.multiaddrs.add(wsMa)
+    // const wsMa = multiaddr(`${process.env.REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL}/${peerIdStr}`)
+    // peerInfo.multiaddrs.add(wsMa)
 
     newNode({ peerInfo }).then((node) => {
       node.idStr = peerIdStr
