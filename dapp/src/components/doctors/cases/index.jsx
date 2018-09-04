@@ -13,7 +13,6 @@ import {
   withSaga,
   cacheCall
 } from '~/saga-genesis'
-import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
 import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'
 import get from 'lodash.get'
@@ -28,8 +27,6 @@ function mapStateToProps(state, { match }) {
 
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
-
-  const openCaseAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
 
   let closedCaseCount = cacheCallValueInt(state, CaseStatusManager, 'closedCaseCount', address)
   if (!closedCaseCount) {
@@ -64,7 +61,6 @@ function mapStateToProps(state, { match }) {
   const props = {
     address,
     CaseStatusManager,
-    openCaseAddresses,
     closedCaseAddresses,
     totalPages,
     currentPage,
@@ -78,8 +74,6 @@ function mapStateToProps(state, { match }) {
 function* saga({ address, CaseStatusManager, start, end }) {
   if (!address || !CaseStatusManager) { return }
   yield cacheCall(CaseStatusManager, 'closedCaseCount', address)
-
-  yield openCaseAddressesSaga(CaseStatusManager, address)
 
   yield range(start, end).map(function* (index) {
     yield cacheCall(CaseStatusManager, 'closedCaseAtIndex', address, index - 1)
@@ -109,7 +103,6 @@ export const OpenCasesContainer = connect(mapStateToProps)(
         let doctorCaseListing, diagnoseCase, doScrollToTop
         const {
           closedCaseAddresses,
-          openCaseAddresses,
           match,
           currentPage,
           totalPages
@@ -121,7 +114,6 @@ export const OpenCasesContainer = connect(mapStateToProps)(
           doctorCaseListing = (
             <DoctorCaseListing
               key="doctor-case-listing"
-              openCaseAddresses={openCaseAddresses}
               closedCaseAddresses={closedCaseAddresses}
               totalPages={totalPages}
               currentPage={currentPage}
@@ -158,6 +150,5 @@ export const OpenCasesContainer = connect(mapStateToProps)(
 )
 
 OpenCasesContainer.defaultProps = {
-  openCaseAddresses: [],
   closedCaseAddresses: []
 }
