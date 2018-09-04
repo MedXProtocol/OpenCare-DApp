@@ -30,12 +30,14 @@ export const EtherFlip = connect(mapStateToProps)(
   withSaga(etherFlipSaga)(
     class _EtherFlip extends Component {
       static propTypes = {
-        wei: PropTypes.any.isRequired
+        wei: PropTypes.any.isRequired,
+        noToggle: PropTypes.bool
       }
 
       static defaultProps = {
         wei: '0',
-        usdPerWei: '1'
+        usdPerWei: '1',
+        noToggle: false
       }
 
       constructor (props) {
@@ -63,9 +65,15 @@ export const EtherFlip = connect(mapStateToProps)(
           secondValue = ether
         }
 
+        if (!this.props.noToggle) {
+           var extraProps = {
+             onClick: this.onFlip
+           }
+        }
+
         return (
-          <span className='ether-flip flip-link' onClick={this.onFlip}>
-            <span className='ether-flip--first-value'>{firstValue}</span>
+          <span className='ether-flip flip-link' {...extraProps}>
+            <span className='ether-flip--first-value'>{firstValue}</span>&nbsp;
             <span className='ether-flip--second-value'>{secondValue}</span>
           </span>
         )

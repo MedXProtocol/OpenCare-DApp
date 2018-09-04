@@ -276,7 +276,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
 
     render () {
       const { diagnosingDoctor, account, updatedAt, status, secondsInADay } = this.props
-      const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
+      const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} noToggle />
       let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
       const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient', secondsInADay)
