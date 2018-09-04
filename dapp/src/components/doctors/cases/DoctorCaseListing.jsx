@@ -5,6 +5,7 @@ import { formatRoute } from 'react-router-named-routes'
 import { CaseRow } from '~/components/CaseRow'
 import * as routes from '~/config/routes'
 import { Pagination } from '~/components/Pagination'
+import { OpenCasesList } from './OpenCasesList'
 
 function renderCaseRows(caseAddresses, key) {
   const caseRows = caseAddresses.map((caseAddress, index) => {
@@ -22,9 +23,29 @@ function renderCaseRows(caseAddresses, key) {
 }
 
 export const DoctorCaseListing = class _DoctorCaseListing extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      openCasePage: 1
+    }
+  }
+
+  onNextOpenCasePage = () => {
+    this.setState({
+      openCasePage: this.state.openCasePage + 1
+    })
+  }
+
+  onPrevOpenCasePage = () => {
+    if (this.state.openCasePage > 1) {
+      this.setState({
+        openCasePage: this.state.openCasePage - 1
+      })
+    }
+  }
 
   render() {
-    const { openCaseAddresses, closedCaseAddresses, currentPage, totalPages } = this.props
+    const { closedCaseAddresses, currentPage, totalPages } = this.props
 
     return (
       <div className='container'>
@@ -53,21 +74,11 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
                 <h5 className="title subtitle">
                   Open Cases:
                 </h5>
-                {
-                  !openCaseAddresses.length ?
-                  <div className="blank-state">
-                    <div className="blank-state--inner text-center text-gray">
-                      <span>You do not have any cases assigned to you right now.</span>
-                    </div>
-                  </div> :
-                  <FlipMove
-                    enterAnimation="accordionVertical"
-                    leaveAnimation="accordionVertical"
-                    className="case-list"
-                  >
-                    {renderCaseRows(openCaseAddresses, 'open')}
-                  </FlipMove>
-                }
+                <OpenCasesList
+                  page={this.state.openCasePage}
+                  onNextPage={this.onNextOpenCasePage}
+                  onPrevPage={this.onPrevOpenCasePage}
+                  />
               </div>
             </div>
           </div>
