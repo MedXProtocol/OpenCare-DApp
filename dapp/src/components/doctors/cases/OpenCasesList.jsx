@@ -16,7 +16,7 @@ import {
 } from '~/saga-genesis'
 import { mapOpenCasePage, openCasePageSaga } from '~/services/openCasesService'
 
-const PAGE_SIZE = 2
+const PAGE_SIZE = 5
 
 function mapStateToProps(state, { page }) {
   const doctorAddress = get(state, 'sagaGenesis.accounts[0]')
@@ -82,12 +82,13 @@ export const OpenCasesList = connect(mapStateToProps)(
       }
 
       render () {
+        const totalPages = Math.ceil(this.props.openCaseCount / (1.0 * PAGE_SIZE))
 
         var nextPageLink
         if (this.hasNextPage()) {
           nextPageLink =
             <li className='pagination--page-number'>
-              <a onClick={this.props.onNextPage}>Next</a>
+              <a onClick={this.props.onNextPage}>{this.props.page + 1}</a>
             </li>
         }
 
@@ -95,7 +96,7 @@ export const OpenCasesList = connect(mapStateToProps)(
         if (this.props.page > 1) {
           prevPageLink =
             <li className='pagination--page-number'>
-              <a onClick={this.props.onPrevPage}>Prev</a>
+              <a onClick={this.props.onPrevPage}>{this.props.page - 1}</a>
             </li>
         }
 
@@ -130,6 +131,9 @@ export const OpenCasesList = connect(mapStateToProps)(
               <nav aria-label="Page navigation" className="text-center">
                 <ul className="pagination">
                   {prevPageLink}
+                  <li className='pagination--page-number active'>
+                    <a>{this.props.page}</a>
+                  </li>
                   {nextPageLink}
                 </ul>
               </nav>
