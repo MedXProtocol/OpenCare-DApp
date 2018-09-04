@@ -1,13 +1,12 @@
-module.exports = function(snapshotId) {
+module.exports = function() {
   const id = Date.now()
 
-  console.log('evmRevert: ', snapshotId)
 
   return new Promise((resolve, reject) => {
     web3.currentProvider.sendAsync({
       jsonrpc: '2.0',
       method: 'evm_revert',
-      params: [snapshotId],
+      params: [4],
       id: id,
     }, err1 => {
       if (err1) return reject(err1)
@@ -17,7 +16,7 @@ module.exports = function(snapshotId) {
         method: 'evm_mine',
         id: id+1,
       }, (err2, res) => {
-        console.log('evmRevert resolve: ', err2, res, snapshotId)
+        console.log('evmRevert resolve: ', err2, res)
         return err2 ? reject(err2) : resolve(res)
       })
     })

@@ -1,5 +1,6 @@
 const expectThrow = require('./helpers/expectThrow')
 const createEnvironment = require('./helpers/create-environment')
+const setupEnvironment = require('./helpers/setupEnvironment')
 const Case = artifacts.require('Case.sol')
 const CaseLifecycleManager = artifacts.require('CaseLifecycleManager.sol')
 const createCase = require('./helpers/create-case')
@@ -26,7 +27,7 @@ contract('CaseLifecycleManager', function (accounts) {
   let snapshotId
 
   beforeEach(async () => {
-    env = getEnv()
+    env = await setupEnvironment(artifacts)
 
     await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc', 'CA', 'AB')
     await env.doctorManager.addOrReactivateDoctor(doctor, 'Doogie', 'US', 'CO')
@@ -43,7 +44,7 @@ contract('CaseLifecycleManager', function (accounts) {
   // })
 
   describe('initialize()', () => {
-    xit('should not work twice', async () => {
+    it('should not work twice', async () => {
       await expectThrow(async () => {
         await env.caseLifecycleManager.initialize(env.registry.address)
       })
@@ -51,7 +52,7 @@ contract('CaseLifecycleManager', function (accounts) {
   })
 
   describe('patientWithdrawFunds()', () => {
-    xit('should close the case and refund the patient', async () => {
+    it('should close the case and refund the patient', async () => {
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
 
       await evmIncreaseTime(SECONDS_IN_A_DAY * 3)

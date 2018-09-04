@@ -32,10 +32,11 @@ module.exports = {
     }
   },
   mocha: {
-    reporter: 'eth-gas-reporter',
-    reporterOptions : {
-      currency: 'CAD',
-      gasPrice: 21
-    }
+    timeout: 20000
+    // reporter: 'eth-gas-reporter',
+    // reporterOptions : {
+    //   currency: 'CAD',
+    //   gasPrice: 21
+    // }
   }
 }
