@@ -22,24 +22,26 @@ function mapStateToProps(state, { page }) {
   const doctorAddress = get(state, 'sagaGenesis.accounts[0]')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
   const openCaseCount = cacheCallValue(state, 'CaseStatusManager', 'openCaseCount', doctorAddress)
+  const totalPages = Math.ceil(openCaseCount / (1.0 * PAGE_SIZE))
 
   var openCaseNodes = null
-  var currentPage = 1
+  var nextPage = 1
   var nextNodeId = null
-  while (currentPage <= page && !openCaseNodes) {
+  while (nextPage <= page && !openCaseNodes) {
     const pageNodes = mapOpenCasePage(state, CaseStatusManager, doctorAddress, PAGE_SIZE, nextNodeId)
-    if (currentPage === page) {
+    if (nextPage === page) {
       openCaseNodes = pageNodes
     }
     if (pageNodes.length) {
       nextNodeId = pageNodes[pageNodes.length - 1].nextId
     }
-    currentPage++
+    nextPage++
   }
 
   return {
     CaseStatusManager,
     openCaseCount,
+    totalPages,
     doctorAddress,
     openCaseNodes
   }
@@ -50,16 +52,17 @@ function* openCasesListSaga({ page, CaseStatusManager, doctorAddress }) {
 
   yield cacheCall(CaseStatusManager, 'openCaseCount', doctorAddress)
   var openCaseNodes = []
-  var currentPage = 1
+  var nextPage = 1
   var lastPage = false
   var nextNodeId = null
-  while (currentPage <= page && !lastPage) {
+  while (nextPage <= page && !lastPage) {
     const newNodes = yield openCasePageSaga(CaseStatusManager, doctorAddress, PAGE_SIZE, nextNodeId)
     openCaseNodes = openCaseNodes.concat(newNodes)
     lastPage = newNodes.length <= PAGE_SIZE
     if (newNodes.length) {
       nextNodeId = newNodes[newNodes.length - 1].nextId
     }
+    nextPage++
   }
 }
 
@@ -77,13 +80,10 @@ export const OpenCasesList = connect(mapStateToProps)(
       }
 
       hasNextPage () {
-        const totalPages = Math.ceil(this.props.openCaseCount / (1.0 * PAGE_SIZE))
-        return this.props.page < totalPages
+        return this.props.page < this.props.totalPages
       }
 
       render () {
-        const totalPages = Math.ceil(this.props.openCaseCount / (1.0 * PAGE_SIZE))
-
         var nextPageLink
         if (this.hasNextPage()) {
           nextPageLink =
