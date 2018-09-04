@@ -6,15 +6,15 @@ module.exports = function() {
       jsonrpc: '2.0',
       method: 'evm_snapshot',
       id: id,
-    }, err1 => {
+    }, (err1, snapshotRes) => {
       if (err1) return reject(err1)
-
       web3.currentProvider.sendAsync({
         jsonrpc: '2.0',
         method: 'evm_mine',
         id: id+1,
       }, (err2, res) => {
-        return err2 ? reject(err2) : resolve(res)
+        console.log('Done mining: ', snapshotRes.result)
+        return err2 ? reject(err2) : resolve(snapshotRes.result)
       })
     })
   })
