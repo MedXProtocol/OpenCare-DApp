@@ -26,11 +26,34 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
    */
   modifier onlyCaseLifecycleManager() {
     require(
-      msg.sender == address(registry.caseLifecycleManager()),
+      isCaseLifecycleManager(),
       'Must be an instance of Case lifecycle Manager contract'
     );
     _;
   }
+
+  /**
+   * @dev - throws unless is instance of either a phase manager
+            or the lifecycle manager
+   */
+  modifier onlyCaseLifecycleOrDiagnosingDoctorContracts() {
+    require(
+      isDiagnosingDoctorContract() || isCaseLifecycleManager(),
+      'must be Case Lifecycle or DiagnosingDoctor contracts'
+    );
+    _;
+  }
+
+  function isDiagnosingDoctorContract() internal view returns (bool) {
+    return msg.sender == address(registry.caseDiagnosingDoctor());
+  }
+
+  function isCaseLifecycleManager() internal view returns (bool) {
+    return msg.sender == address(registry.caseLifecycleManager());
+  }
+
+
+
 
   /**
    * @dev - Contract should not accept any ether
@@ -85,8 +108,13 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
   /**
    * @dev - The initial doctor can accept their evaluation after 48 hours and get tokens owing to them
    */
-  function acceptAsDoctor(Case _case) external onlyCaseLifecycleManager {
+  function acceptAsDoctor(Case _case) external onlyCaseLifecycleOrDiagnosingDoctorContracts {
     accept(_case);
+
+    // If this case had been challenged, clear the case for that doc
+    if (_case.challengingDoctor() != address(0)) {
+      registry.caseSecondPhaseManager().clearChallengingDoctor(_case);
+    }
 
     emit InitialDoctorForceAcceptedDiagnosis(_case, _case.patient(), _case.diagnosingDoctor());
   }
