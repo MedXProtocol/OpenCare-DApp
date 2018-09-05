@@ -79,12 +79,12 @@ module.exports = merge(prodStagingShared, {
         mangle: true,
         output: {
           comments: false,
-          beautify: true
+          beautify: false
         },
         toplevel: true,
         nameCache: null,
         keep_classnames: true,
-        keep_fnames: false
+        keep_fnames: true // keep_fnames false will break our web3 / metamask integration code!
       }
     }),
 
