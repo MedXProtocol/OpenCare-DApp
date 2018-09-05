@@ -30,9 +30,9 @@ if (env.stringified['process.env'].NODE_ENV !== '"production"') {
 module.exports = merge(prodStagingShared, {
   plugins: [
     // Minify the code.
-    new UglifyJsPlugin({
-      sourceMap: true
-    }),
+    // new UglifyJsPlugin({
+    //   sourceMap: true
+    // }),
 
     // Generate a service worker script that will precache, and keep up to date,
     // the HTML & assets that are part of the Webpack build.

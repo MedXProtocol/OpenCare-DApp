@@ -21,9 +21,9 @@ const prodStagingShared = require('./webpack.prodStaging.shared')
 module.exports = merge(prodStagingShared, {
   plugins: [
     // Do not ! Minify the code!
-    // new UglifyJsPlugin({
-    //   sourceMap: true
-    // }),
+    new UglifyJsPlugin({
+      sourceMap: true
+    }),
 
     // Generate a service worker script that will precache, and keep up to date,
     // the HTML & assets that are part of the Webpack build.
