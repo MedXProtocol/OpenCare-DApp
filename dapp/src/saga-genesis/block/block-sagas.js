@@ -4,13 +4,10 @@ import {
   takeEvery,
   getContext,
   select,
-  take,
   fork
 } from 'redux-saga/effects'
 import {
-  delay,
-  eventChannel,
-  END
+  delay
 } from 'redux-saga'
 import {
   contractKeyByAddress

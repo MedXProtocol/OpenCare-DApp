@@ -99,7 +99,7 @@
     "sw-precache-webpack-plugin": "0.11.4",
     "uglifyjs-webpack-plugin": "^1.1.2",
     "url-loader": "0.6.2",
-    "web3": "asselstine/web3.js#1.0",
+    "web3": "asselstine/web3.js#dedc3574ade8ea64dec7416c22c484d89b99f146",
     "webpack": "^3.8.1",
     "webpack-bugsnag-plugin": "^0.1.4",
     "webpack-manifest-plugin": "1.3.2",
