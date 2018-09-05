@@ -4,7 +4,6 @@ const paths = require('./paths');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -67,25 +66,6 @@ module.exports = merge(prodStagingShared, {
         minifyCSS: true,
         minifyURLs: true,
       },
-    }),
-
-    // Minify the code ...
-    new UglifyJsPlugin({
-      sourceMap: true,
-      parallel: true,
-      uglifyOptions: {
-        ecma: 8,
-        warnings: true,
-        mangle: true,
-        output: {
-          comments: false,
-          beautify: false
-        },
-        toplevel: true,
-        nameCache: null,
-        keep_classnames: true,
-        keep_fnames: true // keep_fnames false will break our web3 / metamask integration code!
-      }
     }),
 
   ]
