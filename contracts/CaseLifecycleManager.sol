@@ -241,18 +241,18 @@ contract CaseLifecycleManager is Ownable, Initializable {
   {
     Case _case = Case(_caseAddress);
     require(_case.evaluatedOrChallenging()
-      //, 'Case must be in Evaluated or Challenged state'
+      , 'Case must be in Evaluated or Challenged state'
     );
 
     if (_case.status() == Case.CaseStatus.Evaluated) {
       require(
-        registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress)//,
-        //'Must wait 2 days'
+        registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress),
+        'Must wait 2 days'
       );
     } else if (_case.status() == Case.CaseStatus.Challenging) {
       require(
-        registry.caseScheduleManager().doctorWaitedFourDays(_caseAddress)//,
-        //'Must wait 4 days'
+        registry.caseScheduleManager().doctorWaitedFourDays(_caseAddress),
+        'Must wait 4 days'
       );
     }
 

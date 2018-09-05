@@ -31,11 +31,14 @@ contract CaseDiagnosingDoctor is Ownable, Initializable {
   }
 
   function initialize(Registry _registry) public notInitialized {
-    require(_registry != address(0)/*, 'registry is not blank'*/);
+    require(_registry != address(0), 'registry is not blank');
     registry = _registry;
     owner = msg.sender;
     setInitialized();
   }
+
+  event TestEvent(address indexed _case);
+
 
   /**
    * @dev - The initial doctor can accept their evaluation either
@@ -45,6 +48,7 @@ contract CaseDiagnosingDoctor is Ownable, Initializable {
     external
     isDoctor()
   {
+    emit TestEvent(msg.sender);
     Case[] memory cases = doctorOpenCases(msg.sender);
 
     for (uint256 i; i < cases.length; i++) {
