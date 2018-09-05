@@ -69,10 +69,24 @@ module.exports = merge(prodStagingShared, {
       },
     }),
 
-    // Do not ! Minify the code!
-    // new UglifyJsPlugin({
-    //   sourceMap: true
-    // }),
+    // Minify the code ...
+    new UglifyJsPlugin({
+      sourceMap: true,
+      parallel: true,
+      uglifyOptions: {
+        ecma: 8,
+        warnings: verbose,
+        mangle: false,
+        output: {
+          comments: false,
+          beautify: true
+        },
+        toplevel: true,
+        nameCache: null,
+        keep_classnames: true,
+        keep_fnames: true
+      }
+    }),
 
   ]
 })
