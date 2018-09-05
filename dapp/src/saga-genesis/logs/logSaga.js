@@ -1,6 +1,7 @@
 import {
   takeEvery,
   call,
+  all,
   getContext,
   select,
   put
@@ -19,13 +20,13 @@ function* addSubscription({ address, fromBlock }) {
 }
 
 function* checkReceiptForEvents({ receipt }) {
-  yield receipt.logs.map(function* (log) {
+  yield all(receipt.logs.map(function* (log) {
     const address = log.address.toLowerCase()
     const logs = yield select(state => state.sagaGenesis.logs[address])
     if (logs) {
       yield put({ type: 'NEW_LOG', address, log })
     }
-  })
+  }))
 }
 
 export function* logSaga() {
