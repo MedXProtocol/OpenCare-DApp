@@ -50,7 +50,7 @@ function* saga({ address, CaseStatusManager, CaseScheduleManager }) {
 
   const openAddresses = yield openCaseAddressesSaga(CaseStatusManager, address)
 
-  yield openAddresses.map(function* (caseAddress) {
+  yield all(openAddresses.map(function* (caseAddress) {
     yield addContract({ address: caseAddress, contractKey: 'Case' })
     yield all([
       cacheCall(CaseScheduleManager, 'secondsInADay'),
@@ -58,7 +58,7 @@ function* saga({ address, CaseStatusManager, CaseScheduleManager }) {
       cacheCall(caseAddress, 'status'),
       cacheCall(caseAddress, 'diagnosingDoctor')
     ])
-  })
+  }))
 }
 
 export const HippoCasesRequiringAttention = connect(mapStateToProps)(
