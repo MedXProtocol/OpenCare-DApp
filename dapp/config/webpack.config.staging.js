@@ -15,15 +15,24 @@ let publicPath = paths.servedPath;
 // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
 let publicUrl = publicPath.slice(0, -1);
 
+let getClientEnvironment = require('./env');
+let env = getClientEnvironment(publicUrl);
+
 const merge = require('webpack-merge')
 const prodStagingShared = require('./webpack.prodStaging.shared')
 
+// Assert this just to be safe.
+// Development builds of React are slow and not intended for production.
+if (env.stringified['process.env'].NODE_ENV !== '"production"') {
+  throw new Error('Production builds must have NODE_ENV=production.');
+}
+
 module.exports = merge(prodStagingShared, {
   plugins: [
-    // Do not ! Minify the code!
-    // new UglifyJsPlugin({
-    //   sourceMap: true
-    // }),
+    // Minify the code.
+    new UglifyJsPlugin({
+      sourceMap: true
+    }),
 
     // Generate a service worker script that will precache, and keep up to date,
     // the HTML & assets that are part of the Webpack build.
@@ -46,7 +55,7 @@ module.exports = merge(prodStagingShared, {
         }
         console.log(message);
       },
-      minify: false,
+      minify: true,
       // For unknown URLs, fallback to the index page
       navigateFallback: publicUrl + '/index.html',
       // Ignores URLs starting from /__ (useful for Firebase):
@@ -61,16 +70,16 @@ module.exports = merge(prodStagingShared, {
       inject: true,
       template: paths.appHtml,
       minify: {
-        removeComments: false,
-        collapseWhitespace: false,
-        removeRedundantAttributes: false,
-        useShortDoctype: false,
-        removeEmptyAttributes: false,
-        removeStyleLinkTypeAttributes: false,
-        keepClosingSlash: false,
-        minifyJS: false,
-        minifyCSS: false,
-        minifyURLs: false,
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
       },
     }),
   ]
