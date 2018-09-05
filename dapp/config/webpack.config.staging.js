@@ -70,9 +70,9 @@ module.exports = merge(prodStagingShared, {
     }),
 
     // Do not ! Minify the code!
-    new UglifyJsPlugin({
-      sourceMap: true
-    }),
+    // new UglifyJsPlugin({
+    //   sourceMap: true
+    // }),
 
   ]
 })
