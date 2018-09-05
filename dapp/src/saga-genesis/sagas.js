@@ -1,7 +1,6 @@
 import {
   all,
   fork,
-  take,
   setContext
 } from 'redux-saga/effects'
 
@@ -15,13 +14,9 @@ import ethBalanceSagas from './ethBalance/ethBalanceSagas'
 import transactionSagas, { web3Send } from './transaction/transaction-sagas'
 import web3Initialize from './web3/web3-sagas'
 import { logSaga } from './logs/logSaga'
+import { takeOnceAndRun } from './takeOnceAndRun'
 
 export * from './call-cache/call-cache-sagas'
-
-function* takeOnceAndRun(pattern, saga) {
-  const action = yield take(pattern)
-  yield saga(action)
-}
 
 export function* start({ web3 }) {
   yield setContext({ web3 })

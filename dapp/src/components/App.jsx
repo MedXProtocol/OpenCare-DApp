@@ -19,6 +19,7 @@ import { Welcome } from '~/components/welcome'
 import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
+import { SecuritySettings } from './SecuritySettings'
 import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
 import { PublicKeyCheck } from '~/components/PublicKeyCheck'
 import { BetaFaucetModal } from '~/components/BetaFaucetModal'
@@ -215,6 +216,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
             <Route path={routes.WELCOME} render={ () => WelcomeWrapped } />
             <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
             <Route path={routes.TRY_METAMASK} component={TryMetamask} />
+            <Route path={routes.SECURITY_SETTINGS} component={SecuritySettings} />
 
             <SignedInRoute path={routes.ACCOUNT_EMERGENCY_KIT} component={EmergencyKit} />
             <SignedInRoute path={routes.ACCOUNT_CHANGE_PASSWORD} component={ChangePasswordContainer} />

@@ -10,9 +10,11 @@ import { setRequestedPathname } from '~/services/setRequestedPathname'
 function mapStateToProps (state, ownProps) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const web3Initialized = get(state, 'sagaGenesis.web3.initialized')
+  const localStorageEnabled = get(state, 'features.localStorage')
   return {
     address,
-    web3Initialized
+    web3Initialized,
+    localStorageEnabled
   }
 }
 
@@ -27,6 +29,8 @@ export const Web3Route = connect(mapStateToProps)(class _Web3Route extends Compo
       var redirect = routes.TRY_METAMASK
     } else if (!this.props.address) {
       redirect = routes.LOGIN_METAMASK
+    } else if (!this.props.localStorageEnabled) {
+      redirect = routes.SECURITY_SETTINGS
     }
     return redirect
   }

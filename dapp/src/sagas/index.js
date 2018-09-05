@@ -1,6 +1,7 @@
 import {
   all,
   fork,
+  select,
   setContext
 } from 'redux-saga/effects'
 import rootSagaGenesis, { takeOnceAndRun } from '~/saga-genesis/sagas'
@@ -13,8 +14,10 @@ import signUpSaga from './sign-up-saga'
 import { nextAvailableDoctorSaga } from './next-available-doctor-saga'
 import { pollExternalTransactionsSaga } from './pollExternalTransactionsSaga'
 import { failedTransactionListener } from './failedTransactionListener'
+import { featuresSaga } from './featuresSaga'
 
 export default function* () {
+  yield featuresSaga()
   yield fork(takeOnceAndRun, 'WEB3_NETWORK_ID', function* ({ web3, networkId }) {
     yield setContext({ web3 })
     yield addTopLevelContracts()
@@ -26,8 +29,11 @@ export default function* () {
       // heartbeatSaga(),
       nextAvailableDoctorSaga(),
       pollExternalTransactionsSaga(),
-      failedTransactionListener()
+      failedTransactionListener(),
     ])
   })
-  yield rootSagaGenesis()
+  const localStorageEnabled = yield select(state => state.features.localStorage)
+  if (localStorageEnabled) {
+    yield rootSagaGenesis()
+  }
 }

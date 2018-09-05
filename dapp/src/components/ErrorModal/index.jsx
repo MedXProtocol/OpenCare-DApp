@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle'
 import PropTypes from 'prop-types'
 
 require('./ErrorModal.scss')

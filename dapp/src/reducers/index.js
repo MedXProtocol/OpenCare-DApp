@@ -8,6 +8,7 @@ import nextAvailableDoctor from './next-available-doctor-reducer'
 import externalTransactions from './externalTransactionsReducer'
 import caseLogs from './caseLogsReducer'
 import caseManagerLogs from './caseManagerLogsReducer'
+import features from './featuresReducer'
 
 export default combineReducers({
   sagaGenesis,
@@ -18,5 +19,6 @@ export default combineReducers({
   nextAvailableDoctor,
   externalTransactions,
   caseLogs,
-  caseManagerLogs
+  caseManagerLogs,
+  features
 })

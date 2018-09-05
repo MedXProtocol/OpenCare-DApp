@@ -23,6 +23,8 @@ export const PATIENTS_CASES ='/patients/cases'
 export const PATIENTS_CASES_PAGE_NUMBER = '/patients/cases/:currentPage'
 export const PATIENTS_CASE = '/patients/cases/:currentPage/:caseAddress'
 
+export const SECURITY_SETTINGS = '/security-settings'
+
 export const signedOutRoutes = [
   WELCOME, LOGIN_METAMASK, TRY_METAMASK, SIGN_UP, SIGN_IN, HOME
 ]
