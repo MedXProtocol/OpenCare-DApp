@@ -83,8 +83,8 @@ module.exports = merge(prodStagingShared, {
         },
         toplevel: true,
         nameCache: null,
-        keep_classnames: undefined,
-        keep_fnames: true
+        keep_classnames: true,
+        keep_fnames: false
       }
     }),
 
