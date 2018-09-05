@@ -8,47 +8,13 @@ import {
   fork
 } from 'redux-saga/effects'
 import {
+  delay,
   eventChannel,
   END
 } from 'redux-saga'
 import {
   contractKeyByAddress
 } from '../state-finders'
-import PollingBlockTracker from 'eth-block-tracker'
-
-function createBlockTrackerEmitter (web3) {
-  return eventChannel(emit => {
-    let isFirst = true
-
-    const blockTracker = new PollingBlockTracker({provider: web3.currentProvider})
-
-    blockTracker.on('latest', (block) => {
-      if (isFirst) {
-        isFirst = false
-      } else {
-        emit({type: 'BLOCK_LATEST', block})
-      }
-    })
-
-    blockTracker.start().catch((error) => {
-      console.error('Block Tracker Failed with error:')
-      console.error(error)
-      emit(END)
-    })
-
-    return () => {
-      blockTracker.stop()
-    }
-  })
-}
-
-function* startBlockTracker () {
-  const web3 = yield getContext('web3')
-  const channel = createBlockTrackerEmitter(web3)
-  while (true) {
-    yield put(yield take(channel))
-  }
-}
 
 function* addAddressIfExists(addressSet, address) {
   if (!address) { return false }
@@ -107,8 +73,38 @@ export function* latestBlock({ block }) {
   yield call(invalidateAddressSet, addressSet)
 }
 
+function* updateCurrentBlockNumber() {
+  const web3 = yield getContext('web3')
+  const blockNumber = yield web3.eth.getBlockNumber()
+  const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
+  if (blockNumber !== currentBlockNumber) {
+    yield put({
+      type: 'UPDATE_BLOCK_NUMBER',
+      blockNumber,
+      lastBlockNumber: currentBlockNumber
+    })
+  }
+}
+
+function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
+  if (!lastBlockNumber) { return }
+  const web3 = yield getContext('web3')
+  for (var i = lastBlockNumber + 1; i <= blockNumber; i++) {
+    const block = yield web3.eth.getBlock(i, true)
+    yield put({ type: 'BLOCK_LATEST', block })
+  }
+}
+
+function* startBlockPolling() {
+  while (true) {
+    yield call(updateCurrentBlockNumber)
+    yield call(delay, 1000)
+  }
+}
+
 export default function* () {
   yield takeEvery('BLOCK_LATEST', latestBlock)
   yield takeEvery('BLOCK_TRANSACTION_RECEIPT', transactionReceipt)
-  yield fork(startBlockTracker)
+  yield takeEvery('UPDATE_BLOCK_NUMBER', gatherLatestBlocks)
+  yield startBlockPolling()
 }
