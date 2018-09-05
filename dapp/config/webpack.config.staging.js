@@ -75,8 +75,8 @@ module.exports = merge(prodStagingShared, {
       parallel: true,
       uglifyOptions: {
         ecma: 8,
-        warnings: 'verbose',
-        mangle: false,
+        warnings: true,
+        mangle: true,
         output: {
           comments: false,
           beautify: true
