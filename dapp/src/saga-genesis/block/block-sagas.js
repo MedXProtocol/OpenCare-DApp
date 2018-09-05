@@ -33,6 +33,7 @@ function* collectTransactionAddresses(addressSet, transaction) {
   const from = yield call(addAddressIfExists, addressSet, transaction.from)
   if (to || from) {
     const receipt = yield web3.eth.getTransactionReceipt(transaction.hash)
+    console.log('receipt', receipt)
     yield put({ type: 'BLOCK_TRANSACTION_RECEIPT', receipt })
   }
 }
@@ -69,6 +70,8 @@ export function* collectAllTransactionAddresses(transactions) {
 }
 
 export function* latestBlock({ block }) {
+  console.log('latestBlock({ block })', block)
+  console.log('block.transactions', block.transactions)
   const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
   yield call(invalidateAddressSet, addressSet)
 }
@@ -78,6 +81,7 @@ function* updateCurrentBlockNumber() {
   const blockNumber = yield web3.eth.getBlockNumber()
   const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
   if (blockNumber !== currentBlockNumber) {
+    console.log('blockNumber, currentBlockNumber', blockNumber, currentBlockNumber)
     yield put({
       type: 'UPDATE_BLOCK_NUMBER',
       blockNumber,
@@ -88,9 +92,12 @@ function* updateCurrentBlockNumber() {
 
 function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
   if (!lastBlockNumber) { return }
+  console.log('gatherLatestBlocks({ blockNumber, lastBlockNumber })', blockNumber, lastBlockNumber)
+
   const web3 = yield getContext('web3')
   for (var i = lastBlockNumber + 1; i <= blockNumber; i++) {
     const block = yield web3.eth.getBlock(i, true)
+    console.log('yield web3.eth.getBlock(i, true)', i, block)
     yield put({ type: 'BLOCK_LATEST', block })
   }
 }
