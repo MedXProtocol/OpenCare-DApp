@@ -32,6 +32,7 @@ function* collectTransactionAddresses(addressSet, transaction) {
   const to = yield call(addAddressIfExists, addressSet, transaction.to)
   const from = yield call(addAddressIfExists, addressSet, transaction.from)
   if (to || from) {
+    console.log('transaction.hash', transaction.hash)
     const receipt = yield web3.eth.getTransactionReceipt(transaction.hash)
     console.log('receipt', receipt)
     yield put({ type: 'BLOCK_TRANSACTION_RECEIPT', receipt })
