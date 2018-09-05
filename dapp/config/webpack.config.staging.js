@@ -79,11 +79,11 @@ module.exports = merge(prodStagingShared, {
         mangle: true,
         output: {
           comments: false,
-          beautify: false
+          beautify: true
         },
         toplevel: true,
         nameCache: null,
-        keep_classnames: true,
+        keep_classnames: undefined,
         keep_fnames: true
       }
     }),
