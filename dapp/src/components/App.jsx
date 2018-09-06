@@ -20,6 +20,7 @@ import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
 import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
+import { AcceptAllExpiredCases } from '~/components/AcceptAllExpiredCases'
 import { PublicKeyCheck } from '~/components/PublicKeyCheck'
 import { BetaFaucetModal } from '~/components/BetaFaucetModal'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
@@ -184,6 +185,10 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       var publicKeyCheck = <PublicKeyCheck />
       var betaFaucetModal = <BetaFaucetModal />
       var feedbackLink = <ScrollyFeedbackLink scrollDiffAmount={50} />
+
+      if (this.props.isDoctor) {
+        var acceptAllExpiredCases = <AcceptAllExpiredCases />
+      }
     }
 
     if (this.props.isOwner) {
@@ -201,6 +206,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
         <HippoNavbarContainer openCasesLength={this.props.openCaseCount} />
         {ownerWarning}
         {publicKeyCheck}
+        {acceptAllExpiredCases}
         <div className="content">
           {betaFaucetModal}
 

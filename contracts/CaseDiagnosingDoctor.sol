@@ -59,8 +59,9 @@ contract CaseDiagnosingDoctor is Ownable, Initializable {
       }
       currentNodeId = registry.caseStatusManager().nextOpenCaseId(msg.sender, currentNodeId);
 
+      // Right now it costs about 400,000~ gas for a Doctor to close a case
       // If we don't have much gas left let's get out of this loop
-      if (gasleft() < 50000) {
+      if (gasleft() < 400000) {
         break;
       }
     }

@@ -90,7 +90,7 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
             this.setState({ forceAcceptDiagnosisHandler: null, loading: false })
           })
           .onTxHash(() => {
-            toastr.success('Your accept diagnosis transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your MEDX.')
+            toastr.success('Your accept diagnosis transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your fees.')
             mixpanel.track('Doctor Force Accepting After 48+ Hours')
             this.props.history.push(routes.DOCTORS_CASES_OPEN)
           })
