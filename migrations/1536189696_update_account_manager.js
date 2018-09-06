@@ -1,5 +1,5 @@
-const deployAndRegister = require('./support/deploy-and-register')
-const toRegistryKey = require('./support/to-registry-key')
+const deployAndRegister = require('./support/deployAndRegister')
+const toRegistryKey = require('./support/toRegistryKey')
 
 let AccountManager = artifacts.require("./AccountManager.sol")
 let Registry = artifacts.require('./Registry.sol')

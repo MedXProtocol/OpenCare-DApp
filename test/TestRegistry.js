@@ -1,4 +1,4 @@
-const toRegistryKey = require('../migrations/support/to-registry-key')
+const toRegistryKey = require('../migrations/support/toRegistryKey')
 const Registry = artifacts.require("./Registry.sol")
 const Delegate = artifacts.require("./Delegate.sol")
 
