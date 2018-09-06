@@ -127,9 +127,9 @@ export const AcceptAllExpiredCases = connect(mapStateToProps)(withSend(withSaga(
         >
           <div className="alert alert-info alert--banner alert--banner__large alert--banner__in-content text-center">
             <p>
-              Enough time has passed on <strong>{staleCases}</strong> cases without a response from the patient.
+              <strong>{staleCases}</strong> cases had no response.
               <br className="visible-xs hidden-sm hidden-md hidden-lg" />
-              &nbsp;You can close the cases on their behalf to earn your fees:
+              &nbsp;You can close them to earn your fees:
 
               <br />
               <Button
