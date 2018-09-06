@@ -98,9 +98,23 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier onlyDiagnosingDoctor(address _caseAddress) {
     Case _case = Case(_caseAddress);
-    require(msg.sender == _case.diagnosingDoctor()/*, 'sender needs to be the diagnosis doctor'*/);
+    require(msg.sender == _case.diagnosingDoctor(), 'sender needs to be the diagnosis doctor');
     _;
   }
+
+  /**
+   * @dev - throws if called by any account other than the diagnosing doctor
+   */
+  modifier onlyDiagnosingDoctorSenderOrCaseDiagnosingDoctor(address _caseAddress) {
+    Case _case = Case(_caseAddress);
+    require(
+      msg.sender == _case.diagnosingDoctor() || msg.sender == address(registry.caseDiagnosingDoctor()),
+      'sender needs to be the diagnosis doctor or the CaseDiagnosingDoctor contract'
+    );
+    _;
+  }
+
+
 
   /**
    * @dev - Contract should not accept any ether
@@ -237,31 +251,24 @@ contract CaseLifecycleManager is Ownable, Initializable {
   function acceptAsDoctor(address _caseAddress)
     external
     isCase(_caseAddress)
-    onlyDiagnosingDoctor(_caseAddress)
+    onlyDiagnosingDoctorSenderOrCaseDiagnosingDoctor(_caseAddress)
   {
     Case _case = Case(_caseAddress);
-    require(_case.evaluatedOrChallenging()
-      //, 'Case must be in Evaluated or Challenged state'
-    );
+    require(_case.evaluatedOrChallenging(), 'Case must be in Evaluated or Challenged state');
 
     if (_case.status() == Case.CaseStatus.Evaluated) {
       require(
-        registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress)//,
-        //'Must wait 2 days'
+        registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress),
+        'Must wait 2 days'
       );
     } else if (_case.status() == Case.CaseStatus.Challenging) {
       require(
-        registry.caseScheduleManager().doctorWaitedFourDays(_caseAddress)//,
-        //'Must wait 4 days'
+        registry.caseScheduleManager().doctorWaitedFourDays(_caseAddress),
+        'Must wait 4 days'
       );
     }
 
     registry.caseFirstPhaseManager().acceptAsDoctor(_case);
-
-    // If this case had been challenged, clear the case for that doc
-    if (_case.challengingDoctor() != address(0)) {
-      registry.caseSecondPhaseManager().clearChallengingDoctor(_case);
-    }
   }
 
   function challengeWithDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)

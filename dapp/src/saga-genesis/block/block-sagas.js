@@ -31,9 +31,7 @@ function* collectTransactionAddresses(addressSet, transaction) {
   const to = yield call(addAddressIfExists, addressSet, transaction.to)
   const from = yield call(addAddressIfExists, addressSet, transaction.from)
   if (to || from) {
-    console.log('transaction.hash', transaction.hash)
     const receipt = yield call(getReceiptData, transaction.hash)
-    console.log('receipt', receipt)
     yield put({ type: 'BLOCK_TRANSACTION_RECEIPT', receipt })
   }
 }
@@ -42,7 +40,6 @@ function* getReceiptData(txHash) {
   const web3 = yield getContext('web3')
   for (let i = 0; i < MAX_RETRIES; i++) {
     const receipt = yield web3.eth.getTransactionReceipt(txHash)
-    console.log('attempt i, receipt', i, receipt)
 
     if (receipt) {
       return receipt
@@ -87,8 +84,6 @@ export function* collectAllTransactionAddresses(transactions) {
 }
 
 export function* latestBlock({ block }) {
-  console.log('latestBlock({ block })', block)
-  console.log('block.transactions', block.transactions)
   const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
   yield call(invalidateAddressSet, addressSet)
 }
@@ -98,7 +93,6 @@ function* updateCurrentBlockNumber() {
   const blockNumber = yield web3.eth.getBlockNumber()
   const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
   if (blockNumber !== currentBlockNumber) {
-    console.log('blockNumber, currentBlockNumber', blockNumber, currentBlockNumber)
     yield put({
       type: 'UPDATE_BLOCK_NUMBER',
       blockNumber,
@@ -109,7 +103,6 @@ function* updateCurrentBlockNumber() {
 
 function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
   if (!lastBlockNumber) { return }
-  console.log('gatherLatestBlocks({ blockNumber, lastBlockNumber })', blockNumber, lastBlockNumber)
 
   for (var i = lastBlockNumber + 1; i <= blockNumber; i++) {
     const block = yield call(getBlockData, i)
@@ -121,7 +114,6 @@ function* getBlockData(blockId) {
   const web3 = yield getContext('web3')
   for (let i = 0; i < MAX_RETRIES; i++) {
     const block = yield web3.eth.getBlock(blockId, true)
-    console.log('attempt i, yield web3.eth.getBlock(i, true), result', i, blockId, block)
 
     if (block) {
       return block

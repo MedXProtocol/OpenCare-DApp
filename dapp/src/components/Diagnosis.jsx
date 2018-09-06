@@ -200,9 +200,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
           toastr.transactionError(error)
           this.setState({ challengeHandler: null, loading: false })
         })
-        .onConfirmed(() => {
-          this.setState({ challengeHandler: null })
-        })
         .onTxHash(() => {
           toastr.success('Working on getting you a second opinion.')
           mixpanel.track('Challenge Diagnosis Submitted')

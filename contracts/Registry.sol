@@ -1,6 +1,7 @@
 pragma solidity ^0.4.23;
 
 import "./CaseManager.sol";
+import "./CaseDiagnosingDoctor.sol";
 import "./CaseLifecycleManager.sol";
 import "./CaseScheduleManager.sol";
 import "./CaseStatusManager.sol";
