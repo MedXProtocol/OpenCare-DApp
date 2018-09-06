@@ -1,4 +1,4 @@
-const toRegistryKey = require('../../migrations/support/to-registry-key')
+const toRegistryKey = require('../../migrations/support/toRegistryKey')
 
 module.exports = async function (artifacts, env) {
   const Delegate = artifacts.require('Delegate.sol')

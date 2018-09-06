@@ -1,4 +1,4 @@
-var deployAndRegister = require('./support/deploy-and-register')
+var deployAndRegister = require('./support/deployAndRegister')
 
 const Case = artifacts.require("./Case.sol")
 const Registry = artifacts.require('./Registry.sol')

@@ -1,4 +1,4 @@
-const toRegistryKey = require('../../migrations/support/to-registry-key')
+const toRegistryKey = require('../../migrations/support/toRegistryKey')
 
 module.exports = async function(registry, Delegate, contract, name) {
   let contractInstance = await contract.new()

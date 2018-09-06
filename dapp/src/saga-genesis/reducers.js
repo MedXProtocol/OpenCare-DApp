@@ -7,6 +7,7 @@ import ethBalance from './ethBalance/ethBalanceReducer'
 import network from './network/network-reducer'
 import web3 from './web3/web3-reducer'
 import logs from './logs/logReducer'
+import block from './block/block-reducer'
 
 export const sagaGenesis = combineReducers({
   callCache,
@@ -16,5 +17,6 @@ export const sagaGenesis = combineReducers({
   ethBalance,
   contracts,
   web3,
-  logs
+  logs,
+  block
 })

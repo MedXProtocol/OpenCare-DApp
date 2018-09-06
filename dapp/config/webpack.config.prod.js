@@ -4,7 +4,6 @@ const paths = require('./paths');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -29,11 +28,6 @@ if (env.stringified['process.env'].NODE_ENV !== '"production"') {
 
 module.exports = merge(prodStagingShared, {
   plugins: [
-    // Minify the code.
-    new UglifyJsPlugin({
-      sourceMap: true
-    }),
-
     // Generate a service worker script that will precache, and keep up to date,
     // the HTML & assets that are part of the Webpack build.
     new SWPrecacheWebpackPlugin({

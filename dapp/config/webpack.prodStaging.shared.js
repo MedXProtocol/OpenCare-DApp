@@ -7,6 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const paths = require('./paths');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
@@ -245,6 +246,26 @@ module.exports = {
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+
+    // Minify the code ...
+    new UglifyJsPlugin({
+      sourceMap: true,
+      parallel: true,
+      uglifyOptions: {
+        ecma: 8,
+        warnings: true,
+        mangle: true,
+        output: {
+          comments: false,
+          beautify: false
+        },
+        toplevel: true,
+        nameCache: null,
+        keep_classnames: true,
+        keep_fnames: true // keep_fnames false will break our web3 / metamask integration code!
+      }
+    }),
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.

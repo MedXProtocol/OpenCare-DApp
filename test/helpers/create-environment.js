@@ -1,4 +1,4 @@
-const toRegistryKey = require('../../migrations/support/to-registry-key')
+const toRegistryKey = require('../../migrations/support/toRegistryKey')
 
 const envDeployWithDelegate = require('./env-deploy-with-delegate')
 

@@ -27,15 +27,12 @@ export default function (state, { type, transactionId, txType, txHash, call }) {
       state = {
         ...state,
         transactions: state.transactions.map( (item, index) => {
-          if (item.transactionId !== transactionId) { return item }
-
-          return {
-            transactionId,
-            txType,
-            txHash,
-            inFlight: false,
-            success: true
+          item = {...item}
+          if (item.transactionId === transactionId) {
+            item.inFlight = false
+            item.success = true
           }
+          return item
         })
       }
       break
@@ -44,15 +41,12 @@ export default function (state, { type, transactionId, txType, txHash, call }) {
       state = {
         ...state,
         transactions: state.transactions.map( (item, index) => {
-          if (item.transactionId !== transactionId) { return item }
-
-          return {
-            transactionId,
-            txType,
-            txHash,
-            inFlight: false,
-            success: false
+          item = {...item}
+          if (item.transactionId === transactionId) {
+            item.inFlight = false
+            item.success = false
           }
+          return item
         })
       }
       break

@@ -34,8 +34,10 @@ contract AccountManager {
     bool isCaseManager = (msg.sender == address(registry.caseManager()));
     bool isOwner = msg.sender == owner;
     require(isSender || isCaseManager || isOwner, 'must be a sender, owner or case manager');
+    if (!isOwner) { // allow override, just in case
+      require(publicKeys[_address].length == 0);
+    }
     publicKeys[_address] = _publicKey;
     emit PublicKeySet(_address, _publicKey);
   }
-
 }

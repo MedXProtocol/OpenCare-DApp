@@ -1,5 +1,6 @@
 import {
   put,
+  all,
   select,
   takeEvery,
   takeLatest,
@@ -44,12 +45,12 @@ export function* invalidateAddress({ address }) {
   let callCountRegistry = yield getContext('callCountRegistry')
   let contractCalls = Object.values(callCountRegistry.getContractCalls(address))
   if (!contractCalls) { return }
-  yield contractCalls.map(function* (callState) {
+  yield all(contractCalls.map(function* (callState) {
     if (callState.count > 0) {
       const { call } = callState
       yield executeWeb3Call(call)
     }
-  })
+  }))
 }
 
 export function* invalidateTransaction({ transactionId, call, receipt }) {
@@ -59,12 +60,12 @@ export function* invalidateTransaction({ transactionId, call, receipt }) {
 
   contractAddresses.add(call.address)
 
-  yield Array.from(contractAddresses).map(function* (address) {
+  yield all(Array.from(contractAddresses).map(function* (address) {
     const contractKey = yield select(contractKeyByAddress, address)
     if (contractKey) {
       yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
     }
-  })
+  }))
 }
 
 export function* runSaga({saga, props, key}) {
