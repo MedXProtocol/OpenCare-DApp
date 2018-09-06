@@ -6,7 +6,7 @@ const caseStatus = require('./helpers/case-status')
 const resetCaseManager = require('./helpers/reset-case-manager')
 const increaseTime = require('./helpers/increaseTime')
 
-const SECONDS_IN_A_DAY = 86400
+const SECONDS_IN_A_DAY = 120
 
 contract('CaseDiagnosingDoctor', function (accounts) {
 
@@ -65,38 +65,41 @@ contract('CaseDiagnosingDoctor', function (accounts) {
         { from: doctor }
       )
       await env.caseLifecycleManager.challengeWithDoctor(
-        caseInstance1.address,
+        caseInstance2.address,
         doctor2,
         'doctor 2 encrypted case key',
         { from: patient }
       )
 
       //// START TESTING 'ALL' LOOP
-      env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor })
+      let result = await env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor })
 
-      let doctorBalance = await env.weth9.balanceOf(doctor)
-      console.log(doctorBalance.toString())
-      assert.equal(doctorBalance.toString(), '0')
       assert.equal(await caseInstance1.status.call(), caseStatus('Evaluated'))
       assert.equal(await caseInstance2.status.call(), caseStatus('Challenging'))
 
+      let doctorBalance = await env.weth9.balanceOf(doctor)
+      assert.equal(doctorBalance.toString(), '0')
 
+
+      //// Move 3 days into the future & run it again
       increaseTime(SECONDS_IN_A_DAY * 3)
-      env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor })
+      result = await env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor })
 
       doctorBalance = await env.weth9.balanceOf(doctor)
-      console.log(doctorBalance.toString(), caseFeeWei.toString())
+      // console.log(doctorBalance.toString(), caseFeeWei.toString())
       assert.equal(doctorBalance.toString(), caseFeeWei.toString())
+
       assert.equal(await caseInstance1.status.call(), caseStatus('Closed'))
       assert.equal(await caseInstance2.status.call(), caseStatus('Challenging'))
 
 
+      //// This time, 2 days in the future (5 days total)
       increaseTime(SECONDS_IN_A_DAY * 2)
-      env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor })
+      await env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor })
 
       doctorBalance = await env.weth9.balanceOf(doctor)
-      console.log(doctorBalance.toString(), (caseFeeWei * 2).toString())
-      assert.equal(doctorBalance.toString(), (caseFeeWei * 2).toString())
+      // console.log(doctorBalance, (caseFeeWei * 2))
+      assert.equal(doctorBalance, (caseFeeWei * 2))
 
       assert.equal(await caseInstance1.status.call(), caseStatus('Closed'))
       assert.equal(await caseInstance2.status.call(), caseStatus('Closed'))

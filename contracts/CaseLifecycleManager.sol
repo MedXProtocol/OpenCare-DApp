@@ -98,9 +98,23 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier onlyDiagnosingDoctor(address _caseAddress) {
     Case _case = Case(_caseAddress);
-    require(msg.sender == _case.diagnosingDoctor()/*, 'sender needs to be the diagnosis doctor'*/);
+    require(msg.sender == _case.diagnosingDoctor(), 'sender needs to be the diagnosis doctor');
     _;
   }
+
+  /**
+   * @dev - throws if called by any account other than the diagnosing doctor
+   */
+  modifier onlyDiagnosingDoctorSenderOrCaseDiagnosingDoctor(address _caseAddress) {
+    Case _case = Case(_caseAddress);
+    require(
+      msg.sender == _case.diagnosingDoctor() || msg.sender == address(registry.caseDiagnosingDoctor()),
+      'sender needs to be the diagnosis doctor or the CaseDiagnosingDoctor contract'
+    );
+    _;
+  }
+
+
 
   /**
    * @dev - Contract should not accept any ether
@@ -237,12 +251,10 @@ contract CaseLifecycleManager is Ownable, Initializable {
   function acceptAsDoctor(address _caseAddress)
     external
     isCase(_caseAddress)
-    onlyDiagnosingDoctor(_caseAddress)
+    onlyDiagnosingDoctorSenderOrCaseDiagnosingDoctor(_caseAddress)
   {
     Case _case = Case(_caseAddress);
-    require(_case.evaluatedOrChallenging()
-      , 'Case must be in Evaluated or Challenged state'
-    );
+    require(_case.evaluatedOrChallenging(), 'Case must be in Evaluated or Challenged state');
 
     if (_case.status() == Case.CaseStatus.Evaluated) {
       require(

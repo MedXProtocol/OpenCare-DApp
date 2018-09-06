@@ -37,49 +37,35 @@ contract CaseDiagnosingDoctor is Ownable, Initializable {
     setInitialized();
   }
 
-  event TestEvent(address indexed _case);
-
+  event AcceptedAllAsDoctor(address indexed _doctor);
 
   /**
    * @dev - The initial doctor can accept their evaluation either
    *        48 hours or 96 hours after diagnosing and get tokens owing to them
    */
-  function acceptAllAsDoctor()
-    external
-    isDoctor()
-  {
-    emit TestEvent(msg.sender);
-    Case[] memory cases = doctorOpenCases(msg.sender);
-
-    for (uint256 i; i < cases.length; i++) {
-      registry.caseFirstPhaseManager().acceptAsDoctor(cases[i]);
-    }
-  }
-
-  function doctorOpenCases(address _doctorAddress) internal view returns (Case[]) {
-    uint256 numOpenCases = registry.caseStatusManager().openCaseCount(_doctorAddress);
-    Case[] memory cases = new Case[](numOpenCases);
-    uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
+  function acceptAllAsDoctor() external isDoctor {
+    uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(msg.sender);
 
     while (currentNodeId != 0) {
-      address caseAddress = registry.caseStatusManager().openCaseAddress(_doctorAddress, currentNodeId);
+      address caseAddress = registry.caseStatusManager().openCaseAddress(msg.sender, currentNodeId);
       Case openCase = Case(caseAddress);
 
       // We're only interested in this case if the Doc is the diagnosing doctor
       if (
-        _doctorAddress == openCase.diagnosingDoctor()
+        msg.sender == openCase.diagnosingDoctor()
         && registry.caseScheduleManager().caseExpiredForDoctor(openCase)
       ) {
-        cases[currentNodeId] = openCase;
+        registry.caseLifecycleManager().acceptAsDoctor(openCase);
       }
+      currentNodeId = registry.caseStatusManager().nextOpenCaseId(msg.sender, currentNodeId);
 
-      currentNodeId = registry.caseStatusManager().nextOpenCaseId(_doctorAddress, currentNodeId);
+      // If we don't have much gas left let's get out of this loop
+      if (gasleft() < 50000) {
+        break;
+      }
     }
 
-    return cases;
+    emit AcceptedAllAsDoctor(msg.sender);
   }
 
 }
-
-// todo: check gas inn for loops and cancel if gas remaining is too low
-//     make sure another doc cannot 'close all' on other doc's cases, even if challening doc

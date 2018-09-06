@@ -27,7 +27,7 @@ contract CaseFirstPhaseManager is Ownable, Initializable {
   modifier onlyCaseLifecycleManager() {
     require(
       isCaseLifecycleManager(),
-      'Must be an instance of Case lifecycle Manager contract'
+      'Must be an instance of CaseLifecycleManager contract'
     );
     _;
   }
