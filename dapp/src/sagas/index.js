@@ -1,6 +1,5 @@
 import {
   all,
-  put,
   fork,
   setContext
 } from 'redux-saga/effects'

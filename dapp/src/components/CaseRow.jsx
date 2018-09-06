@@ -209,8 +209,7 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   caseRowAction(caseRowObject, pendingTransaction) {
-    let options = {}
-    const { caseAddress, error, call, gasUsed, transactionId } = caseRowObject
+    const { caseAddress, error, call, options, gasUsed, transactionId } = caseRowObject
 
     let action = (
       <React.Fragment>
@@ -279,7 +278,6 @@ export const CaseRow = connect(mapStateToProps, mapDispatchToProps)(
       caseRowObject['statusLabel'] = 'Requires Attention'
       caseRowObject['statusClass'] = 'warning'
     }
-
 
     const labelClass = this.caseRowLabelClass(caseRowObject)
     label = (
