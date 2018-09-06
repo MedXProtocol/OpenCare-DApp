@@ -1,9 +1,10 @@
-import { put, takeEvery, call } from 'redux-saga/effects'
+import { put, takeEvery, call, select } from 'redux-saga/effects'
 import { signIn } from '~/services/sign-in'
 import secretKeyInvalid from '~/services/secret-key-invalid'
 import masterPasswordInvalid from '~/services/master-password-invalid'
 import { mixpanel } from '~/mixpanel'
 import { Account } from '~/accounts/Account'
+import { contractByName, web3Call } from '~/saga-genesis'
 
 // Here the sign in should perform the check
 export function* signInSaga({ secretKey, masterPassword, account, address, overrideAccount }) {
@@ -13,7 +14,7 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
     return
   }
 
-  if (secretKey) { //Then we are signing into an existing account
+  if (secretKey) { // we are signing into an existing account
     var secretKeyError = secretKeyInvalid(secretKey)
     if (secretKeyError) {
       yield put({ type: 'SIGN_IN_ERROR', secretKeyError })
@@ -40,7 +41,21 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
   } else if (account) { // Check the existing account
     try {
       yield call([account, 'unlockAsync'], masterPassword)
+
+      const AccountManager = yield select(contractByName, 'AccountManager')
+      let existingPublicKey = yield web3Call(AccountManager, 'publicKeys', address)
+      let expectedPublicKey = '0x' + account.hexPublicKey()
+      if (existingPublicKey && existingPublicKey !== expectedPublicKey) {
+        yield put({
+          type: 'SIGN_IN_ERROR',
+          publicKeyMismatchError: 'This account does not match the account registered on the blockchain. Please sign in using the secret key from the browser you signed up with.'
+        })
+        yield account.destroy()
+        return
+      }
+
       yield put({ type: 'SIGN_IN_OK', account, masterPassword, address })
+
       mixpanel.track("Signin")
     } catch (error) {
       yield put({ type: 'SIGN_IN_ERROR', masterPasswordError: error.message })
