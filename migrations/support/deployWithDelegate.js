@@ -1,5 +1,5 @@
-var deployAndRegister = require('./deploy-and-register')
-var deployAndRegisterDelegate = require('./deploy-and-register-delegate')
+var deployAndRegister = require('./deployAndRegister')
+var deployAndRegisterDelegate = require('./deployAndRegisterDelegate')
 var migrationLog = require('./migrationLog')
 
 /** @title deployWithDelegate

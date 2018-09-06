@@ -1,4 +1,4 @@
-var toRegistryKey = require('./to-registry-key')
+var toRegistryKey = require('./toRegistryKey')
 
 /**
  * WARNING: Use this to destroy and replace a Delegate, which will blow away the memory
