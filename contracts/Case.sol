@@ -5,6 +5,7 @@ import "./MedXToken.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
 import "./WETH9.sol";
+import './DelegateTarget.sol';
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -97,6 +98,11 @@ contract Case is Ownable, Initializable {
     _;
   }
 
+  modifier patientMustBeZero() {
+    require(patient == address(0));
+    _;
+  }
+
   /**
    * @dev - Contract should not accept any ether
    */
@@ -104,29 +110,30 @@ contract Case is Ownable, Initializable {
     revert();
   }
 
+  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
+    setInitialized();
+    owner = msg.sender;
+    registry = Registry(_registry);
+  }
+
   /**
    * @dev - Creates a new case with the given parameters
    * @param _patient - the patient who created the case
    * @param _caseFee - fee for this particular case
-   * @param _registry - the registry contract
    */
   function initialize (
       address _patient,
       bytes _encryptedCaseKey,
       bytes _caseKeySalt,
       bytes _caseHash,
-      uint256 _caseFee,
-      address _registry
-  ) external notInitialized {
-    setInitialized();
+      uint256 _caseFee
+  ) external patientMustBeZero {
     require(_encryptedCaseKey.length != 0, 'encryptedCaseKey required');
     require(_caseKeySalt.length != 0, 'caseKeySalt required');
     require(_caseHash.length != 0, 'caseHash required');
-    owner = msg.sender;
     status = CaseStatus.Open;
     patient = _patient;
     caseFee = _caseFee;
-    registry = Registry(_registry);
     emit CaseCreated(patient, _encryptedCaseKey, _caseKeySalt, _caseHash);
   }
 

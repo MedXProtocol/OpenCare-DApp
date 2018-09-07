@@ -1,3 +1,6 @@
+
+
+
 const toRegistryKey = require('../../migrations/support/toRegistryKey')
 
 module.exports = async function (artifacts, env) {
@@ -9,12 +12,11 @@ module.exports = async function (artifacts, env) {
   let caseManagerDelegate = await Delegate.new(env.registry.address, toRegistryKey('CaseManagerTarget'))
   await env.registry.register(toRegistryKey('CaseManager'), caseManagerDelegate.address)
   let caseManager = await CaseManager.at(caseManagerDelegate.address)
-  await caseManager.initialize(web3.toWei('10', 'ether'), env.registry.address)
+  await caseManager.setBaseCaseFee(web3.toWei('10', 'ether'))
 
   let caseStatusManagerDelegate = await Delegate.new(env.registry.address, toRegistryKey('CaseStatusManagerTarget'))
   await env.registry.register(toRegistryKey('CaseStatusManager'), caseStatusManagerDelegate.address)
   let caseStatusManager = await CaseStatusManager.at(caseStatusManagerDelegate.address)
-  await caseStatusManager.initialize(env.registry.address)
 
   let wrappedEther = await WETH9.new()
   await env.registry.register(toRegistryKey('WrappedEther'), wrappedEther.address)

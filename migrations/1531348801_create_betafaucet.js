@@ -9,9 +9,7 @@ module.exports = function(deployer) {
     const medXTokenInstance = await MedXToken.deployed()
 
     return deployWithDelegate(artifacts, deployer, BetaFaucet).then(betaFaucetDelegateInstance => {
-      return betaFaucetDelegateInstance.initialize().then(() => {
-        return betaFaucetDelegateInstance.updateMedXTokenAddress(medXTokenInstance.address)
-      })
+      return betaFaucetDelegateInstance.updateMedXTokenAddress(medXTokenInstance.address)
     })
   })
 };

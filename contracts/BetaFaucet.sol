@@ -4,8 +4,9 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Initializable.sol";
 import "./MedXToken.sol";
+import "./DelegateTarget.sol";
 
-contract BetaFaucet is Ownable, Initializable {
+contract BetaFaucet is Ownable, Initializable, DelegateTarget {
 
   using SafeMath for uint256;
   using SafeMath for uint128;
@@ -31,10 +32,6 @@ contract BetaFaucet is Ownable, Initializable {
   event EtherSent(address indexed recipient, uint256 value);
   event MedXSent(address indexed recipient, uint256 value);
 
-  // Constructor which allows us to fund contract on creation
-  constructor() public payable {
-  }
-
   // `fallback` function called when eth is sent to this contract
   function () payable {
   }
@@ -42,7 +39,7 @@ contract BetaFaucet is Ownable, Initializable {
   /**
    * @dev - Creates a new BetaFaucet contract with the given parameters
    */
-  function initialize() external notInitialized {
+  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
     setInitialized();
     owner = msg.sender;
   }

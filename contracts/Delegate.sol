@@ -11,6 +11,12 @@ contract Delegate {
     require(_key != bytes32(0), '_key cannot be blank');
     _setDelegateRegistry(_registry);
     _setDelegateKey(_key);
+    address _impl = implementation();
+    require(_impl != address(0), '_impl must be defined');
+    require(
+      _impl.delegatecall(bytes4(keccak256('initializeTarget(address,bytes32)')), _registry, _key),
+      'constructor failed'
+    );
   }
 
   function getDelegateRegistry() public view returns (address impl) {

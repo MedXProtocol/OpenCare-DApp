@@ -8,7 +8,6 @@ module.exports = function(deployer) {
     const registryInstance = await Registry.deployed()
 
     return deployWithDelegate(artifacts, deployer, CaseDiagnosingDoctor).then((caseDiagnosingDoctor) => {
-      return caseDiagnosingDoctor.initialize(registryInstance.address)
     })
   })
 };

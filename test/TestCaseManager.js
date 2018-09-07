@@ -41,14 +41,6 @@ contract('CaseManager', function (accounts) {
     })
   })
 
-  describe('initialize()', () => {
-    it('should not be called again', async () => {
-      await expectThrow(async () => {
-        await env.caseManager.initialize(web3.toWei('10', 'ether'), env.registry.address)
-      })
-    })
-  })
-
   describe('usdToWei(uint256)', () => {
     it('should dynamically calculate the case fee', async () => {
       assert.equal((web3.toDecimal(await env.etherPriceFeed.read())), web3.toWei('300', 'ether'))

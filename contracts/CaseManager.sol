@@ -13,8 +13,9 @@ import './RegistryLookup.sol';
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import './DelegateTarget.sol';
 
-contract CaseManager is Ownable, Pausable, Initializable {
+contract CaseManager is Ownable, Pausable, Initializable, DelegateTarget {
 
   using RegistryLookup for Registry;
   using SafeMath for uint256;
@@ -68,15 +69,11 @@ contract CaseManager is Ownable, Pausable, Initializable {
     );
   }
 
-  /**
-   * @dev - Constructor
-   */
-  function initialize(address _registry) external notInitialized {
+  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
     require(_registry != 0x0, 'registry is zero');
     setInitialized();
-
-    owner = msg.sender;
     registry = Registry(_registry);
+    owner = msg.sender;
     caseList.push(address(0));
   }
 
@@ -136,7 +133,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
   ) public payable {
     uint256 caseTokenFeeWei = registry.casePaymentManager().caseFeeTokenWei(_tokenContract);
     Case newCase = Case(new Delegate(registry, keccak256("Case")));
-    newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseTokenFeeWei, registry);
+    newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseTokenFeeWei);
     registry.caseLifecycleManager().setDiagnosingDoctor(newCase, _doctor, _doctorEncryptedKey);
     registry.caseScheduleManager().initializeCase(newCase);
     registry.casePaymentManager().initializeCase.value(msg.value)(newCase, _tokenContract);
