@@ -98,8 +98,9 @@ function* heartbeatMessage(lastHeartbeatTime, { message }) {
 
 function* startHeartbeat(symKeyId) {
   while (true) {
-    const address = yield select((state) => state.sagaGenesis.accounts[0])
-    if (address) {
+    const address = yield select(state => state.sagaGenesis.accounts[0])
+    const isAvailable = yield select(state => state.heartbeat.isAvailable)
+    if (address && isAvailable) {
       yield call(postHeartbeat, symKeyId, address)
     }
     yield call(delay, HEARTBEAT_INTERVAL)
