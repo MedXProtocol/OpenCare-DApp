@@ -16,14 +16,14 @@ import { Ether } from './Ether'
 function mapStateToProps(state) {
   const CaseManager = contractByName(state, 'CaseManager')
   return {
-    usdPerWei: cacheCallValue(state, CaseManager, 'usdPerWei'),
+    usdPerWei: cacheCallValue(state, CasePaymentManager, 'usdPerEtherWei'),
     CaseManager
   }
 }
 
 function* etherFlipSaga({ CaseManager }) {
   if (!CaseManager) { return }
-  yield cacheCall(CaseManager, 'usdPerWei')
+  yield cacheCall(CasePaymentManager, 'usdPerEtherWei')
 }
 
 export const EtherFlip = connect(mapStateToProps)(

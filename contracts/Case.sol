@@ -8,6 +8,7 @@ import "./WETH9.sol";
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 contract Case is Ownable, Initializable {
 
@@ -61,6 +62,11 @@ contract Case is Ownable, Initializable {
    */
   modifier onlyCasePhaseManagers() {
     require(isCasePhaseManager(), 'must be one of the Case Phase Manager contracts');
+    _;
+  }
+
+  modifier onlyCasePaymentManager() {
+    require(msg.sender == address(registry.casePaymentManager()));
     _;
   }
 
@@ -128,9 +134,8 @@ contract Case is Ownable, Initializable {
     diagnosingDoctor = _doctorAddress;
   }
 
-  function deposit() external payable {
-    require(msg.value >= createCaseCost(), 'Not enough ether to create case');
-    lookupWeth9().deposit.value(msg.value)();
+  function deposit() external payable onlyCasePaymentManager {
+    registry.weth9().deposit.value(msg.value)();
   }
 
   function setChallengingDoctor(address _doctorAddress) external onlyCaseSecondPhaseManager {
@@ -157,27 +162,26 @@ contract Case is Ownable, Initializable {
     emit CaseFinalized(address(this), patient, diagnosingDoctor, challengingDoctor);
   }
 
-  function transferCaseFeeToDiagnosingDoctor() external onlyCasePhaseManagers {
-    WETH9 weth9 = lookupWeth9();
-    weth9.transfer(diagnosingDoctor, caseFee);
-  }
-
-  function transferRemainingBalanceToPatient() external onlyCasePhaseManagers {
-    WETH9 weth9 = lookupWeth9();
-    weth9.transfer(patient, weth9.balanceOf(address(this)));
-  }
-
-  function transferChallengingDoctorFee() external onlyCaseSecondPhaseManager {
-    WETH9 weth9 = lookupWeth9();
-    weth9.transfer(challengingDoctor, caseFee.mul(50).div(100));
-  }
-
-  function createCaseCost() internal view returns (uint256) {
+  function requiredDeposit() external view returns (uint256) {
     return caseFee.add(caseFee.mul(50).div(100));
   }
 
-  function lookupWeth9() internal view returns (WETH9) {
-    return WETH9(registry.lookup(keccak256("WrappedEther")));
+  function transferCaseFeeToDiagnosingDoctor() external onlyCasePhaseManagers {
+    ERC20 tokenContract = erc20();
+    tokenContract.transfer(diagnosingDoctor, caseFee);
   }
 
+  function transferRemainingBalanceToPatient() external onlyCasePhaseManagers {
+    ERC20 tokenContract = erc20();
+    tokenContract.transfer(patient, tokenContract.balanceOf(address(this)));
+  }
+
+  function transferChallengingDoctorFee() external onlyCaseSecondPhaseManager {
+    ERC20 tokenContract = erc20();
+    tokenContract.transfer(challengingDoctor, caseFee.mul(50).div(100));
+  }
+
+  function erc20() internal view returns (ERC20) {
+    return registry.casePaymentManager().getCaseTokenContract(this);
+  }
 }
