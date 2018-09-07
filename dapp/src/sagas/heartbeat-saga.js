@@ -64,7 +64,7 @@ function* postHeartbeat(symKeyId, address) {
     })
   } catch (error) {
     console.error(error)
-    yield put({ type: 'WEB3_SHH_ERROR', error })
+    yield put({ type: 'WEB3_SHH_DISCONNECT', error })
   }
 }
 
@@ -111,9 +111,8 @@ export default function* () {
     const lastHeartbeatTime = {}
     const subscriptionTask = yield fork(startHeartbeatSubscription, web3, symKeyId, lastHeartbeatTime)
     const heartbeatTask = yield fork(startHeartbeat, symKeyId)
-    yield take('WEB3_SHH_ERROR')
+    yield take('WEB3_SHH_DISCONNECT')
     yield cancel(subscriptionTask)
     yield cancel(heartbeatTask)
-    yield put({ type: 'WEB3_SHH_INIT' })
   })
 }

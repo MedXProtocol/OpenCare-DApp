@@ -3,7 +3,8 @@ import {
   takeLatest,
   put,
   select,
-  call
+  call,
+  take
 } from 'redux-saga/effects'
 import {
   delay
@@ -12,7 +13,8 @@ import {
 const URLS = {
   1: process.env.REACT_APP_WHISPER_MAINNET_WEBSOCKET_URL,
   3: process.env.REACT_APP_WHISPER_ROPSTEN_WEBSOCKET_URL,
-  4: process.env.REACT_APP_WHISPER_RINKEBY_WEBSOCKET_URL
+  4: process.env.REACT_APP_WHISPER_RINKEBY_WEBSOCKET_URL,
+  1234: process.env.REACT_APP_WHISPER_RINKEBY_WEBSOCKET_URL
 }
 
 export function* whisperSaga() {
@@ -22,7 +24,7 @@ export function* whisperSaga() {
     const networkId = yield select(state => state.sagaGenesis.network.networkId)
     let url = URLS[networkId]
     if (!url) {
-      url = URLS[1]
+      url = URLS[1234]
     }
 
     while (true) {
@@ -36,5 +38,12 @@ export function* whisperSaga() {
     }
     const symKeyId = yield web3.shh.generateSymKeyFromPassword('hippocrates')
     yield put({ type: 'WEB3_SHH_INITIALIZED', web3, symKeyId })
+
+    yield take('WEB3_SHH_DISCONNECT', function* () {
+      yield put({ type: 'WEB3_SHH_INIT' })
+    })
   })
+
+  // kick it off!
+  yield put({ type: 'WEB3_SHH_INIT' })
 }
