@@ -7,7 +7,6 @@ module.exports = function(deployer) {
   deployer.then(async () => {
     const registryInstance = await Registry.deployed()
     return deployWithDelegate(artifacts, deployer, CaseScheduleManager).then((caseScheduleManager) => {
-      return caseScheduleManager.initialize(registryInstance.address)
     })
   })
 };

@@ -31,14 +31,6 @@ contract('CaseDiagnosingDoctor', function (accounts) {
     await resetCaseManager(artifacts, env)
   })
 
-  describe('initialize()', () => {
-    it('should not work twice', async () => {
-      await expectThrow(async () => {
-        await env.caseDiagnosingDoctor.initialize(env.registry.address)
-      })
-    })
-  })
-
   // Yes, Diagnosing Doctor Can Force Accept
   // 1. doctor 1 diagnosed, no challenge, 48+ hours       (caseInstance1)
   // 2. doctor 1 diagnosed, patient challenged, 96+ hours (caseInstance2)

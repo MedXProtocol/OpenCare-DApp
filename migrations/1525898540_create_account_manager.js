@@ -7,8 +7,6 @@ let Registry = artifacts.require('./Registry.sol')
 module.exports = function(deployer) {
   deployer.then(async () => {
     const registryInstance = await Registry.deployed()
-    return deployWithDelegate(artifacts, deployer, AccountManager).then((delegateInstance) => {
-      return delegateInstance.setRegistry(registryInstance.address)
-    })
+    return deployWithDelegate(artifacts, deployer, AccountManager)
   })
 };

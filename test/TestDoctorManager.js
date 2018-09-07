@@ -11,16 +11,10 @@ contract('DoctorManager', function (accounts) {
 
   beforeEach(async () => {
     doctorManager = await DoctorManager.new()
-    await doctorManager.initialize()
+    await doctorManager.initializeTarget(0, 0)
   })
 
   describe('initialize()', () => {
-    it('should not be called again', async () => {
-      await expectThrow(async () => {
-        await doctorManager.initialize()
-      })
-    })
-
     it('should set the values at 0', async () => {
       assert.equal(await doctorManager.doctorCount.call(), 1)
     })

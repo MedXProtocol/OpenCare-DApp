@@ -8,10 +8,11 @@ import './DoctorManager.sol';
 import "./Initializable.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
+import './DelegateTarget.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract CaseSecondPhaseManager is Ownable, Initializable {
+contract CaseSecondPhaseManager is Ownable, Initializable, DelegateTarget {
 
   using RegistryLookup for Registry;
 
@@ -55,9 +56,9 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
     revert();
   }
 
-  function initialize(Registry _registry) public notInitialized {
+  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
     require(_registry != address(0), 'registry is not blank');
-    registry = _registry;
+    registry = Registry(_registry);
     owner = msg.sender;
     setInitialized();
   }

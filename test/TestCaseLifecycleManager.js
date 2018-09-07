@@ -36,14 +36,6 @@ contract('CaseLifecycleManager', function (accounts) {
     caseInstance = await Case.at(await createCase(env, patient, doctor))
   })
 
-  describe('initialize()', () => {
-    it('should not work twice', async () => {
-      await expectThrow(async () => {
-        await env.caseLifecycleManager.initialize(env.registry.address)
-      })
-    })
-  })
-
   describe('patientWithdrawFunds()', () => {
     it('should close the case and refund the patient', async () => {
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))

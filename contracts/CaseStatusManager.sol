@@ -5,10 +5,11 @@ import "./LinkedList.sol";
 import './Initializable.sol';
 import './Registry.sol';
 import './RegistryLookup.sol';
+import './DelegateTarget.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract CaseStatusManager is Initializable, Ownable {
+contract CaseStatusManager is Initializable, Ownable, DelegateTarget {
 
   using RegistryLookup for Registry;
   using LinkedList for LinkedList.UInt256;
@@ -60,9 +61,9 @@ contract CaseStatusManager is Initializable, Ownable {
     _;
   }
 
-  function initialize(Registry _registry) public notInitialized {
+  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
     require(_registry != address(0), 'registry address cannot be blank');
-    registry = _registry;
+    registry = Registry(_registry);
     owner = msg.sender;
     setInitialized();
   }

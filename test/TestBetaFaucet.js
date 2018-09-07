@@ -16,14 +16,6 @@ contract('BetaFaucet', function (accounts) {
     betaFaucetInstance.updateMedXTokenAddress(env.medXToken.address)
   })
 
-  describe('initialize()', () => {
-    it('should not be called again', async () => {
-      await expectThrow(async () => {
-        await betaFaucetInstance.initialize()
-      })
-    })
-  })
-
   describe('updateMedXTokenAddress()', () => {
     it('should not be called again', () => {
       expectThrow(async () => {
@@ -76,5 +68,5 @@ contract('BetaFaucet', function (accounts) {
       })
     })
   })
-  
+
 })
