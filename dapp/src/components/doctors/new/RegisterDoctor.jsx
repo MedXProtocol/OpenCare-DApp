@@ -47,9 +47,12 @@ export const RegisterDoctorContainer =
 
           this.setRegionRef = element => { this.regionInput = element }
 
-          this.priorityDoctors = process.env.REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES
-            .split(',')
-            .filter((val) => val)
+          this.priorityDoctors = []
+          if (process.env.REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES) {
+            this.priorityDoctors = process.env.REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES
+              .split(',')
+              .filter((val) => val)
+          }
         }
 
         handleSubmit = async (event) => {

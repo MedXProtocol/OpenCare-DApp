@@ -138,7 +138,12 @@ function* findNextAvailableOnlineDoctor () {
 
 function* findNextPriorityDoctor() {
   let doctor = null
-  let addresses = process.env.REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES.split(',').filter((val) => val)
+  let addresses = []
+  if (process.env.REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES) {
+    addresses = process.env.REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES
+      .split(',')
+      .filter((val) => val)
+  }
   addresses = shuffle(addresses)
 
   for (var i = 0; i < addresses.length; i++) {
