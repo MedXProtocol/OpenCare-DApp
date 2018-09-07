@@ -16,31 +16,34 @@ export class Pagination extends Component {
   }
 
   calculatePageValues = () => {
-    const pageNumbers = range(
-      Math.max(this.props.currentPage - NUM_VALUES_TO_SHOW, 2),
-      Math.min(this.props.currentPage + NUM_VALUES_TO_SHOW, this.props.totalPages)
-    )
+    const startNum = Math.max(this.props.currentPage - NUM_VALUES_TO_SHOW, 2)
+    const endNum   = Math.min(this.props.currentPage + NUM_VALUES_TO_SHOW, this.props.totalPages)
+
+    const pageNumbers = range(startNum, endNum)
 
     // Add ellipsis to end, before last to show that there's more pages truncated
     // do this calculation first, before adding the ellipsis at the front
-    // if (pageNumbers.length >= (NUM_VALUES_TO_SHOW * 2)) {
-    if (
-      this.props.totalPages > 5
-      && pageNumbers[pageNumbers.length-1] !== (this.props.totalPages - 1)
-    ) {
+    const isManyPages = this.props.totalPages > NUM_VALUES_TO_SHOW
+    const currentPageIsFarBelowTotal = (this.props.currentPage < (this.props.totalPages - NUM_VALUES_TO_SHOW))
+
+    if (isManyPages && currentPageIsFarBelowTotal) {
       pageNumbers.splice(pageNumbers.length, 0, '...')
     }
 
     // Add ellipsis after the first page to show that there's more pages truncated
-    if (this.props.currentPage > NUM_VALUES_TO_SHOW + 1) {
+    const beginningTruncated = this.props.currentPage > (NUM_VALUES_TO_SHOW + 1)
+    if (beginningTruncated) {
       pageNumbers.splice(0, 0, '...')
     }
 
     // We always want the first and last pages in the array
-    if (pageNumbers[0] !== 1) {
+    const needsFirstPage = pageNumbers[0] !== 1
+    if (needsFirstPage) {
       pageNumbers.splice(0, 0, 1)
     }
-    if (pageNumbers[pageNumbers.length-1] !== this.props.totalPages) {
+
+    const needsLastPage = pageNumbers[pageNumbers.length-1] !== this.props.totalPages
+    if (needsLastPage) {
       pageNumbers.push(this.props.totalPages)
     }
 
@@ -88,12 +91,14 @@ export class Pagination extends Component {
   }
 
   render () {
-    if (this.props.totalPages <= 1) { return null }
-
-    return (
-      <nav aria-label="Page navigation" className="text-center">
-        {this.renderPageNumbers()}
-      </nav>
-    )
+    if (this.props.totalPages > 1) {
+      return (
+        <nav aria-label="Page navigation" className="text-center">
+          {this.renderPageNumbers()}
+        </nav>
+      )
+    } else {
+      return null
+    }
   }
 }
