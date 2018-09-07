@@ -152,7 +152,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
           id='transactions'
           title={
             <span>
-              <span className={classnames('nav-transactions--circle', this.getDropdownClassName())} /> Status
+              <span className={classnames('nav-transactions--circle', this.getDropdownClassName())} /> Tx
             </span>
           }>
           <li>

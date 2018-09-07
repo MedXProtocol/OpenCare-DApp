@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
 import { all } from 'redux-saga/effects'
+import { toastr } from '~/toastr'
 import {
   Nav,
   Navbar,
@@ -36,6 +37,7 @@ import * as routes from '~/config/routes'
 function mapStateToProps (state) {
   let doctorName
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const isAvailable = get(state, 'heartbeat.isAvailable')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const WrappedEther = contractByName(state, 'WrappedEther')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
@@ -50,6 +52,7 @@ function mapStateToProps (state) {
 
   return {
     address,
+    isAvailable,
     balance,
     doctorName,
     isDoctor,
@@ -68,6 +71,9 @@ function mapDispatchToProps (dispatch) {
     },
     dispatchShowBetaFaucetModal: () => {
       dispatch({ type: 'SHOW_BETA_FAUCET_MODAL', manuallyOpened: true })
+    },
+    dispatchAvailabilityChange: (isAvailable) => {
+      dispatch({ type: 'AVAILABILITY_CHANGED', isAvailable })
     }
   }
 }
@@ -109,6 +115,16 @@ export const HippoNavbar = withContractRegistry(
     event.preventDefault()
     this.props.dispatchShowBetaFaucetModal()
     this.toggleProfileMenu(false)
+  }
+
+  onToggleIsAvailable = () => {
+    const isAvailable = !this.props.isAvailable
+    if (isAvailable) {
+      toastr.success('You are now online and will be prioritized to diagnose cases')
+    } else {
+      toastr.warning('You are now offline and will not be prioritized to diagnose cases')
+    }
+    this.props.dispatchAvailabilityChange(isAvailable)
   }
 
   render() {
@@ -201,6 +217,17 @@ export const HippoNavbar = withContractRegistry(
       }
     }
 
+    var statusItem =
+      <NavItem onClick={this.onToggleIsAvailable}>
+        <span className={
+            classnames(
+              'nav-transactions--circle',
+              this.props.isAvailable ? 'nav-transactions-text--success' : 'nav-transactions-text--danger'
+            )
+        }/>&nbsp;
+        {this.props.isAvailable ? 'Online' : 'Offline'}
+      </NavItem>
+
     let navbarClassName = classnames(
       'navbar',
       'container--nav',
@@ -248,6 +275,7 @@ export const HippoNavbar = withContractRegistry(
             {openCasesItem}
             {adminItem}
             {profileMenu}
+            {statusItem}
           </Nav>
         </Navbar.Collapse>
       </Navbar>

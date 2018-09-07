@@ -112,12 +112,11 @@ function* findNextAvailableDoctor() {
     yield put({ type: 'NEXT_AVAILABLE_DOCTOR', doctor })
   } else {
     yield put({ type: 'NO_DOCTORS_AVAILABLE' })
-    // console.warn('No doctors are available')
   }
 }
 
 function* findNextAvailableOnlineDoctor () {
-  const onlineAddresses = Object.keys(yield select(state => state.heartbeat))
+  const onlineAddresses = Object.keys(yield select(state => state.heartbeat.users))
   let doctor = null
   for (var i = 0; i < onlineAddresses.length; i++) {
     doctor = yield fetchDoctorByAddress(onlineAddresses[i])
