@@ -117,7 +117,7 @@ export const HippoNavbar = withContractRegistry(
     this.toggleProfileMenu(false)
   }
 
-  onToggleIsAvailable = () => {
+  handleToggleIsAvailable = () => {
     const isAvailable = !this.props.isAvailable
     if (isAvailable) {
       toastr.success('You are now online and will be prioritized to diagnose cases')
@@ -218,7 +218,7 @@ export const HippoNavbar = withContractRegistry(
     }
 
     var statusItem =
-      <NavItem onClick={this.onToggleIsAvailable}>
+      <NavItem onClick={this.handleToggleIsAvailable}>
         <span className={
             classnames(
               'nav-transactions--circle',
