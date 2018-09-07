@@ -48,9 +48,7 @@ export const UserAgentCheckModal = class _UserAgentCheckModal extends Component 
   }
 
   render () {
-    // console.log('unsupportedBrowser()', unsupportedBrowser())
     const isVisible = unsupportedBrowser() && !this.state.hidden
-    // console.log('isVisible', isVisible)
 
     const androidLink = <a
         href="https://play.google.com/store/apps/details?id=org.toshi&hl=en_CA"
