@@ -21,6 +21,7 @@ import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
 import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
 import { AcceptAllExpiredCases } from '~/components/AcceptAllExpiredCases'
+import { PublicKeyListener } from '~/components/PublicKeyListener'
 import { PublicKeyCheck } from '~/components/PublicKeyCheck'
 import { BetaFaucetModal } from '~/components/BetaFaucetModal'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
@@ -181,6 +182,8 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       setRequestedPathname('')
     }
 
+    var publicKeyListener = <PublicKeyListener dispatchSignOut={this.props.dispatchSignOut} />
+
     if (this.props.isSignedIn) {
       var publicKeyCheck = <PublicKeyCheck />
       var betaFaucetModal = <BetaFaucetModal />
@@ -206,6 +209,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
         <HippoNavbarContainer openCasesLength={this.props.openCaseCount} />
         {ownerWarning}
         {publicKeyCheck}
+        {publicKeyListener}
         {acceptAllExpiredCases}
         <div className="content">
           {betaFaucetModal}
