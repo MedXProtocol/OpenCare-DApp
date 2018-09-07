@@ -42,8 +42,7 @@ contract('Case', function (accounts) {
           'alaksefj',
           'caseKeySalt',
           [1, 2],
-          10000,
-          env.registry.address
+          10000
         )
       })
     })

@@ -3,6 +3,6 @@ const DoctorManager = artifacts.require("./DoctorManager.sol");
 
 module.exports = function(deployer) {
   deployWithDelegate(artifacts, deployer, DoctorManager).then((doctorManager) => {
-    return doctorManager.initialize()
+    // return doctorManager.initialize()
   })
 };

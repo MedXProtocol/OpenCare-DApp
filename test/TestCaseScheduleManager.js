@@ -30,14 +30,6 @@ contract('CaseScheduleManager', function (accounts) {
     })
   })
 
-  describe('initialize()', () => {
-    it('should not be called again', async () => {
-      await expectThrow(async () => {
-        await env.caseScheduleManager.initialize(env.registry.address)
-      })
-    })
-  })
-
   describe('initializeCase()', () => {
     it('should assign timestamps', async () => {
       const caseInstance = await Case.at(await createCase(env, patient, doctor))

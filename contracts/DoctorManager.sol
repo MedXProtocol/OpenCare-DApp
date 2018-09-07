@@ -2,8 +2,9 @@ pragma solidity ^0.4.23;
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Initializable.sol";
+import "./DelegateTarget.sol";
 
-contract DoctorManager is Ownable, Initializable {
+contract DoctorManager is Ownable, Initializable, DelegateTarget {
 
   /*
     MEMORY START
@@ -28,7 +29,7 @@ contract DoctorManager is Ownable, Initializable {
   event DoctorDeactivated(address indexed doctor);
   event DoctorReactivated(address indexed doctor);
 
-  function initialize() public notInitialized {
+  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
     setInitialized();
     owner = msg.sender;
 

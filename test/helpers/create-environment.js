@@ -34,34 +34,25 @@ module.exports = async function createEnvironment(artifacts) {
   await registry.register(toRegistryKey('Case'), caseInstance.address)
 
   let caseManager = await envDeployWithDelegate(registry, Delegate, CaseManager, 'CaseManager')
-  await caseManager.initialize(web3.toWei('10', 'ether'), registry.address)
+  await caseManager.setBaseCaseFee(web3.toWei('10', 'ether'))
 
   let caseDiagnosingDoctor = await envDeployWithDelegate(registry, Delegate, CaseDiagnosingDoctor, 'CaseDiagnosingDoctor')
-  await caseDiagnosingDoctor.initialize(registry.address)
 
   let caseStatusManager = await envDeployWithDelegate(registry, Delegate, CaseStatusManager, 'CaseStatusManager')
-  await caseStatusManager.initialize(registry.address)
 
   let caseScheduleManager = await envDeployWithDelegate(registry, Delegate, CaseScheduleManager, 'CaseScheduleManager')
-  await caseScheduleManager.initialize(registry.address)
 
   let caseLifecycleManager = await envDeployWithDelegate(registry, Delegate, CaseLifecycleManager, 'CaseLifecycleManager')
-  await caseLifecycleManager.initialize(registry.address)
 
   let caseFirstPhaseManager = await envDeployWithDelegate(registry, Delegate, CaseFirstPhaseManager, 'CaseFirstPhaseManager')
-  await caseFirstPhaseManager.initialize(registry.address)
 
   let caseSecondPhaseManager = await envDeployWithDelegate(registry, Delegate, CaseSecondPhaseManager, 'CaseSecondPhaseManager')
-  await caseSecondPhaseManager.initialize(registry.address)
 
   let doctorManager = await envDeployWithDelegate(registry, Delegate, DoctorManager, 'DoctorManager')
-  await doctorManager.initialize()
 
   let betaFaucet = await envDeployWithDelegate(registry, Delegate, BetaFaucet, 'BetaFaucet')
-  await betaFaucet.initialize()
 
   let accountManager = await envDeployWithDelegate(registry, Delegate, AccountManager, 'AccountManager')
-  await accountManager.setRegistry(registry.address)
 
   return {
     betaFaucet,

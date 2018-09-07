@@ -25,7 +25,6 @@ contract('Delegate', function (accounts) {
 
   describe('delegated call', () => {
     it('should work', async () => {
-      await doctorManagerDelegate.initialize()
       assert.equal(await doctorManagerDelegate.owner.call(), accounts[0])
     })
   })

@@ -8,7 +8,7 @@ module.exports = function(deployer, network, accounts) {
     let registryInstance = await Registry.deployed()
     return deployWithDelegate(artifacts, deployer, CaseManager).then((caseManager) => {
       let caseFeeUsd = web3.toWei('15', 'ether')
-      return caseManager.initialize(caseFeeUsd, registryInstance.address)
+      return caseManager.setBaseCaseFee(caseFeeUsd)
     })
   })
 }
