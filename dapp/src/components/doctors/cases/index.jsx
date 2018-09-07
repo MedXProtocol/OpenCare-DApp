@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
+import { all } from 'redux-saga/effects'
 import { DiagnoseCaseContainer } from '~/components/doctors/diagnose'
 import { DoctorCaseListing } from './DoctorCaseListing'
 import { PageTitle } from '~/components/PageTitle'
@@ -75,9 +76,9 @@ function* saga({ address, CaseStatusManager, start, end }) {
   if (!address || !CaseStatusManager) { return }
   yield cacheCall(CaseStatusManager, 'closedCaseCount', address)
 
-  yield range(start, end).map(function* (index) {
+  yield all(range(start, end).map(function* (index) {
     yield cacheCall(CaseStatusManager, 'closedCaseAtIndex', address, index - 1)
-  })
+  }))
 }
 
 export const OpenCasesContainer = connect(mapStateToProps)(

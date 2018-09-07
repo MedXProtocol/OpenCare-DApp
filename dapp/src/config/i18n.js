@@ -13,6 +13,7 @@ i18next
           transactions: {
             acceptDiagnosis: 'Accepting Diagnosis',
             acceptAsDoctor: 'Accepting Diagnosis',
+            acceptAllAsDoctor: 'Closing Multiple Cases',
             addDoctor: 'Upgrading to Doctor',
             addOrReactivateDoctor: 'Adding / Reactivating Doctor',
             deactivateDoctor: 'Deactivating Doctor',

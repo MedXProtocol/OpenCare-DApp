@@ -10,11 +10,12 @@ import addRegistryContracts from './add-registry-contracts-saga'
 import signInSaga from './sign-in-saga'
 import signOutSaga from './sign-out-saga'
 import signUpSaga from './sign-up-saga'
-// import heartbeatSaga from './heartbeat-saga'
+import heartbeatSaga from './heartbeat-saga'
 import { nextAvailableDoctorSaga } from './next-available-doctor-saga'
 import { pollExternalTransactionsSaga } from './pollExternalTransactionsSaga'
 import { failedTransactionListener } from './failedTransactionListener'
 import { featuresSaga } from './featuresSaga'
+import { whisperSaga } from './whisperSaga'
 
 export default function* () {
   yield featuresSaga()
@@ -22,14 +23,15 @@ export default function* () {
     yield setContext({ web3 })
     yield addTopLevelContracts()
     yield addRegistryContracts({ web3 })
-    yield all([
+    yield fork(all, [
       signInSaga(),
       signOutSaga(),
       signUpSaga(),
-      // heartbeatSaga(),
       nextAvailableDoctorSaga(),
       pollExternalTransactionsSaga(),
       failedTransactionListener(),
+      whisperSaga(),
+      heartbeatSaga()
     ])
   })
   const localStorageEnabled = yield select(state => state.features.localStorage)

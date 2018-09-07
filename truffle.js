@@ -31,11 +31,11 @@ module.exports = {
       gasPrice: 10 * 1000000000
     }
   },
-  mocha: {
-    reporter: 'eth-gas-reporter',
-    reporterOptions : {
-      currency: 'CAD',
-      gasPrice: 21
-    }
-  }
+  // mocha: {
+  //   reporter: 'eth-gas-reporter',
+  //   reporterOptions : {
+  //     currency: 'CAD',
+  //     gasPrice: 21
+  //   }
+  // }
 }

@@ -58,12 +58,19 @@ contract CaseScheduleManager is Initializable, Ownable {
     return (block.timestamp - updatedAt[_caseAddress]) > SECONDS_IN_A_DAY;
   }
 
-  function doctorWaitedTwoDays(address _caseAddress) external view returns (bool) {
+  function doctorWaitedTwoDays(address _caseAddress) public view returns (bool) {
     return (block.timestamp - updatedAt[_caseAddress]) > (SECONDS_IN_A_DAY * 2);
   }
 
-  function doctorWaitedFourDays(address _caseAddress) external view returns (bool) {
+  function doctorWaitedFourDays(address _caseAddress) public view returns (bool) {
     return (block.timestamp - updatedAt[_caseAddress]) > (SECONDS_IN_A_DAY * 4);
+  }
+
+  function caseExpiredForDoctor(Case _case) external view returns (bool) {
+    return (
+         _case.status() == Case.CaseStatus.Evaluated   && doctorWaitedTwoDays(_case)
+      || _case.status() == Case.CaseStatus.Challenging && doctorWaitedFourDays(_case)
+    );
   }
 
   /**

@@ -16,6 +16,7 @@ function mapStateToProps(state, ownProps) {
     signingIn,
     overrideError: state.account.overrideError,
     secretKeyError: state.account.secretKeyError,
+    publicKeyMismatchError: state.account.publicKeyMismatchError,
     masterPasswordError: state.account.masterPasswordError
   }
 }
@@ -57,20 +58,19 @@ export const SignInForm = class _SignInForm extends Component {
   }
 
   render () {
-    const { signingIn } = this.props
-    var masterPasswordError
-    if (this.props.masterPasswordError) {
-      masterPasswordError = <Alert bsStyle='danger'>{this.props.masterPasswordError}</Alert>
-    }
+    const { signingIn, masterPasswordError, secretKeyError, publicKeyMismatchError } = this.props
 
-    var secretKeyError
-    if (this.props.secretKeyError) {
-      secretKeyError = <Alert bsStyle='danger'>{this.props.secretKeyError}</Alert>
+    if (masterPasswordError) {
+      var passwordError = <Alert bsStyle='danger'>{masterPasswordError}</Alert>
     }
-
+    if (secretKeyError) {
+      var errorAlert = <Alert bsStyle='danger'>{secretKeyError}</Alert>
+    }
+    if (publicKeyMismatchError) {
+      errorAlert = <Alert bsStyle='danger'>{publicKeyMismatchError}</Alert>
+    }
     if (this.props.hasAccount) {
-      var existingSecretKey =
-        <HelpBlock>Leave blank to use your secret key on file</HelpBlock>
+      errorAlert = <HelpBlock>Leave blank to use your secret key on file</HelpBlock>
     }
 
     return (
@@ -92,8 +92,7 @@ export const SignInForm = class _SignInForm extends Component {
                 name='secret-key'
                 minLength='79'
                 maxLength='79' />
-              {existingSecretKey}
-              {secretKeyError}
+              {errorAlert}
             </div>
             <div className='form-group'>
               <label htmlFor="masterPassword">Master Password</label>
@@ -103,7 +102,7 @@ export const SignInForm = class _SignInForm extends Component {
                 type="password"
                 className="form-control input-lg"
                 autoFocus={true} />
-              {masterPasswordError}
+              {passwordError}
             </div>
           </div>
           <div className="form-wrapper--footer">
@@ -128,5 +127,6 @@ SignInFormContainer.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   hasAccount: PropTypes.bool,
   masterPasswordError: PropTypes.string,
-  secretKeyError: PropTypes.string
+  secretKeyError: PropTypes.string,
+  publicKeyMismatchError: PropTypes.string
 }

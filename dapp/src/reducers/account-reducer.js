@@ -2,7 +2,8 @@ export default function (state, {
   type,
   overrideError,
   masterPasswordError,
-  secretKeyError
+  secretKeyError,
+  publicKeyMismatchError
 }) {
   if (typeof state === 'undefined') {
     state = {
@@ -22,7 +23,8 @@ export default function (state, {
         signingIn: false,
         overrideError,
         masterPasswordError,
-        secretKeyError
+        secretKeyError,
+        publicKeyMismatchError
       }
       break
     case 'SIGN_IN_RESET_OVERRIDE':

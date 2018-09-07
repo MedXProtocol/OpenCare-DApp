@@ -1,6 +1,6 @@
 const promisify = require('../test/helpers/promisify').promisify
-const deployAndRegister = require('./support/deploy-and-register')
-const toRegistryKey = require('./support/to-registry-key')
+const deployAndRegister = require('./support/deployAndRegister')
+const toRegistryKey = require('./support/toRegistryKey')
 const Registry = artifacts.require('./Registry.sol')
 const WETH9 = artifacts.require('./WETH9.sol')
 

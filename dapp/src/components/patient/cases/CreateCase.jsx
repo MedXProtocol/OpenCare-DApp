@@ -488,24 +488,22 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
   }
 
   handleSubmit = async (event) => {
+    const { account, balance, caseFeeWei, noDoctorsAvailable, previousCase } = this.props
     event.preventDefault()
 
     await this.runValidation()
 
-    if (!this.props.balance) {
-      console.error("The props.balance wasn't set!")
-    }
-
-    if (this.state.selectedDoctor && this.state.selectedDoctor.value === this.props.account) {
-      toastr.warning('You cannot be your own Doctor. Please try again later.')
-    } else if (this.props.noDoctorsAvailable) {
+    if (!balance) {
+      toastr.warning('We are unable to read your Eth balance.')
+    } else if (!caseFeeWei) {
+      toastr.warning('The case fee has not been set.')
+    } else if (this.state.selectedDoctor && this.state.selectedDoctor.value === account) {
+      toastr.warning('You cannot be your own Doctor.')
+    } else if (noDoctorsAvailable) {
       toastr.warning('There are no Doctors currently available. Please try again later.')
-    }
-
-
-    if (this.state.errors.length === 0) {
-      if (computeTotalFee(this.props.caseFeeWei).greaterThan(this.props.balance)) {
-        if (this.props.previousCase) {
+    } else if (this.state.errors.length === 0) {
+      if (computeTotalFee(caseFeeWei).greaterThan(balance)) {
+        if (previousCase) {
           this.setState({ showBalanceTooLowModal: true })
         } else {
           this.props.showBetaFaucetModal()

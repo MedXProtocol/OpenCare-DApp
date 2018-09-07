@@ -32,7 +32,18 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
   modifier onlyCaseLifecycleManager() {
     require(
       msg.sender == address(registry.caseLifecycleManager()),
-      'Must be an instance of Case lifecycle Manager contract'
+      'Must be an instance of Case Lifecycle Manager contract'
+    );
+    _;
+  }
+
+  /**
+   * @dev - throws if called by anything not an instance of the lifecycle manager contract
+   */
+  modifier onlyCaseLifecycleManagerOrFirstPhaseManager() {
+    require(
+      msg.sender == address(registry.caseLifecycleManager()) || msg.sender == address(registry.caseFirstPhaseManager()),
+      'Must be lifecycle manager or first phase manager contract'
     );
     _;
   }
@@ -148,7 +159,7 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
     setChallengingDoctor(_case, _doctor, _doctorEncryptedKey);
   }
 
-  function clearChallengingDoctor(Case _case) public onlyCaseLifecycleManager {
+  function clearChallengingDoctor(Case _case) public onlyCaseLifecycleManagerOrFirstPhaseManager {
     address patient = _case.patient();
     address challengingDoctor = _case.challengingDoctor();
 

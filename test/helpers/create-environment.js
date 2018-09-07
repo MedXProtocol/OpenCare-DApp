@@ -1,4 +1,4 @@
-const toRegistryKey = require('../../migrations/support/to-registry-key')
+const toRegistryKey = require('../../migrations/support/toRegistryKey')
 
 const envDeployWithDelegate = require('./env-deploy-with-delegate')
 
@@ -10,6 +10,7 @@ module.exports = async function createEnvironment(artifacts) {
   const AccountManager = artifacts.require('./AccountManager.sol')
   const Delegate = artifacts.require('./Delegate.sol')
   const CaseManager = artifacts.require('./CaseManager.sol')
+  const CaseDiagnosingDoctor = artifacts.require('./CaseDiagnosingDoctor.sol')
   const CaseLifecycleManager = artifacts.require('./CaseLifecycleManager.sol')
   const CaseFirstPhaseManager = artifacts.require('./CaseFirstPhaseManager.sol')
   const CaseSecondPhaseManager = artifacts.require('./CaseSecondPhaseManager.sol')
@@ -34,6 +35,9 @@ module.exports = async function createEnvironment(artifacts) {
 
   let caseManager = await envDeployWithDelegate(registry, Delegate, CaseManager, 'CaseManager')
   await caseManager.initialize(web3.toWei('10', 'ether'), registry.address)
+
+  let caseDiagnosingDoctor = await envDeployWithDelegate(registry, Delegate, CaseDiagnosingDoctor, 'CaseDiagnosingDoctor')
+  await caseDiagnosingDoctor.initialize(registry.address)
 
   let caseStatusManager = await envDeployWithDelegate(registry, Delegate, CaseStatusManager, 'CaseStatusManager')
   await caseStatusManager.initialize(registry.address)
@@ -66,6 +70,7 @@ module.exports = async function createEnvironment(artifacts) {
     weth9,
     etherPriceFeed,
     caseManager,
+    caseDiagnosingDoctor,
     caseLifecycleManager,
     caseFirstPhaseManager,
     caseSecondPhaseManager,
