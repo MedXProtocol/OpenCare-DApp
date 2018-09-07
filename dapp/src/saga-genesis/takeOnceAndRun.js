@@ -1,6 +1,6 @@
 import {
   take
-} from 'redux-saga'
+} from 'redux-saga/effects'
 
 export function* takeOnceAndRun(pattern, saga) {
   const action = yield take(pattern)
