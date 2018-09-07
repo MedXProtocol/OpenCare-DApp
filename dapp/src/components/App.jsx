@@ -21,6 +21,7 @@ import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
 import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
 import { AcceptAllExpiredCases } from '~/components/AcceptAllExpiredCases'
+import { UserAgentCheckModal } from '~/components/UserAgentCheckModal'
 import { PublicKeyListener } from '~/components/PublicKeyListener'
 import { PublicKeyCheck } from '~/components/PublicKeyCheck'
 import { BetaFaucetModal } from '~/components/BetaFaucetModal'
@@ -185,6 +186,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     var publicKeyListener = <PublicKeyListener dispatchSignOut={this.props.dispatchSignOut} />
 
     if (this.props.isSignedIn) {
+      var userAgentCheckModal = <UserAgentCheckModal />
       var publicKeyCheck = <PublicKeyCheck />
       var betaFaucetModal = <BetaFaucetModal />
       var feedbackLink = <ScrollyFeedbackLink scrollDiffAmount={50} />
@@ -208,6 +210,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
         <LogListener address={this.props.CaseManager} fromBlock={this.props.fromBlock} />
         <HippoNavbarContainer openCasesLength={this.props.openCaseCount} />
         {ownerWarning}
+        {userAgentCheckModal}
         {publicKeyCheck}
         {publicKeyListener}
         {acceptAllExpiredCases}
