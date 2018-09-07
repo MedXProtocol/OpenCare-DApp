@@ -67,10 +67,7 @@ export const DoctorCaseListing = class _DoctorCaseListing extends Component {
         <div className="row">
           <div className='col-xs-12'>
             <div className="card">
-              <div className={classnames(
-                'card-body',
-                /*{ 'card-body--cases__has-pagination': (totalPages > 1) }*/
-              )}>
+              <div className="card-body">
                 <h5 className="title subtitle">
                   Open Cases:
                 </h5>
