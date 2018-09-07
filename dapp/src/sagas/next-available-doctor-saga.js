@@ -106,13 +106,23 @@ function* fetchDoctorByIndex(index) {
 function* findNextAvailableDoctor() {
   let doctor = yield findNextAvailableOnlineDoctor()
   if (!doctor) {
-    doctor = yield findNextAvailableOfflineDoctor()
+    doctor = yield priorityDoctorOrOfflineDoctor()
   }
   if (doctor) {
     yield put({ type: 'NEXT_AVAILABLE_DOCTOR', doctor })
   } else {
     yield put({ type: 'NO_DOCTORS_AVAILABLE' })
   }
+}
+
+function* priorityDoctorOrOfflineDoctor() {
+  let doctor = yield findNextPriorityDoctor()
+
+  if (!doctor) {
+    doctor = yield findNextAvailableOfflineDoctor()
+  }
+
+  return doctor
 }
 
 function* findNextAvailableOnlineDoctor () {
@@ -122,6 +132,27 @@ function* findNextAvailableOnlineDoctor () {
     doctor = yield fetchDoctorByAddress(onlineAddresses[i])
     if (doctor) { break }
   }
+  return doctor
+}
+
+function* findNextPriorityDoctor() {
+  let doctor = null
+  let addresses = []
+  if (process.env.REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES) {
+    addresses = process.env.REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES
+      .split(',')
+      .filter((val) => val)
+  }
+  addresses = shuffle(addresses)
+
+  for (var i = 0; i < addresses.length; i++) {
+    doctor = yield fetchDoctorByAddress(addresses[i])
+
+    if (doctor) {
+      break
+    }
+  }
+
   return doctor
 }
 
