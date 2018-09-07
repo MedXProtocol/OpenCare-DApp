@@ -3,6 +3,7 @@ import { EthAddress } from '~/components/EthAddress'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
+import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
 import sortBy from 'lodash.sortby'
 import { isBlank } from '~/utils/isBlank'
 import { withDoctors } from '~/components/withDoctors'
@@ -45,6 +46,10 @@ export const RegisterDoctorContainer =
           }
 
           this.setRegionRef = element => { this.regionInput = element }
+
+          this.priorityDoctors = process.env.REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES
+            .split(',')
+            .filter((val) => val)
         }
 
         handleSubmit = async (event) => {
@@ -285,6 +290,7 @@ export const RegisterDoctorContainer =
                       <table className="table table-striped">
                         <thead>
                           <tr>
+                            <th>Priority?</th>
                             <th>Online</th>
                             <th>Doctor Address</th>
                             <th>Doctor Details</th>
@@ -318,6 +324,13 @@ export const RegisterDoctorContainer =
                                   appear={true}
                                   classNames="fade">
                                     <tr key={`doctor-row-${doctorIndex}`} className={!isActive ? 'deactivated' : ''}>
+                                      <td width="5%" className='text-center text-green'>
+                                        {
+                                          this.priorityDoctors.includes(address.toLowerCase())
+                                            ? <FontAwesomeIcon icon={faCheck} />
+                                            : null
+                                        }
+                                      </td>
                                       <td width="5%" className='text-center'>
                                         {
                                           online
