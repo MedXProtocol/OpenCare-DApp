@@ -4,12 +4,13 @@ import "./Case.sol";
 import "./Initializable.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
+import './DelegateTarget.sol';
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
-contract CasePaymentManager is Ownable, Initializable {
+contract CasePaymentManager is Ownable, Initializable, DelegateTarget {
   using RegistryLookup for Registry;
   using SafeMath for uint256;
 
@@ -22,8 +23,8 @@ contract CasePaymentManager is Ownable, Initializable {
     _;
   }
 
-  function initialize(Registry _registry) external notInitialized {
-    require(address(_registry) != 0x0);
+  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
+    require(_registry != 0x0);
     setInitialized();
     owner = msg.sender;
     registry = _registry;
