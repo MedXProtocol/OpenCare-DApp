@@ -1,4 +1,4 @@
-.nav-transactions {
+.nav-list {
   bottom: 0;
   height: 300px;
   background-color: #fff;
@@ -17,35 +17,23 @@
   display: none;
 }
 
-.nav-transactions--circle:before {
-  border-radius: 100%;
-  content: "";
-  height: 1rem;
-  width: 1rem;
-  margin-right: 3px;
-  top: -1px;
-  position: relative;
-  z-index: 1;
-  display: inline-block;
-}
-
-.nav-transactions--group {
+.nav-list--group {
   margin-bottom: 20px;
   padding-left: 0;
 }
 
-.nav-transactions--item:last-child {
+.nav-list--item:last-child {
   margin-bottom: 0;
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
 }
 
-.nav-transactions--item:first-child {
+.nav-list--item:first-child {
   border-top-right-radius: 4px;
   border-top-left-radius: 4px;
 }
 
-.nav-transactions--item {
+.nav-list--item {
   position: relative;
   display: block;
   padding: 10px 5px;
@@ -53,14 +41,23 @@
   background-color: #fff;
 }
 
-.nav-transactions-text--success:before {
-  background-color: #44ce46;
+.nav-list--tx-wrapper {
+  display: grid;
+  grid-template-areas:
+    "a b"
+    "a b";
+  max-width: 210px;
 }
 
-.nav-transactions-text--warning:before {
-  background-color: #f7e12e;
+.nav-list--tx-wrapper__child {
+  grid-area: a;
+  align-self: center;
+  justify-self: center;
 }
 
-.nav-transactions-text--danger:before {
-  background-color: #f9434f;
+.nav-list--tx-name {
+  display: inline-block;
+  grid-area: b;
+  margin-left: 10px;
+  width: 170px;
 }
