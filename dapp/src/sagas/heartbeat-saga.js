@@ -64,7 +64,7 @@ function* postHeartbeat(symKeyId, address) {
     })
   } catch (error) {
     console.error(error)
-    yield put({ type: 'WEB3_SHH_ERROR', error })
+    yield put({ type: 'WEB3_SHH_DISCONNECT', error })
   }
 }
 
