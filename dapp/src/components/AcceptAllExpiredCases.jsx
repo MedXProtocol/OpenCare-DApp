@@ -115,7 +115,6 @@ export const AcceptAllExpiredCases = connect(mapStateToProps)(withSend(withSaga(
 
     render () {
       const { staleCases } = this.props
-      console.log('re-rendering!')
       const visible = this.state.isVisible && (staleCases > 1)
 
       return (
