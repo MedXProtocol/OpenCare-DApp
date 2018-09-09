@@ -111,6 +111,14 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   withSaga(saga)(
     class _App extends Component {
 
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      triggerRefresh: false
+    }
+  }
+
   componentDidMount () {
     window.addEventListener("beforeunload", this.unload)
     window.addEventListener("focus", this.refocus)
@@ -127,6 +135,14 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   }
 
   componentWillReceiveProps (nextProps) {
+    // This will force specific child components to re-render when there is no
+    // automatic reason for them to re-render
+    if (this.props.location.pathname !== nextProps.location.pathname) {
+      this.setState({
+        triggerRefresh: !this.state.triggerRefresh
+      })
+    }
+
     this.onAccountChangeSignOut(nextProps)
 
     // We know new case data is incoming so mark it that we are ready to show it
@@ -192,7 +208,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       var feedbackLink = <ScrollyFeedbackLink scrollDiffAmount={50} />
 
       if (this.props.isDoctor) {
-        var acceptAllExpiredCases = <AcceptAllExpiredCases />
+        var acceptAllExpiredCases = <AcceptAllExpiredCases triggerRefresh={this.state.triggerRefresh} />
       }
     }
 

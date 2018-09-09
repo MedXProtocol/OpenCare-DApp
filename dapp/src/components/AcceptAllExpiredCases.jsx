@@ -106,7 +106,7 @@ export const AcceptAllExpiredCases = connect(mapStateToProps)(withSend(withSaga(
             this.setState({ forceAcceptAllAsDoctorHandler: null, loading: false, isVisible: true })
           })
           .onTxHash(() => {
-            toastr.success('Your accept all diagnoses on stale cases transaction has been broadcast to the network. After it confirms you will receive your fees.')
+            toastr.success('Your "Accept all Diagnoses on Stale Cases" transaction has been broadcast to the network. After it confirms you will receive your fees.')
             mixpanel.track('Doctor Force Accepting All Stale Cases')
             this.setState({ isVisible: false })
           })
@@ -115,7 +115,7 @@ export const AcceptAllExpiredCases = connect(mapStateToProps)(withSend(withSaga(
 
     render () {
       const { staleCases } = this.props
-
+      console.log('re-rendering!')
       const visible = this.state.isVisible && (staleCases > 1)
 
       return (
