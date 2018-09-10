@@ -70,4 +70,34 @@ contract CaseDiagnosingDoctor is Ownable, Initializable, DelegateTarget {
     emit AcceptedAllAsDoctor(msg.sender);
   }
 
+  function acceptOneAsDoctor(address _doctorAddress) external {
+    uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
+
+    address caseAddress = registry.caseStatusManager().openCaseAddress(_doctorAddress, currentNodeId);
+    Case openCase = Case(caseAddress);
+    // registry.caseLifecycleManager().acceptAsDoctor(openCase);
+    registry.caseFirstPhaseManager().acceptAsDoctor(openCase);
+  }
+
+  function currentNodeForDoc(address _doctorAddress) external view returns (uint256) {
+    return registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
+  }
+
+  function currentCaseForDoc(address _doctorAddress) external view returns (address) {
+    uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
+    address caseAddress = registry.caseStatusManager().openCaseAddress(_doctorAddress, currentNodeId);
+    return caseAddress;
+  }
+
+  function doctorCloseCase(address _doctorAddress) external {
+    uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
+    address caseAddress = registry.caseStatusManager().openCaseAddress(_doctorAddress, currentNodeId);
+    Case openCase = Case(caseAddress);
+    registry.caseLifecycleManager().acceptAsDoctor(address(openCase));
+  }
+
+  function caseDiagnosingDoctor() external view returns (address) {
+    return address(registry.caseDiagnosingDoctor());
+  }
+
 }

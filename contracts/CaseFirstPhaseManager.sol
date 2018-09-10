@@ -33,28 +33,9 @@ contract CaseFirstPhaseManager is Ownable, Initializable, DelegateTarget {
     _;
   }
 
-  /**
-   * @dev - throws unless is instance of either a phase manager
-            or the lifecycle manager
-   */
-  modifier onlyCaseLifecycleOrDiagnosingDoctorContracts() {
-    require(
-      isDiagnosingDoctorContract() || isCaseLifecycleManager(),
-      'must be Case Lifecycle or DiagnosingDoctor contracts'
-    );
-    _;
-  }
-
-  function isDiagnosingDoctorContract() internal view returns (bool) {
-    return msg.sender == address(registry.caseDiagnosingDoctor());
-  }
-
   function isCaseLifecycleManager() internal view returns (bool) {
     return msg.sender == address(registry.caseLifecycleManager());
   }
-
-
-
 
   /**
    * @dev - Contract should not accept any ether
@@ -109,7 +90,7 @@ contract CaseFirstPhaseManager is Ownable, Initializable, DelegateTarget {
   /**
    * @dev - The initial doctor can accept their evaluation after 48 hours and get tokens owing to them
    */
-  function acceptAsDoctor(Case _case) external onlyCaseLifecycleOrDiagnosingDoctorContracts {
+  function acceptAsDoctor(Case _case) external onlyCaseLifecycleManager {
     accept(_case);
 
     // If this case had been challenged, clear the case for that doc

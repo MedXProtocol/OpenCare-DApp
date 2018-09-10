@@ -26,11 +26,11 @@ function mapStateToProps(state) {
   const CaseDiagnosingDoctor = contractByName(state, 'CaseDiagnosingDoctor')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
+  const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
 
   const openAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
 
   openAddresses.forEach(caseAddress => {
-    const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
     const status = cacheCallValueInt(state, caseAddress, 'status')
     const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
