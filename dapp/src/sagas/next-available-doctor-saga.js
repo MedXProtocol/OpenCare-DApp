@@ -23,16 +23,21 @@ function* thisAccount () {
   return yield select((state) => state.sagaGenesis.accounts[0])
 }
 
-function* isExcluded(address) {
+function* isExcluded(doctorAddress) {
   let excludedAddresses = yield select(state => state.nextAvailableDoctor.excludedAddresses)
+  let thisAccountAddress = yield thisAccount()
 
-  excludedAddresses = [...excludedAddresses, yield thisAccount()]
+  excludedAddresses = [
+    ...excludedAddresses.map(address => address.toLowerCase()),
+    thisAccountAddress.toLowerCase()
+  ]
 
-  return excludedAddresses.indexOf(address) !== -1
+  return excludedAddresses.includes(doctorAddress.toLowerCase())
 }
 
 function* fetchDoctorCredentials(address) {
   let credentials = null
+
   if (yield isExcluded(address)) { return null }
 
   const isActive = yield web3Call(yield doctorManager(), 'isActive', address)
@@ -46,6 +51,7 @@ function* fetchDoctorCredentials(address) {
 
   const patientIsDoctor = yield web3Call(yield doctorManager(), 'isDoctor', patientAddress)
   const patientUSOrCADifferentRegion = yield sameCountryDifferentRegion(address)
+
   if (!patientIsDoctor && patientUSOrCADifferentRegion) { return null }
 
   credentials = {
@@ -127,6 +133,7 @@ function* priorityDoctorOrOfflineDoctor() {
 
 function* findNextAvailableOnlineDoctor () {
   const onlineAddresses = Object.keys(yield select(state => state.heartbeat.users))
+
   let doctor = null
   for (var i = 0; i < onlineAddresses.length; i++) {
     doctor = yield fetchDoctorByAddress(onlineAddresses[i])
@@ -174,7 +181,7 @@ function* findNextAvailableOfflineDoctor() {
       break
     }
 
-    // remove this doctor from the array so we don't choose it again
+    // remove this doctor from the array so we don't choose them again
     doctorIndices.shift()
   }
   return doctor

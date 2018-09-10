@@ -60,13 +60,13 @@ function mapStateToProps(state, { caseAddress }) {
 
   const excludeAddresses = []
   if (address) {
-    excludeAddresses.push(address)
+    excludeAddresses.push(address.toLowerCase())
   }
   if (!isBlank(diagnosingDoctor)) {
-    excludeAddresses.push(diagnosingDoctor)
+    excludeAddresses.push(diagnosingDoctor.toLowerCase())
   }
   if (!isBlank(challengingDoctor)) {
-    excludeAddresses.push(challengingDoctor)
+    excludeAddresses.push(challengingDoctor.toLowerCase())
   }
 
   return {
@@ -356,7 +356,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
                           <div>
                             <label className='control-label'>Select Another Doctor</label>
                             <DoctorSelect
-                              excludeAddresses={[diagnosingDoctor, account]}
+                              excludeAddresses={[diagnosingDoctor.toLowerCase(), account.toLowerCase()]}
                               value={this.state.selectedDoctor}
                               isClearable={false}
                               onChange={this.onChangeDoctor} />

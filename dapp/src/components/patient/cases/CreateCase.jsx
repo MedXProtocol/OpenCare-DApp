@@ -664,6 +664,8 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
   }
 
   render() {
+    if (this.props.account === undefined) { return null }
+
     let errors = {}
     for (var i = 0; i < this.state.errors.length; i++) {
       let fieldName = this.state.errors[i]
@@ -826,7 +828,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                           <div>
                             <label>Select a Doctor<span className='star'>*</span></label>
                               <DoctorSelect
-                                excludeAddresses={[this.props.account]}
+                                excludeAddresses={[this.props.account.toLowerCase()]}
                                 value={this.state.selectedDoctor}
                                 isClearable={false}
                                 onChange={this.onChangeDoctor} />

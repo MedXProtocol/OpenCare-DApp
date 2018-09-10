@@ -61,13 +61,13 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
 
   const excludeAddresses = []
   if (address) {
-    excludeAddresses.push(address)
+    excludeAddresses.push(address.toLowerCase())
   }
   if (diagnosingDoctor) {
-    excludeAddresses.push(diagnosingDoctor)
+    excludeAddresses.push(diagnosingDoctor.toLowerCase())
   }
   if (challengingDoctor) {
-    excludeAddresses.push(challengingDoctor)
+    excludeAddresses.push(challengingDoctor.toLowerCase())
   }
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
@@ -295,6 +295,10 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   render() {
+    if (this.props.diagnosingDoctor === undefined || this.props.address === undefined) {
+      return null
+    }
+
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
     const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== 3
     const challengeFeeEtherNoFlip = <Ether wei={computeChallengeFee(this.props.caseFeeWei)} />
@@ -361,7 +365,10 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                         <div>
                           <label className='control-label'>Select Another Doctor</label>
                           <DoctorSelect
-                            excludeAddresses={[this.props.diagnosingDoctor, this.props.address]}
+                            excludeAddresses={[
+                              this.props.diagnosingDoctor.toLowerCase(),
+                              this.props.address.toLowerCase()
+                            ]}
                             value={this.state.selectedDoctor}
                             isClearable={false}
                             onChange={this.onChangeDoctor} />
