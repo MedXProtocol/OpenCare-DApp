@@ -15,6 +15,8 @@ contract CaseDiagnosingDoctor is Ownable, Initializable, DelegateTarget {
   using RegistryLookup for Registry;
 
   Registry registry;
+  address[] public caseAddresses;
+  uint256[] public nodeIds;
 
   /**
    * @dev - throws if called by any account other than a doctor.
@@ -44,7 +46,7 @@ contract CaseDiagnosingDoctor is Ownable, Initializable, DelegateTarget {
    * @dev - The initial doctor can accept their evaluation either
    *        48 hours or 96 hours after diagnosing and get tokens owing to them
    */
-  function acceptAllAsDoctor() external isDoctor {
+  function acceptAllAsDoctor() public isDoctor {
     uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(msg.sender);
 
     while (currentNodeId != 0) {
@@ -70,33 +72,69 @@ contract CaseDiagnosingDoctor is Ownable, Initializable, DelegateTarget {
     emit AcceptedAllAsDoctor(msg.sender);
   }
 
-  function acceptOneAsDoctor(address _doctorAddress) external {
+  function caseCountForDoctor(address _doctorAddress) public view returns (uint256) {
+    uint256 caseCount = 0;
     uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
 
-    address caseAddress = registry.caseStatusManager().openCaseAddress(_doctorAddress, currentNodeId);
-    Case openCase = Case(caseAddress);
-    // registry.caseLifecycleManager().acceptAsDoctor(openCase);
-    registry.caseFirstPhaseManager().acceptAsDoctor(openCase);
+    while (currentNodeId != 0) {
+      address caseAddress = registry.caseStatusManager().openCaseAddress(_doctorAddress, currentNodeId);
+      Case openCase = Case(caseAddress);
+
+      caseAddresses.push(openCase);
+
+      // We're only interested in this case if the Doc is the diagnosing doctor
+      if (
+        _doctorAddress == openCase.diagnosingDoctor()
+        && registry.caseScheduleManager().caseExpiredForDoctor(openCase)
+      ) {
+        caseCount += 1;
+
+      }
+      currentNodeId = registry.caseStatusManager().nextOpenCaseId(_doctorAddress, currentNodeId);
+    }
+
+    return caseCount;
   }
 
-  function currentNodeForDoc(address _doctorAddress) external view returns (uint256) {
-    return registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
+  function arrayStats() public view returns (uint, uint) {
+    return (nodeIds.length, caseAddresses.length);
   }
 
-  function currentCaseForDoc(address _doctorAddress) external view returns (address) {
-    uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
-    address caseAddress = registry.caseStatusManager().openCaseAddress(_doctorAddress, currentNodeId);
-    return caseAddress;
-  }
-
-  function doctorCloseCase(address _doctorAddress) external {
+  // this works
+  function doctorCloseCase(address _doctorAddress) public {
     uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
     address caseAddress = registry.caseStatusManager().openCaseAddress(_doctorAddress, currentNodeId);
     Case openCase = Case(caseAddress);
     registry.caseLifecycleManager().acceptAsDoctor(address(openCase));
   }
 
-  function caseDiagnosingDoctor() external view returns (address) {
+  function casesDoctor(address _doctorAddress) public {
+    uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
+    nodeIds.push(currentNodeId);
+
+    while (currentNodeId != 0) {
+      address caseAddress = registry.caseStatusManager().openCaseAddress(_doctorAddress, currentNodeId);
+      caseAddresses.push(caseAddress);
+
+      currentNodeId = registry.caseStatusManager().nextOpenCaseId(_doctorAddress, currentNodeId);
+      nodeIds.push(currentNodeId);
+    }
+
+    nodeIds.push(currentNodeId);
+    nodeIds.push(999);
+  }
+
+  function currentNodeForDoc(address _doctorAddress) public view returns (uint256) {
+    return registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
+  }
+
+  function currentCaseForDoc(address _doctorAddress) public view returns (address) {
+    uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(_doctorAddress);
+    address caseAddress = registry.caseStatusManager().openCaseAddress(_doctorAddress, currentNodeId);
+    return caseAddress;
+  }
+
+  function caseDiagnosingDoctor() public view returns (address) {
     return address(registry.caseDiagnosingDoctor());
   }
 
