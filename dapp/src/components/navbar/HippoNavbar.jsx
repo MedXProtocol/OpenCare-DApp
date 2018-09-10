@@ -38,6 +38,7 @@ function mapStateToProps (state) {
   let doctorName
   const address = get(state, 'sagaGenesis.accounts[0]')
   const isAvailable = get(state, 'heartbeat.isAvailable')
+  const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const WrappedEther = contractByName(state, 'WrappedEther')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
@@ -53,6 +54,7 @@ function mapStateToProps (state) {
   return {
     address,
     isAvailable,
+    isSignedIn,
     balance,
     doctorName,
     isDoctor,
@@ -128,7 +130,7 @@ export const HippoNavbar = withContractRegistry(
   }
 
   render() {
-    const { isDoctor } = this.props
+    const { isDoctor, isSignedIn } = this.props
     const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
 
     if (this.props.signedIn && this.props.address) {
@@ -217,7 +219,7 @@ export const HippoNavbar = withContractRegistry(
       }
     }
 
-    if (isDoctor) {
+    if (isDoctor && isSignedIn) {
       var statusItem =
         <NavItem onClick={this.handleToggleIsAvailable} className="nav--button">
           <span className={
