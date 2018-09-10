@@ -106,8 +106,7 @@ function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
 
   for (var i = lastBlockNumber + 1; i <= blockNumber; i++) {
     const block = yield call(getBlockData, i)
-    const blockGasLimit = block.gasLimit
-    yield put({ type: 'BLOCK_LATEST', block, blockGasLimit })
+    yield put({ type: 'BLOCK_LATEST', block })
   }
 }
 

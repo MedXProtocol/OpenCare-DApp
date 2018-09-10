@@ -1,4 +1,4 @@
-export default function (state, {type, blockNumber, blockGasLimit}) {
+export default function (state, {type, block, blockNumber}) {
   if (typeof state === 'undefined') {
     state = {}
   }
@@ -11,7 +11,7 @@ export default function (state, {type, blockNumber, blockGasLimit}) {
 
     case 'BLOCK_LATEST':
       state = {...state}
-      state.blockGasLimit = blockGasLimit
+      state.blockGasLimit = block.gasLimit
       break
     // no default
   }
