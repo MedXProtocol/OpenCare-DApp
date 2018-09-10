@@ -20,7 +20,7 @@ contract('CaseDiagnosingDoctor', function (accounts) {
   before(async () => {
     env = await createEnvironment(artifacts)
 
-    caseFeeWei = await env.caseManager.caseFeeWei()
+    caseFeeWei = await env.casePaymentManager.caseFeeTokenWei(env.weth9.address)
 
     await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc', 'CA', 'AB')
     await env.doctorManager.addOrReactivateDoctor(doctor, 'Doogie', 'US', 'CO')

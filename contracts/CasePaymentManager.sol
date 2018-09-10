@@ -14,7 +14,7 @@ contract CasePaymentManager is Ownable, Initializable, DelegateTarget {
   using RegistryLookup for Registry;
   using SafeMath for uint256;
 
-  uint256 public baseCaseFeeUsd;
+  uint256 public baseCaseFeeUsdWei;
   mapping (address => address) caseTokenContract;
   Registry registry;
 
@@ -27,7 +27,7 @@ contract CasePaymentManager is Ownable, Initializable, DelegateTarget {
     require(_registry != 0x0);
     setInitialized();
     owner = msg.sender;
-    registry = _registry;
+    registry = Registry(_registry);
   }
 
   function getCaseTokenContract(Case _case) public view returns (ERC20) {
@@ -36,7 +36,7 @@ contract CasePaymentManager is Ownable, Initializable, DelegateTarget {
 
   function caseFeeTokenWei(address _tokenContract) public view returns (uint256) {
     if (_tokenContract == address(registry.dai())) {
-      return baseCaseFeeUsd;
+      return baseCaseFeeUsdWei;
     } else if (_tokenContract == address(registry.weth9())){
       return caseFeeEtherWei();
     } else {
@@ -44,31 +44,38 @@ contract CasePaymentManager is Ownable, Initializable, DelegateTarget {
     }
   }
 
-  function initializeCase(Case _case, address _tokenContract) external payable onlyCaseManager {
-    require(caseTokenContract[_case] == address(0));
+  function initializeCase(Case _case, address _tokenContract) external payable {
+    require(caseTokenContract[_case] == address(0), 'the case token contract has already been initialized');
     caseTokenContract[_case] = _tokenContract;
     ERC20 dai = registry.dai();
     if (_tokenContract == address(registry.weth9())) {
-      require(msg.value >= _case.requiredDeposit(), 'not enough ether');
+      require(msg.value >= requiredDepositTokenWei(_tokenContract), 'not enough ether');
       _case.deposit.value(msg.value)();
     } else if (_tokenContract == address(dai)) {
-      dai.transferFrom(_case.patient(), _case, _case.requiredDeposit());
+      dai.transferFrom(_case.patient(), _case, requiredDepositTokenWei(_tokenContract));
+    } else {
+      revert('Unknown token contract');
     }
+  }
+
+  function requiredDepositTokenWei(address _tokenContract) public view returns (uint256) {
+    uint256 caseFeeWei = caseFeeTokenWei(_tokenContract);
+    return caseFeeWei.add(caseFeeWei.mul(50).div(100));
   }
 
   /**
    * @dev - sets the base case fee - only affects new cases
    */
-  function setBaseCaseFeeUsd(uint256 _baseCaseFeeUsd) public onlyOwner {
-    require(_baseCaseFeeUsd > 0);
-    baseCaseFeeUsd = _baseCaseFeeUsd;
+  function setBaseCaseFeeUsdWei(uint256 _baseCaseFeeUsdWei) public onlyOwner {
+    require(_baseCaseFeeUsdWei > 0);
+    baseCaseFeeUsdWei = _baseCaseFeeUsdWei;
   }
 
   function caseFeeEtherWei() public view returns (uint256) {
-    return baseCaseFeeUsd.div(usdPerEtherWei());
+    return baseCaseFeeUsdWei.div(usdPerEther());
   }
 
-  function usdPerEtherWei() public view returns (uint256) {
+  function usdPerEther() public view returns (uint256) {
     uint256 usdPerEth = uint256(registry.etherPriceFeed().read());
     return usdPerEth.div(1000000000000000000);
   }

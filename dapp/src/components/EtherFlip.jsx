@@ -14,16 +14,16 @@ import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
 import { Ether } from './Ether'
 
 function mapStateToProps(state) {
-  const CaseManager = contractByName(state, 'CaseManager')
+  const CasePaymentManager = contractByName(state, 'CasePaymentManager')
   return {
-    usdPerWei: cacheCallValue(state, CasePaymentManager, 'usdPerEtherWei'),
-    CaseManager
+    usdPerWei: cacheCallValue(state, CasePaymentManager, 'usdPerEther'),
+    CasePaymentManager
   }
 }
 
-function* etherFlipSaga({ CaseManager }) {
-  if (!CaseManager) { return }
-  yield cacheCall(CasePaymentManager, 'usdPerEtherWei')
+function* etherFlipSaga({ CasePaymentManager }) {
+  if (!CasePaymentManager) { return }
+  yield cacheCall(CasePaymentManager, 'usdPerEther')
 }
 
 export const EtherFlip = connect(mapStateToProps)(

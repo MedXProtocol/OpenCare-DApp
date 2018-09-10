@@ -49,10 +49,11 @@ import { regions } from '~/lib/regions'
 function mapStateToProps (state) {
   const account = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
+  const CasePaymentManager = contractByName(state, 'CasePaymentManager')
 
   const balance = get(state, 'sagaGenesis.ethBalance.balance')
   const caseFeeWei = cacheCallValue(state, CasePaymentManager, 'caseFeeEtherWei')
-  const usdPerWei = cacheCallValue(state, CasePaymentManager, 'usdPerEtherWei')
+  const usdPerWei = cacheCallValue(state, CasePaymentManager, 'usdPerEther')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
@@ -66,6 +67,7 @@ function mapStateToProps (state) {
     usdPerWei,
     transactions: state.sagaGenesis.transactions,
     CaseManager,
+    CasePaymentManager,
     publicKey,
     balance,
     noDoctorsAvailable,
@@ -87,11 +89,11 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ account, AccountManager, CaseManager }) {
+function* saga({ account, AccountManager, CaseManager, CasePaymentManager }) {
   if (!account || !AccountManager || !CaseManager) { return }
   yield cacheCall(AccountManager, 'publicKeys', account)
   yield cacheCall(CasePaymentManager, 'caseFeeEtherWei')
-  yield cacheCall(CasePaymentManager, 'usdPerEtherWei')
+  yield cacheCall(CasePaymentManager, 'usdPerEther')
 }
 
 const requiredFields = [

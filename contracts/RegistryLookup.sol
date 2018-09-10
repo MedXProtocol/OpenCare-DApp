@@ -58,15 +58,15 @@ library RegistryLookup {
     return DoctorManager(self.lookup(keccak256("DoctorManager")));
   }
 
-  function dai(Registry self) public view returns (ERC20) {
+  function dai(Registry self) internal view returns (ERC20) {
     return ERC20(self.lookup(keccak256("Dai")));
   }
 
-  function weth9(Registry self) public view returns (WETH9) {
+  function weth9(Registry self) internal view returns (WETH9) {
     return WETH9(self.lookup(keccak256("WrappedEther")));
   }
 
-  function etherPriceFeed(Registry self) public view returns (IEtherPriceFeed) {
+  function etherPriceFeed(Registry self) internal view returns (IEtherPriceFeed) {
     return IEtherPriceFeed(self.lookup(keccak256('EtherPriceFeed')));
   }
 }

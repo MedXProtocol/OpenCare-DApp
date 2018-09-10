@@ -131,47 +131,19 @@ contract CaseManager is Ownable, Pausable, Initializable, DelegateTarget {
     address _doctor,
     bytes _doctorEncryptedKey
   ) public payable {
-    uint256 caseTokenFeeWei = registry.casePaymentManager().caseFeeTokenWei(_tokenContract);
     Case newCase = Case(new Delegate(registry, keccak256("Case")));
+    uint256 caseIndex = caseList.push(address(newCase)) - 1;
+    caseIndices[address(newCase)] = caseIndex;
+    patientCases[_patient].push(address(newCase));
+
+    uint256 caseTokenFeeWei = registry.casePaymentManager().caseFeeTokenWei(_tokenContract);
     newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseTokenFeeWei);
     registry.caseLifecycleManager().setDiagnosingDoctor(newCase, _doctor, _doctorEncryptedKey);
     registry.caseScheduleManager().initializeCase(newCase);
     registry.casePaymentManager().initializeCase.value(msg.value)(newCase, _tokenContract);
 
-    uint256 caseIndex = caseList.push(address(newCase)) - 1;
-    caseIndices[address(newCase)] = caseIndex;
-    patientCases[_patient].push(address(newCase));
-
     emit NewCase(newCase, caseIndex);
   }
-
-  // -----------------------------------------------
-  // -----------------------------------------------
-  function setBaseCaseFee(uint256 _newCaseFeeUsd) public onlyOwner {
-    require(_newCaseFeeUsd > 0);
-    caseFeeUsd = _newCaseFeeUsd;
-  }
-
-  function createCaseCostWei (uint256 _caseFeeUsd) public view returns (uint256) {
-    uint256 caseFee = usdToWei(_caseFeeUsd);
-    return caseFee.add(caseFee.mul(50).div(100));
-  }
-
-  function caseFeeWei() public view returns (uint256) {
-    return usdToWei(caseFeeUsd);
-  }
-
-  function usdToWei(uint256 _caseFeeUsd) public view returns (uint256) {
-    return _caseFeeUsd.div(usdPerWei());
-  }
-
-  function usdPerWei() public view returns (uint256) {
-    IEtherPriceFeed etherPriceFeed = IEtherPriceFeed(registry.lookup(keccak256('EtherPriceFeed')));
-    uint256 usdPerEth = uint256(etherPriceFeed.read());
-    return usdPerEth.div(1000000000000000000);
-  }
-  // -----------------------------------------------
-  // -----------------------------------------------
 
   function addDoctorToDoctorCases(address _doctor, address _caseAddress) public onlyCasePhaseManagers() {
     doctorCases[_doctor].push(_caseAddress);

@@ -24,6 +24,7 @@ export default function* ({ web3 }) {
     lookupAndAddContract(web3, 'CaseScheduleManager'),
     lookupAndAddContract(web3, 'CaseFirstPhaseManager'),
     lookupAndAddContract(web3, 'CaseSecondPhaseManager'),
+    lookupAndAddContract(web3, 'CasePaymentManager'),
     lookupAndAddContract(web3, 'CaseStatusManager'),
     lookupAndAddContract(web3, 'DoctorManager'),
     lookupAndAddContract(web3, 'AccountManager'),

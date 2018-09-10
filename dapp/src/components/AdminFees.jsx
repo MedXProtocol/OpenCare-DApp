@@ -16,18 +16,18 @@ import { mixpanel } from '~/mixpanel'
 
 function mapStateToProps(state) {
   const transactions = state.sagaGenesis.transactions
-  const CaseManager = contractByName(state, 'CaseManager')
-  const caseFeeUsd = cacheCallValue(state, CaseManager, 'caseFeeUsd')
+  const CasePaymentManager = contractByName(state, 'CasePaymentManager')
+  const caseFeeUsd = cacheCallValue(state, CasePaymentManager, 'caseFeeUsd')
   return {
     caseFeeUsd,
-    CaseManager,
+    CasePaymentManager,
     transactions
   }
 }
 
-function* adminFeeSaga({ CaseManager }) {
-  if (!CaseManager) { return }
-  yield cacheCall(CaseManager, 'caseFeeUsd')
+function* adminFeeSaga({ CasePaymentManager }) {
+  if (!CasePaymentManager) { return }
+  yield cacheCall(CasePaymentManager, 'caseFeeUsd')
 }
 
 export const AdminFees = connect(mapStateToProps)(
@@ -69,7 +69,7 @@ export const AdminFees = connect(mapStateToProps)(
         onSubmitBaseCaseFee = (event) => {
           event.preventDefault()
           if (this.isBaseCaseFeeValid()) {
-            const setBaseCaseFeeId = this.props.send(this.props.CaseManager, 'setBaseCaseFee', etherToWei(this.state.newCaseFeeUsd))()
+            const setBaseCaseFeeId = this.props.send(this.props.CasePaymentManager, 'setBaseCaseFeeUsdWei', etherToWei(this.state.newCaseFeeUsd))()
             this.setState({
               setBaseCaseFeeId,
               setBaseCaseFeeHandler: new TransactionStateHandler()

@@ -32,7 +32,7 @@ i18next
             sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',
             withdraw: 'Withdrawing W-ETH',
-            setBaseCaseFee: 'Updating case fee'
+            setBaseCaseFeeUsdWei: 'Updating case fee'
           },
           transactionErrors: {
             userRevert: 'You rejected the transaction',

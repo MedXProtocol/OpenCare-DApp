@@ -128,6 +128,7 @@ contract Case is Ownable, Initializable {
       bytes _caseHash,
       uint256 _caseFee
   ) external patientMustBeZero {
+    require(_patient != address(0), 'patient must be defined');
     require(_encryptedCaseKey.length != 0, 'encryptedCaseKey required');
     require(_caseKeySalt.length != 0, 'caseKeySalt required');
     require(_caseHash.length != 0, 'caseHash required');
@@ -167,10 +168,6 @@ contract Case is Ownable, Initializable {
 
   function finalize() external onlyCasePhaseManagers {
     emit CaseFinalized(address(this), patient, diagnosingDoctor, challengingDoctor);
-  }
-
-  function requiredDeposit() external view returns (uint256) {
-    return caseFee.add(caseFee.mul(50).div(100));
   }
 
   function transferCaseFeeToDiagnosingDoctor() external onlyCasePhaseManagers {

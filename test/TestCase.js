@@ -41,8 +41,8 @@ contract('Case', function (accounts) {
           accounts[0],
           'alaksefj',
           'caseKeySalt',
-          [1, 2],
-          10000
+          'caseHash',
+          web3.toWei('10', 'ether')
         )
       })
     })
