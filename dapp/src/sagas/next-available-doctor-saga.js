@@ -126,8 +126,9 @@ function* priorityDoctorOrOfflineDoctor() {
 }
 
 function* findNextAvailableOnlineDoctor () {
-  const onlineAddresses = Object.keys(yield select(state => state.heartbeat.users))
+  let onlineAddresses = Object.keys(yield select(state => state.heartbeat.users))
   let doctor = null
+  onlineAddresses = shuffle(onlineAddresses)
   for (var i = 0; i < onlineAddresses.length; i++) {
     doctor = yield fetchDoctorByAddress(onlineAddresses[i])
     if (doctor) { break }
