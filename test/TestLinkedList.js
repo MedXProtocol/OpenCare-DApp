@@ -115,7 +115,7 @@ contract('TestLinkedList', function (accounts) {
     it('should remove a single node correctly', async () => {
       await linkedList.enqueue(1)
 
-      linkedList.remove(1)
+      await linkedList.remove(1)
 
       assert.equal(await linkedList.length(), 0)
       assert.equal(await linkedList.peekId(), 0)
