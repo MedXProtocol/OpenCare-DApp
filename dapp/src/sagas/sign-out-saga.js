@@ -6,6 +6,7 @@ import {
 export function* signOutSaga() {
   signOut()
   yield put({ type: 'SIGNED_OUT' })
+  yield put({ type: 'WEB3_SHH_DISCONNECT' })
 }
 
 export default function* rootSaga() {

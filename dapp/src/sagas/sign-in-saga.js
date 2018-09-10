@@ -70,6 +70,7 @@ export function* signInOkSaga({ account, masterPassword, address }) {
   mixpanel.identify(account.address())
   yield put({ type: 'SIGNED_IN' })
   yield put({ type: 'FIND_NEXT_AVAILABLE_DOCTOR', excludedAddresses: [address] })
+  yield put({ type: 'WEB3_SHH_INIT' })
 }
 
 export default function* rootSaga() {

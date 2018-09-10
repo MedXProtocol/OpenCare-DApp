@@ -3,8 +3,7 @@ import {
   takeLatest,
   put,
   select,
-  call,
-  take
+  call
 } from 'redux-saga/effects'
 import {
   delay
@@ -38,12 +37,5 @@ export function* whisperSaga() {
     }
     const symKeyId = yield web3.shh.generateSymKeyFromPassword('hippocrates')
     yield put({ type: 'WEB3_SHH_INITIALIZED', web3, symKeyId })
-
-    yield take('WEB3_SHH_DISCONNECT', function* () {
-      yield put({ type: 'WEB3_SHH_INIT' })
-    })
   })
-
-  // kick it off!
-  yield put({ type: 'WEB3_SHH_INIT' })
 }

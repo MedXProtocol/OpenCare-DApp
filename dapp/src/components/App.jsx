@@ -87,6 +87,9 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    dispatchWeb3SHHInit: () => {
+      dispatch({ type: 'WEB3_SHH_INIT' })
+    },
     dispatchSignOut: () => {
       dispatch({ type: 'SIGN_OUT' })
     }
@@ -118,6 +121,14 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     if (process.env.NODE_ENV !== 'development' && !this.props.address && this.props.isSignedIn) {
       this.signOut()
+    }
+
+    if (process.env.NODE_ENV === 'development' && this.props.isSignedIn) {
+      // wait 5 seconds to ensure the sagas have initialized first
+      // we should update our architecture so sagas init first, then components
+      this.props.setTimeout(() => {
+        this.props.dispatchWeb3SHHInit()
+      }, 5000)
     }
   }
 
