@@ -23,12 +23,16 @@ function* thisAccount () {
   return yield select((state) => state.sagaGenesis.accounts[0])
 }
 
-function* isExcluded(address) {
+function* isExcluded(doctorAddress) {
   let excludedAddresses = yield select(state => state.nextAvailableDoctor.excludedAddresses)
+  let thisAccountAddress = yield thisAccount()
 
-  excludedAddresses = [...excludedAddresses, yield thisAccount()]
+  excludedAddresses = [
+    ...excludedAddresses.map(address => address.toLowerCase()),
+    thisAccountAddress.toLowerCase()
+  ]
 
-  return excludedAddresses.includes(address.toLowerCase())
+  return excludedAddresses.includes(doctorAddress.toLowerCase())
 }
 
 function* fetchDoctorCredentials(address) {
