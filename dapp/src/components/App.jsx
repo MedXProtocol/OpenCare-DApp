@@ -215,7 +215,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
         </div>
     }
 
-    if (process.env.REACT_APP_ENV === 'staging' || process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
+    if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
       var debugLink = <DebugLink />
     }
 
