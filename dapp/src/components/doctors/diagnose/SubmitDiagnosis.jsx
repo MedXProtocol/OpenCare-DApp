@@ -535,20 +535,23 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
 
                   {errors['oneRecommendation']}
 
-
                   <FlipMove
                     enterAnimation="accordionVertical"
                     leaveAnimation="accordionVertical"
                   >
-                    <div
-                      className="form-group form-group--logical-grouping"
-                      key={`key-noFurtherTreatment`}
-                    >
-                      <label className="checkbox-inline">
-                        <input type="checkbox" onClick={this.onChangeNoFurtherTreatment} /> &nbsp;
-                        No Further Treatment Necessary
-                      </label>
-                    </div>
+
+                    {(this.state.overTheCounters[0].prescription || this.state.prescriptions[0].prescription)
+                      ? <span key={`key-noFurtherTreatment-hidden`} />
+                      : <div
+                          className="form-group form-group--logical-grouping"
+                          key={`key-noFurtherTreatment`}
+                        >
+                          <label className="checkbox-inline">
+                            <input type="checkbox" onClick={this.onChangeNoFurtherTreatment} /> &nbsp;
+                            No Further Treatment Necessary
+                          </label>
+                        </div>
+                    }
                   </FlipMove>
 
 
