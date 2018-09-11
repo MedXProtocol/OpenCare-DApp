@@ -1,6 +1,10 @@
 export default function (state, {type, block, blockNumber}) {
   if (typeof state === 'undefined') {
-    state = {}
+    state = {
+      latestBlock: {
+        timestamp: Math.floor(Date.now() / 1000)
+      }
+    }
   }
 
   switch (type) {

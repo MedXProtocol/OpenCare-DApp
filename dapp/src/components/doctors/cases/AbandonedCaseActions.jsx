@@ -20,13 +20,7 @@ import get from 'lodash.get'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
-  let latestBlockTimestamp
-
-  const latestBlock = get(state, 'sagaGenesis.block.latestBlock')
-  if (latestBlock) {
-    latestBlockTimestamp = latestBlock.timestamp
-  }
-
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 

@@ -15,14 +15,9 @@ import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCase
 import { doesNotRequireAttention } from '~/utils/doesNotRequireAttention'
 
 function mapStateToProps (state) {
-  let latestBlockTimestamp
   let casesRequiringAttentionCount = 0
 
-  const latestBlock = get(state, 'sagaGenesis.block.latestBlock')
-  if (latestBlock) {
-    latestBlockTimestamp = latestBlock.timestamp
-  }
-
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')

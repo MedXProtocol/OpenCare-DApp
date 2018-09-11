@@ -20,14 +20,9 @@ import { mixpanel } from '~/mixpanel'
 import get from 'lodash.get'
 
 function mapStateToProps(state) {
-  let latestBlockTimestamp
   let staleCases = 0
 
   const latestBlock = get(state, 'sagaGenesis.block.latestBlock')
-  if (latestBlock) {
-    latestBlockTimestamp = latestBlock.timestamp
-  }
-
   const address = get(state, 'sagaGenesis.accounts[0]')
   const transactions = get(state, 'sagaGenesis.transactions')
   const CaseDiagnosingDoctor = contractByName(state, 'CaseDiagnosingDoctor')
@@ -43,7 +38,7 @@ function mapStateToProps(state) {
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
     const isFirstDoc = diagnosingDoctor === address
 
-    if (isFirstDoc && caseStale(updatedAt, status, 'doctor', secondsInADay, latestBlockTimestamp)) {
+    if (isFirstDoc && caseStale(updatedAt, status, 'doctor', secondsInADay, latestBlock.timestamp)) {
       staleCases++
     }
   })
