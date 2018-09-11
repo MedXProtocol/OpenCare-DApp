@@ -10,10 +10,10 @@ export const DoctorSelect =
           label: doctor.name,
           value: doctor.address,
           publicKey: doctor.publicKey,
+          isDermatologist: doctor.isDermatologist,
           isActive: doctor.isActive
         }))
         return <Select {...this.props} options={options} />
       }
     }
   )
-

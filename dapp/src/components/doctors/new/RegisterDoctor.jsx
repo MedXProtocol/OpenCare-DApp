@@ -4,6 +4,7 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faEdit from '@fortawesome/fontawesome-free-solid/faEdit';
 import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
+import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
 import sortBy from 'lodash.sortby'
 import { isBlank } from '~/utils/isBlank'
 import { withDoctors } from '~/components/withDoctors'
@@ -40,6 +41,7 @@ export const RegisterDoctorContainer =
             name: '',
             country: '',
             region: '',
+            dermatologist: false,
             errors: [],
             regionOptions: [],
             submitInProgress: false
@@ -65,21 +67,23 @@ export const RegisterDoctorContainer =
           }
         }
 
-        handleActivate = (address, name, country, region) => {
+        handleActivate = (address, name, country, region, dermatologist) => {
           this.setState({
             address: address,
             name: name,
             country: country,
-            region: region
+            region: region,
+            dermatologist: dermatologist
           }, this.addOrReactivateDoctor)
         }
 
-        handleDeactivate = (address, name, country, region) => {
+        handleDeactivate = (address, name, country, region, dermatologist) => {
           this.setState({
             address: address,
             name: name,
             country: country,
-            region: region
+            region: region,
+            dermatologist: dermatologist
           }, this.deactivateDoctor)
         }
 
@@ -91,7 +95,8 @@ export const RegisterDoctorContainer =
             this.state.address,
             this.state.name,
             this.state.country,
-            this.state.region
+            this.state.region,
+            this.state.dermatologist === 'Yes' ? true : false
           )()
         }
 
@@ -195,6 +200,10 @@ export const RegisterDoctorContainer =
           return this.state.country === 'US' || this.state.country === 'CA'
         }
 
+        handleButtonGroupOnChange = (event) => {
+          this.setState({ [event.target.name]: event.target.value })
+        }
+
         render() {
           const doctors = sortBy(this.props.doctors, ['isActive']).reverse()
 
@@ -246,8 +255,9 @@ export const RegisterDoctorContainer =
                           </div>
 
                           <div className={classnames('form-group', { 'has-error': errors['country'] })}>
-                            <label htmlFor="name">Country</label>
+                            <label htmlFor="country">Country</label>
                             <Select
+                              id="country"
                               placeholder="Please select the Doctor's Country"
                               styles={customStyles}
                               components={Animated}
@@ -261,8 +271,9 @@ export const RegisterDoctorContainer =
                           </div>
 
                           <div className={classnames('form-group', { 'has-error': errors['region'] })}>
-                            <label htmlFor="name">Region</label>
+                            <label htmlFor="region">Region</label>
                             <Select
+                              id="region"
                               isDisabled={!this.isCanadaOrUSA()}
                               placeholder="Please select the Doctor's Region"
                               styles={customStyles}
@@ -274,6 +285,17 @@ export const RegisterDoctorContainer =
                               selected={this.state.region}
                             />
                             {errors['region']}
+                          </div>
+
+                          <div className={classnames('form-group', { 'has-error': errors['region'] })}>
+                            <HippoToggleButtonGroup
+                              id='isDermatologist-checkbox'
+                              name="dermatologist"
+                              colClasses='col-xs-12 col-md-12'
+                              label='Is a dermatologist?'
+                              buttonGroupOnChange={this.handleButtonGroupOnChange}
+                              values={['Yes', 'No']}
+                            />
                           </div>
 
                           <div className="text-right">
@@ -295,7 +317,7 @@ export const RegisterDoctorContainer =
                           <tr>
                             <th>Priority?</th>
                             <th>Online</th>
-                            <th>Doctor Address &amp; Specialities</th>
+                            <th>Doctor Address</th>
                             <th>Doctor Details</th>
                             <th>Public Key Set?</th>
                             <th className="text-right">
@@ -319,6 +341,11 @@ export const RegisterDoctorContainer =
                               const countryAndRegion = <React.Fragment>
                                 <br />
                                 {region ? `${region}, ` : ''}{country}
+                              </React.Fragment>
+
+                              const specialities = <React.Fragment>
+                                <br />
+                                {isDermatologist ? 'Dermatologist' : ''}
                               </React.Fragment>
 
                               return (
@@ -348,12 +375,13 @@ export const RegisterDoctorContainer =
                                         <span>
                                           <EthAddress address={address} showFull={true} />
                                         </span>
-                                        <br />
-                                        <strong>{isDermatologist}</strong>
                                       </td>
                                       <td width="20%" className="td--status">
                                         {name}
                                         {countryAndRegion}
+                                        <strong>
+                                          {specialities}
+                                        </strong>
                                       </td>
                                       <td width="14%">
                                         {isBlank(publicKey) ? 'No' : 'Yes'}
@@ -361,14 +389,14 @@ export const RegisterDoctorContainer =
                                       <td width="15%" className="td-actions text-right">
                                         { isActive ? (
                                             <a
-                                              onClick={() => { this.handleDeactivate(address, name, country, region) }}
+                                              onClick={() => { this.handleDeactivate(address, name, country, region, isDermatologist) }}
                                               className="btn btn-xs btn-info"
                                             >
                                               Deactivate
                                             </a>
                                           ) : (
                                             <a
-                                              onClick={() => { this.handleActivate(address, name, country, region) }}
+                                              onClick={() => { this.handleActivate(address, name, country, region, isDermatologist) }}
                                               className="btn btn-xs btn-default"
                                             >
                                               Reactivate
