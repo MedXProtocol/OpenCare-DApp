@@ -47,25 +47,31 @@ import { promisify } from '~/utils/promisify'
 import { regions } from '~/lib/regions'
 
 function mapStateToProps (state) {
-  const account = get(state, 'sagaGenesis.accounts[0]')
+  const address = get(state, 'sagaGenesis.accounts[0]')
+  const BetaFaucet = contractByName(state, 'BetaFaucet')
   const CaseManager = contractByName(state, 'CaseManager')
 
   const balance = get(state, 'sagaGenesis.ethBalance.balance')
+  const networkId = get(state, 'sagaGenesis.network.networkId')
   const caseFeeWei = cacheCallValue(state, CaseManager, 'caseFeeWei')
   const usdPerWei = cacheCallValue(state, CaseManager, 'usdPerWei')
   const AccountManager = contractByName(state, 'AccountManager')
-  const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account)
-  const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', account)
+  const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
+  const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const previousCase = (caseListCount > 0)
   const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
+  const hasBeenSentEther = cacheCallValue(state, BetaFaucet, 'sentAddresses', address)
 
   return {
     AccountManager,
-    account,
+    BetaFaucet,
+    CaseManager,
+    address,
     caseFeeWei,
+    hasBeenSentEther,
     usdPerWei,
     transactions: state.sagaGenesis.transactions,
-    CaseManager,
+    networkId,
     publicKey,
     balance,
     noDoctorsAvailable,
@@ -87,10 +93,11 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ account, AccountManager, CaseManager }) {
-  if (!account || !AccountManager || !CaseManager) { return }
-  yield cacheCall(AccountManager, 'publicKeys', account)
+function* saga({ BetaFaucet, address, AccountManager, CaseManager }) {
+  if (!BetaFaucet || !address || !AccountManager || !CaseManager) { return }
+  yield cacheCall(AccountManager, 'publicKeys', address)
   yield cacheCall(CaseManager, 'caseFeeWei')
+  yield cacheCall(BetaFaucet, 'sentAddresses', address)
 }
 
 const requiredFields = [
@@ -162,14 +169,14 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
   componentDidMount() {
     // This ensures we attempt to randomly find a different doctor for the next
     // case this patient may submit
-    this.props.dispatchExcludedDoctors([ this.props.account ])
+    this.props.dispatchExcludedDoctors([ this.props.address ])
   }
 
   componentWillReceiveProps (nextProps) {
-    if (this.props.account !== nextProps.account) {
+    if (this.props.address !== nextProps.address) {
       // This ensures we attempt to randomly find a different doctor if the current eth address
       // was undefined on mount or changes mid-session
-      this.props.dispatchExcludedDoctors([ nextProps.account ])
+      this.props.dispatchExcludedDoctors([ nextProps.address ])
     }
 
     if (this.state.createCaseEvents) {
@@ -189,7 +196,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
 
           // This ensures we attempt to randomly find a different doctor for the next
           // case this patient may submit
-          // this.props.dispatchExcludedDoctors([ this.props.account ])
+          // this.props.dispatchExcludedDoctors([ this.props.address ])
         })
     }
   }
@@ -488,7 +495,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
   }
 
   handleSubmit = async (event) => {
-    const { account, balance, caseFeeWei, noDoctorsAvailable, previousCase } = this.props
+    const { address,
+      balance,
+      caseFeeWei,
+      noDoctorsAvailable,
+      previousCase,
+      hasBeenSentEther
+    } = this.props
     event.preventDefault()
 
     await this.runValidation()
@@ -497,13 +510,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       toastr.warning('We are unable to read your Eth balance.')
     } else if (!caseFeeWei) {
       toastr.warning('The case fee has not been set.')
-    } else if (this.state.selectedDoctor && this.state.selectedDoctor.value === account) {
+    } else if (this.state.selectedDoctor && this.state.selectedDoctor.value === address) {
       toastr.warning('You cannot be your own Doctor.')
     } else if (noDoctorsAvailable) {
       toastr.warning('There are no Doctors currently available. Please try again later.')
     } else if (this.state.errors.length === 0) {
       if (computeTotalFee(caseFeeWei).greaterThan(balance)) {
-        if (previousCase) {
+        if (hasBeenSentEther || previousCase) {
           this.setState({ showBalanceTooLowModal: true })
         } else {
           this.props.showBetaFaucetModal()
@@ -620,7 +633,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     let result = null
     if (!this.props.publicKey) {
       result = await send(CaseManager, 'createAndAssignCaseWithPublicKey',
-        this.props.account,
+        this.props.address,
         '0x' + encryptedCaseKey,
         '0x' + caseKeySalt,
         '0x' + hashHex,
@@ -629,11 +642,11 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         '0x' + account.hexPublicKey()
       )({
         value,
-        from: this.props.account
+        from: this.props.address
       })
     } else {
       result = await send(CaseManager, 'createAndAssignCase',
-        this.props.account,
+        this.props.address,
         '0x' + encryptedCaseKey,
         '0x' + caseKeySalt,
         '0x' + hashHex,
@@ -641,7 +654,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         '0x' + doctorEncryptedCaseKey
       )({
         value,
-        from: this.props.account
+        from: this.props.address
       })
     }
     return result
@@ -663,8 +676,22 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
     return msg
   }
 
+  faucetLink = () => {
+    let url
+
+    if (this.props.networkId === 1234) {
+      url = 'no faucet in development!'
+    } else if (this.props.networkId === 3) {
+      url = 'https://faucet.metamask.io/'
+    } else if (this.props.networkId === 4) {
+      url = 'https://faucet.rinkeby.io/'
+    }
+
+    return <a target="_blank" rel="noopener noreferrer" href={url}>{url}</a>
+  }
+
   render() {
-    if (this.props.account === undefined) { return null }
+    if (this.props.address === undefined) { return null }
 
     let errors = {}
     for (var i = 0; i < this.state.errors.length; i++) {
@@ -828,7 +855,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
                           <div>
                             <label>Select a Doctor<span className='star'>*</span></label>
                               <DoctorSelect
-                                excludeAddresses={[this.props.account.toLowerCase()]}
+                                excludeAddresses={[this.props.address.toLowerCase()]}
                                 value={this.state.selectedDoctor}
                                 isClearable={false}
                                 onChange={this.onChangeDoctor} />
@@ -920,10 +947,31 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         </Modal>
 
         <Modal show={this.state.showBalanceTooLowModal}>
+          <Modal.Header>
+            <div className="row">
+              <div className="col-xs-12 text-center">
+                <h4>
+                  Insufficient Funds
+                </h4>
+              </div>
+            </div>
+          </Modal.Header>
           <Modal.Body>
             <div className="row">
               <div className="col-xs-12 text-center">
-                <h4>You need <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} /> to submit a case.</h4>
+                <p>
+                  You need at least <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} /> (plus gas fees) to submit a case.
+                </p>
+
+                {this.props.hasBeenSentEther
+                  ? (
+                    <p>
+                      You can get more ether from the faucet: {this.faucetLink()}
+                    </p>
+                  )
+                  : null
+                }
+
               </div>
             </div>
           </Modal.Body>
