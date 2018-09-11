@@ -11,7 +11,7 @@ export default function (state, {type, block, blockNumber}) {
 
     case 'BLOCK_LATEST':
       state = {...state}
-      state.blockGasLimit = block.gasLimit
+      state.latestBlock = block
       break
     // no default
   }

@@ -38,7 +38,14 @@ import {
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress }) {
+  let latestBlockTimestamp
+
   if (!caseAddress) { return {} }
+
+  const latestBlock = get(state, 'sagaGenesis.block.latestBlock')
+  if (latestBlock) {
+    latestBlockTimestamp = latestBlock.timestamp
+  }
 
   const address = get(state, 'sagaGenesis.accounts[0]')
 
@@ -81,6 +88,7 @@ function mapStateToProps(state, { caseAddress }) {
     challengingDoctor,
     diagnosingDoctor,
     encryptedCaseKey,
+    latestBlockTimestamp,
     caseKeySalt,
     status,
     transactions,
@@ -275,11 +283,11 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     render () {
-      const { diagnosingDoctor, account, updatedAt, status, secondsInADay } = this.props
+      const { diagnosingDoctor, account, updatedAt, status, secondsInADay, latestBlockTimestamp } = this.props
       const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} noToggle />
       let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
-      const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient', secondsInADay)
+      const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient', secondsInADay, latestBlockTimestamp)
 
       let buttons = (
         <div className="button-set__btn-clear">

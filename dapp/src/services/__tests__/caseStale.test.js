@@ -1,9 +1,10 @@
 import { caseStale } from '~/services/caseStale'
 import { caseStatus } from '~/utils/caseStatus'
+import { latestBlock } from '../__mocks__/latestBlock'
 
 describe('caseStale', () => {
 
-  let compareTime, status, context, secondsInADay
+  let compareTime, status, context, secondsInADay, latestBlockTimestamp
 
   beforeEach(() => {
     compareTime = (Date.now() / 1000)
@@ -44,6 +45,27 @@ describe('caseStale', () => {
       context = 'doctor'
       expect(caseStale(compareTime, status, context, secondsInADay)).toEqual(false)
     })
+
+    describe('using latestBlock timestamp as currentTime', () => {
+      beforeEach(() => {
+        status = caseStatus('Evaluated')
+        context = 'doctor'
+
+        latestBlockTimestamp = latestBlock.timestamp
+      })
+
+      it('is false when not enough time passed', () => {
+        compareTime = latestBlockTimestamp - (secondsInADay * 1)
+        expect(caseStale(compareTime, status, context, secondsInADay, latestBlockTimestamp)).toEqual(false)
+      })
+
+      it('is true when enough time has passed', () => {
+        compareTime = latestBlockTimestamp - (secondsInADay * 5)
+        expect(caseStale(compareTime, status, context, secondsInADay, latestBlockTimestamp)).toEqual(true)
+      })
+
+    })
+
   })
 
   describe('as patient', () => {

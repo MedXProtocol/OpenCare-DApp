@@ -20,8 +20,14 @@ import { mixpanel } from '~/mixpanel'
 import get from 'lodash.get'
 
 function mapStateToProps(state) {
+  let latestBlockTimestamp
   let staleCases = 0
-  const blockGasLimit = get(state, 'sagaGenesis.block.blockGasLimit')
+
+  const latestBlock = get(state, 'sagaGenesis.block.latestBlock')
+  if (latestBlock) {
+    latestBlockTimestamp = latestBlock.timestamp
+  }
+
   const address = get(state, 'sagaGenesis.accounts[0]')
   const transactions = get(state, 'sagaGenesis.transactions')
   const CaseDiagnosingDoctor = contractByName(state, 'CaseDiagnosingDoctor')
@@ -37,13 +43,13 @@ function mapStateToProps(state) {
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
     const isFirstDoc = diagnosingDoctor === address
 
-    if (isFirstDoc && caseStale(updatedAt, status, 'doctor', secondsInADay)) {
+    if (isFirstDoc && caseStale(updatedAt, status, 'doctor', secondsInADay, latestBlockTimestamp)) {
       staleCases++
     }
   })
 
   return {
-    blockGasLimit,
+    latestBlock,
     CaseDiagnosingDoctor,
     address,
     staleCases,
@@ -85,9 +91,11 @@ export const AcceptAllExpiredCases = connect(mapStateToProps)(withSend(withSaga(
     handleAcceptAllAsDoctorHandler = (e) => {
       e.preventDefault()
 
-      let gas = 4000000 // if we don't have the block gas limit yet then set this to 4million
-      if (this.props.blockGasLimit) {
-        gas = Math.min(500000 * this.props.staleCases, this.props.blockGasLimit)
+      // if we don't have the block gas limit yet then default this to 4million
+      let gas = 4000000
+      const { latestBlock, staleCases } = this.props
+      if (latestBlock && latestBlock.gasLimit) {
+        gas = Math.min(500000 * staleCases, latestBlock.gasLimit)
       }
 
       const acceptAllAsDoctorTransactionId = this.props.send(

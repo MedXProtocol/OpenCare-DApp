@@ -16,9 +16,17 @@ import {
 import { caseStale } from '~/services/caseStale'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
+import get from 'lodash.get'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
+  let latestBlockTimestamp
+
+  const latestBlock = get(state, 'sagaGenesis.block.latestBlock')
+  if (latestBlock) {
+    latestBlockTimestamp = latestBlock.timestamp
+  }
+
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
@@ -29,6 +37,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
 
   return {
     CaseLifecycleManager,
+    latestBlockTimestamp,
     transactions,
     status,
     updatedAt,
@@ -98,8 +107,8 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
     }
 
     render () {
-      const { updatedAt, status, secondsInADay } = this.props
-      if (!caseStale(updatedAt, status, 'doctor', secondsInADay)
+      const { updatedAt, status, secondsInADay, latestBlockTimestamp } = this.props
+      if (!caseStale(updatedAt, status, 'doctor', secondsInADay, latestBlockTimestamp)
       ) {
         return null
       } else {

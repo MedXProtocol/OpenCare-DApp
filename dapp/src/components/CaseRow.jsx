@@ -54,9 +54,14 @@ const caseStatusToClass = (caseRowObject, context) => {
 }
 
 function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex }) {
-  let status, createdAt, updatedAt, secondsInADay
+  let status, createdAt, updatedAt, secondsInADay, latestBlockTimestamp
   let caseIsStale = false
   if (caseRowObject === undefined) { caseRowObject = {} }
+
+  const latestBlock = get(state, 'sagaGenesis.block.latestBlock')
+  if (latestBlock) {
+    latestBlockTimestamp = latestBlock.timestamp
+  }
 
   const CaseManager = contractByName(state, 'CaseManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
@@ -93,7 +98,7 @@ function mapStateToProps(state, { caseRowObject, caseAddress, context, objIndex 
   caseRowObject['statusLabel'] = caseStatusToName(caseRowObject, context)
   caseRowObject['statusClass'] = caseStatusToClass(caseRowObject, context)
 
-  if (caseStale(updatedAt, status, context, secondsInADay)) {
+  if (caseStale(updatedAt, status, context, secondsInADay, latestBlockTimestamp)) {
     caseIsStale = true
   }
 
