@@ -51,7 +51,6 @@ function mapStateToProps (state) {
   let nextCaseAddress, doctorCasesCount, openCaseCount
 
   const address = get(state, 'sagaGenesis.accounts[0]')
-
   const CaseManager = contractByName(state, 'CaseManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
   const DoctorManager = contractByName(state, 'DoctorManager')

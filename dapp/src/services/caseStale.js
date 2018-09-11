@@ -15,7 +15,7 @@ const staleStatuses = [
 // compareTime would typically be a record's createdAt or updatedAt unix timestamp (UTC)
 // status is CaseStatus (Open, Closed, Evaluated, etc)
 // context is 'patient' or 'doctor'
-export function caseStale(compareTime, status, context, secondsInADay) {
+export function caseStale(compareTime, status, context, secondsInADay, currentTime) {
   if (!compareTime || !status) {
     return false
   } else if (!staleStatuses.includes(status)) {
@@ -42,7 +42,7 @@ export function caseStale(compareTime, status, context, secondsInADay) {
     }
 
     const enoughTimeHasPassed = (
-      (Math.floor(Date.now() / 1000) - compareTime) > secondsRequired
+      (currentTime - compareTime) > secondsRequired
     )
 
     return enoughTimeHasPassed && ((isPatient && waitingOnDoctor) || (!isPatient && waitingOnPatient))
