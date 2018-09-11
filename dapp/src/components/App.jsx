@@ -19,6 +19,7 @@ import { Welcome } from '~/components/welcome'
 import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
+import { DebugLink } from '~/components/DebugLink'
 import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
 import { AcceptAllExpiredCases } from '~/components/AcceptAllExpiredCases'
 import { UserAgentCheckModal } from '~/components/UserAgentCheckModal'
@@ -214,6 +215,10 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
         </div>
     }
 
+    if (process.env.REACT_APP_ENV === 'staging' || process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
+      var debugLink = <DebugLink />
+    }
+
     const WelcomeWrapped = <Welcome isDoctor={this.props.isDoctor} />
 
     return (
@@ -280,6 +285,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
               <div className="col-sm-12 text-center">
                 <p className="text-footer">
                   &copy; 2018 MedCredits Inc. - All Rights Reserved.
+                  <br />{debugLink}
                 </p>
               </div>
             </div>
