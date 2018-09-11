@@ -1,4 +1,4 @@
-const deployWithDelegate = require('./support/deployWithDelegate')
+const deployTargetAndDelegate = require('./support/deployTargetAndDelegate')
 
 let CaseLifecycleManager = artifacts.require("./CaseLifecycleManager.sol");
 let Registry = artifacts.require('./Registry.sol');
@@ -7,7 +7,7 @@ module.exports = function(deployer) {
   deployer.then(async () => {
     const registryInstance = await Registry.deployed()
 
-    return deployWithDelegate(artifacts, deployer, CaseLifecycleManager).then((caseLifecycleManager) => {
+    return deployTargetAndDelegate(artifacts, deployer, CaseLifecycleManager).then((caseLifecycleManager) => {
     })
   })
 };

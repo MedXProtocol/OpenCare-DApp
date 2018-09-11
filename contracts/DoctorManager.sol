@@ -20,6 +20,8 @@ contract DoctorManager is Ownable, Initializable, DelegateTarget {
   mapping (uint256 => bool) public doctorDeactivated;
   mapping (uint256 => string) public doctorCountries;
   mapping (uint256 => string) public doctorRegions;
+
+  mapping (uint256 => bool) public dermatologists;
   /*
     MEMORY END
     It is safe to add new data definitions here
@@ -43,13 +45,14 @@ contract DoctorManager is Ownable, Initializable, DelegateTarget {
     address _doctor,
     string _name,
     string _country,
-    string _region
+    string _region,
+    bool _dermatologist
   ) public onlyOwner {
     address doctorAddress = doctorAddresses[doctorIndex(_doctor)];
     if (_doctor == doctorAddress) {
-      reactivateDoctor(_doctor, _name, _country, _region);
+      reactivateDoctor(_doctor, _name, _country, _region, _dermatologist);
     } else {
-      addDoctor(_doctor, _name, _country, _region);
+      addDoctor(_doctor, _name, _country, _region, _dermatologist);
     }
   }
 
@@ -57,7 +60,8 @@ contract DoctorManager is Ownable, Initializable, DelegateTarget {
     address _doctor,
     string _name,
     string _country,
-    string _region
+    string _region,
+    bool _dermatologist
   ) private onlyOwner {
     require(!isDoctor(_doctor), "Address provided is already a doctor");
     doctorIndices[_doctor] = doctorCount;
@@ -65,14 +69,17 @@ contract DoctorManager is Ownable, Initializable, DelegateTarget {
     doctorNames[doctorCount] = _name;
     doctorCountries[doctorCount] = _country;
     doctorRegions[doctorCount] = _region;
+    dermatologists[doctorCount] = _dermatologist;
     doctorCount += 1;
     emit AddDoctor(_doctor);
   }
 
-  function reactivateDoctor(address _doctor,
+  function reactivateDoctor(
+    address _doctor,
     string _name,
     string _country,
-    string _region
+    string _region,
+    bool _dermatologist
   ) private onlyOwner {
     require(!isActive(_doctor), "Address provided is already activated, cannot reactivate");
     uint256 index = doctorIndex(_doctor);
@@ -80,6 +87,7 @@ contract DoctorManager is Ownable, Initializable, DelegateTarget {
     doctorNames[index] = _name;
     doctorCountries[index] = _country;
     doctorRegions[index] = _region;
+    dermatologists[index] = _dermatologist;
     emit DoctorReactivated(_doctor);
   }
 
@@ -107,6 +115,11 @@ contract DoctorManager is Ownable, Initializable, DelegateTarget {
   function isActive(address _doctor) public view returns (bool) {
     uint256 index = doctorIndex(_doctor);
     return index != 0 && !doctorDeactivated[index];
+  }
+
+  function isDermatologist(address _doctor) public view returns (bool) {
+    uint256 index = doctorIndex(_doctor);
+    return index != 0 && dermatologists[index];
   }
 
   function name(address _doctor) public view returns (string) {

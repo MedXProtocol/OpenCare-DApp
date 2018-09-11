@@ -295,7 +295,7 @@ export const RegisterDoctorContainer =
                           <tr>
                             <th>Priority?</th>
                             <th>Online</th>
-                            <th>Doctor Address</th>
+                            <th>Doctor Address &amp; Specialities</th>
                             <th>Doctor Details</th>
                             <th>Public Key Set?</th>
                             <th className="text-right">
@@ -308,6 +308,7 @@ export const RegisterDoctorContainer =
                             {doctors.map(({
                               publicKey,
                               isActive,
+                              isDermatologist,
                               address,
                               name,
                               country,
@@ -347,6 +348,8 @@ export const RegisterDoctorContainer =
                                         <span>
                                           <EthAddress address={address} showFull={true} />
                                         </span>
+                                        <br />
+                                        <strong>{isDermatologist}</strong>
                                       </td>
                                       <td width="20%" className="td--status">
                                         {name}
