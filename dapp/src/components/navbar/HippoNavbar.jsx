@@ -16,8 +16,13 @@ import {
 import { withRouter, Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import ReactTooltip from 'react-tooltip'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle'
+import faWallet from '@fortawesome/fontawesome-free-solid/faWallet'
+import faBriefcaseMedical from '@fortawesome/fontawesome-free-solid/faBriefcaseMedical'
+import faNotesMedical from '@fortawesome/fontawesome-free-solid/faNotesMedical'
+import faUserMd from '@fortawesome/fontawesome-free-solid/faUserMd'
+import faUser from '@fortawesome/fontawesome-free-solid/faUser'
 import logo from '~/assets/img/logo.png'
 import get from 'lodash.get'
 import networkIdToName from '~/utils/network-id-to-name'
@@ -136,13 +141,24 @@ export const HippoNavbar = withContractRegistry(
     if (this.props.signedIn && this.props.address) {
       var profileMenu =
         <NavDropdown
-          title={nameOrAccountString}
+          title={
+            <span>
+              <FontAwesomeIcon
+                icon={faUser}
+                size='sm'
+                data-tip='Profile' />
+              &nbsp;&nbsp;
+                {nameOrAccountString}
+            </span>
+          }
           id='account-dropdown'
           open={this.state.profileMenuOpen}
           onToggle={(value) => this.toggleProfileMenu(value)}
 
         >
-          <MenuItem header>Profile</MenuItem>
+          <MenuItem header>
+            Profile
+          </MenuItem>
 
           <LinkContainer to={routes.ACCOUNT_WALLET}>
             <MenuItem href={routes.ACCOUNT_WALLET}>
@@ -177,13 +193,23 @@ export const HippoNavbar = withContractRegistry(
       var wrappedEtherBalance =
         <LinkContainer to={routes.ACCOUNT_WALLET}>
           <NavItem href={routes.ACCOUNT_WALLET}>
-            <Ether wei={this.props.balance} noStyle />
+            <FontAwesomeIcon
+              icon={faWallet}
+              size='sm'
+              data-tip='Wallet' />
+            &nbsp;
+            Wallet
           </NavItem>
         </LinkContainer>
 
       var myCasesItem =
         <IndexLinkContainer to={routes.PATIENTS_CASES}  activeClassName="active">
           <NavItem href={routes.PATIENTS_CASES}>
+            <FontAwesomeIcon
+              icon={faNotesMedical}
+              size='sm'
+              data-tip='My Cases' />
+            &nbsp;
             My Cases
           </NavItem>
         </IndexLinkContainer>
@@ -192,7 +218,13 @@ export const HippoNavbar = withContractRegistry(
         var openCasesItem =
           <LinkContainer to={routes.DOCTORS_CASES_OPEN}>
             <NavItem href={routes.DOCTORS_CASES_OPEN}>
-              <HippoCasesRequiringAttention /> Diagnose Cases
+              <HippoCasesRequiringAttention />
+              <FontAwesomeIcon
+                icon={faUserMd}
+                size='sm'
+                data-tip='My Cases' />
+                &nbsp;
+              Diagnose Cases
             </NavItem>
           </LinkContainer>
       }
@@ -267,9 +299,6 @@ export const HippoNavbar = withContractRegistry(
               <ReactTooltip effect='solid' place='bottom' />
             </NavItem>
           ) : null}
-          <NavItem>
-            {networkIdToName(this.props.networkId)} Network
-          </NavItem>
         </Nav>
         <Navbar.Collapse>
           <Nav pullRight>

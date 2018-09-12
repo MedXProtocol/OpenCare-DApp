@@ -183,7 +183,9 @@
   min-width: 100px;
   padding-bottom: 1px;
   padding-top: 10px;
-  text-align: center;
+  @media (min-width: 768px) {
+    text-align: center;
+  }
 }
 
 .navbar-inverse .navbar-nav > li.nav--button a:hover {
