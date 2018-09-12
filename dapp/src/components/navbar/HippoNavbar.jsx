@@ -177,7 +177,7 @@ export const HippoNavbar = withContractRegistry(
       var wrappedEtherBalance =
         <LinkContainer to={routes.ACCOUNT_WALLET}>
           <NavItem href={routes.ACCOUNT_WALLET}>
-            <Ether wei={this.props.balance} />
+            <Ether wei={this.props.balance} noStyle />
           </NavItem>
         </LinkContainer>
 

@@ -65,8 +65,7 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
   /**
    * @dev - Throws if not instance of CaseManager
    */
-  modifier onlyCaseManager(address _caseAddress) {
-    Case _case = Case(_caseAddress);
+  modifier onlyCaseManager() {
     require(msg.sender == address(registry.caseManager())//,
       //'must be the Case Manager contract'
     );
@@ -134,14 +133,14 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
   function setDiagnosingDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
     public
     isCase(_caseAddress)
-    onlyCaseManager(_caseAddress)
+    onlyCaseManager
     isDoctor(_doctor)
   {
     Case _case = Case(_caseAddress);
 
-    require(_case.status() == Case.CaseStatus.Open/*, 'case must be open to set the Diagnosing Doctor'*/);
-    require(_case.diagnosingDoctor() == address(0)/*, 'the Diagnosing Doctor must be blank'*/);
-    require(_doctor != _case.patient()/*, 'the doctor cannot be the patient'*/);
+    require(_case.status() == Case.CaseStatus.Open, 'case must be open to set the Diagnosing Doctor');
+    require(_case.diagnosingDoctor() == address(0), 'the Diagnosing Doctor must be blank');
+    require(_doctor != _case.patient(), 'the doctor cannot be the patient');
 
     registry.caseFirstPhaseManager().setDiagnosingDoctor(_case, _doctor, _doctorEncryptedKey);
   }

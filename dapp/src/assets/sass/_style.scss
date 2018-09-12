@@ -22,6 +22,10 @@ body {
   }
 }
 
+.d-inline-block {
+  display: inline-block;
+}
+
 // Forces everything to fit within browser window on mobile
 .content .container,
 .navbar-header {
@@ -79,14 +83,22 @@ a {
   cursor: pointer;
 }
 
+.danger .currency {
+  color: red;
+}
+
+.currency,
 .flip-link span {
-  border-bottom: 3px solid #c9eeff;
   color: #6bf;
-  cursor: pointer;
   font-weight: bold;
-  line-height: 24px;
   text-decoration: none;
   transition: color 50ms ease-in;
+}
+
+.flip-link span {
+  border-bottom: 3px solid #c9eeff;
+  line-height: 24px;
+  cursor: pointer;
 }
 
 .flip-link span:hover {
@@ -96,14 +108,13 @@ a {
 .flip-link .ether-flip--second-value,
 .flip-link .ether-flip--second-value:hover {
   border-bottom: none;
-  opacity: 0.8;
+  opacity: 0.6;
   font-weight: normal;
 }
 
-.button .flip-link,
-.button .flip-link span,
-.alert .flip-link,
-.alert .flip-link span {
+button .currency,
+.button .currency,
+.alert .currency {
   border-color: inherit;
   color: inherit;
 }

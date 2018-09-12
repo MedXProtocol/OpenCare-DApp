@@ -41,42 +41,52 @@ contract('CaseManager', function (accounts) {
     })
   })
 
-  describe('usdToWei(uint256)', () => {
-    it('should dynamically calculate the case fee', async () => {
-      assert.equal((web3.toDecimal(await env.etherPriceFeed.read())), web3.toWei('300', 'ether'))
-      assert.equal((await env.caseManager.usdToWei(web3.toWei('15', 'ether'))).toString(), web3.toWei('0.05', 'ether').toString())
-    })
-  })
-
-  describe('createCaseCostWei(uint256)', () => {
-    it('should dynamically calculate the case fee', async () => {
-      const totalFeeWei = await env.caseManager.createCaseCostWei(web3.toWei('10', 'ether'))
-      assert.equal(totalFeeWei.toString(), '49999999999999999')
-    })
-  })
-
   describe('createAndAssignCase()', () => {
-    it('should work', async () => {
-      assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
-      await env.caseManager.createAndAssignCase(
-        patient,
-        encryptedCaseKey,
-        caseKeySalt,
-        ipfsHash,
-        doctor,
-        'doctor encrypted case key',
-        { from: patient, value: caseCharge }
-      )
+    describe('with weth9', () => {
+      it('should work', async () => {
+        assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
+        await env.caseManager.createAndAssignCase(
+          env.weth9.address,
+          patient,
+          encryptedCaseKey,
+          caseKeySalt,
+          ipfsHash,
+          doctor,
+          'doctor encrypted case key',
+          { from: patient, value: caseCharge }
+        )
 
-      assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
-      assert.equal(await env.caseManager.getPatientCaseListCount(patient), 1)
-      assert.equal(await env.caseManager.doctorCasesCount(doctor), 1)
+        assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
+        assert.equal(await env.caseManager.getPatientCaseListCount(patient), 1)
+        assert.equal(await env.caseManager.doctorCasesCount(doctor), 1)
 
-      let caseAddress = await env.caseManager.patientCases(patient, 0)
-      assert.equal(await env.caseManager.doctorCaseAtIndex(doctor, 0), caseAddress)
-      var caseInstance = await Case.at(caseAddress)
-      assert.equal(await caseInstance.patient.call(), patient)
-      assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
+        let caseAddress = await env.caseManager.patientCases(patient, 0)
+        assert.equal(await env.caseManager.doctorCaseAtIndex(doctor, 0), caseAddress)
+        var caseInstance = await Case.at(caseAddress)
+        assert.equal(await caseInstance.patient.call(), patient)
+        assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
+      })
+    })
+
+    describe('with dai', () => {
+      it('should work', async () => {
+        await env.dai.mint(patient, web3.toWei('1000', 'ether'))
+        const depositTokenWei = await env.casePaymentManager.requiredDepositTokenWei(env.dai.address)
+        await env.dai.approve(env.casePaymentManager.address, depositTokenWei, { from: patient })
+
+        await env.caseManager.createAndAssignCase(
+          env.dai.address,
+          patient,
+          encryptedCaseKey,
+          caseKeySalt,
+          ipfsHash,
+          doctor,
+          'doctor encrypted case key',
+          { from: patient, value: caseCharge }
+        )
+
+        assert.equal(await env.caseManager.getPatientCaseListCount(patient), 1)
+      })
     })
   })
 
@@ -85,6 +95,7 @@ contract('CaseManager', function (accounts) {
       assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
 
       await env.caseManager.createAndAssignCaseWithPublicKey(
+        env.weth9.address,
         patient2,
         encryptedCaseKey,
         caseKeySalt,

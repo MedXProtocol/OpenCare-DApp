@@ -31,7 +31,7 @@ contract('CaseLifecycleManager', function (accounts) {
   beforeEach(async () => {
     await resetCaseManager(artifacts, env)
 
-    caseFeeWei = await env.caseManager.caseFeeWei()
+    caseFeeWei = await env.casePaymentManager.caseFeeTokenWei(env.weth9.address)
 
     caseInstance = await Case.at(await createCase(env, patient, doctor))
   })

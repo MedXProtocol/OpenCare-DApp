@@ -9,8 +9,12 @@ import './CaseFirstPhaseManager.sol';
 import './CaseSecondPhaseManager.sol';
 import './CaseScheduleManager.sol';
 import './CaseStatusManager.sol';
+import './CasePaymentManager.sol';
 import './DoctorManager.sol';
+import "./IEtherPriceFeed.sol";
 import './Registry.sol';
+import './WETH9.sol';
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 library RegistryLookup {
 
@@ -46,8 +50,23 @@ library RegistryLookup {
     return CaseSecondPhaseManager(self.lookup(keccak256("CaseSecondPhaseManager")));
   }
 
+  function casePaymentManager(Registry self) internal view returns (CasePaymentManager) {
+    return CasePaymentManager(self.lookup(keccak256("CasePaymentManager")));
+  }
+
   function doctorManager(Registry self) internal view returns (DoctorManager) {
     return DoctorManager(self.lookup(keccak256("DoctorManager")));
   }
 
+  function dai(Registry self) internal view returns (ERC20) {
+    return ERC20(self.lookup(keccak256("Dai")));
+  }
+
+  function weth9(Registry self) internal view returns (WETH9) {
+    return WETH9(self.lookup(keccak256("WrappedEther")));
+  }
+
+  function etherPriceFeed(Registry self) internal view returns (IEtherPriceFeed) {
+    return IEtherPriceFeed(self.lookup(keccak256('EtherPriceFeed')));
+  }
 }

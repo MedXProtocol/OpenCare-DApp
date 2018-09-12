@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 
 let lastSagaKey = 0
@@ -20,12 +20,12 @@ export function withSaga(saga) {
         },
 
         dispatchEndSaga: (key) => {
-          dispatch({ type: `END_SAGA_${key}` })
+          dispatch({ type: `END_SAGA_${key}`, key })
         }
       }
     }
 
-    const SagaWrapper = connect(() => { return {} }, mapDispatchToProps)(class _SagaWrapper extends Component {
+    const SagaWrapper = connect(() => { return {} }, mapDispatchToProps)(class _SagaWrapper extends PureComponent {
 
       displayName = `WithSaga(${getDisplayName(WrappedComponent)})`
 
@@ -42,8 +42,8 @@ export function withSaga(saga) {
         this.props.dispatchEndSaga(this.sagaKey)
       }
 
-      componentWillReceiveProps (props) {
-        this.props.dispatchRunSaga(props, this.sagaKey, this.displayName)
+      componentDidUpdate () {
+        this.props.dispatchRunSaga(this.props, this.sagaKey, this.displayName)
       }
 
       render () {
