@@ -166,7 +166,6 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
               &nbsp;
                 <FontAwesomeIcon
                   icon={faEthereum}
-                  size='md'
                   data-tip='Profile' />
                 &nbsp;
                 Tx
