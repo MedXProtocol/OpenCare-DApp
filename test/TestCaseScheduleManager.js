@@ -16,8 +16,8 @@ contract('CaseScheduleManager', function (accounts) {
 
   before(async () => {
     env = await createEnvironment(artifacts)
-    await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr Xavier', 'CA', 'AB')
-    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr Hibbert', 'US', 'CO')
+    await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr Xavier', 'CA', 'AB', true)
+    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr Hibbert', 'US', 'CO', true)
   })
 
   beforeEach(async () => {
