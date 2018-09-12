@@ -3,10 +3,8 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import BigNumber from 'bignumber.js'
-import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { Dai } from '~/components/Dai'
-import { displayWeiToEther } from '~/utils/displayWeiToEther'
 import {
   withSend,
   withSaga,

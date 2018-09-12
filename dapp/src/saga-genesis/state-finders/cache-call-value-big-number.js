@@ -5,7 +5,7 @@ export default function(state, address, method, ...args) {
   const callState = cacheCallState(state, address, method, ...args)
   let response = callState.response
   if (response) {
-    response = new BigNumber(response)
+    var bigNum = new BigNumber(response)
   }
-  return response
+  return bigNum
 }

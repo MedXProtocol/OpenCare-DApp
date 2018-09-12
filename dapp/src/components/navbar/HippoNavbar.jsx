@@ -19,13 +19,11 @@ import ReactTooltip from 'react-tooltip'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle'
 import faWallet from '@fortawesome/fontawesome-free-solid/faWallet'
-import faBriefcaseMedical from '@fortawesome/fontawesome-free-solid/faBriefcaseMedical'
-import faNotesMedical from '@fortawesome/fontawesome-free-solid/faNotesMedical'
+import faHeartbeat from '@fortawesome/fontawesome-free-solid/faHeartbeat';
 import faUserMd from '@fortawesome/fontawesome-free-solid/faUserMd'
 import faUser from '@fortawesome/fontawesome-free-solid/faUser'
 import logo from '~/assets/img/logo.png'
 import get from 'lodash.get'
-import networkIdToName from '~/utils/network-id-to-name'
 import { connect } from 'react-redux'
 import {
   cacheCall,
@@ -36,7 +34,6 @@ import {
 } from '~/saga-genesis'
 import { HippoCasesRequiringAttention } from './HippoCasesRequiringAttention'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
-import { Ether } from '~/components/Ether'
 import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
@@ -162,7 +159,7 @@ export const HippoNavbar = withContractRegistry(
 
           <LinkContainer to={routes.ACCOUNT_WALLET}>
             <MenuItem href={routes.ACCOUNT_WALLET}>
-              W-ETH Balance
+              Wallet
             </MenuItem>
           </LinkContainer>
 
@@ -206,7 +203,7 @@ export const HippoNavbar = withContractRegistry(
         <IndexLinkContainer to={routes.PATIENTS_CASES}  activeClassName="active">
           <NavItem href={routes.PATIENTS_CASES}>
             <FontAwesomeIcon
-              icon={faNotesMedical}
+              icon={faHeartbeat}
               size='sm'
               data-tip='My Cases' />
             &nbsp;
