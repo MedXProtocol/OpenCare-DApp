@@ -21,7 +21,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
   render () {
     let launchLink
     if (this.props.signedIn) {
-      if (this.props.isDoctor) {
+      if (this.props.isDoctor && this.props.isDermatologist) {
         launchLink = routes.DOCTORS_CASES_OPEN
       } else {
         launchLink = routes.PATIENTS_CASES

@@ -21,6 +21,7 @@ function mapStateToProps (state) {
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
   const CaseManager = contractByName(state, 'CaseManager')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', address)
   const BetaFaucet = contractByName(state, 'BetaFaucet')
   const hasBeenSentEther = cacheCallValue(state, BetaFaucet, 'sentAddresses', address)
 
@@ -47,6 +48,7 @@ function mapStateToProps (state) {
     MedXToken,
     isOwner,
     isDoctor,
+    isDermatologist,
     dontShowEther,
     dontShowMedX,
     dontShowAddDoctor,
@@ -61,7 +63,8 @@ function* saga({ BetaFaucet, CaseManager, MedXToken, DoctorManager, address }) {
     cacheCall(CaseManager, 'getPatientCaseListCount', address),
     cacheCall(DoctorManager, 'owner'),
     cacheCall(BetaFaucet, 'sentAddresses', address),
-    yield cacheCall(DoctorManager, 'isDoctor', address)
+    cacheCall(DoctorManager, 'isDoctor', address),
+    cacheCall(DoctorManager, 'isDermatologist', address)
   ])
 }
 
@@ -117,7 +120,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
           && !props.dontShowEther
         )
 
-        const canBeDoctor = (!props.isDoctor && !props.dontShowAddDoctor)
+        const canBeDoctor = (!props.isDoctor && !props.isDermatologist && !props.dontShowAddDoctor)
 
 
         let showBetaFaucetModal = true
@@ -189,7 +192,8 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
           ethBalance,
           isOwner,
           address,
-          isDoctor
+          isDoctor,
+          isDermatologist
         } = this.props
 
         if (this.props.betaFaucetModalDismissed) { return null }
@@ -197,7 +201,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         if (isOwner) { return null }
 
         // Don't show this if they've already been onboarded
-        if (step === 2 && isDoctor) { return null }
+        if (step === 2 && isDoctor && isDermatologist) { return null }
 
         if (step === 1) {
           content = <EthFaucetAPI
