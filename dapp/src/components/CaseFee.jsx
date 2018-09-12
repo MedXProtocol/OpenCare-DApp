@@ -5,6 +5,7 @@ import {
   contractByName
 } from '~/saga-genesis'
 import { Dai } from '~/components/Dai'
+import { Ether } from '~/components/Ether'
 import { EtherFlip } from '~/components/EtherFlip'
 import { mapStateToCase } from '~/services/case/mapStateToCase'
 import { caseSaga } from '~/services/case/caseSaga'
@@ -32,24 +33,34 @@ export const CaseFee = connect(mapStateToProps)(
       static propTypes = {
         address: PropTypes.string.isRequired,
         calc: PropTypes.func,
-        noToggle: PropTypes.bool
+        noToggle: PropTypes.bool,
+        noFlip: PropTypes.bool
       }
 
       static defaultProps = {
-        noToggle: false
+        noToggle: false,
+        noFlip: false
       }
 
       render () {
         if (this.props.calc) {
-          var wei = this.props.calc(wei)
+          var wei = this.props.calc(this.props.caseObject.caseFee)
         } else {
-          var wei = this.props.caseObject.caseFee
+          wei = this.props.caseObject.caseFee
         }
+        var result
         if (this.props.caseObject.tokenContract === this.props.Dai) {
-          <EtherFlip wei={wei} noToggle={this.props.noToggle} />
+          result = <Dai wei={wei} />
         } else if (this.props.caseObject.tokenContract === this.props.WrappedEther) {
-          <Dai wei={wei} />
+          if (this.props.noFlip) {
+            result = <Ether wei={wei} />
+          } else {
+            result = <EtherFlip wei={wei} noToggle={this.props.noToggle} />
+          }
+        } else {
+          result = null
         }
+        return result
       }
     }
   )

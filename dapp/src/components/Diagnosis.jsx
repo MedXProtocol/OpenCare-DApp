@@ -300,7 +300,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
     const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== 3
-    const challengeFeeEtherNoFlip = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} noToggle />
+    const challengeFeeEtherNoFlip = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} noFlip />
     const challengeFeeEther = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} />
     const totalFeeEther = <CaseFee address={this.props.caseAddress} calc={computeTotalFee} />
 

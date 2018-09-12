@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
 
 export default function (secretKey) {
   if (!secretKey) {
@@ -8,7 +8,7 @@ export default function (secretKey) {
     return 'The secret key must contain 64 characters'
   }
   try {
-    var bn = new BigNumber(secretKey, 16)
+    var bn = new BN(secretKey, 16)
     bn.toString(16)
   } catch (error) {
     return 'The secret key is not valid'

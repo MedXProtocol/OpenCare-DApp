@@ -12,7 +12,6 @@ import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
 import { computeTotalFee } from '~/utils/computeTotalFee'
 import { CaseFee } from '~/components/CaseFee'
-import { EtherFlip } from '~/components/EtherFlip'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { caseAddress }) {

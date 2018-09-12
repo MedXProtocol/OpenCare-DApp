@@ -1,7 +1,6 @@
-import BigNumber from 'bignumber.js'
-
 import { weiToEther } from './weiToEther'
 
 export function displayWeiToEther(wei) {
-  return new BigNumber(weiToEther(wei)).round(4).toString()
+  const ether = weiToEther(wei)
+  return ether.toString()
 }
