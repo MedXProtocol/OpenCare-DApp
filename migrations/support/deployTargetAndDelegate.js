@@ -2,9 +2,13 @@ var deployAndRegister = require('./deployAndRegister')
 var deployAndRegisterDelegate = require('./deployAndRegisterDelegate')
 var migrationLog = require('./migrationLog')
 
-/** @title deployWithDelegate
-  * @dev Deploys a new Contract and registers it with the Registry then creates a new Delegate
-  * that points to the contract, and is registered under the same name as the contract.
+/** @title 
+  * @dev Deploys a new Contract and registers it with the Registry
+  * then creates a new Delegate that points to the contract, and is registered
+  * under the same name as the contract.
+  *
+  * Use this to deploy a brand new Contract (*Target, behaviour) and it's
+  * corresponding sibling Delegate (memory)
   */
 module.exports = function(artifacts, deployer, contract) {
   const Delegate = artifacts.require('Delegate.sol')

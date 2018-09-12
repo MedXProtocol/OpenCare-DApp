@@ -1,8 +1,8 @@
-const deployWithDelegate = require('./support/deployWithDelegate')
+const deployTargetAndDelegate = require('./support/deployTargetAndDelegate')
 let CaseLifecycleManager = artifacts.require("./CaseLifecycleManager.sol")
 
 module.exports = function(deployer) {
   deployer.then(async () => {
-    return deployWithDelegate(artifacts, deployer, CaseLifecycleManager)
+    return deployTargetAndDelegate(artifacts, deployer, CaseLifecycleManager)
   })
 };

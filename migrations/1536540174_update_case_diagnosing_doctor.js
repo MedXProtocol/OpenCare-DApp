@@ -1,8 +1,8 @@
-const deployWithDelegate = require('./support/deployWithDelegate')
+const deployTargetAndDelegate = require('./support/deployTargetAndDelegate')
 let CaseDiagnosingDoctor = artifacts.require("./CaseDiagnosingDoctor.sol")
 
 module.exports = function(deployer) {
   deployer.then(async () => {
-    return deployWithDelegate(artifacts, deployer, CaseDiagnosingDoctor)
+    return deployTargetAndDelegate(artifacts, deployer, CaseDiagnosingDoctor)
   })
 };
