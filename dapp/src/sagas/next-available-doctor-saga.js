@@ -43,6 +43,9 @@ function* fetchDoctorCredentials(address) {
   const isActive = yield web3Call(yield doctorManager(), 'isActive', address)
   if (!isActive) { return null }
 
+  const isDermatologist = yield web3Call(yield doctorManager(), 'isDermatologist', address)
+  if (!isDermatologist) { return null }
+
   const publicKey = yield web3Call(yield accountManager(), 'publicKeys', address)
   if (isBlank(publicKey)) { return null }
 
@@ -57,6 +60,7 @@ function* fetchDoctorCredentials(address) {
   credentials = {
     address,
     isActive,
+    isDermatologist,
     publicKey
   }
   return credentials

@@ -1,7 +1,7 @@
-const deployWithDelegate = require('./support/deployWithDelegate')
+const deployTargetAndDelegate = require('./support/deployTargetAndDelegate')
 const FromBlockNumber = artifacts.require("./FromBlockNumber.sol")
 
 module.exports = function(deployer) {
-  return deployWithDelegate(artifacts, deployer, FromBlockNumber).then((fromBlockNumber) => {
+  return deployTargetAndDelegate(artifacts, deployer, FromBlockNumber).then((fromBlockNumber) => {
   })
 }

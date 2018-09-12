@@ -1,7 +1,6 @@
-var deployWithDelegate = require('./support/deployWithDelegate')
-
+const deployTargetAndDelegate = require('./support/deployTargetAndDelegate')
 const CaseManager = artifacts.require("./CaseManager.sol")
 
 module.exports = function(deployer, network, accounts) {
-  deployWithDelegate(artifacts, deployer, CaseManager)
+  deployTargetAndDelegate(artifacts, deployer, CaseManager)
 }

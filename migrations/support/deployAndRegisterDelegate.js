@@ -1,5 +1,7 @@
 var toRegistryKey = require('./toRegistryKey')
 
+// Internally used by deployTargetAndDelegate, don't use this directly
+
 /**
  * WARNING: Use this to destroy and replace a Delegate, which will blow away the memory
  * Typically you only want to replace the behaviour, which lives in the Target Contract
