@@ -60,8 +60,9 @@ function mapStateToProps (state) {
 
   const isSignedIn = get(state, 'account.signedIn')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', address)
 
-  if (isDoctor) {
+  if (isDoctor && isDermatologist) {
     doctorCasesCount = cacheCallValueInt(state, CaseManager, 'doctorCasesCount', address)
     openCaseCount = cacheCallValue(state, CaseStatusManager, 'openCaseCount', address)
     nextCaseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, (doctorCasesCount - 1))
@@ -71,6 +72,7 @@ function mapStateToProps (state) {
 
   return {
     address,
+    isDermatologist,
     isDoctor,
     FromBlockNumber,
     fromBlock,
@@ -100,7 +102,8 @@ function* saga({ address, CaseManager, CaseStatusManager, DoctorManager, doctorC
   if (!address || !CaseManager || !DoctorManager || !CaseStatusManager || !FromBlockNumber) { return }
   yield cacheCall(FromBlockNumber, 'blockNumber')
   const isDoctor = yield cacheCall(DoctorManager, 'isDoctor', address)
-  if (isDoctor) {
+  const isDermatologist = yield cacheCall(DoctorManager, 'isDermatologist', address)
+  if (isDoctor && isDermatologist) {
     yield cacheCall(CaseManager, 'doctorCasesCount', address)
     yield cacheCall(CaseStatusManager, 'openCaseCount', address)
 
@@ -150,7 +153,13 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     }
 
     // We have a new case assigned and the new case address from the blockchain
-    if (nextProps.isSignedIn && nextProps.isDoctor && this.newCaseAssigned && nextProps.nextCaseAddress) {
+    if (
+         nextProps.isSignedIn
+      && nextProps.isDoctor
+      && nextProps.isDermatologist
+      && this.newCaseAssigned
+      && nextProps.nextCaseAddress
+    ) {
       this.showNewCaseAssignedToast(nextProps)
     }
   }
@@ -202,7 +211,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       var betaFaucetModal = <BetaFaucetModal />
       var feedbackLink = <ScrollyFeedbackLink scrollDiffAmount={50} />
 
-      if (this.props.isDoctor) {
+      if (this.props.isDoctor && this.props.isDermatologist) {
         var acceptAllExpiredCases = <AcceptAllExpiredCases />
       }
     }
@@ -218,7 +227,10 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       var debugLink = <DebugLink />
     }
 
-    const WelcomeWrapped = <Welcome isDoctor={this.props.isDoctor} />
+    const WelcomeWrapped = <Welcome
+      isDoctor={this.props.isDoctor}
+      isDermatologist={this.props.isDermatologist}
+    />
 
     return (
       <React.Fragment>

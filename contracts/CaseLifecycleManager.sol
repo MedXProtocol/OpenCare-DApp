@@ -37,8 +37,8 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
    */
   modifier patientWaitedOneDay(address _caseAddress) {
     require(
-      registry.caseScheduleManager().patientWaitedOneDay(_caseAddress)//,
-      //'patient must wait at least one day to call this'
+      registry.caseScheduleManager().patientWaitedOneDay(_caseAddress)/*,
+      'patient must wait at least one day to call this'*/
     );
     _;
   }
@@ -56,8 +56,8 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
    */
   modifier onlyCaseScheduleManager() {
     require(
-      msg.sender == address(registry.caseScheduleManager())//,
-      //'Must be the Case Schedule Manager contract'
+      msg.sender == address(registry.caseScheduleManager())/*,
+      'Must be the Case Schedule Manager contract'*/
     );
     _;
   }
@@ -66,8 +66,8 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
    * @dev - Throws if not instance of CaseManager
    */
   modifier onlyCaseManager() {
-    require(msg.sender == address(registry.caseManager())//,
-      //'must be the Case Manager contract'
+    require(msg.sender == address(registry.caseManager())/*,
+      'must be the Case Manager contract'*/
     );
     _;
   }
@@ -79,8 +79,8 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
     Case _case = Case(_caseAddress);
 
     require(
-      msg.sender == _case.challengingDoctor()//,
-      //'Must be the second opinion challenging doctor'
+      msg.sender == _case.challengingDoctor()/*,
+      'Must be the second opinion challenging doctor'*/
     );
     _;
   }
@@ -88,8 +88,12 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
   /**
    * @dev - throws if called by any account other than a doctor.
    */
-  modifier isDoctor(address _doctor) {
-    require(registry.doctorManager().isDoctor(_doctor)/*, '_doctor address must be a Doctor'*/);
+  modifier isDermatologist(address _doctor) {
+    require(
+         registry.doctorManager().isDoctor(_doctor)
+      && registry.doctorManager().isDermatologist(_doctor)/*,
+      '_doctor address must be a Registered Doctor & Dermatologist'*/
+    );
     _;
   }
 
@@ -98,7 +102,7 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
    */
   modifier onlyDiagnosingDoctor(address _caseAddress) {
     Case _case = Case(_caseAddress);
-    require(msg.sender == _case.diagnosingDoctor(), 'sender needs to be the diagnosis doctor');
+    require(msg.sender == _case.diagnosingDoctor()/*, 'sender needs to be the diagnosis doctor'*/);
     _;
   }
 
@@ -108,8 +112,8 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
   modifier onlyDiagnosingDoctorSenderOrCaseDiagnosingDoctor(address _caseAddress) {
     Case _case = Case(_caseAddress);
     require(
-      msg.sender == _case.diagnosingDoctor() || msg.sender == address(registry.caseDiagnosingDoctor()),
-      'sender needs to be the diagnosis doctor or the CaseDiagnosingDoctor contract'
+      msg.sender == _case.diagnosingDoctor() || msg.sender == address(registry.caseDiagnosingDoctor())/*,
+      'sender needs to be the diagnosis doctor or the CaseDiagnosingDoctor contract'*/
     );
     _;
   }
@@ -134,13 +138,13 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
     public
     isCase(_caseAddress)
     onlyCaseManager
-    isDoctor(_doctor)
+    isDermatologist(_doctor)
   {
     Case _case = Case(_caseAddress);
 
-    require(_case.status() == Case.CaseStatus.Open, 'case must be open to set the Diagnosing Doctor');
-    require(_case.diagnosingDoctor() == address(0), 'the Diagnosing Doctor must be blank');
-    require(_doctor != _case.patient(), 'the doctor cannot be the patient');
+    require(_case.status() == Case.CaseStatus.Open/*, 'case must be open to set the Diagnosing Doctor'*/);
+    require(_case.diagnosingDoctor() == address(0)/*, 'the Diagnosing Doctor must be blank'*/);
+    require(_doctor != _case.patient()/*, 'the doctor cannot be the patient'*/);
 
     registry.caseFirstPhaseManager().setDiagnosingDoctor(_case, _doctor, _doctorEncryptedKey);
   }
@@ -254,17 +258,17 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
     onlyDiagnosingDoctorSenderOrCaseDiagnosingDoctor(_caseAddress)
   {
     Case _case = Case(_caseAddress);
-    require(_case.evaluatedOrChallenging(), 'Case must be in Evaluated or Challenged state');
+    require(_case.evaluatedOrChallenging()/*, 'Case must be in Evaluated or Challenged state'*/);
 
     if (_case.status() == Case.CaseStatus.Evaluated) {
       require(
-        registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress),
-        'Must wait 2 days'
+        registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress)/*,
+        'Must wait 2 days'*/
       );
     } else if (_case.status() == Case.CaseStatus.Challenging) {
       require(
-        registry.caseScheduleManager().doctorWaitedFourDays(_caseAddress),
-        'Must wait 4 days'
+        registry.caseScheduleManager().doctorWaitedFourDays(_caseAddress)/*,
+        'Must wait 4 days'*/
       );
     }
 
@@ -275,6 +279,7 @@ contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
     external
     onlyPatient(_caseAddress)
     isCase(_caseAddress)
+    isDermatologist(_doctor)
   {
     Case _case = Case(_caseAddress);
 

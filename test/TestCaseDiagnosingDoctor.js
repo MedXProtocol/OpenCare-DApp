@@ -15,6 +15,7 @@ contract('CaseDiagnosingDoctor', function (accounts) {
   let patient = accounts[0]
   let doctor = accounts[1]
   let doctor2 = accounts[2]
+  let doctor3 = accounts[3]
   let caseFeeWei
 
   before(async () => {
@@ -22,9 +23,10 @@ contract('CaseDiagnosingDoctor', function (accounts) {
 
     caseFeeWei = await env.casePaymentManager.caseFeeTokenWei(env.weth9.address)
 
-    await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc', 'CA', 'AB')
-    await env.doctorManager.addOrReactivateDoctor(doctor, 'Doogie', 'US', 'CO')
-    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Hibbert', 'US', 'CO')
+    await env.doctorManager.addOrReactivateDoctor(patient, 'Patient is a Doc', 'CA', 'AB', true)
+    await env.doctorManager.addOrReactivateDoctor(doctor, 'Doogie', 'US', 'CO', true)
+    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Hibbert', 'US', 'CO', true)
+    await env.doctorManager.addOrReactivateDoctor(doctor3, 'Dr. Egg Sandwich', 'AB', '', false)
   })
 
   beforeEach(async () => {
@@ -40,6 +42,12 @@ contract('CaseDiagnosingDoctor', function (accounts) {
   // 3. doctor 1 diagnosed, no challenge, less than 48 hours
   // 4. doctor 1 diagnosed, patient challenged, less than 96 hours
   describe('acceptAllAsDoctor()', () => {
+    it('cannot be run unless Doctor is a Dermatologist', async () => {
+      expectThrow(async () => {
+        await env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor3 })
+      })
+    })
+
     it('after 2 or 4 days it should close all cases and pay the doctor', async () => {
       //// FIRST CASE DIAGNOSED
       const caseInstance1 = await Case.at(await createCase(env, patient, doctor))
