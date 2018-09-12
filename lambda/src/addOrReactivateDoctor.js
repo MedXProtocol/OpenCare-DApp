@@ -18,6 +18,7 @@ exports.handler = function (event, context, callback) {
     let ethAddress, name, publicKey
     let country = ''
     let region = ''
+    let isDermatologist = true
 
     if (event.queryStringParameters !== null && event.queryStringParameters !== undefined) {
       if (event.queryStringParameters.ethAddress !== undefined &&
@@ -59,7 +60,7 @@ exports.handler = function (event, context, callback) {
       callback(`you must pass a publicKey`)
     } else {
       console.info('hippo.addOrReactivateDoctor ' + ethAddress + ' to be a doctor named ' + name + ' with public key ' + publicKey)
-      hippo.addOrReactivateDoctor(ethAddress, name, country, region, publicKey)
+      hippo.addOrReactivateDoctor(ethAddress, name, country, region, isDermatologist, publicKey)
         .then((transactionHash) => {
           console.info('Successfully sent transaction with hash: ', transactionHash)
           callback(null, {

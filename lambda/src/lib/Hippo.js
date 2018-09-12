@@ -115,7 +115,7 @@ export class Hippo {
     })
   }
 
-  async addOrReactivateDoctor (ethAddress, name, country, region, publicKey) {
+  async addOrReactivateDoctor (ethAddress, name, country, region, isDermatologist, publicKey) {
     const accountManager = await this.lookupAccountManager()
     const existingPublicKeys = await accountManager.publicKeys(ethAddress)
     const existingPublicKey = existingPublicKeys['0']
@@ -131,22 +131,22 @@ export class Hippo {
       }
       return this.sendTransaction(tx)
         .then(() => {
-          return this._addOrReactivateDoctor(ethAddress, name, country, region)
+          return this._addOrReactivateDoctor(ethAddress, name, country, region, isDermatologist)
         })
         .catch((error) => {
           console.error('addOrReactivateDoctor: ', error.message)
           fail(error.message)
         })
     } else {
-      return this._addOrReactivateDoctor(ethAddress, name, country, region)
+      return this._addOrReactivateDoctor(ethAddress, name, country, region, isDermatologist)
     }
   }
 
-  _addOrReactivateDoctor (ethAddress, name, country, region) {
+  _addOrReactivateDoctor (ethAddress, name, country, region, isDermatologist) {
     return this.lookupContractAddress('DoctorManager')
       .then((doctorManagerAddress) => {
         const method = doctorManagerArtifact.abi.find((obj) => obj.name === 'addOrReactivateDoctor')
-        var data = abi.encodeMethod(method, [ethAddress, name, country, region])
+        var data = abi.encodeMethod(method, [ethAddress, name, country, region, isDermatologist])
         const tx = {
           from: this.ownerAddress(),
           to: doctorManagerAddress[0],
