@@ -74,7 +74,7 @@ contract('CaseDiagnosingDoctor', function (accounts) {
 
 
       //// Move 3 days into the future & run it again
-      increaseTime(SECONDS_IN_A_DAY * 3)
+      await increaseTime(SECONDS_IN_A_DAY * 3)
       result = await env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor })
 
       doctorBalance = await env.weth9.balanceOf(doctor)
@@ -86,7 +86,7 @@ contract('CaseDiagnosingDoctor', function (accounts) {
 
 
       //// This time, 2 days in the future (5 days total)
-      increaseTime(SECONDS_IN_A_DAY * 2)
+      await increaseTime(SECONDS_IN_A_DAY * 2)
       await env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor })
 
       doctorBalance = await env.weth9.balanceOf(doctor)

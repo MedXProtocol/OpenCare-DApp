@@ -16,6 +16,8 @@ import { doesNotRequireAttention } from '~/utils/doesNotRequireAttention'
 
 function mapStateToProps (state) {
   let casesRequiringAttentionCount = 0
+
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
@@ -32,7 +34,7 @@ function mapStateToProps (state) {
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
 
     // This case is actually on hold, waiting for action from another user so decrement the counter
-    if (doesNotRequireAttention(address, diagnosingDoctor, updatedAt, status, secondsInADay)) {
+    if (doesNotRequireAttention(address, diagnosingDoctor, updatedAt, status, secondsInADay, latestBlockTimestamp)) {
       casesRequiringAttentionCount--
     }
   })

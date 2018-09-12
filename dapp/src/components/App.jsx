@@ -19,6 +19,7 @@ import { Welcome } from '~/components/welcome'
 import { TryMetamask } from './try-metamask'
 import { LoginToMetaMask } from './login-to-metamask'
 import { FourOhFour } from './four-oh-four'
+import { DebugLink } from '~/components/DebugLink'
 import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
 import { AcceptAllExpiredCases } from '~/components/AcceptAllExpiredCases'
 import { UserAgentCheckModal } from '~/components/UserAgentCheckModal'
@@ -51,7 +52,6 @@ function mapStateToProps (state) {
   let nextCaseAddress, doctorCasesCount, openCaseCount
 
   const address = get(state, 'sagaGenesis.accounts[0]')
-
   const CaseManager = contractByName(state, 'CaseManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
   const DoctorManager = contractByName(state, 'DoctorManager')
@@ -87,6 +87,9 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    dispatchWeb3SHHInit: () => {
+      dispatch({ type: 'WEB3_SHH_INIT' })
+    },
     dispatchSignOut: () => {
       dispatch({ type: 'SIGN_OUT' })
     }
@@ -118,6 +121,14 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     if (process.env.NODE_ENV !== 'development' && !this.props.address && this.props.isSignedIn) {
       this.signOut()
+    }
+
+    if (process.env.NODE_ENV === 'development' && this.props.isSignedIn) {
+      // wait 5 seconds to ensure the sagas have initialized first
+      // we should update our architecture so sagas init first, then components
+      this.props.setTimeout(() => {
+        this.props.dispatchWeb3SHHInit()
+      }, 5000)
     }
   }
 
@@ -203,6 +214,10 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
         </div>
     }
 
+    if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
+      var debugLink = <DebugLink />
+    }
+
     const WelcomeWrapped = <Welcome isDoctor={this.props.isDoctor} />
 
     return (
@@ -269,6 +284,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
               <div className="col-sm-12 text-center">
                 <p className="text-footer">
                   &copy; 2018 MedCredits Inc. - All Rights Reserved.
+                  <br />{debugLink}
                 </p>
               </div>
             </div>

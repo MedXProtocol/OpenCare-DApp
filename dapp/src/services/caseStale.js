@@ -10,18 +10,18 @@ const staleStatuses = [
 // Intial doc can take action after 4 days when the case has been challenged
 // Patient after 1 day
 
-// secondsElapsed is the amount of time we want to compare by
+// secondsRequired is the amount of time we want to compare by
 //   (eg. 86400 seconds will evaluate to true 1 day after the compareTime)
 // compareTime would typically be a record's createdAt or updatedAt unix timestamp (UTC)
 // status is CaseStatus (Open, Closed, Evaluated, etc)
 // context is 'patient' or 'doctor'
-export function caseStale(compareTime, status, context, secondsInADay) {
+export function caseStale(compareTime, status, context, secondsInADay, currentTime) {
   if (!compareTime || !status) {
     return false
   } else if (!staleStatuses.includes(status)) {
     return false
   } else {
-    let secondsElapsed = secondsInADay
+    let secondsRequired = secondsInADay
 
     const isPatient = (context === 'patient')
     const waitingOnDoctor = (
@@ -35,14 +35,14 @@ export function caseStale(compareTime, status, context, secondsInADay) {
 
     if (!isPatient) {
       if (status === caseStatus('Challenging')) {
-        secondsElapsed = (secondsInADay * 4)
+        secondsRequired = (secondsInADay * 4)
       } else {
-        secondsElapsed = (secondsInADay * 2)
+        secondsRequired = (secondsInADay * 2)
       }
     }
 
     const enoughTimeHasPassed = (
-      (Math.floor(Date.now() / 1000) - compareTime) > secondsElapsed
+      (currentTime - compareTime) > secondsRequired
     )
 
     return enoughTimeHasPassed && ((isPatient && waitingOnDoctor) || (!isPatient && waitingOnPatient))

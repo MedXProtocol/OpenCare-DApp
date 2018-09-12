@@ -21,27 +21,30 @@ import get from 'lodash.get'
 
 function mapStateToProps(state) {
   let staleCases = 0
+
+  const latestBlock = get(state, 'sagaGenesis.block.latestBlock')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const transactions = get(state, 'sagaGenesis.transactions')
   const CaseDiagnosingDoctor = contractByName(state, 'CaseDiagnosingDoctor')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
+  const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
 
   const openAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
 
   openAddresses.forEach(caseAddress => {
-    const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
     const status = cacheCallValueInt(state, caseAddress, 'status')
     const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
     const isFirstDoc = diagnosingDoctor === address
 
-    if (isFirstDoc && caseStale(updatedAt, status, 'doctor', secondsInADay)) {
+    if (isFirstDoc && caseStale(updatedAt, status, 'doctor', secondsInADay, latestBlock.timestamp)) {
       staleCases++
     }
   })
 
   return {
+    latestBlock,
     CaseDiagnosingDoctor,
     address,
     staleCases,
@@ -72,8 +75,7 @@ export const AcceptAllExpiredCases = connect(mapStateToProps)(withSend(withSaga(
       super(props)
 
       this.state = {
-        isVisible: true,
-        loading: false
+        forceAcceptAllAsDoctorHandler: null
       }
     }
 
@@ -84,14 +86,20 @@ export const AcceptAllExpiredCases = connect(mapStateToProps)(withSend(withSaga(
     handleAcceptAllAsDoctorHandler = (e) => {
       e.preventDefault()
 
+      // if we don't have the block gas limit yet then default this to 4million
+      let gas = 4000000
+      const { latestBlock, staleCases } = this.props
+      if (latestBlock && latestBlock.gasLimit) {
+        gas = Math.min(500000 * staleCases, latestBlock.gasLimit)
+      }
+
       const acceptAllAsDoctorTransactionId = this.props.send(
         this.props.CaseDiagnosingDoctor,
         'acceptAllAsDoctor'
-      )()
+      )({ gas })
       this.setState({
         acceptAllAsDoctorTransactionId,
-        forceAcceptAllAsDoctorHandler: new TransactionStateHandler(),
-        loading: true
+        forceAcceptAllAsDoctorHandler: new TransactionStateHandler()
       })
     }
 
@@ -100,13 +108,13 @@ export const AcceptAllExpiredCases = connect(mapStateToProps)(withSend(withSaga(
         this.state.forceAcceptAllAsDoctorHandler.handle(props.transactions[this.state.acceptAllAsDoctorTransactionId])
           .onError((error) => {
             toastr.transactionError(error)
-            this.setState({ forceAcceptAllAsDoctorHandler: null, loading: false, isVisible: true })
+            this.setState({ forceAcceptAllAsDoctorHandler: null })
           })
           .onConfirmed(() => {
-            this.setState({ forceAcceptAllAsDoctorHandler: null, loading: false, isVisible: true })
+            this.setState({ forceAcceptAllAsDoctorHandler: null })
           })
           .onTxHash(() => {
-            toastr.success('Your accept all diagnoses on stale cases transaction has been broadcast to the network. After it confirms you will receive your fees.')
+            toastr.success('Your "Accept all Diagnoses on Stale Cases" transaction has been broadcast to the network. After it confirms you will receive your fees.')
             mixpanel.track('Doctor Force Accepting All Stale Cases')
             this.setState({ isVisible: false })
           })
@@ -115,12 +123,11 @@ export const AcceptAllExpiredCases = connect(mapStateToProps)(withSend(withSaga(
 
     render () {
       const { staleCases } = this.props
-
-      const visible = this.state.isVisible && (staleCases > 1)
+      const isVisible = (staleCases > 1)
 
       return (
         <CSSTransition
-          in={visible}
+          in={isVisible}
           timeout={1200}
           unmountOnExit
           classNames="slide-down"
@@ -133,7 +140,7 @@ export const AcceptAllExpiredCases = connect(mapStateToProps)(withSend(withSaga(
 
               <br />
               <Button
-                disabled={this.state.loading}
+                disabled={this.state.forceAcceptAllAsDoctorHandler !== null}
                 onClick={this.handleAcceptAllAsDoctorHandler}
                 bsStyle="info"
                 className="btn btn-sm btn-clear"

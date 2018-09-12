@@ -6,13 +6,14 @@ export const doesNotRequireAttention = function(
   diagnosingDoctor,
   updatedAt,
   status,
-  secondsInADay
+  secondsInADay,
+  latestBlockTimestamp
 ) {
   if (!address || !diagnosingDoctor || !updatedAt || !status || !secondsInADay) { return false }
 
   const isFirstDoc = address === diagnosingDoctor
 
-  const isStale = caseStale(updatedAt, status, 'doctor', secondsInADay)
+  const isStale = caseStale(updatedAt, status, 'doctor', secondsInADay, latestBlockTimestamp)
 
   if (isFirstDoc) {
     return (status !== caseStatus('Evaluating')) && !isStale

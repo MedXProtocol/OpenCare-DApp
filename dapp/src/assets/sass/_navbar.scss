@@ -50,8 +50,7 @@
 }
 
 .navbar-inverse .navbar-nav > li.active > a::after,
-.navbar-inverse .navbar-nav > li > a:hover::after,
-.navbar-inverse .navbar-nav > li > a:focus::after {
+.navbar-inverse .navbar-nav > li > a:hover::after{
   transform: scaleX(1);
 }
 
@@ -66,13 +65,23 @@
   background-color: lighten($brand-dark-blue, 30%);
 }
 
+.navbar-inverse .navbar-nav > li > a:hover {
+  color: #fff;
+  background-color: transparent;
+}
+
+.navbar-inverse .navbar-nav > li > a:focus {
+  background-color: $brand-dark-blue;
+}
+
 .navbar-nav > li > a {
   @media (min-width: 768px) {
     padding-bottom: 14px;
   }
 }
 
-.navbar-inverse .navbar-nav > li > a {
+.navbar-inverse .navbar-nav > li > a,
+.navbar-inverse .navbar-nav > li > a:focus {
   color: #c4c7d4;
 }
 
@@ -135,4 +144,53 @@
 
 .nav--open-cases__zero:after {
   display: none;
+}
+
+.nav--circle:before {
+  border-radius: 100%;
+  content: "";
+  height: 1rem;
+  width: 1rem;
+  margin-right: 3px;
+  top: -1px;
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
+
+.nav--circle__success:before {
+  background-color: #44ce46;
+}
+
+.nav--circle__warning:before {
+  background-color: #f7e12e;
+}
+
+.nav--circle__danger:before {
+  background-color: #f9434f;
+}
+
+.navbar-inverse .navbar-nav > li.nav--button a {
+  background-color: lighten($brand-dark-blue, 15%);
+  border: 1px solid #0b1e38;
+  border-radius: 4px;
+  margin-top: 10px;
+  margin-bottom: 9px;
+  min-width: 100px;
+  padding-bottom: 1px;
+  padding-top: 10px;
+  text-align: center;
+}
+
+.navbar-inverse .navbar-nav > li.nav--button a:hover {
+  background-color: lighten($brand-dark-blue, 20%);
+}
+
+.navbar-inverse .navbar-nav > li.nav--button a:focus {
+  background-color: lighten($brand-dark-blue, 15%);
+}
+
+.navbar-inverse .navbar-nav > li.nav--button.active > a::after,
+.navbar-inverse .navbar-nav > li.nav--button > a:hover::after {
+  transform: scale(0);
 }

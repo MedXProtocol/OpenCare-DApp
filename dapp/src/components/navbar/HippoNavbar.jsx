@@ -38,6 +38,7 @@ function mapStateToProps (state) {
   let doctorName
   const address = get(state, 'sagaGenesis.accounts[0]')
   const isAvailable = get(state, 'heartbeat.isAvailable')
+  const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const WrappedEther = contractByName(state, 'WrappedEther')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
@@ -53,6 +54,7 @@ function mapStateToProps (state) {
   return {
     address,
     isAvailable,
+    isSignedIn,
     balance,
     doctorName,
     isDoctor,
@@ -120,15 +122,15 @@ export const HippoNavbar = withContractRegistry(
   handleToggleIsAvailable = () => {
     const isAvailable = !this.props.isAvailable
     if (isAvailable) {
-      toastr.success('You are now online and will be prioritized to diagnose cases')
+      toastr.success('You are now online and will be prioritized to diagnose cases.')
     } else {
-      toastr.warning('You are now offline and will not be prioritized to diagnose cases')
+      toastr.warning('You are now offline and will not be prioritized to diagnose cases.')
     }
     this.props.dispatchAvailabilityChange(isAvailable)
   }
 
   render() {
-    const { isDoctor } = this.props
+    const { isDoctor, isSignedIn } = this.props
     const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
 
     if (this.props.signedIn && this.props.address) {
@@ -217,16 +219,18 @@ export const HippoNavbar = withContractRegistry(
       }
     }
 
-    var statusItem =
-      <NavItem onClick={this.handleToggleIsAvailable}>
-        <span className={
-            classnames(
-              'nav-transactions--circle',
-              this.props.isAvailable ? 'nav-transactions-text--success' : 'nav-transactions-text--danger'
-            )
-        }/>&nbsp;
-        {this.props.isAvailable ? 'Online' : 'Offline'}
-      </NavItem>
+    if (isDoctor && isSignedIn) {
+      var statusItem =
+        <NavItem onClick={this.handleToggleIsAvailable} className="nav--button">
+          <span className={
+              classnames(
+                'nav--circle',
+                this.props.isAvailable ? 'nav--circle__success' : 'nav--circle__danger'
+              )
+          }/>&nbsp;
+          {this.props.isAvailable ? 'Online' : 'Offline'}
+        </NavItem>
+    }
 
     let navbarClassName = classnames(
       'navbar',
@@ -270,12 +274,12 @@ export const HippoNavbar = withContractRegistry(
         <Navbar.Collapse>
           <Nav pullRight>
             <CurrentTransactionsList />
+            {statusItem}
             {wrappedEtherBalance}
             {myCasesItem}
             {openCasesItem}
             {adminItem}
             {profileMenu}
-            {statusItem}
           </Nav>
         </Navbar.Collapse>
       </Navbar>

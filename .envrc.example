@@ -33,6 +33,8 @@ export REACT_APP_IPFS_PROTOCOL=https
 export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star/ipfs
 export REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL=/ip4/127.0.0.1/tcp/9091/ws/p2p-websocket-star/ipfs
 
+export REACT_APP_ENABLE_FIREBUG_DEBUGGER=true
+
 export LAMBDA_CONFIG_CORS_ORIGIN="*"
 export LAMBDA_CONFIG_PRIVKEY="<contractOwnerPrivKey>"
 export LAMBDA_CONFIG_PROVIDER_URL=http://localhost:8545

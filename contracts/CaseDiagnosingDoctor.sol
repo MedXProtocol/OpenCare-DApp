@@ -69,5 +69,5 @@ contract CaseDiagnosingDoctor is Ownable, Initializable, DelegateTarget {
 
     emit AcceptedAllAsDoctor(msg.sender);
   }
-
+  
 }

@@ -27,7 +27,6 @@ import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 import { ControlLabel, ToggleButtonGroup, ToggleButton, ButtonToolbar } from 'react-bootstrap'
 import {
   contractByName,
-  withContractRegistry,
   cacheCall,
   cacheCallValue,
   withSaga,
@@ -53,6 +52,7 @@ import { regions } from '~/lib/regions'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const BetaFaucet = contractByName(state, 'BetaFaucet')
   const CaseManager = contractByName(state, 'CaseManager')
   const CasePaymentManager = contractByName(state, 'CasePaymentManager')
   const Dai = contractByName(state, 'Dai')
@@ -62,11 +62,13 @@ function mapStateToProps (state) {
   const caseFeeEtherWei = cacheCallValue(state, CasePaymentManager, 'caseFeeEtherWei')
   const caseFeeUsdWei = cacheCallValue(state, CasePaymentManager, 'baseCaseFeeUsdWei')
   const usdPerWei = cacheCallValue(state, CasePaymentManager, 'usdPerEther')
+  const networkId = get(state, 'sagaGenesis.network.networkId')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
   const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const previousCase = (caseListCount > 0)
   const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
+  const hasBeenSentEther = cacheCallValue(state, BetaFaucet, 'sentAddresses', address)
 
   return {
     AccountManager,
@@ -77,6 +79,9 @@ function mapStateToProps (state) {
     transactions: state.sagaGenesis.transactions,
     CaseManager,
     CasePaymentManager,
+    BetaFaucet,
+    hasBeenSentEther,
+    networkId,
     publicKey,
     balance,
     noDoctorsAvailable,
@@ -100,12 +105,13 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ address, AccountManager, CaseManager, CasePaymentManager }) {
-  if (!address || !AccountManager || !CaseManager) { return }
+function* saga({ address, AccountManager, BetaFaucet, CaseManager, CasePaymentManager }) {
+  if (!address || !BetaFaucet || !AccountManager || !CaseManager || !CasePaymentManager) { return }
   yield cacheCall(AccountManager, 'publicKeys', address)
   yield cacheCall(CasePaymentManager, 'caseFeeEtherWei')
   yield cacheCall(CasePaymentManager, 'usdPerEther')
   yield cacheCall(CasePaymentManager, 'baseCaseFeeUsdWei')
+  yield cacheCall(BetaFaucet, 'sentAddresses', address)
 }
 
 const requiredFields = [
@@ -129,7 +135,7 @@ const requiredFields = [
 // 'onBirthControl' => female and acne only
 // 'hadBefore' => spot/rash only
 
-export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
+export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     withSend(
       class _CreateCase extends Component {
@@ -138,38 +144,38 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           super(props)
 
           this.state = {
-            firstImageHash: null,
-            firstImageFileName: null,
-            firstImagePercent: null,
-            secondImageHash: null,
-            secondImageFileName: null,
-            secondImagePercent: null,
-            gender: null,
-            allergies: null,
-            pregnant: null,
-            whatAllergies: null,
-            spotRashOrAcne: null,
-            howLong: null,
-            hadBefore: null,
-            isTheSpot: [],
-            isTheRash: [],
             acneDoesItInclude: [],
-            sexuallyActive: null,
             age: null,
-            country: '',
-            region: '',
-            prevTreatment: null,
-            description: null,
-            onBirthControl: null,
-            worseWithPeriod: null,
+            allergies: null,
             caseEncryptionKey: genKey(32),
+            country: '',
+            description: null,
+            errors: [],
+            firstImageFileName: null,
+            firstImageHash: null,
+            firstImagePercent: null,
+            gender: null,
+            hadBefore: null,
+            howLong: null,
+            isSubmitting: false,
+            isTheRash: [],
+            isTheSpot: [],
+            onBirthControl: null,
+            paymentMethod: 'ETH',
+            pregnant: null,
+            prevTreatment: null,
+            region: '',
+            regionOptions: [],
+            secondImageFileName: null,
+            secondImageHash: null,
+            secondImagePercent: null,
+            sexuallyActive: null,
             showBalanceTooLowModal: false,
             showPublicKeyModal: false,
             showTermsModal: false,
-            isSubmitting: false,
-            paymentMethod: 'ETH',
-            errors: [],
-            regionOptions: []
+            spotRashOrAcne: null,
+            whatAllergies: null,
+            worseWithPeriod: null,
           }
 
           this.setCountryRef = element => { this.countryInput = element }
@@ -505,7 +511,13 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
         }
 
         handleSubmit = async (event) => {
-          const { address, balance, caseFeeEtherWei, noDoctorsAvailable, previousCase } = this.props
+          const { address,
+            balance,
+            caseFeeEtherWei,
+            noDoctorsAvailable,
+            previousCase,
+            hasBeenSentEther
+          } = this.props
           event.preventDefault()
 
           await this.runValidation()
@@ -520,7 +532,7 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
             toastr.warning('There are no Doctors currently available. Please try again later.')
           } else if (this.state.errors.length === 0) {
             if (computeTotalFee(caseFeeEtherWei).greaterThan(balance)) {
-              if (previousCase) {
+              if (hasBeenSentEther || previousCase) {
                 this.setState({ showBalanceTooLowModal: true })
               } else {
                 this.props.showBetaFaucetModal()
@@ -690,7 +702,23 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
           return msg
         }
 
+        faucetLink = () => {
+          let url
+
+          if (this.props.networkId === 1234) {
+            url = 'no faucet in development!'
+          } else if (this.props.networkId === 3) {
+            url = 'https://faucet.metamask.io/'
+          } else if (this.props.networkId === 4) {
+            url = 'https://faucet.rinkeby.io/'
+          }
+
+          return <a target="_blank" rel="noopener noreferrer" href={url}>{url}</a>
+        }
+
         render() {
+          if (this.props.address === undefined) { return null }
+
           let errors = {}
           for (var i = 0; i < this.state.errors.length; i++) {
             let fieldName = this.state.errors[i]
@@ -1005,10 +1033,31 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
               </Modal>
 
               <Modal show={this.state.showBalanceTooLowModal}>
+                <Modal.Header>
+                  <div className="row">
+                    <div className="col-xs-12 text-center">
+                      <h4>
+                        Insufficient Funds
+                      </h4>
+                    </div>
+                  </div>
+                </Modal.Header>
                 <Modal.Body>
                   <div className="row">
                     <div className="col-xs-12 text-center">
-                      <h4>You need <EtherFlip wei={computeTotalFee(this.props.caseFeeEtherWei)} /> to submit a case.</h4>
+                      <p>
+                        You need at least <EtherFlip wei={computeTotalFee(this.props.caseFeeEtherWei)} /> (plus gas fees) to submit a case.
+                      </p>
+
+                      {this.props.hasBeenSentEther
+                        ? (
+                          <p>
+                            You can get more ether from the faucet: {this.faucetLink()}
+                          </p>
+                        )
+                        : null
+                      }
+
                     </div>
                   </div>
                 </Modal.Body>
@@ -1054,6 +1103,6 @@ export const CreateCase = withContractRegistry(connect(mapStateToProps, mapDispa
       }
     )
   )
-))
+)
 
 export const CreateCaseContainer = cold(withRouter(CreateCase))

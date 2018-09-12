@@ -39,11 +39,11 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
       let labelClass = ''
 
       if (error)
-        labelClass = 'nav-transactions-text--danger'
+        labelClass = 'nav--circle__danger'
       else if (confirmed)
-        labelClass = 'nav-transactions-text--success'
+        labelClass = 'nav--circle__success'
       else
-        labelClass = 'nav-transactions-text--warning'
+        labelClass = 'nav--circle__warning'
 
       return labelClass
     }
@@ -120,12 +120,20 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
           return (
             <li
               key={`transaction-${key}`}
-              className="nav-transactions--item"
+              className="nav-list--item"
             >
-              <span className={classnames('nav-transactions--circle', this.getClassName(error, confirmed))} /> &nbsp;
-              {t(`transactions.${name}`, {
-                mintMedxCount: mintMedxCount
-              })}
+              <div className="nav-list--tx-wrapper">
+                <span className={classnames(
+                  'nav--circle',
+                  'nav-list--tx-wrapper__child',
+                  this.getClassName(error, confirmed)
+                )} />
+                <span className="nav-list--tx-name nav-list--tx-wrapper__child">
+                  {t(`transactions.${name}`, {
+                    mintMedxCount: mintMedxCount
+                  })}
+                </span>
+              </div>
               {confirmed}
               {errorMessage}
               {resendButton}
@@ -135,7 +143,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
         })
 
         transactionHtml = (
-          <ul className="nav-transactions--group">
+          <ul className="nav-list--group">
             <FlipMove>
               {transactions}
             </FlipMove>
@@ -152,11 +160,11 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
           id='transactions'
           title={
             <span>
-              <span className={classnames('nav-transactions--circle', this.getDropdownClassName())} /> Tx
+              <span className={classnames('nav--circle', this.getDropdownClassName())} /> Tx
             </span>
           }>
           <li>
-            <div className="nav-transactions">
+            <div className="nav-list">
               <I18n>
                 {
                   (t) => {
