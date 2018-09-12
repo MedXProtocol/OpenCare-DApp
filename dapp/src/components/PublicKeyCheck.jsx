@@ -44,7 +44,7 @@ function* saga({ account, AccountManager, DoctorManager }) {
   if (!account || !AccountManager || !DoctorManager) { return }
   yield all([
     cacheCall(AccountManager, 'publicKeys', account.address()),
-    cacheCall(DoctorManager, 'isDoctor', account.address())
+    cacheCall(DoctorManager, 'isDoctor', account.address()),
     cacheCall(DoctorManager, 'isDermatologist', account.address())
   ])
 }
