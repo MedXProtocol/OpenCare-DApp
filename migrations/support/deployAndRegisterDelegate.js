@@ -1,6 +1,6 @@
 var toRegistryKey = require('./toRegistryKey')
 
-// Internally used by , don't use this directly
+// Internally used by deployTargetAndDelegate, don't use this directly
 
 /**
  * WARNING: Use this to destroy and replace a Delegate, which will blow away the memory
