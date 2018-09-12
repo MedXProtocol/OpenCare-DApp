@@ -12,7 +12,7 @@ export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Comp
     selectedValues: PropTypes.any,
     formGroupClassNames: PropTypes.any,
     id: PropTypes.any,
-    name: PropTypes.any,
+    name: PropTypes.any.isRequired,
     error: PropTypes.any,
     label: PropTypes.any,
     values: PropTypes.any,

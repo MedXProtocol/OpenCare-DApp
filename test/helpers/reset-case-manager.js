@@ -27,6 +27,7 @@ module.exports = async function (artifacts, env) {
   let dai = await Dai.new()
   await env.registry.register(toRegistryKey('Dai'), dai.address)
 
+  env.casePaymentManager = casePaymentManager
   env.caseManager = caseManager
   env.caseStatusManager = caseStatusManager
   env.weth9 = wrappedEther

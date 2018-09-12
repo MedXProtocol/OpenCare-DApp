@@ -17,9 +17,9 @@ import { mixpanel } from '~/mixpanel'
 function mapStateToProps(state) {
   const transactions = state.sagaGenesis.transactions
   const CasePaymentManager = contractByName(state, 'CasePaymentManager')
-  const caseFeeUsd = cacheCallValue(state, CasePaymentManager, 'caseFeeUsd')
+  const baseCaseFeeUsdWei = cacheCallValue(state, CasePaymentManager, 'baseCaseFeeUsdWei')
   return {
-    caseFeeUsd,
+    baseCaseFeeUsdWei,
     CasePaymentManager,
     transactions
   }
@@ -27,7 +27,7 @@ function mapStateToProps(state) {
 
 function* adminFeeSaga({ CasePaymentManager }) {
   if (!CasePaymentManager) { return }
-  yield cacheCall(CasePaymentManager, 'caseFeeUsd')
+  yield cacheCall(CasePaymentManager, 'baseCaseFeeUsdWei')
 }
 
 export const AdminFees = connect(mapStateToProps)(
@@ -78,7 +78,7 @@ export const AdminFees = connect(mapStateToProps)(
         }
 
         render() {
-          const caseFeeUsd = displayWeiToUsd(this.props.caseFeeUsd)
+          const caseFeeUsd = displayWeiToUsd(this.props.baseCaseFeeUsdWei)
 
           return (
             <div>

@@ -45,17 +45,30 @@ contract CasePaymentManager is Ownable, Initializable, DelegateTarget {
   }
 
   function initializeCase(Case _case, address _tokenContract) external payable {
+    require(_case != address(0), 'the case contract is not defined');
     require(caseTokenContract[_case] == address(0), 'the case token contract has already been initialized');
     caseTokenContract[_case] = _tokenContract;
     ERC20 dai = registry.dai();
+    require(dai != address(0), 'dai is not defined');
     if (_tokenContract == address(registry.weth9())) {
       require(msg.value >= requiredDepositTokenWei(_tokenContract), 'not enough ether');
       _case.deposit.value(msg.value)();
     } else if (_tokenContract == address(dai)) {
-      dai.transferFrom(_case.patient(), _case, requiredDepositTokenWei(_tokenContract));
+      uint256 depositWei = requiredDepositTokenWei(_tokenContract);
+      uint256 allowance = dai.allowance(_case.patient(), address(this));
+      require(allowance >= depositWei, 'not enough deposit');
+      dai.transferFrom(_case.patient(), _case, depositWei);
     } else {
       revert('Unknown token contract');
     }
+  }
+
+  function dai() public view returns (address) {
+    return address(registry.dai());
+  }
+
+  function addr() public view returns (address) {
+    return address(this);
   }
 
   function requiredDepositTokenWei(address _tokenContract) public view returns (uint256) {
