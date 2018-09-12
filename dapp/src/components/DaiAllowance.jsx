@@ -28,7 +28,7 @@ function mapStateToProps(state, { address }) {
 }
 
 function* daiApprovalSaga({ CasePaymentManager, Dai, address }) {
-  if (!Dai || !CasePaymentManager) { return }
+  if (!address || !Dai || !CasePaymentManager) { return }
   yield cacheCall(Dai, 'allowance', address, CasePaymentManager)
 }
 

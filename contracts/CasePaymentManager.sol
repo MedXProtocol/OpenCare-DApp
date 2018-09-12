@@ -50,11 +50,11 @@ contract CasePaymentManager is Ownable, Initializable, DelegateTarget {
     caseTokenContract[_case] = _tokenContract;
     ERC20 dai = registry.dai();
     require(dai != address(0), 'dai is not defined');
+    uint256 depositWei = requiredDepositTokenWei(_tokenContract);
     if (_tokenContract == address(registry.weth9())) {
-      require(msg.value >= requiredDepositTokenWei(_tokenContract), 'not enough ether');
+      require(msg.value >= depositWei, 'not enough ether');
       _case.deposit.value(msg.value)();
     } else if (_tokenContract == address(dai)) {
-      uint256 depositWei = requiredDepositTokenWei(_tokenContract);
       uint256 allowance = dai.allowance(_case.patient(), address(this));
       require(allowance >= depositWei, 'not enough deposit');
       dai.transferFrom(_case.patient(), _case, depositWei);

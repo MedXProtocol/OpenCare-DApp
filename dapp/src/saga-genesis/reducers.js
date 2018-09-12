@@ -8,7 +8,6 @@ import network from './network/network-reducer'
 import web3 from './web3/web3-reducer'
 import logs from './logs/logReducer'
 import block from './block/block-reducer'
-import cacheScope from './cache-scope/cache-scope-reducer'
 
 export const sagaGenesis = combineReducers({
   callCache,
@@ -19,6 +18,5 @@ export const sagaGenesis = combineReducers({
   contracts,
   web3,
   logs,
-  block,
-  cacheScope
+  block
 })
