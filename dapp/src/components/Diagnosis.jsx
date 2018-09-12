@@ -22,8 +22,7 @@ import { connect } from 'react-redux'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { computeTotalFee } from '~/utils/computeTotalFee'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
-import { EtherFlip } from '~/components/EtherFlip'
-import { Ether } from '~/components/Ether'
+import { CaseFee } from '~/components/CaseFee'
 import { isTrue } from '~/utils/isTrue'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { isBlank } from '~/utils/isBlank'
@@ -301,9 +300,9 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
 
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
     const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== 3
-    const challengeFeeEtherNoFlip = <Ether wei={computeChallengeFee(this.props.caseFeeWei)} />
-    const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
-    const totalFeeEther = <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} />
+    const challengeFeeEtherNoFlip = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} noToggle />
+    const challengeFeeEther = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} />
+    const totalFeeEther = <CaseFee address={this.props.caseAddress} calc={computeTotalFee} />
 
     if (!buttonsHidden) {
       var buttons =
