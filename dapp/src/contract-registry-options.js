@@ -9,9 +9,11 @@ import caseSecondPhaseManagerContractConfig from '#/CaseSecondPhaseManager.json'
 import caseScheduleManagerContractConfig from '#/CaseScheduleManager.json'
 import caseStatusManagerContractConfig from '#/CaseStatusManager.json'
 import caseContractConfig from '#/Case.json'
+import casePaymentManagerConfig from '#/CasePaymentManager.json'
 import doctorManagerContractConfig from '#/DoctorManager.json'
 import accountManagerConfig from '#/AccountManager.json'
 import fromBlockNumberConfig from '#/FromBlockNumber.json'
+import daiConfig from '#/Dai.json'
 import registryConfig from '#/Registry.json'
 
 import { abiFactory } from '~/saga-genesis/utils'
@@ -23,6 +25,7 @@ export default {
     CaseDiagnosingDoctor: abiFactory(caseDiagnosingDoctorContractConfig.abi),
     CaseLifecycleManager: abiFactory(caseLifecycleManagerContractConfig.abi),
     CaseFirstPhaseManager: abiFactory(caseFirstPhaseManagerContractConfig.abi),
+    CasePaymentManager: abiFactory(casePaymentManagerConfig.abi),
     CaseSecondPhaseManager: abiFactory(caseSecondPhaseManagerContractConfig.abi),
     CaseScheduleManager: abiFactory(caseScheduleManagerContractConfig.abi),
     CaseStatusManager: abiFactory(caseStatusManagerContractConfig.abi),
@@ -32,6 +35,7 @@ export default {
     DoctorManager: abiFactory(doctorManagerContractConfig.abi),
     Case: abiFactory(caseContractConfig.abi),
     Registry: abiFactory(registryConfig.abi),
-    WrappedEther: abiFactory(weth9ContractConfig.abi)
+    WrappedEther: abiFactory(weth9ContractConfig.abi),
+    Dai: abiFactory(daiConfig.abi)
   }
 }

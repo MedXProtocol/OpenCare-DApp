@@ -85,14 +85,6 @@ contract CaseManager is Ownable, Pausable, Initializable, DelegateTarget {
   }
 
   /**
-   * @dev - sets the base case fee - only affects new cases
-   */
-  function setBaseCaseFee(uint256 _newCaseFeeUsd) public onlyOwner {
-    require(_newCaseFeeUsd > 0);
-    caseFeeUsd = _newCaseFeeUsd;
-  }
-
-  /**
    * @dev - returns the length of the "all" case list
    */
   function getAllCaseListCount() public constant returns (uint256) {
@@ -107,6 +99,7 @@ contract CaseManager is Ownable, Pausable, Initializable, DelegateTarget {
   }
 
   function createAndAssignCaseWithPublicKey(
+    address _tokenContract,
     address _patient,
     bytes _encryptedCaseKey,
     bytes _caseKeySalt,
@@ -118,16 +111,19 @@ contract CaseManager is Ownable, Pausable, Initializable, DelegateTarget {
     AccountManager am = registry.accountManager();
     require(am.publicKeys(_patient).length == 0, 'patient already has a public key');
     am.setPublicKey(_patient, _patientPublicKey);
-    createCase(
+    createAndAssignCase(
+      _tokenContract,
       _patient,
       _encryptedCaseKey,
       _caseKeySalt,
       _ipfsHash,
       _doctor,
-      _doctorEncryptedKey);
+      _doctorEncryptedKey
+    );
   }
 
   function createAndAssignCase(
+    address _tokenContract,
     address _patient,
     bytes _encryptedCaseKey,
     bytes _caseKeySalt,
@@ -135,54 +131,18 @@ contract CaseManager is Ownable, Pausable, Initializable, DelegateTarget {
     address _doctor,
     bytes _doctorEncryptedKey
   ) public payable {
-    createCase(
-      _patient,
-      _encryptedCaseKey,
-      _caseKeySalt,
-      _ipfsHash,
-      _doctor,
-      _doctorEncryptedKey);
-  }
-
-  function createCase(
-    address _patient,
-    bytes _encryptedCaseKey,
-    bytes _caseKeySalt,
-    bytes _ipfsHash,
-    address _doctor,
-    bytes _doctorEncryptedKey
-  ) internal {
     Case newCase = Case(new Delegate(registry, keccak256("Case")));
-    newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFeeWei());
     uint256 caseIndex = caseList.push(address(newCase)) - 1;
     caseIndices[address(newCase)] = caseIndex;
     patientCases[_patient].push(address(newCase));
 
+    uint256 caseTokenFeeWei = registry.casePaymentManager().caseFeeTokenWei(_tokenContract);
+    newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseTokenFeeWei);
     registry.caseLifecycleManager().setDiagnosingDoctor(newCase, _doctor, _doctorEncryptedKey);
     registry.caseScheduleManager().initializeCase(newCase);
-
-    newCase.deposit.value(msg.value)();
+    registry.casePaymentManager().initializeCase.value(msg.value)(newCase, _tokenContract);
 
     emit NewCase(newCase, caseIndex);
-  }
-
-  function createCaseCostWei (uint256 _caseFeeUsd) public view returns (uint256) {
-    uint256 caseFee = usdToWei(_caseFeeUsd);
-    return caseFee.add(caseFee.mul(50).div(100));
-  }
-
-  function caseFeeWei() public view returns (uint256) {
-    return usdToWei(caseFeeUsd);
-  }
-
-  function usdToWei(uint256 _caseFeeUsd) public view returns (uint256) {
-    return _caseFeeUsd.div(usdPerWei());
-  }
-
-  function usdPerWei() public view returns (uint256) {
-    IEtherPriceFeed etherPriceFeed = IEtherPriceFeed(registry.lookup(keccak256('EtherPriceFeed')));
-    uint256 usdPerEth = uint256(etherPriceFeed.read());
-    return usdPerEth.div(1000000000000000000);
   }
 
   function addDoctorToDoctorCases(address _doctor, address _caseAddress) public onlyCasePhaseManagers() {

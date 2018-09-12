@@ -16,51 +16,60 @@ module.exports = async function createEnvironment(artifacts) {
   const CaseSecondPhaseManager = artifacts.require('./CaseSecondPhaseManager.sol')
   const CaseScheduleManager = artifacts.require('./CaseScheduleManager.sol')
   const CaseStatusManager = artifacts.require('./CaseStatusManager.sol')
+  const CasePaymentManager = artifacts.require('./CasePaymentManager.sol')
+  const Dai = artifacts.require('./Dai.sol')
   const BetaFaucet = artifacts.require('./BetaFaucet.sol')
   const Registry = artifacts.require("./Registry.sol")
   const EtherPriceFeed = artifacts.require('./EtherPriceFeed.sol')
 
-  let registry = await Registry.new()
-  let medXToken = await MedXToken.new()
+  const registry = await Registry.new()
+  const medXToken = await MedXToken.new()
 
-  let weth9 = await WETH9.new()
+  const weth9 = await WETH9.new()
   await registry.register(toRegistryKey('WrappedEther'), weth9.address)
 
-  let etherPriceFeed = await EtherPriceFeed.new()
+  const dai = await Dai.new()
+  await registry.register(toRegistryKey('Dai'), dai.address)
+
+  const etherPriceFeed = await EtherPriceFeed.new()
   await registry.register(toRegistryKey('EtherPriceFeed'), etherPriceFeed.address)
   await etherPriceFeed.set(web3.toWei('300', 'ether'))
 
-  let caseInstance = await Case.new()
+  const caseInstance = await Case.new()
   await registry.register(toRegistryKey('Case'), caseInstance.address)
 
-  let caseManager = await envDeployWithDelegate(registry, Delegate, CaseManager, 'CaseManager')
-  await caseManager.setBaseCaseFee(web3.toWei('10', 'ether'))
+  const caseManager = await envDeployWithDelegate(registry, Delegate, CaseManager, 'CaseManager')
 
-  let caseDiagnosingDoctor = await envDeployWithDelegate(registry, Delegate, CaseDiagnosingDoctor, 'CaseDiagnosingDoctor')
+  const caseDiagnosingDoctor = await envDeployWithDelegate(registry, Delegate, CaseDiagnosingDoctor, 'CaseDiagnosingDoctor')
 
-  let caseStatusManager = await envDeployWithDelegate(registry, Delegate, CaseStatusManager, 'CaseStatusManager')
+  const caseStatusManager = await envDeployWithDelegate(registry, Delegate, CaseStatusManager, 'CaseStatusManager')
 
-  let caseScheduleManager = await envDeployWithDelegate(registry, Delegate, CaseScheduleManager, 'CaseScheduleManager')
+  const caseScheduleManager = await envDeployWithDelegate(registry, Delegate, CaseScheduleManager, 'CaseScheduleManager')
 
-  let caseLifecycleManager = await envDeployWithDelegate(registry, Delegate, CaseLifecycleManager, 'CaseLifecycleManager')
+  const caseLifecycleManager = await envDeployWithDelegate(registry, Delegate, CaseLifecycleManager, 'CaseLifecycleManager')
 
-  let caseFirstPhaseManager = await envDeployWithDelegate(registry, Delegate, CaseFirstPhaseManager, 'CaseFirstPhaseManager')
+  const caseFirstPhaseManager = await envDeployWithDelegate(registry, Delegate, CaseFirstPhaseManager, 'CaseFirstPhaseManager')
 
-  let caseSecondPhaseManager = await envDeployWithDelegate(registry, Delegate, CaseSecondPhaseManager, 'CaseSecondPhaseManager')
+  const caseSecondPhaseManager = await envDeployWithDelegate(registry, Delegate, CaseSecondPhaseManager, 'CaseSecondPhaseManager')
 
-  let doctorManager = await envDeployWithDelegate(registry, Delegate, DoctorManager, 'DoctorManager')
+  const casePaymentManager = await envDeployWithDelegate(registry, Delegate, CasePaymentManager, 'CasePaymentManager')
+  await casePaymentManager.setBaseCaseFeeUsdWei(web3.toWei('10', 'ether'))
 
-  let betaFaucet = await envDeployWithDelegate(registry, Delegate, BetaFaucet, 'BetaFaucet')
+  const doctorManager = await envDeployWithDelegate(registry, Delegate, DoctorManager, 'DoctorManager')
 
-  let accountManager = await envDeployWithDelegate(registry, Delegate, AccountManager, 'AccountManager')
+  const betaFaucet = await envDeployWithDelegate(registry, Delegate, BetaFaucet, 'BetaFaucet')
+
+  const accountManager = await envDeployWithDelegate(registry, Delegate, AccountManager, 'AccountManager')
 
   return {
     betaFaucet,
     registry,
     medXToken,
     weth9,
+    dai,
     etherPriceFeed,
     caseManager,
+    casePaymentManager,
     caseDiagnosingDoctor,
     caseLifecycleManager,
     caseFirstPhaseManager,

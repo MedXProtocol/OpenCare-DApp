@@ -6,10 +6,10 @@ module.exports = async function(env, patientAddress, doctorAddress) {
 
   let currentCount = await env.caseManager.getPatientCaseListCount(patientAddress)
   currentCount = parseInt(currentCount.toString())
-  let caseFeeWei = await env.caseManager.caseFeeWei()
-  let halfCaseFeeWei = caseFeeWei.mul(50).div(100).floor()
-  let totalCaseFee = caseFeeWei.plus(halfCaseFeeWei)
+  let tokenContract = env.weth9
+  let requiredDepositTokenWei = await env.casePaymentManager.requiredDepositTokenWei(tokenContract.address)
   await env.caseManager.createAndAssignCase(
+    tokenContract.address,
     patientAddress,
     encryptedCaseKey,
     caseKeySalt,
@@ -18,7 +18,7 @@ module.exports = async function(env, patientAddress, doctorAddress) {
     'doctor encrypted case key',
     {
       from: patientAddress,
-      value: totalCaseFee
+      value: requiredDepositTokenWei
     }
   )
   let nextCount = await env.caseManager.getPatientCaseListCount(patientAddress)
