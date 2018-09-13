@@ -5,9 +5,9 @@ export function getAccount(networkId, address) {
   if (!networkId || !address) { return null }
 
   let accountObject
+
   if (storageAvailable('localStorage')) {
     accountObject = getAccountLocalStorage(networkId, address)
-    console.log(accountObject)
   }
 
   return accountObject

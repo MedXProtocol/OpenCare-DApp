@@ -4,6 +4,7 @@ import { upgradeOldAccount } from './upgradeOldAccount'
 
 export function getAccountLocalStorage(networkId, address) {
   let accountObject
+
   accountObject = JSON.parse(localStorage.getItem(formatAccountKey(networkId, address)))
 
   if (!defined(accountObject)) {
