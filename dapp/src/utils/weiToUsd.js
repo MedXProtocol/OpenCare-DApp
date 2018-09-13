@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
 
 export function weiToUsd(wei, usdPerWei) {
   let num
@@ -9,5 +9,5 @@ export function weiToUsd(wei, usdPerWei) {
     num = 0
   }
 
-  return new BigNumber(num).mul(wei.toString())
+  return new BN(num).mul(new BN(wei))
 }

@@ -4,8 +4,10 @@ import { deriveKeyAsync } from '~/utils/derive-key'
 import { deriveKeyPair } from './derive-key-pair'
 import { deriveSharedKey } from './derive-shared-key'
 import { buildAccount } from './build-account'
+import { formatAccountKey } from './formatAccountKey'
 import { getAccount } from './getAccount'
 import { setAccount } from './setAccount'
+import { storageAvailable } from '~/services/storageAvailable'
 import { isAccountMasterPassword } from './is-account-master-password'
 import { isBlank } from '~/utils/isBlank'
 
@@ -91,7 +93,11 @@ export class Account {
   }
 
   store () {
-    setAccount(this.address(), this.toJson())
+    setAccount(this.networkId(), this.address(), this.toJson())
+  }
+
+  networkId() {
+    return this._json.networkId
   }
 
   address() {
@@ -115,36 +121,39 @@ export class Account {
   }
 
   destroy () {
-    setAccount(this.address(), null)
+    if (storageAvailable('localStorage')) {
+      localStorage.removeItem(formatAccountKey(this.networkId(), this.address()))
+    } else {
+      console.warn('Unable to destroy account, no access to localStorage')
+    }
   }
 }
 
-Account.create = async function ({ address, secretKey, masterPassword }) {
-  let account = await Account.build({ address, secretKey, masterPassword })
+Account.create = async function ({ networkId, address, secretKey, masterPassword }) {
+  let account = await Account.build({ networkId, address, secretKey, masterPassword })
   account._secretKey = secretKey
   account.store()
   return account
 }
 
-Account.build = async function ({ address, secretKey, masterPassword }) {
-  if (isBlank(address) || isBlank(secretKey) || isBlank(masterPassword)) {
+Account.build = async function ({ networkId, address, secretKey, masterPassword }) {
+  if (isBlank(networkId) || isBlank(address) || isBlank(secretKey) || isBlank(masterPassword)) {
     throw new Error(
-      'address, secretKey and masterPassword need to be provided as args to Account.create'
+      'networkId, address, secretKey and masterPassword need to be provided as args to Account.create'
     );
   }
-  const json = await buildAccount(address, secretKey, masterPassword)
+  const json = await buildAccount(networkId, address, secretKey, masterPassword)
   const account = new Account(json)
   account.setVersion(ACCOUNT_VERSION)
   account._secretKey = secretKey
   return account
 }
 
-Account.get = function (address) {
-  const json = getAccount(address)
+Account.get = function (networkId, address) {
   let account = null
-  if (json) {
-    account = new Account(json)
-    account.store() // ensure cookie is retained indefinitely
+  const accountObject = getAccount(networkId, address)
+  if (accountObject) {
+    account = new Account(accountObject)
   }
   return account
 }

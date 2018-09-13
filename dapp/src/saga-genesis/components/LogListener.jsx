@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
 import {
   addLogListener,
   removeLogListener
@@ -28,7 +28,7 @@ export const LogListener = connect(() => { return {} }, mapDispatchToProps)(clas
     address: PropTypes.string,
     fromBlock: PropTypes.oneOfType([
       PropTypes.number,
-      PropTypes.instanceOf(BigNumber)
+      PropTypes.instanceOf(BN)
     ])
   }
 

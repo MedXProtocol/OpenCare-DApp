@@ -1,5 +1,6 @@
 export default function (state, {
   type,
+  missingCredentialsError,
   overrideError,
   masterPasswordError,
   secretKeyError,
@@ -7,7 +8,8 @@ export default function (state, {
 }) {
   if (typeof state === 'undefined') {
     state = {
-      signedIn: false
+      signedIn: false,
+      signingIn: false
     }
   }
 
@@ -21,6 +23,7 @@ export default function (state, {
       state = {
         ...state,
         signingIn: false,
+        missingCredentialsError,
         overrideError,
         masterPasswordError,
         secretKeyError,

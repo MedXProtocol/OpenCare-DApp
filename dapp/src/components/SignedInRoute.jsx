@@ -9,11 +9,13 @@ import { Web3Route } from '~/components/Web3Route'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 
 function mapStateToProps (state, ownProps) {
+  const networkId = get(state, 'sagaGenesis.network.networkId')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const signedIn = get(state, 'account.signedIn')
+
   return {
     signedIn,
-    hasAccount: !!Account.get(address)
+    hasAccount: !!Account.get(networkId, address)
   }
 }
 

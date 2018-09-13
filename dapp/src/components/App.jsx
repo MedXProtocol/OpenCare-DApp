@@ -173,6 +173,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   }
 
   onAccountChangeSignOut (nextProps) {
+    // Sign out the localStorage/browser session when the users Eth address changes
     if (this.props.address && this.props.address !== nextProps.address) {
       this.signOut()
     }
@@ -187,6 +188,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   signOut () {
     this.skipRequestedPathname = true
     this.props.dispatchSignOut()
+    this.props.history.push(routes.WELCOME)
   }
 
   render () {
