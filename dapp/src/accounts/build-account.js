@@ -1,7 +1,7 @@
 import { hashWithSaltAsync } from '~/services/hashWithSalt'
 import aes from '~/services/aes'
 
-export async function buildAccount(address, secretKey, masterPassword) {
+export async function buildAccount(networkId, address, secretKey, masterPassword) {
   secretKey = secretKey.toLowerCase()
 
   // Hash the secret key so we can compare it on following sign ins
@@ -19,6 +19,7 @@ export async function buildAccount(address, secretKey, masterPassword) {
   const encryptedSecretKey = aes.encrypt(secretKey, preimage)
 
   return {
+    networkId,
     address,
     hashedSecretKey,
     secretKeySalt,

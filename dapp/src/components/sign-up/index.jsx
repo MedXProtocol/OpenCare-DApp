@@ -1,26 +1,39 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
+import { withRouter } from 'react-router-dom'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Account } from '~/accounts/Account'
 import { genKey } from '~/services/gen-key'
 import { mixpanel } from '~/mixpanel'
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
-import { MasterPasswordContainer } from './master-password'
+import { MasterPasswordForm } from './masterPasswordForm'
 import { SecretKeyContainer } from './secret-key'
 import { contractByName, cacheCall, cacheCallValue, withSaga } from '~/saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
+import get from 'lodash.get'
 
 function mapStateToProps(state) {
-  const address = state.sagaGenesis.accounts[0]
-  const account = Account.get(address)
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+  if (!networkId) { return {} }
+
+  const address = get(state, 'sagaGenesis.accounts[0]')
+  const account = Account.get(networkId, address)
   const signedIn = state.account.signedIn
+  const missingCredentialsError = state.account.missingCredentialsError
+  const masterPasswordError = state.account.masterPasswordError
+  const signingIn = state.account.signingIn
   const overrideError = state.account.overrideError
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
+
   return {
+    networkId,
     address,
     signedIn,
+    signingIn,
+    missingCredentialsError,
+    masterPasswordError,
     overrideError,
     account,
     publicKey,
@@ -30,8 +43,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    signUp: ({ address, secretKey, masterPassword, overrideAccount }) => {
-      dispatch({ type: 'SIGN_UP', address, secretKey, masterPassword, overrideAccount })
+    signUp: ({ networkId, address, secretKey, masterPassword, overrideAccount }) => {
+      dispatch({ type: 'SIGN_UP', networkId, address, secretKey, masterPassword, overrideAccount })
     },
     clearOverrideError: () => {
       dispatch({ type: 'SIGN_IN_RESET_OVERRIDE' })
@@ -51,8 +64,7 @@ export const SignUp = class _SignUp extends Component {
       secretKey: genKey(32),
       showMasterPassword: false,
       showOverrideModal: false,
-      overrideModalHasBeenShown: false,
-      creating: false
+      overrideModalHasBeenShown: false
     }
   }
 
@@ -60,11 +72,13 @@ export const SignUp = class _SignUp extends Component {
     this.init(this.props)
   }
 
-  componentWillReceiveProps (props) {
-    this.init(props)
+  componentWillReceiveProps (nextProps) {
+    this.init(nextProps)
   }
 
   init(props) {
+    if (!props.networkId || !props.address) { return }
+
     if (!this.state.overrideModalHasBeenShown && (props.account || props.publicKey)) {
       this.setState({
         showOverrideModal: true,
@@ -75,19 +89,18 @@ export const SignUp = class _SignUp extends Component {
 
   closeOverrideModal = () => {
     this.setState({
-      showOverrideModal: false,
-      creating: false
+      showOverrideModal: false
     })
     this.props.clearOverrideError()
   }
 
   onMasterPassword = (password) => {
     this.setState({
-      masterPassword: password,
-      creating: true
+      masterPassword: password
     }, () => {
       this.props.setTimeout(() => {
         this.props.signUp({
+          networkId: this.props.networkId,
           secretKey: this.state.secretKey,
           masterPassword: this.state.masterPassword,
           address: this.props.address
@@ -103,9 +116,17 @@ export const SignUp = class _SignUp extends Component {
     if (this.props.signedIn) {
       content = <Redirect to='/patients/cases' />
     } else if (this.state.showMasterPassword) {
-      content = <MasterPasswordContainer onMasterPassword={this.onMasterPassword} creating={this.state.creating} />
+      content = <MasterPasswordForm
+        masterPasswordError={this.props.masterPasswordError}
+        missingCredentialsError={this.props.missingCredentialsError}
+        onMasterPassword={this.onMasterPassword}
+        creating={this.props.signingIn}
+      />
     } else {
-      content = <SecretKeyContainer secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
+      content = <SecretKeyContainer
+        secretKey={this.state.secretKey}
+        onContinue={() => this.setState({showMasterPassword: true})}
+      />
     }
     return (
       <div>
@@ -113,10 +134,11 @@ export const SignUp = class _SignUp extends Component {
         {content}
         <OverrideDisallowedModal
           show={this.state.showOverrideModal || !!this.props.overrideError}
-          onOk={this.closeOverrideModal} />
+          onOk={this.closeOverrideModal}
+        />
       </div>
     )
   }
 }
 
-export const SignUpContainer = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga)(SignUp)))
+export const SignUpContainer = withRouter(ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga)(SignUp))))
