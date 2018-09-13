@@ -33,11 +33,14 @@ function mapStateToProps(state, ownProps) {
   const DoctorManager = contractByName(state, 'DoctorManager')
   const transactions = state.sagaGenesis.transactions
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', address)
+
   return {
     networkId,
     address,
     signedIn,
     isDoctor,
+    isDermatologist,
     DoctorManager,
     AccountManager,
     transactions,
@@ -56,9 +59,10 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ account, DoctorManager }) {
-  if (!account || !DoctorManager) { return }
-  yield cacheCall(DoctorManager, 'isDoctor', account)
+function* saga({ address, DoctorManager }) {
+  if (!address || !DoctorManager) { return }
+  yield cacheCall(DoctorManager, 'isDoctor', address)
+  yield cacheCall(DoctorManager, 'isDermatologist', address)
 }
 
 export const SignInContainer = ReactTimeout(withSend(withRouter(
@@ -143,7 +147,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
 
     const { signedIn, account, isDoctor, isDermatologist } = this.props
     if (signedIn) {
-      let path = isDoctor ? routes.DOCTORS_CASES_OPEN : routes.PATIENTS_CASES
+      let path = (isDoctor && isDermatologist) ? routes.DOCTORS_CASES_OPEN : routes.PATIENTS_CASES
       return <Redirect to={path} />
     }
 

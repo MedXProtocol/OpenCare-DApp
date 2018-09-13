@@ -27,8 +27,8 @@ contract('CaseManager', function (accounts) {
 
   before(async () => {
     env = await createEnvironment(artifacts)
-    await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr. Octagon', 'CA', 'AB')
-    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr. Zaius', 'US', 'CO')
+    await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr. Octagon', 'CA', 'AB', true)
+    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr. NotADerm', 'US', 'CO', false)
   })
 
   beforeEach(async () => {
@@ -43,6 +43,21 @@ contract('CaseManager', function (accounts) {
 
   describe('createAndAssignCase()', () => {
     describe('with weth9', () => {
+      it('will not work unless doctor is a dermatologist', async () => {
+        expectThrow(async () => {
+          await env.caseManager.createAndAssignCase(
+            env.weth9.address,
+            patient,
+            encryptedCaseKey,
+            caseKeySalt,
+            ipfsHash,
+            doctor2,
+            'doctor encrypted case key',
+            { from: patient, value: caseCharge }
+          )
+        })
+      })
+
       it('should work', async () => {
         assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
         await env.caseManager.createAndAssignCase(

@@ -65,7 +65,6 @@ function mapStateToProps (state) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
-  const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
   const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
   const hasBeenSentEther = cacheCallValue(state, BetaFaucet, 'sentAddresses', address)
 
