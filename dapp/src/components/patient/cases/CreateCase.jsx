@@ -65,8 +65,6 @@ function mapStateToProps (state) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
-  const caseListCount = cacheCallValue(state, CaseManager, 'getPatientCaseListCount', address)
-  const previousCase = (caseListCount > 0)
   const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
   const hasBeenSentEther = cacheCallValue(state, BetaFaucet, 'sentAddresses', address)
 
@@ -85,7 +83,6 @@ function mapStateToProps (state) {
     publicKey,
     balance,
     noDoctorsAvailable,
-    previousCase,
     WrappedEther,
     Dai
   }
@@ -515,7 +512,6 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
             balance,
             caseFeeEtherWei,
             noDoctorsAvailable,
-            previousCase,
             hasBeenSentEther
           } = this.props
           event.preventDefault()
@@ -531,8 +527,8 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
           } else if (noDoctorsAvailable) {
             toastr.warning('There are no Doctors currently available. Please try again later.')
           } else if (this.state.errors.length === 0) {
-            if (computeTotalFee(caseFeeEtherWei).greaterThan(balance)) {
-              if (hasBeenSentEther || previousCase) {
+            if (computeTotalFee(caseFeeEtherWei).gt(balance)) {
+              if (hasBeenSentEther) {
                 this.setState({ showBalanceTooLowModal: true })
               } else {
                 this.props.showBetaFaucetModal()

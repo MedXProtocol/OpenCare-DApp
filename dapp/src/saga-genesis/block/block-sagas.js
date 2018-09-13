@@ -32,6 +32,8 @@ function* collectTransactionAddresses(addressSet, transaction) {
   const from = yield call(addAddressIfExists, addressSet, transaction.from)
   if (to || from) {
     const receipt = yield call(getReceiptData, transaction.hash)
+    console.log('got new receipt: ', receipt)
+
     yield put({ type: 'BLOCK_TRANSACTION_RECEIPT', receipt })
   }
 }
@@ -59,6 +61,8 @@ function* transactionReceipt({ receipt }) {
     if (log.topics) {
       yield all(log.topics.map(function* (topic) {
         if (topic) {
+          console.log('got new topic: ', topic)
+
           // topics are 32 bytes and will have leading 0's padded for typical Eth addresses, ignore them
           const actualAddress = '0x' + topic.substr(26)
           yield call(addAddressIfExists, addressSet, actualAddress)
@@ -93,6 +97,8 @@ function* updateCurrentBlockNumber() {
   const blockNumber = yield web3.eth.getBlockNumber()
   const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
   if (blockNumber !== currentBlockNumber) {
+    console.log('blockNumber: ', blockNumber)
+    console.log('currentBlockNumber: ', currentBlockNumber)
     yield put({
       type: 'UPDATE_BLOCK_NUMBER',
       blockNumber,
@@ -106,6 +112,7 @@ function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
 
   for (var i = lastBlockNumber + 1; i <= blockNumber; i++) {
     const block = yield call(getBlockData, i)
+    console.log('got new block: ', block)
     yield put({ type: 'BLOCK_LATEST', block })
   }
 }
@@ -125,7 +132,6 @@ function* getBlockData(blockId) {
     }
   }
 }
-
 
 function* startBlockPolling() {
   while (true) {

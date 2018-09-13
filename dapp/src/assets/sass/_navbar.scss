@@ -170,8 +170,12 @@
   background-color: #f9434f;
 }
 
+.navbar-inverse .navbar-nav > li.nav--button a,
+.navbar-inverse .navbar-nav > li.nav--button a:focus {
+  background-color: #203a5f;
+}
+
 .navbar-inverse .navbar-nav > li.nav--button a {
-  background-color: lighten($brand-dark-blue, 15%);
   border: 1px solid #0b1e38;
   border-radius: 4px;
   margin-top: 10px;
@@ -179,15 +183,13 @@
   min-width: 100px;
   padding-bottom: 1px;
   padding-top: 10px;
-  text-align: center;
+  @media (min-width: 768px) {
+    text-align: center;
+  }
 }
 
 .navbar-inverse .navbar-nav > li.nav--button a:hover {
-  background-color: lighten($brand-dark-blue, 20%);
-}
-
-.navbar-inverse .navbar-nav > li.nav--button a:focus {
-  background-color: lighten($brand-dark-blue, 15%);
+  background-color: #153e79;
 }
 
 .navbar-inverse .navbar-nav > li.nav--button.active > a::after,

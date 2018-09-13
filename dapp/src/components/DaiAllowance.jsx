@@ -2,11 +2,10 @@ import React, {
   Component
 } from 'react'
 import PropTypes from 'prop-types'
-import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
 import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { Dai } from '~/components/Dai'
-import { displayWeiToEther } from '~/utils/displayWeiToEther'
 import {
   withSend,
   withSaga,
@@ -43,15 +42,15 @@ export const DaiAllowance = connect(mapStateToProps)(
 
         approveWei () {
           if (!this.props.allowanceWei) {
-            return new BigNumber('0')
+            return new BN(0)
           } else {
-            return this.props.requiredWei.minus(this.props.allowanceWei || '0')
+            return this.props.requiredWei.sub(this.props.allowanceWei || new BN(0))
           }
         }
 
         render () {
           const moreWei = this.approveWei()
-          const requiresMore = moreWei.greaterThan('0')
+          const requiresMore = moreWei.gt(new BN(0))
 
           return (
             <span className={classnames({ 'danger': requiresMore })}>

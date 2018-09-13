@@ -7,6 +7,7 @@ describe('Account', () => {
 
   beforeEach(async () => {
     account = await Account.create({
+      networkId: 1234,
       address: '0xc1a9b3F3c2ce1cc8cF102e665a1Ea99627A20F6e',
       secretKey: secretKey,
       masterPassword: 'whatever'

@@ -17,7 +17,8 @@ function mapStateToProps(state, ownProps) {
     overrideError: state.account.overrideError,
     secretKeyError: state.account.secretKeyError,
     publicKeyMismatchError: state.account.publicKeyMismatchError,
-    masterPasswordError: state.account.masterPasswordError
+    masterPasswordError: state.account.masterPasswordError,
+    missingCredentialsError: state.account.missingCredentialsError
   }
 }
 
@@ -58,19 +59,26 @@ export const SignInForm = class _SignInForm extends Component {
   }
 
   render () {
-    const { signingIn, masterPasswordError, secretKeyError, publicKeyMismatchError } = this.props
+    const {
+      signingIn,
+      masterPasswordError,
+      secretKeyError,
+      publicKeyMismatchError,
+      missingCredentialsError
+    } = this.props
 
     if (masterPasswordError) {
       var passwordError = <Alert bsStyle='danger'>{masterPasswordError}</Alert>
     }
-    if (secretKeyError) {
-      var errorAlert = <Alert bsStyle='danger'>{secretKeyError}</Alert>
+
+    if (secretKeyError || publicKeyMismatchError || missingCredentialsError) {
+      var errorAlert = <Alert bsStyle='danger'>
+        {secretKeyError || publicKeyMismatchError || missingCredentialsError}
+      </Alert>
     }
-    if (publicKeyMismatchError) {
-      errorAlert = <Alert bsStyle='danger'>{publicKeyMismatchError}</Alert>
-    }
+
     if (this.props.hasAccount) {
-      errorAlert = <HelpBlock>Leave blank to use your secret key on file</HelpBlock>
+      var leaveBlankMsg = <HelpBlock>Leave blank to use your secret key on file</HelpBlock>
     }
 
     return (
@@ -92,6 +100,7 @@ export const SignInForm = class _SignInForm extends Component {
                 name='secret-key'
                 minLength='79'
                 maxLength='79' />
+              {leaveBlankMsg}
               {errorAlert}
             </div>
             <div className='form-group'>
@@ -128,5 +137,6 @@ SignInFormContainer.propTypes = {
   hasAccount: PropTypes.bool,
   masterPasswordError: PropTypes.string,
   secretKeyError: PropTypes.string,
-  publicKeyMismatchError: PropTypes.string
+  publicKeyMismatchError: PropTypes.string,
+  missingCredentialsError: PropTypes.string
 }

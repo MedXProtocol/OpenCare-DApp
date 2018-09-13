@@ -7,7 +7,12 @@ import { Account } from '~/accounts/Account'
 import { contractByName, web3Call } from '~/saga-genesis'
 
 // Here the sign in should perform the check
-export function* signInSaga({ secretKey, masterPassword, account, address, overrideAccount }) {
+export function* signInSaga({ networkId, secretKey, masterPassword, account, address, overrideAccount }) {
+  if (!networkId || !address) {
+    yield put({ type: 'SIGN_IN_ERROR', missingCredentialsError: 'Ethereum Address and/or Network ID is missing' })
+    return
+  }
+
   var masterPasswordError = masterPasswordInvalid(masterPassword)
   if (masterPasswordError) {
     yield put({ type: 'SIGN_IN_ERROR', masterPasswordError })
@@ -22,7 +27,7 @@ export function* signInSaga({ secretKey, masterPassword, account, address, overr
     }
 
     if (account) { // then the secret key must match the account secret key
-      let newAccount = yield call([Account, 'build'], { address, secretKey, masterPassword })
+      let newAccount = yield call([Account, 'build'], { networkId, address, secretKey, masterPassword })
       if (account.hashedSecretKey === newAccount.hashedSecretKey) {
         try {
           yield call([account, 'unlockAsync'], masterPassword)

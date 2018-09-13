@@ -1,6 +1,6 @@
-import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
 
 export function hexToSecretKey(hexString) {
-  const num = new BigNumber(hexString, 16)
+  const num = new BN(hexString, 16)
   return num.toString(36)
 }

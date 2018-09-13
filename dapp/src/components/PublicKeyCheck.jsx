@@ -25,10 +25,11 @@ function mapStateToProps (state) {
   const DoctorManager = contractByName(state, 'DoctorManager')
   const transactions = state.sagaGenesis.transactions
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account.address())
+  const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', account.address())
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account.address())
   const publicKeyIsDefined = publicKey !== undefined
   const publicKeyMatches = publicKey === '0x' + account.hexPublicKey()
-  const isVisible = publicKeyIsDefined && !publicKeyMatches && isDoctor
+  const isVisible = publicKeyIsDefined && !publicKeyMatches && isDoctor && isDermatologist
 
   return {
     account,
@@ -43,7 +44,8 @@ function* saga({ account, AccountManager, DoctorManager }) {
   if (!account || !AccountManager || !DoctorManager) { return }
   yield all([
     cacheCall(AccountManager, 'publicKeys', account.address()),
-    cacheCall(DoctorManager, 'isDoctor', account.address())
+    cacheCall(DoctorManager, 'isDoctor', account.address()),
+    cacheCall(DoctorManager, 'isDermatologist', account.address())
   ])
 }
 

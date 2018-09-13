@@ -16,11 +16,14 @@ import {
 import { withRouter, Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import ReactTooltip from 'react-tooltip'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle'
+import faWallet from '@fortawesome/fontawesome-free-solid/faWallet'
+import faHeartbeat from '@fortawesome/fontawesome-free-solid/faHeartbeat';
+import faUserMd from '@fortawesome/fontawesome-free-solid/faUserMd'
+import faUser from '@fortawesome/fontawesome-free-solid/faUser'
 import logo from '~/assets/img/logo.png'
 import get from 'lodash.get'
-import networkIdToName from '~/utils/network-id-to-name'
 import { connect } from 'react-redux'
 import {
   cacheCall,
@@ -31,7 +34,6 @@ import {
 } from '~/saga-genesis'
 import { HippoCasesRequiringAttention } from './HippoCasesRequiringAttention'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
-import { Ether } from '~/components/Ether'
 import * as routes from '~/config/routes'
 
 function mapStateToProps (state) {
@@ -42,6 +44,7 @@ function mapStateToProps (state) {
   const DoctorManager = contractByName(state, 'DoctorManager')
   const WrappedEther = contractByName(state, 'WrappedEther')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', address)
   const canRegister = cacheCallValue(state, DoctorManager, 'owner') === address
   const balance = cacheCallValue(state, WrappedEther, 'balanceOf', address)
   const networkId = get(state, 'sagaGenesis.network.networkId')
@@ -58,6 +61,7 @@ function mapStateToProps (state) {
     balance,
     doctorName,
     isDoctor,
+    isDermatologist,
     networkId,
     DoctorManager,
     WrappedEther,
@@ -86,6 +90,7 @@ function* saga({ address, DoctorManager, WrappedEther }) {
     cacheCall(WrappedEther, 'balanceOf', address),
     cacheCall(DoctorManager, 'owner'),
     cacheCall(DoctorManager, 'isDoctor', address),
+    cacheCall(DoctorManager, 'isDermatologist', address),
     cacheCall(DoctorManager, 'name', address)
   ])
 }
@@ -130,23 +135,34 @@ export const HippoNavbar = withContractRegistry(
   }
 
   render() {
-    const { isDoctor, isSignedIn } = this.props
+    const { isDoctor, isDermatologist, isSignedIn } = this.props
     const nameOrAccountString = this.props.doctorName ? this.props.doctorName : 'Account'
 
     if (this.props.signedIn && this.props.address) {
       var profileMenu =
         <NavDropdown
-          title={nameOrAccountString}
+          title={
+            <span>
+              <FontAwesomeIcon
+                icon={faUser}
+                size='sm'
+                data-tip='Profile' />
+              &nbsp;&nbsp;
+                {nameOrAccountString}
+            </span>
+          }
           id='account-dropdown'
           open={this.state.profileMenuOpen}
           onToggle={(value) => this.toggleProfileMenu(value)}
 
         >
-          <MenuItem header>Profile</MenuItem>
+          <MenuItem header>
+            Profile
+          </MenuItem>
 
           <LinkContainer to={routes.ACCOUNT_WALLET}>
             <MenuItem href={routes.ACCOUNT_WALLET}>
-              W-ETH Balance
+              Wallet
             </MenuItem>
           </LinkContainer>
 
@@ -177,22 +193,38 @@ export const HippoNavbar = withContractRegistry(
       var wrappedEtherBalance =
         <LinkContainer to={routes.ACCOUNT_WALLET}>
           <NavItem href={routes.ACCOUNT_WALLET}>
-            <Ether wei={this.props.balance} noStyle />
+            <FontAwesomeIcon
+              icon={faWallet}
+              size='sm'
+              data-tip='Wallet' />
+            &nbsp;
+            Wallet
           </NavItem>
         </LinkContainer>
 
       var myCasesItem =
         <IndexLinkContainer to={routes.PATIENTS_CASES}  activeClassName="active">
           <NavItem href={routes.PATIENTS_CASES}>
+            <FontAwesomeIcon
+              icon={faHeartbeat}
+              size='sm'
+              data-tip='My Cases' />
+            &nbsp;
             My Cases
           </NavItem>
         </IndexLinkContainer>
 
-      if (isDoctor) {
+      if (isDoctor && isDermatologist) {
         var openCasesItem =
           <LinkContainer to={routes.DOCTORS_CASES_OPEN}>
             <NavItem href={routes.DOCTORS_CASES_OPEN}>
-              <HippoCasesRequiringAttention /> Diagnose Cases
+              <HippoCasesRequiringAttention />
+              <FontAwesomeIcon
+                icon={faUserMd}
+                size='sm'
+                data-tip='My Cases' />
+                &nbsp;
+              Diagnose Cases
             </NavItem>
           </LinkContainer>
       }
@@ -224,7 +256,7 @@ export const HippoNavbar = withContractRegistry(
       }
     }
 
-    if (isDoctor && isSignedIn) {
+    if (isDoctor && isDermatologist && isSignedIn) {
       var statusItem =
         <NavItem onClick={this.handleToggleIsAvailable} className="nav--button">
           <span className={
@@ -272,9 +304,6 @@ export const HippoNavbar = withContractRegistry(
               <ReactTooltip effect='solid' place='bottom' />
             </NavItem>
           ) : null}
-          <NavItem>
-            {networkIdToName(this.props.networkId)} Network
-          </NavItem>
         </Nav>
         <Navbar.Collapse>
           <Nav pullRight>

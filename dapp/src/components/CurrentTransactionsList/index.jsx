@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavDropdown } from 'react-bootstrap'
 import { I18n } from 'react-i18next'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import faEthereum from '@fortawesome/fontawesome-free-brands/faEthereum'
 import FlipMove from 'react-flip-move'
 import classnames from 'classnames'
 import { txErrorMessage } from '~/services/txErrorMessage'
@@ -160,7 +162,13 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
           id='transactions'
           title={
             <span>
-              <span className={classnames('nav--circle', this.getDropdownClassName())} /> Tx
+              <span className={classnames('nav--circle', this.getDropdownClassName())} />
+              &nbsp;
+                <FontAwesomeIcon
+                  icon={faEthereum}
+                  data-tip='Profile' />
+                &nbsp;
+                Tx
             </span>
           }>
           <li>

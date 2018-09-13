@@ -8,12 +8,14 @@ import * as routes from '~/config/routes'
 import { PageTitle } from '~/components/PageTitle'
 
 function mapStateToProps (state) {
-  let address = get(state, 'sagaGenesis.accounts[0]')
-  let signedIn = get(state, 'account.signedIn')
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+  const address = get(state, 'sagaGenesis.accounts[0]')
+  const signedIn = get(state, 'account.signedIn')
+
   return {
     address,
     signedIn,
-    account: Account.get(address)
+    account: Account.get(networkId, address)
   }
 }
 
@@ -21,7 +23,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
   render () {
     let launchLink
     if (this.props.signedIn) {
-      if (this.props.isDoctor) {
+      if (this.props.isDoctor && this.props.isDermatologist) {
         launchLink = routes.DOCTORS_CASES_OPEN
       } else {
         launchLink = routes.PATIENTS_CASES

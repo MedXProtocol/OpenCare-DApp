@@ -2,11 +2,9 @@ import React, {
   Component
 } from 'react'
 import PropTypes from 'prop-types'
-import BigNumber from 'bignumber.js'
-import classnames from 'classnames'
+import BN from 'bn.js'
 import { connect } from 'react-redux'
 import { Dai } from '~/components/Dai'
-import { displayWeiToEther } from '~/utils/displayWeiToEther'
 import {
   withSend,
   withSaga,
@@ -49,15 +47,15 @@ export const DaiApproval = connect(mapStateToProps)(
 
         approveWei () {
           if (!this.props.allowanceWei) {
-            return new BigNumber('0')
+            return new BN('0')
           } else {
-            return this.props.requiredWei.minus(this.props.allowanceWei || '0')
+            return this.props.requiredWei.sub(this.props.allowanceWei || new BN(0))
           }
         }
 
         render () {
           const moreWei = this.approveWei()
-          const requiresMore = moreWei.greaterThan('0')
+          const requiresMore = moreWei.gt('0')
           if (requiresMore) {
             var approveButton =
               <button onClick={this.handleApprove} className='btn btn-xs btn-primary'>

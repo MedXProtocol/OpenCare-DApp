@@ -19,8 +19,13 @@ contract CaseDiagnosingDoctor is Ownable, Initializable, DelegateTarget {
   /**
    * @dev - throws if called by any account other than a doctor.
    */
-  modifier isDoctor() {
-    require(registry.doctorManager().isDoctor(msg.sender), 'sender must be a Doctor');
+  modifier isDermatologist() {
+    require(
+         registry.doctorManager().isDoctor(msg.sender)
+      && registry.doctorManager().isDermatologist(msg.sender),
+      'sender must be a registered Doctor & Dermatologist'
+    );
+
     _;
   }
 
@@ -44,7 +49,7 @@ contract CaseDiagnosingDoctor is Ownable, Initializable, DelegateTarget {
    * @dev - The initial doctor can accept their evaluation either
    *        48 hours or 96 hours after diagnosing and get tokens owing to them
    */
-  function acceptAllAsDoctor() external isDoctor {
+  function acceptAllAsDoctor() external isDermatologist {
     uint256 currentNodeId = registry.caseStatusManager().firstOpenCaseId(msg.sender);
 
     while (currentNodeId != 0) {
@@ -69,5 +74,5 @@ contract CaseDiagnosingDoctor is Ownable, Initializable, DelegateTarget {
 
     emit AcceptedAllAsDoctor(msg.sender);
   }
-  
+
 }
