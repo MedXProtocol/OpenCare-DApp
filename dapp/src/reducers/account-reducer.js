@@ -8,7 +8,8 @@ export default function (state, {
 }) {
   if (typeof state === 'undefined') {
     state = {
-      signedIn: false
+      signedIn: false,
+      signingIn: false
     }
   }
 
