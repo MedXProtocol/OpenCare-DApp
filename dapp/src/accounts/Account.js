@@ -150,11 +150,10 @@ Account.build = async function ({ networkId, address, secretKey, masterPassword 
 }
 
 Account.get = function (networkId, address) {
-  const accountObject = getAccount(networkId, address)
   let account = null
+  const accountObject = getAccount(networkId, address)
   if (accountObject) {
     account = new Account(accountObject)
-    account.store() // ensure record is retained indefinitely
   }
   return account
 }
