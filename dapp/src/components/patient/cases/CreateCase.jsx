@@ -60,7 +60,6 @@ function mapStateToProps (state) {
   const caseFeeEtherWei = cacheCallValue(state, CasePaymentManager, 'caseFeeEtherWei')
   const caseFeeUsdWei = cacheCallValue(state, CasePaymentManager, 'baseCaseFeeUsdWei')
   const usdPerWei = cacheCallValue(state, CasePaymentManager, 'usdPerEther')
-  const networkId = get(state, 'sagaGenesis.network.networkId')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
   const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
@@ -74,7 +73,6 @@ function mapStateToProps (state) {
     transactions: state.sagaGenesis.transactions,
     CaseManager,
     CasePaymentManager,
-    networkId,
     publicKey,
     noDoctorsAvailable,
     WrappedEther,
