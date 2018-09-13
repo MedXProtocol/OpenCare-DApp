@@ -6,7 +6,7 @@ export const SIGN_IN = '/sign-in'
 export const SIGN_UP = '/sign-up'
 export const HOME = '/'
 
-export const ADMIN_DAPP_SETTINGS = '/admin/settings'
+export const ADMIN_SETTINGS = '/admin/settings'
 export const DOCTORS_NEW = '/doctors/new'
 export const ADMIN_FEES = '/admin/fees'
 

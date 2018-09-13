@@ -4,21 +4,23 @@ import ReduxToastr from 'react-redux-toastr'
 import ReactTimeout from 'react-timeout'
 import { hot } from 'react-hot-loader'
 import { formatRoute } from 'react-router-named-routes'
-import { SignUpContainer } from './sign-up'
-import { SignInContainer } from './sign-in'
-import { PatientDashboard } from './patient/dashboard'
-import { NewCase } from './patient/cases/NewCase'
-import { PatientCaseContainer } from './patient/cases/PatientCase'
-import { AddDoctor } from './doctors/new'
-import { Mint } from './account/mint'
-import { WalletContainer } from './account/wallet'
-import { EmergencyKit } from './account/emergency-kit'
-import { ChangePasswordContainer } from './account/change-password'
-import { OpenCasesContainer } from './doctors/cases'
+import { SignUpContainer } from '~/components/sign-up'
+import { SignInContainer } from '~/components/sign-in'
+import { PatientDashboard } from '~/components/patient/dashboard'
+import { NewCase } from '~/components/patient/cases/NewCase'
+import { PatientCaseContainer } from '~/components/patient/cases/PatientCase'
+import { AdminSettings } from '~/components/AdminSettings'
+import { AddDoctor } from '~/components/doctors/new'
+import { AdminFees } from '~/components/AdminFees'
+import { Mint } from '~/components/account/mint'
+import { WalletContainer } from '~/components/account/wallet'
+import { EmergencyKit } from '~/components/account/emergency-kit'
+import { ChangePasswordContainer } from '~/components/account/change-password'
+import { OpenCasesContainer } from '~/components/doctors/cases'
 import { Welcome } from '~/components/welcome'
-import { TryMetamask } from './try-metamask'
-import { LoginToMetaMask } from './login-to-metamask'
-import { FourOhFour } from './four-oh-four'
+import { TryMetamask } from '~/components/try-metamask'
+import { LoginToMetaMask } from '~/components/login-to-metamask'
+import { FourOhFour } from '~/components/four-oh-four'
 import { DebugLink } from '~/components/DebugLink'
 import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
 import { AcceptAllExpiredCases } from '~/components/AcceptAllExpiredCases'
@@ -31,7 +33,6 @@ import { ScrollyFeedbackLink } from '~/components/ScrollyFeedbackLink'
 import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
-import { AdminFees } from '~/components/AdminFees'
 import { connect } from 'react-redux'
 import {
   cacheCall,
@@ -276,9 +277,9 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
               component={OpenCasesContainer}
             />
 
-            <SignedInRoute path={routes.ADMIN_FEES} component={AdminFees} />
-
+            <SignedInRoute path={routes.ADMIN_DAPP_SETTINGS} component={AdminSettings} />
             <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
+            <SignedInRoute path={routes.ADMIN_FEES} component={AdminFees} />
 
             <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
 
