@@ -277,7 +277,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
               component={OpenCasesContainer}
             />
 
-            <SignedInRoute path={routes.ADMIN_DAPP_SETTINGS} component={AdminSettings} />
+            <SignedInRoute path={routes.ADMIN_SETTINGS} component={AdminSettings} />
             <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
             <SignedInRoute path={routes.ADMIN_FEES} component={AdminFees} />
 

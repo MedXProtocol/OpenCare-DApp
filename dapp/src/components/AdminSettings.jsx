@@ -4,113 +4,123 @@ import { connect } from 'react-redux'
 import {
   withSaga,
   cacheCall,
-  cacheCallValue,
+  cacheCallValueInt,
   withSend,
   contractByName,
   TransactionStateHandler
 } from '~/saga-genesis'
+import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
+import { usageRestrictionsToInt } from '~/utils/usageRestrictionsToInt'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
 
 function mapStateToProps(state) {
   const transactions = state.sagaGenesis.transactions
   const AdminSettings = contractByName(state, 'AdminSettings')
-  const baseCaseFeeUsdWei = cacheCallValue(state, AdminSettings, 'baseCaseFeeUsdWei')
+  const usageRestrictions = cacheCallValueInt(state, 'usageRestrictions')
+
   return {
-    baseCaseFeeUsdWei,
     AdminSettings,
-    transactions
+    transactions,
+    usageRestrictions
   }
 }
 
-function* adminFeeSaga({ AdminSettings }) {
+function* adminSettingsSaga({ AdminSettings }) {
   if (!AdminSettings) { return }
-  yield cacheCall(AdminSettings, 'baseCaseFeeUsdWei')
+
+  yield cacheCall(AdminSettings, 'usageRestrictions')
 }
 
-export const AdminDappSettings = connect(mapStateToProps)(
-  withSaga(adminFeeSaga)(
+export const AdminSettings = connect(mapStateToProps)(
+  withSaga(adminSettingsSaga)(
     withSend(
       class _AdminDappSettings extends Component {
-        constructor (props) {
-          super(props)
-          this.state = {
-            newCaseFeeUsd: ''
-          }
-        }
 
-        isBaseCaseFeeValid () {
-          if (!this.state.newCaseFeeUsd) { return false }
-          try {
-            etherToWei(this.state.newCaseFeeUsd)
-            return true
-          } catch (error) {
-            return false
+        constructor(props) {
+          super(props)
+
+          this.state = {
+            setUsageRestrictionsTxId: null,
+            usageRestrictions: null
           }
         }
 
         componentWillReceiveProps (props) {
-          if (this.state.setBaseCaseFeeId) {
-            this.state.setBaseCaseFeeHandler.handle(props.transactions[this.state.setBaseCaseFeeId])
+          if (this.state.setUsageRestrictionsTxId) {
+            this.state.setUsageRestrictionsHandler.handle(props.transactions[this.state.setUsageRestrictionsTxId])
               .onError((error) => {
                 toastr.transactionError(error)
-                this.setState({ setBaseCaseFeeId: null, setBaseCaseFeeHandler: null })
+                this.setState({ setUsageRestrictionsTxId: null, setUsageRestrictionsHandler: null })
+              })
+              .onConfirmed(() => {
+                toastr.success('Updated Usage Restrictions confirmed!')
+                this.setState({ setUsageRestrictionsTxId: null, setUsageRestrictionsHandler: null })
               })
               .onTxHash(() => {
-                toastr.success('The new case fee has been set')
-                mixpanel.track('setBaseCaseFee')
-                this.setState({ setBaseCaseFeeId: null, setBaseCaseFeeHandler: null, newCaseFeeUsd: '' })
+                toastr.success('Usage Restrictions transaction sent. Will take a few moments to confirm.')
+                mixpanel.track('AdminSetUsageRestrictions')
+                this.setState({ setUsageRestrictionsTxId: null, setUsageRestrictionsHandler: null })
               })
           }
         }
 
-        onSubmitBaseCaseFee = (event) => {
+        handleSubmitUsageRestrictions = (event) => {
           event.preventDefault()
-          if (this.isBaseCaseFeeValid()) {
-            const setBaseCaseFeeId = this.props.send(this.props.AdminSettings, 'setBaseCaseFeeUsdWei', etherToWei(this.state.newCaseFeeUsd))()
-            this.setState({
-              setBaseCaseFeeId,
-              setBaseCaseFeeHandler: new TransactionStateHandler()
-            })
-          }
+
+          const setUsageRestrictionsTxId = this.props.send(
+            this.props.AdminSettings,
+            'setUsageRestrictions',
+            usageRestrictionsToInt(this.state.usageRestrictions)
+          )()
+
+          this.setState({
+            setUsageRestrictionsTxId,
+            setUsageRestrictionsHandler: new TransactionStateHandler()
+          })
+        }
+
+        handleButtonGroupOnChange = (event) => {
+          this.setState({ [event.target.name]: event.target.value })
         }
 
         render() {
-          const caseFeeUsd = displayWeiToUsd(this.props.baseCaseFeeUsdWei)
+          const { usageRestrictions } = this.props
 
           return (
             <div>
-              <PageTitle renderTitle={(t) => t('pageTitles.adminDappSettings')} />
+              <PageTitle renderTitle={(t) => t('pageTitles.adminSettings')} />
               <div className='container'>
                 <div className='row'>
-                  <div className='col-sm-6 col-sm-offset-3'>
+                  <div className='col-sm-8 col-sm-offset-2'>
                     <div className="card">
                       <div className="card-header">
-                        <h3 className="title card-title">DappSettings</h3>
+                        <h3 className="title card-title">Admin Settings</h3>
                       </div>
-                      <div className="card-body">
-                        <form onSubmit={this.onSubmitBaseCaseFee}>
-                          <div className="form-wrapper">
-                            <div className='form-group'>
-                              <label>New Case Fee (USD)</label>
-                              <input
-                                type="number"
-                                className='form-control'
-                                placeholder={`Currently: $${caseFeeUsd} USD`}
-                                value={this.state.newCaseFeeUsd}
-                                onChange={(e) => this.setState({ newCaseFeeUsd: e.target.value })}
-                                />
-                            </div>
-                            <div className='form-group'>
-                              <input
-                                disabled={!!this.state.setBaseCaseFeeId}
-                                type='submit'
-                                className='btn btn-sm btn-success'
-                                value='Update' />
-                            </div>
-                          </div>
-                        </form>
-                      </div>
+
+                      <form onSubmit={this.handleSubmitUsageRestrictions}>
+                        <div className="card-body">
+                          <HippoToggleButtonGroup
+                            id='usageRestrictions'
+                            name='usageRestrictions'
+                            colClasses='col-xs-12'
+                            label='Contract Usage Restrictions'
+                            buttonGroupOnChange={this.handleButtonGroupOnChange}
+                            selectedValues={usageRestrictions}
+                            values={['Locked', 'Open To Everyone', 'Only Doctors']}
+                          />
+                        </div>
+
+                        <div className="card-footer text-right">
+                          <button
+                            disabled={!!this.state.setUsageRestrictionsTxId}
+                            type="submit"
+                            className="btn btn-lg btn-success"
+                          >
+                            Update Settings
+                          </button>
+                        </div>
+                      </form>
                     </div>
                   </div>
                 </div>
