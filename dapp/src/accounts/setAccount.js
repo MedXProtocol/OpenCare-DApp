@@ -1,10 +1,10 @@
 import { storageAvailable } from '~/services/storageAvailable'
 import { setAccountLocalStorage } from './setAccountLocalStorage'
 
-export function setAccount(networkId, address, account) {
+export function setAccount(networkId, address, accountObject) {
   if (storageAvailable('localStorage')) {
-    setAccountLocalStorage(networkId, address, account)
+    setAccountLocalStorage(networkId, address, accountObject)
   } else {
-    console.error('Unable to set account! Possibly no access to localStorage')
+    throw new Error('Unable to set account! Possibly no access to localStorage')
   }
 }

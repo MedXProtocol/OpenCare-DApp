@@ -5,10 +5,6 @@ import { mixpanel } from '~/mixpanel'
 import { contractByName, web3Call } from '~/saga-genesis'
 
 export function* signUpSaga({ networkId, address, secretKey, masterPassword, overrideAccount }) {
-  if (!address) {
-    yield put({ type: 'SIGN_IN_ERROR', addressError: 'Address is not defined' })
-    return
-  }
   var masterPasswordError = masterPasswordInvalid(masterPassword)
   if (masterPasswordError) {
     yield put({ type: 'SIGN_IN_ERROR', masterPasswordError })

@@ -20,7 +20,6 @@ import { BodyClass } from '~/components/BodyClass'
 import { Loading } from '~/components/Loading'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 import { PageTitle } from '~/components/PageTitle'
-import { upgradeOldAccount } from '~/services/upgradeOldAccount'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, ownProps) {
@@ -78,13 +77,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
     }
   }
 
-  componentDidMount () {
-    this.init(this.props)
-  }
-
   componentWillReceiveProps(nextProps) {
-    this.init(nextProps)
-
     if (this.state.resetAccountHandler && this.state.transactionId) {
       this.state.resetAccountHandler.handle(nextProps.transactions[this.state.transactionId])
         .onError((error) => {
@@ -103,12 +96,6 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
 
           toastr.success('Your account has been reset.')
         })
-    }
-  }
-
-  init(props) {
-    if (props.networkId && props.address) {
-      upgradeOldAccount(props.networkId, props.address)
     }
   }
 

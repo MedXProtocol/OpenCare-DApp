@@ -1,11 +1,14 @@
+import { defined } from '~/utils/defined'
 import { formatAccountKey } from './formatAccountKey'
+import { upgradeOldAccount } from './upgradeOldAccount'
 
 export function getAccountLocalStorage(networkId, address) {
-  let json = localStorage.getItem(formatAccountKey(networkId, address))
+  let accountObject
+  accountObject = JSON.parse(localStorage.getItem(formatAccountKey(networkId, address)))
 
-  if (json) {
-    json = JSON.parse(json)
+  if (!defined(accountObject)) {
+    accountObject = upgradeOldAccount(networkId, address)
   }
-  
-  return json
+
+  return accountObject
 }

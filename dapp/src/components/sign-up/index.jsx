@@ -4,22 +4,19 @@ import { withRouter } from 'react-router-dom'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Account } from '~/accounts/Account'
-import { upgradeOldAccount } from '~/services/upgradeOldAccount'
 import { genKey } from '~/services/gen-key'
-import { isBlank } from '~/utils/isBlank'
 import { mixpanel } from '~/mixpanel'
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
-import { MasterPasswordContainer } from './master-password'
+import { MasterPasswordForm } from './masterPasswordForm'
 import { SecretKeyContainer } from './secret-key'
 import { contractByName, cacheCall, cacheCallValue, withSaga } from '~/saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
-import * as routes from '~/config/routes'
 import get from 'lodash.get'
 
 function mapStateToProps(state) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
   if (!networkId) { return {} }
-  
+
   const address = get(state, 'sagaGenesis.accounts[0]')
   const account = Account.get(networkId, address)
   const signedIn = state.account.signedIn
@@ -77,13 +74,6 @@ export const SignUp = class _SignUp extends Component {
   init(props) {
     if (!props.networkId || !props.address) { return }
 
-    if (isBlank(props.account)) {
-      if (upgradeOldAccount(props.networkId, props.address)) {
-        props.history.push(routes.SIGN_IN)
-        return
-      }
-    }
-
     if (!this.state.overrideModalHasBeenShown && (props.account || props.publicKey)) {
       this.setState({
         showOverrideModal: true,
@@ -119,18 +109,21 @@ export const SignUp = class _SignUp extends Component {
   }
 
   render () {
-    if (!this.props.networkId) { return null }
-
     var content
     if (this.props.signedIn) {
       content = <Redirect to='/patients/cases' />
     } else if (this.state.showMasterPassword) {
-      content = <MasterPasswordContainer
+      content = <MasterPasswordForm
+        networkId={this.props.networkId}
+        address={this.props.address}
         onMasterPassword={this.onMasterPassword}
         creating={this.state.creating}
       />
     } else {
-      content = <SecretKeyContainer secretKey={this.state.secretKey} onContinue={() => this.setState({showMasterPassword: true})} />
+      content = <SecretKeyContainer
+        secretKey={this.state.secretKey}
+        onContinue={() => this.setState({showMasterPassword: true})}
+      />
     }
     return (
       <div>
@@ -138,7 +131,8 @@ export const SignUp = class _SignUp extends Component {
         {content}
         <OverrideDisallowedModal
           show={this.state.showOverrideModal || !!this.props.overrideError}
-          onOk={this.closeOverrideModal} />
+          onOk={this.closeOverrideModal}
+        />
       </div>
     )
   }

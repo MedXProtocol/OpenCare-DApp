@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import ReactTimeout from 'react-timeout'
 import { Alert } from 'react-bootstrap'
 import masterPasswordInvalid from '~/services/master-password-invalid'
 import { BodyClass } from '~/components/BodyClass'
@@ -7,7 +6,7 @@ import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import PropTypes from 'prop-types'
 
-export const MasterPassword = class _MasterPassword extends Component {
+export const MasterPasswordForm = class _MasterPassword extends Component {
   static propTypes = {
     onMasterPassword: PropTypes.func.isRequired,
     creating: PropTypes.bool.isRequired
@@ -23,22 +22,25 @@ export const MasterPassword = class _MasterPassword extends Component {
 
   onSubmit = (e) => {
     e.preventDefault()
-    let error = masterPasswordInvalid(this.state.masterPassword)
+    let errorMessage = masterPasswordInvalid(this.state.masterPassword)
+
     if (this.state.masterPassword !== this.state.confirmMasterPassword) {
-      error = 'Both passwords must match'
+      errorMessage = 'Both passwords must match'
+    } else if (!this.props.networkId || !this.props.address) {
+      errorMessage = 'Ethereum Address and/or Network ID is missing'
     }
-    if (!error) {
+
+    if (!errorMessage) {
       this.props.onMasterPassword(this.state.masterPassword)
     } else {
-      this.setState({
-        error
-      })
+      this.setState({ errorMessage })
     }
   }
 
   render () {
-    if (this.state.error) {
-      var error = <Alert className='text-center' bsStyle='danger'>{this.state.error}</Alert>
+    var errorMessage = this.state.errorMessage
+    if (errorMessage) {
+      var errorAlert = <Alert className='text-center' bsStyle='danger'>{this.state.errorMessage}</Alert>
     }
     return (
       <BodyClass isDark={true}>
@@ -63,8 +65,9 @@ export const MasterPassword = class _MasterPassword extends Component {
                       onChange={(event) => this.setState({ masterPassword: event.target.value })}
                       className="form-control input-lg"
                       autoFocus={true}
-                      placeholder="Enter a password" />
-                    {error}
+                      placeholder="Enter a password"
+                    />
+                    {errorAlert}
                   </div>
 
                   <div className='form-group'>
@@ -74,7 +77,8 @@ export const MasterPassword = class _MasterPassword extends Component {
                       value={this.state.confirmMasterPassword}
                       onChange={(event) => this.setState({ confirmMasterPassword: event.target.value })}
                       className="form-control input-lg"
-                      placeholder="Enter password again" />
+                      placeholder="Enter password again"
+                    />
                   </div>
                 </div>
 
@@ -84,7 +88,8 @@ export const MasterPassword = class _MasterPassword extends Component {
                     disabled={this.props.creating}
                     type='submit'
                     value={this.props.creating ? 'Creating Account ...' : 'Create Account'}
-                    className='btn btn-lg btn-primary' />
+                    className='btn btn-lg btn-primary'
+                  />
                 </div>
               </div>
             </div>
@@ -94,5 +99,3 @@ export const MasterPassword = class _MasterPassword extends Component {
     )
   }
 }
-
-export const MasterPasswordContainer = ReactTimeout(MasterPassword)

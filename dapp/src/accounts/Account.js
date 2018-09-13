@@ -4,8 +4,10 @@ import { deriveKeyAsync } from '~/utils/derive-key'
 import { deriveKeyPair } from './derive-key-pair'
 import { deriveSharedKey } from './derive-shared-key'
 import { buildAccount } from './build-account'
+import { formatAccountKey } from './formatAccountKey'
 import { getAccount } from './getAccount'
 import { setAccount } from './setAccount'
+import { storageAvailable } from '~/services/storageAvailable'
 import { isAccountMasterPassword } from './is-account-master-password'
 import { isBlank } from '~/utils/isBlank'
 
@@ -119,7 +121,11 @@ export class Account {
   }
 
   destroy () {
-    setAccount(this.networkId(), this.address(), null)
+    if (storageAvailable('localStorage')) {
+      localStorage.removeItem(formatAccountKey(this.networkId(), this.address()))
+    } else {
+      console.warn('Unable to destroy account, no access to localStorage')
+    }
   }
 }
 
@@ -144,11 +150,11 @@ Account.build = async function ({ networkId, address, secretKey, masterPassword 
 }
 
 Account.get = function (networkId, address) {
-  const json = getAccount(networkId, address)
+  const accountObject = getAccount(networkId, address)
   let account = null
-  if (json) {
-    account = new Account(json)
-    account.store() // ensure cookie is retained indefinitely
+  if (accountObject) {
+    account = new Account(accountObject)
+    account.store() // ensure record is retained indefinitely
   }
   return account
 }

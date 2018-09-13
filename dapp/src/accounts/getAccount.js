@@ -2,10 +2,13 @@ import { storageAvailable } from '~/services/storageAvailable'
 import { getAccountLocalStorage } from './getAccountLocalStorage'
 
 export function getAccount(networkId, address) {
-  if (!address || !networkId) { return null }
-  let account
+  if (!networkId || !address) { return null }
+
+  let accountObject
   if (storageAvailable('localStorage')) {
-    account = getAccountLocalStorage(networkId, address) || account
+    accountObject = getAccountLocalStorage(networkId, address)
+    console.log(accountObject)
   }
-  return account
+
+  return accountObject
 }
