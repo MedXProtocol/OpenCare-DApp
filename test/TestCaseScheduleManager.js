@@ -1,10 +1,7 @@
-const expectThrow = require('./helpers/expectThrow')
-const Registry = artifacts.require("./Registry.sol")
 const Case = artifacts.require("./Case.sol")
 const CaseScheduleManager = artifacts.require("./CaseScheduleManager.sol")
 const createEnvironment = require('./helpers/create-environment')
 const createCase = require('./helpers/create-case')
-const caseStatus = require('./helpers/case-status')
 const resetCaseManager = require('./helpers/reset-case-manager')
 
 contract('CaseScheduleManager', function (accounts) {

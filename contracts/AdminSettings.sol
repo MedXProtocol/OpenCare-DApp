@@ -46,7 +46,7 @@ contract AdminSettings is Ownable, Initializable {
     setUsageRestrictions(UsageRestrictions.OpenToEveryone);
   }
 
-  function setUsageRestrictions(UsageRestrictions _usageRestrictions) external onlyOwner {
+  function setUsageRestrictions(UsageRestrictions _usageRestrictions) public onlyOwner {
     usageRestrictions = _usageRestrictions;
   }
 
