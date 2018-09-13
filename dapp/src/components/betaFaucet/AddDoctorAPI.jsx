@@ -22,7 +22,6 @@ function mapStateToProps(state) {
   }
 }
 
-
 const requiredFields = [
   'name',
   'country'
@@ -79,7 +78,6 @@ export const AddDoctorAPI = ReactTimeout(
               txHash: response.data.txHash
             })
             this.props.addExternalTransaction('addDoctor', response.data.txHash)
-            this.props.moveToNextStep({ withDelay: true })
           } else {
             this.setState({
               responseMessage: '',

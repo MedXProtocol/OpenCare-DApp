@@ -22,6 +22,7 @@ import faWallet from '@fortawesome/fontawesome-free-solid/faWallet'
 import faHeartbeat from '@fortawesome/fontawesome-free-solid/faHeartbeat';
 import faUserMd from '@fortawesome/fontawesome-free-solid/faUserMd'
 import faUser from '@fortawesome/fontawesome-free-solid/faUser'
+import faCog from '@fortawesome/fontawesome-free-solid/faCog'
 import logo from '~/assets/img/logo.png'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
@@ -232,7 +233,16 @@ export const HippoNavbar = withContractRegistry(
       if (this.props.canRegister) {
         var adminItem =
           <NavDropdown
-            title='Admin'
+            title={
+              <span>
+                <FontAwesomeIcon
+                  icon={faCog}
+                  size='sm'
+                  data-tip='Admin' />
+                &nbsp;
+                Admin
+              </span>
+            }
             id='admin-dropdown'
             open={this.state.adminMenuOpen}
             onToggle={(value) => this.setState({adminMenuOpen: !this.state.adminMenuOpen})}
