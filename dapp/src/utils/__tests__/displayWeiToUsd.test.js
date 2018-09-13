@@ -9,6 +9,6 @@ describe('displayWeiToUsd', () => {
       .toEqual('1,235,213.13')
 
     expect(displayWeiToUsd(web3.utils.toWei('1200', 'ether')))
-      .toEqual('1,200.00')
+      .toEqual('1,200')
   })
 })

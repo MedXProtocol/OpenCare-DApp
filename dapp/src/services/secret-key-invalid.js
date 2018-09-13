@@ -7,10 +7,9 @@ export default function (secretKey) {
   if (secretKey.length !== 64) {
     return 'The secret key must contain 64 characters'
   }
-  try {
-    var bn = new BN(secretKey, 16)
-    bn.toString(16)
-  } catch (error) {
+  var bn = new BN(secretKey, 16)
+  const hex = bn.toString(16)
+  if (secretKey !== hex) {
     return 'The secret key is not valid'
   }
   return false
