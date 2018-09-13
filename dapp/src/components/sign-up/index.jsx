@@ -1,21 +1,25 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
+import { withRouter } from 'react-router-dom'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Account } from '~/accounts/Account'
 import { upgradeOldAccount } from '~/services/upgradeOldAccount'
 import { genKey } from '~/services/gen-key'
+import { isBlank } from '~/utils/isBlank'
 import { mixpanel } from '~/mixpanel'
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
 import { MasterPasswordContainer } from './master-password'
 import { SecretKeyContainer } from './secret-key'
 import { contractByName, cacheCall, cacheCallValue, withSaga } from '~/saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
+import * as routes from '~/config/routes'
 import get from 'lodash.get'
 
 function mapStateToProps(state) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
   if (!networkId) { return {} }
+  
   const address = get(state, 'sagaGenesis.accounts[0]')
   const account = Account.get(networkId, address)
   const signedIn = state.account.signedIn
@@ -71,17 +75,16 @@ export const SignUp = class _SignUp extends Component {
   }
 
   init(props) {
-    console.log(props.networkId, props.address)
     if (!props.networkId || !props.address) { return }
 
-    let account = props.account
-    console.log(account)
-    account = upgradeOldAccount(props.networkId, props.address)
+    if (isBlank(props.account)) {
+      if (upgradeOldAccount(props.networkId, props.address)) {
+        props.history.push(routes.SIGN_IN)
+        return
+      }
+    }
 
-    console.log(account)
-    console.log(props.publicKey)
-
-    if (!this.state.overrideModalHasBeenShown && (account || props.publicKey)) {
+    if (!this.state.overrideModalHasBeenShown && (props.account || props.publicKey)) {
       this.setState({
         showOverrideModal: true,
         overrideModalHasBeenShown: true
@@ -141,4 +144,4 @@ export const SignUp = class _SignUp extends Component {
   }
 }
 
-export const SignUpContainer = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga)(SignUp)))
+export const SignUpContainer = withRouter(ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(withSaga(saga)(SignUp))))

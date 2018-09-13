@@ -1,23 +1,33 @@
+import { isBlank } from '~/utils/isBlank'
 import { setAccountLocalStorage } from '~/accounts/setAccountLocalStorage'
 
-//////////
-// TODO: WARNING this might run upgradeOldAccount on a domain with the wrong domain networkId!~
+function formatOldKey(address) {
+  return `account-${address.toLowerCase()}`
+}
 
-///////////// !!!
+function deleteOldAccount(address) {
+  localStorage.removeItem(formatOldKey(address))
+}
 
 // check for old account and upgrade it if we have one to the new account key
 export const upgradeOldAccount = function(networkId, address) {
-  if (!networkId || !address) { return null }
-  let account
-  let json = localStorage.getItem(`account-${address.toLowerCase()}`)
+  const envNetworkId = parseInt(process.env.REACT_APP_REQUIRED_NETWORK_ID, 10)
 
-  if (json && (json !== null)) {
-    account = setAccountLocalStorage(networkId, address, JSON.parse(json))
-    console.log(account)
+  if (!networkId || !address || (networkId !== envNetworkId)) { return }
+
+  let result
+  let json = localStorage.getItem(formatOldKey(address))
+
+  if (json) {
+    if (isBlank(json)) {
+      deleteOldAccount(address)
+    } else {
+      setAccountLocalStorage(networkId, address, JSON.parse(json))
+      result = true
+
+      deleteOldAccount(address)
+    }
   }
 
-  // delete the old key/val
-  localStorage.removeItem(`account-${address.toLowerCase()}`)
-
-  return account
+  return result
 }

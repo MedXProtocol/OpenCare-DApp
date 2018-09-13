@@ -20,11 +20,13 @@ import { BodyClass } from '~/components/BodyClass'
 import { Loading } from '~/components/Loading'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 import { PageTitle } from '~/components/PageTitle'
+import { upgradeOldAccount } from '~/services/upgradeOldAccount'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, ownProps) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
   if (!networkId) { return {} }
+
   const address = get(state, 'sagaGenesis.accounts[0]')
   const signedIn = state.account.signedIn
   const AccountManager = contractByName(state, 'AccountManager')
@@ -72,29 +74,13 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
     }
   }
 
-  // componentWillReceiveProps ?
-
-  onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
-    // this is solely to update the UI prior to running the decrypt code
-    this.props.setSigningIn()
-
-    this.props.setTimeout(() => {
-      this.doSubmit({ secretKey, masterPassword, overrideAccount })
-    }, 100)
-  }
-
-  doSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
-    this.props.signIn({
-      networkId: this.props.networkId,
-      secretKey,
-      masterPassword,
-      account: this.props.account,
-      address: this.props.address,
-      overrideAccount
-    })
+  componentDidMount () {
+    this.init(this.props)
   }
 
   componentWillReceiveProps(nextProps) {
+    this.init(nextProps)
+
     if (this.state.resetAccountHandler && this.state.transactionId) {
       this.state.resetAccountHandler.handle(nextProps.transactions[this.state.transactionId])
         .onError((error) => {
@@ -114,6 +100,32 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
           toastr.success('Your account has been reset.')
         })
     }
+  }
+
+  init(props) {
+    if (props.networkId && props.address) {
+      upgradeOldAccount(props.networkId, props.address)
+    }
+  }
+
+  onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
+    // this is solely to update the UI prior to running the decrypt code
+    this.props.setSigningIn()
+
+    this.props.setTimeout(() => {
+      this.doSubmit({ secretKey, masterPassword, overrideAccount })
+    }, 100)
+  }
+
+  doSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
+    this.props.signIn({
+      networkId: this.props.networkId,
+      secretKey,
+      masterPassword,
+      account: this.props.account,
+      address: this.props.address,
+      overrideAccount
+    })
   }
 
   handleReset = () => {

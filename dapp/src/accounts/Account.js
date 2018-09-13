@@ -13,7 +13,7 @@ import { isBlank } from '~/utils/isBlank'
 // NOTE: DANGEROUS
 // NOTE: DO NOT CHANGE THIS
 // NOTE: NOTE:
-export const ACCOUNT_VERSION = 9
+export const ACCOUNT_VERSION = 8
 
 export class Account {
 
@@ -91,7 +91,6 @@ export class Account {
   }
 
   store () {
-    console.log(this)
     setAccount(this.networkId(), this.address(), this.toJson())
   }
 

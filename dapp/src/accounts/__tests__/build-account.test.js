@@ -10,7 +10,6 @@ describe('buildAccount()', () => {
     const bytes = randomBytes(32)
     const secretKey = Buffer.from(bytes).toString('hex')
     const account = await buildAccount(1234, '0x1234', secretKey.toUpperCase(), 'masterPassword')
-    console.log(account)
     expect(account.address).toEqual('0x1234')
     expect(account.networkId).toEqual(1234)
   })

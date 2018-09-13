@@ -1,16 +1,10 @@
 import { put, call, takeEvery, select } from 'redux-saga/effects'
 import masterPasswordInvalid from '~/services/master-password-invalid'
-import { upgradeOldAccount } from '~/services/upgradeOldAccount'
 import { Account } from '~/accounts/Account'
 import { mixpanel } from '~/mixpanel'
 import { contractByName, web3Call } from '~/saga-genesis'
 
 export function* signUpSaga({ networkId, address, secretKey, masterPassword, overrideAccount }) {
-  console.log(networkId, address)
-  if (networkId && address) {
-    upgradeOldAccount(networkId, address)
-  }
-
   if (!address) {
     yield put({ type: 'SIGN_IN_ERROR', addressError: 'Address is not defined' })
     return
@@ -35,7 +29,6 @@ export function* signUpSaga({ networkId, address, secretKey, masterPassword, ove
   }
 
   if (differentAccountExists && !overrideAccount) {
-    console.log('hello')
     yield put({ type: 'SIGN_IN_ERROR', overrideError: true })
   } else {
     const account = yield call(Account.create, { networkId, address, secretKey, masterPassword })

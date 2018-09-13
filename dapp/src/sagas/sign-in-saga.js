@@ -2,18 +2,12 @@ import { put, takeEvery, call, select } from 'redux-saga/effects'
 import { signIn } from '~/services/sign-in'
 import secretKeyInvalid from '~/services/secret-key-invalid'
 import masterPasswordInvalid from '~/services/master-password-invalid'
-import { upgradeOldAccount } from '~/services/upgradeOldAccount'
 import { mixpanel } from '~/mixpanel'
 import { Account } from '~/accounts/Account'
 import { contractByName, web3Call } from '~/saga-genesis'
 
 // Here the sign in should perform the check
 export function* signInSaga({ networkId, secretKey, masterPassword, account, address, overrideAccount }) {
-  console.log(networkId, address)
-  if (networkId && address) {
-    upgradeOldAccount(networkId, address)
-  }
-
   var masterPasswordError = masterPasswordInvalid(masterPassword)
   if (masterPasswordError) {
     yield put({ type: 'SIGN_IN_ERROR', masterPasswordError })
