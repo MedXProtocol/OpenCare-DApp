@@ -20,6 +20,9 @@ function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
   const account = Account.get(networkId, address)
   const signedIn = state.account.signedIn
+  const missingCredentialsError = state.account.missingCredentialsError
+  const masterPasswordError = state.account.masterPasswordError
+  const signingIn = state.account.signingIn
   const overrideError = state.account.overrideError
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
@@ -28,6 +31,9 @@ function mapStateToProps(state) {
     networkId,
     address,
     signedIn,
+    signingIn,
+    missingCredentialsError,
+    masterPasswordError,
     overrideError,
     account,
     publicKey,
@@ -58,8 +64,7 @@ export const SignUp = class _SignUp extends Component {
       secretKey: genKey(32),
       showMasterPassword: false,
       showOverrideModal: false,
-      overrideModalHasBeenShown: false,
-      creating: false
+      overrideModalHasBeenShown: false
     }
   }
 
@@ -84,16 +89,14 @@ export const SignUp = class _SignUp extends Component {
 
   closeOverrideModal = () => {
     this.setState({
-      showOverrideModal: false,
-      creating: false
+      showOverrideModal: false
     })
     this.props.clearOverrideError()
   }
 
   onMasterPassword = (password) => {
     this.setState({
-      masterPassword: password,
-      creating: true
+      masterPassword: password
     }, () => {
       this.props.setTimeout(() => {
         this.props.signUp({
@@ -114,10 +117,10 @@ export const SignUp = class _SignUp extends Component {
       content = <Redirect to='/patients/cases' />
     } else if (this.state.showMasterPassword) {
       content = <MasterPasswordForm
-        networkId={this.props.networkId}
-        address={this.props.address}
+        masterPasswordError={this.props.masterPasswordError}
+        missingCredentialsError={this.props.missingCredentialsError}
         onMasterPassword={this.onMasterPassword}
-        creating={this.state.creating}
+        creating={this.props.signingIn}
       />
     } else {
       content = <SecretKeyContainer

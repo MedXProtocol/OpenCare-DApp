@@ -8,6 +8,8 @@ import PropTypes from 'prop-types'
 
 export const MasterPasswordForm = class _MasterPassword extends Component {
   static propTypes = {
+    masterPasswordError: PropTypes.string,
+    missingCredentialsError: PropTypes.string,
     onMasterPassword: PropTypes.func.isRequired,
     creating: PropTypes.bool.isRequired
   }
@@ -22,25 +24,22 @@ export const MasterPasswordForm = class _MasterPassword extends Component {
 
   onSubmit = (e) => {
     e.preventDefault()
-    let errorMessage = masterPasswordInvalid(this.state.masterPassword)
 
     if (this.state.masterPassword !== this.state.confirmMasterPassword) {
-      errorMessage = 'Both passwords must match'
-    } else if (!this.props.networkId || !this.props.address) {
-      errorMessage = 'Ethereum Address and/or Network ID is missing'
-    }
-
-    if (!errorMessage) {
-      this.props.onMasterPassword(this.state.masterPassword)
+      this.setState({ errorMessage: 'Both passwords must match' })
     } else {
-      this.setState({ errorMessage })
+      this.setState({ errorMessage: null }, () => {
+        this.props.onMasterPassword(this.state.masterPassword)
+      })
     }
   }
 
   render () {
-    var errorMessage = this.state.errorMessage
+    var errorMessage = this.state.errorMessage || this.props.masterPasswordError || this.props.missingCredentialsError
     if (errorMessage) {
-      var errorAlert = <Alert className='text-center' bsStyle='danger'>{this.state.errorMessage}</Alert>
+      var errorAlert = <Alert className='text-center' bsStyle='danger'>
+        {errorMessage}
+      </Alert>
     }
     return (
       <BodyClass isDark={true}>

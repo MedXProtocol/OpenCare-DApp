@@ -5,6 +5,13 @@ import { mixpanel } from '~/mixpanel'
 import { contractByName, web3Call } from '~/saga-genesis'
 
 export function* signUpSaga({ networkId, address, secretKey, masterPassword, overrideAccount }) {
+  yield put({ type: 'SIGNING_IN' })
+
+  if (!networkId || !address) {
+    yield put({ type: 'SIGN_IN_ERROR', missingCredentialsError: 'Ethereum Address and/or Network ID is missing' })
+    return
+  }
+
   var masterPasswordError = masterPasswordInvalid(masterPassword)
   if (masterPasswordError) {
     yield put({ type: 'SIGN_IN_ERROR', masterPasswordError })
