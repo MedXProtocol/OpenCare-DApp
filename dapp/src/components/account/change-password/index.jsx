@@ -55,24 +55,6 @@ export const ChangePassword = withSaga(saga)(
       }, this.doChange)
     }
 
-    onNewMasterPassword = async (account) => {
-      let dynamicNextPath = (this.props.isDoctor && this.props.isDermatologist)
-        ? routes.DOCTORS_CASES_OPEN
-        : routes.PATIENTS_CASES
-      let newAccount = await Account.create({
-        networkId: account.networkId(),
-        address: account.address(),
-        secretKey: account.secretKey(),
-        masterPassword: this.state.newMasterPassword
-      })
-      signIn(newAccount)
-
-      mixpanel.track("Change Password")
-
-      toastr.success('Your Master Password for this account has been changed.')
-      this.props.history.push(dynamicNextPath)
-    }
-      
     doChange = async () => {
       let currentPasswordError = ''
       let matchPasswordError = masterPasswordInvalid(this.state.newMasterPassword)
@@ -94,6 +76,24 @@ export const ChangePassword = withSaga(saga)(
       } else {
         this.onNewMasterPassword(account)
       }
+    }
+
+    onNewMasterPassword = async (account) => {
+      let dynamicNextPath = (this.props.isDoctor && this.props.isDermatologist)
+        ? routes.DOCTORS_CASES_OPEN
+        : routes.PATIENTS_CASES
+      let newAccount = await Account.create({
+        networkId: account.networkId(),
+        address: account.address(),
+        secretKey: account.secretKey(),
+        masterPassword: this.state.newMasterPassword
+      })
+      signIn(newAccount)
+
+      mixpanel.track("Change Password")
+
+      toastr.success('Your Master Password for this account has been changed.')
+      this.props.history.push(dynamicNextPath)
     }
 
     render() {

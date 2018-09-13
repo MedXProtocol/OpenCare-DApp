@@ -111,7 +111,7 @@ export const HippoNavbar = withContractRegistry(
 
   signOut = () => {
     this.props.dispatchSignOut()
-    this.props.history.push(routes.WELCOME)
+    this.props.history.push(routes.SIGN_IN)
   }
 
   toggleProfileMenu = (value) => {

@@ -20,7 +20,7 @@ export function* signInSaga({ networkId, secretKey, masterPassword, account, add
       yield put({ type: 'SIGN_IN_ERROR', secretKeyError })
       return
     }
-    console.log('account', account)
+    
     if (account) { // then the secret key must match the account secret key
       let newAccount = yield call([Account, 'build'], { networkId, address, secretKey, masterPassword })
       if (account.hashedSecretKey === newAccount.hashedSecretKey) {
