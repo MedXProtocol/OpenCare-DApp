@@ -13,7 +13,7 @@ import { isBlank } from '~/utils/isBlank'
 // NOTE: DANGEROUS
 // NOTE: DO NOT CHANGE THIS
 // NOTE: NOTE:
-export const ACCOUNT_VERSION = 8
+export const ACCOUNT_VERSION = 9
 
 export class Account {
 
@@ -91,7 +91,12 @@ export class Account {
   }
 
   store () {
-    setAccount(this.address(), this.toJson())
+    console.log(this)
+    setAccount(this.networkId(), this.address(), this.toJson())
+  }
+
+  networkId() {
+    return this._json.networkId
   }
 
   address() {
@@ -115,32 +120,32 @@ export class Account {
   }
 
   destroy () {
-    setAccount(this.address(), null)
+    setAccount(this.networkId(), this.address(), null)
   }
 }
 
-Account.create = async function ({ address, secretKey, masterPassword }) {
-  let account = await Account.build({ address, secretKey, masterPassword })
+Account.create = async function ({ networkId, address, secretKey, masterPassword }) {
+  let account = await Account.build({ networkId, address, secretKey, masterPassword })
   account._secretKey = secretKey
   account.store()
   return account
 }
 
-Account.build = async function ({ address, secretKey, masterPassword }) {
-  if (isBlank(address) || isBlank(secretKey) || isBlank(masterPassword)) {
+Account.build = async function ({ networkId, address, secretKey, masterPassword }) {
+  if (isBlank(networkId) || isBlank(address) || isBlank(secretKey) || isBlank(masterPassword)) {
     throw new Error(
-      'address, secretKey and masterPassword need to be provided as args to Account.create'
+      'networkId, address, secretKey and masterPassword need to be provided as args to Account.create'
     );
   }
-  const json = await buildAccount(address, secretKey, masterPassword)
+  const json = await buildAccount(networkId, address, secretKey, masterPassword)
   const account = new Account(json)
   account.setVersion(ACCOUNT_VERSION)
   account._secretKey = secretKey
   return account
 }
 
-Account.get = function (address) {
-  const json = getAccount(address)
+Account.get = function (networkId, address) {
+  const json = getAccount(networkId, address)
   let account = null
   if (json) {
     account = new Account(json)

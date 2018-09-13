@@ -23,6 +23,8 @@ import { PageTitle } from '~/components/PageTitle'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, ownProps) {
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+  if (!networkId) { return {} }
   const address = get(state, 'sagaGenesis.accounts[0]')
   const signedIn = state.account.signedIn
   const AccountManager = contractByName(state, 'AccountManager')
@@ -30,13 +32,14 @@ function mapStateToProps(state, ownProps) {
   const transactions = state.sagaGenesis.transactions
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
   return {
+    networkId,
     address,
     signedIn,
     isDoctor,
     DoctorManager,
     AccountManager,
     transactions,
-    account: Account.get(address)
+    account: Account.get(networkId, address)
   }
 }
 
@@ -45,8 +48,8 @@ function mapDispatchToProps(dispatch) {
     setSigningIn: () => {
       dispatch({ type: 'SIGNING_IN' })
     },
-    signIn: ({ secretKey, masterPassword, account, address, overrideAccount }) => {
-      dispatch({ type: 'SIGN_IN', secretKey, masterPassword, account, address, overrideAccount })
+    signIn: ({ networkId, secretKey, masterPassword, account, address, overrideAccount }) => {
+      dispatch({ type: 'SIGN_IN', networkId, secretKey, masterPassword, account, address, overrideAccount })
     }
   }
 }
@@ -69,6 +72,8 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
     }
   }
 
+  // componentWillReceiveProps ?
+
   onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
     // this is solely to update the UI prior to running the decrypt code
     this.props.setSigningIn()
@@ -80,6 +85,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
 
   doSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
     this.props.signIn({
+      networkId: this.props.networkId,
       secretKey,
       masterPassword,
       account: this.props.account,
@@ -121,7 +127,9 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
   }
 
   render () {
-    const { signedIn, account, isDoctor } = this.props
+    if (!this.props.networkId) { return null }
+
+    const { signedIn, account, isDoctor, isDermatologist } = this.props
     if (signedIn) {
       let path = isDoctor ? routes.DOCTORS_CASES_OPEN : routes.PATIENTS_CASES
       return <Redirect to={path} />

@@ -1,12 +1,11 @@
 import { storageAvailable } from '~/services/storageAvailable'
-import { setAccountCookie } from './setAccountCookie'
 import { setAccountLocalStorage } from './setAccountLocalStorage'
 
-export function setAccount(address, account) {
+export function setAccount(networkId, address, account) {
+  if (!address) { return }
   if (storageAvailable('localStorage')) {
-    setAccountLocalStorage(address, account)
-    setAccountCookie(address, null) // clear out the cookie
+    setAccountLocalStorage(networkId, address, account)
   } else {
-    setAccountCookie(address, account)
+    console.error('Unable to set account! Possibly no access to localStorage')
   }
 }

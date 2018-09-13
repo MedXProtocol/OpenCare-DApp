@@ -1,12 +1,11 @@
 import { storageAvailable } from '~/services/storageAvailable'
 import { getAccountLocalStorage } from './getAccountLocalStorage'
-import { getAccountCookie } from './getAccountCookie'
 
-export function getAccount(address) {
-  if (!address) { return null }
-  let account = getAccountCookie(address)
+export function getAccount(networkId, address) {
+  if (!address || !networkId) { return null }
+  let account
   if (storageAvailable('localStorage')) {
-    account = getAccountLocalStorage(address) || account
+    account = getAccountLocalStorage(networkId, address) || account
   }
   return account
 }

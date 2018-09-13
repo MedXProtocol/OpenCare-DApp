@@ -1,6 +1,8 @@
-import { formatLocalStorageAccountKey } from './formatLocalStorageAccountKey'
+import { formatAccountKey } from './formatAccountKey'
 
-export function setAccountLocalStorage(address, account) {
-  const key = formatLocalStorageAccountKey(address)
+export function setAccountLocalStorage(networkId, address, account) {
+  const key = formatAccountKey(networkId, address)
   localStorage.setItem(key, JSON.stringify(account))
+
+  return account
 }

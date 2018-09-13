@@ -65,8 +65,11 @@ export const ChangePassword = class _ChangePassword extends Component {
   }
 
   onNewMasterPassword = async (account) => {
-    let dynamicNextPath = this.props.isDoctor ? routes.DOCTORS_CASES_OPEN : routes.PATIENTS_CASES
+    let dynamicNextPath = (this.props.isDoctor && this.props.isDermatologist)
+      ? routes.DOCTORS_CASES_OPEN
+      : routes.PATIENTS_CASES
     let newAccount = await Account.create({
+      networkId: account.networkId(),
       address: account.address(),
       secretKey: account.secretKey(),
       masterPassword: this.state.newMasterPassword

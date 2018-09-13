@@ -1,9 +1,11 @@
-import { formatLocalStorageAccountKey } from './formatLocalStorageAccountKey'
+import { formatAccountKey } from './formatAccountKey'
 
-export function getAccountLocalStorage(address) {
-  let json = localStorage.getItem(formatLocalStorageAccountKey(address))
+export function getAccountLocalStorage(networkId, address) {
+  let json = localStorage.getItem(formatAccountKey(networkId, address))
+
   if (json) {
     json = JSON.parse(json)
   }
+  
   return json
 }
