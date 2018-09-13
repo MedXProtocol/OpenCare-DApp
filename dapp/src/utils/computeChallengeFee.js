@@ -1,7 +1,7 @@
-import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
 
 export function computeChallengeFee(caseFee) {
-  if (!caseFee) return new BigNumber(0)
-  const fee = new BigNumber(caseFee)
-  return fee.mul(50).div(100).floor()
+  if (!caseFee) return new BN(0)
+  const fee = new BN(caseFee)
+  return fee.mul(new BN(50)).div(new BN(100))
 }

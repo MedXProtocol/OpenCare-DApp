@@ -527,7 +527,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
           } else if (noDoctorsAvailable) {
             toastr.warning('There are no Doctors currently available. Please try again later.')
           } else if (this.state.errors.length === 0) {
-            if (computeTotalFee(caseFeeEtherWei).greaterThan(balance)) {
+            if (computeTotalFee(caseFeeEtherWei).gt(balance)) {
               if (hasBeenSentEther) {
                 this.setState({ showBalanceTooLowModal: true })
               } else {
