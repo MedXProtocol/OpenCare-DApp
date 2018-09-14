@@ -227,9 +227,10 @@ export const RegisterDoctorContainer =
                         Register a new Doctor
                       </h3>
                     </div>
-                    <div className="card-body">
-                      <div className="form-wrapper">
-                        <form onSubmit={this.handleSubmit}>
+
+                    <form onSubmit={this.handleSubmit}>
+                      <div className="card-body">
+                        <div className="form-wrapper">
                           <div className={classnames('form-group', { 'has-error': errors['address'] })}>
                             <label htmlFor="address">Address</label>
                             <input
@@ -297,13 +298,18 @@ export const RegisterDoctorContainer =
                               values={['Yes', 'No']}
                             />
                           </div>
-
-                          <div className="text-right">
-                            <button type="submit" className="btn btn-success btn-default">Register</button>
-                          </div>
-                        </form>
+                        </div>
                       </div>
-                    </div>
+
+                      <div className="card-footer text-right">
+                        <button
+                          type="submit"
+                          className="btn btn-success btn-lg">
+                          Register
+                        </button>
+                      </div>
+                    </form>
+
                   </div>
                 </div>
               </div>

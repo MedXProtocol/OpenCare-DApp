@@ -39,7 +39,7 @@ contract AdminSettings is Ownable, Initializable {
     revert();
   }
 
-  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
+  function initializeTarget(address _registry, bytes32) public notInitialized {
     setInitialized();
     owner = msg.sender;
     registry = Registry(_registry);

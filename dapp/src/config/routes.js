@@ -7,7 +7,7 @@ export const SIGN_UP = '/sign-up'
 export const HOME = '/'
 
 export const ADMIN_SETTINGS = '/admin/settings'
-export const DOCTORS_NEW = '/doctors/new'
+export const ADMIN_DOCTORS = '/admin/doctors'
 export const ADMIN_FEES = '/admin/fees'
 
 export const ACCOUNT_EMERGENCY_KIT = '/account/emergency-kit'

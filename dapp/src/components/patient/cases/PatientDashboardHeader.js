@@ -9,7 +9,7 @@ import {
   cacheCallValueInt,
   contractByName
 } from '~/saga-genesis'
-import { usageRestrictionsToString } from '~/utils/usageRestrictionsToString'
+import { usageRestrictionsToString } from '~/utils/usageRestrictions'
 import get from 'lodash.get'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faFileMedical from '@fortawesome/fontawesome-free-solid/faFileMedical';
@@ -101,7 +101,7 @@ export const PatientDashboardHeader = connect(mapStateToProps)(
                     <Link
                       className="btn btn-lg btn-success"
                       to={this.createCaseNotPermitted() ? '#' : routes.PATIENTS_CASES_NEW}
-                      disabled={this.createCaseNotPermitted() ? true : false}
+                      disabled={this.createCaseNotPermitted()}
                     >
                       <FontAwesomeIcon
                         icon={faFileMedical}

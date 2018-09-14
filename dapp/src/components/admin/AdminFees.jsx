@@ -90,8 +90,9 @@ export const AdminFees = connect(mapStateToProps)(
                       <div className="card-header">
                         <h3 className="title card-title">Fees</h3>
                       </div>
-                      <div className="card-body">
-                        <form onSubmit={this.onSubmitBaseCaseFee}>
+
+                      <form onSubmit={this.onSubmitBaseCaseFee}>
+                        <div className="card-body">
                           <div className="form-wrapper">
                             <div className='form-group'>
                               <label>New Case Fee (USD)</label>
@@ -103,16 +104,18 @@ export const AdminFees = connect(mapStateToProps)(
                                 onChange={(e) => this.setState({ newCaseFeeUsd: e.target.value })}
                                 />
                             </div>
-                            <div className='form-group'>
-                              <input
-                                disabled={!!this.state.setBaseCaseFeeId}
-                                type='submit'
-                                className='btn btn-sm btn-success'
-                                value='Update' />
-                            </div>
                           </div>
-                        </form>
-                      </div>
+                        </div>
+
+                        <div className="card-footer text-right">
+                          <input
+                            disabled={!!this.state.setBaseCaseFeeId}
+                            type='submit'
+                            className='btn btn-lg btn-success'
+                            value='Update Case Fee'
+                           />
+                        </div>
+                      </form>
                     </div>
                   </div>
                 </div>

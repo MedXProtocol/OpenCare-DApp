@@ -9,9 +9,9 @@ import { SignInContainer } from '~/components/sign-in'
 import { PatientDashboard } from '~/components/patient/dashboard'
 import { NewCase } from '~/components/patient/cases/NewCase'
 import { PatientCaseContainer } from '~/components/patient/cases/PatientCase'
-import { AdminSettings } from '~/components/AdminSettings'
-import { AddDoctor } from '~/components/doctors/new'
-import { AdminFees } from '~/components/AdminFees'
+import { AdminSettings } from '~/components/admin/AdminSettings'
+import { AdminDoctors } from '~/components/admin/AdminDoctors'
+import { AdminFees } from '~/components/admin/AdminFees'
 import { Mint } from '~/components/account/mint'
 import { WalletContainer } from '~/components/account/wallet'
 import { EmergencyKit } from '~/components/account/emergency-kit'
@@ -278,7 +278,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
             />
 
             <SignedInRoute path={routes.ADMIN_SETTINGS} component={AdminSettings} />
-            <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
+            <SignedInRoute path={routes.ADMIN_DOCTORS} component={AdminDoctors} />
             <SignedInRoute path={routes.ADMIN_FEES} component={AdminFees} />
 
             <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />

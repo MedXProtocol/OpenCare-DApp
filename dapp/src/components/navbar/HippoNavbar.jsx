@@ -252,8 +252,8 @@ export const HippoNavbar = withContractRegistry(
                 Settings
               </MenuItem>
             </LinkContainer>
-            <LinkContainer to={routes.DOCTORS_NEW}>
-              <MenuItem href={routes.DOCTORS_NEW}>
+            <LinkContainer to={routes.ADMIN_DOCTORS}>
+              <MenuItem href={routes.ADMIN_DOCTORS}>
                 Doctors
               </MenuItem>
             </LinkContainer>

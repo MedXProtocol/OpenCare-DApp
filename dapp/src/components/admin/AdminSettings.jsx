@@ -10,8 +10,11 @@ import {
   TransactionStateHandler
 } from '~/saga-genesis'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
-import { usageRestrictionsStringMap, usageRestrictionsToInt } from '~/utils/usageRestrictionsToInt'
-import { usageRestrictionsToString } from '~/utils/usageRestrictionsToString'
+import {
+  usageRestrictionsMapInverted,
+  usageRestrictionsToInt,
+  usageRestrictionsToString
+} from '~/utils/usageRestrictions'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
 
@@ -38,7 +41,7 @@ function* adminSettingsSaga({ AdminSettings }) {
 export const AdminSettings = connect(mapStateToProps)(
   withSaga(adminSettingsSaga)(
     withSend(
-      class _AdminDappSettings extends Component {
+      class _AdminSettings extends Component {
 
         constructor(props) {
           super(props)
@@ -116,7 +119,7 @@ export const AdminSettings = connect(mapStateToProps)(
                                   label='Contract Usage Restrictions'
                                   buttonGroupOnChange={this.handleButtonGroupOnChange}
                                   defaultValue={usageRestrictionsString}
-                                  values={Object.keys(usageRestrictionsStringMap).map(value => value)}
+                                  values={Object.keys(usageRestrictionsMapInverted).map(value => value)}
                                 />
                               : null
                           }
