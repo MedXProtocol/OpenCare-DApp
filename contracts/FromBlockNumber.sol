@@ -7,7 +7,7 @@ import './DelegateTarget.sol';
 contract FromBlockNumber is Ownable, Initializable, DelegateTarget {
   uint256 public blockNumber;
 
-  function initializeTarget (address _registry, bytes32 _key) public notInitialized {
+  function initializeTarget (address _registry, bytes32) public notInitialized {
     setInitialized();
     blockNumber = block.number;
     owner = msg.sender;

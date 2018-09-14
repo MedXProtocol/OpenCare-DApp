@@ -23,7 +23,7 @@ contract CasePaymentManager is Ownable, Initializable, DelegateTarget {
     _;
   }
 
-  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
+  function initializeTarget(address _registry, bytes32) public notInitialized {
     require(_registry != 0x0);
     setInitialized();
     owner = msg.sender;

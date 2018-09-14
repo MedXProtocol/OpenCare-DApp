@@ -31,7 +31,7 @@ contract DoctorManager is Ownable, Initializable, DelegateTarget {
   event DoctorDeactivated(address indexed doctor);
   event DoctorReactivated(address indexed doctor);
 
-  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
+  function initializeTarget(address, bytes32) public notInitialized {
     setInitialized();
     owner = msg.sender;
 

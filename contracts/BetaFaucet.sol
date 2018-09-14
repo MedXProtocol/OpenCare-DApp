@@ -33,13 +33,13 @@ contract BetaFaucet is Ownable, Initializable, DelegateTarget {
   event MedXSent(address indexed recipient, uint256 value);
 
   // `fallback` function called when eth is sent to this contract
-  function () payable {
+  function () public payable {
   }
 
   /**
    * @dev - Creates a new BetaFaucet contract with the given parameters
    */
-  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
+  function initializeTarget(address, bytes32) public notInitialized {
     setInitialized();
     owner = msg.sender;
   }

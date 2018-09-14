@@ -25,7 +25,7 @@ contract AccountManager is Initializable, DelegateTarget {
 
   event PublicKeySet(address indexed user, bytes publicKey);
 
-  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
+  function initializeTarget(address _registry, bytes32) public notInitialized {
     require(_registry != address(0), 'a registry address needs to be provided');
     owner = msg.sender;
     registry = Registry(_registry);
