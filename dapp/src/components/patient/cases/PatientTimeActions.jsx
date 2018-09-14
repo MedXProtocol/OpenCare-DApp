@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { defined } from '~/utils/defined'
 import { Button, Modal } from 'react-bootstrap'
 import ReactTooltip from 'react-tooltip'
 import { withRouter } from 'react-router-dom'
@@ -276,12 +277,17 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       }
     }
 
+    requestNewDoctorDataLoaded () {
+      const { encryptedCaseKey, caseKeySalt, CaseLifecycleManager, caseAddress } = this.props
+      return defined(encryptedCaseKey) && defined(caseKeySalt) && defined(CaseLifecycleManager) && defined(caseAddress)
+    }
+
     render () {
       const { diagnosingDoctor, account, updatedAt, status, secondsInADay, latestBlockTimestamp } = this.props
       const challengeFeeEther = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} noToggle />
-      let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
-
       const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient', secondsInADay, latestBlockTimestamp)
+      const loading = this.state.loading || !this.requestNewDoctorDataLoaded()
+      let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
       let buttons = (
         <div className="button-set__btn-clear">
