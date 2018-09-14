@@ -31,6 +31,7 @@ i18next
             setPublicKey: 'Registering Account',
             sendMedX: 'Sending {{mintMedxCount}} MEDT (Test MEDX)',
             sendEther: 'Sending 1 ETH',
+            mintDai: 'Mint DAI',
             withdraw: 'Withdrawing W-ETH',
             setBaseCaseFeeUsdWei: 'Updating case fee',
             approve: 'Approving DAI Spend'
