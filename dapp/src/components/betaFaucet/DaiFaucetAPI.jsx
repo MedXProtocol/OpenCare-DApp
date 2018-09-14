@@ -27,7 +27,7 @@ export const DaiFaucetAPI = ReactTimeout(class _DaiFaucetAPI extends Component {
   }
 
   doMintDai = async () => {
-    const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetMintDai`
+    const faucetLambdaURI = `${process.env.REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI}/betaFaucetSendDai`
 
     try {
       const response = await axiosInstance.get(`${faucetLambdaURI}?ethAddress=${this.props.address}`)
