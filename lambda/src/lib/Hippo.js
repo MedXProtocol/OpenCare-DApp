@@ -8,6 +8,7 @@ const betaFaucetArtifact = require("../../../build/contracts/BetaFaucet.json")
 const doctorManagerArtifact = require("../../../build/contracts/DoctorManager.json")
 const accountManagerArtifact = require("../../../build/contracts/AccountManager.json")
 const registryArtifact = require("../../../build/contracts/Registry.json")
+const daiArtifact = require("../../../build/contracts/Dai.json")
 
 function fail(msg) {
   throw new Error(msg)
@@ -108,6 +109,24 @@ export class Hippo {
         data
       }
       console.info('sendMedX tx: ', tx)
+      return this.sendTransaction(tx)
+    }).catch(error => {
+      console.info(error.message)
+      fail(error.message)
+    })
+  }
+
+  mintDai (ethAddress) {
+    return this.lookupContractAddress('Dai').then((daiAddress) => {
+      const method = daiArtifact.abi.find((obj) => obj.name === 'mint')
+      var data = abi.encodeMethod(method, [ethAddress, Eth.toWei('1000', 'ether')])
+      const tx = {
+        from: this.ownerAddress(),
+        to: daiAddress[0],
+        gas: 4000000,
+        gasPrice: Eth.toWei(20, 'gwei').toString(),
+        data
+      }
       return this.sendTransaction(tx)
     }).catch(error => {
       console.info(error.message)
