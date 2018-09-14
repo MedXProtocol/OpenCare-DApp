@@ -52,21 +52,17 @@ import { regions } from '~/lib/regions'
 
 function mapStateToProps (state) {
   const address = get(state, 'sagaGenesis.accounts[0]')
-  const BetaFaucet = contractByName(state, 'BetaFaucet')
   const CaseManager = contractByName(state, 'CaseManager')
   const CasePaymentManager = contractByName(state, 'CasePaymentManager')
   const Dai = contractByName(state, 'Dai')
   const WrappedEther = contractByName(state, 'WrappedEther')
 
-  const balance = get(state, 'sagaGenesis.ethBalance.balance')
   const caseFeeEtherWei = cacheCallValue(state, CasePaymentManager, 'caseFeeEtherWei')
   const caseFeeUsdWei = cacheCallValue(state, CasePaymentManager, 'baseCaseFeeUsdWei')
   const usdPerWei = cacheCallValue(state, CasePaymentManager, 'usdPerEther')
-  const networkId = get(state, 'sagaGenesis.network.networkId')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
   const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
-  const hasBeenSentEther = cacheCallValue(state, BetaFaucet, 'sentAddresses', address)
 
   return {
     AccountManager,
@@ -77,11 +73,7 @@ function mapStateToProps (state) {
     transactions: state.sagaGenesis.transactions,
     CaseManager,
     CasePaymentManager,
-    BetaFaucet,
-    hasBeenSentEther,
-    networkId,
     publicKey,
-    balance,
     noDoctorsAvailable,
     WrappedEther,
     Dai
@@ -90,9 +82,6 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    showBetaFaucetModal: () => {
-      dispatch({ type: 'SHOW_BETA_FAUCET_MODAL' })
-    },
     dispatchExcludedDoctors: (excludedAddresses) => {
       dispatch({ type: 'EXCLUDED_DOCTORS', excludedAddresses })
     },
@@ -102,13 +91,12 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ address, AccountManager, BetaFaucet, CaseManager, CasePaymentManager }) {
-  if (!address || !BetaFaucet || !AccountManager || !CaseManager || !CasePaymentManager) { return }
+function* saga({ address, AccountManager, CaseManager, CasePaymentManager }) {
+  if (!address || !AccountManager || !CaseManager || !CasePaymentManager) { return }
   yield cacheCall(AccountManager, 'publicKeys', address)
   yield cacheCall(CasePaymentManager, 'caseFeeEtherWei')
   yield cacheCall(CasePaymentManager, 'usdPerEther')
   yield cacheCall(CasePaymentManager, 'baseCaseFeeUsdWei')
-  yield cacheCall(BetaFaucet, 'sentAddresses', address)
 }
 
 const requiredFields = [
@@ -167,7 +155,6 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
             secondImageHash: null,
             secondImagePercent: null,
             sexuallyActive: null,
-            showBalanceTooLowModal: false,
             showPublicKeyModal: false,
             showTermsModal: false,
             spotRashOrAcne: null,
@@ -509,41 +496,24 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
 
         handleSubmit = async (event) => {
           const { address,
-            balance,
             caseFeeEtherWei,
-            noDoctorsAvailable,
-            hasBeenSentEther
+            noDoctorsAvailable
           } = this.props
           event.preventDefault()
 
           await this.runValidation()
 
-          if (!balance) {
-            toastr.warning('We are unable to read your Eth balance.')
-          } else if (!caseFeeEtherWei) {
+          if (!caseFeeEtherWei) {
             toastr.warning('The case fee has not been set.')
           } else if (this.state.selectedDoctor && this.state.selectedDoctor.value === address) {
             toastr.warning('You cannot be your own Doctor.')
           } else if (noDoctorsAvailable) {
             toastr.warning('There are no Doctors currently available. Please try again later.')
           } else if (this.state.errors.length === 0) {
-            if (computeTotalFee(caseFeeEtherWei).gt(balance)) {
-              if (hasBeenSentEther) {
-                this.setState({ showBalanceTooLowModal: true })
-              } else {
-                this.props.showBetaFaucetModal()
-              }
-            } else {
-              this.setState({
-                isSubmitting: true
-              }, this.doCreateCase)
-            }
+            this.setState({
+              isSubmitting: true
+            }, this.doCreateCase)
           }
-        }
-
-        handleCloseBalanceTooLowModal = (event) => {
-          event.preventDefault()
-          this.setState({ showBalanceTooLowModal: false })
         }
 
         handleCloseDisclaimerModal = (event) => {
@@ -696,20 +666,6 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
             msg = 'must be filled out'
           }
           return msg
-        }
-
-        faucetLink = () => {
-          let url
-
-          if (this.props.networkId === 1234) {
-            url = 'no faucet in development!'
-          } else if (this.props.networkId === 3) {
-            url = 'https://faucet.metamask.io/'
-          } else if (this.props.networkId === 4) {
-            url = 'https://faucet.rinkeby.io/'
-          }
-
-          return <a target="_blank" rel="noopener noreferrer" href={url}>{url}</a>
         }
 
         render() {
@@ -1025,44 +981,6 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
                     type="button"
                     className="btn btn-danger"
                   >Ok</button>
-                </Modal.Footer>
-              </Modal>
-
-              <Modal show={this.state.showBalanceTooLowModal}>
-                <Modal.Header>
-                  <div className="row">
-                    <div className="col-xs-12 text-center">
-                      <h4>
-                        Insufficient Funds
-                      </h4>
-                    </div>
-                  </div>
-                </Modal.Header>
-                <Modal.Body>
-                  <div className="row">
-                    <div className="col-xs-12 text-center">
-                      <p>
-                        You need at least <EtherFlip wei={computeTotalFee(this.props.caseFeeEtherWei)} /> (plus gas fees) to submit a case.
-                      </p>
-
-                      {this.props.hasBeenSentEther
-                        ? (
-                          <p>
-                            You can get more ether from the faucet: {this.faucetLink()}
-                          </p>
-                        )
-                        : null
-                      }
-
-                    </div>
-                  </div>
-                </Modal.Body>
-                <Modal.Footer>
-                  <button
-                    onClick={this.handleCloseBalanceTooLowModal}
-                    type="button"
-                    className="btn btn-primary"
-                  >Close</button>
                 </Modal.Footer>
               </Modal>
 
