@@ -10,7 +10,7 @@ export default function (state, { type, transactionId, call, options, error, rec
         [transactionId]: {
           transactionId,
           call,
-          options,
+          options: options || {},
           address,
           inFlight: true
         }
