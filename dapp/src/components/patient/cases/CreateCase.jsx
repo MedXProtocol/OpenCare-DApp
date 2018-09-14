@@ -3,9 +3,7 @@ import { connect } from 'react-redux'
 import { cold } from 'react-hot-loader';
 import {
   Button,
-  Modal,
-  OverlayTrigger,
-  Tooltip
+  Modal
 } from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import ReactTooltip from 'react-tooltip'
