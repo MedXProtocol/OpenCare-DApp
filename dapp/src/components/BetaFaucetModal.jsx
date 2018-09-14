@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
-import ReactCSSTransitionReplace from 'react-css-transition-replace';
+import ReactCSSTransitionReplace from 'react-css-transition-replace'
 import ReactTimeout from 'react-timeout'
+import { externalTransactionFinders } from '~/finders/externalTransactionFinders'
 import { cacheCall, withSaga, cacheCallValue, contractByName, nextId } from '~/saga-genesis'
 import { Modal } from 'react-bootstrap'
 import get from 'lodash.get'
@@ -12,7 +13,6 @@ import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
 import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps (state) {
-  let etherWasDripped, doctorWasAdded, daiWasMinted
   const Dai = contractByName(state, 'Dai')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const daiBalance = cacheCallValue(state, Dai, 'balanceOf', address)
@@ -28,17 +28,13 @@ function mapStateToProps (state) {
   const BetaFaucet = contractByName(state, 'BetaFaucet')
   const hasBeenSentEther = cacheCallValue(state, BetaFaucet, 'sentAddresses', address)
 
-  const externalTransactions = get(state, 'externalTransactions.transactions')
-  for (let i = 0; i < externalTransactions.length; i++) {
-    const { inFlight, txType, success } = externalTransactions[i]
-    if (txType === 'sendEther' && (inFlight || (!inFlight && success))) {
-      etherWasDripped = true
-    } else if (txType === 'addDoctor' && (inFlight || (!inFlight && success))) {
-      doctorWasAdded = true
-    } else if (txType === 'mintDai' && (inFlight || (!inFlight && success))) {
-      daiWasMinted = true
-    }
-  }
+  const sendEtherTx = externalTransactionFinders.sendEther(state)
+  const sendDaiTx = externalTransactionFinders.sendDai(state)
+  const addDoctorTx = externalTransactionFinders.addDoctor(state)
+
+  const etherWasDripped = sendEtherTx && (sendEtherTx.inFlight || sendEtherTx.success)
+  const doctorWasAdded = addDoctorTx && (addDoctorTx.inFlight || addDoctorTx.success)
+  const daiWasMinted = sendDaiTx && (sendDaiTx.inFlight || sendDaiTx.success)
 
   const fieldsAreUndefined = isDoctor === undefined || isDermatologist === undefined || hasBeenSentEther === undefined || ethBalance === undefined
   const canBeDoctor = (!isDoctor && !isDermatologist)

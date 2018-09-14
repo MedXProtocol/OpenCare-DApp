@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { cold } from 'react-hot-loader';
-import { Button, Modal } from 'react-bootstrap'
+import {
+  Button,
+  Modal
+} from 'react-bootstrap'
 import { toastr } from '~/toastr'
 import ReactTooltip from 'react-tooltip'
 import { withRouter } from 'react-router-dom'
@@ -25,6 +28,7 @@ import { DaiApproval } from '~/components/DaiApproval'
 import { DaiAllowance } from '~/components/DaiAllowance'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
 import { ControlLabel, ToggleButtonGroup, ToggleButton, ButtonToolbar } from 'react-bootstrap'
+import { externalTransactionFinders } from '~/finders/externalTransactionFinders'
 import {
   contractByName,
   cacheCall,
@@ -64,9 +68,16 @@ function mapStateToProps (state) {
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
   const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
 
+  const sendEtherTx = externalTransactionFinders.sendEther(state)
+  const sendDaiTx = externalTransactionFinders.sendDai(state)
+  const etherIsInflight = sendEtherTx && sendEtherTx.inFlight
+  const daiIsInFlight = sendDaiTx && sendDaiTx.inFlight
+
   return {
     AccountManager,
     address,
+    daiIsInFlight,
+    etherIsInflight,
     caseFeeEtherWei,
     caseFeeUsdWei,
     usdPerWei,
@@ -716,6 +727,12 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
             />
           }
 
+          if (this.props.daiIsInFlight) {
+            var submitButtonTooltip = 'Your DAI is still transferring'
+          } else if (this.props.etherIsInflight) {
+            submitButtonTooltip = 'Your Ether is still transferring'
+          }
+
           if (this.state.paymentMethod === 'ETH') {
             var caseFeeItem = <EtherFlip wei={computeTotalFee(this.props.caseFeeEtherWei) - computeChallengeFee(this.props.caseFeeEtherWei)} />
             var depositItem = <EtherFlip wei={computeChallengeFee(this.props.caseFeeEtherWei)} />
@@ -947,15 +964,15 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
                         </table>
                       </div>
 
-
                       <div className="card-footer text-right">
                         <button
                           type="submit"
                           className="btn btn-lg btn-success"
+                          data-tip=''
                         >
                           Submit Case
                         </button>
-                        <ReactTooltip effect='solid' place='top' />
+                        <ReactTooltip effect='solid' place='top' getContent={() => submitButtonTooltip} />
                       </div>
                     </form>
                   </div>

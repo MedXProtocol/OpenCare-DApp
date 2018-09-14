@@ -37,7 +37,7 @@ export const DaiFaucetAPI = ReactTimeout(class _DaiFaucetAPI extends Component {
           responseMessage: "We're sending you Dai",
           txHash: response.data.txHash
         })
-        this.props.addExternalTransaction('mintDai', response.data.txHash)
+        this.props.addExternalTransaction('sendDai', response.data.txHash)
       } else {
         this.setState({
           responseMessage: '',
