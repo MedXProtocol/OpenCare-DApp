@@ -14,8 +14,8 @@ import { weiToEther } from '~/utils/weiToEther'
 function mapStateToProps (state) {
   let etherWasDripped, doctorWasAdded, daiWasMinted
   const Dai = contractByName(state, 'Dai')
-  const daiBalance = cacheCallValue(state, Dai, 'balanceOf', address)
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const daiBalance = cacheCallValue(state, Dai, 'balanceOf', address)
   const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
   const manuallyOpened = get(state, 'betaFaucet.manuallyOpened')
@@ -161,7 +161,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
 
       render() {
         let content
-        let totalSteps = '2'
+        let totalSteps = '3'
         const { step } = this.state
         const {
           ethBalance,
