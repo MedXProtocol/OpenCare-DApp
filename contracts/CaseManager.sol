@@ -6,7 +6,6 @@ import './CaseLifecycleManager.sol';
 import './CaseScheduleManager.sol';
 import "./Delegate.sol";
 import "./Initializable.sol";
-import "./IEtherPriceFeed.sol";
 import "./MedXToken.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
@@ -69,7 +68,7 @@ contract CaseManager is Ownable, Pausable, Initializable, DelegateTarget {
     );
   }
 
-  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
+  function initializeTarget(address _registry, bytes32) public notInitialized {
     require(_registry != 0x0, 'registry is zero');
     setInitialized();
     registry = Registry(_registry);

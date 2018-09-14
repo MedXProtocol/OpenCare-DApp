@@ -6,5 +6,5 @@ https://etherscan.io/address/0x729D19f657BD0614b4985Cf1D82531c67569197B
 */
 
 interface IEtherPriceFeed {
-  function read() view returns (bytes32);
+  function read() external view returns (bytes32);
 }

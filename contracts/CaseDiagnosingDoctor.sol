@@ -36,7 +36,7 @@ contract CaseDiagnosingDoctor is Ownable, Initializable, DelegateTarget {
     revert();
   }
 
-  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
+  function initializeTarget(address _registry, bytes32) public notInitialized {
     require(_registry != address(0), 'registry is not blank');
     registry = Registry(_registry);
     owner = msg.sender;

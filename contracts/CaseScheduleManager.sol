@@ -81,7 +81,7 @@ contract CaseScheduleManager is Initializable, Ownable, DelegateTarget {
     revert();
   }
 
-  function initializeTarget(address _registry, bytes32 _key) public notInitialized {
+  function initializeTarget(address _registry, bytes32) public notInitialized {
     require(_registry != address(0), 'registry is not blank');
     registry = Registry(_registry);
     owner = msg.sender;
@@ -99,7 +99,7 @@ contract CaseScheduleManager is Initializable, Ownable, DelegateTarget {
     emit CaseUpdatedAt(_caseAddress, block.timestamp);
   }
 
-  function secondsInADay() public view returns (uint) {
+  function secondsInADay() public pure returns (uint) {
     return SECONDS_IN_A_DAY;
   }
 
