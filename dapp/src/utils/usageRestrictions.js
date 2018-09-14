@@ -20,7 +20,6 @@ export const usageRestrictionsToInt = function (usageRestrictionsString) {
 }
 
 export const usageRestrictionsToString = function (usageRestrictionsInt) {
-  console.log(usageRestrictionsInt)
   if (usageRestrictionsInt === undefined) { return }
 
   const usageRestrictionsString = usageRestrictionsMap[usageRestrictionsInt]

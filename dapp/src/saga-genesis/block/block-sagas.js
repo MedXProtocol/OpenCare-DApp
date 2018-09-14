@@ -33,8 +33,6 @@ function* collectTransactionAddresses(addressSet, transaction) {
   const from = yield call(addAddressIfExists, addressSet, transaction.from)
   if (to || from) {
     const receipt = yield call(getReceiptData, transaction.hash)
-    console.log('got new receipt: ', receipt)
-
     yield put({ type: 'BLOCK_TRANSACTION_RECEIPT', receipt })
   }
 }
@@ -62,8 +60,6 @@ function* transactionReceipt({ receipt }) {
     if (log.topics) {
       yield all(log.topics.map(function* (topic) {
         if (topic) {
-          console.log('got new topic: ', topic)
-
           // topics are 32 bytes and will have leading 0's padded for typical Eth addresses, ignore them
           const actualAddress = '0x' + topic.substr(26)
           yield call(addAddressIfExists, addressSet, actualAddress)
@@ -76,8 +72,6 @@ function* transactionReceipt({ receipt }) {
 
 export function* invalidateAddressSet(addressSet) {
   yield all(Array.from(addressSet).map(function* (address) {
-    console.log('invalidateAddress', address)
-
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   }))
 }
@@ -87,36 +81,50 @@ export function* collectAllTransactionAddresses(transactions) {
   yield all(transactions.map(function* (transaction) {
     yield call(collectTransactionAddresses, addressSet, transaction)
   }))
-  console.log('addressSet', addressSet)
 
   return addressSet
 }
 
 export function* latestBlock({ block }) {
   try {
-    console.log('processing block', block)
     const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
     yield call(invalidateAddressSet, addressSet)
   } catch (e) {
     bugsnagClient.notify(e)
   }
+  try {
+  } catch (e) {
+    bugsnagClient.notify(e)
+  }
 }
 
+let attempt = 1
+
 function* updateCurrentBlockNumber() {
-  const web3 = yield getContext('web3')
-  const blockNumber = yield call(web3.eth.getBlockNumber)
-  console.log('updateCurrentBlockNumber', blockNumber)
-  const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
-  console.log('updateCurrentBlockNumber', currentBlockNumber)
-  if (blockNumber !== currentBlockNumber) {
-    console.log('blockNumber: ', blockNumber)
-    console.log('currentBlockNumber: ', currentBlockNumber)
-    yield put({
-      type: 'UPDATE_BLOCK_NUMBER',
-      blockNumber,
-      lastBlockNumber: currentBlockNumber
-    })
+  try {
+    const web3 = yield getContext('web3')
+    if (attempt === 2) {
+      console.log(web3)
+      console.log(web3.eth)
+      console.log(web3.eth.getBlockNumber)
+    }
+    attempt++
+
+    const blockNumber = yield call(web3.eth.getBlockNumber)
+    const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
+    console.log('blockNumber', blockNumber, 'updateCurrentBlockNumber', currentBlockNumber)
+    if (blockNumber !== currentBlockNumber) {
+      yield put({
+        type: 'UPDATE_BLOCK_NUMBER',
+        blockNumber,
+        lastBlockNumber: currentBlockNumber
+      })
+    }
+  } catch (exception) {
+    console.warn(exception)
+    bugsnagClient.notify(exception)
   }
+
 }
 
 function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
@@ -125,7 +133,6 @@ function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
   try {
     for (var i = lastBlockNumber + 1; i <= blockNumber; i++) {
       const block = yield call(getBlockData, i)
-      console.log('got new block: ', block)
       yield put({ type: 'BLOCK_LATEST', block })
     }
   } catch (e) {
@@ -152,13 +159,11 @@ function* getBlockData(blockId) {
 function* startBlockPolling() {
   while (true) {
     try {
-      console.log('blockPolling try')
       yield call(updateCurrentBlockNumber)
     } catch (e) {
       bugsnagClient.notify(e)
     }
-    console.log('call delay')
-    yield call(delay, 1000)
+    yield call(delay, 10000)
   }
 }
 
