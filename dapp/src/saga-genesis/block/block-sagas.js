@@ -76,6 +76,8 @@ function* transactionReceipt({ receipt }) {
 
 export function* invalidateAddressSet(addressSet) {
   yield all(Array.from(addressSet).map(function* (address) {
+    console.log('invalidateAddress', address)
+
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   }))
 }
@@ -85,11 +87,14 @@ export function* collectAllTransactionAddresses(transactions) {
   yield all(transactions.map(function* (transaction) {
     yield call(collectTransactionAddresses, addressSet, transaction)
   }))
+  console.log('addressSet', addressSet)
+
   return addressSet
 }
 
 export function* latestBlock({ block }) {
   try {
+    console.log('processing block', block)
     const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
     yield call(invalidateAddressSet, addressSet)
   } catch (e) {

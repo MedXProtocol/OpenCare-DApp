@@ -1,5 +1,5 @@
 import {
-  call,
+  call as reduxSagaCall,
   fork,
   put,
   select,
@@ -12,6 +12,7 @@ import { bugsnagClient } from '~/bugsnagClient'
 
 export function* checkExternalTransactionReceipts(web3) {
   try {
+    const web3 = yield getContext('web3')
     const transactions = yield select((state) => state.externalTransactions.transactions)
 
     for (let i = 0; i < transactions.length; i++) {
@@ -20,7 +21,11 @@ export function* checkExternalTransactionReceipts(web3) {
         continue
       }
 
-      const receipt = yield call(web3.eth.getTransactionReceipt, txHash)
+      console.log(txHash)
+      console.log('web3', web3)
+      console.log('web3.eth', web3.eth)
+      console.log('web3.eth.getTransactionReceipt', web3.eth.getTransactionReceipt)
+      const receipt = yield reduxSagaCall(web3.eth.getTransactionReceipt, txHash)
 
       if (receipt) {
         if (receipt.status) {
@@ -39,15 +44,13 @@ export function* checkExternalTransactionReceipts(web3) {
   }
 }
 
-export function* pollTransactions(web3) {
+export function* pollTransactions() {
   while (true) {
-    yield call(checkExternalTransactionReceipts, web3)
-    yield call(delay, 2000)
+    yield reduxSagaCall(checkExternalTransactionReceipts)
+    yield reduxSagaCall(delay, 2000)
   }
 }
 
 export function* pollExternalTransactionsSaga() {
-  const web3 = yield getContext('web3')
-
-  yield fork(pollTransactions, web3)
+  yield fork(pollTransactions)
 }
