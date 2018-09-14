@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
+import { toBN } from '~/utils/toBN'
 import { connect } from 'react-redux'
-import { cold } from 'react-hot-loader';
+import { cold } from 'react-hot-loader'
 import {
   Button,
   Modal
@@ -23,7 +24,6 @@ import { computeChallengeFee } from '~/utils/computeChallengeFee'
 import { computeTotalFee } from '~/utils/computeTotalFee'
 import { EtherFlip } from '~/components/EtherFlip'
 import { Dai } from '~/components/Dai'
-import { DaiBalance } from '~/components/DaiBalance'
 import { DaiApproval } from '~/components/DaiApproval'
 import { DaiAllowance } from '~/components/DaiAllowance'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
@@ -60,6 +60,7 @@ function mapStateToProps (state) {
   const CasePaymentManager = contractByName(state, 'CasePaymentManager')
   const Dai = contractByName(state, 'Dai')
   const WrappedEther = contractByName(state, 'WrappedEther')
+  const daiBalance = cacheCallValue(state, Dai, 'balanceOf', address)
 
   const caseFeeEtherWei = cacheCallValue(state, CasePaymentManager, 'caseFeeEtherWei')
   const caseFeeUsdWei = cacheCallValue(state, CasePaymentManager, 'baseCaseFeeUsdWei')
@@ -76,6 +77,7 @@ function mapStateToProps (state) {
   return {
     AccountManager,
     address,
+    daiBalance,
     daiIsInFlight,
     etherIsInflight,
     caseFeeEtherWei,
@@ -102,12 +104,13 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-function* saga({ address, AccountManager, CaseManager, CasePaymentManager }) {
-  if (!address || !AccountManager || !CaseManager || !CasePaymentManager) { return }
+function* saga({ address, Dai, AccountManager, CaseManager, CasePaymentManager }) {
+  if (!address || !Dai || !AccountManager || !CaseManager || !CasePaymentManager) { return }
   yield cacheCall(AccountManager, 'publicKeys', address)
   yield cacheCall(CasePaymentManager, 'caseFeeEtherWei')
   yield cacheCall(CasePaymentManager, 'usdPerEther')
   yield cacheCall(CasePaymentManager, 'baseCaseFeeUsdWei')
+  yield cacheCall(Dai, 'balanceOf', address)
 }
 
 const requiredFields = [
@@ -739,11 +742,15 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
             var totalItem = <EtherFlip wei={computeTotalFee(this.props.caseFeeEtherWei)} />
           } else {
             const totalFeeUsdWei = computeTotalFee(this.props.caseFeeUsdWei)
-            // var daiApprovalButton = <DaiApproval address={this.props.address} requiredWei={totalFeeUsdWei} />
+            const daiBalance = toBN(this.props.daiBalance)
+            let insufficientFunds = false
+            if (totalFeeUsdWei.gt(daiBalance)) {
+              insufficientFunds = true
+            }
             var daiBalanceRow =
               <tr>
                 <th>Your DAI balance:</th>
-                <td><DaiBalance address={this.props.address} /></td>
+                <td><span className={classnames({ 'danger': insufficientFunds })}><Dai wei={this.props.daiBalance} /></span></td>
               </tr>
             var daiApprovalRow =
               <tr>
