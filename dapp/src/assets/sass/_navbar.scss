@@ -103,12 +103,12 @@
 .nav--open-cases__circle {
   font-size: 11px;
   font-weight: bold;
-  height: 18px;
+  height: 20px;
   position: absolute;
-  left: 130px;
+  right: 0px;
   top: 12px;
   text-align: center;
-  width: 18px;
+  width: 20px;
   z-index: 1;
 
   @media (max-width: 768px) {
@@ -121,11 +121,11 @@
   border-radius: 100%;
   content: "";
   display: inline-block;
-  height: 18px;
+  height: 20px;
   left: 0;
   position: absolute;
-  top: 1px;
-  width: 18px;
+  top: -1px;
+  width: 20px;
   z-index: -1;
 }
 
