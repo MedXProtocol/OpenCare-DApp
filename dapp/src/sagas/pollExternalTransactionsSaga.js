@@ -8,6 +8,7 @@ import {
 import {
   delay
 } from 'redux-saga'
+import { bugsnagClient } from '~/bugsnagClient'
 
 export function* checkExternalTransactionReceipts(web3) {
   try {
@@ -19,7 +20,7 @@ export function* checkExternalTransactionReceipts(web3) {
         continue
       }
 
-      const receipt = yield web3.eth.getTransactionReceipt(txHash)
+      const receipt = yield call(web3.eth.getTransactionReceipt, txHash)
 
       if (receipt) {
         if (receipt.status) {
@@ -34,7 +35,7 @@ export function* checkExternalTransactionReceipts(web3) {
       }
     }
   } catch (error) {
-    console.error(error)
+    bugsnagClient.notify(error)
   }
 }
 

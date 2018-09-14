@@ -13,6 +13,7 @@ import {
 import {
   contractKeyByAddress
 } from '../state-finders'
+import { bugsnagClient } from '~/bugsnagClient'
 
 const MAX_RETRIES = 50
 
@@ -41,7 +42,7 @@ function* collectTransactionAddresses(addressSet, transaction) {
 function* getReceiptData(txHash) {
   const web3 = yield getContext('web3')
   for (let i = 0; i < MAX_RETRIES; i++) {
-    const receipt = yield web3.eth.getTransactionReceipt(txHash)
+    const receipt = yield call(web3.eth.getTransactionReceipt, txHash)
 
     if (receipt) {
       return receipt
@@ -88,13 +89,17 @@ export function* collectAllTransactionAddresses(transactions) {
 }
 
 export function* latestBlock({ block }) {
-  const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
-  yield call(invalidateAddressSet, addressSet)
+  try {
+    const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
+    yield call(invalidateAddressSet, addressSet)
+  } catch (e) {
+    bugsnagClient.notify(e)
+  }
 }
 
 function* updateCurrentBlockNumber() {
   const web3 = yield getContext('web3')
-  const blockNumber = yield web3.eth.getBlockNumber()
+  const blockNumber = yield call(web3.eth.getBlockNumber)
   const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
   if (blockNumber !== currentBlockNumber) {
     console.log('blockNumber: ', blockNumber)
@@ -110,17 +115,21 @@ function* updateCurrentBlockNumber() {
 function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
   if (!lastBlockNumber) { return }
 
-  for (var i = lastBlockNumber + 1; i <= blockNumber; i++) {
-    const block = yield call(getBlockData, i)
-    console.log('got new block: ', block)
-    yield put({ type: 'BLOCK_LATEST', block })
+  try {
+    for (var i = lastBlockNumber + 1; i <= blockNumber; i++) {
+      const block = yield call(getBlockData, i)
+      console.log('got new block: ', block)
+      yield put({ type: 'BLOCK_LATEST', block })
+    }
+  } catch (e) {
+    bugsnagClient.notify(e)
   }
 }
 
 function* getBlockData(blockId) {
   const web3 = yield getContext('web3')
   for (let i = 0; i < MAX_RETRIES; i++) {
-    const block = yield web3.eth.getBlock(blockId, true)
+    const block = yield call(web3.eth.getBlock, blockId, true)
 
     if (block) {
       return block
@@ -135,7 +144,11 @@ function* getBlockData(blockId) {
 
 function* startBlockPolling() {
   while (true) {
-    yield call(updateCurrentBlockNumber)
+    try {
+      yield call(updateCurrentBlockNumber)
+    } catch (e) {
+      bugsnagClient.notify(e)
+    }
     yield call(delay, 1000)
   }
 }

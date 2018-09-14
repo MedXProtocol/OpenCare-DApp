@@ -8,6 +8,7 @@ import {
 import {
   delay
 } from 'redux-saga'
+import { bugsnagClient } from '~/bugsnagClient'
 
 export function* refreshNetwork() {
   const web3 = yield getContext('web3')
@@ -20,7 +21,7 @@ export function* refreshNetwork() {
       yield put({type: 'WEB3_NETWORK_ID', web3, networkId})
     }
   } catch(e) {
-    console.log('Network request failed: ' + e.message)
+    bugsnagClient.notify(e)
   }
 }
 
