@@ -120,7 +120,7 @@ export const SignUp = class _SignUp extends Component {
         masterPasswordError={this.props.masterPasswordError}
         missingCredentialsError={this.props.missingCredentialsError}
         onMasterPassword={this.onMasterPassword}
-        creating={this.props.signingIn}
+        creating={this.props.signingIn || false}
       />
     } else {
       content = <SecretKeyContainer
