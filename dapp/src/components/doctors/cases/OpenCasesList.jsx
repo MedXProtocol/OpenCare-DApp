@@ -5,6 +5,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { formatRoute } from 'react-router-named-routes'
 import * as routes from '~/config/routes'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import faArrowAltCircleLeft from '@fortawesome/fontawesome-free-regular/faArrowAltCircleLeft'
+import faArrowAltCircleRight from '@fortawesome/fontawesome-free-regular/faArrowAltCircleRight'
 import FlipMove from 'react-flip-move'
 import { CaseRow } from '~/components/CaseRow'
 import get from 'lodash.get'
@@ -88,7 +91,9 @@ export const OpenCasesList = connect(mapStateToProps)(
         if (this.hasNextPage()) {
           nextPageLink =
             <li className='pagination--page-number'>
-              <a onClick={this.props.onNextPage}>{this.props.page + 1}</a>
+              <a onClick={this.props.onNextPage}>
+                Next Page <FontAwesomeIcon icon={faArrowAltCircleRight} />
+              </a>
             </li>
         }
 
@@ -96,7 +101,9 @@ export const OpenCasesList = connect(mapStateToProps)(
         if (this.props.page > 1) {
           prevPageLink =
             <li className='pagination--page-number'>
-              <a onClick={this.props.onPrevPage}>{this.props.page - 1}</a>
+              <a onClick={this.props.onPrevPage}>
+                <FontAwesomeIcon icon={faArrowAltCircleLeft} /> Previous Page
+              </a>
             </li>
         }
 
@@ -132,7 +139,7 @@ export const OpenCasesList = connect(mapStateToProps)(
                 <ul className="pagination">
                   {prevPageLink}
                   <li className='pagination--page-number active'>
-                    <a>{this.props.page}</a>
+                    <a>Page {this.props.page}</a>
                   </li>
                   {nextPageLink}
                 </ul>
