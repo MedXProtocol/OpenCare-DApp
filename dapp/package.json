@@ -91,7 +91,7 @@
     "uglify-js": "3.4.9",
     "uglifyjs-webpack-plugin": "1.3.0",
     "url-loader": "0.6.2",
-    "web3": "^1.0.0-beta.34",
+    "web3": "1.0.0-beta.35",
     "webpack": "^3.8.1",
     "webpack-bugsnag-plugin": "^0.1.4",
     "webpack-manifest-plugin": "1.3.2",
