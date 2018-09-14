@@ -10,19 +10,22 @@ import {
   TransactionStateHandler
 } from '~/saga-genesis'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
-import { usageRestrictionsToInt } from '~/utils/usageRestrictionsToInt'
+import { usageRestrictionsStringMap, usageRestrictionsToInt } from '~/utils/usageRestrictionsToInt'
+import { usageRestrictionsToString } from '~/utils/usageRestrictionsToString'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
 
 function mapStateToProps(state) {
   const transactions = state.sagaGenesis.transactions
   const AdminSettings = contractByName(state, 'AdminSettings')
-  const usageRestrictions = cacheCallValueInt(state, 'usageRestrictions')
+  const usageRestrictions = cacheCallValueInt(state, AdminSettings, 'usageRestrictions')
+  const usageRestrictionsString = usageRestrictionsToString(usageRestrictions)
 
   return {
     AdminSettings,
     transactions,
-    usageRestrictions
+    usageRestrictions,
+    usageRestrictionsString
   }
 }
 
@@ -41,14 +44,18 @@ export const AdminSettings = connect(mapStateToProps)(
           super(props)
 
           this.state = {
-            setUsageRestrictionsTxId: null,
-            usageRestrictions: null
+            setUsageRestrictionsTxId: null
           }
         }
 
-        componentWillReceiveProps (props) {
+        componentWillReceiveProps (nextProps) {
+          const { usageRestrictionsString } = nextProps
+          if (!this.state.usageRestrictionsString && usageRestrictionsString) {
+            this.setState({ usageRestrictionsString })
+          }
+
           if (this.state.setUsageRestrictionsTxId) {
-            this.state.setUsageRestrictionsHandler.handle(props.transactions[this.state.setUsageRestrictionsTxId])
+            this.state.setUsageRestrictionsHandler.handle(nextProps.transactions[this.state.setUsageRestrictionsTxId])
               .onError((error) => {
                 toastr.transactionError(error)
                 this.setState({ setUsageRestrictionsTxId: null, setUsageRestrictionsHandler: null })
@@ -71,7 +78,7 @@ export const AdminSettings = connect(mapStateToProps)(
           const setUsageRestrictionsTxId = this.props.send(
             this.props.AdminSettings,
             'setUsageRestrictions',
-            usageRestrictionsToInt(this.state.usageRestrictions)
+            usageRestrictionsToInt(this.state.usageRestrictionsString)
           )()
 
           this.setState({
@@ -85,7 +92,7 @@ export const AdminSettings = connect(mapStateToProps)(
         }
 
         render() {
-          const { usageRestrictions } = this.props
+          const { usageRestrictionsString } = this.props
 
           return (
             <div>
@@ -100,15 +107,22 @@ export const AdminSettings = connect(mapStateToProps)(
 
                       <form onSubmit={this.handleSubmitUsageRestrictions}>
                         <div className="card-body">
-                          <HippoToggleButtonGroup
-                            id='usageRestrictions'
-                            name='usageRestrictions'
-                            colClasses='col-xs-12'
-                            label='Contract Usage Restrictions'
-                            buttonGroupOnChange={this.handleButtonGroupOnChange}
-                            selectedValues={usageRestrictions}
-                            values={['Locked', 'Open To Everyone', 'Only Doctors']}
-                          />
+                          {
+                            usageRestrictionsString
+                              ? <HippoToggleButtonGroup
+                                  id='usageRestrictionsString'
+                                  name='usageRestrictionsString'
+                                  colClasses='col-xs-12'
+                                  label='Contract Usage Restrictions'
+                                  buttonGroupOnChange={this.handleButtonGroupOnChange}
+                                  defaultValue={usageRestrictionsString}
+                                  values={Object.keys(usageRestrictionsStringMap).map(value => value)}
+                                />
+                              : null
+                          }
+                          <p>
+                            <strong>Currently:</strong> {usageRestrictionsString}
+                          </p>
                         </div>
 
                         <div className="card-footer text-right">
