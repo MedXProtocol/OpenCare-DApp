@@ -10,8 +10,8 @@ function* web3Initialize() {
     console.log(typeof process.env.REACT_APP_REQUIRED_NETWORK_ID)
     console.log(process.env.REACT_APP_REQUIRED_NETWORK_ID)
     if (process.env.REACT_APP_REQUIRED_NETWORK_ID === '4') {
-      web3 = new Web3(process.env.RINKEBY_PROVIDER_URL)
-      console.log('web3 set to ', process.env.RINKEBY_PROVIDER_URL)
+      web3 = new Web3('https://rinkeby.infura.io/To0546l6M9AapR2JxoHN')
+      console.log('web3 set to ', 'https://rinkeby.infura.io/To0546l6M9AapR2JxoHN')
     } else {
       web3 = new Web3(window.web3.currentProvider)
       console.log('web3 set to ', window.web3.currentProvider)
