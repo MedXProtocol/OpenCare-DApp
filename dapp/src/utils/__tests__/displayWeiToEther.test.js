@@ -10,6 +10,11 @@ describe('displayWeiToEther', () => {
         .toEqual('1,235,213.1235')
     })
 
+    test('will still render the first zero', () => {
+      expect(displayWeiToEther(web3.utils.toWei('0.1234999', 'ether')))
+        .toEqual('0.1235')
+    })
+
     test('will exclude decimals if theyre zero', () => {
       expect(displayWeiToEther(web3.utils.toWei('1200', 'ether')))
         .toEqual('1,200')
