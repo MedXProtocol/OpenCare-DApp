@@ -92,7 +92,7 @@ export const OpenCasesList = connect(mapStateToProps)(
           nextPageLink =
             <li className='pagination--page-number'>
               <a onClick={this.props.onNextPage}>
-                Next Page <FontAwesomeIcon icon={faArrowAltCircleRight} />
+                Next <FontAwesomeIcon icon={faArrowAltCircleRight} />
               </a>
             </li>
         }
@@ -102,7 +102,7 @@ export const OpenCasesList = connect(mapStateToProps)(
           prevPageLink =
             <li className='pagination--page-number'>
               <a onClick={this.props.onPrevPage}>
-                <FontAwesomeIcon icon={faArrowAltCircleLeft} /> Previous Page
+                <FontAwesomeIcon icon={faArrowAltCircleLeft} /> Previous
               </a>
             </li>
         }
