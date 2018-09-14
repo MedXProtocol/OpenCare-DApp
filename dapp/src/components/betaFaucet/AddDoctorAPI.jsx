@@ -247,8 +247,7 @@ export const AddDoctorAPI = ReactTimeout(
             <div className="text-center">
               <strong>Would you like to Diagnose Cases?</strong>
               <p>
-                During this version of the beta you can opt to become a
-                <br />Doctor and diagnose patient cases.
+                During this version of the beta you can opt to become a Doctor and diagnose patient cases.
               </p>
             </div>
             <form onSubmit={this.handleSubmit}>

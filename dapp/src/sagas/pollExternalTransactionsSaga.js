@@ -21,10 +21,6 @@ export function* checkExternalTransactionReceipts(web3) {
         continue
       }
 
-      console.log(txHash)
-      console.log('web3', web3)
-      console.log('web3.eth', web3.eth)
-      console.log('web3.eth.getTransactionReceipt', web3.eth.getTransactionReceipt)
       const receipt = yield reduxSagaCall(web3.eth.getTransactionReceipt, txHash)
 
       if (receipt) {

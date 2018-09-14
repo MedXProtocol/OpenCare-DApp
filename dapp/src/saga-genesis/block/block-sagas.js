@@ -105,7 +105,9 @@ export function* latestBlock({ block }) {
 function* updateCurrentBlockNumber() {
   const web3 = yield getContext('web3')
   const blockNumber = yield call(web3.eth.getBlockNumber)
+  console.log('updateCurrentBlockNumber', blockNumber)
   const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
+  console.log('updateCurrentBlockNumber', currentBlockNumber)
   if (blockNumber !== currentBlockNumber) {
     console.log('blockNumber: ', blockNumber)
     console.log('currentBlockNumber: ', currentBlockNumber)
@@ -150,10 +152,12 @@ function* getBlockData(blockId) {
 function* startBlockPolling() {
   while (true) {
     try {
+      console.log('blockPolling try')
       yield call(updateCurrentBlockNumber)
     } catch (e) {
       bugsnagClient.notify(e)
     }
+    console.log('call delay')
     yield call(delay, 1000)
   }
 }
