@@ -17,15 +17,15 @@ function getMobileOperatingSystem() {
 }
 
 function unsupportedBrowser() {
+  const _web3 = getWeb3()
   const userAgent = navigator.userAgent || navigator.vendor || window.opera
 
   // Cipher & Status are not supported
   // Cipher is discontinued
-  // Status doesn't support file uploads and is generally not ready for production
-  // (Status claims the `isStatus` bool should be set but it wasn't on Android Sept 7/2018)
+  // Status doesn't support file uploads and is not ready for production
   if (/Cipher/.test(userAgent)) {
     return true
-  } else if (getWeb3().currentProvider && getWeb3().currentProvider.isStatus) {
+  } else if (_web3 && _web3.givenProvider && _web3.givenProvider.isStatus) {
     return true
   }
 

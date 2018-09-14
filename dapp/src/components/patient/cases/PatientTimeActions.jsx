@@ -292,14 +292,14 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       let buttons = (
         <div className="button-set__btn-clear">
           <Button
-            disabled={this.state.loading}
+            disabled={loading}
             onClick={this.handlePatientWithdraw}
             className="btn btn-sm btn-clear"
           >
             Close Case &amp; Withdraw Funds
           </Button>
           <Button
-            disabled={this.state.loading}
+            disabled={loading}
             onClick={this.handleShowRequestNewDoctorModal}
             className="btn btn-sm btn-clear"
           >
@@ -313,14 +313,14 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         buttons = (
           <div className="button-set__btn-clear">
             <Button
-              disabled={this.state.loading}
+              disabled={loading}
               onClick={this.handlePatientAcceptDiagnosis}
               className="btn btn-sm btn-clear"
             >
               Accept Initial Diagnosis<br /> (Withdraw {challengeFeeEther})
             </Button>
             <Button
-              disabled={this.state.loading}
+              disabled={loading}
               onClick={this.handleShowRequestNewDoctorModal}
               className="btn btn-sm btn-clear"
             >
@@ -407,7 +407,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
               </form>
             </Modal>
 
-            <Loading loading={this.state.loading} />
+            <Loading loading={loading} />
           </React.Fragment>
         )
       }
