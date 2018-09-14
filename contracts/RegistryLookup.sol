@@ -1,6 +1,7 @@
 pragma solidity ^0.4.23;
 
 import './AccountManager.sol';
+import './AdminSettings.sol';
 import './Case.sol';
 import './CaseDiagnosingDoctor.sol';
 import './CaseManager.sol';
@@ -68,5 +69,9 @@ library RegistryLookup {
 
   function etherPriceFeed(Registry self) internal view returns (IEtherPriceFeed) {
     return IEtherPriceFeed(self.lookup(keccak256('EtherPriceFeed')));
+  }
+
+  function adminSettings(Registry self) internal view returns (AdminSettings) {
+    return AdminSettings(self.lookup(keccak256('AdminSettings')));
   }
 }

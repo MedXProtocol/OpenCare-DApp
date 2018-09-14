@@ -51,6 +51,19 @@ contract CaseManager is Ownable, Pausable, Initializable, DelegateTarget {
     _;
   }
 
+  /**
+   * @dev - throws when the system is locked down, or when it's onlyDoctors and the
+   *        patient is not a doctor
+   */
+  modifier byUsageRestrictions(address _patient) {
+    if (registry.adminSettings().usageRestrictions() == AdminSettings.UsageRestrictions.OnlyDoctors) {
+      require(registry.doctorManager().isDoctor(_patient), '_patient must be a doctor');
+    } else if (registry.adminSettings().usageRestrictions() == AdminSettings.UsageRestrictions.Locked) {
+      require(false, 'system is currently locked down by AdminSettings');
+    }
+    _;
+  }
+
   function isCasePhaseManager() internal view returns (bool) {
     return (
          (msg.sender == address(registry.caseFirstPhaseManager()))
@@ -130,7 +143,7 @@ contract CaseManager is Ownable, Pausable, Initializable, DelegateTarget {
     bytes _ipfsHash,
     address _doctor,
     bytes _doctorEncryptedKey
-  ) public payable {
+  ) public payable byUsageRestrictions(_patient) {
     Case newCase = Case(new Delegate(registry, keccak256("Case")));
     uint256 caseIndex = caseList.push(address(newCase)) - 1;
     caseIndices[address(newCase)] = caseIndex;

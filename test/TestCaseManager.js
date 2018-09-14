@@ -52,6 +52,51 @@ contract('CaseManager', function (accounts) {
         })
       })
 
+      it('will not work while the system is locked down by AdminSettings', async () => {
+        await env.adminSettings.setUsageRestrictions(0)
+        expectThrow(async () => {
+          await env.caseManager.createAndAssignCase(
+            env.weth9.address,
+            patient,
+            encryptedCaseKey,
+            caseKeySalt,
+            ipfsHash,
+            doctor,
+            'doctor encrypted case key',
+            { from: patient, value: caseCharge }
+          )
+        })
+      })
+
+      it('will not work unless patient is a doctor w/ AdminSettings UsageRestrictions as OnlyDoctors', async () => {
+        await env.adminSettings.setUsageRestrictions(2)
+        expectThrow(async () => {
+          await env.caseManager.createAndAssignCase(
+            env.weth9.address,
+            patient,
+            encryptedCaseKey,
+            caseKeySalt,
+            ipfsHash,
+            doctor,
+            'doctor encrypted case key',
+            { from: patient, value: caseCharge }
+          )
+        })
+
+        assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
+        await env.caseManager.createAndAssignCase(
+          env.weth9.address,
+          doctor2,
+          encryptedCaseKey,
+          caseKeySalt,
+          ipfsHash,
+          doctor,
+          'doctor encrypted case key',
+          { from: doctor2, value: caseCharge }
+        )
+        assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
+      })
+
       it('should work', async () => {
         assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
         await env.caseManager.createAndAssignCase(
