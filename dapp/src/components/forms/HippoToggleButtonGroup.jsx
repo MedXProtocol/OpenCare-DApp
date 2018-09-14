@@ -76,7 +76,9 @@ export const HippoToggleButtonGroup = class _HippoToggleButtonGroup extends Comp
                     <ToggleButtonGroup
                       name={name}
                       type="radio"
-                      {...selectedValues}>
+                      defaultValue={this.props.defaultValue}
+                      {...selectedValues}
+                    >
                       {
                         values.map((value) => {
                           return <ToggleButton

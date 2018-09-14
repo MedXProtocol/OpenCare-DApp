@@ -247,8 +247,13 @@ export const HippoNavbar = withContractRegistry(
             open={this.state.adminMenuOpen}
             onToggle={(value) => this.setState({adminMenuOpen: !this.state.adminMenuOpen})}
           >
-            <LinkContainer to={routes.DOCTORS_NEW}>
-              <MenuItem href={routes.DOCTORS_NEW}>
+            <LinkContainer to={routes.ADMIN_SETTINGS}>
+              <MenuItem href={routes.ADMIN_SETTINGS}>
+                Settings
+              </MenuItem>
+            </LinkContainer>
+            <LinkContainer to={routes.ADMIN_DOCTORS}>
+              <MenuItem href={routes.ADMIN_DOCTORS}>
                 Doctors
               </MenuItem>
             </LinkContainer>

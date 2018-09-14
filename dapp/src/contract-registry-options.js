@@ -1,6 +1,7 @@
 import betaFaucetContractConfig from '#/BetaFaucet.json'
 import medXTokenContractConfig from '#/MedXToken.json'
 import weth9ContractConfig from '#/WETH9.json'
+import adminSettingsContractConfig from '#/AdminSettings.json'
 import caseManagerContractConfig from '#/CaseManager.json'
 import caseDiagnosingDoctorContractConfig from '#/CaseDiagnosingDoctor.json'
 import caseLifecycleManagerContractConfig from '#/CaseLifecycleManager.json'
@@ -21,6 +22,7 @@ import { abiFactory } from '~/saga-genesis/utils'
 export default {
   contractFactories: {
     AccountManager: abiFactory(accountManagerConfig.abi),
+    AdminSettings: abiFactory(adminSettingsContractConfig.abi),
     CaseManager: abiFactory(caseManagerContractConfig.abi),
     CaseDiagnosingDoctor: abiFactory(caseDiagnosingDoctorContractConfig.abi),
     CaseLifecycleManager: abiFactory(caseLifecycleManagerContractConfig.abi),

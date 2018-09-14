@@ -9,6 +9,7 @@ module.exports = async function createEnvironment(artifacts) {
   const DoctorManager = artifacts.require('./DoctorManager.sol')
   const AccountManager = artifacts.require('./AccountManager.sol')
   const Delegate = artifacts.require('./Delegate.sol')
+  const AdminSettings = artifacts.require('./AdminSettings.sol')
   const CaseManager = artifacts.require('./CaseManager.sol')
   const CaseDiagnosingDoctor = artifacts.require('./CaseDiagnosingDoctor.sol')
   const CaseLifecycleManager = artifacts.require('./CaseLifecycleManager.sol')
@@ -37,6 +38,8 @@ module.exports = async function createEnvironment(artifacts) {
 
   const caseInstance = await Case.new()
   await registry.register(toRegistryKey('Case'), caseInstance.address)
+
+  const adminSettings = await envDeployWithDelegate(registry, Delegate, AdminSettings, 'AdminSettings')
 
   const caseManager = await envDeployWithDelegate(registry, Delegate, CaseManager, 'CaseManager')
 
@@ -68,6 +71,7 @@ module.exports = async function createEnvironment(artifacts) {
     weth9,
     dai,
     etherPriceFeed,
+    adminSettings,
     caseManager,
     casePaymentManager,
     caseDiagnosingDoctor,

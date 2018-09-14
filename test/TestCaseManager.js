@@ -1,13 +1,7 @@
 const expectThrow = require('./helpers/expectThrow')
-const toRegistryKey = require('../migrations/support/toRegistryKey')
-const Registry = artifacts.require("./Registry.sol")
-const Delegate = artifacts.require("./Delegate.sol")
 const CaseManager = artifacts.require("./CaseManager.sol")
-const MedXToken = artifacts.require("./MedXToken.sol")
 const Case = artifacts.require("./Case.sol")
-const generateBytes = require('./helpers/generate-bytes')
 const createEnvironment = require('./helpers/create-environment')
-const createCase = require('./helpers/create-case')
 const caseStatus = require('./helpers/case-status')
 const resetCaseManager = require('./helpers/reset-case-manager')
 
@@ -56,6 +50,51 @@ contract('CaseManager', function (accounts) {
             { from: patient, value: caseCharge }
           )
         })
+      })
+
+      it('will not work while the system is locked down by AdminSettings', async () => {
+        await env.adminSettings.setUsageRestrictions(0)
+        expectThrow(async () => {
+          await env.caseManager.createAndAssignCase(
+            env.weth9.address,
+            patient,
+            encryptedCaseKey,
+            caseKeySalt,
+            ipfsHash,
+            doctor,
+            'doctor encrypted case key',
+            { from: patient, value: caseCharge }
+          )
+        })
+      })
+
+      it('will not work unless patient is a doctor w/ AdminSettings UsageRestrictions as OnlyDoctors', async () => {
+        await env.adminSettings.setUsageRestrictions(2)
+        expectThrow(async () => {
+          await env.caseManager.createAndAssignCase(
+            env.weth9.address,
+            patient,
+            encryptedCaseKey,
+            caseKeySalt,
+            ipfsHash,
+            doctor,
+            'doctor encrypted case key',
+            { from: patient, value: caseCharge }
+          )
+        })
+
+        assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 0)
+        await env.caseManager.createAndAssignCase(
+          env.weth9.address,
+          doctor2,
+          encryptedCaseKey,
+          caseKeySalt,
+          ipfsHash,
+          doctor,
+          'doctor encrypted case key',
+          { from: doctor2, value: caseCharge }
+        )
+        assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
       })
 
       it('should work', async () => {
