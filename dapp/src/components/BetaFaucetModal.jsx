@@ -39,7 +39,7 @@ function mapStateToProps (state) {
   const fieldsAreUndefined = isDoctor === undefined || isDermatologist === undefined || hasBeenSentEther === undefined || ethBalance === undefined
   const canBeDoctor = (!isDoctor && !isDermatologist)
   const needsEth = weiToEther(ethBalance) < 0.1 && !hasBeenSentEther
-  const needsDai = true // weiToEther(daiBalance) < 0.1
+  const needsDai = weiToEther(daiBalance) < 0.1
 
   const showBetaFaucetModal =
     !fieldsAreUndefined &&
