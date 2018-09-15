@@ -104,7 +104,6 @@ function* updateCurrentBlockNumber() {
     const web3 = customProviderWeb3()
     const blockNumber = yield call(web3.eth.getBlockNumber)
     const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
-    console.log('blockNumber', blockNumber, 'updateCurrentBlockNumber', currentBlockNumber)
     if (blockNumber !== currentBlockNumber) {
       yield put({
         type: 'UPDATE_BLOCK_NUMBER',

@@ -24,7 +24,7 @@ export const customProviderWeb3 = function() {
     console.warn('customWeb3 set to currentProvider when should have been custom')
   }
 
-  console.log('setting customWeb3 to ', customProvider)
+  // console.log('setting customWeb3 to ', customProvider)
   customWeb3 = new Web3(customProvider)
 
   return customWeb3
