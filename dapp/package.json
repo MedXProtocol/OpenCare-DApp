@@ -119,6 +119,7 @@
     "libp2p-websocket-star-rendezvous": "^0.2.3",
     "react-dev-utils": "^4.2.1",
     "react-hot-loader": "^4.3.3",
+    "redux-saga-test-plan": "^3.7.0",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-dev-server": "2.9.4"
   },

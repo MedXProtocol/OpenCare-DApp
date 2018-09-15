@@ -2,7 +2,6 @@ import {
   call,
   put,
   all,
-  takeEvery,
   getContext,
   select,
   fork
@@ -13,11 +12,12 @@ import {
 import {
   contractKeyByAddress
 } from '../state-finders'
+import { takeSequentially } from '~/saga-genesis/utils/takeSequentially'
 import { bugsnagClient } from '~/bugsnagClient'
 
 const MAX_RETRIES = 50
 
-function* addAddressIfExists(addressSet, address) {
+export function* addAddressIfExists(addressSet, address) {
   if (!address) { return false }
   address = address.toLowerCase()
   const contractKey = yield select(contractKeyByAddress, address)
@@ -26,15 +26,6 @@ function* addAddressIfExists(addressSet, address) {
     return true
   }
   return false
-}
-
-function* collectTransactionAddresses(addressSet, transaction) {
-  const to = yield call(addAddressIfExists, addressSet, transaction.to)
-  const from = yield call(addAddressIfExists, addressSet, transaction.from)
-  if (to || from) {
-    const receipt = yield call(getReceiptData, transaction.hash)
-    yield put({ type: 'BLOCK_TRANSACTION_RECEIPT', receipt })
-  }
 }
 
 function* getReceiptData(txHash) {
@@ -76,23 +67,19 @@ export function* invalidateAddressSet(addressSet) {
   }))
 }
 
-export function* collectAllTransactionAddresses(transactions) {
-  const addressSet = new Set()
-  yield all(transactions.map(function* (transaction) {
-    yield call(collectTransactionAddresses, addressSet, transaction)
-  }))
-
-  return addressSet
-}
-
 export function* latestBlock({ block }) {
   try {
-    const addressSet = yield call(collectAllTransactionAddresses, block.transactions)
+    const addressSet = new Set()
+    for (var i in block.transactions) {
+      const transaction = block.transactions[i]
+      const to = yield call(addAddressIfExists, addressSet, transaction.to)
+      const from = yield call(addAddressIfExists, addressSet, transaction.from)
+      if (to || from) { // if the transaction was one of ours
+        const receipt = yield call(getReceiptData, transaction.hash)
+        yield put({ type: 'BLOCK_TRANSACTION_RECEIPT', receipt })
+      }
+    }
     yield call(invalidateAddressSet, addressSet)
-  } catch (e) {
-    bugsnagClient.notify(e)
-  }
-  try {
   } catch (e) {
     bugsnagClient.notify(e)
   }
@@ -168,9 +155,9 @@ function* startBlockPolling() {
 }
 
 export default function* () {
-  yield takeEvery('BLOCK_LATEST', latestBlock)
-  yield takeEvery('BLOCK_TRANSACTION_RECEIPT', transactionReceipt)
-  yield takeEvery('UPDATE_BLOCK_NUMBER', gatherLatestBlocks)
+  yield call(takeSequentially, 'BLOCK_LATEST', latestBlock)
+  yield call(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', transactionReceipt)
+  yield call(takeSequentially, 'UPDATE_BLOCK_NUMBER', gatherLatestBlocks)
 
   yield startBlockPolling()
 }

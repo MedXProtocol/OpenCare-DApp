@@ -286,20 +286,20 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       const { diagnosingDoctor, account, updatedAt, status, secondsInADay, latestBlockTimestamp } = this.props
       const challengeFeeEther = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} noToggle />
       const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient', secondsInADay, latestBlockTimestamp)
-      const loading = this.state.loading || !this.requestNewDoctorDataLoaded()
+      const buttonsDisabled = this.state.loading || !this.requestNewDoctorDataLoaded()
       let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
       let buttons = (
         <div className="button-set__btn-clear">
           <Button
-            disabled={this.state.loading}
+            disabled={buttonsDisabled}
             onClick={this.handlePatientWithdraw}
             className="btn btn-sm btn-clear"
           >
             Close Case &amp; Withdraw Funds
           </Button>
           <Button
-            disabled={this.state.loading}
+            disabled={buttonsDisabled}
             onClick={this.handleShowRequestNewDoctorModal}
             className="btn btn-sm btn-clear"
           >
@@ -313,14 +313,14 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         buttons = (
           <div className="button-set__btn-clear">
             <Button
-              disabled={this.state.loading}
+              disabled={buttonsDisabled}
               onClick={this.handlePatientAcceptDiagnosis}
               className="btn btn-sm btn-clear"
             >
               Accept Initial Diagnosis<br /> (Withdraw {challengeFeeEther})
             </Button>
             <Button
-              disabled={this.state.loading}
+              disabled={buttonsDisabled}
               onClick={this.handleShowRequestNewDoctorModal}
               className="btn btn-sm btn-clear"
             >

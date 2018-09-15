@@ -1,11 +1,13 @@
 import {
-  takeEvery,
   call,
   all,
   getContext,
   select,
   put
 } from 'redux-saga/effects'
+import {
+  takeSequentially
+} from '~/saga-genesis/utils/takeSequentially'
 
 function* addSubscription({ address, fromBlock }) {
   address = address.toLowerCase()
@@ -30,6 +32,6 @@ function* checkReceiptForEvents({ receipt }) {
 }
 
 export function* logSaga() {
-  yield takeEvery('ADD_LOG_LISTENER', addSubscription)
-  yield takeEvery('BLOCK_TRANSACTION_RECEIPT', checkReceiptForEvents)
+  yield takeSequentially('ADD_LOG_LISTENER', addSubscription)
+  yield takeSequentially('BLOCK_TRANSACTION_RECEIPT', checkReceiptForEvents)
 }
