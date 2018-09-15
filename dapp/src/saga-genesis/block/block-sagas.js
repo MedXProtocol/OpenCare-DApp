@@ -155,7 +155,7 @@ function* startBlockPolling() {
     } catch (e) {
       bugsnagClient.notify(e)
     }
-    yield call(delay, 10000)
+    yield call(delay, 1000)
   }
 }
 
