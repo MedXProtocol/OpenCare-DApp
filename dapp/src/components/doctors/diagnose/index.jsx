@@ -26,12 +26,13 @@ import {
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { connect } from 'react-redux'
 import { PageTitle } from '~/components/PageTitle'
+import { fixAddress } from '~/utils/fixAddress'
 
 function mapStateToProps(state, { match }) {
   if (isEmptyObject(match.params)) { return {} }
 
   let address = get(state, 'sagaGenesis.accounts[0]')
-  const caseAddress = match.params.caseAddress
+  const caseAddress = fixAddress(match.params.caseAddress)
   const AccountManager = contractByName(state, 'AccountManager')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
@@ -59,7 +60,7 @@ function mapStateToProps(state, { match }) {
 
 function* saga({ match, address, AccountManager, fromBlock }) {
   if (!AccountManager || isEmptyObject(match.params)) { return }
-  const caseAddress = match.params.caseAddress
+  const caseAddress = fixAddress(match.params.caseAddress)
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield all([
