@@ -8,10 +8,7 @@ import { contractByName, web3Call } from '~/saga-genesis'
 
 // Here the sign in should perform the check
 export function* signInSaga({ networkId, secretKey, masterPassword, account, address, overrideAccount }) {
-  console.log('networkId', networkId)
-  console.log('address', address)
   if (!networkId || !address) {
-    console.log('why here')
     yield put({ type: 'SIGN_IN_ERROR', missingCredentialsError: 'Ethereum Address and/or Network ID is missing' })
     return
   }
@@ -43,7 +40,7 @@ export function* signInSaga({ networkId, secretKey, masterPassword, account, add
         yield put({ type: 'SIGN_IN_ERROR', secretKeyError: 'An account already exists for your address' })
       }
     } else {
-      yield put({ type: 'SIGN_UP', address, secretKey, masterPassword, overrideAccount })
+      yield put({ type: 'SIGN_UP', networkId, address, secretKey, masterPassword, overrideAccount })
     }
 
   } else if (account) { // Check the existing account
