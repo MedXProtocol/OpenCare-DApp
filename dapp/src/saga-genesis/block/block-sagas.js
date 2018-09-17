@@ -102,7 +102,6 @@ function* updateCurrentBlockNumber() {
     console.warn(exception)
     bugsnagClient.notify(exception)
   }
-
 }
 
 function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
@@ -146,9 +145,9 @@ function* startBlockPolling() {
 }
 
 export default function* () {
-  yield call(takeSequentially, 'BLOCK_LATEST', latestBlock)
-  yield call(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', transactionReceipt)
-  yield call(takeSequentially, 'UPDATE_BLOCK_NUMBER', gatherLatestBlocks)
+  yield fork(takeSequentially, 'BLOCK_LATEST', latestBlock)
+  yield fork(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', transactionReceipt)
+  yield fork(takeSequentially, 'UPDATE_BLOCK_NUMBER', gatherLatestBlocks)
 
   yield startBlockPolling()
 }
