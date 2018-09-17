@@ -5,6 +5,7 @@ import reducers from './reducers'
 import { ContractRegistry, CallCountRegistry } from '~/saga-genesis'
 import contractRegistryOptions from './contract-registry-options'
 import { preloadedState } from '~/services/preloadedStateService'
+import { bugsnagClient } from '~/bugsnagClient'
 
 export const contractRegistry = new ContractRegistry(contractRegistryOptions)
 export const callCountRegistry = new CallCountRegistry()
@@ -25,5 +26,10 @@ let store = createStore(
   composeEnhancers(applyMiddleware(sagaMiddleware))
 )
 sagaMiddleware.run(sagas)
+
+store.subscribe(() => {
+  bugsnagClient.metaData = bugsnagClient.metaData || {}
+  bugsnagClient.metaData.state = store.getState()
+})
 
 export default store
