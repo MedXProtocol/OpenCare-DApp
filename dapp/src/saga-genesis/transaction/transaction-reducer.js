@@ -53,6 +53,16 @@ export default function (state, { type, transactionId, call, options, error, rec
       }
       break
 
+    case 'TRANSACTION_CONFIRMATION':
+      state = {
+        ...state,
+        [transactionId]: {
+          ...state[transactionId],
+          confirmationNumber
+        }
+      }
+      break
+
     case 'TRANSACTION_ERROR':
       state = {
         ...state,
