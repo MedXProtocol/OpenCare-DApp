@@ -61,18 +61,18 @@ exports.handler = function (event, context, callback) {
     } else {
       console.info('hippo.addOrReactivateDoctor ' + ethAddress + ' to be a doctor named ' + name + ' with public key ' + publicKey)
       hippo.addOrReactivateDoctor(ethAddress, name, country, region, isDermatologist, publicKey)
-      //   .then((transactionHash) => {
-      //     console.info('Successfully sent transaction with hash: ', transactionHash)
-      //     callback(null, {
-      //       statusCode: 200,
-      //       body: JSON.stringify({ txHash: transactionHash }),
-      //       headers: responseHeaders
-      //     })
-      //   })
-      //   .catch(error => {
-      //     console.error('ERROR: ', error)
-      //     callback(error)
-      //   })
+        .then((transactionHash) => {
+          console.info('Successfully sent transaction with hash: ', transactionHash)
+          callback(null, {
+            statusCode: 200,
+            body: JSON.stringify({ txHash: transactionHash }),
+            headers: responseHeaders
+          })
+        })
+        .catch(error => {
+          console.error('ERROR: ', error)
+          callback(error)
+        })
     }
   } catch (error) {
     console.error('MASSIVE ERROR: ', error)
