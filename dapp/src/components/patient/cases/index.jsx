@@ -22,6 +22,7 @@ import { Pagination } from '~/components/Pagination'
 import range from 'lodash.range'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
+import { fixAddress } from '~/utils/fixAddress'
 
 const MAX_CASES_PER_PAGE = 5
 
@@ -37,7 +38,7 @@ function mapStateToProps(state, props) {
   const end = Math.max((start - MAX_CASES_PER_PAGE), 0)
 
   caseAddresses = range(end, start).reduce((accumulator, index) => {
-    const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, index)
+    const caseAddress = fixAddress(cacheCallValue(state, CaseManager, 'patientCases', address, index))
     if (caseAddress) {
       accumulator.push(caseAddress)
     }

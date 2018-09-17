@@ -3,6 +3,7 @@ import {
   ABIHelper,
   logReducerFactory
 } from '~/saga-genesis'
+import { fixAddress } from '~/utils/fixAddress'
 
 const caseAbi = new ABIHelper(caseContractConfig.abi)
 const CASE_CREATED = caseAbi.topic0('CaseCreated')
@@ -15,7 +16,7 @@ function applyLog(state, log) {
   switch(log.topics[0]) {
     case CASE_CREATED:
       params = caseAbi.decodeLogParameters(log)
-      caseAddress = log.address
+      caseAddress = fixAddress(log.address)
       state[caseAddress] = {
         caseDataHash: params.caseDataHash,
         encryptedCaseKey: params.encryptedCaseKey,
@@ -25,7 +26,7 @@ function applyLog(state, log) {
 
     case DOCTOR_ENCRYPTED_CASE_KEY_SET:
       params = caseAbi.decodeLogParameters(log)
-      caseAddress = log.address
+      caseAddress = fixAddress(log.address)
       state[caseAddress] = {
         ...state[caseAddress],
         [params.doctor.toLowerCase()]: params.doctorEncryptedCaseKey
@@ -34,7 +35,7 @@ function applyLog(state, log) {
 
     case DIAGNOSIS_HASH:
       params = caseAbi.decodeLogParameters(log)
-      caseAddress = log.address
+      caseAddress = fixAddress(log.address)
       state[caseAddress] = {
         ...state[caseAddress],
         diagnosisHash: params.diagnosisHash
@@ -43,7 +44,7 @@ function applyLog(state, log) {
 
     case CHALLENGE_HASH:
       params = caseAbi.decodeLogParameters(log)
-      caseAddress = log.address
+      caseAddress = fixAddress(log.address)
       state[caseAddress] = {
         ...state[caseAddress],
         challengeHash: params.challengeHash

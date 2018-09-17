@@ -49,6 +49,7 @@ import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { toastr } from '~/toastr'
 import get from 'lodash.get'
+import { fixAddress } from '~/utils/fixAddress'
 
 function mapStateToProps (state) {
   let nextCaseAddress, doctorCasesCount, openCaseCount
@@ -67,7 +68,7 @@ function mapStateToProps (state) {
   if (isDoctor && isDermatologist) {
     doctorCasesCount = cacheCallValueInt(state, CaseManager, 'doctorCasesCount', address)
     openCaseCount = cacheCallValue(state, CaseStatusManager, 'openCaseCount', address)
-    nextCaseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, (doctorCasesCount - 1))
+    nextCaseAddress = fixAddress(cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, (doctorCasesCount - 1)))
   }
 
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
@@ -312,8 +313,8 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
               <div className="col-sm-12 text-center">
                 <p className="text-footer">
                   &copy; 2018 MedCredits Inc. - All Rights Reserved.
-                  <br />{debugLink}
                 </p>
+                {debugLink}
               </div>
             </div>
           </div>

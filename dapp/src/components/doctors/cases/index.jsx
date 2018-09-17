@@ -18,6 +18,7 @@ import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
+import { fixAddress } from '~/utils/fixAddress'
 
 const MAX_CASES_PER_PAGE = 5
 
@@ -49,7 +50,7 @@ function mapStateToProps(state, { match }) {
     end = Math.max((start - MAX_CASES_PER_PAGE), 0)
 
     for (let i = (start - 1); i >= end; i--) {
-      const closedCaseAddress = cacheCallValue(state, CaseStatusManager, 'closedCaseAtIndex', address, i)
+      const closedCaseAddress = fixAddress(cacheCallValue(state, CaseStatusManager, 'closedCaseAtIndex', address, i))
 
       if (closedCaseAddress && !isBlank(closedCaseAddress)) {
         closedCaseAddresses.push(closedCaseAddress)

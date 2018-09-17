@@ -1,12 +1,13 @@
 import { cacheCall } from '~/saga-genesis/sagas'
 import { cacheCallValue } from '~/saga-genesis/state-finders'
+import { fixAddress } from '~/utils/fixAddress'
 
 export const mapOpenCaseAddresses = function(state, CaseStatusManager, address) {
   const openAddresses = []
 
   let currentNodeId = cacheCallValue(state, CaseStatusManager, 'firstOpenCaseId', address)
   while (currentNodeId && currentNodeId !== '0') {
-    const openCaseAddress = cacheCallValue(state, CaseStatusManager, 'openCaseAddress', address, currentNodeId)
+    const openCaseAddress = fixAddress(cacheCallValue(state, CaseStatusManager, 'openCaseAddress', address, currentNodeId))
     openAddresses.push(openCaseAddress)
 
     currentNodeId = cacheCallValue(state, CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
@@ -21,7 +22,7 @@ export const openCaseAddressesSaga = function* (CaseStatusManager, address) {
   let currentNodeId = yield cacheCall(CaseStatusManager, 'firstOpenCaseId', address)
   while (currentNodeId && currentNodeId !== '0') {
     const caseAddress = yield cacheCall(CaseStatusManager, 'openCaseAddress', address, currentNodeId)
-    yield openAddresses.push(caseAddress)
+    yield openAddresses.push(fixAddress(caseAddress))
 
     currentNodeId = yield cacheCall(CaseStatusManager, 'nextOpenCaseId', address, currentNodeId)
   }
@@ -37,7 +38,7 @@ export const mapOpenCasePage = function (state, CaseStatusManager, doctorAddress
   }
   let count = 0
   while (currentNodeId && currentNodeId !== '0' && count < pageSize) {
-    const openCaseAddress = cacheCallValue(state, CaseStatusManager, 'openCaseAddress', doctorAddress, currentNodeId)
+    const openCaseAddress = fixAddress(cacheCallValue(state, CaseStatusManager, 'openCaseAddress', doctorAddress, currentNodeId))
     const nextOpenCaseId = cacheCallValue(state, CaseStatusManager, 'nextOpenCaseId', doctorAddress, currentNodeId)
     var node = {
       id: currentNodeId,
