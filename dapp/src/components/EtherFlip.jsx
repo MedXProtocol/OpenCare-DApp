@@ -54,7 +54,7 @@ export const EtherFlip = connect(mapStateToProps)(
       render () {
         const wei = this.props.wei || 0
 
-        const usd = <React.Fragment>${displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</React.Fragment>
+        const usd = <span className='currency'>${displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</span>
         const ether = <Ether wei={wei} />
 
         let firstValue = ether
