@@ -183,8 +183,16 @@
   min-width: 100px;
   padding-bottom: 1px;
   padding-top: 10px;
+
   @media (min-width: 768px) {
     text-align: center;
+  }
+  @media (max-width: 768px) {
+    margin-top: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: center;
+    max-width: 150px;
   }
 }
 

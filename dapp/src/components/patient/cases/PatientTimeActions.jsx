@@ -296,7 +296,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
             onClick={this.handlePatientWithdraw}
             className="btn btn-sm btn-clear"
           >
-            Close Case &amp; Withdraw Funds
+            Close &amp; Withdraw Funds
           </Button>
           <Button
             disabled={loading}
