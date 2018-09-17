@@ -1,31 +1,39 @@
 import React, { Component } from 'react'
 import { PageTitle } from '~/components/PageTitle'
+import { Checkbox } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import {
   withSaga,
   cacheCall,
+  cacheCallValue,
   cacheCallValueInt,
   withSend,
   contractByName,
   TransactionStateHandler
 } from '~/saga-genesis'
+import {
+  all
+} from 'redux-saga/effects'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
 import {
   usageRestrictionsMapInverted,
   usageRestrictionsToInt,
   usageRestrictionsToString
 } from '~/utils/usageRestrictions'
+import { defined } from '~/utils/defined'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
 
 function mapStateToProps(state) {
-  const transactions = state.sagaGenesis.transactions
   const AdminSettings = contractByName(state, 'AdminSettings')
+  const betaFaucetRegisterDoctor = cacheCallValue(state, AdminSettings, 'betaFaucetRegisterDoctor')
+  const transactions = state.sagaGenesis.transactions
   const usageRestrictions = cacheCallValueInt(state, AdminSettings, 'usageRestrictions')
   const usageRestrictionsString = usageRestrictionsToString(usageRestrictions)
 
   return {
     AdminSettings,
+    betaFaucetRegisterDoctor,
     transactions,
     usageRestrictions,
     usageRestrictionsString
@@ -35,7 +43,10 @@ function mapStateToProps(state) {
 function* adminSettingsSaga({ AdminSettings }) {
   if (!AdminSettings) { return }
 
-  yield cacheCall(AdminSettings, 'usageRestrictions')
+  yield all([
+    cacheCall(AdminSettings, 'betaFaucetRegisterDoctor'),
+    cacheCall(AdminSettings, 'usageRestrictions')
+  ])
 }
 
 export const AdminSettings = connect(mapStateToProps)(
@@ -47,45 +58,61 @@ export const AdminSettings = connect(mapStateToProps)(
           super(props)
 
           this.state = {
-            setUsageRestrictionsTxId: null
+            betaFaucetRegisterDoctor: 0,
+            updateAdminSettingsTxId: null
           }
         }
 
         componentWillReceiveProps (nextProps) {
-          const { usageRestrictionsString } = nextProps
-          if (!this.state.usageRestrictionsString && usageRestrictionsString) {
-            this.setState({ usageRestrictionsString })
+          if (!this.state.usageRestrictionsString && nextProps.usageRestrictionsString) {
+            this.setState({ usageRestrictionsString: nextProps.usageRestrictionsString })
           }
 
-          if (this.state.setUsageRestrictionsTxId) {
-            this.state.setUsageRestrictionsHandler.handle(nextProps.transactions[this.state.setUsageRestrictionsTxId])
+          // only do this once, soon after page load when we receive the current
+          // value from the contract
+          if (
+               !defined(this.props.betaFaucetRegisterDoctor)
+            && defined(nextProps.betaFaucetRegisterDoctor)
+          ) {
+            this.setState({ betaFaucetRegisterDoctor: nextProps.betaFaucetRegisterDoctor })
+          }
+
+          if (this.state.updateAdminSettingsTxId) {
+            this.state.setUsageRestrictionsHandler.handle(nextProps.transactions[this.state.updateAdminSettingsTxId])
               .onError((error) => {
                 toastr.transactionError(error)
-                this.setState({ setUsageRestrictionsTxId: null, setUsageRestrictionsHandler: null })
+                this.setState({ updateAdminSettingsTxId: null, setUsageRestrictionsHandler: null })
               })
               .onConfirmed(() => {
-                toastr.success('Updated Usage Restrictions confirmed!')
-                this.setState({ setUsageRestrictionsTxId: null, setUsageRestrictionsHandler: null })
+                toastr.success('Admin Settings updated!')
+                this.setState({ updateAdminSettingsTxId: null, setUsageRestrictionsHandler: null })
               })
               .onTxHash(() => {
-                toastr.success('Usage Restrictions transaction sent. Will take a few moments to confirm.')
-                mixpanel.track('AdminSetUsageRestrictions')
-                this.setState({ setUsageRestrictionsTxId: null, setUsageRestrictionsHandler: null })
+                toastr.success('Admin Settings transaction sent. Will take a few moments to confirm.')
+                mixpanel.track('Admin Updated Settings')
+                this.setState({ updateAdminSettingsTxId: null, setUsageRestrictionsHandler: null })
               })
           }
         }
 
-        handleSubmitUsageRestrictions = (event) => {
+        handleBetaFaucetRegisterDoctor = (event) => {
+          this.setState({
+            betaFaucetRegisterDoctor: !this.state.betaFaucetRegisterDoctor
+          })
+        }
+
+        handleSubmit = (event) => {
           event.preventDefault()
 
-          const setUsageRestrictionsTxId = this.props.send(
+          const updateAdminSettingsTxId = this.props.send(
             this.props.AdminSettings,
-            'setUsageRestrictions',
-            usageRestrictionsToInt(this.state.usageRestrictionsString)
+            'updateAdminSettings',
+            usageRestrictionsToInt(this.state.usageRestrictionsString),
+            this.state.betaFaucetRegisterDoctor ? 1 : 0
           )()
 
           this.setState({
-            setUsageRestrictionsTxId,
+            updateAdminSettingsTxId,
             setUsageRestrictionsHandler: new TransactionStateHandler()
           })
         }
@@ -108,7 +135,7 @@ export const AdminSettings = connect(mapStateToProps)(
                         <h3 className="title card-title">Admin Settings</h3>
                       </div>
 
-                      <form onSubmit={this.handleSubmitUsageRestrictions}>
+                      <form onSubmit={this.handleSubmit}>
                         <div className="card-body">
                           {
                             usageRestrictionsString
@@ -116,7 +143,7 @@ export const AdminSettings = connect(mapStateToProps)(
                                   id='usageRestrictionsString'
                                   name='usageRestrictionsString'
                                   colClasses='col-xs-12'
-                                  label='Contract Usage Restrictions'
+                                  label='Usage Restrictions:'
                                   buttonGroupOnChange={this.handleButtonGroupOnChange}
                                   defaultValue={usageRestrictionsString}
                                   values={Object.keys(usageRestrictionsMapInverted).map(value => value)}
@@ -126,11 +153,28 @@ export const AdminSettings = connect(mapStateToProps)(
                           <p>
                             <strong>Currently:</strong> {usageRestrictionsString}
                           </p>
+
+                          <hr />
+
+                          <h4>
+                            Beta Faucet
+                          </h4>
+                          <Checkbox
+                            inline
+                            onChange={this.handleBetaFaucetRegisterDoctor}
+                            checked={this.state.betaFaucetRegisterDoctor}
+                          >
+                            Patients can upgrade to Doctors &amp; Dermatologists
+                          </Checkbox>
+                          <p>
+                            <strong>Currently:</strong>
+                            &nbsp;{this.props.betaFaucetRegisterDoctor ? 'Allowed' : 'Disallowed'}
+                          </p>
                         </div>
 
                         <div className="card-footer text-right">
                           <button
-                            disabled={!!this.state.setUsageRestrictionsTxId}
+                            disabled={!!this.state.updateAdminSettingsTxId}
                             type="submit"
                             className="btn btn-lg btn-success"
                           >

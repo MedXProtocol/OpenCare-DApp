@@ -13,6 +13,7 @@ import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
 import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps (state) {
+  const AdminSettings = contractByName(state, 'AdminSettings')
   const Dai = contractByName(state, 'Dai')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const daiBalance = cacheCallValue(state, Dai, 'balanceOf', address)
@@ -36,8 +37,10 @@ function mapStateToProps (state) {
   const doctorWasAdded = addDoctorTx && (addDoctorTx.inFlight || addDoctorTx.success)
   const daiWasMinted = sendDaiTx && (sendDaiTx.inFlight || sendDaiTx.success)
 
+  const canSelfRegisterAsDoctor = cacheCallValue(state, AdminSettings, 'betaFaucetRegisterDoctor')
+
   const fieldsAreUndefined = isDoctor === undefined || isDermatologist === undefined || hasBeenSentEther === undefined || ethBalance === undefined
-  const canBeDoctor = (!isDoctor && !isDermatologist)
+  const canBeDoctor = (!isDoctor && !isDermatologist) && canSelfRegisterAsDoctor
   const needsEth = weiToEther(ethBalance) < 0.1 && !hasBeenSentEther
   const needsDai = weiToEther(daiBalance) < 0.1
 
@@ -47,8 +50,10 @@ function mapStateToProps (state) {
     (needsEth || canBeDoctor || needsDai || manuallyOpened)
 
   return {
+    AdminSettings,
     address,
     BetaFaucet,
+    canSelfRegisterAsDoctor,
     showBetaFaucetModal,
     canBeDoctor,
     needsEth,
@@ -70,10 +75,11 @@ function mapStateToProps (state) {
   }
 }
 
-function* saga({ Dai, BetaFaucet, CaseManager, MedXToken, DoctorManager, address }) {
-  if (!Dai || !BetaFaucet || !CaseManager || !MedXToken || !DoctorManager || !address) { return }
+function* saga({ AdminSettings, Dai, BetaFaucet, CaseManager, MedXToken, DoctorManager, address }) {
+  if (!AdminSettings || !Dai || !BetaFaucet || !CaseManager || !MedXToken || !DoctorManager || !address) { return }
 
   yield all([
+    cacheCall(AdminSettings, 'betaFaucetRegisterDoctor'),
     cacheCall(Dai, 'balanceOf', address),
     cacheCall(CaseManager, 'getPatientCaseListCount', address),
     cacheCall(DoctorManager, 'owner'),
@@ -157,7 +163,12 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
 
       render() {
         let content
-        let totalSteps = '3'
+
+        let totalSteps = 3
+        if (!this.props.canSelfRegisterAsDoctor) {
+          totalSteps--
+        }
+
         const { step } = this.state
         const {
           ethBalance,
