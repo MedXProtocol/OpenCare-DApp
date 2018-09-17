@@ -29,7 +29,7 @@ export function* addAddressIfExists(addressSet, address) {
   return false
 }
 
-function* getReceiptData(txHash) {
+export function* getReceiptData(txHash) {
   const web3 = yield getContext('web3')
   for (let i = 0; i < MAX_RETRIES; i++) {
     const receipt = yield call(web3.eth.getTransactionReceipt, txHash)

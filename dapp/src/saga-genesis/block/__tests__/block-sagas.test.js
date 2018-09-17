@@ -1,5 +1,6 @@
 import {
   addAddressIfExists,
+  getReceiptData,
   latestBlock
 } from '../block-sagas'
 import {
