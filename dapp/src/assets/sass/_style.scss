@@ -106,7 +106,8 @@ a {
 }
 
 .flip-link .ether-flip--second-value,
-.flip-link .ether-flip--second-value:hover {
+.flip-link .ether-flip--second-value:hover,
+.flip-link .ether-flip--second-value span {
   border-bottom: none;
   opacity: 0.7;
   font-weight: normal;
@@ -114,7 +115,10 @@ a {
 
 button .currency,
 .button .currency,
-.alert .currency {
+.alert .currency,
+button .flip-link span,
+.button .flip-link span,
+.alert .flip-link span {
   border-color: inherit;
   color: inherit;
 }
