@@ -3,6 +3,7 @@ import {
   all,
   getContext,
   select,
+  fork,
   put
 } from 'redux-saga/effects'
 import {
@@ -32,6 +33,6 @@ function* checkReceiptForEvents({ receipt }) {
 }
 
 export function* logSaga() {
-  yield takeSequentially('ADD_LOG_LISTENER', addSubscription)
-  yield takeSequentially('BLOCK_TRANSACTION_RECEIPT', checkReceiptForEvents)
+  yield fork(takeSequentially, 'ADD_LOG_LISTENER', addSubscription)
+  yield fork(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', checkReceiptForEvents)
 }
