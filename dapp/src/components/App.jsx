@@ -236,11 +236,11 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
       var debugLink =
-        <div>
+        <React.Fragment>
           <DebugLink />
           &nbsp;
           <a onClick={this.handleBugsnagTrigger} className='btn btn-danger'>Trigger Bugsnag Notification</a>
-        </div>
+        </React.Fragment>
     }
 
     const WelcomeWrapped = <Welcome
