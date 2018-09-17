@@ -14,6 +14,7 @@ import {
 } from '../state-finders'
 import { takeSequentially } from '~/saga-genesis/utils/takeSequentially'
 import { bugsnagClient } from '~/bugsnagClient'
+import { customProviderWeb3 } from '~/utils/customProviderWeb3'
 
 const MAX_RETRIES = 50
 
@@ -85,21 +86,11 @@ export function* latestBlock({ block }) {
   }
 }
 
-let attempt = 1
-
 function* updateCurrentBlockNumber() {
   try {
-    const web3 = yield getContext('web3')
-    if (attempt === 2) {
-      console.log(web3)
-      console.log(web3.eth)
-      console.log(web3.eth.getBlockNumber)
-    }
-    attempt++
-
+    const web3 = customProviderWeb3()
     const blockNumber = yield call(web3.eth.getBlockNumber)
     const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
-    console.log('blockNumber', blockNumber, 'updateCurrentBlockNumber', currentBlockNumber)
     if (blockNumber !== currentBlockNumber) {
       yield put({
         type: 'UPDATE_BLOCK_NUMBER',
@@ -150,7 +141,7 @@ function* startBlockPolling() {
     } catch (e) {
       bugsnagClient.notify(e)
     }
-    yield call(delay, 10000)
+    yield call(delay, 1000)
   }
 }
 

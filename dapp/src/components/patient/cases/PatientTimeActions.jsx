@@ -286,20 +286,20 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       const { diagnosingDoctor, account, updatedAt, status, secondsInADay, latestBlockTimestamp } = this.props
       const challengeFeeEther = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} noToggle />
       const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient', secondsInADay, latestBlockTimestamp)
-      const buttonsDisabled = this.state.loading || !this.requestNewDoctorDataLoaded()
+      const loading = this.state.loading || !this.requestNewDoctorDataLoaded()
       let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
       let buttons = (
         <div className="button-set__btn-clear">
           <Button
-            disabled={buttonsDisabled}
+            disabled={loading}
             onClick={this.handlePatientWithdraw}
             className="btn btn-sm btn-clear"
           >
             Close Case &amp; Withdraw Funds
           </Button>
           <Button
-            disabled={buttonsDisabled}
+            disabled={loading}
             onClick={this.handleShowRequestNewDoctorModal}
             className="btn btn-sm btn-clear"
           >
@@ -313,14 +313,14 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         buttons = (
           <div className="button-set__btn-clear">
             <Button
-              disabled={buttonsDisabled}
+              disabled={loading}
               onClick={this.handlePatientAcceptDiagnosis}
               className="btn btn-sm btn-clear"
             >
               Accept Initial Diagnosis<br /> (Withdraw {challengeFeeEther})
             </Button>
             <Button
-              disabled={buttonsDisabled}
+              disabled={loading}
               onClick={this.handleShowRequestNewDoctorModal}
               className="btn btn-sm btn-clear"
             >
@@ -407,7 +407,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
               </form>
             </Modal>
 
-            <Loading loading={this.state.loading} />
+            <Loading loading={loading} />
           </React.Fragment>
         )
       }
