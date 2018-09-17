@@ -65,7 +65,8 @@ i18next
             patientCase: 'Case {{caseId}} | Hippocrates',
             fourOhFour: '404 | Hippocrates',
             adminSettings: 'Settings | Hippocrates',
-            adminFees: 'Fees | Hippocrates'
+            adminFees: 'Fees | Hippocrates',
+            updateAdminSettings: 'Updating Admin Settings'
           }
         }
       }
