@@ -5,7 +5,7 @@ import Select from 'react-select'
 import { connect } from 'react-redux'
 import * as Animated from 'react-select/lib/animated';
 import { withRouter } from 'react-router-dom'
-import { Checkbox, Modal } from 'react-bootstrap'
+import { Checkbox } from 'react-bootstrap'
 import FlipMove from 'react-flip-move'
 import PropTypes from 'prop-types'
 import { mixpanel } from '~/mixpanel'
@@ -85,8 +85,6 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
       originalDiagnosis: null,
 
       diagnosis: null,
-
-      showConfirmationModal: false,
 
       isSubmitting: false,
       errors: [],
@@ -412,20 +410,13 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     await this.runValidation()
 
     if (!this.state.isError) {
-      this.setState({
-        showConfirmationModal: true
-      })
+      this.submitDiagnosis()
     }
-  }
-
-  handleCancelConfirmSubmissionModal = (event) => {
-    this.setState({ showConfirmationModal: false })
   }
 
   submitDiagnosis = async () => {
     this.setState({
-      isSubmitting: true,
-      showConfirmationModal: false
+      isSubmitting: true
     })
 
     const diagnosisInformation = {
@@ -465,8 +456,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
     }
     this.setState({
       transactionId,
-      transactionHandler: new TransactionStateHandler(),
-      showConfirmationModal: false
+      transactionHandler: new TransactionStateHandler()
     })
   }
 
@@ -801,36 +791,6 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
             </div>
           </form>
         </div>
-
-        <Modal show={this.state.showConfirmationModal}>
-          <Modal.Body>
-            <div className="row">
-              <div className="col-xs-12 text-center">
-                <h4>
-                  Are you sure?
-                </h4>
-                <h5>
-                  This will send your diagnosis to the patient.
-                </h5>
-              </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button
-              onClick={this.handleCancelConfirmSubmissionModal}
-              type="button"
-              className="btn btn-link">
-              No
-            </button>
-            <button
-              onClick={this.submitDiagnosis}
-              type="button"
-              className="btn btn-primary"
-              disabled={loading}>
-              Yes
-            </button>
-          </Modal.Footer>
-        </Modal>
 
         <Loading loading={loading} />
       </div>

@@ -46,7 +46,6 @@ export const mapOpenCasePage = function (state, CaseStatusManager, doctorAddress
     }
     nodes.push(node)
     currentNodeId = nextOpenCaseId
-    console.log('mSTP currentNodeId', currentNodeId)
     count++
   }
 
@@ -70,7 +69,6 @@ export const openCasePageSaga = function* (CaseStatusManager, doctorAddress, pag
     }
     nodes.push(node)
     currentNodeId = nextOpenCaseId
-    console.log('saga currentNodeId', currentNodeId)
     count++
   }
 
