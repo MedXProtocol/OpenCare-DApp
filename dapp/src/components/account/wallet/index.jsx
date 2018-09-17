@@ -92,11 +92,11 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
 
     if (this.props.wethBalance > 0) {
       var withdrawWethButton =
-        <div className="text-center">
+        <React.Fragment>
           <button onClick={this.doWithdraw} className="btn btn-primary btn-lg" disabled={!!this.props.withdrawTransactionId}>
             Withdraw
           </button>
-        </div>
+        </React.Fragment>
     }
 
     return (
@@ -129,13 +129,15 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                     </small>
                   </h3>
                 </div>
-                <div className="card-body">
+                <div className="card-body ">
                   <div className="form-wrapper">
                     <p className='lead text-center'>
                       &nbsp; <EtherFlip wei={this.props.wethBalance} />
                     </p>
-                    {withdrawWethButton}
                   </div>
+                </div>
+                <div className="card-footer text-right">
+                  {withdrawWethButton}
                 </div>
               </div>
             </div>
@@ -151,12 +153,15 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                     </small>
                   </h3>
                 </div>
-                <div className="card-body">
+                <div className="card-body ">
                   <div className="form-wrapper">
                     <p className='lead text-center'>
                       &nbsp; <Dai wei={this.props.daiBalance} />
                     </p>
                   </div>
+                </div>
+                <div className="card-footer text-right">
+                  &nbsp;
                 </div>
               </div>
             </div>
