@@ -2,7 +2,6 @@ import {
   call,
   put,
   all,
-  getContext,
   select,
   fork
 } from 'redux-saga/effects'
@@ -30,7 +29,8 @@ export function* addAddressIfExists(addressSet, address) {
 }
 
 export function* getReceiptData(txHash) {
-  const web3 = yield getContext('web3')
+  const web3 = customProviderWeb3()
+
   for (let i = 0; i < MAX_RETRIES; i++) {
     const receipt = yield call(web3.eth.getTransactionReceipt, txHash)
 
@@ -118,7 +118,7 @@ function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
 }
 
 function* getBlockData(blockId) {
-  const web3 = yield getContext('web3')
+  const web3 = customProviderWeb3()
   for (let i = 0; i < MAX_RETRIES; i++) {
     const block = yield call(web3.eth.getBlock, blockId, true)
 
