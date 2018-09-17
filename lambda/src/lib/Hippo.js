@@ -4,6 +4,7 @@ const SignerProvider = require('ethjs-provider-signer')
 const sign = require('ethjs-signer').sign
 const privateToAccount = require('ethjs-account').privateToAccount
 
+const adminSettingsArtifact = require("../../../build/contracts/AdminSettings.json")
 const betaFaucetArtifact = require("../../../build/contracts/BetaFaucet.json")
 const doctorManagerArtifact = require("../../../build/contracts/DoctorManager.json")
 const accountManagerArtifact = require("../../../build/contracts/AccountManager.json")
@@ -135,30 +136,44 @@ export class Hippo {
   }
 
   async addOrReactivateDoctor (ethAddress, name, country, region, isDermatologist, publicKey) {
-    const accountManager = await this.lookupAccountManager()
-    const existingPublicKeys = await accountManager.publicKeys(ethAddress)
-    const existingPublicKey = existingPublicKeys['0']
-    if (!existingPublicKey || existingPublicKey === '0x') {
-      const method = accountManagerArtifact.abi.find((obj) => obj.name === 'setPublicKey')
-      var data = abi.encodeMethod(method, [ethAddress, publicKey])
-      const tx = {
-        from: this.ownerAddress(),
-        to: accountManager.address,
-        gas: 4000000,
-        gasPrice: Eth.toWei(20, 'gwei').toString(),
-        data
-      }
-      return this.sendTransaction(tx)
-        .then(() => {
+    return this.lookupContractAddress('AdminSettings').then(async (adminSettingsAddress) => {
+      const AdminSettings = new this._eth.contract(
+        adminSettingsArtifact.abi, adminSettingsArtifact.bytecode)
+        .at(adminSettingsAddress[0])
+
+      return AdminSettings.betaFaucetRegisterDoctor().then(async (result) => {
+        const canSelfRegisterAsDoctor = result[0]
+        if (!canSelfRegisterAsDoctor) {
+          console.warn('Admin Settings prevent self registering as Doctor')
+          return false
+        }
+
+        const accountManager = await this.lookupAccountManager()
+        const existingPublicKeys = await accountManager.publicKeys(ethAddress)
+        const existingPublicKey = existingPublicKeys['0']
+        if (!existingPublicKey || existingPublicKey === '0x') {
+          const method = accountManagerArtifact.abi.find((obj) => obj.name === 'setPublicKey')
+          var data = abi.encodeMethod(method, [ethAddress, publicKey])
+          const tx = {
+            from: this.ownerAddress(),
+            to: accountManager.address,
+            gas: 4000000,
+            gasPrice: Eth.toWei(20, 'gwei').toString(),
+            data
+          }
+          return this.sendTransaction(tx)
+            .then(() => {
+              return this._addOrReactivateDoctor(ethAddress, name, country, region, isDermatologist)
+            })
+            .catch((error) => {
+              console.error('addOrReactivateDoctor: ', error.message)
+              fail(error.message)
+            })
+        } else {
           return this._addOrReactivateDoctor(ethAddress, name, country, region, isDermatologist)
-        })
-        .catch((error) => {
-          console.error('addOrReactivateDoctor: ', error.message)
-          fail(error.message)
-        })
-    } else {
-      return this._addOrReactivateDoctor(ethAddress, name, country, region, isDermatologist)
-    }
+        }
+      })
+    })
   }
 
   _addOrReactivateDoctor (ethAddress, name, country, region, isDermatologist) {

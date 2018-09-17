@@ -20,13 +20,13 @@ import {
   usageRestrictionsToInt,
   usageRestrictionsToString
 } from '~/utils/usageRestrictions'
+import { defined } from '~/utils/defined'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
 
 function mapStateToProps(state) {
   const AdminSettings = contractByName(state, 'AdminSettings')
   const betaFaucetRegisterDoctor = cacheCallValue(state, AdminSettings, 'betaFaucetRegisterDoctor')
-  console.log('cCV:', betaFaucetRegisterDoctor)
   const transactions = state.sagaGenesis.transactions
   const usageRestrictions = cacheCallValueInt(state, AdminSettings, 'usageRestrictions')
   const usageRestrictionsString = usageRestrictionsToString(usageRestrictions)
@@ -64,14 +64,18 @@ export const AdminSettings = connect(mapStateToProps)(
         }
 
         componentWillReceiveProps (nextProps) {
-          const { betaFaucetRegisterDoctor, usageRestrictionsString } = nextProps
-          if (!this.state.usageRestrictionsString && usageRestrictionsString) {
-            this.setState({ usageRestrictionsString })
+          if (!this.state.usageRestrictionsString && nextProps.usageRestrictionsString) {
+            this.setState({ usageRestrictionsString: nextProps.usageRestrictionsString })
           }
 
-          console.log(betaFaucetRegisterDoctor)
-          console.log('cWRP setting betaFaucetRegisterDoctor to :', betaFaucetRegisterDoctor )
-          this.setState({ betaFaucetRegisterDoctor })
+          // only do this once, soon after page load when we receive the current
+          // value from the contract
+          if (
+               !defined(this.props.betaFaucetRegisterDoctor)
+            && defined(nextProps.betaFaucetRegisterDoctor)
+          ) {
+            this.setState({ betaFaucetRegisterDoctor: nextProps.betaFaucetRegisterDoctor })
+          }
 
           if (this.state.updateAdminSettingsTxId) {
             this.state.setUsageRestrictionsHandler.handle(nextProps.transactions[this.state.updateAdminSettingsTxId])
@@ -92,7 +96,6 @@ export const AdminSettings = connect(mapStateToProps)(
         }
 
         handleBetaFaucetRegisterDoctor = (event) => {
-          console.log('clieckdd, setting to: ', !this.state.betaFaucetRegisterDoctor)
           this.setState({
             betaFaucetRegisterDoctor: !this.state.betaFaucetRegisterDoctor
           })
@@ -100,13 +103,12 @@ export const AdminSettings = connect(mapStateToProps)(
 
         handleSubmit = (event) => {
           event.preventDefault()
-          console.log(this.state.betaFaucetRegisterDoctor)
 
           const updateAdminSettingsTxId = this.props.send(
             this.props.AdminSettings,
             'updateAdminSettings',
-            this.state.betaFaucetRegisterDoctor,
-            usageRestrictionsToInt(this.state.usageRestrictionsString)
+            usageRestrictionsToInt(this.state.usageRestrictionsString),
+            this.state.betaFaucetRegisterDoctor ? 1 : 0
           )()
 
           this.setState({
@@ -154,16 +156,20 @@ export const AdminSettings = connect(mapStateToProps)(
 
                           <hr />
 
-                          <h3>
+                          <h4>
                             Beta Faucet
-                          </h3>
+                          </h4>
                           <Checkbox
                             inline
-                            onClick={this.handleBetaFaucetRegisterDoctor}
-                            value={this.state.betaFaucetRegisterDoctor}
+                            onChange={this.handleBetaFaucetRegisterDoctor}
+                            checked={this.state.betaFaucetRegisterDoctor}
                           >
                             Patients can upgrade to Doctors &amp; Dermatologists
                           </Checkbox>
+                          <p>
+                            <strong>Currently:</strong>
+                            &nbsp;{this.props.betaFaucetRegisterDoctor ? 'Allowed' : 'Disallowed'}
+                          </p>
                         </div>
 
                         <div className="card-footer text-right">
