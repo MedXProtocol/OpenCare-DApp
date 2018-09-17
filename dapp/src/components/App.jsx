@@ -33,6 +33,7 @@ import { ScrollyFeedbackLink } from '~/components/ScrollyFeedbackLink'
 import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
+import { bugsnagClient } from '~/bugsnagClient'
 import { connect } from 'react-redux'
 import {
   cacheCall,
@@ -192,6 +193,13 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     this.props.history.push(routes.WELCOME)
   }
 
+  handleBugsnagTrigger = () => {
+    bugsnagClient.notify({
+      name: 'Manually Triggered Test Error',
+      message: 'This was triggered manually. Please ignore'
+    })
+  }
+
   render () {
     const requestedPathname = getRequestedPathname()
     if (this.props.address &&
@@ -227,7 +235,12 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     }
 
     if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
-      var debugLink = <DebugLink />
+      var debugLink =
+        <div>
+          <DebugLink />
+          &nbsp;
+          <a onClick={this.handleBugsnagTrigger} className='btn btn-danger'>Trigger Bugsnag Notification</a>
+        </div>
     }
 
     const WelcomeWrapped = <Welcome

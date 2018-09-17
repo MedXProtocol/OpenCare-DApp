@@ -40,8 +40,8 @@ export const DebugLink = ReactTimeout(class _DebugLink extends Component {
 
   render() {
     return (
-      <a onClick={this.handleRenderDebugger}>
-        debug
+      <a onClick={this.handleRenderDebugger} className='btn btn-primary'>
+        Open Firebug
       </a>
     )
   }
