@@ -21,7 +21,5 @@ export const upgradeOldAccount = function(networkId, address) {
     setAccountLocalStorage(networkId, address, accountObject)
   }
 
-  deleteOldAccount(address)
-
   return accountObject
 }
