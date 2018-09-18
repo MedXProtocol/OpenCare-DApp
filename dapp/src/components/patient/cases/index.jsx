@@ -9,7 +9,6 @@ import {
   cacheCall,
   contractByName,
   withSaga,
-  withContractRegistry,
   cacheCallValue,
   cacheCallValueInt
 } from '~/saga-genesis'
@@ -65,7 +64,7 @@ function* saga({ address, CaseManager }) {
   }))
 }
 
-export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class _PatientCases extends Component {
+export const PatientCases = connect(mapStateToProps)(withSaga(saga)(class _PatientCases extends Component {
   renderCaseRows (caseAddresses, transactions, caseCount) {
     let caseRows = caseAddresses.map((caseAddress, index) => {
       return (
@@ -161,6 +160,6 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
       </div>
     )
   }
-})))
+}))
 
 export const PatientCasesContainer = withRouter(PatientCases)

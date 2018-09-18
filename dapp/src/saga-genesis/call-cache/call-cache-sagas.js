@@ -14,6 +14,7 @@ import {
   contractKeyByAddress,
   contractByName
 } from '../state-finders'
+import { customProviderWeb3 } from '~/utils/customProviderWeb3'
 const debug = require('debug')('call-cache-sagas')
 
 const callsInFlight = new Set()
@@ -107,8 +108,8 @@ export function* web3Call(address, method, ...args) {
 }
 
 export function* findWeb3Contract(address) {
-  const contractRegistry = yield getContext('contractRegistry')
-  const web3 = yield getContext('web3')
+  const contractRegistry = yield getContext('readContractRegistry')
+  const web3 = customProviderWeb3()
   const contractKey = yield select(contractKeyByAddress, address)
   return contractRegistry.get(address, contractKey, web3)
 }

@@ -62,7 +62,7 @@ export function* web3Send({ transactionId, call, options }) {
       from: account
     }, options || {})
 
-    const contractRegistry = yield getContext('contractRegistry')
+    const contractRegistry = yield getContext('writeContractRegistry')
     const web3 = yield getContext('web3')
     const contractKey = yield select(contractKeyByAddress, address)
     const contract = contractRegistry.get(address, contractKey, web3)
