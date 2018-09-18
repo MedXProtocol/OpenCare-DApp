@@ -52,6 +52,7 @@
     "lodash.rangeright": "^4.2.0",
     "lodash.shuffle": "^4.2.0",
     "lodash.sortby": "^4.7.0",
+    "lodash.throttle": "^4.1.1",
     "lodash.values": "^4.3.0",
     "mixpanel-browser": "^2.22.4",
     "multiaddr": "^5.0.0",
