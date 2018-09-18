@@ -250,20 +250,20 @@ module.exports = {
 
     // Minify the code ...
     new UglifyJsPlugin({
-      sourceMap: true,
-      parallel: true,
+      sourceMap: false,
+      parallel: false,
       uglifyOptions: {
         ecma: 8,
-        warnings: true,
-        mangle: true,
+        warnings: false,
+        mangle: false,
         output: {
           comments: false,
           beautify: false
         },
-        toplevel: true,
+        toplevel: false,
         nameCache: null,
-        keep_classnames: true,
-        keep_fnames: true // keep_fnames false will break our web3 / metamask integration code!
+        keep_classnames: false,
+        keep_fnames: false // keep_fnames false will break our web3 / metamask integration code!
       }
     }),
   ],
