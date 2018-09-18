@@ -14,7 +14,7 @@ export class DebugLog extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      namespace: window.localStorage.debug || '*',
+      namespace: window.localStorage.debug || '-actions',
       logs: []
     }
   }
