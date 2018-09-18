@@ -10,10 +10,12 @@ export const addPendingTx = function(transaction, objIndex) {
        call.method === 'createAndAssignCaseWithPublicKey'
     || call.method === 'createAndAssignCase'
   )
+  console.log(isNewPatientCase)
 
   // TODO: Find a way to only fade this out after a few seconds
   // A tx we care about
   if (isNewPatientCase && (!confirmed || defined(error))) {
+    console.log('in here')
     caseRowObject = {
       ...transaction,
       objIndex
