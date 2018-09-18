@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import raf from 'raf'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import faTelegramPlane from '@fortawesome/fontawesome-free-brands/faTelegramPlane'
+import throttle from 'lodash.throttle'
 
 export const ScrollyFeedbackLink = class _ScrollyFeedbackLink extends Component {
   fixedStyle = {
@@ -22,13 +22,10 @@ export const ScrollyFeedbackLink = class _ScrollyFeedbackLink extends Component 
 
   constructor(props) {
     super(props)
-
     this.state = {
       previousScrollY: 0,
       hidden: true
     }
-
-    this.handlingScrollUpdate = false
   }
 
   getScrollY = () => {
@@ -41,20 +38,13 @@ export const ScrollyFeedbackLink = class _ScrollyFeedbackLink extends Component 
     }
   }
 
-  handleScroll = () => {
-    if (!this.handlingScrollUpdate) {
-      this.handlingScrollUpdate = true
-      raf(this.update)
-    }
-  }
-
-  update = () => {
+  update = throttle(() => {
     let currentScrollY = this.getScrollY()
     let hidden = this.state.hidden
 
     if (currentScrollY >= this.state.previousScrollY) {
       hidden = true
-    } else if (currentScrollY < (this.state.previousScrollY - this.props.scrollDiffAmount)) {
+    } else if (currentScrollY < this.state.previousScrollY) {
       hidden = false
     }
 
@@ -62,16 +52,16 @@ export const ScrollyFeedbackLink = class _ScrollyFeedbackLink extends Component 
       hidden: hidden,
       previousScrollY: currentScrollY
     })
-
-    this.handlingScrollUpdate = false
-  }
+  }, 200, { leading: true, trailing: false })
 
   componentDidMount() {
-    window.addEventListener('scroll', this.handleScroll)
+    window.addEventListener('scroll', this.update)
+    window.addEventListener('touchmove', this.update)
   }
 
   componentWillUnmount() {
-    window.removeEventListener('scroll', this.handleScroll)
+    window.removeEventListener('scroll', this.update)
+    window.removeEventListener('touchmove', this.update)
   }
 
   render() {
