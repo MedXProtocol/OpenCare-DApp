@@ -32,9 +32,7 @@
     "zeppelin-solidity": "1.10.0"
   },
   "dependencies": {
-    "babel-plugin-redux-saga": "^1.0.0-beta.2",
     "date-fns": "^2.0.0-alpha.16",
-    "redux-saga": "^1.0.0-beta.2",
     "websocket": "^1.0.26"
   }
 }
