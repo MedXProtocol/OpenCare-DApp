@@ -1,4 +1,4 @@
-import { getContext, put, select, call, fork } from 'redux-saga/effects'
+import { put, select, call, fork } from 'redux-saga/effects'
 import { delay } from 'redux-saga'
 import { bugsnagClient } from '~/bugsnagClient'
 import { customProviderWeb3 } from '~/utils/customProviderWeb3'
