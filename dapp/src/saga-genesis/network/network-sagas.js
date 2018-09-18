@@ -9,7 +9,6 @@ import {
   delay
 } from 'redux-saga'
 import { bugsnagClient } from '~/bugsnagClient'
-const debug = require('debug')('network-sagas')
 
 export function* refreshNetwork() {
   const web3 = yield getContext('web3')

@@ -14,6 +14,7 @@ import {
   contractKeyByAddress,
   contractByName
 } from '../state-finders'
+const debug = require('debug')('call-cache-sagas')
 
 const callsInFlight = new Set()
 
@@ -127,6 +128,8 @@ function* findCallMethod(call) {
 Triggers the web3 call.
 */
 function* web3CallExecute({call}) {
+  debug(`web3CallExecute`, call)
+
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
     const options = { from: account }
@@ -136,6 +139,7 @@ function* web3CallExecute({call}) {
         let response = yield reduxSagaCall(callMethod, options, 'pending')
         yield put({ type: 'WEB3_CALL_RETURN', call, response })
       } catch (error) {
+        debug(`web3CallExecute rpc ERROR: ${error}`)
         yield put({ type: 'WEB3_CALL_ERROR', call, error })
         console.error('Error on WEB3 Call: ', call.method, call.args, call, error)
       } finally {
@@ -143,6 +147,7 @@ function* web3CallExecute({call}) {
       }
     })
   } catch (error) {
+    debug(`web3CallExecute general ERROR: ${error}`)
     if (yield cancelled()) {
       console.warn('Cancelled on WEB3 Call: ', call.method, call.args, call, error)
       yield put({ type: 'WEB3_CALL_CANCELLED', call })

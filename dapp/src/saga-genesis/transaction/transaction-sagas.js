@@ -10,14 +10,19 @@ import {
   END
 } from 'redux-saga'
 import { contractKeyByAddress } from '../state-finders'
+const debug = require('debug')('transaction-sagas')
 
 function createTransactionEventChannel (web3, call, transactionId, send, options) {
+  debug(`createTransactionEventChannel ${transactionId}`, call)
+
   return eventChannel(emit => {
     let promiEvent = send(options)
       .on('transactionHash', (txHash) => {
+        debug(`transactionHash ${transactionId} ${txHash}`)
         emit({ type: 'TRANSACTION_HASH', transactionId, txHash, call })
       })
       .on('confirmation', (confirmationNumber, receipt) => {
+        debug(`confirmation ${transactionId} ${confirmationNumber}`)
         emit({ type: 'TRANSACTION_CONFIRMATION', transactionId, confirmationNumber, receipt })
         if (confirmationNumber > 2) {
           emit({ type: 'TRANSACTION_CONFIRMED', transactionId, call, confirmationNumber, receipt })
@@ -25,9 +30,12 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
         }
       })
       .on('receipt', (receipt) => {
+        debug(`receipt ${transactionId}`, receipt)
         emit({ type: 'TRANSACTION_RECEIPT', transactionId, receipt })
       })
       .on('error', error => {
+        debug(`error ${transactionId} ${error}`)
+
         const txObject = { type: 'TRANSACTION_ERROR', transactionId, call, error: error.toString() }
         const gasUsed = error.message.match(/"gasUsed": ([0-9]*)/)
 
@@ -45,6 +53,8 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
 }
 
 export function* web3Send({ transactionId, call, options }) {
+  debug(`web3Send ${transactionId}`, call)
+
   const { address, method, args } = call
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
@@ -73,7 +83,7 @@ export function* web3Send({ transactionId, call, options }) {
       transactionChannel.close()
     }
   } catch (error) {
-    console.error(error)
+    debug(`web3Send ERROR ${transactionId}`, call)
     yield put({type: 'TRANSACTION_ERROR', transactionId, call, error: error.message})
   }
 }

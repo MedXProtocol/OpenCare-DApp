@@ -75,7 +75,7 @@ export class DebugLog extends PureComponent {
     if (remainingArgs.length) {
       var preArgs = <pre style={{ fontSize: '10px' }}>
         {prettyFormat(remainingArgs, {
-          maxDepth: 4
+          maxDepth: 2
         })}
       </pre>
     }
@@ -113,7 +113,7 @@ export class DebugLog extends PureComponent {
                 value={this.state.namespace}
                 onChange={(event) => this.setState({ namespace: event.target.value })}
                 className="form-control input-sm"
-                placeholder="block-sagas:*" />
+                placeholder="block-sagas,-actions" />
             </div>
             <div className='form-group col-sm-6 text-left'>
               <label>Controls</label>
