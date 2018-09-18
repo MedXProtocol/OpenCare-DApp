@@ -301,3 +301,9 @@ small,
 .info-question-mark {
   cursor: pointer;
 }
+
+.button-container {
+  @media (min-width: $screen-sm) {
+    text-align: right;
+  }
+}

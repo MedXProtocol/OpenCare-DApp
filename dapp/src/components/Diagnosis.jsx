@@ -308,20 +308,26 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
       var buttons =
         <div className="card-footer">
           <div className="row">
-            <div className="col-xs-12 text-right" >
+            <div className="col-xs-12 button-container">
               <button
                 disabled={transactionRunning}
                 onClick={this.handleChallengeDiagnosis}
                 type="button"
                 className="btn btn-warning"
-              >Get Second Opinion</button>
+              >
+                Get Second Opinion
+              </button>
               &nbsp;
+              <br className="visible-xs hidden-sm hidden-md hidden-lg" />
+              <br className="visible-xs hidden-sm hidden-md hidden-lg" />
               <button
                 disabled={transactionRunning}
                 onClick={this.handleAcceptDiagnosis}
                 type="button"
                 className="btn btn-success"
-              >Accept and Withdraw ({challengeFeeEtherNoFlip})</button>
+              >
+                Accept and Withdraw ({challengeFeeEtherNoFlip})
+              </button>
             </div>
           </div>
         </div>
