@@ -1,6 +1,10 @@
 import {
+  call,
   put
 } from 'redux-saga/effects'
+import {
+  delay
+} from 'redux-saga'
 
 import Web3 from 'web3'
 
@@ -18,5 +22,6 @@ function* web3Initialize() {
 }
 
 export default function* () {
+  yield call(delay, 6000)
   yield web3Initialize()
 }
