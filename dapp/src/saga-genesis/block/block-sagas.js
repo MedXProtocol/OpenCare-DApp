@@ -1,5 +1,5 @@
 import {
-  // getContext,
+  getContext,
   call,
   put,
   all,
@@ -32,8 +32,8 @@ export function* addAddressIfExists(addressSet, address) {
 }
 
 export function* getReceiptData(txHash) {
-  // const web3 = yield getContext('web3')
-  const web3 = customProviderWeb3()
+  const web3 = yield getContext('web3')
+  // const web3 = customProviderWeb3()
 
   for (let i = 0; i < MAX_RETRIES; i++) {
     const receipt = yield call(web3.eth.getTransactionReceipt, txHash)
@@ -94,8 +94,8 @@ export function* latestBlock({ block }) {
 
 function* updateCurrentBlockNumber() {
   try {
-    // const web3 = yield getContext('web3')
-    const web3 = customProviderWeb3()
+    const web3 = yield getContext('web3')
+    // const web3 = customProviderWeb3()
 
     const blockNumber = yield call(web3.eth.getBlockNumber)
     const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
@@ -127,8 +127,8 @@ function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
 }
 
 function* getBlockData(blockId) {
-  // const web3 = yield getContext('web3')
-  const web3 = customProviderWeb3()
+  const web3 = yield getContext('web3')
+  // const web3 = customProviderWeb3()
   for (let i = 0; i < MAX_RETRIES; i++) {
     const block = yield call(web3.eth.getBlock, blockId, true)
 
