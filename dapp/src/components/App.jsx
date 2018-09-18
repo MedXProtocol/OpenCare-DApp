@@ -43,8 +43,7 @@ import {
   cacheCallValueBigNumber,
   contractByName,
   LogListener,
-  withSaga,
-  withContractRegistry
+  withSaga
 } from '~/saga-genesis'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
@@ -117,7 +116,7 @@ function* saga({ address, CaseManager, CaseStatusManager, DoctorManager, doctorC
   }
 }
 
-const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
+const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     class _App extends Component {
 
@@ -335,6 +334,6 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       </React.Fragment>
   )
 }
-}))))
+})))
 
 export default hot(module)(withRouter(App))

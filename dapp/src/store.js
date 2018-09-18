@@ -9,14 +9,16 @@ import { bugsnagClient } from '~/bugsnagClient'
 
 const debug = require('debug')('actions')
 
-export const contractRegistry = new ContractRegistry(contractRegistryOptions)
+export const writeContractRegistry = new ContractRegistry(contractRegistryOptions)
+export const readContractRegistry = new ContractRegistry(contractRegistryOptions)
 export const callCountRegistry = new CallCountRegistry()
 export const logRegistry = new CallCountRegistry()
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const sagaMiddleware = createSagaMiddleware({
   context: {
-    contractRegistry,
+    writeContractRegistry,
+    readContractRegistry,
     callCountRegistry,
     logRegistry
   }

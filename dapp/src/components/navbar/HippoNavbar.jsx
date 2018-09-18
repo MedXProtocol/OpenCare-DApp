@@ -28,7 +28,6 @@ import get from 'lodash.get'
 import { connect } from 'react-redux'
 import {
   cacheCall,
-  withContractRegistry,
   withSaga,
   cacheCallValue,
   contractByName
@@ -96,8 +95,7 @@ function* saga({ address, DoctorManager, WrappedEther }) {
   ])
 }
 
-export const HippoNavbar = withContractRegistry(
-  connect(mapStateToProps, mapDispatchToProps)(
+export const HippoNavbar = connect(mapStateToProps, mapDispatchToProps)(
     withSaga(saga)(
       class _HippoNavbar extends Component {
 
@@ -329,7 +327,7 @@ export const HippoNavbar = withContractRegistry(
       </Navbar>
     );
   }
-})))
+}))
 
 HippoNavbar.propTypes = {
   transparent: PropTypes.bool

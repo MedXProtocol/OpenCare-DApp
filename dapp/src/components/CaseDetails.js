@@ -11,7 +11,6 @@ import { downloadJson, downloadImage } from '../utils/storage-util'
 import { all } from 'redux-saga/effects'
 import {
   contractByName,
-  withContractRegistry,
   withSaga,
   cacheCallValueInt,
   cacheCall,
@@ -64,7 +63,7 @@ function* saga({ CaseScheduleManager, caseAddress, networkId, fromBlock }) {
   ])
 }
 
-export const CaseDetails = withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
+export const CaseDetails = connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     class _CaseDetails extends Component {
 
@@ -417,7 +416,7 @@ export const CaseDetails = withContractRegistry(connect(mapStateToProps, mapDisp
     }
     return <LogListener address={caseAddress} fromBlock={this.props.fromBlock}>{jsx}</LogListener>
   }
-})))
+}))
 
 CaseDetails.propTypes = {
   caseAddress: PropTypes.string,

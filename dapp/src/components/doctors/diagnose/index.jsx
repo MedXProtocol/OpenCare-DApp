@@ -13,7 +13,6 @@ import get from 'lodash.get'
 import {
   cacheCall,
   addContract,
-  withContractRegistry,
   withSaga,
   LogListener,
   cacheCallValue,
@@ -71,7 +70,7 @@ function* saga({ match, address, AccountManager, fromBlock }) {
   ])
 }
 
-export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class _DiagnoseCase extends Component {
+export const DiagnoseCaseContainer = connect(mapStateToProps)(withSaga(saga)(class _DiagnoseCase extends Component {
   render () {
     if (isEmptyObject(this.props.match.params)) { return null }
 
@@ -190,4 +189,4 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
       </div>
     )
   }
-})))
+}))
