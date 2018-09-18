@@ -15,6 +15,8 @@ import { takeSequentially } from '~/saga-genesis/utils/takeSequentially'
 import { bugsnagClient } from '~/bugsnagClient'
 import { customProviderWeb3 } from '~/utils/customProviderWeb3'
 
+const debug = require('debug')('block-sagas')
+
 const MAX_RETRIES = 50
 
 export function* addAddressIfExists(addressSet, address) {
@@ -46,6 +48,7 @@ export function* getReceiptData(txHash) {
 }
 
 function* transactionReceipt({ receipt }) {
+  debug(`transactionReceipt(): `: receipt)
   const addressSet = new Set()
   yield all(receipt.logs.map(function* (log) {
     yield call(addAddressIfExists, addressSet, log.address)
@@ -69,6 +72,7 @@ export function* invalidateAddressSet(addressSet) {
 }
 
 export function* latestBlock({ block }) {
+  debug(`latestBlock(): `, block)
   try {
     const addressSet = new Set()
     for (var i in block.transactions) {
@@ -105,6 +109,7 @@ function* updateCurrentBlockNumber() {
 }
 
 function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
+  debug(`gatherLatestBlocks(${blockNumber}, ${lastBlockNumber})`)
   if (!lastBlockNumber) { return }
 
   try {
@@ -148,6 +153,6 @@ export default function* () {
   yield fork(takeSequentially, 'BLOCK_LATEST', latestBlock)
   yield fork(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', transactionReceipt)
   yield fork(takeSequentially, 'UPDATE_BLOCK_NUMBER', gatherLatestBlocks)
-
-  yield startBlockPolling()
+  yield fork(startBlockPolling)
+  debug('Started.')
 }

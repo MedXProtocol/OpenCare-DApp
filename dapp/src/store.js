@@ -7,6 +7,8 @@ import contractRegistryOptions from './contract-registry-options'
 import { preloadedState } from '~/services/preloadedStateService'
 import { bugsnagClient } from '~/bugsnagClient'
 
+const debug = require('debug')('actions')
+
 export const contractRegistry = new ContractRegistry(contractRegistryOptions)
 export const callCountRegistry = new CallCountRegistry()
 export const logRegistry = new CallCountRegistry()
@@ -20,10 +22,17 @@ const sagaMiddleware = createSagaMiddleware({
   }
 })
 
+function logger({ getState }) {
+  return next => action => {
+    debug(action.type, action)
+    return next(action)
+  }
+}
+
 let store = createStore(
   reducers,
   preloadedState(),
-  composeEnhancers(applyMiddleware(sagaMiddleware))
+  composeEnhancers(applyMiddleware(logger, sagaMiddleware))
 )
 sagaMiddleware.run(sagas)
 

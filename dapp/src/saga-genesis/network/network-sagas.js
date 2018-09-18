@@ -9,6 +9,7 @@ import {
   delay
 } from 'redux-saga'
 import { bugsnagClient } from '~/bugsnagClient'
+const debug = require('debug')('network-sagas')
 
 export function* refreshNetwork() {
   const web3 = yield getContext('web3')
@@ -33,6 +34,5 @@ export function* startNetworkPolling() {
 }
 
 export default function* () {
-  // console.log('IN START NETWORKING POLLING')
   yield fork(startNetworkPolling)
 }

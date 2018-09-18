@@ -34,6 +34,7 @@ import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
 import { bugsnagClient } from '~/bugsnagClient'
+import { DebugLog } from '~/components/DebugLog'
 import { connect } from 'react-redux'
 import {
   cacheCall,
@@ -241,6 +242,8 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
           <DebugLink />
           &nbsp;
           <a onClick={this.handleBugsnagTrigger} className='btn btn-danger'>Trigger Bugsnag Notification</a>
+          <br />
+          <DebugLog />
         </div>
     }
 
