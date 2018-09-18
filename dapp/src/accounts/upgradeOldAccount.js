@@ -5,10 +5,6 @@ function formatOldKey(address) {
   return `account-${address.toLowerCase()}`
 }
 
-function deleteOldAccount(address) {
-  localStorage.removeItem(formatOldKey(address))
-}
-
 // Check for an old account and upgrade it to the new account shape and key
 export const upgradeOldAccount = function(networkId, address) {
   const envNetworkId = parseInt(process.env.REACT_APP_REQUIRED_NETWORK_ID, 10)
@@ -20,8 +16,6 @@ export const upgradeOldAccount = function(networkId, address) {
     accountObject.networkId = networkId
     setAccountLocalStorage(networkId, address, accountObject)
   }
-
-  deleteOldAccount(address)
 
   return accountObject
 }
