@@ -12,7 +12,6 @@ function* getEthBalance() {
   }
   const balance = yield call(web3.eth.getBalance, address)
   const oldBalance = yield select(state => state.sagaGenesis.ethBalance.balance)
-  console.log(balance, oldBalance)
   if (oldBalance !== balance) {
     yield put({type: 'ETH_BALANCE', balance})
   }
@@ -25,7 +24,7 @@ function* startEthBalancePolling() {
     } catch (e) {
       bugsnagClient.notify(e)
     }
-    yield call(delay, 10000)
+    yield call(delay, 2000)
   }
 }
 
