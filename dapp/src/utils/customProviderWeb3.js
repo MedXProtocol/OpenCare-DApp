@@ -28,9 +28,7 @@ export const customProviderWeb3 = function() {
     throw new Error('*_PROVIDER_URL is undefined')
   }
 
-  console.log('setting customWeb3 to ', customProvider)
   customWeb3 = new Web3(new Web3.providers.HttpProvider(customProvider))
-  console.log(customWeb3)
   // customWeb3 = new Web3(customProvider)
 
   return customWeb3
