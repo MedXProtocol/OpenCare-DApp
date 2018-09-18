@@ -140,6 +140,10 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
           step = -1
         }
 
+        if (step > 3) {
+          step = -1
+        }
+
         return step
       }
 
