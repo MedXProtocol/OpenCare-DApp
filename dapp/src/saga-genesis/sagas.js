@@ -20,7 +20,9 @@ import { takeSequentially } from './utils/takeSequentially'
 export * from './call-cache/call-cache-sagas'
 
 export function* start({ web3 }) {
+  console.log('in start')
   yield setContext({ web3 })
+  console.log('setContext')
   yield all(
     [
       cacheCallSagas(),
