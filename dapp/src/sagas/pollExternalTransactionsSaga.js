@@ -1,5 +1,4 @@
 import {
-  getContext,
   call as reduxSagaCall,
   fork,
   put,
@@ -13,7 +12,6 @@ import { customProviderWeb3 } from '~/utils/customProviderWeb3'
 
 export function* checkExternalTransactionReceipts(web3) {
   try {
-    // const web3 = yield getContext('web3')
     const web3 = customProviderWeb3()
     const transactions = yield select((state) => state.externalTransactions.transactions)
 
