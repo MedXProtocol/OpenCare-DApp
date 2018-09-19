@@ -608,7 +608,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
             sexuallyActive: this.state.sexuallyActive,
             age: this.state.age,
             country: this.state.country,
-            region: this.state.region,
+            region: this.state.region ? this.state.region.value : '',
             prevTreatment: this.state.prevTreatment,
             description: this.state.description
           }

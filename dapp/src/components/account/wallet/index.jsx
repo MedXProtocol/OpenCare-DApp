@@ -131,7 +131,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                       {wethEtherscanLink}
                     </small>
                   </p>
-                  <span class="sm-block text-gray">
+                  <span className="sm-block text-gray">
                     You can withdraw your W-ETH balance into regular Ether.
                     <br />
                     <a
@@ -164,7 +164,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                       {daiEtherscanLink}
                     </small>
                   </p>
-                  <span class="sm-block text-gray">
+                  <span className="sm-block text-gray">
                     DAI is a stablecoin (1 Dai = $1 USD).
                     <br /> You can purchase DAI from&nbsp;<a
                       target="_blank"
