@@ -15,6 +15,7 @@ import {
 import { CaseRow } from '~/components/CaseRow'
 import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
+import { transactionFinders } from '~/finders/transactionFinders'
 import { addPendingTx } from '~/services/pendingTxs'
 import { defined } from '~/utils/defined'
 import { Pagination } from '~/components/Pagination'
@@ -29,7 +30,8 @@ function mapStateToProps(state, props) {
   let caseAddresses = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-  const transactions = Object.values(state.sagaGenesis.transactions)
+  const createAndAssignCaseTxs = transactionFinders.createAndAssignCase(state)
+
   const caseCount = cacheCallValueInt(state, CaseManager, 'getPatientCaseListCount', address)
   const currentPage = parseInt(props.match.params.currentPage, 10)
 
@@ -50,7 +52,7 @@ function mapStateToProps(state, props) {
     caseAddresses,
     CaseManager,
     currentPage,
-    transactions
+    createAndAssignCaseTxs
   }
 }
 
@@ -102,7 +104,7 @@ export const PatientCases = connect(mapStateToProps)(withSaga(saga)(class _Patie
 
   render() {
     let loadingLines, noCases, caseRows
-    const { caseAddresses, caseCount, transactions } = this.props
+    const { caseAddresses, caseCount, createAndAssignCaseTxs } = this.props
     const loading = (this.props.caseCount === undefined)
 
     const totalPages = Math.ceil(this.props.caseCount / MAX_CASES_PER_PAGE)
@@ -115,7 +117,7 @@ export const PatientCases = connect(mapStateToProps)(withSaga(saga)(class _Patie
           </div>
         </div>
       )
-    } else if (!caseAddresses.length) {
+    } else if (!caseAddresses.length && createAndAssignCaseTxs.length === 0) {
       noCases = (
         <div className="blank-state">
           <div className="blank-state--inner text-center text-gray">
@@ -134,7 +136,7 @@ export const PatientCases = connect(mapStateToProps)(withSaga(saga)(class _Patie
             leaveAnimation="accordionVertical"
             className="case-list"
           >
-            {this.renderCaseRows(caseAddresses, transactions, caseCount)}
+            {this.renderCaseRows(caseAddresses, createAndAssignCaseTxs, caseCount)}
           </FlipMove>
         </div>
       )
