@@ -6,6 +6,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const CommonsChunkPlugin = require('webpack/optimize/CommonsChunkPlugin')
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const paths = require('./paths');
@@ -211,6 +212,11 @@ module.exports = {
     ],
   },
   plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'commons',
+      minChunks: Infinity
+    }),
+
     new BugsnagSourceMapPlugin({
       apiKey: process.env.REACT_APP_BUGSNAG_API_KEY,
       publicPath: `${process.env.DEPLOY_URL}`,
