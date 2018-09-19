@@ -17,6 +17,8 @@ import {
   withSend,
   TransactionStateHandler
 } from '~/saga-genesis'
+import oasisDirectButtonImg from '~/assets/img/oasis-direct-button.png'
+import oasisDirectButtonImg2x from '~/assets/img/oasis-direct-button@2x.png'
 
 function mapStateToProps (state) {
   const transactions = get(state, 'sagaGenesis.transactions')
@@ -117,6 +119,28 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
               </div>
             </div>
           </div>
+
+
+          <div className="row">
+            <div className="col-sm-12">
+              <div className="card">
+                <div className="card-body">
+                  <p className="no-margin">
+                    W-ETH is wrapped Ether. When you have a W-ETH balance you can withdraw it into regular Ether.
+                    <br />
+                    <br />
+                    DAI is a stablecoin (1 Dai = $1 USD). You can purchase more DAI from&nbsp;<a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://oasis.direct/"
+                    >Oasis Direct</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
           <div className="row">
             <div className="col-sm-6">
               <div className="card">
@@ -153,7 +177,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                     </small>
                   </h3>
                 </div>
-                <div className="card-body ">
+                <div className="card-body">
                   <div className="form-wrapper">
                     <p className='lead text-center'>
                       &nbsp; <Dai wei={this.props.daiBalance} />
@@ -161,7 +185,19 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                   </div>
                 </div>
                 <div className="card-footer text-right">
-                  &nbsp;
+                  <span data-tip={`You can purchase more DAI from Oasis Direct`}>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://oasis.direct/"
+                    >
+                      <img
+                        src={oasisDirectButtonImg}
+                        alt="Oasis Direct Button"
+                        srcSet={`${oasisDirectButtonImg} 1x, ${oasisDirectButtonImg2x} 2x`}
+                      />
+                    </a>
+                  </span>
                 </div>
               </div>
             </div>
