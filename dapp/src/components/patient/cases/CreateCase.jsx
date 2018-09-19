@@ -163,7 +163,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
             paymentMethod: 'ETH',
             pregnant: null,
             prevTreatment: null,
-            region: '',
+            region: null,
             regionOptions: [],
             secondImageFileName: null,
             secondImageHash: null,
@@ -436,7 +436,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
         }
 
         findNewDoctor = () => {
-          this.props.dispatchPatientInfo(this.state.country, this.state.region)
+          this.props.dispatchPatientInfo(this.state.country, this.state.region ? this.state.region.value : '')
         }
 
         checkCountry = () => {
@@ -447,7 +447,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
           } else {
             pull(requiredFields, 'region')
 
-            this.setState({ region: '' })
+            this.setState({ region: null })
             this.regionInput.select.clearValue()
           }
 
@@ -568,11 +568,11 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
         }
 
         handleCountryChange = (newValue) => {
-          this.setState({ country: newValue.value }, this.checkCountry)
+          this.setState({ country: newValue.value, region: null }, this.checkCountry)
         }
 
         handleRegionChange = (newValue) => {
-          this.setState({ region: newValue ? newValue.value : '' }, () => {
+          this.setState({ region: newValue }, () => {
             if (this.isCanadaOrUSA()) {
               this.validateField('region')
 
