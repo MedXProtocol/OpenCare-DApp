@@ -73,7 +73,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                   </p>
                   <hr />
                   <p className="text-danger small">
-                    NOTE: This is the public Beta 2.4 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for September 2018.
+                    NOTE: This is the public Beta 2.5 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for September 2018.
                   </p>
                 </div>
 
