@@ -14,24 +14,27 @@ function mapStateToProps(state) {
 
 export const EtherscanLink = connect(mapStateToProps)(class _EtherscanLink extends Component {
   static propTypes = {
-    address: PropTypes.string.isRequired
+    address: PropTypes.string.isRequired,
+    networkId: PropTypes.number
   }
 
   render () {
     var url
-
     switch(this.props.networkId) {
-      case '1':
+      case 1:
         url = `https://etherscan.io/address/${this.props.address}`
         break
-      case '3':
+      case 3:
         url = `https://ropsten.etherscan.io/address/${this.props.address}`
         break
-      case '4':
+      case 4:
         url = `https://rinkeby.etherscan.io/address/${this.props.address}`
         break
-      case '42':
+      case 42:
         url = `https://kovan.etherscan.io/address/${this.props.address}`
+        break
+      case 1234:
+        url = `https://localhost.etherscan.io/address/${this.props.address}`
         break
       // no default
     }

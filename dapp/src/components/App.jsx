@@ -164,6 +164,12 @@ function* saga({ address, CaseManager, CaseStatusManager, DoctorManager, doctorC
 const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     class _App extends Component {
+      constructor(props) {
+        super(props)
+        this.state = {
+          debugging: false
+        }
+      }
 
   componentDidMount () {
     window.addEventListener("beforeunload", this.unload)
@@ -281,13 +287,21 @@ const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
     }
 
     if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
+      if (this.state.debugging) {
+        var debugLog =
+          <div>
+            <hr />
+            <DebugLog />
+          </div>
+      }
       var debugLink =
         <div>
           <DebugLink />
           &nbsp;
           <a onClick={this.handleBugsnagTrigger} className='btn btn-danger'>Trigger Bugsnag Notification</a>
-          <br />
-          <DebugLog />
+          &nbsp;
+          <a onClick={() => this.setState({ debugging: !this.state.debugging })} className='btn btn-info'>Toggle Log</a>
+          {debugLog}
         </div>
     }
 

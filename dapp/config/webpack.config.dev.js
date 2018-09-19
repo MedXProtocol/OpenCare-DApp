@@ -253,7 +253,6 @@ module.exports = {
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     // new BundleAnalyzerPlugin(),
-
     new webpack.optimize.CommonsChunkPlugin({
       name: 'commons',
       filename: 'commons.[hash].js',

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGroup'
 import { HippoTextInput } from '~/components/forms/HippoTextInput'
 import classnames from 'classnames'
@@ -7,7 +7,7 @@ import * as Animated from 'react-select/lib/animated';
 import { customStyles } from '~/config/react-select-custom-styles'
 import { countries } from '~/lib/countries'
 
-export const PatientInfo = class _PatientInfo extends Component {
+export const PatientInfo = class _PatientInfo extends PureComponent {
 
   render() {
     const {
@@ -93,7 +93,7 @@ export const PatientInfo = class _PatientInfo extends Component {
                 ref={this.props.setRegionRef}
                 options={this.props.regionOptions}
                 onChange={this.props.handleRegionChange}
-                selected={region}
+                value={region}
               />
               {errors['region']}
             </div>
