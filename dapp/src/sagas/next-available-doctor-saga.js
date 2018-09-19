@@ -11,6 +11,8 @@ import {
 import shuffle from 'lodash.shuffle'
 import range from 'lodash.range'
 
+const debug = require('debug')('next-available-doctor-saga')
+
 function* doctorManager() {
   return yield select(state => contractByName(state, 'DoctorManager'))
 }
@@ -36,6 +38,8 @@ function* isExcluded(doctorAddress) {
 }
 
 function* fetchDoctorCredentials(address) {
+  debug(`fetchDoctorCredentials(${address})`)
+
   let credentials = null
 
   if (yield isExcluded(address)) { return null }
@@ -53,9 +57,13 @@ function* fetchDoctorCredentials(address) {
   if (patientAddress === undefined) { return null }
 
   const patientIsDoctor = yield web3Call(yield doctorManager(), 'isDoctor', patientAddress)
-  const patientUSOrCADifferentRegion = yield sameCountryDifferentRegion(address)
+  const regionMatches = yield isRegionMatch(address)
 
-  if (!patientIsDoctor && patientUSOrCADifferentRegion) { return null }
+  if (!patientIsDoctor && !regionMatches) {
+    return null
+  }
+
+  debug(`fetchDoctorCredentials(${address}): MATCH patientIsDoctor: ${patientIsDoctor}, regionMatches: ${regionMatches}`)
 
   credentials = {
     address,
@@ -68,19 +76,21 @@ function* fetchDoctorCredentials(address) {
 
 // When the patient is in Canada and the same province then it's ok, but if other
 // province then it's not okay. Same goes for USA
-function* sameCountryDifferentRegion(address) {
+function* isRegionMatch(address) {
   const patientCountry = yield select(state => state.nextAvailableDoctor.patientCountry)
   const patientRegion = yield select(state => state.nextAvailableDoctor.patientRegion)
   const doctorCountry = yield web3Call(yield doctorManager(), 'country', address)
   const doctorRegion = yield web3Call(yield doctorManager(), 'region', address)
 
-  if (
-    patientCountry === doctorCountry
-    && (patientCountry === 'US' || patientCountry === 'CA')
-    && patientRegion !== doctorRegion
-  ) {
-    return true
-  }
+  debug(`isRegionMatch(${address}): ${doctorCountry}, ${doctorRegion} patient: ${patientCountry}, ${patientRegion}`)
+
+  const requiresRegionMatch = patientCountry === 'US' || patientCountry === 'CA'
+
+  return (
+    requiresRegionMatch &&
+    patientCountry === doctorCountry &&
+    patientRegion === doctorRegion
+  )
 }
 
 function* fetchDoctorByAddress(address) {
@@ -98,6 +108,7 @@ function* fetchDoctorByAddress(address) {
 }
 
 function* fetchDoctorByIndex(index) {
+  debug(`fetchDoctorByIndex(${index})`)
   let doctor = null
 
   const DoctorManager = yield doctorManager()
@@ -106,6 +117,7 @@ function* fetchDoctorByIndex(index) {
 
   if (credentials) {
     const name = yield web3Call(DoctorManager, 'doctorNames', index)
+    debug(`fetchDoctorByIndex(${index}): found ${name}`)
     doctor = {
       index, name, ...credentials
     }
@@ -114,20 +126,23 @@ function* fetchDoctorByIndex(index) {
 }
 
 function* findNextAvailableDoctor() {
+  debug('findNextAvailableDoctor')
   let doctor = yield findNextAvailableOnlineDoctor()
   if (!doctor) {
     doctor = yield priorityDoctorOrOfflineDoctor()
   }
   if (doctor) {
+    debug(`findNextAvailableDoctor: found: ${doctor.address}`)
     yield put({ type: 'NEXT_AVAILABLE_DOCTOR', doctor })
   } else {
+    debug(`findNextAvailableDoctor: NO DOCTOR`)
     yield put({ type: 'NO_DOCTORS_AVAILABLE' })
   }
 }
 
 function* priorityDoctorOrOfflineDoctor() {
+  debug('priorityDoctorOrOfflineDoctor')
   let doctor = yield findNextPriorityDoctor()
-
   if (!doctor) {
     doctor = yield findNextAvailableOfflineDoctor()
   }
@@ -136,17 +151,22 @@ function* priorityDoctorOrOfflineDoctor() {
 }
 
 function* findNextAvailableOnlineDoctor () {
+  debug('findNextAvailableOnlineDoctor')
   let onlineAddresses = Object.keys(yield select(state => state.heartbeat.users))
   let doctor = null
   onlineAddresses = shuffle(onlineAddresses)
   for (var i = 0; i < onlineAddresses.length; i++) {
     doctor = yield fetchDoctorByAddress(onlineAddresses[i])
-    if (doctor) { break }
+    if (doctor) {
+      debug(`findNextAvailableOnlineDoctor: fetchDoctorByAddress: ${doctor.address}`)
+      break
+    }
   }
   return doctor
 }
 
 function* findNextPriorityDoctor() {
+  debug('findNextPriorityDoctor')
   let doctor = null
   let addresses = []
   if (process.env.REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES) {
@@ -160,6 +180,7 @@ function* findNextPriorityDoctor() {
     doctor = yield fetchDoctorByAddress(addresses[i])
 
     if (doctor) {
+      debug(`findNextPriorityDoctor: found: ${doctor.address}`)
       break
     }
   }
@@ -168,6 +189,7 @@ function* findNextPriorityDoctor() {
 }
 
 function* findNextAvailableOfflineDoctor() {
+  debug('findNextAvailableOfflineDoctor')
   const DoctorManager = yield doctorManager()
   const doctorCount = yield web3Call(DoctorManager, 'doctorCount')
   let doctor = null
@@ -182,6 +204,7 @@ function* findNextAvailableOfflineDoctor() {
 
     doctor = yield fetchDoctorByIndex(randomIndex)
     if (doctor) {
+      debug(`findNextAvailableOfflineDoctor: found: ${doctor.address}`)
       break
     }
 
