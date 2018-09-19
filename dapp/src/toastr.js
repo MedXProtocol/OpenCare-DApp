@@ -34,8 +34,8 @@ function warning(message, link) {
   toastrLib.light('Warning', message, options)
 }
 
-function transactionError(transactionError) {
-  error(txErrorMessage(transactionError))
+function transactionError(exception) {
+  error(txErrorMessage(exception))
 }
 
 export const toastr = {
