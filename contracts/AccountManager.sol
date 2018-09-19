@@ -23,6 +23,11 @@ contract AccountManager is Initializable, DelegateTarget {
     It is safe to add new data definitions here
   */
 
+  modifier notOwner(address _address) {
+    require(_address != owner);
+    _;
+  }
+
   event PublicKeySet(address indexed user, bytes publicKey);
 
   function initializeTarget(address _registry, bytes32) public notInitialized {
@@ -31,7 +36,7 @@ contract AccountManager is Initializable, DelegateTarget {
     registry = Registry(_registry);
   }
 
-  function setPublicKey(address _address, bytes _publicKey) external {
+  function setPublicKey(address _address, bytes _publicKey) external notOwner(_address) {
     bool isSender = (msg.sender == _address);
     bool isCaseManager = (msg.sender == address(registry.caseManager()));
     bool isOwner = msg.sender == owner;
