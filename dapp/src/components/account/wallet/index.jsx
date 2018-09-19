@@ -120,38 +120,26 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
             </div>
           </div>
 
-
-          <div className="row">
-            <div className="col-sm-12">
-              <div className="card">
-                <div className="card-body">
-                  <p className="no-margin">
-                    W-ETH is wrapped Ether. When you have a W-ETH balance you can withdraw it into regular Ether.
-                    <br />
-                    <br />
-                    DAI is a stablecoin (1 Dai = $1 USD). You can purchase more DAI from&nbsp;<a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href="https://oasis.direct/"
-                    >Oasis Direct</a>.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
           <div className="row">
             <div className="col-sm-6">
               <div className="card">
                 <div className="card-header">
-                  <h3 className="title">
+                  <p className="lead lead--card-title">
                     W-ETH
                     &nbsp;
                     <small>
                       {wethEtherscanLink}
                     </small>
-                  </h3>
+                  </p>
+                  <span class="sm-block text-gray">
+                    You can withdraw your W-ETH balance into regular Ether.
+                    <br />
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://weth.io/"
+                    >Read More About W-ETH</a>
+                  </span>
                 </div>
                 <div className="card-body ">
                   <div className="form-wrapper">
@@ -169,13 +157,21 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
             <div className="col-sm-6">
               <div className="card">
                 <div className="card-header">
-                  <h3 className="title">
+                  <p className="lead lead--card-title">
                     DAI
                     &nbsp;
                     <small>
                       {daiEtherscanLink}
                     </small>
-                  </h3>
+                  </p>
+                  <span class="sm-block text-gray">
+                    DAI is a stablecoin (1 Dai = $1 USD).
+                    <br /> You can purchase DAI from&nbsp;<a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://oasis.direct/"
+                    >Oasis Direct</a>
+                  </span>
                 </div>
                 <div className="card-body">
                   <div className="form-wrapper">
@@ -185,7 +181,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                   </div>
                 </div>
                 <div className="card-footer text-right">
-                  <span data-tip={`You can purchase more DAI from Oasis Direct`}>
+                  <span data-tip={`You can purchase DAI from Oasis Direct`}>
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
