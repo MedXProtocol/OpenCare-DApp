@@ -6,6 +6,7 @@ import { isBlank } from '~/utils/isBlank'
 import {
   select,
   put,
+  call,
   takeLatest
 } from 'redux-saga/effects'
 import shuffle from 'lodash.shuffle'
@@ -84,11 +85,13 @@ function* isRegionMatch(address) {
 
   debug(`isRegionMatch(${address}): ${doctorCountry}, ${doctorRegion} patient: ${patientCountry}, ${patientRegion}`)
 
-  const requiresRegionMatch = patientCountry === 'US' || patientCountry === 'CA'
+  return checkRegionMatch(doctorCountry, doctorRegion, patientCountry, patientRegion)
+}
 
+export function checkRegionMatch(doctorCountry, doctorRegion, patientCountry, patientRegion) {
+  const requiresRegionMatch = (patientCountry === 'US' && doctorCountry === 'US') || (patientCountry === 'CA' && doctorCountry === 'CA')
   return (
-    requiresRegionMatch &&
-    patientCountry === doctorCountry &&
+    !requiresRegionMatch ||
     patientRegion === doctorRegion
   )
 }

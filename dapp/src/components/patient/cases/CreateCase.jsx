@@ -68,6 +68,8 @@ function mapStateToProps (state) {
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
   const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
+  const searchingForDoctor = get(state, 'nextAvailableDoctor.searching')
+  const doctor = get(state, 'nextAvailableDoctor.doctor')
 
   const sendEtherTx = externalTransactionFinders.sendEther(state)
   const sendDaiTx = externalTransactionFinders.sendDai(state)
@@ -76,6 +78,8 @@ function mapStateToProps (state) {
 
   return {
     AccountManager,
+    searchingForDoctor,
+    doctor,
     address,
     daiBalance,
     daiIsInFlight,
@@ -100,6 +104,9 @@ function mapDispatchToProps(dispatch) {
     },
     dispatchPatientInfo: (patientCountry, patientRegion) => {
       dispatch({ type: 'PATIENT_INFO', patientCountry, patientRegion })
+    },
+    dispatchNextAvailableDoctor: (doctor) => {
+      dispatch({ type: "NEXT_AVAILABLE_DOCTOR", doctor })
     }
   }
 }
@@ -124,7 +131,7 @@ const requiredFields = [
   'howLong',
   'sexuallyActive',
   'prevTreatment',
-  'selectedDoctor'
+  'doctor'
 ]
 // These fields are dynamically added as required depending on choices the user makes:
 // 'pregnant' => female only
@@ -491,7 +498,9 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
 
           for (var fieldIndex = 0; fieldIndex < length; fieldIndex++) {
             let fieldName = requiredFields[fieldIndex]
-            if (!isNotEmptyString(this.state[fieldName])) {
+            if (!isNotEmptyString(this.state[fieldName]) &&
+                !isNotEmptyString(this.props[fieldName])
+            ) {
               errors.push(fieldName)
             }
           }
@@ -519,7 +528,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
 
           if (!caseFeeEtherWei) {
             toastr.warning('The case fee has not been set.')
-          } else if (this.state.selectedDoctor && this.state.selectedDoctor.value === address) {
+          } else if (this.props.doctor && this.props.doctor.address === address) {
             toastr.warning('You cannot be your own Doctor.')
           } else if (noDoctorsAvailable) {
             toastr.warning('There are no Doctors currently available. Please try again later.')
@@ -581,10 +590,8 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
           })
         }
 
-        onChangeDoctor = (option) => {
-          this.setState({
-            selectedDoctor: option
-          })
+        handleOnChangeDoctor = (option) => {
+          this.props.dispatchNextAvailableDoctor(option.doctor)
         }
 
         createNewCase = async () => {
@@ -619,7 +626,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
           const caseKeySalt = genKey(32)
           const encryptedCaseKey = await account.encrypt(this.state.caseEncryptionKey, caseKeySalt)
 
-          const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
+          const doctorPublicKey = this.props.doctor.publicKey.substring(2)
           const doctorEncryptedCaseKey = await reencryptCaseKeyAsync({ account, encryptedCaseKey, doctorPublicKey, caseKeySalt })
 
           let hashHex = hashToHex(hash)
@@ -642,7 +649,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
               '0x' + encryptedCaseKey,
               '0x' + caseKeySalt,
               '0x' + hashHex,
-              this.state.selectedDoctor.value,
+              this.props.doctor.address,
               '0x' + doctorEncryptedCaseKey,
               '0x' + account.hexPublicKey()
             )({
@@ -656,7 +663,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
               '0x' + encryptedCaseKey,
               '0x' + caseKeySalt,
               '0x' + hashHex,
-              this.state.selectedDoctor.value,
+              this.props.doctor.address,
               '0x' + doctorEncryptedCaseKey
             )({
               value,
@@ -890,25 +897,14 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
 
                         <div className="row">
                           <div className="col-xs-12 col-sm-12 col-md-12">
-                            <div className={classnames("form-group", { 'has-error': !!errors['selectedDoctor'] })}>
-                              {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
-                                ?
-                                <div>
-                                  <label>Select a Doctor<span className='star'>*</span></label>
-                                    <DoctorSelect
-                                      excludeAddresses={[this.props.address]}
-                                      value={this.state.selectedDoctor}
-                                      isClearable={false}
-                                      onChange={this.onChangeDoctor} />
-                                </div>
-                                :
-                                <AvailableDoctorSelect
-                                  value={this.state.selectedDoctor}
-                                  onChange={this.onChangeDoctor}
-                                />
-                               }
-
-                              {errors['selectedDoctor']}
+                            <div className={classnames("form-group", { 'has-error': !!errors['doctor'] })}>
+                              <AvailableDoctorSelect
+                                doctor={this.props.doctor}
+                                noDoctorsAvailable={this.props.noDoctorsAvailable}
+                                searching={this.props.searchingForDoctor}
+                              />
+                            <input type='hidden' name='doctor' value={get(this.props.doctor, 'address', '')} />
+                              {errors['doctor']}
                             </div>
                           </div>
                         </div>
