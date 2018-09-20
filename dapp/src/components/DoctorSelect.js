@@ -11,7 +11,8 @@ export const DoctorSelect =
           value: doctor.address,
           publicKey: doctor.publicKey,
           isDermatologist: doctor.isDermatologist,
-          isActive: doctor.isActive
+          isActive: doctor.isActive,
+          doctor
         }))
         return <Select {...this.props} options={options} />
       }
