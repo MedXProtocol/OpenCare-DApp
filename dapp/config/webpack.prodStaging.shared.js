@@ -211,6 +211,12 @@ module.exports = {
     ],
   },
   plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'commons',
+      filename: 'commons.[hash].js',
+      minChunks: Infinity
+    }),
+
     new BugsnagSourceMapPlugin({
       apiKey: process.env.REACT_APP_BUGSNAG_API_KEY,
       publicPath: `${process.env.DEPLOY_URL}`,
