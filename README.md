@@ -1,4 +1,4 @@
-# MedCredits Smart Contracts & Dev Blockchain Server
+# MedX Protocol Smart Contracts & OpenCare Dev Blockchain Server
 
 [![Logo](assets/medcredwhitecropped.png)](https://medcredits.io/)
 
