@@ -139,6 +139,8 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                       rel="noopener noreferrer"
                       href="https://weth.io/"
                     >Read More About W-ETH</a>
+                    <br />
+                    <br />
                   </span>
                 </div>
                 <div className="card-body ">
@@ -166,11 +168,11 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                   </p>
                   <span className="sm-block text-gray">
                     DAI is a stablecoin (1 Dai = $1 USD).
-                    <br /> You can purchase DAI from&nbsp;<a
+                    <br /> You can exchange your W-ETH to DAI using <a
                       target="_blank"
                       rel="noopener noreferrer"
                       href="https://oasis.direct/"
-                    >Oasis Direct</a>
+                    >Oasis Direct</a> to avoid ETH volatility
                   </span>
                 </div>
                 <div className="card-body">
@@ -181,19 +183,17 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                   </div>
                 </div>
                 <div className="card-footer text-right">
-                  <span data-tip={`You can purchase DAI from Oasis Direct`}>
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href="https://oasis.direct/"
-                    >
-                      <img
-                        src={oasisDirectButtonImg}
-                        alt="Oasis Direct Button"
-                        srcSet={`${oasisDirectButtonImg} 1x, ${oasisDirectButtonImg2x} 2x`}
-                      />
-                    </a>
-                  </span>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://oasis.direct/"
+                  >
+                    <img
+                      src={oasisDirectButtonImg}
+                      alt="Oasis Direct Button"
+                      srcSet={`${oasisDirectButtonImg} 1x, ${oasisDirectButtonImg2x} 2x`}
+                    />
+                  </a>
                 </div>
               </div>
             </div>
