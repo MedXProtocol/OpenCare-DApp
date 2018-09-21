@@ -735,9 +735,9 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
             />
           }
 
-          if (this.props.daiIsInFlight) {
+          if (this.props.daiIsInFlight && this.state.paymentMethod === 'DAI') {
             var submitButtonTooltip = 'Your DAI is still transferring'
-          } else if (this.props.etherIsInflight) {
+          } else if (this.props.etherIsInflight && this.state.paymentMethod === 'ETH') {
             submitButtonTooltip = 'Your Ether is still transferring'
           }
 
