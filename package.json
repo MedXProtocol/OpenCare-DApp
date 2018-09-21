@@ -2,7 +2,8 @@
   "name": "OpenCare",
   "version": "0.0.1",
   "scripts": {
-    "start": "./scripts/ganache.sh",
+    "ganache": "./scripts/ganache.sh",
+    "dapp": "cd dapp && node --max-old-space-size=4096 scripts/start.js",
     "test": "truffle compile && truffle test",
     "test-watch": "./scripts/watch-tests.sh",
     "netlify-build": "./scripts/staging-build.sh",

@@ -4,7 +4,7 @@
 
 Smart contracts used by MedCredits.
 
-OpenCare Dapp readme is location [here](dapp/README.md)
+OpenCare dApp readme is location [here](dapp/README.md)
 
 ### Setup
 
@@ -32,7 +32,7 @@ To run the truffle tests:
 
 ### To run the Ganache server:
 
-`$ npm run start`
+`$ npm run ganache`
 
 ### To run the beta faucet lambda endpoint:
 
@@ -48,9 +48,17 @@ Then compile the functions and run the server with:
 
 `$ npm run lambda` (boots up lambda compute endpoints)
 
-### Running Webpack Dev server
+### Running the dApp (Webpack Dev server)
 
-See README.md in ./dapp directory
+Install the npm packages in the `dapp` dir:
+
+```sh
+$ cd dapp
+$ npm i
+$ cd ..
+```
+
+`$ npm run dapp`
 
 ### Migration
 
