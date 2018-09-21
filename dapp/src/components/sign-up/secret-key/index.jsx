@@ -100,14 +100,14 @@ export const SecretKey = class _SecretKey extends Component {
            </Modal.Header>
           <Modal.Body>
             <p>
-              Hippocrates is a decentralized application serving as an open bulletin
+              OpenCare is a decentralized application serving as an open bulletin
               board connecting users to dermatologists. The MedCredits team does not control or view
               user-physician encounters. Physician credentials are verified by nodes in the MedCredits’
               Token Curated Registry. The MedCredits team does not guarantee physician credentials nor
               control which physicians are able to participate in this decentralized application.
               Client side HIPAA-compliant encryption is used in an effort to maintain user confidentiality.
               However, we strongly advise users to avoid using any identifiers or images that
-              could compromise confidentiality.  The Hippocrates app is in Beta, and users are urged to
+              could compromise confidentiality.  The OpenCare app is in Beta, and users are urged to
               treat the application as such.
             </p>
           </Modal.Body>

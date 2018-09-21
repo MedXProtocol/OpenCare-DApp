@@ -10,7 +10,6 @@ import { toastr } from '~/toastr'
 import ReactTooltip from 'react-tooltip'
 import { withRouter } from 'react-router-dom'
 import classnames from 'classnames'
-import { isTrue } from '~/utils/isTrue'
 import { sleep } from '~/utils/sleep'
 import { isNotEmptyString } from '~/utils/isNotEmptyString'
 import { cancelablePromise } from '~/utils/cancelablePromise'
@@ -37,7 +36,6 @@ import {
   withSend,
   TransactionStateHandler
 } from '~/saga-genesis'
-import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { getExifOrientation } from '~/services/getExifOrientation'
 import { mixpanel } from '~/mixpanel'
@@ -798,7 +796,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
                             Tell your physician about your problem by answering the questions below.
                           </p>
                           <p className="text-gray">
-                            All information is encrypted and visible to only you and the dermatologist. By submitting a case on Hippocrates, you agree to the terms in our disclaimer: <a onClick={(e) => this.setState({ showDisclaimerModal: true })}>Read Disclaimer</a>
+                            All information is encrypted and visible to only you and the dermatologist. By submitting a case on OpenCare you agree to the terms in our disclaimer: <a onClick={(e) => this.setState({ showDisclaimerModal: true })}>Read Disclaimer</a>
                           </p>
                         </div>
                       </div>

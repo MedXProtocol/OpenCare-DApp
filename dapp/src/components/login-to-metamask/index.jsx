@@ -31,7 +31,7 @@ export const LoginToMetaMask = connect(mapStateToProps)(class _LoginToMetaMask e
                 <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
                   <div className="form-wrapper--body form-wrapper--body__extra-padding text-center">
                     <p className="lead">
-                      To continue using Hippocrates please log in to your MetaMask account
+                      To continue using OpenCare please log in to your MetaMask account
                     </p>
 
                     <img src={metaMaskFoxAndWordmarkImg} alt="MetaMask logo" />

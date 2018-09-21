@@ -60,7 +60,7 @@ export const PatientDashboardHeader = connect(mapStateToProps)(
         let reasonString
         const usageRestrictions = usageRestrictionsToString(this.props.usageRestrictionsInt)
         if (usageRestrictions === 'Locked') {
-          reasonString = 'You are currently not permitted to create<br /> new cases as Hippocrates is locked.'
+          reasonString = 'You are currently not permitted to create<br /> new cases as OpenCare is locked.'
         } else if (usageRestrictions === 'Only Doctors') {
           reasonString = 'You are currently not permitted to create<br /> new cases unless you are a Doctor.'
         }

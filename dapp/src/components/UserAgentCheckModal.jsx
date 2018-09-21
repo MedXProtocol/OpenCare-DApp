@@ -82,10 +82,10 @@ export const UserAgentCheckModal = class _UserAgentCheckModal extends Component 
         <Modal.Body>
           <div className="text-center">
             <p>
-              You are using an unsupported mobile DApp browser which has many bugs which will affect your Hippocrates experience.
+              You are using an unsupported mobile dApp browser which has many bugs which will affect your OpenCare experience.
             </p>
             <p>
-              We recommend using the Coinbase Wallet DApp browser:
+              We recommend using the Coinbase Wallet dApp browser:
             </p>
             <br />
             {link}

@@ -170,7 +170,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
                 <h3 className='text-center text-white title--inverse'>
-                  Sign in to Hippocrates
+                  Sign in to OpenCare
                 </h3>
                 {warning}
                 <SignInFormContainer
