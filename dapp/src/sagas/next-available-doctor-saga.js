@@ -6,7 +6,6 @@ import { isBlank } from '~/utils/isBlank'
 import {
   select,
   put,
-  call,
   takeLatest
 } from 'redux-saga/effects'
 import shuffle from 'lodash.shuffle'

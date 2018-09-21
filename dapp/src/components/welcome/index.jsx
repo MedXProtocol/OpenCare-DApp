@@ -43,13 +43,15 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
               <div className="form-wrapper form-wrapper--inverse">
                 <div className="form-wrapper--body">
                   <h3 className="text-center">
-                    Welcome to Hippocrates!
-                    <br /><small>The first DApp in the MedX Health System</small>
-                    <br /><small className="text-gray">Ask a board-certified specialist about your skin ailment today</small>
+                    Welcome to OpenCare!
+                    <br /><small>The first dApp in the MedX Health System</small>
+                    <br /><small className="text-gray">Connecting patients and physicians worldwide.</small>
+                    <br /><small className="text-gray">Supported medical specialties: Dermatology for skin ailments.</small>
+                    <br /><small className="text-gray"><strong>Coming soon:</strong> Ophthalmology, general medicine and radiology</small>
                   </h3>
                   <hr />
                   <p>
-                    Submit your case in under 2 minutes.
+                    Diagnose or submit a case in minutes.
                   </p>
                   <ol>
                     <li>
@@ -69,11 +71,11 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                     </li>
                   </ol>
                   <p>
-                    As the beta development progresses your cases may be reset from time to time.  If you see all of your cases vanish don't worry: your case count will be based on your complete history.
+                    As beta development progresses, your cases may be reset from time to time. If you see all of your cases vanish, don't worry. Your case count will be based on your complete history.
                   </p>
                   <hr />
                   <p className="text-danger small">
-                    NOTE: This is the public Beta 2.5 of Hippocrates and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for September 2018.
+                    NOTE: This is the public Beta 2.5 of OpenCare and is for <strong><em>testing purposes</em></strong> only. Cases will not be evaluated by licensed doctors. The public launch on Ethereum mainnet with board-certified doctors is scheduled for September 2018.
                   </p>
                 </div>
 
@@ -82,7 +84,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                     <Link
                       className="btn btn-lg btn-success"
                       to={launchLink}>
-                        Launch Hippocrates
+                        Launch OpenCare
                     </Link>
                   </div>
                 </div>

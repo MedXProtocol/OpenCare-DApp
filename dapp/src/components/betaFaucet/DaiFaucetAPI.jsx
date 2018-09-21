@@ -125,7 +125,7 @@ export const DaiFaucetAPI = ReactTimeout(class _DaiFaucetAPI extends Component {
         </p>
         <hr />
         <p>
-          You're low on Dai, which can be used to pay for cases on Hippocrates.
+          You're low on Dai, which can be used to pay for cases on OpenCare.
           <br />Not to worry! We can mint you some:
         </p>
         <p>

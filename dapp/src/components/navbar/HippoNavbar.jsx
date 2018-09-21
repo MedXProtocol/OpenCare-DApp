@@ -23,7 +23,8 @@ import faHeartbeat from '@fortawesome/fontawesome-free-solid/faHeartbeat';
 import faUserMd from '@fortawesome/fontawesome-free-solid/faUserMd'
 import faUser from '@fortawesome/fontawesome-free-solid/faUser'
 import faCog from '@fortawesome/fontawesome-free-solid/faCog'
-import logo from '~/assets/img/logo.png'
+import openCareLogoImg from '~/assets/img/opencare-logo.png'
+import openCareLogoImg2x from '~/assets/img/opencare-logo@2x.png'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
 import {
@@ -296,7 +297,11 @@ export const HippoNavbar = connect(mapStateToProps, mapDispatchToProps)(
         <Navbar.Header>
           <Navbar.Brand>
             <Link to={routes.HOME} className="navbar-brand">
-              <img src={logo} alt="MedCredits"></img>
+              <img
+                src={openCareLogoImg}
+                alt="OpenCare Logo - Powered by MedX Protocol"
+                srcSet={`${openCareLogoImg} 1x, ${openCareLogoImg2x} 2x`}
+              />
             </Link>
           </Navbar.Brand>
           <Navbar.Toggle />

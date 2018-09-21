@@ -14,7 +14,7 @@ export const TryMetamask = class _TryMetamask extends Component {
           <div className='row'>
             <div className='col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
               <h3 className='text-white text-center title--inverse'>
-                To use Hippocrates you will need to use an Ethereum wallet
+                To use OpenCare you will need to use an Ethereum wallet
               </h3>
 
               <div className="form-wrapper form-wrapper--inverse form-wrapper--account">

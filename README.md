@@ -4,7 +4,7 @@
 
 Smart contracts used by MedCredits.
 
-Hippocrates Dapp readme is location [here](dapp/README.md)
+OpenCare Dapp readme is location [here](dapp/README.md)
 
 ### Setup
 
@@ -57,4 +57,3 @@ See README.md in ./dapp directory
 To deploy/migrate the contracts:
 
 `$ npm run migrate`
-
