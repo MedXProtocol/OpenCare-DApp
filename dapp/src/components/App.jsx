@@ -4,19 +4,9 @@ import ReduxToastr from 'react-redux-toastr'
 import ReactTimeout from 'react-timeout'
 import { hot } from 'react-hot-loader'
 import { formatRoute } from 'react-router-named-routes'
-import { SignUpContainer } from '~/components/sign-up'
-import { SignInContainer } from '~/components/sign-in'
-import { PatientDashboard } from '~/components/patient/dashboard'
-import { NewCase } from '~/components/patient/cases/NewCase'
-import { PatientCaseContainer } from '~/components/patient/cases/PatientCase'
-import { AdminSettings } from '~/components/admin/AdminSettings'
-import { AdminDoctors } from '~/components/admin/AdminDoctors'
-import { AdminFees } from '~/components/admin/AdminFees'
-import { Mint } from '~/components/account/mint'
-import { WalletContainer } from '~/components/account/wallet'
+import { newAsyncWrap } from '~/components/newAsyncWrap'
 import { EmergencyKit } from '~/components/account/emergency-kit'
 import { ChangePasswordContainer } from '~/components/account/change-password'
-import { OpenCasesContainer } from '~/components/doctors/cases'
 import { Welcome } from '~/components/welcome'
 import { TryMetamask } from '~/components/try-metamask'
 import { LoginToMetaMask } from '~/components/login-to-metamask'
@@ -50,6 +40,61 @@ import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { toastr } from '~/toastr'
 import get from 'lodash.get'
 import { fixAddress } from '~/utils/fixAddress'
+
+const PatientDashboard = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: "PatientDashboard" */ './patient/dashboard'),
+  name: 'PatientDashboard'
+})
+
+const WalletContainer = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'WalletContainer' */ './account/wallet'),
+  name: 'WalletContainer'
+})
+
+const PatientCaseContainer = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'PatientCaseContainer' */ './patient/cases/PatientCase'),
+  name: 'PatientCaseContainer'
+})
+
+const NewCase = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'NewCase' */ './patient/cases/NewCase'),
+  name: 'NewCase'
+})
+
+const OpenCasesContainer = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'OpenCasesContainer' */ './doctors/cases'),
+  name: 'OpenCasesContainer'
+})
+
+const Mint = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'Mint' */ './account/mint'),
+  name: 'Mint'
+})
+
+const AdminSettings = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'AdminSettings' */ './admin/AdminSettings'),
+  name: 'AdminSettings'
+})
+
+const AdminDoctors = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'AdminDoctors' */ './admin/AdminDoctors'),
+  name: 'AdminDoctors'
+})
+
+const AdminFees = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'AdminFees' */ './admin/AdminFees'),
+  name: 'AdminFees'
+})
+
+const SignUpContainer = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'SignUpContainer' */ './sign-up'),
+  name: 'SignUpContainer'
+})
+
+const SignInContainer = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'SignInContainer' */ './sign-in'),
+  name: 'SignInContainer'
+})
 
 function mapStateToProps (state) {
   let nextCaseAddress, doctorCasesCount, openCaseCount
