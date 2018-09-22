@@ -168,7 +168,7 @@ export const WalletContainer = connect(mapStateToProps)(withSaga(saga)(withSend(
                   </p>
                   <span className="sm-block text-gray">
                     DAI is a stablecoin (1 Dai = $1 USD).
-                    <br /> You can exchange your W-ETH to DAI using <a
+                    <br /> You can exchange your ETH to DAI using <a
                       target="_blank"
                       rel="noopener noreferrer"
                       href="https://oasis.direct/"
