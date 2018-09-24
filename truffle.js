@@ -7,8 +7,8 @@ module.exports = {
   networks: {
     test: {
       host: '0.0.0.0',
-      port: 8545,
-      network_id: 1234,
+      port: 8145,
+      network_id: 333,
       gas: 4700000,
       gasPrice: 60 * 1000000000
     },
