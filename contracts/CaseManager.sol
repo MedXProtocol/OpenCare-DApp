@@ -6,15 +6,15 @@ import './CaseLifecycleManager.sol';
 import './CaseScheduleManager.sol';
 import "./Delegate.sol";
 import "./Initializable.sol";
-import "./IEtherPriceFeed.sol";
 import "./MedXToken.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import './DelegateTarget.sol';
 
-contract CaseManager is Ownable, Pausable, Initializable {
+contract CaseManager is Ownable, Pausable, Initializable, DelegateTarget {
 
   using RegistryLookup for Registry;
   using SafeMath for uint256;
@@ -50,6 +50,19 @@ contract CaseManager is Ownable, Pausable, Initializable {
     _;
   }
 
+  /**
+   * @dev - throws when the system is locked down, or when it's onlyDoctors and the
+   *        patient is not a doctor
+   */
+  modifier byUsageRestrictions(address _patient) {
+    if (registry.adminSettings().usageRestrictions() == AdminSettings.UsageRestrictions.OnlyDoctors) {
+      require(registry.doctorManager().isDoctor(_patient), '_patient must be a doctor');
+    } else if (registry.adminSettings().usageRestrictions() == AdminSettings.UsageRestrictions.Locked) {
+      require(false, 'system is currently locked down by AdminSettings');
+    }
+    _;
+  }
+
   function isCasePhaseManager() internal view returns (bool) {
     return (
          (msg.sender == address(registry.caseFirstPhaseManager()))
@@ -68,18 +81,11 @@ contract CaseManager is Ownable, Pausable, Initializable {
     );
   }
 
-  /**
-   * @dev - Constructor
-   * @param _baseCaseFeeUsd - initial case fee
-   */
-  function initialize(uint256 _baseCaseFeeUsd, address _registry) external notInitialized {
-    require(_baseCaseFeeUsd > 0, 'base case fee is lt eq zero');
+  function initializeTarget(address _registry, bytes32) public notInitialized {
     require(_registry != 0x0, 'registry is zero');
     setInitialized();
-
-    owner = msg.sender;
-    caseFeeUsd = _baseCaseFeeUsd;
     registry = Registry(_registry);
+    owner = msg.sender;
     caseList.push(address(0));
   }
 
@@ -88,14 +94,6 @@ contract CaseManager is Ownable, Pausable, Initializable {
    */
   function () payable public {
     revert();
-  }
-
-  /**
-   * @dev - sets the base case fee - only affects new cases
-   */
-  function setBaseCaseFee(uint256 _newCaseFeeUsd) public onlyOwner {
-    require(_newCaseFeeUsd > 0);
-    caseFeeUsd = _newCaseFeeUsd;
   }
 
   /**
@@ -113,6 +111,7 @@ contract CaseManager is Ownable, Pausable, Initializable {
   }
 
   function createAndAssignCaseWithPublicKey(
+    address _tokenContract,
     address _patient,
     bytes _encryptedCaseKey,
     bytes _caseKeySalt,
@@ -124,71 +123,38 @@ contract CaseManager is Ownable, Pausable, Initializable {
     AccountManager am = registry.accountManager();
     require(am.publicKeys(_patient).length == 0, 'patient already has a public key');
     am.setPublicKey(_patient, _patientPublicKey);
-    createCase(
+    createAndAssignCase(
+      _tokenContract,
       _patient,
       _encryptedCaseKey,
       _caseKeySalt,
       _ipfsHash,
       _doctor,
-      _doctorEncryptedKey);
+      _doctorEncryptedKey
+    );
   }
 
   function createAndAssignCase(
+    address _tokenContract,
     address _patient,
     bytes _encryptedCaseKey,
     bytes _caseKeySalt,
     bytes _ipfsHash,
     address _doctor,
     bytes _doctorEncryptedKey
-  ) public payable {
-    createCase(
-      _patient,
-      _encryptedCaseKey,
-      _caseKeySalt,
-      _ipfsHash,
-      _doctor,
-      _doctorEncryptedKey);
-  }
-
-  function createCase(
-    address _patient,
-    bytes _encryptedCaseKey,
-    bytes _caseKeySalt,
-    bytes _ipfsHash,
-    address _doctor,
-    bytes _doctorEncryptedKey
-  ) internal {
+  ) public payable byUsageRestrictions(_patient) {
     Case newCase = Case(new Delegate(registry, keccak256("Case")));
-    newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseFeeWei(), registry);
     uint256 caseIndex = caseList.push(address(newCase)) - 1;
     caseIndices[address(newCase)] = caseIndex;
     patientCases[_patient].push(address(newCase));
 
+    uint256 caseTokenFeeWei = registry.casePaymentManager().caseFeeTokenWei(_tokenContract);
+    newCase.initialize(_patient, _encryptedCaseKey, _caseKeySalt, _ipfsHash, caseTokenFeeWei);
     registry.caseLifecycleManager().setDiagnosingDoctor(newCase, _doctor, _doctorEncryptedKey);
     registry.caseScheduleManager().initializeCase(newCase);
-
-    newCase.deposit.value(msg.value)();
+    registry.casePaymentManager().initializeCase.value(msg.value)(newCase, _tokenContract);
 
     emit NewCase(newCase, caseIndex);
-  }
-
-  function createCaseCostWei (uint256 _caseFeeUsd) public view returns (uint256) {
-    uint256 caseFee = usdToWei(_caseFeeUsd);
-    return caseFee.add(caseFee.mul(50).div(100));
-  }
-
-  function caseFeeWei() public view returns (uint256) {
-    return usdToWei(caseFeeUsd);
-  }
-
-  function usdToWei(uint256 _caseFeeUsd) public view returns (uint256) {
-    return _caseFeeUsd.div(usdPerWei());
-  }
-
-  function usdPerWei() public view returns (uint256) {
-    IEtherPriceFeed etherPriceFeed = IEtherPriceFeed(registry.lookup(keccak256('EtherPriceFeed')));
-    uint256 usdPerEth = uint256(etherPriceFeed.read());
-    return usdPerEth.div(1000000000000000000);
   }
 
   function addDoctorToDoctorCases(address _doctor, address _caseAddress) public onlyCasePhaseManagers() {

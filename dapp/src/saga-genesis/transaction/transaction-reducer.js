@@ -1,4 +1,4 @@
-export default function (state, { type, transactionId, call, error, receipt, gasUsed, txHash, confirmationNumber, address }) {
+export default function (state, { type, transactionId, call, options, error, receipt, gasUsed, txHash, confirmationNumber, address }) {
   if (typeof state === 'undefined') {
     state = {}
   }
@@ -10,6 +10,7 @@ export default function (state, { type, transactionId, call, error, receipt, gas
         [transactionId]: {
           transactionId,
           call,
+          options: options || {},
           address,
           inFlight: true
         }
@@ -48,6 +49,16 @@ export default function (state, { type, transactionId, call, error, receipt, gas
           ...state[transactionId],
           confirmed: true,
           receipt
+        }
+      }
+      break
+
+    case 'TRANSACTION_CONFIRMATION':
+      state = {
+        ...state,
+        [transactionId]: {
+          ...state[transactionId],
+          confirmationNumber
         }
       }
       break

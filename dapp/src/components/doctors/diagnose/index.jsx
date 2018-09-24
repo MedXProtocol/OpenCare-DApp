@@ -13,7 +13,6 @@ import get from 'lodash.get'
 import {
   cacheCall,
   addContract,
-  withContractRegistry,
   withSaga,
   LogListener,
   cacheCallValue,
@@ -24,14 +23,18 @@ import {
   caseManagerFinders
 } from '~/finders'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
+import { transactionFinders } from '~/finders/transactionFinders'
 import { connect } from 'react-redux'
 import { PageTitle } from '~/components/PageTitle'
+import { fixAddress } from '~/utils/fixAddress'
 
 function mapStateToProps(state, { match }) {
   if (isEmptyObject(match.params)) { return {} }
 
   let address = get(state, 'sagaGenesis.accounts[0]')
-  const caseAddress = match.params.caseAddress
+  const caseAddress = fixAddress(match.params.caseAddress)
+  const submitDiagnosisTransaction = transactionFinders.diagnoseCase(state, caseAddress)
+  const submitChallengeTransaction = transactionFinders.diagnoseChallengedCase(state, caseAddress)
   const AccountManager = contractByName(state, 'AccountManager')
   const patientAddress = cacheCallValue(state, caseAddress, 'patient')
   const patientPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', patientAddress)
@@ -53,13 +56,15 @@ function mapStateToProps(state, { match }) {
     challengeHash,
     AccountManager,
     patientPublicKey,
-    encryptedCaseKey
+    encryptedCaseKey,
+    submitDiagnosisTransaction,
+    submitChallengeTransaction
   }
 }
 
 function* saga({ match, address, AccountManager, fromBlock }) {
   if (!AccountManager || isEmptyObject(match.params)) { return }
-  const caseAddress = match.params.caseAddress
+  const caseAddress = fixAddress(match.params.caseAddress)
   yield addContract({ address: caseAddress, contractKey: 'Case'})
   const patientAddress = yield cacheCall(caseAddress, 'patient')
   yield all([
@@ -70,7 +75,7 @@ function* saga({ match, address, AccountManager, fromBlock }) {
   ])
 }
 
-export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class _DiagnoseCase extends Component {
+export const DiagnoseCaseContainer = connect(mapStateToProps)(withSaga(saga)(class _DiagnoseCase extends Component {
   render () {
     if (isEmptyObject(this.props.match.params)) { return null }
 
@@ -80,24 +85,11 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
       diagnosisHash,
       challengeHash,
       diagnosingDoctor,
-      caseAddress
+      caseAddress,
+      submitDiagnosisTransaction,
+      submitChallengeTransaction
     } = this.props
     const caseKey = decryptDoctorCaseKey(currentAccount(), this.props.patientPublicKey, this.props.encryptedCaseKey)
-
-    const thisDocDiagnosingFirst = (
-      !isBlank(address)
-      && !isBlank(diagnosingDoctor)
-      && (diagnosingDoctor === address)
-      && isBlank(diagnosisHash)
-    )
-    const thisDocChallenging = (
-      !isBlank(address)
-      && !isBlank(challengingDoctor)
-      && (challengingDoctor === address)
-      && isBlank(challengeHash)
-      && !isBlank(diagnosisHash)
-    )
-    const caseIsOpenForDoctor = thisDocDiagnosingFirst || thisDocChallenging
 
     const challengingDoc = (
       !isBlank(address)
@@ -111,40 +103,57 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
       && (diagnosingDoctor === address)
     )
 
-    if (!isBlank(challengeHash) && challengingDoc) {
-      var challenge =
+    var inProgress, diagnosis, challenge, submitDiagnosis, submitChallenge
+
+    const diagnosisSubmitted =
+      (submitDiagnosisTransaction && !submitDiagnosisTransaction.complete) ||
+      (submitChallengeTransaction && !submitChallengeTransaction.complete)
+
+    if (diagnosisSubmitted) {
+      inProgress =
         <div className='col-xs-12'>
-          <ChallengedDiagnosis
-            caseAddress={caseAddress}
-            caseKey={caseKey}
-            title='Your Diagnosis'
-            challengingDoctorAddress={challengingDoctor}
-          />
+          <div className='alert alert-info'>
+            Your diagnosis has been submitted. Please wait.
+          </div>
         </div>
-    } else if (!isBlank(diagnosisHash) && diagnosingDoc) {
-      var diagnosis =
-        <div className='col-xs-12'>
-          <Diagnosis
-            title='Your Diagnosis'
-            caseAddress={caseAddress}
-            caseKey={caseKey}
-          />
-        </div>
-    } else if (thisDocChallenging) {
-      var submitChallenge =
-        <div className='col-xs-12'>
-          <SubmitDiagnosisContainer
-            caseAddress={caseAddress}
-            caseKey={caseKey}
-            diagnosisHash={diagnosisHash} />
-        </div>
-    } else if (thisDocDiagnosingFirst) {
-      var submitDiagnosis =
-        <div className='col-xs-12'>
-          <SubmitDiagnosisContainer
-            caseAddress={caseAddress}
-            caseKey={caseKey} />
-        </div>
+    } else if (diagnosingDoc) {
+      if (isBlank(diagnosisHash)) {
+        submitDiagnosis =
+          <div className='col-xs-12'>
+            <SubmitDiagnosisContainer
+              caseAddress={caseAddress}
+              caseKey={caseKey} />
+          </div>
+      } else {
+        diagnosis =
+          <div className='col-xs-12'>
+            <Diagnosis
+              title='Your Diagnosis'
+              caseAddress={caseAddress}
+              caseKey={caseKey}
+            />
+          </div>
+      }
+    } else if (challengingDoc) {
+      if (isBlank(challengeHash)) {
+        submitChallenge =
+          <div className='col-xs-12'>
+            <SubmitDiagnosisContainer
+              caseAddress={caseAddress}
+              caseKey={caseKey}
+              diagnosisHash={diagnosisHash} />
+          </div>
+      } else {
+        challenge =
+          <div className='col-xs-12'>
+            <ChallengedDiagnosis
+              caseAddress={caseAddress}
+              caseKey={caseKey}
+              title='Your Diagnosis'
+              challengingDoctorAddress={challengingDoctor}
+            />
+          </div>
+      }
     }
 
     if (caseKey === undefined) {
@@ -175,11 +184,12 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
           <div className='row'>
             {diagnosis}
             {challenge}
+            {inProgress}
             <div id="view-case-details" className='col-xs-12'>
               <CaseDetails
                 caseAddress={caseAddress}
                 caseKey={caseKey}
-                caseIsOpenForDoctor={caseIsOpenForDoctor}
+                caseIsOpenForDoctor={!!(submitDiagnosis || submitChallenge)}
                 isDoctor={true} />
             </div>
             {submitDiagnosis}
@@ -189,4 +199,4 @@ export const DiagnoseCaseContainer = withContractRegistry(connect(mapStateToProp
       </div>
     )
   }
-})))
+}))

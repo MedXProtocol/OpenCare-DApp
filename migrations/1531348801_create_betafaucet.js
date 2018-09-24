@@ -1,4 +1,4 @@
-var deployWithDelegate = require('./support/deployWithDelegate')
+const deployTargetAndDelegate = require('./support/deployTargetAndDelegate')
 
 const BetaFaucet = artifacts.require("./BetaFaucet.sol");
 const Registry = artifacts.require("./Registry.sol");
@@ -8,10 +8,8 @@ module.exports = function(deployer) {
   deployer.then(async () => {
     const medXTokenInstance = await MedXToken.deployed()
 
-    return deployWithDelegate(artifacts, deployer, BetaFaucet).then(betaFaucetDelegateInstance => {
-      return betaFaucetDelegateInstance.initialize().then(() => {
-        return betaFaucetDelegateInstance.updateMedXTokenAddress(medXTokenInstance.address)
-      })
+    return deployTargetAndDelegate(artifacts, deployer, BetaFaucet).then(betaFaucetDelegateInstance => {
+      return betaFaucetDelegateInstance.updateMedXTokenAddress(medXTokenInstance.address)
     })
   })
 };

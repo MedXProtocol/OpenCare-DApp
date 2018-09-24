@@ -39,7 +39,6 @@ export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
           txHash: response.data.txHash
         })
         this.props.addExternalTransaction('sendEther', response.data.txHash)
-        this.props.moveToNextStep({ withDelay: true })
       } else {
         this.setState({
           responseMessage: '',
@@ -127,7 +126,7 @@ export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
         </p>
         <hr />
         <p>
-          You're low on ether, which is necessary to use Hippocrates.
+          You're low on ether, which is necessary to use OpenCare.
           <br />Not to worry! We can have some sent to your account:
         </p>
         <p>

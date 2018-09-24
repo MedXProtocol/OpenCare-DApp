@@ -1,4 +1,4 @@
-const toRegistryKey = require('../migrations/support/to-registry-key')
+const toRegistryKey = require('../migrations/support/toRegistryKey')
 const Registry = artifacts.require("./Registry.sol")
 const Delegate = artifacts.require("./Delegate.sol")
 const DoctorManager = artifacts.require("./DoctorManager.sol")
@@ -25,7 +25,6 @@ contract('Delegate', function (accounts) {
 
   describe('delegated call', () => {
     it('should work', async () => {
-      await doctorManagerDelegate.initialize()
       assert.equal(await doctorManagerDelegate.owner.call(), accounts[0])
     })
   })

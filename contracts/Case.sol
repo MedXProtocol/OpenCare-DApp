@@ -5,9 +5,11 @@ import "./MedXToken.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
 import "./WETH9.sol";
+import './DelegateTarget.sol';
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 contract Case is Ownable, Initializable {
 
@@ -64,6 +66,11 @@ contract Case is Ownable, Initializable {
     _;
   }
 
+  modifier onlyCasePaymentManager() {
+    require(msg.sender == address(registry.casePaymentManager()));
+    _;
+  }
+
   function isCasePhaseManager() internal view returns (bool) {
     return (
          (msg.sender == address(registry.caseFirstPhaseManager()))
@@ -91,6 +98,11 @@ contract Case is Ownable, Initializable {
     _;
   }
 
+  modifier patientMustBeZero() {
+    require(patient == address(0));
+    _;
+  }
+
   /**
    * @dev - Contract should not accept any ether
    */
@@ -98,29 +110,31 @@ contract Case is Ownable, Initializable {
     revert();
   }
 
+  function initializeTarget(address _registry, bytes32) public notInitialized {
+    setInitialized();
+    owner = msg.sender;
+    registry = Registry(_registry);
+  }
+
   /**
    * @dev - Creates a new case with the given parameters
    * @param _patient - the patient who created the case
    * @param _caseFee - fee for this particular case
-   * @param _registry - the registry contract
    */
   function initialize (
       address _patient,
       bytes _encryptedCaseKey,
       bytes _caseKeySalt,
       bytes _caseHash,
-      uint256 _caseFee,
-      address _registry
-  ) external notInitialized {
-    setInitialized();
+      uint256 _caseFee
+  ) external patientMustBeZero {
+    require(_patient != address(0), 'patient must be defined');
     require(_encryptedCaseKey.length != 0, 'encryptedCaseKey required');
     require(_caseKeySalt.length != 0, 'caseKeySalt required');
     require(_caseHash.length != 0, 'caseHash required');
-    owner = msg.sender;
     status = CaseStatus.Open;
     patient = _patient;
     caseFee = _caseFee;
-    registry = Registry(_registry);
     emit CaseCreated(patient, _encryptedCaseKey, _caseKeySalt, _caseHash);
   }
 
@@ -128,9 +142,8 @@ contract Case is Ownable, Initializable {
     diagnosingDoctor = _doctorAddress;
   }
 
-  function deposit() external payable {
-    require(msg.value >= createCaseCost(), 'Not enough ether to create case');
-    lookupWeth9().deposit.value(msg.value)();
+  function deposit() external payable onlyCasePaymentManager {
+    registry.weth9().deposit.value(msg.value)();
   }
 
   function setChallengingDoctor(address _doctorAddress) external onlyCaseSecondPhaseManager {
@@ -158,26 +171,21 @@ contract Case is Ownable, Initializable {
   }
 
   function transferCaseFeeToDiagnosingDoctor() external onlyCasePhaseManagers {
-    WETH9 weth9 = lookupWeth9();
-    weth9.transfer(diagnosingDoctor, caseFee);
+    ERC20 tokenContract = erc20();
+    tokenContract.transfer(diagnosingDoctor, caseFee);
   }
 
   function transferRemainingBalanceToPatient() external onlyCasePhaseManagers {
-    WETH9 weth9 = lookupWeth9();
-    weth9.transfer(patient, weth9.balanceOf(address(this)));
+    ERC20 tokenContract = erc20();
+    tokenContract.transfer(patient, tokenContract.balanceOf(address(this)));
   }
 
   function transferChallengingDoctorFee() external onlyCaseSecondPhaseManager {
-    WETH9 weth9 = lookupWeth9();
-    weth9.transfer(challengingDoctor, caseFee.mul(50).div(100));
+    ERC20 tokenContract = erc20();
+    tokenContract.transfer(challengingDoctor, caseFee.mul(50).div(100));
   }
 
-  function createCaseCost() internal view returns (uint256) {
-    return caseFee.add(caseFee.mul(50).div(100));
+  function erc20() internal view returns (ERC20) {
+    return registry.casePaymentManager().getCaseTokenContract(this);
   }
-
-  function lookupWeth9() internal view returns (WETH9) {
-    return WETH9(registry.lookup(keccak256("WrappedEther")));
-  }
-
 }

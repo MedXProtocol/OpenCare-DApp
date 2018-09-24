@@ -14,28 +14,30 @@ import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
 import { Ether } from './Ether'
 
 function mapStateToProps(state) {
-  const CaseManager = contractByName(state, 'CaseManager')
+  const CasePaymentManager = contractByName(state, 'CasePaymentManager')
   return {
-    usdPerWei: cacheCallValue(state, CaseManager, 'usdPerWei'),
-    CaseManager
+    usdPerWei: cacheCallValue(state, CasePaymentManager, 'usdPerEther'),
+    CasePaymentManager
   }
 }
 
-function* etherFlipSaga({ CaseManager }) {
-  if (!CaseManager) { return }
-  yield cacheCall(CaseManager, 'usdPerWei')
+function* etherFlipSaga({ CasePaymentManager }) {
+  if (!CasePaymentManager) { return }
+  yield cacheCall(CasePaymentManager, 'usdPerEther')
 }
 
 export const EtherFlip = connect(mapStateToProps)(
   withSaga(etherFlipSaga)(
     class _EtherFlip extends Component {
       static propTypes = {
-        wei: PropTypes.any.isRequired
+        wei: PropTypes.any.isRequired,
+        noToggle: PropTypes.bool
       }
 
       static defaultProps = {
         wei: '0',
-        usdPerWei: '1'
+        usdPerWei: '1',
+        noToggle: false
       }
 
       constructor (props) {
@@ -52,15 +54,29 @@ export const EtherFlip = connect(mapStateToProps)(
       render () {
         const wei = this.props.wei || 0
 
+        const usd = <span className='currency'>${displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</span>
+        const ether = <Ether wei={wei} />
+
+        let firstValue = ether
+        let secondValue = usd
+
         if (this.state.showUsd) {
-          var value = (
-            <span>${displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</span>
-          )
-        } else {
-          value = <Ether wei={wei} />
+          firstValue = usd
+          secondValue = ether
         }
 
-        return <span className='ether-flip flip-link' onClick={this.onFlip}>{value}</span>
+        if (!this.props.noToggle) {
+           var extraProps = {
+             onClick: this.onFlip
+           }
+        }
+
+        return (
+          <span className='ether-flip flip-link' {...extraProps}>
+            <span className='ether-flip--first-value'>{firstValue}</span>&nbsp;
+            <span className='ether-flip--second-value'>{secondValue}</span>
+          </span>
+        )
       }
     }
   )

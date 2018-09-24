@@ -23,20 +23,27 @@ import { PageTitle } from '~/components/PageTitle'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, ownProps) {
+  const networkId = get(state, 'sagaGenesis.network.networkId')
+  if (!networkId) { return {} }
+
   const address = get(state, 'sagaGenesis.accounts[0]')
   const signedIn = state.account.signedIn
   const AccountManager = contractByName(state, 'AccountManager')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const transactions = state.sagaGenesis.transactions
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', address)
+
   return {
+    networkId,
     address,
     signedIn,
     isDoctor,
+    isDermatologist,
     DoctorManager,
     AccountManager,
     transactions,
-    account: Account.get(address)
+    account: Account.get(networkId, address)
   }
 }
 
@@ -45,15 +52,16 @@ function mapDispatchToProps(dispatch) {
     setSigningIn: () => {
       dispatch({ type: 'SIGNING_IN' })
     },
-    signIn: ({ secretKey, masterPassword, account, address, overrideAccount }) => {
-      dispatch({ type: 'SIGN_IN', secretKey, masterPassword, account, address, overrideAccount })
+    signIn: ({ networkId, secretKey, masterPassword, account, address, overrideAccount }) => {
+      dispatch({ type: 'SIGN_IN', networkId, secretKey, masterPassword, account, address, overrideAccount })
     }
   }
 }
 
-function* saga({ account, DoctorManager }) {
-  if (!account || !DoctorManager) { return }
-  yield cacheCall(DoctorManager, 'isDoctor', account)
+function* saga({ address, DoctorManager }) {
+  if (!address || !DoctorManager) { return }
+  yield cacheCall(DoctorManager, 'isDoctor', address)
+  yield cacheCall(DoctorManager, 'isDermatologist', address)
 }
 
 export const SignInContainer = ReactTimeout(withSend(withRouter(
@@ -67,25 +75,6 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
     this.state = {
       isResetting: false
     }
-  }
-
-  onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
-    // this is solely to update the UI prior to running the decrypt code
-    this.props.setSigningIn()
-
-    this.props.setTimeout(() => {
-      this.doSubmit({ secretKey, masterPassword, overrideAccount })
-    }, 100)
-  }
-
-  doSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
-    this.props.signIn({
-      secretKey,
-      masterPassword,
-      account: this.props.account,
-      address: this.props.address,
-      overrideAccount
-    })
   }
 
   componentWillReceiveProps(nextProps) {
@@ -110,6 +99,26 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
     }
   }
 
+  onSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
+    // this is solely to update the UI prior to running the decrypt code
+    this.props.setSigningIn()
+
+    this.props.setTimeout(() => {
+      this.doSubmit({ secretKey, masterPassword, overrideAccount })
+    }, 100)
+  }
+
+  doSubmit = ({ secretKey, masterPassword, overrideAccount }) => {
+    this.props.signIn({
+      networkId: this.props.networkId,
+      secretKey,
+      masterPassword,
+      account: this.props.account,
+      address: this.props.address,
+      overrideAccount
+    })
+  }
+
   handleReset = () => {
     let transactionId = this.props.send(this.props.AccountManager, 'setPublicKey', this.props.address, '0x')({ gas: 200000 })
 
@@ -121,9 +130,11 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
   }
 
   render () {
-    const { signedIn, account, isDoctor } = this.props
+    if (!this.props.networkId) { return null }
+
+    const { signedIn, account, isDoctor, isDermatologist } = this.props
     if (signedIn) {
-      let path = isDoctor ? routes.DOCTORS_CASES_OPEN : routes.PATIENTS_CASES
+      let path = (isDoctor && isDermatologist) ? routes.DOCTORS_CASES_OPEN : routes.PATIENTS_CASES
       return <Redirect to={path} />
     }
 
@@ -136,6 +147,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
           <p>
             You have a previous beta account that no longer works. &nbsp;
             <InfoQuestionMark
+              name="sign-in-info"
               place="bottom"
               tooltipText="We have made changes that break compatibility with old cases.<br />Your account needs to be reset before submitting or diagnosing new cases." />
           </p>
@@ -158,7 +170,7 @@ export const SignInContainer = ReactTimeout(withSend(withRouter(
             <div className='row'>
               <div className='col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3'>
                 <h3 className='text-center text-white title--inverse'>
-                  Sign in to Hippocrates
+                  Sign in to OpenCare
                 </h3>
                 {warning}
                 <SignInFormContainer

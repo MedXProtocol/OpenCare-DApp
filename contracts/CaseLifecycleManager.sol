@@ -13,10 +13,11 @@ import './DoctorManager.sol';
 import "./Initializable.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
+import './DelegateTarget.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract CaseLifecycleManager is Ownable, Initializable {
+contract CaseLifecycleManager is Ownable, Initializable, DelegateTarget {
 
   using RegistryLookup for Registry;
 
@@ -36,8 +37,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier patientWaitedOneDay(address _caseAddress) {
     require(
-      registry.caseScheduleManager().patientWaitedOneDay(_caseAddress)//,
-      //'patient must wait at least one day to call this'
+      registry.caseScheduleManager().patientWaitedOneDay(_caseAddress)/*,
+      'patient must wait at least one day to call this'*/
     );
     _;
   }
@@ -55,8 +56,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
    */
   modifier onlyCaseScheduleManager() {
     require(
-      msg.sender == address(registry.caseScheduleManager())//,
-      //'Must be the Case Schedule Manager contract'
+      msg.sender == address(registry.caseScheduleManager())/*,
+      'Must be the Case Schedule Manager contract'*/
     );
     _;
   }
@@ -64,10 +65,9 @@ contract CaseLifecycleManager is Ownable, Initializable {
   /**
    * @dev - Throws if not instance of CaseManager
    */
-  modifier onlyCaseManager(address _caseAddress) {
-    Case _case = Case(_caseAddress);
-    require(msg.sender == address(registry.caseManager())//,
-      //'must be the Case Manager contract'
+  modifier onlyCaseManager() {
+    require(msg.sender == address(registry.caseManager())/*,
+      'must be the Case Manager contract'*/
     );
     _;
   }
@@ -79,8 +79,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
     Case _case = Case(_caseAddress);
 
     require(
-      msg.sender == _case.challengingDoctor()//,
-      //'Must be the second opinion challenging doctor'
+      msg.sender == _case.challengingDoctor()/*,
+      'Must be the second opinion challenging doctor'*/
     );
     _;
   }
@@ -88,8 +88,12 @@ contract CaseLifecycleManager is Ownable, Initializable {
   /**
    * @dev - throws if called by any account other than a doctor.
    */
-  modifier isDoctor(address _doctor) {
-    require(registry.doctorManager().isDoctor(_doctor)/*, '_doctor address must be a Doctor'*/);
+  modifier isDermatologist(address _doctor) {
+    require(
+         registry.doctorManager().isDoctor(_doctor)
+      && registry.doctorManager().isDermatologist(_doctor)/*,
+      '_doctor address must be a Registered Doctor & Dermatologist'*/
+    );
     _;
   }
 
@@ -103,15 +107,29 @@ contract CaseLifecycleManager is Ownable, Initializable {
   }
 
   /**
+   * @dev - throws if called by any account other than the diagnosing doctor
+   */
+  modifier onlyDiagnosingDoctorSenderOrCaseDiagnosingDoctor(address _caseAddress) {
+    Case _case = Case(_caseAddress);
+    require(
+      msg.sender == _case.diagnosingDoctor() || msg.sender == address(registry.caseDiagnosingDoctor())/*,
+      'sender needs to be the diagnosis doctor or the CaseDiagnosingDoctor contract'*/
+    );
+    _;
+  }
+
+
+
+  /**
    * @dev - Contract should not accept any ether
    */
   function () public payable {
     revert();
   }
 
-  function initialize(Registry _registry) public notInitialized {
+  function initializeTarget(address _registry, bytes32) public notInitialized {
     require(_registry != address(0)/*, 'registry is not blank'*/);
-    registry = _registry;
+    registry = Registry(_registry);
     owner = msg.sender;
     setInitialized();
   }
@@ -119,8 +137,8 @@ contract CaseLifecycleManager is Ownable, Initializable {
   function setDiagnosingDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
     public
     isCase(_caseAddress)
-    onlyCaseManager(_caseAddress)
-    isDoctor(_doctor)
+    onlyCaseManager
+    isDermatologist(_doctor)
   {
     Case _case = Case(_caseAddress);
 
@@ -237,37 +255,31 @@ contract CaseLifecycleManager is Ownable, Initializable {
   function acceptAsDoctor(address _caseAddress)
     external
     isCase(_caseAddress)
-    onlyDiagnosingDoctor(_caseAddress)
+    onlyDiagnosingDoctorSenderOrCaseDiagnosingDoctor(_caseAddress)
   {
     Case _case = Case(_caseAddress);
-    require(_case.evaluatedOrChallenging()
-      //, 'Case must be in Evaluated or Challenged state'
-    );
+    require(_case.evaluatedOrChallenging()/*, 'Case must be in Evaluated or Challenged state'*/);
 
     if (_case.status() == Case.CaseStatus.Evaluated) {
       require(
-        registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress)//,
-        //'Must wait 2 days'
+        registry.caseScheduleManager().doctorWaitedTwoDays(_caseAddress)/*,
+        'Must wait 2 days'*/
       );
     } else if (_case.status() == Case.CaseStatus.Challenging) {
       require(
-        registry.caseScheduleManager().doctorWaitedFourDays(_caseAddress)//,
-        //'Must wait 4 days'
+        registry.caseScheduleManager().doctorWaitedFourDays(_caseAddress)/*,
+        'Must wait 4 days'*/
       );
     }
 
     registry.caseFirstPhaseManager().acceptAsDoctor(_case);
-
-    // If this case had been challenged, clear the case for that doc
-    if (_case.challengingDoctor() != address(0)) {
-      registry.caseSecondPhaseManager().clearChallengingDoctor(_case);
-    }
   }
 
   function challengeWithDoctor(address _caseAddress, address _doctor, bytes _doctorEncryptedKey)
     external
     onlyPatient(_caseAddress)
     isCase(_caseAddress)
+    isDermatologist(_doctor)
   {
     Case _case = Case(_caseAddress);
 

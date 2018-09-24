@@ -12,10 +12,10 @@
 }
 
 .navbar-brand {
-  padding: 10px;
+  padding: 12px 0 10px 14px;
 
   @media (max-width: 768px) {
-    padding: 1rem 0;
+    padding: 12px 0 10px 4px;
   }
 }
 
@@ -50,8 +50,7 @@
 }
 
 .navbar-inverse .navbar-nav > li.active > a::after,
-.navbar-inverse .navbar-nav > li > a:hover::after,
-.navbar-inverse .navbar-nav > li > a:focus::after {
+.navbar-inverse .navbar-nav > li > a:hover::after{
   transform: scaleX(1);
 }
 
@@ -66,13 +65,23 @@
   background-color: lighten($brand-dark-blue, 30%);
 }
 
+.navbar-inverse .navbar-nav > li > a:hover {
+  color: #fff;
+  background-color: transparent;
+}
+
+.navbar-inverse .navbar-nav > li > a:focus {
+  background-color: $brand-dark-blue;
+}
+
 .navbar-nav > li > a {
   @media (min-width: 768px) {
     padding-bottom: 14px;
   }
 }
 
-.navbar-inverse .navbar-nav > li > a {
+.navbar-inverse .navbar-nav > li > a,
+.navbar-inverse .navbar-nav > li > a:focus {
   color: #c4c7d4;
 }
 
@@ -94,17 +103,17 @@
 .nav--open-cases__circle {
   font-size: 11px;
   font-weight: bold;
-  height: 18px;
+  height: 20px;
   position: absolute;
-  left: 130px;
+  right: 0px;
   top: 12px;
   text-align: center;
-  width: 18px;
+  width: 20px;
   z-index: 1;
 
   @media (max-width: 768px) {
-    left: 132px;
-    top: 4px;
+    left: 160px;
+    top: 10px;
   }
 }
 
@@ -112,11 +121,11 @@
   border-radius: 100%;
   content: "";
   display: inline-block;
-  height: 18px;
+  height: 20px;
   left: 0;
   position: absolute;
-  top: 1px;
-  width: 18px;
+  top: -1px;
+  width: 20px;
   z-index: -1;
 }
 
@@ -135,4 +144,63 @@
 
 .nav--open-cases__zero:after {
   display: none;
+}
+
+.nav--circle:before {
+  border-radius: 100%;
+  content: "";
+  height: 1rem;
+  width: 1rem;
+  margin-right: 3px;
+  top: -1px;
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
+
+.nav--circle__success:before {
+  background-color: #44ce46;
+}
+
+.nav--circle__warning:before {
+  background-color: #f7e12e;
+}
+
+.nav--circle__danger:before {
+  background-color: #f9434f;
+}
+
+.navbar-inverse .navbar-nav > li.nav--button a,
+.navbar-inverse .navbar-nav > li.nav--button a:focus {
+  background-color: #203a5f;
+}
+
+.navbar-inverse .navbar-nav > li.nav--button a {
+  border: 1px solid #0b1e38;
+  border-radius: 4px;
+  margin-top: 10px;
+  margin-bottom: 9px;
+  min-width: 100px;
+  padding-bottom: 1px;
+  padding-top: 10px;
+
+  @media (min-width: 768px) {
+    text-align: center;
+  }
+  @media (max-width: 768px) {
+    margin-top: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: center;
+    max-width: 150px;
+  }
+}
+
+.navbar-inverse .navbar-nav > li.nav--button a:hover {
+  background-color: #153e79;
+}
+
+.navbar-inverse .navbar-nav > li.nav--button.active > a::after,
+.navbar-inverse .navbar-nav > li.nav--button > a:hover::after {
+  transform: scale(0);
 }

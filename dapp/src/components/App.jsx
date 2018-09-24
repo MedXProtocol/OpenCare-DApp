@@ -4,22 +4,18 @@ import ReduxToastr from 'react-redux-toastr'
 import ReactTimeout from 'react-timeout'
 import { hot } from 'react-hot-loader'
 import { formatRoute } from 'react-router-named-routes'
-import { SignUpContainer } from './sign-up'
-import { SignInContainer } from './sign-in'
-import { PatientDashboard } from './patient/dashboard'
-import { NewCase } from './patient/cases/NewCase'
-import { PatientCaseContainer } from './patient/cases/PatientCase'
-import { AddDoctor } from './doctors/new'
-import { Mint } from './account/mint'
-import { WalletContainer } from './account/wallet'
-import { EmergencyKit } from './account/emergency-kit'
-import { ChangePasswordContainer } from './account/change-password'
-import { OpenCasesContainer } from './doctors/cases'
+import { newAsyncWrap } from '~/components/newAsyncWrap'
+import { EmergencyKit } from '~/components/account/emergency-kit'
+import { ChangePasswordContainer } from '~/components/account/change-password'
 import { Welcome } from '~/components/welcome'
-import { TryMetamask } from './try-metamask'
-import { LoginToMetaMask } from './login-to-metamask'
-import { FourOhFour } from './four-oh-four'
+import { TryMetamask } from '~/components/try-metamask'
+import { LoginToMetaMask } from '~/components/login-to-metamask'
+import { FourOhFour } from '~/components/four-oh-four'
+import { DebugLink } from '~/components/DebugLink'
 import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
+import { AcceptAllExpiredCases } from '~/components/AcceptAllExpiredCases'
+import { UserAgentCheckModal } from '~/components/UserAgentCheckModal'
+import { PublicKeyListener } from '~/components/PublicKeyListener'
 import { PublicKeyCheck } from '~/components/PublicKeyCheck'
 import { BetaFaucetModal } from '~/components/BetaFaucetModal'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
@@ -27,45 +23,107 @@ import { ScrollyFeedbackLink } from '~/components/ScrollyFeedbackLink'
 import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
-import { AdminFees } from '~/components/AdminFees'
+import { bugsnagClient } from '~/bugsnagClient'
+import { DebugLog } from '~/components/DebugLog'
 import { connect } from 'react-redux'
 import {
   cacheCall,
   cacheCallValue,
   cacheCallValueInt,
+  cacheCallValueBigNumber,
   contractByName,
   LogListener,
-  withSaga,
-  withContractRegistry
+  withSaga
 } from '~/saga-genesis'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { toastr } from '~/toastr'
 import get from 'lodash.get'
+import { fixAddress } from '~/utils/fixAddress'
+
+const PatientDashboard = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: "PatientDashboard" */ './patient/dashboard'),
+  name: 'PatientDashboard'
+})
+
+const WalletContainer = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'WalletContainer' */ './account/wallet'),
+  name: 'WalletContainer'
+})
+
+const PatientCaseContainer = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'PatientCaseContainer' */ './patient/cases/PatientCase'),
+  name: 'PatientCaseContainer'
+})
+
+const NewCase = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'NewCase' */ './patient/cases/NewCase'),
+  name: 'NewCase'
+})
+
+const OpenCasesContainer = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'OpenCasesContainer' */ './doctors/cases'),
+  name: 'OpenCasesContainer'
+})
+
+const Mint = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'Mint' */ './account/mint'),
+  name: 'Mint'
+})
+
+const AdminSettings = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'AdminSettings' */ './admin/AdminSettings'),
+  name: 'AdminSettings'
+})
+
+const AdminDoctors = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'AdminDoctors' */ './admin/AdminDoctors'),
+  name: 'AdminDoctors'
+})
+
+const AdminFees = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'AdminFees' */ './admin/AdminFees'),
+  name: 'AdminFees'
+})
+
+const SignUpContainer = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'SignUpContainer' */ './sign-up'),
+  name: 'SignUpContainer'
+})
+
+const SignInContainer = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'SignInContainer' */ './sign-in'),
+  name: 'SignInContainer'
+})
 
 function mapStateToProps (state) {
   let nextCaseAddress, doctorCasesCount, openCaseCount
 
   const address = get(state, 'sagaGenesis.accounts[0]')
-
   const CaseManager = contractByName(state, 'CaseManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
   const DoctorManager = contractByName(state, 'DoctorManager')
+  const FromBlockNumber = contractByName(state, 'FromBlockNumber')
+  const fromBlock = cacheCallValueBigNumber(state, FromBlockNumber, 'blockNumber')
 
   const isSignedIn = get(state, 'account.signedIn')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', address)
 
-  if (isDoctor) {
+  if (isDoctor && isDermatologist) {
     doctorCasesCount = cacheCallValueInt(state, CaseManager, 'doctorCasesCount', address)
     openCaseCount = cacheCallValue(state, CaseStatusManager, 'openCaseCount', address)
-    nextCaseAddress = cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, (doctorCasesCount - 1))
+    nextCaseAddress = fixAddress(cacheCallValue(state, CaseManager, 'doctorCaseAtIndex', address, (doctorCasesCount - 1)))
   }
 
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
 
   return {
     address,
+    isDermatologist,
     isDoctor,
+    FromBlockNumber,
+    fromBlock,
     DoctorManager,
     isSignedIn,
     doctorCasesCount,
@@ -79,16 +137,21 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    dispatchWeb3SHHInit: () => {
+      dispatch({ type: 'WEB3_SHH_INIT' })
+    },
     dispatchSignOut: () => {
       dispatch({ type: 'SIGN_OUT' })
     }
   }
 }
 
-function* saga({ address, CaseManager, CaseStatusManager, DoctorManager, doctorCasesCount }) {
-  if (!address || !CaseManager || !DoctorManager || !CaseStatusManager) { return }
+function* saga({ address, CaseManager, CaseStatusManager, DoctorManager, doctorCasesCount, FromBlockNumber }) {
+  if (!address || !CaseManager || !DoctorManager || !CaseStatusManager || !FromBlockNumber) { return }
+  yield cacheCall(FromBlockNumber, 'blockNumber')
   const isDoctor = yield cacheCall(DoctorManager, 'isDoctor', address)
-  if (isDoctor) {
+  const isDermatologist = yield cacheCall(DoctorManager, 'isDermatologist', address)
+  if (isDoctor && isDermatologist) {
     yield cacheCall(CaseManager, 'doctorCasesCount', address)
     yield cacheCall(CaseStatusManager, 'openCaseCount', address)
 
@@ -98,9 +161,15 @@ function* saga({ address, CaseManager, CaseStatusManager, DoctorManager, doctorC
   }
 }
 
-const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispatchToProps)(
+const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     class _App extends Component {
+      constructor(props) {
+        super(props)
+        this.state = {
+          debugging: false
+        }
+      }
 
   componentDidMount () {
     window.addEventListener("beforeunload", this.unload)
@@ -109,6 +178,14 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
 
     if (process.env.NODE_ENV !== 'development' && !this.props.address && this.props.isSignedIn) {
       this.signOut()
+    }
+
+    if (process.env.NODE_ENV === 'development' && this.props.isSignedIn) {
+      // wait 5 seconds to ensure the sagas have initialized first
+      // we should update our architecture so sagas init first, then components
+      this.props.setTimeout(() => {
+        this.props.dispatchWeb3SHHInit()
+      }, 5000)
     }
   }
 
@@ -130,7 +207,13 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
     }
 
     // We have a new case assigned and the new case address from the blockchain
-    if (nextProps.isSignedIn && nextProps.isDoctor && this.newCaseAssigned && nextProps.nextCaseAddress) {
+    if (
+         nextProps.isSignedIn
+      && nextProps.isDoctor
+      && nextProps.isDermatologist
+      && this.newCaseAssigned
+      && nextProps.nextCaseAddress
+    ) {
       this.showNewCaseAssignedToast(nextProps)
     }
   }
@@ -144,6 +227,7 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   }
 
   onAccountChangeSignOut (nextProps) {
+    // Sign out the localStorage/browser session when the users Eth address changes
     if (this.props.address && this.props.address !== nextProps.address) {
       this.signOut()
     }
@@ -158,6 +242,14 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
   signOut () {
     this.skipRequestedPathname = true
     this.props.dispatchSignOut()
+    this.props.history.push(routes.WELCOME)
+  }
+
+  handleBugsnagTrigger = () => {
+    bugsnagClient.notify({
+      name: 'Manually Triggered Test Error',
+      message: 'This was triggered manually. Please ignore'
+    })
   }
 
   render () {
@@ -174,10 +266,17 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       setRequestedPathname('')
     }
 
+    var publicKeyListener = <PublicKeyListener dispatchSignOut={this.props.dispatchSignOut} />
+
     if (this.props.isSignedIn) {
+      var userAgentCheckModal = <UserAgentCheckModal />
       var publicKeyCheck = <PublicKeyCheck />
       var betaFaucetModal = <BetaFaucetModal />
       var feedbackLink = <ScrollyFeedbackLink scrollDiffAmount={50} />
+
+      if (this.props.isDoctor && this.props.isDermatologist) {
+        var acceptAllExpiredCases = <AcceptAllExpiredCases />
+      }
     }
 
     if (this.props.isOwner) {
@@ -187,14 +286,39 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
         </div>
     }
 
-    const WelcomeWrapped = <Welcome isDoctor={this.props.isDoctor} />
+    if (process.env.REACT_APP_ENABLE_FIREBUG_DEBUGGER) {
+      if (this.state.debugging) {
+        var debugLog =
+          <div>
+            <hr />
+            <DebugLog />
+          </div>
+      }
+      var debugLink =
+        <div>
+          <DebugLink />
+          &nbsp;
+          <a onClick={this.handleBugsnagTrigger} className='btn btn-danger'>Trigger Bugsnag Notification</a>
+          &nbsp;
+          <a onClick={() => this.setState({ debugging: !this.state.debugging })} className='btn btn-info'>Toggle Log</a>
+          {debugLog}
+        </div>
+    }
+
+    const WelcomeWrapped = <Welcome
+      isDoctor={this.props.isDoctor}
+      isDermatologist={this.props.isDermatologist}
+    />
 
     return (
       <React.Fragment>
-        <LogListener address={this.props.CaseManager} fromBlock={0} />
+        <LogListener address={this.props.CaseManager} fromBlock={this.props.fromBlock} />
         <HippoNavbarContainer openCasesLength={this.props.openCaseCount} />
         {ownerWarning}
+        {userAgentCheckModal}
         {publicKeyCheck}
+        {publicKeyListener}
+        {acceptAllExpiredCases}
         <div className="content">
           {betaFaucetModal}
 
@@ -228,9 +352,9 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
               component={OpenCasesContainer}
             />
 
+            <SignedInRoute path={routes.ADMIN_SETTINGS} component={AdminSettings} />
+            <SignedInRoute path={routes.ADMIN_DOCTORS} component={AdminDoctors} />
             <SignedInRoute path={routes.ADMIN_FEES} component={AdminFees} />
-
-            <SignedInRoute path={routes.DOCTORS_NEW} component={AddDoctor} />
 
             <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
 
@@ -249,8 +373,9 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
             <div className="row">
               <div className="col-sm-12 text-center">
                 <p className="text-footer">
-                  &copy; 2018 MedCredits Inc. - All Rights Reserved.
+                  &copy; 2018 MedX Protocol - All Rights Reserved
                 </p>
+                {debugLink}
               </div>
             </div>
           </div>
@@ -268,6 +393,6 @@ const App = ReactTimeout(withContractRegistry(connect(mapStateToProps, mapDispat
       </React.Fragment>
   )
 }
-}))))
+})))
 
 export default hot(module)(withRouter(App))

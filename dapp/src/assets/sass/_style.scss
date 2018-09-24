@@ -22,6 +22,10 @@ body {
   }
 }
 
+.d-inline-block {
+  display: inline-block;
+}
+
 // Forces everything to fit within browser window on mobile
 .content .container,
 .navbar-header {
@@ -75,24 +79,48 @@ a {
 }
 
 /* find way to tap into defined vars in component scss files */
-.flip-link,
-.flip-link span {
-  border-bottom: 3px solid #c9eeff;
-  color: #6bf;
+.flip-link {
   cursor: pointer;
-  line-height: 30px;
+}
+
+.danger .currency {
+  color: red;
+}
+
+.currency,
+.flip-link span {
+  color: #6bf;
+  font-weight: bold;
+  text-decoration: none;
   transition: color 50ms ease-in;
 }
 
-.flip-link:hover,
+.flip-link span {
+  border-bottom: 3px solid #c9eeff;
+  line-height: 24px;
+  cursor: pointer;
+}
+
 .flip-link span:hover {
   border-bottom: 3px solid #d9f4ff;
 }
 
-.alert .flip-link,
+.flip-link .ether-flip--second-value,
+.flip-link .ether-flip--second-value:hover,
+.flip-link .ether-flip--second-value span {
+  border-bottom: none;
+  opacity: 0.7;
+  font-weight: normal;
+}
+
+button .currency,
+.button .currency,
+.alert .currency,
+button .flip-link span,
+.button .flip-link span,
 .alert .flip-link span {
-  border-color: #fff;
-  color: #fff;
+  border-color: inherit;
+  color: inherit;
 }
 
 h1,
@@ -160,6 +188,10 @@ not(.nav) li {
   color: $medcredits-text-gold;
 }
 
+.text-green {
+  color: $brand-success;
+}
+
 .text-footer {
   color: $medcredits-text-gray;
 }
@@ -190,7 +222,6 @@ not(.nav) li {
   text-align: center;
   font-weight: bold;
   font-family: "Space Mono", monospace;
-  text-transform: uppercase;
   word-wrap: break-word;
 
   @media (max-width: 768px) {
@@ -272,4 +303,10 @@ small,
 
 .info-question-mark {
   cursor: pointer;
+}
+
+.button-container {
+  @media (min-width: $screen-sm) {
+    text-align: right;
+  }
 }

@@ -23,9 +23,10 @@ function mapStateToProps(state, ownProps) {
         region: cacheCallValue(state, DoctorManager, 'doctorRegions', i),
         name: cacheCallValue(state, DoctorManager, 'doctorNames', i),
         address,
+        isDermatologist: cacheCallValue(state, DoctorManager, 'isDermatologist', address),
         isActive: cacheCallValue(state, DoctorManager, 'isActive', address),
         publicKey: cacheCallValue(state, AccountManager, 'publicKeys', address),
-        online: get(state, `heartbeat[${address.toLowerCase()}].online`, false)
+        online: get(state, `heartbeat.users[${address.toLowerCase()}].online`, false)
       })
     }
   }
@@ -52,6 +53,7 @@ function* saga({ DoctorManager, AccountManager }) {
         cacheCall(DoctorManager, 'doctorCountries', i),
         cacheCall(DoctorManager, 'doctorRegions', i),
         cacheCall(DoctorManager, 'doctorNames', i),
+        cacheCall(DoctorManager, 'isDermatologist', address),
         cacheCall(DoctorManager, 'isActive', address),
         cacheCall(AccountManager, 'publicKeys', address)
       ])
@@ -73,6 +75,7 @@ export function withDoctors(WrappedComponent) {
             this.props.doctors.forEach(doctor => {
               if (
                 doctor.isActive &&
+                doctor.isDermatologist &&
                 !isBlank(doctor.publicKey) &&
                 this.props.excludeAddresses.indexOf(doctor.address) === -1
               ) {

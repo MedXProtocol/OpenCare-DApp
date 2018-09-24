@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { defined } from '~/utils/defined'
 import { Button, Modal } from 'react-bootstrap'
 import ReactTooltip from 'react-tooltip'
 import { withRouter } from 'react-router-dom'
@@ -26,7 +27,7 @@ import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
-import { EtherFlip } from '~/components/EtherFlip'
+import { CaseFee } from '~/components/CaseFee'
 import { isBlank } from '~/utils/isBlank'
 import { isTrue } from '~/utils/isTrue'
 import { caseStatus } from '~/utils/caseStatus'
@@ -40,6 +41,7 @@ import * as routes from '~/config/routes'
 function mapStateToProps(state, { caseAddress }) {
   if (!caseAddress) { return {} }
 
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const address = get(state, 'sagaGenesis.accounts[0]')
 
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
@@ -60,13 +62,13 @@ function mapStateToProps(state, { caseAddress }) {
 
   const excludeAddresses = []
   if (address) {
-    excludeAddresses.push(address)
+    excludeAddresses.push(address.toLowerCase())
   }
   if (!isBlank(diagnosingDoctor)) {
-    excludeAddresses.push(diagnosingDoctor)
+    excludeAddresses.push(diagnosingDoctor.toLowerCase())
   }
   if (!isBlank(challengingDoctor)) {
-    excludeAddresses.push(challengingDoctor)
+    excludeAddresses.push(challengingDoctor.toLowerCase())
   }
 
   return {
@@ -81,6 +83,7 @@ function mapStateToProps(state, { caseAddress }) {
     challengingDoctor,
     diagnosingDoctor,
     encryptedCaseKey,
+    latestBlockTimestamp,
     caseKeySalt,
     status,
     transactions,
@@ -274,24 +277,29 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
       }
     }
 
-    render () {
-      const { diagnosingDoctor, account, updatedAt, status, secondsInADay } = this.props
-      const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
-      let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
+    requestNewDoctorDataLoaded () {
+      const { encryptedCaseKey, caseKeySalt, CaseLifecycleManager, caseAddress } = this.props
+      return defined(encryptedCaseKey) && defined(caseKeySalt) && defined(CaseLifecycleManager) && defined(caseAddress)
+    }
 
-      const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient', secondsInADay)
+    render () {
+      const { diagnosingDoctor, account, updatedAt, status, secondsInADay, latestBlockTimestamp } = this.props
+      const challengeFeeEther = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} noToggle />
+      const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient', secondsInADay, latestBlockTimestamp)
+      const loading = this.state.loading || !this.requestNewDoctorDataLoaded()
+      let followUpText = 'You can close the case and withdraw your deposit or assign to a different doctor:'
 
       let buttons = (
         <div className="button-set__btn-clear">
           <Button
-            disabled={this.state.loading}
+            disabled={loading}
             onClick={this.handlePatientWithdraw}
             className="btn btn-sm btn-clear"
           >
-            Close Case &amp; Withdraw Funds
+            Close &amp; Withdraw Funds
           </Button>
           <Button
-            disabled={this.state.loading}
+            disabled={loading}
             onClick={this.handleShowRequestNewDoctorModal}
             className="btn btn-sm btn-clear"
           >
@@ -305,14 +313,14 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
         buttons = (
           <div className="button-set__btn-clear">
             <Button
-              disabled={this.state.loading}
+              disabled={loading}
               onClick={this.handlePatientAcceptDiagnosis}
               className="btn btn-sm btn-clear"
             >
               Accept Initial Diagnosis<br /> (Withdraw {challengeFeeEther})
             </Button>
             <Button
-              disabled={this.state.loading}
+              disabled={loading}
               onClick={this.handleShowRequestNewDoctorModal}
               className="btn btn-sm btn-clear"
             >
@@ -356,7 +364,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
                           <div>
                             <label className='control-label'>Select Another Doctor</label>
                             <DoctorSelect
-                              excludeAddresses={[diagnosingDoctor, account]}
+                              excludeAddresses={[diagnosingDoctor.toLowerCase(), account.toLowerCase()]}
                               value={this.state.selectedDoctor}
                               isClearable={false}
                               onChange={this.onChangeDoctor} />
@@ -399,7 +407,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
               </form>
             </Modal>
 
-            <Loading loading={this.state.loading} />
+            <Loading loading={loading} />
           </React.Fragment>
         )
       }

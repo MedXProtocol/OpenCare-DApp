@@ -1,7 +1,6 @@
 import {
   put
 } from 'redux-saga/effects'
-
 import Web3 from 'web3'
 
 function* web3Initialize() {

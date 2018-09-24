@@ -1,13 +1,6 @@
-import contractByName from './contract-by-name'
-import contractKeyByAddress from './contract-key-by-address'
-import cacheCallState from './cache-call-state'
-import cacheCallValue from './cache-call-value'
-import cacheCallValueInt from './cache-call-value-int'
-
-export {
-  contractByName,
-  contractKeyByAddress,
-  cacheCallState,
-  cacheCallValue,
-  cacheCallValueInt
-}
+export { default as contractByName } from './contract-by-name'
+export { default as contractKeyByAddress } from './contract-key-by-address'
+export { default as cacheCallState } from './cache-call-state'
+export { default as cacheCallValue } from './cache-call-value'
+export { default as cacheCallValueInt } from './cache-call-value-int'
+export { default as cacheCallValueBigNumber } from './cache-call-value-big-number'

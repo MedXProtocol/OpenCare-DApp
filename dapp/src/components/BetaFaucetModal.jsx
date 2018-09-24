@@ -1,18 +1,22 @@
 import React, { Component } from 'react'
 import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
-import ReactCSSTransitionReplace from 'react-css-transition-replace';
+import ReactCSSTransitionReplace from 'react-css-transition-replace'
 import ReactTimeout from 'react-timeout'
+import { externalTransactionFinders } from '~/finders/externalTransactionFinders'
 import { cacheCall, withSaga, cacheCallValue, contractByName, nextId } from '~/saga-genesis'
 import { Modal } from 'react-bootstrap'
 import get from 'lodash.get'
+import { DaiFaucetAPI } from '~/components/betaFaucet/DaiFaucetAPI'
 import { EthFaucetAPI } from '~/components/betaFaucet/EthFaucetAPI'
 import { AddDoctorAPI } from '~/components/betaFaucet/AddDoctorAPI'
 import { weiToEther } from '~/utils/weiToEther'
 
 function mapStateToProps (state) {
-  let dontShowEther, dontShowMedX, dontShowAddDoctor
+  const AdminSettings = contractByName(state, 'AdminSettings')
+  const Dai = contractByName(state, 'Dai')
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const daiBalance = cacheCallValue(state, Dai, 'balanceOf', address)
   const ethBalance = get(state, 'sagaGenesis.ethBalance.balance')
   const betaFaucetModalDismissed = get(state, 'betaFaucet.betaFaucetModalDismissed')
   const manuallyOpened = get(state, 'betaFaucet.manuallyOpened')
@@ -21,47 +25,67 @@ function mapStateToProps (state) {
   const isOwner = address && (cacheCallValue(state, DoctorManager, 'owner') === address)
   const CaseManager = contractByName(state, 'CaseManager')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', address)
   const BetaFaucet = contractByName(state, 'BetaFaucet')
   const hasBeenSentEther = cacheCallValue(state, BetaFaucet, 'sentAddresses', address)
 
-  const externalTransactions = get(state, 'externalTransactions.transactions')
-  for (let i = 0; i < externalTransactions.length; i++) {
-    const { inFlight, txType, success } = externalTransactions[i]
-    if (txType === 'sendEther' && (inFlight || (!inFlight && success))) {
-      dontShowEther = true
-    } else if (txType === 'sendMedX' && (inFlight || (!inFlight && success))) {
-      dontShowMedX = true
-    } else if (txType === 'addDoctor' && (inFlight || (!inFlight && success))) {
-      dontShowAddDoctor = true
-    }
-  }
+  const sendEtherTx = externalTransactionFinders.sendEther(state)
+  const sendDaiTx = externalTransactionFinders.sendDai(state)
+  const addDoctorTx = externalTransactionFinders.addDoctor(state)
+
+  const etherWasDripped = sendEtherTx && (sendEtherTx.inFlight || sendEtherTx.success)
+  const doctorWasAdded = addDoctorTx && (addDoctorTx.inFlight || addDoctorTx.success)
+  const daiWasMinted = sendDaiTx && (sendDaiTx.inFlight || sendDaiTx.success)
+
+  const canSelfRegisterAsDoctor = cacheCallValue(state, AdminSettings, 'betaFaucetRegisterDoctor')
+
+  const fieldsAreUndefined = isDoctor === undefined || isDermatologist === undefined || hasBeenSentEther === undefined || ethBalance === undefined
+  const canBeDoctor = (!isDoctor && !isDermatologist) && canSelfRegisterAsDoctor
+  const needsEth = weiToEther(ethBalance) < 0.1 && !hasBeenSentEther
+  const needsDai = weiToEther(daiBalance) < 0.1
+
+  const showBetaFaucetModal =
+    !fieldsAreUndefined &&
+    !betaFaucetModalDismissed &&
+    (needsEth || canBeDoctor || needsDai || manuallyOpened)
 
   return {
+    AdminSettings,
     address,
     BetaFaucet,
-    betaFaucetModalDismissed,
+    canSelfRegisterAsDoctor,
+    showBetaFaucetModal,
+    canBeDoctor,
+    needsEth,
+    needsDai,
     CaseManager,
     ethBalance,
+    Dai,
+    daiBalance,
     hasBeenSentEther,
     DoctorManager,
     MedXToken,
     isOwner,
     isDoctor,
-    dontShowEther,
-    dontShowMedX,
-    dontShowAddDoctor,
+    isDermatologist,
+    etherWasDripped,
+    daiWasMinted,
+    doctorWasAdded,
     manuallyOpened
   }
 }
 
-function* saga({ BetaFaucet, CaseManager, MedXToken, DoctorManager, address }) {
-  if (!BetaFaucet || !CaseManager || !MedXToken || !DoctorManager || !address) { return }
+function* saga({ AdminSettings, Dai, BetaFaucet, CaseManager, MedXToken, DoctorManager, address }) {
+  if (!AdminSettings || !Dai || !BetaFaucet || !CaseManager || !MedXToken || !DoctorManager || !address) { return }
 
   yield all([
+    cacheCall(AdminSettings, 'betaFaucetRegisterDoctor'),
+    cacheCall(Dai, 'balanceOf', address),
     cacheCall(CaseManager, 'getPatientCaseListCount', address),
     cacheCall(DoctorManager, 'owner'),
     cacheCall(BetaFaucet, 'sentAddresses', address),
-    yield cacheCall(DoctorManager, 'isDoctor', address)
+    cacheCall(DoctorManager, 'isDoctor', address),
+    cacheCall(DoctorManager, 'isDermatologist', address)
   ])
 }
 
@@ -82,14 +106,9 @@ function mapDispatchToProps(dispatch) {
 export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
   withSaga(saga)(
     class _BetaFaucetModal extends Component {
-
       constructor(props) {
         super(props)
-
-        this.state = {
-          step: 1,
-          showBetaFaucetModal: false
-        }
+        this.state = {}
       }
 
       componentDidMount() {
@@ -101,56 +120,31 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
       }
 
       init(props) {
-        if (props.ethBalance === undefined || props.hasBeenSentEther === undefined) {
-          return
-        }
-
-        // If they've already seen the faucet or they're currently viewing, skip
-        if (props.betaFaucetModalDismissed || this.state.showBetaFaucetModal) {
-          return
-        }
-
-        let step
-        const needEth = (
-          !props.hasBeenSentEther
-          && weiToEther(props.ethBalance) < 0.1
-          && !props.dontShowEther
-        )
-
-        const canBeDoctor = (!props.isDoctor && !props.dontShowAddDoctor)
-
-
-        let showBetaFaucetModal = true
-
-        if (needEth) {
-          step = 1
-        } else if (canBeDoctor) {
-          step = 2
-        } else if (props.manuallyOpened) {
-          step = -1
-        } else {
-          showBetaFaucetModal = false
-        }
-
-        // Wait for other components to mount and load so the animation doesn't
-        // jaggedy jagger
-        this.props.setTimeout(() => {
-          this.setState({
-            showBetaFaucetModal: showBetaFaucetModal,
-            step
-          })
-        }, 1200)
+        this.setState({ step: this.nextStep(this.state.step, props) })
       }
 
-      determineNextStep = () => {
-        let nextStep = 1
-        if (this.state.step === 1) {
-          nextStep = 2
-        } else if (this.state.step === 2) {
-          nextStep = -1
+      nextStep = (step, props) => {
+        if (!step) {
+          step = 1
         }
 
-        this.setState({ step: nextStep })
+        if (step === 1 && (!props.needsEth || props.etherWasDripped)) {
+          step = 2
+        }
+
+        if (step === 2 && (!props.needsDai || props.daiWasMinted)) {
+          step = 3
+        }
+
+        if (step === 3 && (!props.canBeDoctor || props.doctorWasAdded)) {
+          step = -1
+        }
+
+        if (step > 3) {
+          step = -1
+        }
+
+        return step
       }
 
       addExternalTransaction = (txType, txHash) => {
@@ -161,57 +155,51 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
       }
 
       closeModal = () => {
-        this.props.hideModal()
         this.setState({
-          showBetaFaucetModal: false
-        })
+          step: null
+        }, this.props.hideModal)
       }
 
       handleMoveToNextStep = (e) => {
         e.preventDefault()
-
-        this.moveToNextStep()
-      }
-
-      moveToNextStep = ({ withDelay = false } = {}) => {
-        if (withDelay) {
-          this.props.setTimeout(this.determineNextStep, 3000)
-        } else {
-          this.determineNextStep()
-        }
+        this.setState({ step: this.nextStep(this.state.step + 1, this.props) })
       }
 
       render() {
         let content
-        let totalSteps = '2'
-        const { showBetaFaucetModal, step } = this.state
+
+        let totalSteps = 3
+        if (!this.props.canSelfRegisterAsDoctor) {
+          totalSteps--
+        }
+
+        const { step } = this.state
         const {
           ethBalance,
-          isOwner,
-          address,
-          isDoctor
+          daiBalance,
+          address
         } = this.props
 
-        if (this.props.betaFaucetModalDismissed) { return null }
-
-        if (isOwner) { return null }
-
-        // Don't show this if they've already been onboarded
-        if (step === 2 && isDoctor) { return null }
+        if (!this.props.showBetaFaucetModal) { return null }
 
         if (step === 1) {
           content = <EthFaucetAPI
             key="ethFaucet"
             address={address}
             ethBalance={ethBalance}
-            moveToNextStep={this.moveToNextStep}
             addExternalTransaction={this.addExternalTransaction}
             handleMoveToNextStep={this.handleMoveToNextStep} />
         } else if (step === 2) {
+          content = <DaiFaucetAPI
+            key='daiFaucet'
+            address={address}
+            daiBalance={daiBalance}
+            addExternalTransaction={this.addExternalTransaction}
+            handleMoveToNextStep={this.handleMoveToNextStep} />
+        } else if (step === 3) {
           content = <AddDoctorAPI
             key="addDoctorAPI"
             address={address}
-            moveToNextStep={this.moveToNextStep}
             addExternalTransaction={this.addExternalTransaction}
             handleMoveToNextStep={this.handleMoveToNextStep} />
         } else {
@@ -223,7 +211,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
                 You're all set!
               </h2>
               <p>
-                There is nothing more to do to start using Hippocrates.
+                There is nothing more to do to start using OpenCare.
               </p>
               <hr />
               <p>
@@ -235,7 +223,7 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
 
         let stepText
 
-        if (step > 0 && step < 4) {
+        if (step > 0) {
           stepText = (
             <React.Fragment>
               &nbsp;<small>(Step {step} of {totalSteps})</small>
@@ -244,11 +232,12 @@ export const BetaFaucetModal = ReactTimeout(connect(mapStateToProps, mapDispatch
         }
 
         return (
-          <Modal show={showBetaFaucetModal} onHide={this.closeModal}>
+          <Modal show={this.props.showBetaFaucetModal} onHide={this.closeModal}>
             <Modal.Header>
               <div className="row">
                 <div className="col-xs-12 text-center">
-                  <h4>Welcome to the Hippocrates Beta
+                  <h4>
+                    Welcome to the OpenCare Beta
                     <br className="visible-xs hidden-sm hidden-md hidden-lg" />
                     {stepText}
                   </h4>

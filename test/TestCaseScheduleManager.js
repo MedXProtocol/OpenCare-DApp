@@ -1,10 +1,7 @@
-const expectThrow = require('./helpers/expectThrow')
-const Registry = artifacts.require("./Registry.sol")
 const Case = artifacts.require("./Case.sol")
 const CaseScheduleManager = artifacts.require("./CaseScheduleManager.sol")
 const createEnvironment = require('./helpers/create-environment')
 const createCase = require('./helpers/create-case')
-const caseStatus = require('./helpers/case-status')
 const resetCaseManager = require('./helpers/reset-case-manager')
 
 contract('CaseScheduleManager', function (accounts) {
@@ -16,8 +13,8 @@ contract('CaseScheduleManager', function (accounts) {
 
   before(async () => {
     env = await createEnvironment(artifacts)
-    await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr Xavier', 'CA', 'AB')
-    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr Hibbert', 'US', 'CO')
+    await env.doctorManager.addOrReactivateDoctor(doctor, 'Dr Xavier', 'CA', 'AB', true)
+    await env.doctorManager.addOrReactivateDoctor(doctor2, 'Dr Hibbert', 'US', 'CO', true)
   })
 
   beforeEach(async () => {
@@ -27,14 +24,6 @@ contract('CaseScheduleManager', function (accounts) {
   describe('CaseScheduleManager', () => {
     it("should work", async () => {
       const caseScheduleManager = await CaseScheduleManager.new()
-    })
-  })
-
-  describe('initialize()', () => {
-    it('should not be called again', async () => {
-      await expectThrow(async () => {
-        await env.caseScheduleManager.initialize(env.registry.address)
-      })
     })
   })
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import FlipMove from 'react-flip-move'
+import { all } from 'redux-saga/effects'
 import { DiagnoseCaseContainer } from '~/components/doctors/diagnose'
 import { DoctorCaseListing } from './DoctorCaseListing'
 import { PageTitle } from '~/components/PageTitle'
@@ -13,11 +14,11 @@ import {
   withSaga,
   cacheCall
 } from '~/saga-genesis'
-import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
 import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
+import { fixAddress } from '~/utils/fixAddress'
 
 const MAX_CASES_PER_PAGE = 5
 
@@ -28,8 +29,6 @@ function mapStateToProps(state, { match }) {
 
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
-
-  const openCaseAddresses = mapOpenCaseAddresses(state, CaseStatusManager, address)
 
   let closedCaseCount = cacheCallValueInt(state, CaseStatusManager, 'closedCaseCount', address)
   if (!closedCaseCount) {
@@ -51,7 +50,7 @@ function mapStateToProps(state, { match }) {
     end = Math.max((start - MAX_CASES_PER_PAGE), 0)
 
     for (let i = (start - 1); i >= end; i--) {
-      const closedCaseAddress = cacheCallValue(state, CaseStatusManager, 'closedCaseAtIndex', address, i)
+      const closedCaseAddress = fixAddress(cacheCallValue(state, CaseStatusManager, 'closedCaseAtIndex', address, i))
 
       if (closedCaseAddress && !isBlank(closedCaseAddress)) {
         closedCaseAddresses.push(closedCaseAddress)
@@ -64,7 +63,6 @@ function mapStateToProps(state, { match }) {
   const props = {
     address,
     CaseStatusManager,
-    openCaseAddresses,
     closedCaseAddresses,
     totalPages,
     currentPage,
@@ -79,11 +77,9 @@ function* saga({ address, CaseStatusManager, start, end }) {
   if (!address || !CaseStatusManager) { return }
   yield cacheCall(CaseStatusManager, 'closedCaseCount', address)
 
-  yield openCaseAddressesSaga(CaseStatusManager, address)
-
-  yield range(start, end).map(function* (index) {
+  yield all(range(start, end).map(function* (index) {
     yield cacheCall(CaseStatusManager, 'closedCaseAtIndex', address, index - 1)
-  })
+  }))
 }
 
 export const OpenCasesContainer = connect(mapStateToProps)(
@@ -109,7 +105,6 @@ export const OpenCasesContainer = connect(mapStateToProps)(
         let doctorCaseListing, diagnoseCase, doScrollToTop
         const {
           closedCaseAddresses,
-          openCaseAddresses,
           match,
           currentPage,
           totalPages
@@ -121,7 +116,6 @@ export const OpenCasesContainer = connect(mapStateToProps)(
           doctorCaseListing = (
             <DoctorCaseListing
               key="doctor-case-listing"
-              openCaseAddresses={openCaseAddresses}
               closedCaseAddresses={closedCaseAddresses}
               totalPages={totalPages}
               currentPage={currentPage}
@@ -158,6 +152,5 @@ export const OpenCasesContainer = connect(mapStateToProps)(
 )
 
 OpenCasesContainer.defaultProps = {
-  openCaseAddresses: [],
   closedCaseAddresses: []
 }

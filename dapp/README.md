@@ -4,12 +4,10 @@
 
 # Running Webpack Dev server
 
-In './' directory:
-`$ npm run start` (runs Ganache-CLI server)
-
-In './dapp directory:
-`$ npm run start`
+In root directory:
+`$ npm run dapp`
 
 # Testing app
 
-`$ npm test`
+In './dapp' directory:
+`$ npm run test`

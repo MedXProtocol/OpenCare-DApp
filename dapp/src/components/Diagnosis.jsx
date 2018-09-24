@@ -22,8 +22,7 @@ import { connect } from 'react-redux'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { computeTotalFee } from '~/utils/computeTotalFee'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
-import { EtherFlip } from '~/components/EtherFlip'
-import { Ether } from '~/components/Ether'
+import { CaseFee } from '~/components/CaseFee'
 import { isTrue } from '~/utils/isTrue'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { isBlank } from '~/utils/isBlank'
@@ -61,13 +60,13 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
 
   const excludeAddresses = []
   if (address) {
-    excludeAddresses.push(address)
+    excludeAddresses.push(address.toLowerCase())
   }
   if (diagnosingDoctor) {
-    excludeAddresses.push(diagnosingDoctor)
+    excludeAddresses.push(diagnosingDoctor.toLowerCase())
   }
   if (challengingDoctor) {
-    excludeAddresses.push(challengingDoctor)
+    excludeAddresses.push(challengingDoctor.toLowerCase())
   }
 
   const networkId = get(state, 'sagaGenesis.network.networkId')
@@ -200,9 +199,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
           toastr.transactionError(error)
           this.setState({ challengeHandler: null, loading: false })
         })
-        .onConfirmed(() => {
-          this.setState({ challengeHandler: null })
-        })
         .onTxHash(() => {
           toastr.success('Working on getting you a second opinion.')
           mixpanel.track('Challenge Diagnosis Submitted')
@@ -298,30 +294,40 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   }
 
   render() {
+    if (this.props.diagnosingDoctor === undefined || this.props.address === undefined) {
+      return null
+    }
+
     const transactionRunning = !!this.state.challengeHandler || !!this.state.acceptHandler
     const buttonsHidden = transactionRunning || !this.props.isPatient || this.props.status !== 3
-    const challengeFeeEtherNoFlip = <Ether wei={computeChallengeFee(this.props.caseFeeWei)} />
-    const challengeFeeEther = <EtherFlip wei={computeChallengeFee(this.props.caseFeeWei)} />
-    const totalFeeEther = <EtherFlip wei={computeTotalFee(this.props.caseFeeWei)} />
+    const challengeFeeEtherNoFlip = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} noFlip />
+    const challengeFeeEther = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} />
+    const totalFeeEther = <CaseFee address={this.props.caseAddress} calc={computeTotalFee} />
 
     if (!buttonsHidden) {
       var buttons =
         <div className="card-footer">
           <div className="row">
-            <div className="col-xs-12 text-right" >
+            <div className="col-xs-12 button-container">
               <button
                 disabled={transactionRunning}
                 onClick={this.handleChallengeDiagnosis}
                 type="button"
                 className="btn btn-warning"
-              >Get Second Opinion</button>
+              >
+                Get Second Opinion
+              </button>
               &nbsp;
+              <br className="visible-xs hidden-sm hidden-md hidden-lg" />
+              <br className="visible-xs hidden-sm hidden-md hidden-lg" />
               <button
                 disabled={transactionRunning}
                 onClick={this.handleAcceptDiagnosis}
                 type="button"
                 className="btn btn-success"
-              >Accept and Withdraw ({challengeFeeEtherNoFlip})</button>
+              >
+                Accept and Withdraw ({challengeFeeEtherNoFlip})
+              </button>
             </div>
           </div>
         </div>
@@ -364,7 +370,10 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                         <div>
                           <label className='control-label'>Select Another Doctor</label>
                           <DoctorSelect
-                            excludeAddresses={[this.props.diagnosingDoctor, this.props.address]}
+                            excludeAddresses={[
+                              this.props.diagnosingDoctor.toLowerCase(),
+                              this.props.address.toLowerCase()
+                            ]}
                             value={this.state.selectedDoctor}
                             isClearable={false}
                             onChange={this.onChangeDoctor} />

@@ -5,15 +5,11 @@ import { caseStatus } from '~/utils/caseStatus'
 // Contains info about pending tx's
 export const addPendingTx = function(transaction, objIndex) {
   let caseRowObject
-  const { confirmed, error, call } = transaction
-  const isNewPatientCase = (
-       call.method === 'createAndAssignCaseWithPublicKey'
-    || call.method === 'createAndAssignCase'
-  )
+  const { confirmed, error } = transaction
 
   // TODO: Find a way to only fade this out after a few seconds
   // A tx we care about
-  if (isNewPatientCase && (!confirmed || defined(error))) {
+  if (!confirmed || defined(error)) {
     caseRowObject = {
       ...transaction,
       objIndex

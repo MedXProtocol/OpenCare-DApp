@@ -14,6 +14,8 @@ import {
   contractKeyByAddress,
   contractByName
 } from '../state-finders'
+import { customProviderWeb3 } from '~/utils/customProviderWeb3'
+const debug = require('debug')('call-cache-sagas')
 
 const callsInFlight = new Set()
 
@@ -106,8 +108,9 @@ export function* web3Call(address, method, ...args) {
 }
 
 export function* findWeb3Contract(address) {
-  const contractRegistry = yield getContext('contractRegistry')
-  const web3 = yield getContext('web3')
+  const contractRegistry = yield getContext('readContractRegistry')
+  // const web3 = yield getContext('web3')
+  const web3 = customProviderWeb3()
   const contractKey = yield select(contractKeyByAddress, address)
   return contractRegistry.get(address, contractKey, web3)
 }
@@ -127,6 +130,8 @@ function* findCallMethod(call) {
 Triggers the web3 call.
 */
 function* web3CallExecute({call}) {
+  debug(`web3CallExecute`, call)
+
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
     const options = { from: account }
@@ -136,6 +141,7 @@ function* web3CallExecute({call}) {
         let response = yield reduxSagaCall(callMethod, options, 'pending')
         yield put({ type: 'WEB3_CALL_RETURN', call, response })
       } catch (error) {
+        debug(`web3CallExecute rpc ERROR: ${error}`)
         yield put({ type: 'WEB3_CALL_ERROR', call, error })
         console.error('Error on WEB3 Call: ', call.method, call.args, call, error)
       } finally {
@@ -143,6 +149,7 @@ function* web3CallExecute({call}) {
       }
     })
   } catch (error) {
+    debug(`web3CallExecute general ERROR: ${error}`)
     if (yield cancelled()) {
       console.warn('Cancelled on WEB3 Call: ', call.method, call.args, call, error)
       yield put({ type: 'WEB3_CALL_CANCELLED', call })

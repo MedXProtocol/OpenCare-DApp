@@ -14,14 +14,6 @@ contract('CaseFirstPhaseManager', function (accounts) {
     await resetCaseManager(artifacts, env)
   })
 
-  describe('initialize()', () => {
-    it('should not work twice', async () => {
-      await expectThrow(async () => {
-        await env.caseFirstPhaseManager.initialize(env.registry.address)
-      })
-    })
-  })
-
   // This contract is tested by it's external interface: CaseLifecycleManager
 
 })

@@ -16,9 +16,11 @@ import {
 import { caseStale } from '~/services/caseStale'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
+import get from 'lodash.get'
 import * as routes from '~/config/routes'
 
 function mapStateToProps(state, { caseAddress, caseKey }) {
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
@@ -29,6 +31,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
 
   return {
     CaseLifecycleManager,
+    latestBlockTimestamp,
     transactions,
     status,
     updatedAt,
@@ -90,7 +93,7 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
             this.setState({ forceAcceptDiagnosisHandler: null, loading: false })
           })
           .onTxHash(() => {
-            toastr.success('Your accept diagnosis transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your MEDX.')
+            toastr.success('Your accept diagnosis transaction has been broadcast to the network. It will take a moment to be confirmed and then you will receive your fees.')
             mixpanel.track('Doctor Force Accepting After 48+ Hours')
             this.props.history.push(routes.DOCTORS_CASES_OPEN)
           })
@@ -98,8 +101,8 @@ const AbandonedCaseActions = connect(mapStateToProps)(withSend(withSaga(saga)(
     }
 
     render () {
-      const { updatedAt, status, secondsInADay } = this.props
-      if (!caseStale(updatedAt, status, 'doctor', secondsInADay)
+      const { updatedAt, status, secondsInADay, latestBlockTimestamp } = this.props
+      if (!caseStale(updatedAt, status, 'doctor', secondsInADay, latestBlockTimestamp)
       ) {
         return null
       } else {

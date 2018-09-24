@@ -16,6 +16,8 @@ import { doesNotRequireAttention } from '~/utils/doesNotRequireAttention'
 
 function mapStateToProps (state) {
   let casesRequiringAttentionCount = 0
+
+  const latestBlockTimestamp = get(state, 'sagaGenesis.block.latestBlock.timestamp')
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
@@ -32,7 +34,7 @@ function mapStateToProps (state) {
     const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
 
     // This case is actually on hold, waiting for action from another user so decrement the counter
-    if (doesNotRequireAttention(address, diagnosingDoctor, updatedAt, status, secondsInADay)) {
+    if (doesNotRequireAttention(address, diagnosingDoctor, updatedAt, status, secondsInADay, latestBlockTimestamp)) {
       casesRequiringAttentionCount--
     }
   })
@@ -50,7 +52,7 @@ function* saga({ address, CaseStatusManager, CaseScheduleManager }) {
 
   const openAddresses = yield openCaseAddressesSaga(CaseStatusManager, address)
 
-  yield openAddresses.map(function* (caseAddress) {
+  yield all(openAddresses.map(function* (caseAddress) {
     yield addContract({ address: caseAddress, contractKey: 'Case' })
     yield all([
       cacheCall(CaseScheduleManager, 'secondsInADay'),
@@ -58,7 +60,7 @@ function* saga({ address, CaseStatusManager, CaseScheduleManager }) {
       cacheCall(caseAddress, 'status'),
       cacheCall(caseAddress, 'diagnosingDoctor')
     ])
-  })
+  }))
 }
 
 export const HippoCasesRequiringAttention = connect(mapStateToProps)(

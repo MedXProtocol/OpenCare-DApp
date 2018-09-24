@@ -1,5 +1,4 @@
-const deployWithDelegate = require('./support/deployWithDelegate')
-const toRegistryKey = require('./support/to-registry-key')
+const deployTargetAndDelegate = require('./support/deployTargetAndDelegate')
 
 let AccountManager = artifacts.require("./AccountManager.sol")
 let Registry = artifacts.require('./Registry.sol')
@@ -7,8 +6,6 @@ let Registry = artifacts.require('./Registry.sol')
 module.exports = function(deployer) {
   deployer.then(async () => {
     const registryInstance = await Registry.deployed()
-    return deployWithDelegate(artifacts, deployer, AccountManager).then((delegateInstance) => {
-      return delegateInstance.setRegistry(registryInstance.address)
-    })
+    return deployTargetAndDelegate(artifacts, deployer, AccountManager)
   })
 };

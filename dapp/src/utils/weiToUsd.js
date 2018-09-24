@@ -1,5 +1,7 @@
-import BigNumber from 'bignumber.js'
+import { toBN } from '~/utils/toBN'
 
 export function weiToUsd(wei, usdPerWei) {
-  return new BigNumber(usdPerWei || 0).mul(wei)
+  wei = toBN(wei)
+  usdPerWei = toBN(usdPerWei)
+  return usdPerWei.mul(wei)
 }

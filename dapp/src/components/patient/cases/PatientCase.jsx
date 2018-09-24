@@ -21,10 +21,11 @@ import {
 } from '~/finders'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import get from 'lodash.get'
+import { fixAddress } from '~/utils/fixAddress'
 
 function mapStateToProps(state, { match }) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
-  const caseAddress = match.params.caseAddress
+  const caseAddress = fixAddress(match.params.caseAddress)
 
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
 
@@ -49,7 +50,7 @@ function mapStateToProps(state, { match }) {
 function* saga({ CaseScheduleManager, match, networkId, fromBlock }) {
   if (!networkId) { return }
 
-  const caseAddress = match.params.caseAddress
+  const caseAddress = fixAddress(match.params.caseAddress)
 
   yield addContract({ address: caseAddress, contractKey: 'Case' })
 }
@@ -81,7 +82,7 @@ export const PatientCaseContainer = connect(mapStateToProps)(
 
       render() {
         const caseKey = this.state.caseKey
-        const caseAddress = this.props.match.params.caseAddress
+        const caseAddress = fixAddress(this.props.match.params.caseAddress)
         const { diagnosisHash, challengeHash } = this.props
 
         if (caseKey) {

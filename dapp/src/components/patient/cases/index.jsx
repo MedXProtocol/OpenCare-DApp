@@ -9,19 +9,20 @@ import {
   cacheCall,
   contractByName,
   withSaga,
-  withContractRegistry,
   cacheCallValue,
   cacheCallValueInt
 } from '~/saga-genesis'
 import { CaseRow } from '~/components/CaseRow'
 import { LoadingLines } from '~/components/LoadingLines'
 import { ScrollToTop } from '~/components/ScrollToTop'
+import { transactionFinders } from '~/finders/transactionFinders'
 import { addPendingTx } from '~/services/pendingTxs'
 import { defined } from '~/utils/defined'
 import { Pagination } from '~/components/Pagination'
 import range from 'lodash.range'
 import get from 'lodash.get'
 import * as routes from '~/config/routes'
+import { fixAddress } from '~/utils/fixAddress'
 
 const MAX_CASES_PER_PAGE = 5
 
@@ -29,7 +30,8 @@ function mapStateToProps(state, props) {
   let caseAddresses = []
   const address = get(state, 'sagaGenesis.accounts[0]')
   const CaseManager = contractByName(state, 'CaseManager')
-  const transactions = Object.values(state.sagaGenesis.transactions)
+  const createAndAssignCaseTxs = transactionFinders.createAndAssignCase(state)
+
   const caseCount = cacheCallValueInt(state, CaseManager, 'getPatientCaseListCount', address)
   const currentPage = parseInt(props.match.params.currentPage, 10)
 
@@ -37,7 +39,7 @@ function mapStateToProps(state, props) {
   const end = Math.max((start - MAX_CASES_PER_PAGE), 0)
 
   caseAddresses = range(end, start).reduce((accumulator, index) => {
-    const caseAddress = cacheCallValue(state, CaseManager, 'patientCases', address, index)
+    const caseAddress = fixAddress(cacheCallValue(state, CaseManager, 'patientCases', address, index))
     if (caseAddress) {
       accumulator.push(caseAddress)
     }
@@ -50,7 +52,7 @@ function mapStateToProps(state, props) {
     caseAddresses,
     CaseManager,
     currentPage,
-    transactions
+    createAndAssignCaseTxs
   }
 }
 
@@ -64,7 +66,7 @@ function* saga({ address, CaseManager }) {
   }))
 }
 
-export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSaga(saga)(class _PatientCases extends Component {
+export const PatientCases = connect(mapStateToProps)(withSaga(saga)(class _PatientCases extends Component {
   renderCaseRows (caseAddresses, transactions, caseCount) {
     let caseRows = caseAddresses.map((caseAddress, index) => {
       return (
@@ -102,7 +104,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
 
   render() {
     let loadingLines, noCases, caseRows
-    const { caseAddresses, caseCount, transactions } = this.props
+    const { caseAddresses, caseCount, createAndAssignCaseTxs } = this.props
     const loading = (this.props.caseCount === undefined)
 
     const totalPages = Math.ceil(this.props.caseCount / MAX_CASES_PER_PAGE)
@@ -115,7 +117,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
           </div>
         </div>
       )
-    } else if (!caseAddresses.length) {
+    } else if (!caseAddresses.length && createAndAssignCaseTxs.length === 0) {
       noCases = (
         <div className="blank-state">
           <div className="blank-state--inner text-center text-gray">
@@ -134,7 +136,7 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
             leaveAnimation="accordionVertical"
             className="case-list"
           >
-            {this.renderCaseRows(caseAddresses, transactions, caseCount)}
+            {this.renderCaseRows(caseAddresses, createAndAssignCaseTxs, caseCount)}
           </FlipMove>
         </div>
       )
@@ -160,6 +162,6 @@ export const PatientCases = withContractRegistry(connect(mapStateToProps)(withSa
       </div>
     )
   }
-})))
+}))
 
 export const PatientCasesContainer = withRouter(PatientCases)

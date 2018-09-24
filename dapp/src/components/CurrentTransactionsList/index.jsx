@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavDropdown } from 'react-bootstrap'
 import { I18n } from 'react-i18next'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import faEthereum from '@fortawesome/fontawesome-free-brands/faEthereum'
 import FlipMove from 'react-flip-move'
 import classnames from 'classnames'
 import { txErrorMessage } from '~/services/txErrorMessage'
@@ -39,11 +41,11 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
       let labelClass = ''
 
       if (error)
-        labelClass = 'nav-transactions-text--danger'
+        labelClass = 'nav--circle__danger'
       else if (confirmed)
-        labelClass = 'nav-transactions-text--success'
+        labelClass = 'nav--circle__success'
       else
-        labelClass = 'nav-transactions-text--warning'
+        labelClass = 'nav--circle__warning'
 
       return labelClass
     }
@@ -72,12 +74,11 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
       } else {
         transactions = this.props.pendingOrErrorTransactions.reverse().map(tx => {
           const key   = tx[0]
-          const { call, error, confirmed, gasUsed, address } = tx[1]
-          let name
+          const { call, options, error, confirmed, gasUsed, address } = tx[1]
+          let name = call.method
           let mintMedxCount = 500 // these numbers could be pulled from the tx's call args
 
           if (error) {
-            const options = {}
             if (gasUsed)
               options['gas'] = parseInt(1.2 * gasUsed, 10)
 
@@ -121,12 +122,20 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
           return (
             <li
               key={`transaction-${key}`}
-              className="nav-transactions--item"
+              className="nav-list--item"
             >
-              <span className={classnames('nav-transactions--circle', this.getClassName(error, confirmed))} /> &nbsp;
-              {t(`transactions.${name}`, {
-                mintMedxCount: mintMedxCount
-              })}
+              <div className="nav-list--tx-wrapper">
+                <span className={classnames(
+                  'nav--circle',
+                  'nav-list--tx-wrapper__child',
+                  this.getClassName(error, confirmed)
+                )} />
+                <span className="nav-list--tx-name nav-list--tx-wrapper__child">
+                  {t(`transactions.${name}`, {
+                    mintMedxCount: mintMedxCount
+                  })}
+                </span>
+              </div>
               {confirmed}
               {errorMessage}
               {resendButton}
@@ -136,7 +145,7 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
         })
 
         transactionHtml = (
-          <ul className="nav-transactions--group">
+          <ul className="nav-list--group">
             <FlipMove>
               {transactions}
             </FlipMove>
@@ -153,11 +162,17 @@ export const CurrentTransactionsList = connect(mapStateToProps, mapDispatchToPro
           id='transactions'
           title={
             <span>
-              <span className={classnames('nav-transactions--circle', this.getDropdownClassName())} /> Status
+              <span className={classnames('nav--circle', this.getDropdownClassName())} />
+              &nbsp;
+                <FontAwesomeIcon
+                  icon={faEthereum}
+                  data-tip='Profile' />
+                &nbsp;
+                Tx
             </span>
           }>
           <li>
-            <div className="nav-transactions">
+            <div className="nav-list">
               <I18n>
                 {
                   (t) => {

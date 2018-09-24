@@ -8,10 +8,11 @@ import './DoctorManager.sol';
 import "./Initializable.sol";
 import './Registry.sol';
 import './RegistryLookup.sol';
+import './DelegateTarget.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract CaseSecondPhaseManager is Ownable, Initializable {
+contract CaseSecondPhaseManager is Ownable, Initializable, DelegateTarget {
 
   using RegistryLookup for Registry;
 
@@ -32,7 +33,18 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
   modifier onlyCaseLifecycleManager() {
     require(
       msg.sender == address(registry.caseLifecycleManager()),
-      'Must be an instance of Case lifecycle Manager contract'
+      'Must be an instance of Case Lifecycle Manager contract'
+    );
+    _;
+  }
+
+  /**
+   * @dev - throws if called by anything not an instance of the lifecycle manager contract
+   */
+  modifier onlyCaseLifecycleManagerOrFirstPhaseManager() {
+    require(
+      msg.sender == address(registry.caseLifecycleManager()) || msg.sender == address(registry.caseFirstPhaseManager()),
+      'Must be lifecycle manager or first phase manager contract'
     );
     _;
   }
@@ -44,9 +56,9 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
     revert();
   }
 
-  function initialize(Registry _registry) public notInitialized {
+  function initializeTarget(address _registry, bytes32) public notInitialized {
     require(_registry != address(0), 'registry is not blank');
-    registry = _registry;
+    registry = Registry(_registry);
     owner = msg.sender;
     setInitialized();
   }
@@ -148,7 +160,7 @@ contract CaseSecondPhaseManager is Ownable, Initializable {
     setChallengingDoctor(_case, _doctor, _doctorEncryptedKey);
   }
 
-  function clearChallengingDoctor(Case _case) public onlyCaseLifecycleManager {
+  function clearChallengingDoctor(Case _case) public onlyCaseLifecycleManagerOrFirstPhaseManager {
     address patient = _case.patient();
     address challengingDoctor = _case.challengingDoctor();
 

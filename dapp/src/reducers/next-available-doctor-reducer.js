@@ -8,13 +8,18 @@ export default function (state, {
   if (typeof state === 'undefined') {
     state = {
       noDoctorsAvailable: false,
-      excludedAddresses: []
+      excludedAddresses: [],
+      searching: false,
+      doctor: null
     }
   }
 
   switch(type) {
     case 'FIND_NEXT_AVAILABLE_DOCTOR':
-      state = {...state}
+      state = {
+        ...state,
+        searching: true
+      }
       delete state['doctor']
       if (excludedAddresses) {
         state.excludedAddresses = excludedAddresses
@@ -26,6 +31,7 @@ export default function (state, {
       state = {
         ...state,
         noDoctorsAvailable: false,
+        searching: false,
         doctor
       }
 
@@ -46,6 +52,7 @@ export default function (state, {
     case 'NO_DOCTORS_AVAILABLE':
       state = {
         ...state,
+        searching: false,
         noDoctorsAvailable: true
       }
 

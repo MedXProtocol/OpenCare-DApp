@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import BN from 'bn.js'
 import {
   addLogListener,
   removeLogListener
@@ -25,7 +26,10 @@ function isDefined(variable) {
 export const LogListener = connect(() => { return {} }, mapDispatchToProps)(class _LogListener extends Component {
   static propTypes = {
     address: PropTypes.string,
-    fromBlock: PropTypes.number
+    fromBlock: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.instanceOf(BN)
+    ])
   }
 
   componentDidMount () {

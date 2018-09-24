@@ -2,8 +2,10 @@ pragma solidity ^0.4.23;
 
 import './Registry.sol';
 import './RegistryLookup.sol';
+import "./DelegateTarget.sol";
+import './Initializable.sol';
 
-contract AccountManager {
+contract AccountManager is Initializable, DelegateTarget {
 
   using RegistryLookup for Registry;
 
@@ -21,21 +23,28 @@ contract AccountManager {
     It is safe to add new data definitions here
   */
 
-  event PublicKeySet(address indexed user, bytes publicKey);
-
-  function setRegistry(Registry _registry) external {
-    require(registry == address(0), 'a registry address needs to be provided');
-    owner = msg.sender;
-    registry = _registry;
+  modifier notOwner(address _address) {
+    require(_address != owner);
+    _;
   }
 
-  function setPublicKey(address _address, bytes _publicKey) external {
+  event PublicKeySet(address indexed user, bytes publicKey);
+
+  function initializeTarget(address _registry, bytes32) public notInitialized {
+    require(_registry != address(0), 'a registry address needs to be provided');
+    owner = msg.sender;
+    registry = Registry(_registry);
+  }
+
+  function setPublicKey(address _address, bytes _publicKey) external notOwner(_address) {
     bool isSender = (msg.sender == _address);
     bool isCaseManager = (msg.sender == address(registry.caseManager()));
     bool isOwner = msg.sender == owner;
     require(isSender || isCaseManager || isOwner, 'must be a sender, owner or case manager');
+    if (!isOwner) { // allow override, just in case
+      require(publicKeys[_address].length == 0, 'the public key is already defined');
+    }
     publicKeys[_address] = _publicKey;
     emit PublicKeySet(_address, _publicKey);
   }
-
 }

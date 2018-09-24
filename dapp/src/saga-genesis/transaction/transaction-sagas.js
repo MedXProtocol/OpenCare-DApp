@@ -10,14 +10,19 @@ import {
   END
 } from 'redux-saga'
 import { contractKeyByAddress } from '../state-finders'
+const debug = require('debug')('transaction-sagas')
 
 function createTransactionEventChannel (web3, call, transactionId, send, options) {
+  debug(`#${transactionId}: createTransactionEventChannel`, call)
+
   return eventChannel(emit => {
     let promiEvent = send(options)
       .on('transactionHash', (txHash) => {
+        debug(`#${transactionId}: transactionHash ${txHash}`)
         emit({ type: 'TRANSACTION_HASH', transactionId, txHash, call })
       })
       .on('confirmation', (confirmationNumber, receipt) => {
+        debug(`#${transactionId}: confirmation ${confirmationNumber}`)
         emit({ type: 'TRANSACTION_CONFIRMATION', transactionId, confirmationNumber, receipt })
         if (confirmationNumber > 2) {
           emit({ type: 'TRANSACTION_CONFIRMED', transactionId, call, confirmationNumber, receipt })
@@ -25,9 +30,12 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
         }
       })
       .on('receipt', (receipt) => {
+        debug(`#${transactionId}: receipt`, receipt)
         emit({ type: 'TRANSACTION_RECEIPT', transactionId, receipt })
       })
       .on('error', error => {
+        debug(`#${transactionId}: error ${error}`)
+
         const txObject = { type: 'TRANSACTION_ERROR', transactionId, call, error: error.toString() }
         const gasUsed = error.message.match(/"gasUsed": ([0-9]*)/)
 
@@ -45,6 +53,8 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
 }
 
 export function* web3Send({ transactionId, call, options }) {
+  debug(`#${transactionId}: web3Send`, call)
+
   const { address, method, args } = call
   try {
     const account = yield select(state => state.sagaGenesis.accounts[0])
@@ -52,7 +62,7 @@ export function* web3Send({ transactionId, call, options }) {
       from: account
     }, options || {})
 
-    const contractRegistry = yield getContext('contractRegistry')
+    const contractRegistry = yield getContext('writeContractRegistry')
     const web3 = yield getContext('web3')
     const contractKey = yield select(contractKeyByAddress, address)
     const contract = contractRegistry.get(address, contractKey, web3)
@@ -73,7 +83,7 @@ export function* web3Send({ transactionId, call, options }) {
       transactionChannel.close()
     }
   } catch (error) {
-    console.error(error)
+    debug(`#${transactionId} web3Send: ERROR`, call)
     yield put({type: 'TRANSACTION_ERROR', transactionId, call, error: error.message})
   }
 }

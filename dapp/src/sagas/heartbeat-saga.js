@@ -1,7 +1,9 @@
 import {
-  takeEvery,
+  getContext,
   select,
   take,
+  cancel,
+  takeEvery,
   put,
   fork,
   spawn,
@@ -12,95 +14,58 @@ import {
   eventChannel,
   END
 } from 'redux-saga'
-import { createNode } from '~/services/createNode'
-import { promisify } from '~/utils/promisify'
 
-const HEARTBEAT_SUBSCRIPTION_CHANNEL = '/MedCredits/Heartbeat'
+const HEARTBEAT_TOPIC = '0x4ea67bea'
 const HEARTBEAT_INTERVAL = 2000
 const MAX_LIFETIME = HEARTBEAT_INTERVAL * 2
 
-function* startNode() {
-  try {
-    const node = yield promisify(cb => createNode(cb))
-    yield promisify(cb => node.start(cb))
-
-    node.on('peer:discovery', (peerInfo) => {
-      const idStr = peerInfo.id.toB58String()
-      console.log('Discovered: ' + idStr)
-      node.dial(peerInfo, (err, conn) => {
-        if (err) { console.error(err) }
-        else {
-          // return console.log('Dialled:', idStr, conn)
-        }
-      })
-    })
-
-    node.on('peer:connect', (peerInfo) => {
-      const idStr = peerInfo.id.toB58String()
-      console.log('Got connection to: ' + idStr)
-    })
-
-    node.on('peer:disconnect', (peerInfo) => {
-      const idStr = peerInfo.id.toB58String()
-      console.log('Lost connection to: ' + idStr)
-    })
-
-    const idStr = node.peerInfo.id.toB58String()
-    console.log('Node is listening on', idStr)
-    return node
-  } catch (error) {
-    console.error(error)
-    return null
-  }
-}
-
-function createPubsubChannel (node) {
+function createHeartbeatChannel(web3, symKeyId) {
   return eventChannel(emit => {
-    const messageHandler = (message) => {
-      if (message.from !== node.peerInfo.id.toB58String()) {
-        const dataJson = JSON.parse(Buffer.from(message.data).toString())
-        emit({ type: 'HEARTBEAT_MESSAGE', message, dataJson, date: new Date() })
+    web3.shh.subscribe('messages', {
+      symKeyId,
+      topics: [HEARTBEAT_TOPIC],
+      minPow: 0.05
+    }, (error, message, subscription) => {
+      if (error) {
+        emit(END)
+      } else {
+        emit({ type: 'HEARTBEAT_MESSAGE', message, subscription })
       }
-    }
-
-    node.pubsub.subscribe(HEARTBEAT_SUBSCRIPTION_CHANNEL,
-      messageHandler,
-      (error) => {
-        if (error) {
-          emit({ type: 'HEARTBEAT_SUBSCRIPTION_FAILURE', error })
-          emit(END)
-        } else {
-          emit({ type: 'HEARTBEAT_SUBSCRIBED' })
-        }
-      }
-    )
+    })
 
     return () => {
-      node.pubsub.unsubscribe(HEARTBEAT_SUBSCRIPTION_CHANNEL, messageHandler)
+      web3.shh.clearSubscriptions()
     }
   })
 }
 
-function* startPubsub(node, lastHeartbeatTime) {
-  const channel = createPubsubChannel(node)
-  while (true) {
-    const action = yield take(channel)
-    if (action.type === 'HEARTBEAT_MESSAGE') {
+function* startHeartbeatSubscription(web3, symKeyId, lastHeartbeatTime) {
+  const channel = createHeartbeatChannel(web3, symKeyId)
+  try {
+    while (true) {
+      const action = yield take(channel)
       yield call(heartbeatMessage, lastHeartbeatTime, action)
-    } else {
-      yield put(action)
     }
+  } catch (error) {
+    console.log(error)
   }
 }
 
-function heartbeatBody(address) {
-  return Buffer.from(JSON.stringify(
-    {
-      type: 'DOCTOR_HEARTBEAT',
-      address,
-      message: 'Heartbeat'
-    }
-  ))
+function* postHeartbeat(symKeyId, address) {
+  const web3 = yield getContext('web3')
+  try {
+    yield web3.shh.post({
+      symKeyId,
+      ttl: 4,
+      topic: HEARTBEAT_TOPIC,
+      payload: address,
+      powTime: 4,
+      powTarget: 0.1
+    })
+  } catch (error) {
+    console.error(error)
+    yield put({ type: 'WEB3_SHH_DISCONNECT', error })
+  }
 }
 
 function skippedABeat(lastHeartbeatTime, address) {
@@ -108,9 +73,13 @@ function skippedABeat(lastHeartbeatTime, address) {
   return !lastTime || ((new Date() - lastTime) >= MAX_LIFETIME)
 }
 
-function* heartbeatMessage(lastHeartbeatTime, { message, dataJson, date }) {
-  const { address } = dataJson
-  if (!address) { return console.error('Missing address: ', dataJson) }
+function* heartbeatMessage(lastHeartbeatTime, { message }) {
+  const address = message.payload
+  if (!address) {
+    console.warn('Missing address: ', message )
+    return
+  }
+  const date = new Date()
 
   if (skippedABeat(lastHeartbeatTime, address)) {
     yield put({ type: 'USER_ONLINE', address: address.toLowerCase(), date })
@@ -127,36 +96,24 @@ function* heartbeatMessage(lastHeartbeatTime, { message, dataJson, date }) {
   })
 }
 
-function* sendHeartbeat(node) {
-  const address = yield select((state) => state.sagaGenesis.accounts[0])
-  node.pubsub.publish(
-    HEARTBEAT_SUBSCRIPTION_CHANNEL,
-    heartbeatBody(address),
-    (err) => {
-      if (err) { return console.error('Could not deliver message: ', err) }
-    }
-  )
-}
-
-function* startHeartbeat(node) {
+function* startHeartbeat(symKeyId) {
   while (true) {
-    yield call(sendHeartbeat, node)
+    const address = yield select(state => state.sagaGenesis.accounts[0])
+    const isAvailable = yield select(state => state.heartbeat.isAvailable)
+    if (address && isAvailable) {
+      yield call(postHeartbeat, symKeyId, address)
+    }
     yield call(delay, HEARTBEAT_INTERVAL)
   }
 }
 
 export default function* () {
-  let node = null
-  while (!node) {
-    node = yield startNode()
-    if (node) {
-      const lastHeartbeatTime = {}
-      yield fork(startHeartbeat, node)
-      yield fork(startPubsub, node, lastHeartbeatTime)
-      yield takeEvery('SEND_HEARTBEAT', sendHeartbeat, node)
-      return
-    }
-    console.warn('Unable to start p2p node....retrying in four seconds.')
-    yield call(delay, 4000)
-  }
+  yield takeEvery('WEB3_SHH_INITIALIZED', function* ({ web3, symKeyId }) {
+    const lastHeartbeatTime = {}
+    const subscriptionTask = yield fork(startHeartbeatSubscription, web3, symKeyId, lastHeartbeatTime)
+    const heartbeatTask = yield fork(startHeartbeat, symKeyId)
+    yield take('WEB3_SHH_DISCONNECT')
+    yield cancel(subscriptionTask)
+    yield cancel(heartbeatTask)
+  })
 }

@@ -4,10 +4,11 @@ import './Case.sol';
 import './Initializable.sol';
 import './Registry.sol';
 import './RegistryLookup.sol';
+import './DelegateTarget.sol';
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract CaseScheduleManager is Initializable, Ownable {
+contract CaseScheduleManager is Initializable, Ownable, DelegateTarget {
 
   using RegistryLookup for Registry;
 
@@ -58,12 +59,19 @@ contract CaseScheduleManager is Initializable, Ownable {
     return (block.timestamp - updatedAt[_caseAddress]) > SECONDS_IN_A_DAY;
   }
 
-  function doctorWaitedTwoDays(address _caseAddress) external view returns (bool) {
+  function doctorWaitedTwoDays(address _caseAddress) public view returns (bool) {
     return (block.timestamp - updatedAt[_caseAddress]) > (SECONDS_IN_A_DAY * 2);
   }
 
-  function doctorWaitedFourDays(address _caseAddress) external view returns (bool) {
+  function doctorWaitedFourDays(address _caseAddress) public view returns (bool) {
     return (block.timestamp - updatedAt[_caseAddress]) > (SECONDS_IN_A_DAY * 4);
+  }
+
+  function caseExpiredForDoctor(Case _case) external view returns (bool) {
+    return (
+         _case.status() == Case.CaseStatus.Evaluated   && doctorWaitedTwoDays(_case)
+      || _case.status() == Case.CaseStatus.Challenging && doctorWaitedFourDays(_case)
+    );
   }
 
   /**
@@ -73,9 +81,9 @@ contract CaseScheduleManager is Initializable, Ownable {
     revert();
   }
 
-  function initialize(Registry _registry) public notInitialized {
+  function initializeTarget(address _registry, bytes32) public notInitialized {
     require(_registry != address(0), 'registry is not blank');
-    registry = _registry;
+    registry = Registry(_registry);
     owner = msg.sender;
     setInitialized();
   }
@@ -91,7 +99,7 @@ contract CaseScheduleManager is Initializable, Ownable {
     emit CaseUpdatedAt(_caseAddress, block.timestamp);
   }
 
-  function secondsInADay() public view returns (uint) {
+  function secondsInADay() public pure returns (uint) {
     return SECONDS_IN_A_DAY;
   }
 

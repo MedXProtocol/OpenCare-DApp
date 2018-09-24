@@ -1,21 +1,32 @@
-export default function (state, { type, address }) {
+export default function (state, { type, address, isAvailable }) {
   if (typeof state === 'undefined') {
-    state = {}
+    state = {
+      users: {},
+      isAvailable: true
+    }
   }
 
   switch(type) {
     case 'USER_ONLINE':
       state = {
         ...state,
-        [address]: {
-          online: true
+        users: {
+          ...state.users,
+          [address]: {
+            online: true
+          }
         }
       }
       break
 
     case 'USER_OFFLINE':
       state = {...state}
-      delete state[address]
+      delete state.users[address]
+      break
+
+    case 'AVAILABILITY_CHANGED':
+      state = {...state}
+      state.isAvailable = !!isAvailable
       break
 
     // no default

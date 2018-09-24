@@ -1,10 +1,11 @@
 # You can automatically load this file using direnv: https://direnv.net/
 # or just `source .envrc`
 
-export HDWALLET_MNEMONIC="pony machine fee rent spawn doll erase dizzy remove logic unlock estate"
-export ROPSTEN_PROVIDER_URL=https://ropsten.infura.io/To0546l6M9AapR2JxoHN
-export RINKEBY_PROVIDER_URL=https://rinkeby.infura.io/To0546l6M9AapR2JxoHN
-export MAINNET_PROVIDER_URL=https://mainnet.infura.io/To0546l6M9AapR2JxoHN
+export HDWALLET_MNEMONIC="track endorse coyote area casino budget item income vote pull cushion soon"
+export REACT_APP_ROPSTEN_PROVIDER_URL=https://ropsten.infura.io/To0546l6M9AapR2JxoHN
+export REACT_APP_RINKEBY_PROVIDER_URL=https://rinkeby.infura.io/To0546l6M9AapR2JxoHN
+export REACT_APP_MAINNET_PROVIDER_URL=https://mainnet.infura.io/To0546l6M9AapR2JxoHN
+export REACT_APP_LOCALHOST_PROVIDER_URL=http://localhost:8545
 
 export GENERATE_SOURCEMAP=true
 
@@ -14,6 +15,12 @@ export REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT=false
 export REACT_APP_REQUIRED_NETWORK_ID=1234
 export REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI=http://localhost:9000
 
+export REACT_APP_WHISPER_MAINNET_WEBSOCKET_URL=ws://34.205.83.76:11546
+export REACT_APP_WHISPER_ROPSTEN_WEBSOCKET_URL=ws://34.205.83.76:9546
+export REACT_APP_WHISPER_RINKEBY_WEBSOCKET_URL=ws://34.205.83.76:10546
+
+export REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES="0x7fda1a1aca962a7a5a22fec9590676525e33c6eb,0xef139fc8a960f78f5b492d2410c71a68620b14b4,0x84073c621efdede4abea225e12caeab96110f8dd"
+
 # export REACT_APP_MIXPANEL_KEY=<your_dev_key>
 # export REACT_APP_BUGSNAG_API_KEY=<your bug snag key>
 # export REACT_APP_ENV=<your env ie staging or production>
@@ -22,10 +29,12 @@ export REACT_APP_IPFS_HOSTNAME=ipfs.medcredits.io
 export REACT_APP_IPFS_PORT=5001
 export REACT_APP_IPFS_PROTOCOL=https
 
-# export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/dns4/localhost/tcp/9090/ws/p2p-webrtc-star/ipfs
-# export REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL=/dns4/localhost/tcp/9091/ws/p2p-websocket-star/ipfs
-export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/dns4/ipfs.medcredits.io/tcp/443/wss/p2p-webrtc-star/ipfs
-export REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL=/dns4/ipfs.medcredits.io/tcp/9091/wss/p2p-websocket-star/ipfs
+# export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/dns4/ipfs.medcredits.io/tcp/9090/wss/p2p-webrtc-star/ipfs
+# export REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL=/dns4/ipfs.medcredits.io/tcp/443/wss/p2p-websocket-star/ipfs
+export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star/ipfs
+export REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL=/ip4/127.0.0.1/tcp/9091/ws/p2p-websocket-star/ipfs
+
+export REACT_APP_ENABLE_FIREBUG_DEBUGGER=true
 
 export LAMBDA_CONFIG_CORS_ORIGIN="*"
 export LAMBDA_CONFIG_PRIVKEY="<contractOwnerPrivKey>"

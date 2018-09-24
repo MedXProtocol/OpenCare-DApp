@@ -18,12 +18,6 @@ $card-columns-margin:               $card-spacer-y;
 
 
 .header-card {
-  @media (min-width: $screen-sm) {
-    .button-container {
-      text-align: right;
-    }
-  }
-
   .sm-block {
     margin-right: 20px;
 
@@ -161,6 +155,7 @@ $card-columns-margin:               $card-spacer-y;
   padding: 2rem 4rem;
   background-color: #fafafa;
   border-top: $card-border-width solid $card-border-color;
+  min-height: 102px;
 
   @media (max-width: 768px) {
     padding-left: 2rem;
@@ -169,7 +164,9 @@ $card-columns-margin:               $card-spacer-y;
 }
 
 .card-footer .btn {
-  margin-left: 10px;
+  @media (min-width: $screen-sm) {
+    margin-left: 10px;
+  }
 }
 
 //
@@ -371,4 +368,8 @@ $card-columns-margin:               $card-spacer-y;
   @media (max-width: 768px) {
     min-height: 440px;
   }
+}
+
+.card-footer--invoice {
+  background: #f1f1f1;
 }

@@ -11,7 +11,7 @@ export const EmergencyKit = (
 
       this.state = {
         masterPassword: '',
-        masterPasswordError: '',
+        errorMessage: '',
         masterPasswordOk: false,
         isChecking: false
       }
@@ -23,34 +23,36 @@ export const EmergencyKit = (
     }
 
     checkMasterPassword = async () => {
-      let error
+      let errorMessage
       let masterPasswordOk = false
       let isMasterPassword = await currentAccount().isMasterPassword(this.state.masterPassword)
-      if (!this.state.masterPassword)
-        error = 'You must enter a master password'
-      else if (isMasterPassword)
+
+      if (!this.state.masterPassword) {
+        errorMessage = 'You must enter a master password'
+      } else if (isMasterPassword) {
         masterPasswordOk = true
-      else
-        error = 'The master password does not match the account password'
+      } else {
+        errorMessage = 'The master password does not match the account password'
+      }
 
       this.setState({
-        masterPasswordOk: masterPasswordOk,
-        masterPasswordError: error,
+        masterPasswordOk,
+        errorMessage,
         isChecking: false
       })
     }
 
     render () {
       let emergencyKit = null
-      let { masterPasswordError } = this.state
+      let { errorMessage } = this.state
       const { isChecking, masterPasswordOk, masterPassword } = this.state
 
       if (masterPasswordOk) {
         emergencyKit = <EmergencyKitDisplayContainer />
       }
       else {
-        if (masterPasswordError) {
-          masterPasswordError = <Alert bsStyle='danger'>{masterPasswordError}</Alert>
+        if (errorMessage) {
+          var errorAlert = <Alert bsStyle='danger'>{errorMessage}</Alert>
         }
         emergencyKit = (
           <div>
@@ -63,7 +65,7 @@ export const EmergencyKit = (
                     <form onSubmit={this.handleSubmit} autoComplete='off'>
                       <div className="card-header">
                         <h3 className="title card-title">
-                          Hippocrates Emergency Kit
+                          OpenCare Emergency Kit
                           <br /><small className="text-gray">To access your secret key, please verify your account by entering your master password:</small>
                         </h3>
                       </div>
@@ -79,7 +81,7 @@ export const EmergencyKit = (
                             onChange={(e) => this.setState({ masterPassword: e.target.value })}
                             type="password"
                             className="form-control input-lg" />
-                          {masterPasswordError}
+                          {errorAlert}
                         </div>
                       </div>
 

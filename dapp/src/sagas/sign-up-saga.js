@@ -4,19 +4,22 @@ import { Account } from '~/accounts/Account'
 import { mixpanel } from '~/mixpanel'
 import { contractByName, web3Call } from '~/saga-genesis'
 
-export function* signUpSaga({ address, secretKey, masterPassword, overrideAccount }) {
-  if (!address) {
-    yield put({ type: 'SIGN_IN_ERROR', addressError: 'Address is not defined' })
+export function* signUpSaga({ networkId, address, secretKey, masterPassword, overrideAccount }) {
+  yield put({ type: 'SIGNING_IN' })
+
+  if (!networkId || !address) {
+    yield put({ type: 'SIGN_IN_ERROR', missingCredentialsError: 'Ethereum Address and/or Network ID is missing' })
     return
   }
+
   var masterPasswordError = masterPasswordInvalid(masterPassword)
   if (masterPasswordError) {
     yield put({ type: 'SIGN_IN_ERROR', masterPasswordError })
     return
   }
 
-  let account = Account.get(address)
-  let newAccount = yield call([Account, 'build'], { address, secretKey, masterPassword })
+  let account = Account.get(networkId, address)
+  let newAccount = yield call([Account, 'build'], { networkId, address, secretKey, masterPassword })
   let differentAccountExists = false
 
   if (account && (account.hashedSecretKey !== newAccount.hashedSecretKey)) {
@@ -31,7 +34,7 @@ export function* signUpSaga({ address, secretKey, masterPassword, overrideAccoun
   if (differentAccountExists && !overrideAccount) {
     yield put({ type: 'SIGN_IN_ERROR', overrideError: true })
   } else {
-    const account = yield call(Account.create, { address, secretKey, masterPassword })
+    const account = yield call(Account.create, { networkId, address, secretKey, masterPassword })
     yield put({ type: 'SIGN_IN_OK', account, masterPassword, address })
     mixpanel.track("Signup")
   }
