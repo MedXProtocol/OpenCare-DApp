@@ -5,6 +5,13 @@ var HDWalletProvider = require("truffle-hdwallet-provider")
 
 module.exports = {
   networks: {
+    test: {
+      host: '0.0.0.0',
+      port: 8145,
+      network_id: 333,
+      gas: 4700000,
+      gasPrice: 60 * 1000000000
+    },
     development: {
       host: 'localhost',
       port: 8545,
