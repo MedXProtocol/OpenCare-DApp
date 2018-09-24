@@ -7,6 +7,7 @@
     "ganache": "./scripts/ganache.sh",
     "dapp": "cd dapp && node --max-old-space-size=4096 scripts/start.js",
     "test": "./scripts/test.sh",
+    "test-circleci": "truffle compile && truffle test",
     "netlify-build": "./scripts/staging-build.sh",
     "staging-build": "./scripts/staging-build.sh",
     "production-build": "./scripts/production-build.sh",
