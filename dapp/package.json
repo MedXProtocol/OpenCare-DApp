@@ -128,7 +128,7 @@
   "scripts": {
     "build-css": "node-sass-chokidar src/ -o src/",
     "watch-css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive",
-    "start": "node --max-old-space-size=4096 scripts/start.js",
+    "start": "echo 'NOTE: This was moved, now run from root dir with `npm run dapp`'",
     "build": "node --max-old-space-size=4096 scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
     "console": "NODE_ENV=development babel-node"

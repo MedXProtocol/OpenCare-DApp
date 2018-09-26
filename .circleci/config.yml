@@ -44,7 +44,7 @@ jobs:
       - run: mkdir -p ./test-results/jest
       - run: cd dapp && npm test
 
-      - run: npm test
+      - run: npm run test-circleci
 
       - store_artifacts:
           path: ./test-results
