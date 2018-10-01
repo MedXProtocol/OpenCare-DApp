@@ -12,7 +12,10 @@ export GENERATE_SOURCEMAP=true
 # Below are variables for the dapp.  They must be prefixed with `REACT_APP_` to be included.
 
 export REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT=false
-export REACT_APP_REQUIRED_NETWORK_ID=1234
+
+# Space-separated list of one or more required network ids
+export REACT_APP_REQUIRED_NETWORK_IDS="1234 4"
+
 export REACT_APP_LAMBDA_BETA_FAUCET_ENDPOINT_URI=http://localhost:9000
 
 export REACT_APP_WHISPER_MAINNET_WEBSOCKET_URL=ws://34.205.83.76:11546
