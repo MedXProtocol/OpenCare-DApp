@@ -8,18 +8,20 @@ import {
   contractByName
 } from '~/saga-genesis'
 import { toastr } from '~/toastr'
+import get from 'lodash.get'
 
 function mapStateToProps (state) {
   const account = currentAccount()
+  const networkId = get(state, 'sagaGenesis.network.networkId')
 
   if (account === null)
     return {}
 
   const AccountManager = contractByName(state, 'AccountManager')
   const blockchainPublicKey = cacheCallValue(state, AccountManager, 'publicKeys', account.address())
-  const blockchainPublicKeyDefined = !!blockchainPublicKey
-  const publicKeyMatches = blockchainPublicKey === '0x' + account.hexPublicKey()
-  const destroyAccount = blockchainPublicKeyDefined && !publicKeyMatches
+  const publicKeyDoesNotMatch = blockchainPublicKey && blockchainPublicKey !== '0x' + account.hexPublicKey()
+  const networkMatches = networkId && networkId === account.networkId()
+  const destroyAccount = publicKeyDoesNotMatch && networkMatches
 
   return {
     account,
@@ -36,7 +38,6 @@ function* saga({ account, AccountManager }) {
 
 export const PublicKeyListener = connect(mapStateToProps)(
   withSaga(saga)(class _PublicKeyListener extends Component {
-
     componentWillReceiveProps (nextProps) {
       if (nextProps.destroyAccount) {
         this.props.account.destroy()
@@ -48,6 +49,5 @@ export const PublicKeyListener = connect(mapStateToProps)(
     render() {
       return null
     }
-
   })
 )
