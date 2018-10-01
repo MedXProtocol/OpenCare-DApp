@@ -9,7 +9,7 @@ function formatOldKey(address) {
 // Check for an old account and upgrade it to the new account shape and key
 export const upgradeOldAccount = function(networkId, address) {
   const envNetworkIds = requiredNetworkIds()
-  if (envNetworkIds.indexOf(networkId) === -1) { return }
+  if (!envNetworkIds.includes(networkId)) { return }
 
   let accountObject = JSON.parse(localStorage.getItem(formatOldKey(address)))
 

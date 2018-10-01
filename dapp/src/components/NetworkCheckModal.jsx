@@ -17,7 +17,7 @@ export const NetworkCheckModal = connect(mapStateToProps)(function({ networkId }
   var requiredNetworkNames = []
   if (networkIds &&
       networkId &&
-      networkIds.indexOf(networkId) === -1) {
+      !networkIds.includes(networkId)) {
     requiredNetworkNames = networkIds.map(requiredNetworkId => networkIdToName(requiredNetworkId))
     var showNetworkModal = true
   }
