@@ -23,18 +23,16 @@ import { cancelablePromise } from '~/utils/cancelablePromise'
 import { computeTotalFee } from '~/utils/computeTotalFee'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
 import { CaseFee } from '~/components/CaseFee'
-import { isTrue } from '~/utils/isTrue'
 import { isEmptyObject } from '~/utils/isEmptyObject'
 import { isBlank } from '~/utils/isBlank'
 import { downloadJson } from '~/utils/storage-util'
 import { getFileHashFromBytes } from '~/utils/get-file-hash-from-bytes'
 import { DiagnosisDisplay } from '~/components/DiagnosisDisplay'
-import { DoctorSelect } from '~/components/DoctorSelect'
 import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { mixpanel } from '~/mixpanel'
 import { toastr } from '~/toastr'
 import * as routes from '~/config/routes'
-import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
+import { NextAvailableDoctor } from '~/components/NextAvailableDoctor'
 import {
   caseFinders,
   caseManagerFinders
@@ -52,6 +50,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
   const diagnosisHash = getFileHashFromBytes(caseFinders.diagnosisHash(state, caseAddress))
   const diagnosingDoctor = cacheCallValue(state, caseAddress, 'diagnosingDoctor')
   const challengingDoctor = cacheCallValue(state, caseAddress, 'challengingDoctor')
+  const doctor = get(state, 'nextAvailableDoctor.doctor')
   const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
   const transactions = state.sagaGenesis.transactions
   const isPatient = address === patientAddress
@@ -73,6 +72,7 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
 
   return {
     CaseLifecycleManager,
+    doctor,
     address,
     fromBlock,
     currentlyExcludedDoctors,
@@ -86,7 +86,6 @@ function mapStateToProps(state, { caseAddress, caseKey }) {
     encryptedCaseKey,
     caseKeySalt,
     diagnosingDoctor,
-    selectedDoctor: '',
     networkId
   }
 }
@@ -227,13 +226,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
     }
   }
 
-  onChangeDoctor = (option) => {
-    this.setState({
-      selectedDoctor: option,
-      doctorAddressError: ''
-    })
-  }
-
   handleAcceptDiagnosis = () => {
     const acceptTransactionId = this.props.send(
       this.props.CaseLifecycleManager,
@@ -254,7 +246,6 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   handleCloseChallengeModal = () => {
     this.setState({
       showChallengeModal: false,
-      selectedDoctor: null,
       doctorAddressError: ''
     })
   }
@@ -262,13 +253,13 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
   onSubmitChallenge = async (e) => {
     e.preventDefault()
     this.setState({ doctorAddressError: '' })
-    if (!this.state.selectedDoctor) {
+    if (!this.props.doctor) {
       this.setState({
         doctorAddressError: 'You must select a doctor to challenge the case'
       })
     } else {
       const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
-      const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
+      const doctorPublicKey = this.props.doctor.publicKey.substring(2)
       const caseKeySalt = this.props.caseKeySalt.substring(2)
       const doctorEncryptedCaseKey = await reencryptCaseKeyAsync({
         account: currentAccount(),
@@ -280,7 +271,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         this.props.CaseLifecycleManager,
         'challengeWithDoctor',
         this.props.caseAddress,
-        this.state.selectedDoctor.value,
+        this.props.doctor.address,
         '0x' + doctorEncryptedCaseKey
       )()
 
@@ -365,30 +356,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                     </p>
                     <hr />
                     <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>
-                      {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
-                        ?
-                        <div>
-                          <label className='control-label'>Select Another Doctor</label>
-                          <DoctorSelect
-                            excludeAddresses={[
-                              this.props.diagnosingDoctor.toLowerCase(),
-                              this.props.address.toLowerCase()
-                            ]}
-                            value={this.state.selectedDoctor}
-                            isClearable={false}
-                            onChange={this.onChangeDoctor} />
-                          {!this.state.doctorAddressError ||
-                            <p className='help-block has-error'>
-                              {this.state.doctorAddressError}
-                            </p>
-                          }
-                        </div>
-                        :
-                        <AvailableDoctorSelect
-                          value={this.state.selectedDoctor}
-                          onChange={this.onChangeDoctor}
-                        />
-                       }
+                      <NextAvailableDoctor />
                     </div>
                   </div>
                 </div>
@@ -399,9 +367,9 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
                   type="button"
                   className="btn btn-link"
                 >Cancel</button>
-                <span data-tip={!this.state.selectedDoctor ? 'No available doctors to receive a second opinion from' : ''}>
+                <span data-tip={!this.props.doctor ? 'No available doctors to receive a second opinion from' : ''}>
                   <input
-                    disabled={!this.state.selectedDoctor}
+                    disabled={!this.props.doctor}
                     type='submit'
                     className="btn btn-success"
                     value='OK'

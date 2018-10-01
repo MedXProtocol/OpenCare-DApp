@@ -46,7 +46,7 @@ import { PatientInfo } from './PatientInfo'
 import { SpotQuestions } from './SpotQuestions'
 import { RashQuestions } from './RashQuestions'
 import { AcneQuestions } from './AcneQuestions'
-import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
+import { NextAvailableDoctor } from '~/components/NextAvailableDoctor'
 import pull from 'lodash.pull'
 import FlipMove from 'react-flip-move'
 import { promisify } from '~/utils/promisify'
@@ -65,8 +65,6 @@ function mapStateToProps (state) {
   const usdPerWei = cacheCallValue(state, CasePaymentManager, 'usdPerEther')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
-  const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
-  const searchingForDoctor = get(state, 'nextAvailableDoctor.searching')
   const doctor = get(state, 'nextAvailableDoctor.doctor')
 
   const sendEtherTx = externalTransactionFinders.sendEther(state)
@@ -76,7 +74,6 @@ function mapStateToProps (state) {
 
   return {
     AccountManager,
-    searchingForDoctor,
     doctor,
     address,
     daiBalance,
@@ -89,7 +86,6 @@ function mapStateToProps (state) {
     CaseManager,
     CasePaymentManager,
     publicKey,
-    noDoctorsAvailable,
     WrappedEther,
     Dai
   }
@@ -896,12 +892,8 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
                         <div className="row">
                           <div className="col-xs-12 col-sm-12 col-md-12">
                             <div className={classnames("form-group", { 'has-error': !!errors['doctor'] })}>
-                              <AvailableDoctorSelect
-                                doctor={this.props.doctor}
-                                noDoctorsAvailable={this.props.noDoctorsAvailable}
-                                searching={this.props.searchingForDoctor}
-                              />
-                            <input type='hidden' name='doctor' value={get(this.props.doctor, 'address', '')} />
+                              <NextAvailableDoctor />
+                              <input type='hidden' name='doctor' value={get(this.props.doctor, 'address', '')} />
                               {errors['doctor']}
                             </div>
                           </div>
