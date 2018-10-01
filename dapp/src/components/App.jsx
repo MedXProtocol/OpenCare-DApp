@@ -100,6 +100,7 @@ function mapStateToProps (state) {
   let nextCaseAddress, doctorCasesCount, openCaseCount
 
   const address = get(state, 'sagaGenesis.accounts[0]')
+  const networkId = get(state, 'sagaGenesis.network.networkId')
   const CaseManager = contractByName(state, 'CaseManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
   const DoctorManager = contractByName(state, 'DoctorManager')
@@ -120,6 +121,7 @@ function mapStateToProps (state) {
 
   return {
     address,
+    networkId,
     isDermatologist,
     isDoctor,
     FromBlockNumber,
@@ -228,7 +230,9 @@ const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
 
   onAccountChangeSignOut (nextProps) {
     // Sign out the localStorage/browser session when the users Eth address changes
-    if (this.props.address && this.props.address !== nextProps.address) {
+    const addressDoesNotMatch = this.props.address && this.props.address !== nextProps.address
+    const networkDoesNotMatch = this.props.networkId && this.props.networkId !== nextProps.networkId
+    if (addressDoesNotMatch || networkDoesNotMatch) {
       this.signOut()
     }
   }
