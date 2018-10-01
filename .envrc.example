@@ -11,8 +11,6 @@ export GENERATE_SOURCEMAP=true
 
 # Below are variables for the dapp.  They must be prefixed with `REACT_APP_` to be included.
 
-export REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT=false
-
 # Space-separated list of one or more required network ids
 export REACT_APP_REQUIRED_NETWORK_IDS="1234 4"
 
@@ -31,11 +29,6 @@ export REACT_APP_COMMA_SEPARATED_PRIORITY_DOCTOR_ADDRESSES="0x7fda1a1aca962a7a5a
 export REACT_APP_IPFS_HOSTNAME=ipfs.medcredits.io
 export REACT_APP_IPFS_PORT=5001
 export REACT_APP_IPFS_PROTOCOL=https
-
-# export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/dns4/ipfs.medcredits.io/tcp/9090/wss/p2p-webrtc-star/ipfs
-# export REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL=/dns4/ipfs.medcredits.io/tcp/443/wss/p2p-websocket-star/ipfs
-export REACT_APP_P2P_WEBRTC_STAR_MULTIADDR_BASE_URL=/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star/ipfs
-export REACT_APP_P2P_WEBSOCKET_STAR_MULTIADDR_BASE_URL=/ip4/127.0.0.1/tcp/9091/ws/p2p-websocket-star/ipfs
 
 export REACT_APP_ENABLE_FIREBUG_DEBUGGER=true
 
