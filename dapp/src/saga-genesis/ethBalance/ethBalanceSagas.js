@@ -4,7 +4,7 @@ import { bugsnagClient } from '~/bugsnagClient'
 import { customProviderWeb3 } from '~/utils/customProviderWeb3'
 
 function* getEthBalance() {
-  const web3 = customProviderWeb3()
+  const web3 = yield customProviderWeb3()
   const address = yield select((state) => state.sagaGenesis.accounts[0])
   if (web3 === undefined || address === undefined) {
     return

@@ -12,7 +12,7 @@ import { customProviderWeb3 } from '~/utils/customProviderWeb3'
 
 export function* checkExternalTransactionReceipts(web3) {
   try {
-    const web3 = customProviderWeb3()
+    const web3 = yield customProviderWeb3()
     const transactions = yield select((state) => state.externalTransactions.transactions)
 
     for (let i = 0; i < transactions.length; i++) {

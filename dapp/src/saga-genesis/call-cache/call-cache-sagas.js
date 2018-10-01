@@ -110,7 +110,7 @@ export function* web3Call(address, method, ...args) {
 export function* findWeb3Contract(address) {
   const contractRegistry = yield getContext('readContractRegistry')
   // const web3 = yield getContext('web3')
-  const web3 = customProviderWeb3()
+  const web3 = yield customProviderWeb3()
   const contractKey = yield select(contractKeyByAddress, address)
   return contractRegistry.get(address, contractKey, web3)
 }
