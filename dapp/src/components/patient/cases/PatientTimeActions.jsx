@@ -19,8 +19,7 @@ import {
   withSend,
   TransactionStateHandler
 } from '~/saga-genesis'
-import { AvailableDoctorSelect } from '~/components/AvailableDoctorSelect'
-import { DoctorSelect } from '~/components/DoctorSelect'
+import { NextAvailableDoctor } from '~/components/NextAvailableDoctor'
 import { Loading } from '~/components/Loading'
 import { caseStale } from '~/services/caseStale'
 import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
@@ -29,7 +28,6 @@ import { mixpanel } from '~/mixpanel'
 import { computeChallengeFee } from '~/utils/computeChallengeFee'
 import { CaseFee } from '~/components/CaseFee'
 import { isBlank } from '~/utils/isBlank'
-import { isTrue } from '~/utils/isTrue'
 import { caseStatus } from '~/utils/caseStatus'
 import get from 'lodash.get'
 import {
@@ -46,7 +44,7 @@ function mapStateToProps(state, { caseAddress }) {
 
   const CaseLifecycleManager = contractByName(state, 'CaseLifecycleManager')
   const CaseScheduleManager = contractByName(state, 'CaseScheduleManager')
-
+  const noDoctorsAvailable = get(state, 'nextAvailableDoctor.noDoctorsAvailable')
   const secondsInADay = cacheCallValueInt(state, CaseScheduleManager, 'secondsInADay')
   const status = cacheCallValueInt(state, caseAddress, 'status')
   const updatedAt = cacheCallValueInt(state, CaseScheduleManager, 'updatedAt', caseAddress)
@@ -56,6 +54,7 @@ function mapStateToProps(state, { caseAddress }) {
   const caseKeySalt = caseFinders.caseKeySalt(state, caseAddress)
   const caseFeeWei = cacheCallValue(state, caseAddress, 'caseFee')
   const fromBlock = caseManagerFinders.caseFromBlock(state, caseAddress)
+  const doctor = get(state, 'nextAvailableDoctor.doctor')
 
   const transactions = state.sagaGenesis.transactions
   const currentlyExcludedDoctors = state.nextAvailableDoctor.excludedAddresses
@@ -73,6 +72,8 @@ function mapStateToProps(state, { caseAddress }) {
 
   return {
     address,
+    doctor,
+    noDoctorsAvailable,
     fromBlock,
     secondsInADay,
     caseFeeWei,
@@ -87,7 +88,7 @@ function mapStateToProps(state, { caseAddress }) {
     caseKeySalt,
     status,
     transactions,
-    updatedAt,
+    updatedAt
   }
 }
 
@@ -196,13 +197,13 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
 
       this.setState({ doctorAddressError: '' })
 
-      if (!this.state.selectedDoctor) {
+      if (!this.props.doctor) {
         this.setState({
           doctorAddressError: 'You must select a doctor to challenge the case'
         })
       } else {
         const encryptedCaseKey = this.props.encryptedCaseKey.substring(2)
-        const doctorPublicKey = this.state.selectedDoctor.publicKey.substring(2)
+        const doctorPublicKey = this.props.doctor.publicKey.substring(2)
         const caseKeySalt = this.props.caseKeySalt.substring(2)
         const doctorEncryptedCaseKey = await reencryptCaseKeyAsync({
           account: currentAccount(),
@@ -220,7 +221,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
           this.props.CaseLifecycleManager,
           contractMethod,
           this.props.caseAddress,
-          this.state.selectedDoctor.value,
+          this.props.doctor.address,
           '0x' + doctorEncryptedCaseKey
         )()
         this.setState({
@@ -283,7 +284,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
     }
 
     render () {
-      const { diagnosingDoctor, account, updatedAt, status, secondsInADay, latestBlockTimestamp } = this.props
+      const { updatedAt, status, secondsInADay, latestBlockTimestamp } = this.props
       const challengeFeeEther = <CaseFee address={this.props.caseAddress} calc={computeChallengeFee} noToggle />
       const isCaseNotStale = !updatedAt || !caseStale(updatedAt, status, 'patient', secondsInADay, latestBlockTimestamp)
       const loading = this.state.loading || !this.requestNewDoctorDataLoaded()
@@ -347,7 +348,6 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
               </div>
             </div>
 
-
             <Modal show={this.state.showRequestNewDoctorModal} onHide={this.handleCloseRequestNewDoctorModal}>
               <form onSubmit={this.onSubmitRequestNewDoctor}>
                 <Modal.Header>
@@ -359,27 +359,7 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
                   <div className='row'>
                     <div className='col-xs-12'>
                       <div className={classnames('form-group', { 'has-error': !!this.state.doctorAddressError })}>
-                        {isTrue(process.env.REACT_APP_FEATURE_MANUAL_DOCTOR_SELECT)
-                          ?
-                          <div>
-                            <label className='control-label'>Select Another Doctor</label>
-                            <DoctorSelect
-                              excludeAddresses={[diagnosingDoctor.toLowerCase(), account.toLowerCase()]}
-                              value={this.state.selectedDoctor}
-                              isClearable={false}
-                              onChange={this.onChangeDoctor} />
-                            {!this.state.doctorAddressError ||
-                              <p className='help-block has-error'>
-                                {this.state.doctorAddressError}
-                              </p>
-                            }
-                          </div>
-                          :
-                          <AvailableDoctorSelect
-                            value={this.state.selectedDoctor}
-                            onChange={this.onChangeDoctor}
-                          />
-                         }
+                        <NextAvailableDoctor />
                       </div>
                     </div>
                   </div>
@@ -390,9 +370,9 @@ const PatientTimeActions = connect(mapStateToProps, mapDispatchToProps)(
                     type="button"
                     className="btn btn-link"
                   >Cancel</button>
-                  <span data-tip={!this.state.selectedDoctor ? 'No available doctors to receive a second opinion from' : ''}>
+                <span data-tip={this.props.noDoctorsAvailable ? 'No available doctors to receive a second opinion from' : ''}>
                     <input
-                      disabled={!this.state.selectedDoctor}
+                      disabled={this.props.noDoctorsAvailable}
                       type='submit'
                       className="btn btn-success"
                       value='OK'
