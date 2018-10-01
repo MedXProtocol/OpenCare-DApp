@@ -1,15 +1,16 @@
 import Web3 from 'web3'
 
-let customWeb3
+let customWeb3, customNetworkId
 
-export const customProviderWeb3 = function() {
-  // memoize
-  if (customWeb3) {
+export const customProviderWeb3 = async function() {
+  const stockWeb3 = new Web3(window.web3.currentProvider)
+  const networkId = await stockWeb3.eth.net.getId()
+
+  if (customWeb3 && customNetworkId === networkId) {
     return customWeb3
   }
 
   let customProvider
-  const networkId = parseInt(process.env.REACT_APP_REQUIRED_NETWORK_ID, 10)
 
   if (networkId === 1) {
     customProvider = process.env.REACT_APP_MAINNET_PROVIDER_URL
@@ -29,7 +30,7 @@ export const customProviderWeb3 = function() {
   }
 
   customWeb3 = new Web3(new Web3.providers.HttpProvider(customProvider))
-  // customWeb3 = new Web3(customProvider)
+  customNetworkId = networkId
 
   return customWeb3
 }

@@ -14,6 +14,7 @@ import { nextAvailableDoctorSaga } from './next-available-doctor-saga'
 import { pollExternalTransactionsSaga } from './pollExternalTransactionsSaga'
 import { failedTransactionListener } from './failedTransactionListener'
 import { whisperSaga } from './whisperSaga'
+import { mixpanelSagas } from './mixpanelSagas'
 
 export default function* () {
   yield fork(takeOnceAndRun, 'WEB3_NETWORK_ID', function* ({ web3, networkId }) {
@@ -27,6 +28,7 @@ export default function* () {
       nextAvailableDoctorSaga(),
       pollExternalTransactionsSaga(),
       failedTransactionListener(),
+      mixpanelSagas({ networkId }),
       whisperSaga(),
       heartbeatSaga()
     ])

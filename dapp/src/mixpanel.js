@@ -6,6 +6,9 @@ let mixpanel = {
   },
   identify: (...args) => {
     console.log('mixpanel.identify() noop: ', args)
+  },
+  register: (...args) => {
+    console.log('mixpanel.register() noop: ', args)
   }
 }
 
