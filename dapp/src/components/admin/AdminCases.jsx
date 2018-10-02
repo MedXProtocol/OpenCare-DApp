@@ -91,13 +91,18 @@ export const AdminCases = connect(mapStateToProps)(
                               <p>
                                 This value determines the duration of diagnosis or challenge.
                               </p>
-                              <input
-                                type="number"
-                                className='form-control'
-                                placeholder={`${this.props.secondsInADay}`}
-                                value={this.state.newSecondsInADay}
-                                onChange={(e) => this.setState({ newSecondsInADay: e.target.value })}
-                                />
+                              <p>
+                                <input
+                                  type="number"
+                                  className='form-control'
+                                  placeholder={`${this.props.secondsInADay}`}
+                                  value={this.state.newSecondsInADay}
+                                  onChange={(e) => this.setState({ newSecondsInADay: e.target.value })}
+                                  />
+                              </p>
+                              <p>
+                                <small>A day is 86400 seconds long</small>
+                              </p>
                             </div>
                           </div>
                         </div>

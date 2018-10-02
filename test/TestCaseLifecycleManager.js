@@ -35,9 +35,6 @@ contract('CaseLifecycleManager', function (accounts) {
     caseInstance = await Case.at(await createCase(env, patient, doctor))
   })
 
-  afterEach(async () => {
-  })
-
   describe('patientWithdrawFunds()', () => {
     it('should close the case and refund the patient', async () => {
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
