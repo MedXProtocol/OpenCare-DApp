@@ -31,5 +31,4 @@ contract Registry is Ownable, Pausable {
   function lookup(bytes32 _key) public view returns (address) {
     return registry[_key];
   }
-
 }

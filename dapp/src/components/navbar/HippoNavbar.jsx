@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import classnames from 'classnames'
 import { all } from 'redux-saga/effects'
 import { toastr } from '~/toastr'
+import { isBlank } from '~/utils/isBlank'
 import {
   Nav,
   Navbar,
@@ -43,6 +44,7 @@ function mapStateToProps (state) {
   const isAvailable = get(state, 'heartbeat.isAvailable')
   const isSignedIn = get(state, 'account.signedIn')
   const DoctorManager = contractByName(state, 'DoctorManager')
+  const BetaFaucet = contractByName(state, 'BetaFaucet')
   const WrappedEther = contractByName(state, 'WrappedEther')
   const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
   const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', address)
@@ -64,6 +66,7 @@ function mapStateToProps (state) {
     isDoctor,
     isDermatologist,
     networkId,
+    BetaFaucet,
     DoctorManager,
     WrappedEther,
     signedIn,
@@ -166,11 +169,13 @@ export const HippoNavbar = connect(mapStateToProps, mapDispatchToProps)(
             </MenuItem>
           </LinkContainer>
 
-          <li role="presentation">
-            <a role="menuitem" onClick={this.handleBetaFeaturesClick}>
-              Beta Features
-            </a>
-          </li>
+          {!isBlank(this.props.BetaFaucet) &&
+            <li role="presentation">
+              <a role="menuitem" onClick={this.handleBetaFeaturesClick}>
+                Beta Features
+              </a>
+            </li>
+          }
 
           <MenuItem header>Security</MenuItem>
           <LinkContainer to={routes.ACCOUNT_EMERGENCY_KIT}>
