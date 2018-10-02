@@ -15,6 +15,7 @@ import { DebugLink } from '~/components/DebugLink'
 import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
 import { AcceptAllExpiredCases } from '~/components/AcceptAllExpiredCases'
 import { UserAgentCheckModal } from '~/components/UserAgentCheckModal'
+import { UsageRestrictionsModal }  from '~/components/UsageRestrictionsModal'
 import { PublicKeyListener } from '~/components/PublicKeyListener'
 import { PublicKeyCheck } from '~/components/PublicKeyCheck'
 import { BetaFaucetModal } from '~/components/BetaFaucetModal'
@@ -276,6 +277,7 @@ const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
       var userAgentCheckModal = <UserAgentCheckModal />
       var publicKeyCheck = <PublicKeyCheck />
       var betaFaucetModal = <BetaFaucetModal />
+      var usageRestrictionsModal = <UsageRestrictionsModal />
       var feedbackLink = <ScrollyFeedbackLink scrollDiffAmount={50} />
 
       if (this.props.isDoctor && this.props.isDermatologist) {
@@ -325,6 +327,7 @@ const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
         {acceptAllExpiredCases}
         <div className="content">
           {betaFaucetModal}
+          {usageRestrictionsModal}
 
           <Switch>
             <Route path={routes.WELCOME} component={null} />
