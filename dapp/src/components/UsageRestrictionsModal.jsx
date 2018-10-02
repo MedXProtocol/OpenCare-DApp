@@ -50,7 +50,7 @@ export const UsageRestrictionsModal = connect(mapStateToProps, mapDispatchToProp
 
     if (usageRestrictions === '0') { // locked
       warning =
-        <h4>
+        <p>
           OpenCare is not taking any new consultations for the time being. If you would like to join the OpenCare network please <a
             target="_blank"
             href="https://t.me/MedCredits"
@@ -60,10 +60,10 @@ export const UsageRestrictionsModal = connect(mapStateToProps, mapDispatchToProp
               contact us
             </span>
           </a>.
-        </h4>
+        </p>
     } else if (usageRestrictions === '2' && !isDoctor) {
       warning =
-        <h4>
+        <p>
           OpenCare is currently supporting physician-to-physician consultations only. If you would like to join the OpenCare network please <a
             target="_blank"
             href="https://t.me/MedCredits"
@@ -73,7 +73,7 @@ export const UsageRestrictionsModal = connect(mapStateToProps, mapDispatchToProp
               contact us
             </span>
           </a>.
-        </h4>
+        </p>
     }
 
     const show = !!warning && !viewed
