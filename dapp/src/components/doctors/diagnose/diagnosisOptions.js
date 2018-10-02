@@ -146,6 +146,10 @@ const otherOptions = [
 
 export const groupedDiagnosisOptions = [
   {
+    "label": "Non-diagnostic",
+    "options": ["Diagnosis not possible"].map(option => ({ "value": option, "label": option }))
+  },
+  {
     "label": "Infection / Mites",
     "options": infectionMitesOptions.map(option => ({ "value": option, "label": option }))
   },
