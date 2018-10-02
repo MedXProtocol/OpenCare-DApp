@@ -40,7 +40,7 @@ function mapStateToProps(state) {
   }
 }
 
-function* adminSettingsSaga({ AdminSettings }) {
+function* adminSettingsSaga({ AdminSettings, CaseScheduleManager }) {
   if (!AdminSettings) { return }
 
   yield all([

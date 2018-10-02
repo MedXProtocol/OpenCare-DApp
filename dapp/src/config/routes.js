@@ -9,6 +9,7 @@ export const HOME = '/'
 export const ADMIN_SETTINGS = '/admin/settings'
 export const ADMIN_DOCTORS = '/admin/doctors'
 export const ADMIN_FEES = '/admin/fees'
+export const ADMIN_CASES = '/admin/cases'
 
 export const ACCOUNT_EMERGENCY_KIT = '/account/emergency-kit'
 export const ACCOUNT_CHANGE_PASSWORD = '/account/change-password'
