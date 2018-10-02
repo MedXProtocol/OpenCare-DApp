@@ -88,6 +88,11 @@ const AdminFees = newAsyncWrap({
   name: 'AdminFees'
 })
 
+const AdminCases = newAsyncWrap({
+  createImport: () => import(/* webpackChunkName: 'AdminCases' */ './admin/AdminCases'),
+  name: 'AdminCases'
+})
+
 const SignUpContainer = newAsyncWrap({
   createImport: () => import(/* webpackChunkName: 'SignUpContainer' */ './sign-up'),
   name: 'SignUpContainer'
@@ -368,6 +373,7 @@ const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
             <SignedInRoute path={routes.ADMIN_SETTINGS} component={AdminSettings} />
             <SignedInRoute path={routes.ADMIN_DOCTORS} component={AdminDoctors} />
             <SignedInRoute path={routes.ADMIN_FEES} component={AdminFees} />
+            <SignedInRoute path={routes.ADMIN_CASES} component={AdminCases} />
 
             <SignedInRoute exact path={routes.PATIENTS_CASES_NEW} component={NewCase} />
 

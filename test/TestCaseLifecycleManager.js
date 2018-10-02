@@ -7,8 +7,6 @@ const caseStatus = require('./helpers/case-status')
 const resetCaseManager = require('./helpers/reset-case-manager')
 const increaseTime = require('./helpers/increaseTime')
 
-const SECONDS_IN_A_DAY = 86400
-
 contract('CaseLifecycleManager', function (accounts) {
   let caseInstance
   let env
@@ -18,6 +16,7 @@ contract('CaseLifecycleManager', function (accounts) {
   let doctor2 = accounts[2]
   let doctor3 = accounts[3]
   let caseFeeWei
+  let secondsInADay
 
   before(async () => {
     env = await createEnvironment(artifacts)
@@ -29,6 +28,7 @@ contract('CaseLifecycleManager', function (accounts) {
 
   beforeEach(async () => {
     await resetCaseManager(artifacts, env)
+    secondsInADay = (await env.caseScheduleManager.secondsInADay()).toNumber()
 
     caseFeeWei = await env.casePaymentManager.caseFeeTokenWei(env.weth9.address)
 
@@ -39,7 +39,7 @@ contract('CaseLifecycleManager', function (accounts) {
     it('should close the case and refund the patient', async () => {
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
 
-      await increaseTime(SECONDS_IN_A_DAY * 3)
+      await increaseTime(secondsInADay * 3)
 
       await env.caseLifecycleManager.patientWithdrawFunds(caseInstance.address)
       assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
@@ -54,7 +54,7 @@ contract('CaseLifecycleManager', function (accounts) {
       assert.equal(await env.caseManager.doctorCasesCount(doctor), 1)
       assert.equal(await env.caseManager.doctorCaseAtIndex(doctor, 0), caseInstance.address)
 
-      await increaseTime(SECONDS_IN_A_DAY * 3)
+      await increaseTime(secondsInADay * 3)
 
       await env.caseLifecycleManager.patientRequestNewInitialDoctor(
         caseInstance.address,
@@ -112,7 +112,7 @@ contract('CaseLifecycleManager', function (accounts) {
         )
         assert.equal(await caseInstance.status.call(), caseStatus('Challenging'))
 
-        await increaseTime(SECONDS_IN_A_DAY * 3)
+        await increaseTime(secondsInADay * 3)
 
         await env.caseLifecycleManager.acceptDiagnosis(caseInstance.address, { from: patient })
         assert.equal(await env.caseStatusManager.openCaseCount.call(doctor), 0)
@@ -133,7 +133,7 @@ contract('CaseLifecycleManager', function (accounts) {
       it('after 2 days it should close the case and pay the doctor', async () => {
         assert.equal(await caseInstance.status.call(), caseStatus('Evaluated'))
 
-        await increaseTime(SECONDS_IN_A_DAY * 3)
+        await increaseTime(secondsInADay * 3)
 
         await env.caseLifecycleManager.acceptAsDoctor(caseInstance.address, { from: doctor })
         assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
@@ -185,7 +185,7 @@ contract('CaseLifecycleManager', function (accounts) {
 
         describe('patientRequestNewChallengeDoctor()', () => {
           it('should set a new challenge doc if the patient waited on the first one for over 24 hours', async () => {
-            await increaseTime(SECONDS_IN_A_DAY * 3)
+            await increaseTime(secondsInADay * 3)
 
             await env.caseLifecycleManager.patientRequestNewChallengeDoctor(
               caseInstance.address,
@@ -207,7 +207,7 @@ contract('CaseLifecycleManager', function (accounts) {
           it('after 4 days it should close the case and pay the doctor', async () => {
             assert.equal(await caseInstance.status.call(), caseStatus('Challenging'))
 
-            await increaseTime(SECONDS_IN_A_DAY * 5)
+            await increaseTime(secondsInADay * 5)
 
             await env.caseLifecycleManager.acceptAsDoctor(caseInstance.address, { from: doctor })
 

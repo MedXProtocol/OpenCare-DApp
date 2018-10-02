@@ -9,5 +9,5 @@ module.exports = function (deployer, artifacts, contractName) {
   const contract = artifacts.require("./" + contractName + ".sol")
   const Registry = artifacts.require('./Registry.sol')
 
-  deployAndRegister(deployer, contract, Registry, contractName + 'Target')
+  return deployAndRegister(deployer, contract, Registry, contractName + 'Target')
 }

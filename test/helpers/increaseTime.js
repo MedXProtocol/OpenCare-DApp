@@ -1,5 +1,9 @@
+const debug = require('debug')('increaseTime.js')
+
 module.exports = function(duration) {
   const id = Date.now()
+
+  debug(`${duration.toString()}`)
 
   return new Promise((resolve, reject) => {
     web3.currentProvider.sendAsync({

@@ -266,6 +266,11 @@ export const HippoNavbar = connect(mapStateToProps, mapDispatchToProps)(
                 Fees
               </MenuItem>
             </LinkContainer>
+            <LinkContainer to={routes.ADMIN_CASES}>
+              <MenuItem href={routes.ADMIN_CASES}>
+                Cases
+              </MenuItem>
+            </LinkContainer>
           </NavDropdown>
       }
     }

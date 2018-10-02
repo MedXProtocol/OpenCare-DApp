@@ -66,6 +66,7 @@ i18next
             fourOhFour: '404 | OpenCare - Powered by MedX Protocol',
             adminSettings: 'Settings | OpenCare - Powered by MedX Protocol',
             adminFees: 'Fees | OpenCare - Powered by MedX Protocol',
+            adminCases: 'Cases | OpenCare - Powered by MedX Protocol',
             updateAdminSettings: 'Updating Admin Settings'
           }
         }
