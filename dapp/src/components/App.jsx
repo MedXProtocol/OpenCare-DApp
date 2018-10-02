@@ -15,11 +15,13 @@ import { DebugLink } from '~/components/DebugLink'
 import { HippoNavbarContainer } from '~/components/navbar/HippoNavbar'
 import { AcceptAllExpiredCases } from '~/components/AcceptAllExpiredCases'
 import { UserAgentCheckModal } from '~/components/UserAgentCheckModal'
+import { UsageRestrictionsModal }  from '~/components/UsageRestrictionsModal'
 import { PublicKeyListener } from '~/components/PublicKeyListener'
 import { PublicKeyCheck } from '~/components/PublicKeyCheck'
 import { BetaFaucetModal } from '~/components/BetaFaucetModal'
 import { NetworkCheckModal } from '~/components/NetworkCheckModal'
 import { ScrollyFeedbackLink } from '~/components/ScrollyFeedbackLink'
+import { isBlank } from '~/utils/isBlank'
 import * as routes from '~/config/routes'
 import { SignedInRoute } from '~/components/SignedInRoute'
 import { Web3Route } from '~/components/Web3Route'
@@ -106,6 +108,7 @@ function mapStateToProps (state) {
 
   const address = get(state, 'sagaGenesis.accounts[0]')
   const networkId = get(state, 'sagaGenesis.network.networkId')
+  const BetaFaucet = contractByName(state, 'BetaFaucet')
   const CaseManager = contractByName(state, 'CaseManager')
   const CaseStatusManager = contractByName(state, 'CaseStatusManager')
   const DoctorManager = contractByName(state, 'DoctorManager')
@@ -131,6 +134,7 @@ function mapStateToProps (state) {
     isDoctor,
     FromBlockNumber,
     fromBlock,
+    BetaFaucet,
     DoctorManager,
     isSignedIn,
     doctorCasesCount,
@@ -280,7 +284,11 @@ const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
     if (this.props.isSignedIn) {
       var userAgentCheckModal = <UserAgentCheckModal />
       var publicKeyCheck = <PublicKeyCheck />
-      var betaFaucetModal = <BetaFaucetModal />
+      if (!isBlank(this.props.BetaFaucet)) {
+        var betaFaucetModal = <BetaFaucetModal />
+      } else {
+        var usageRestrictionsModal = <UsageRestrictionsModal />
+      }
       var feedbackLink = <ScrollyFeedbackLink scrollDiffAmount={50} />
 
       if (this.props.isDoctor && this.props.isDermatologist) {
@@ -330,6 +338,7 @@ const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
         {acceptAllExpiredCases}
         <div className="content">
           {betaFaucetModal}
+          {usageRestrictionsModal}
 
           <Switch>
             <Route path={routes.WELCOME} component={null} />

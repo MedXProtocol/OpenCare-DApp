@@ -29,7 +29,9 @@ export class ErrorModal extends Component {
     } else {
       children = (
         <Modal.Footer>
-          <button onClick={this.props.onHide} className="btn btn-lg btn-danger">Ok</button>
+          <button
+            onClick={this.props.onHide}
+            className={`btn btn-lg btn-${this.props.bsStyle}`}>Ok</button>
         </Modal.Footer>
       )
     }
