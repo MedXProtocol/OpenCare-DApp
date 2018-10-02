@@ -12,7 +12,7 @@ contract CaseScheduleManager is Initializable, Ownable, DelegateTarget {
 
   using RegistryLookup for Registry;
 
-  uint public constant SECONDS_IN_A_DAY = 120;
+  uint private secondsInDay;
 
   /*
     MEMORY START
@@ -56,15 +56,15 @@ contract CaseScheduleManager is Initializable, Ownable, DelegateTarget {
   }
 
   function patientWaitedOneDay(address _caseAddress) external view returns (bool) {
-    return (block.timestamp - updatedAt[_caseAddress]) > SECONDS_IN_A_DAY;
+    return (block.timestamp - updatedAt[_caseAddress]) > secondsInADay();
   }
 
   function doctorWaitedTwoDays(address _caseAddress) public view returns (bool) {
-    return (block.timestamp - updatedAt[_caseAddress]) > (SECONDS_IN_A_DAY * 2);
+    return (block.timestamp - updatedAt[_caseAddress]) > (secondsInADay() * 2);
   }
 
   function doctorWaitedFourDays(address _caseAddress) public view returns (bool) {
-    return (block.timestamp - updatedAt[_caseAddress]) > (SECONDS_IN_A_DAY * 4);
+    return (block.timestamp - updatedAt[_caseAddress]) > (secondsInADay() * 4);
   }
 
   function caseExpiredForDoctor(Case _case) external view returns (bool) {
@@ -84,6 +84,7 @@ contract CaseScheduleManager is Initializable, Ownable, DelegateTarget {
   function initializeTarget(address _registry, bytes32) public notInitialized {
     require(_registry != address(0), 'registry is not blank');
     registry = Registry(_registry);
+    secondsInDay = 86400;
     owner = msg.sender;
     setInitialized();
   }
@@ -99,8 +100,11 @@ contract CaseScheduleManager is Initializable, Ownable, DelegateTarget {
     emit CaseUpdatedAt(_caseAddress, block.timestamp);
   }
 
-  function secondsInADay() public pure returns (uint) {
-    return SECONDS_IN_A_DAY;
+  function secondsInADay() public view returns (uint) {
+    return secondsInDay;
   }
 
+  function setSecondsInADay(uint _secondsInDay) public onlyOwner {
+    secondsInDay = _secondsInDay;
+  }
 }
