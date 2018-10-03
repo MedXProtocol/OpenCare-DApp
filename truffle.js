@@ -32,7 +32,7 @@ module.exports = {
       gasPrice: 60 * 1000000000
     },
     mainnet: {
-      provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC, process.env.REACT_APP_MAINNET_PROVIDER_URL),
+      provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC_MAINNET, process.env.REACT_APP_MAINNET_PROVIDER_URL),
       network_id: 1,
       gas: 4700000,
       gasPrice: 2 * 1000000000

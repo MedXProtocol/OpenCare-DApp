@@ -1,553 +1,550 @@
-{
-  "migrationVersion": 1538515142,
-  "contracts": [
-    {
-      "contractName": "Migrations",
-      "address": "0x3a21ab7d24a8550f5e5fe3402debbff9bd38f746"
-    },
-    {
-      "contractName": "Registry",
-      "address": "0x119c9a1615f70059c01a9b3d6a189c1589fa455f"
-    },
-    {
-      "contractName": "MedXToken",
-      "address": "0x6df94a05e34ff04622155c9e07b44bd72f1a753b"
-    },
-    {
-      "contractName": "AccountManager",
-      "address": "0x36e6ada906ce920197a2ddd42be9c176d7a44b3e"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x478e38554477699ffa1b8990bd3cffb25f5f7c94"
-    },
-    {
-      "contractName": "CaseManager",
-      "address": "0x55bb71b0e0f172f97f31372855dff562dffdea63"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xfe1feda85c398b81980ff354303f2faf62afac57"
-    },
-    {
-      "contractName": "DoctorManager",
-      "address": "0x72a9b305da345afa85e67502968e76f6752c8e9d"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x380e1b638027850c185622a61d64bcbb9bd1b512"
-    },
-    {
-      "contractName": "Case",
-      "address": "0x6364cf0f13d54141d898ab7d12c5be297953688d"
-    },
-    {
-      "contractName": "BetaFaucet",
-      "address": "0xc17cd9f187d387a808de6977906059f98e3b5973"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x0f1588e359b292115481ddf9306ebfd7746c045d"
-    },
-    {
-      "contractName": "CaseStatusManager",
-      "address": "0xbc9e3ca4b70fa70729225f6b96bbda5c74642d50"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x252d2cdded56c3da53500f0968df14ca4c45b175"
-    },
-    {
-      "contractName": "CaseScheduleManager",
-      "address": "0x37804e13c6fdb7bb173b19b56ce88a0ed14c90f2"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x6c177aec1406bc12b4402297646fcc7a502cbb5a"
-    },
-    {
-      "contractName": "CaseFirstPhaseManager",
-      "address": "0x3ccf47b962bff8675c2c5bfc19d5346520882799"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xcc5cfdc00517d3d4095018663a21187b66cd8142"
-    },
-    {
-      "contractName": "CaseSecondPhaseManager",
-      "address": "0x9204551808c0052dd4ed91640d70db8587dd867b"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x591160f637d963f323ec5a5d04d8b72db90b7ff0"
-    },
-    {
-      "contractName": "CaseLifecycleManager",
-      "address": "0x704b85df10d7d1ac554b9171cd1b86cc50a0c7db"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x7526662edd27b2883f8a8cf2ff7e6b0ee1991429"
-    },
-    {
-      "contractName": "EtherPriceFeed",
-      "address": "0x085202d59372097eb0eb2afd6380968128a95f97"
-    },
-    {
-      "contractName": "FromBlockNumber",
-      "address": "0x810ac203e3f7eac5f7e4f5139c70275e01ec19b2"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xad8f9a153c8ea4ff813a9b5e24192218518eb20c"
-    },
-    {
-      "contractName": "CaseDiagnosingDoctor",
-      "address": "0xdc8ca6272bb6e09b9d7b51ea8bc819765e20833b"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x927f7ca89aca630a1e628c5f613587b9de4707f4"
-    },
-    {
-      "contractName": "Dai",
-      "address": "0xb0b51688433b317d88c0f7191d132f7d08cf7bbb"
-    },
-    {
-      "contractName": "CasePaymentManager",
-      "address": "0x1706ece1730fc320f908580cb7d0ee83909b793b"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x9d36664e5d3df74e047338435f467576fc04e9c3"
-    },
-    {
-      "contractName": "DoctorManager",
-      "address": "0xab506a0fe83845b4d6e0a424514cc0a88183952d"
-    },
-    {
-      "contractName": "CaseDiagnosingDoctor",
-      "address": "0x51309aed59a05124b61e98065c72aeace955cca6"
-    },
-    {
-      "contractName": "CaseLifecycleManager",
-      "address": "0x19989ebcdc985c267f04c1e8680200bba3985771"
-    },
-    {
-      "contractName": "AdminSettings",
-      "address": "0x0ab447507291eda49aeb427fc91258622b3348be"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x43b1bd2fbf24354127cbc9570d99b89c395a6bdb"
-    },
-    {
-      "contractName": "CaseManager",
-      "address": "0x5eed732bf187ccdf2d642088f03933d6c6c1e696"
-    },
-    {
-      "contractName": "AdminSettings",
-      "address": "0x4bb1c972c7f6958c5392c62d11ae045676fc1bf0"
-    },
-    {
-      "contractName": "AccountManager",
-      "address": "0xf09b6afe754d63332035d30d2c34f589f5072c87"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xb9e57fa877a0c44603332912ea7989fef05ba5a5"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x501723728aba06d806db66c22bd10b2a313cae38"
-    },
-    {
-      "contractName": "Migrations",
-      "address": "0x12cf341d20178694d1f41207921686bd4c127156"
-    },
-    {
-      "contractName": "Registry",
-      "address": "0x92d2ea4a9c121c19b8b8399d0d1973761995ba6c"
-    },
-    {
-      "contractName": "MedXToken",
-      "address": "0x5cd3896dd96414b937eb1c0dbc573b05d8c58808"
-    },
-    {
-      "contractName": "AccountManager",
-      "address": "0x03ced0226c04a9d676e2097d09112b883ddff0ba"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x9cac56799cb22a9b85838e70147b95cc7f36e75d"
-    },
-    {
-      "contractName": "CaseManager",
-      "address": "0xc5ce402b0b65617e383b6a8d85072bde83cf7631"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x0a0695d1fd7abb6e7eacdc0bb029f6a9db77d75c"
-    },
-    {
-      "contractName": "DoctorManager",
-      "address": "0x84e4f6aa3dca2f629e7945321bdfac23b59bb81e"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x9ac0a07806816cce261bd269ed2f8f1c02932558"
-    },
-    {
-      "contractName": "Case",
-      "address": "0x30f484d94180e1802ffa923d710b102498ee648d"
-    },
-    {
-      "contractName": "BetaFaucet",
-      "address": "0x8046695ec90b8ddc75c08694cfa017677e4df1d0"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xd545b451b3c146183b73ea9d31e0e5ce0f6af587"
-    },
-    {
-      "contractName": "CaseStatusManager",
-      "address": "0x6bd56e45d88268af17f476b6fe3207c1510d218e"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x47f6ac896b371591f0dd34cb490f15360618aa29"
-    },
-    {
-      "contractName": "CaseScheduleManager",
-      "address": "0xcf507613166d82906a4ada3667b8a4b8a3f346cd"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x7e7c1026f474a85f16716544ad9cbbfa9f4ee50e"
-    },
-    {
-      "contractName": "Migrations",
-      "address": "0x99999558f14a2592f1952f60177d1c40be9700f4"
-    },
-    {
-      "contractName": "Registry",
-      "address": "0x850af6c53f200c5360c7df5f1785d9571e5f7777"
-    },
-    {
-      "contractName": "MedXToken",
-      "address": "0x7967293f068f889a6a5929fa808b3f6f101388f2"
-    },
-    {
-      "contractName": "AccountManager",
-      "address": "0x4d1a9961f87c70239cb3a1b958e6dd76005fda7f"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xc042c9141d52da553b2b6b62a36a93a12505a08b"
-    },
-    {
-      "contractName": "CaseManager",
-      "address": "0x0472885515db631c6ff9736a8d99419264f2b5bb"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x06384e172d46bed369532601c907f15931134ac9"
-    },
-    {
-      "contractName": "DoctorManager",
-      "address": "0x1650592496756e23f8eabf25cb9b7abd7fce679a"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x1c6c7afb0b95e564904877a521b3f1f5426dd06d"
-    },
-    {
-      "contractName": "Case",
-      "address": "0x730decf20ebd6e73006482939c178728f0075e2b"
-    },
-    {
-      "contractName": "BetaFaucet",
-      "address": "0x5e9ee8be5d2f1e061bc9d7b298ef725feaa09467"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x27b4d514b94b345398d240f9aeff5d744047e3ca"
-    },
-    {
-      "contractName": "CaseStatusManager",
-      "address": "0x5bae3f95e52e13060cfb972101cad42ad8ed1fd7"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x664b77912656ba0a670f76c591215e6734d660f8"
-    },
-    {
-      "contractName": "CaseScheduleManager",
-      "address": "0xff603a7db912b41650fe3fcf87980a8d1558a2b6"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x030590bb53f83984a1a5ce2c61f476dc7769e3d5"
-    },
-    {
-      "contractName": "CaseFirstPhaseManager",
-      "address": "0xcaf58ee0e33ebd4ccce0da6de6de77db72cfdcf0"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x78d4ca739d5e473c9cd9728220c6486df4e37c22"
-    },
-    {
-      "contractName": "CaseSecondPhaseManager",
-      "address": "0xb299651536355adbecbacab43cc6c6210428cbe1"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x981cbd9b7473a1fff4eb2cc48fb139bde863e5bb"
-    },
-    {
-      "contractName": "CaseLifecycleManager",
-      "address": "0x8059095c8cb7333350223606e437cf3433a6c755"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xc2b6de1b283c0d456d8600c7fdf644bb69adbbe7"
-    },
-    {
-      "contractName": "EtherPriceFeed",
-      "address": "0x09294a41e50f85a12e49c00aa66df3a6864fc09d"
-    },
-    {
-      "contractName": "Migrations",
-      "address": "0x8fc876ec86d9f8bf074be75300ef44372915bda6"
-    },
-    {
-      "contractName": "Registry",
-      "address": "0x4f557098b98690d1c1609b63ecee6dd6b3f4d291"
-    },
-    {
-      "contractName": "MedXToken",
-      "address": "0x459e1e0365c4c4ea4cbe8795bad026da376196a9"
-    },
-    {
-      "contractName": "AccountManager",
-      "address": "0x2a6780880dfecca41e549b9ba40b5629d0c22505"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xc870e369d0c6655bd1554d24b168f010b69b4d1b"
-    },
-    {
-      "contractName": "CaseManager",
-      "address": "0x15160ff2788ea7b5325786ba8a35acc3d08bcf21"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xb0e6bedece496bdd089beabe3d20f43957ba03b4"
-    },
-    {
-      "contractName": "DoctorManager",
-      "address": "0xe27de16209ebd1a858ad90c7316d5166ba65c1af"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x70812516d344ff25ab4cb34915598ff3edae39cb"
-    },
-    {
-      "contractName": "Case",
-      "address": "0x084ae798c3e634974cc2fc8ba30917508d5414f4"
-    },
-    {
-      "contractName": "BetaFaucet",
-      "address": "0x299c01338d9293ae41598b78480b609dd9c8d7bb"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xbc664a5739af3811e64a843bdd19872e9f36acb4"
-    },
-    {
-      "contractName": "CaseStatusManager",
-      "address": "0xb59c3acf0a9ab5ed2f7b243822183bd2204a94c7"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xf83628fcc5930e677760a043f6d202a7a264301e"
-    },
-    {
-      "contractName": "CaseScheduleManager",
-      "address": "0x10f44703b3d4869cd032ae7f902bf4e833dbbb27"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x348c1137a3fc11bad7f477b6ad3cc3c5f9b815ac"
-    },
-    {
-      "contractName": "CaseFirstPhaseManager",
-      "address": "0x814ca0546f88cce394c7bfe80a1c08288c6c2b5f"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x5b21900aa269e27b5cf29408aa963e6efb525404"
-    },
-    {
-      "contractName": "CaseSecondPhaseManager",
-      "address": "0xf03ce88717564bc76ae888f07cad8cf99bfea854"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x370c6b6fd0f425afbbdfe5e753312a97796f092d"
-    },
-    {
-      "contractName": "CaseLifecycleManager",
-      "address": "0xd5b12387dcde8500bfd4db484e8c0d1537b67cd1"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x02b3d14506d3c0e1a12dca5a53523440f4c8036c"
-    },
-    {
-      "contractName": "EtherPriceFeed",
-      "address": "0xf018c067d9332f57fea97838b64a5198cd6142a7"
-    },
-    {
-      "contractName": "Migrations",
-      "address": "0x5f6b3733515de229db40eb4b291cbb02ddc870fb"
-    },
-    {
-      "contractName": "Registry",
-      "address": "0x7c207b81effbd2d23a4a773d78a79e0176bffc48"
-    },
-    {
-      "contractName": "MedXToken",
-      "address": "0x4e0c57988a8d1ad2f974126286d7eed856716abc"
-    },
-    {
-      "contractName": "AccountManager",
-      "address": "0x32af133fa1e20dc6143ea4ae22d7e0b20bf022c9"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xf115a9be28a60cd2991930bb5a5f403d2eb39b07"
-    },
-    {
-      "contractName": "CaseManager",
-      "address": "0x9368fbab12075af001e774deed26277daab78726"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x871cedb52d4eb85299250112459fe048bfd2b31a"
-    },
-    {
-      "contractName": "DoctorManager",
-      "address": "0x22b17d884374467e6c90e02f62e520d9417ca4d9"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xd86cc01feb8fb043196e29c25026c1bdb9b1c6b4"
-    },
-    {
-      "contractName": "Case",
-      "address": "0x0727f0d4ecaf06222fbe7d882516626bee572fcd"
-    },
-    {
-      "contractName": "BetaFaucet",
-      "address": "0x2c9f80afadcf25e03e3e28121c30daa862875a75"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x4288f6acd9e1674172b70b3a1080ea34eb9cb618"
-    },
-    {
-      "contractName": "CaseStatusManager",
-      "address": "0xb7f6afc02146052b1f01e09e34f9154733e0562f"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xefd89d08abc6aa03ae33b55e1227d3532925d410"
-    },
-    {
-      "contractName": "CaseScheduleManager",
-      "address": "0x430872437b7c6686be523bca2239423d25da3c1d"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x7b249502477a0b2663c9dece623f412371793d91"
-    },
-    {
-      "contractName": "CaseFirstPhaseManager",
-      "address": "0xbcb3f6b5dde81f33f05cad8e12081598186e01a0"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x23a3246434cf4f46fdad3f8734404de3f2ad176e"
-    },
-    {
-      "contractName": "CaseSecondPhaseManager",
-      "address": "0xa17474d6d5270c7e1c564c9e73be8c0e5cd1d7d5"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x57596cf49d0416127a3e675fb9af358f8152b306"
-    },
-    {
-      "contractName": "CaseLifecycleManager",
-      "address": "0xc151c37cb5931a38f5585541e6e0c240ce40b46e"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xed0f3c194567df2733d5039222c4e3dab60a8676"
-    },
-    {
-      "contractName": "EtherPriceFeed",
-      "address": "0xf3a01fcbacba18b8adbc04b9e920eace23abf7e4"
-    },
-    {
-      "contractName": "FromBlockNumber",
-      "address": "0x10c2d5d8f0cbadd0b08cf6b7e1ed909fe88712cd"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x3b92b3d9df4c17a1c54f3f5c85ba45c8fd7afe96"
-    },
-    {
-      "contractName": "CaseDiagnosingDoctor",
-      "address": "0xda39061d1b693213eca2d13f7b2d30d72d285b46"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x053f5a048c9bf459c9f3629781d028f6eb2cc5f0"
-    },
-    {
-      "contractName": "Dai",
-      "address": "0x948470cb2dc8c5ea3f60e038aada07baecfcb639"
-    },
-    {
-      "contractName": "CasePaymentManager",
-      "address": "0x10c4bb4300a14bf053fa63923eefd48062349f40"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x0b22b8e0f9ab81ebbf23ae9b21fa5fb60d399aa4"
-    },
-    {
-      "contractName": "AdminSettings",
-      "address": "0x69d4c107ad428d6962b457953c609e9686c35582"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0xeacb0cff87110aa15587ca3b667beacab46aa00d"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x0d24b9821c0967292663f941299c2f399c4b0dcc"
-    },
-    {
-      "contractName": "Delegate",
-      "address": "0x97a464dd0957a0bb92adc243f3fb7074caa407e6"
-    },
-    {
-      "contractName": "CaseScheduleManager",
-      "address": "0xcd4c1fac469eb0c512b3db2070d49941c90869c6"
-    }
-  ]
-}
+[
+  {
+    "contractName": "Migrations",
+    "address": "0x3a21ab7d24a8550f5e5fe3402debbff9bd38f746"
+  },
+  {
+    "contractName": "Registry",
+    "address": "0x119c9a1615f70059c01a9b3d6a189c1589fa455f"
+  },
+  {
+    "contractName": "MedXToken",
+    "address": "0x6df94a05e34ff04622155c9e07b44bd72f1a753b"
+  },
+  {
+    "contractName": "AccountManager",
+    "address": "0x36e6ada906ce920197a2ddd42be9c176d7a44b3e"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x478e38554477699ffa1b8990bd3cffb25f5f7c94"
+  },
+  {
+    "contractName": "CaseManager",
+    "address": "0x55bb71b0e0f172f97f31372855dff562dffdea63"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xfe1feda85c398b81980ff354303f2faf62afac57"
+  },
+  {
+    "contractName": "DoctorManager",
+    "address": "0x72a9b305da345afa85e67502968e76f6752c8e9d"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x380e1b638027850c185622a61d64bcbb9bd1b512"
+  },
+  {
+    "contractName": "Case",
+    "address": "0x6364cf0f13d54141d898ab7d12c5be297953688d"
+  },
+  {
+    "contractName": "BetaFaucet",
+    "address": "0xc17cd9f187d387a808de6977906059f98e3b5973"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x0f1588e359b292115481ddf9306ebfd7746c045d"
+  },
+  {
+    "contractName": "CaseStatusManager",
+    "address": "0xbc9e3ca4b70fa70729225f6b96bbda5c74642d50"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x252d2cdded56c3da53500f0968df14ca4c45b175"
+  },
+  {
+    "contractName": "CaseScheduleManager",
+    "address": "0x37804e13c6fdb7bb173b19b56ce88a0ed14c90f2"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x6c177aec1406bc12b4402297646fcc7a502cbb5a"
+  },
+  {
+    "contractName": "CaseFirstPhaseManager",
+    "address": "0x3ccf47b962bff8675c2c5bfc19d5346520882799"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xcc5cfdc00517d3d4095018663a21187b66cd8142"
+  },
+  {
+    "contractName": "CaseSecondPhaseManager",
+    "address": "0x9204551808c0052dd4ed91640d70db8587dd867b"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x591160f637d963f323ec5a5d04d8b72db90b7ff0"
+  },
+  {
+    "contractName": "CaseLifecycleManager",
+    "address": "0x704b85df10d7d1ac554b9171cd1b86cc50a0c7db"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x7526662edd27b2883f8a8cf2ff7e6b0ee1991429"
+  },
+  {
+    "contractName": "EtherPriceFeed",
+    "address": "0x085202d59372097eb0eb2afd6380968128a95f97"
+  },
+  {
+    "contractName": "FromBlockNumber",
+    "address": "0x810ac203e3f7eac5f7e4f5139c70275e01ec19b2"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xad8f9a153c8ea4ff813a9b5e24192218518eb20c"
+  },
+  {
+    "contractName": "CaseDiagnosingDoctor",
+    "address": "0xdc8ca6272bb6e09b9d7b51ea8bc819765e20833b"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x927f7ca89aca630a1e628c5f613587b9de4707f4"
+  },
+  {
+    "contractName": "Dai",
+    "address": "0xb0b51688433b317d88c0f7191d132f7d08cf7bbb"
+  },
+  {
+    "contractName": "CasePaymentManager",
+    "address": "0x1706ece1730fc320f908580cb7d0ee83909b793b"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x9d36664e5d3df74e047338435f467576fc04e9c3"
+  },
+  {
+    "contractName": "DoctorManager",
+    "address": "0xab506a0fe83845b4d6e0a424514cc0a88183952d"
+  },
+  {
+    "contractName": "CaseDiagnosingDoctor",
+    "address": "0x51309aed59a05124b61e98065c72aeace955cca6"
+  },
+  {
+    "contractName": "CaseLifecycleManager",
+    "address": "0x19989ebcdc985c267f04c1e8680200bba3985771"
+  },
+  {
+    "contractName": "AdminSettings",
+    "address": "0x0ab447507291eda49aeb427fc91258622b3348be"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x43b1bd2fbf24354127cbc9570d99b89c395a6bdb"
+  },
+  {
+    "contractName": "CaseManager",
+    "address": "0x5eed732bf187ccdf2d642088f03933d6c6c1e696"
+  },
+  {
+    "contractName": "AdminSettings",
+    "address": "0x4bb1c972c7f6958c5392c62d11ae045676fc1bf0"
+  },
+  {
+    "contractName": "AccountManager",
+    "address": "0xf09b6afe754d63332035d30d2c34f589f5072c87"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xb9e57fa877a0c44603332912ea7989fef05ba5a5"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x501723728aba06d806db66c22bd10b2a313cae38"
+  },
+  {
+    "contractName": "Migrations",
+    "address": "0x12cf341d20178694d1f41207921686bd4c127156"
+  },
+  {
+    "contractName": "Registry",
+    "address": "0x92d2ea4a9c121c19b8b8399d0d1973761995ba6c"
+  },
+  {
+    "contractName": "MedXToken",
+    "address": "0x5cd3896dd96414b937eb1c0dbc573b05d8c58808"
+  },
+  {
+    "contractName": "AccountManager",
+    "address": "0x03ced0226c04a9d676e2097d09112b883ddff0ba"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x9cac56799cb22a9b85838e70147b95cc7f36e75d"
+  },
+  {
+    "contractName": "CaseManager",
+    "address": "0xc5ce402b0b65617e383b6a8d85072bde83cf7631"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x0a0695d1fd7abb6e7eacdc0bb029f6a9db77d75c"
+  },
+  {
+    "contractName": "DoctorManager",
+    "address": "0x84e4f6aa3dca2f629e7945321bdfac23b59bb81e"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x9ac0a07806816cce261bd269ed2f8f1c02932558"
+  },
+  {
+    "contractName": "Case",
+    "address": "0x30f484d94180e1802ffa923d710b102498ee648d"
+  },
+  {
+    "contractName": "BetaFaucet",
+    "address": "0x8046695ec90b8ddc75c08694cfa017677e4df1d0"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xd545b451b3c146183b73ea9d31e0e5ce0f6af587"
+  },
+  {
+    "contractName": "CaseStatusManager",
+    "address": "0x6bd56e45d88268af17f476b6fe3207c1510d218e"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x47f6ac896b371591f0dd34cb490f15360618aa29"
+  },
+  {
+    "contractName": "CaseScheduleManager",
+    "address": "0xcf507613166d82906a4ada3667b8a4b8a3f346cd"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x7e7c1026f474a85f16716544ad9cbbfa9f4ee50e"
+  },
+  {
+    "contractName": "Migrations",
+    "address": "0x99999558f14a2592f1952f60177d1c40be9700f4"
+  },
+  {
+    "contractName": "Registry",
+    "address": "0x850af6c53f200c5360c7df5f1785d9571e5f7777"
+  },
+  {
+    "contractName": "MedXToken",
+    "address": "0x7967293f068f889a6a5929fa808b3f6f101388f2"
+  },
+  {
+    "contractName": "AccountManager",
+    "address": "0x4d1a9961f87c70239cb3a1b958e6dd76005fda7f"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xc042c9141d52da553b2b6b62a36a93a12505a08b"
+  },
+  {
+    "contractName": "CaseManager",
+    "address": "0x0472885515db631c6ff9736a8d99419264f2b5bb"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x06384e172d46bed369532601c907f15931134ac9"
+  },
+  {
+    "contractName": "DoctorManager",
+    "address": "0x1650592496756e23f8eabf25cb9b7abd7fce679a"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x1c6c7afb0b95e564904877a521b3f1f5426dd06d"
+  },
+  {
+    "contractName": "Case",
+    "address": "0x730decf20ebd6e73006482939c178728f0075e2b"
+  },
+  {
+    "contractName": "BetaFaucet",
+    "address": "0x5e9ee8be5d2f1e061bc9d7b298ef725feaa09467"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x27b4d514b94b345398d240f9aeff5d744047e3ca"
+  },
+  {
+    "contractName": "CaseStatusManager",
+    "address": "0x5bae3f95e52e13060cfb972101cad42ad8ed1fd7"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x664b77912656ba0a670f76c591215e6734d660f8"
+  },
+  {
+    "contractName": "CaseScheduleManager",
+    "address": "0xff603a7db912b41650fe3fcf87980a8d1558a2b6"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x030590bb53f83984a1a5ce2c61f476dc7769e3d5"
+  },
+  {
+    "contractName": "CaseFirstPhaseManager",
+    "address": "0xcaf58ee0e33ebd4ccce0da6de6de77db72cfdcf0"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x78d4ca739d5e473c9cd9728220c6486df4e37c22"
+  },
+  {
+    "contractName": "CaseSecondPhaseManager",
+    "address": "0xb299651536355adbecbacab43cc6c6210428cbe1"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x981cbd9b7473a1fff4eb2cc48fb139bde863e5bb"
+  },
+  {
+    "contractName": "CaseLifecycleManager",
+    "address": "0x8059095c8cb7333350223606e437cf3433a6c755"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xc2b6de1b283c0d456d8600c7fdf644bb69adbbe7"
+  },
+  {
+    "contractName": "EtherPriceFeed",
+    "address": "0x09294a41e50f85a12e49c00aa66df3a6864fc09d"
+  },
+  {
+    "contractName": "Migrations",
+    "address": "0x8fc876ec86d9f8bf074be75300ef44372915bda6"
+  },
+  {
+    "contractName": "Registry",
+    "address": "0x4f557098b98690d1c1609b63ecee6dd6b3f4d291"
+  },
+  {
+    "contractName": "MedXToken",
+    "address": "0x459e1e0365c4c4ea4cbe8795bad026da376196a9"
+  },
+  {
+    "contractName": "AccountManager",
+    "address": "0x2a6780880dfecca41e549b9ba40b5629d0c22505"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xc870e369d0c6655bd1554d24b168f010b69b4d1b"
+  },
+  {
+    "contractName": "CaseManager",
+    "address": "0x15160ff2788ea7b5325786ba8a35acc3d08bcf21"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xb0e6bedece496bdd089beabe3d20f43957ba03b4"
+  },
+  {
+    "contractName": "DoctorManager",
+    "address": "0xe27de16209ebd1a858ad90c7316d5166ba65c1af"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x70812516d344ff25ab4cb34915598ff3edae39cb"
+  },
+  {
+    "contractName": "Case",
+    "address": "0x084ae798c3e634974cc2fc8ba30917508d5414f4"
+  },
+  {
+    "contractName": "BetaFaucet",
+    "address": "0x299c01338d9293ae41598b78480b609dd9c8d7bb"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xbc664a5739af3811e64a843bdd19872e9f36acb4"
+  },
+  {
+    "contractName": "CaseStatusManager",
+    "address": "0xb59c3acf0a9ab5ed2f7b243822183bd2204a94c7"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xf83628fcc5930e677760a043f6d202a7a264301e"
+  },
+  {
+    "contractName": "CaseScheduleManager",
+    "address": "0x10f44703b3d4869cd032ae7f902bf4e833dbbb27"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x348c1137a3fc11bad7f477b6ad3cc3c5f9b815ac"
+  },
+  {
+    "contractName": "CaseFirstPhaseManager",
+    "address": "0x814ca0546f88cce394c7bfe80a1c08288c6c2b5f"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x5b21900aa269e27b5cf29408aa963e6efb525404"
+  },
+  {
+    "contractName": "CaseSecondPhaseManager",
+    "address": "0xf03ce88717564bc76ae888f07cad8cf99bfea854"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x370c6b6fd0f425afbbdfe5e753312a97796f092d"
+  },
+  {
+    "contractName": "CaseLifecycleManager",
+    "address": "0xd5b12387dcde8500bfd4db484e8c0d1537b67cd1"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x02b3d14506d3c0e1a12dca5a53523440f4c8036c"
+  },
+  {
+    "contractName": "EtherPriceFeed",
+    "address": "0xf018c067d9332f57fea97838b64a5198cd6142a7"
+  },
+  {
+    "contractName": "Migrations",
+    "address": "0x5f6b3733515de229db40eb4b291cbb02ddc870fb"
+  },
+  {
+    "contractName": "Registry",
+    "address": "0x7c207b81effbd2d23a4a773d78a79e0176bffc48"
+  },
+  {
+    "contractName": "MedXToken",
+    "address": "0x4e0c57988a8d1ad2f974126286d7eed856716abc"
+  },
+  {
+    "contractName": "AccountManager",
+    "address": "0x32af133fa1e20dc6143ea4ae22d7e0b20bf022c9"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xf115a9be28a60cd2991930bb5a5f403d2eb39b07"
+  },
+  {
+    "contractName": "CaseManager",
+    "address": "0x9368fbab12075af001e774deed26277daab78726"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x871cedb52d4eb85299250112459fe048bfd2b31a"
+  },
+  {
+    "contractName": "DoctorManager",
+    "address": "0x22b17d884374467e6c90e02f62e520d9417ca4d9"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xd86cc01feb8fb043196e29c25026c1bdb9b1c6b4"
+  },
+  {
+    "contractName": "Case",
+    "address": "0x0727f0d4ecaf06222fbe7d882516626bee572fcd"
+  },
+  {
+    "contractName": "BetaFaucet",
+    "address": "0x2c9f80afadcf25e03e3e28121c30daa862875a75"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x4288f6acd9e1674172b70b3a1080ea34eb9cb618"
+  },
+  {
+    "contractName": "CaseStatusManager",
+    "address": "0xb7f6afc02146052b1f01e09e34f9154733e0562f"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xefd89d08abc6aa03ae33b55e1227d3532925d410"
+  },
+  {
+    "contractName": "CaseScheduleManager",
+    "address": "0x430872437b7c6686be523bca2239423d25da3c1d"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x7b249502477a0b2663c9dece623f412371793d91"
+  },
+  {
+    "contractName": "CaseFirstPhaseManager",
+    "address": "0xbcb3f6b5dde81f33f05cad8e12081598186e01a0"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x23a3246434cf4f46fdad3f8734404de3f2ad176e"
+  },
+  {
+    "contractName": "CaseSecondPhaseManager",
+    "address": "0xa17474d6d5270c7e1c564c9e73be8c0e5cd1d7d5"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x57596cf49d0416127a3e675fb9af358f8152b306"
+  },
+  {
+    "contractName": "CaseLifecycleManager",
+    "address": "0xc151c37cb5931a38f5585541e6e0c240ce40b46e"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xed0f3c194567df2733d5039222c4e3dab60a8676"
+  },
+  {
+    "contractName": "EtherPriceFeed",
+    "address": "0xf3a01fcbacba18b8adbc04b9e920eace23abf7e4"
+  },
+  {
+    "contractName": "FromBlockNumber",
+    "address": "0x10c2d5d8f0cbadd0b08cf6b7e1ed909fe88712cd"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x3b92b3d9df4c17a1c54f3f5c85ba45c8fd7afe96"
+  },
+  {
+    "contractName": "CaseDiagnosingDoctor",
+    "address": "0xda39061d1b693213eca2d13f7b2d30d72d285b46"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x053f5a048c9bf459c9f3629781d028f6eb2cc5f0"
+  },
+  {
+    "contractName": "Dai",
+    "address": "0x948470cb2dc8c5ea3f60e038aada07baecfcb639"
+  },
+  {
+    "contractName": "CasePaymentManager",
+    "address": "0x10c4bb4300a14bf053fa63923eefd48062349f40"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x0b22b8e0f9ab81ebbf23ae9b21fa5fb60d399aa4"
+  },
+  {
+    "contractName": "AdminSettings",
+    "address": "0x69d4c107ad428d6962b457953c609e9686c35582"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0xeacb0cff87110aa15587ca3b667beacab46aa00d"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x0d24b9821c0967292663f941299c2f399c4b0dcc"
+  },
+  {
+    "contractName": "Delegate",
+    "address": "0x97a464dd0957a0bb92adc243f3fb7074caa407e6"
+  },
+  {
+    "contractName": "CaseScheduleManager",
+    "address": "0xcd4c1fac469eb0c512b3db2070d49941c90869c6"
+  }
+]
