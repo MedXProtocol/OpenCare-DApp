@@ -60,8 +60,14 @@ $ cd ..
 
 `$ npm run dapp`
 
+### Compilation
+
+Addresses for mainnet and test nets are stored in networks/ and merged using the `truffle-deploy-registry` command `apply-registry build/contracts`.  There is an npm script for compilation you can run that combines `truffle compile` with the merge command:
+
+`$ npm run compile`
+
 ### Migration
 
 To deploy/migrate the contracts:
 
-`$ npm run migrate`
+`$ truffle migrate`

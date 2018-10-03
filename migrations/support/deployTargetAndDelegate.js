@@ -1,8 +1,9 @@
-var deployAndRegister = require('./deployAndRegister')
-var deployAndRegisterDelegate = require('./deployAndRegisterDelegate')
-var migrationLog = require('./migrationLog')
+const deployAndRegister = require('./deployAndRegister')
+const deployAndRegisterDelegate = require('./deployAndRegisterDelegate')
+const migrationLog = require('./migrationLog')
+const append = require('truffle-deploy-registry').append
 
-/** @title 
+/** @title
   * @dev Deploys a new Contract and registers it with the Registry
   * then creates a new Delegate that points to the contract, and is registered
   * under the same name as the contract.
@@ -18,9 +19,14 @@ module.exports = function(artifacts, deployer, contract) {
   const delegateKey = contract.contractName
 
   return deployAndRegister(deployer, contract, Registry, targetKey).then(() => {
-    return deployAndRegisterDelegate(deployer, Delegate, Registry, delegateKey, targetKey).then((address) => {
+    return deployAndRegisterDelegate(deployer, Delegate, Registry, delegateKey, targetKey).then(async (delegate) => {
+      const address = delegate.address
+      await append(deployer.network_id, {
+        contractName: delegateKey,
+        address: address,
+        transactionHash: delegate.transactionHash
+      })
       migrationLog(delegateKey, targetKey, address)
-
       return contract.at(address)
     })
   })
