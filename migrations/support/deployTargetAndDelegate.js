@@ -19,10 +19,12 @@ module.exports = function(artifacts, deployer, contract) {
   const delegateKey = contract.contractName
 
   return deployAndRegister(deployer, contract, Registry, targetKey).then(() => {
-    return deployAndRegisterDelegate(deployer, Delegate, Registry, delegateKey, targetKey).then(async (address) => {
-      await append({
-        contractName: contract.contractName,
-        address: address
+    return deployAndRegisterDelegate(deployer, Delegate, Registry, delegateKey, targetKey).then(async (delegate) => {
+      const address = delegate.address
+      await append(deployer.network_id, {
+        contractName: delegateKey,
+        address: address,
+        transactionHash: delegate.transactionHash
       })
       migrationLog(delegateKey, targetKey, address)
       return contract.at(address)

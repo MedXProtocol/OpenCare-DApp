@@ -1,11 +1,6 @@
-import React, {
-  PureComponent
-} from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import get from 'lodash.get'
-import { Modal, Alert } from 'react-bootstrap'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle';
 import { ErrorModal } from '~/components/ErrorModal'
 import {
   cacheCallValue,

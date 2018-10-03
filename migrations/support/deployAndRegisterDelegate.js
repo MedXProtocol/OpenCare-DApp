@@ -16,7 +16,7 @@ module.exports = function (deployer, delegate, registry, key, target) {
     return registry.deployed().then((registryInstance) => {
       return deployer.deploy(delegate, registryInstance.address, targetKey).then(() => {
         return registryInstance.register(delegateKey, delegate.address).then(() => {
-          return delegate.address
+          return delegate
         })
       })
     })

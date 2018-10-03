@@ -12,7 +12,7 @@ module.exports = function (deployer, artifacts, contractName) {
   const Delegate = artifacts.require('Delegate.sol')
   const Registry = artifacts.require('Registry.sol')
 
-  deployAndRegisterDelegate(deployer, Delegate, Registry, delegateKey, targetKey).then(address => {
-    migrationLog(delegateKey, targetKey, address)
+  deployAndRegisterDelegate(deployer, Delegate, Registry, delegateKey, targetKey).then(delegate => {
+    migrationLog(delegateKey, targetKey, delegate.address)
   })
 }
