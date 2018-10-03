@@ -1,0 +1,19 @@
+{
+    "name": "OpenCare by MedX Protocol",
+    "short_name": "OpenCare",
+    "icons": [
+        {
+            "src": "/android-chrome-192x192.png?v=M4mb9y2ead",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/android-chrome-512x512.png?v=M4mb9y2ead",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#ffffff",
+    "background_color": "#051A38",
+    "display": "standalone"
+}
