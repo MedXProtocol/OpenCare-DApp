@@ -1,4 +1,5 @@
-http://hippocrates.medcredits.io/*  https://hippocrates.medcredits.io/:splat  301!
+http://hippocrates.medcredits.io/*  https://opencare.medxprotocol.com/:splat  301!
+https://hippocrates.medcredits.io/*  https://opencare.medxprotocol.com/:splat  301!
 http://opencare-staging.netlify.com/*  https://opencare-staging.netlify.com/:splat  301!
 /static/*                         /static/:splat                          200
 /*                                /index.html                             200
