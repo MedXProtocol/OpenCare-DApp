@@ -1,0 +1,17 @@
+[
+  {
+    "contractName": "Migrations",
+    "address": "0x626b2e1dbfa730d15c62023b476f8e7c739b0fc5",
+    "transactionHash": "0xa3e681ed0d8106dd1b6e14470c2f400ad711023bbfd766eaa08d9cf2fdeec2d1"
+  },
+  {
+    "contractName": "Registry",
+    "address": "0x030968414e2c60e7e5c3deab3cfc7993644d3a98",
+    "transactionHash": "0xa946b3a87777cec9a4d029aee43d13ec49114e0ea90d4c4074561dfc97a66a44"
+  },
+  {
+    "contractName": "MedXToken",
+    "address": "0x2d1b38cd2e71e370feab94457af1c6dec438d0c0",
+    "transactionHash": "0x110adcfb6dfee192ad4ebb67c44f1236e1788c766d12bbc5f734baad32a22c59"
+  }
+]
