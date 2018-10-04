@@ -1,9 +1,9 @@
 pragma solidity ^0.4.23;
 
 import "./Initializable.sol";
-import './Registry.sol';
-import './RegistryLookup.sol';
-import './DelegateTarget.sol';
+import "./Registry.sol";
+import "./RegistryLookup.sol";
+import "./DelegateTarget.sol";
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -39,7 +39,7 @@ contract AdminSettings is Ownable, Initializable {
    * @dev - Contract should not accept any ether
    */
   function () public payable {
-    revert();
+    revert("is not payable");
   }
 
   function initializeTarget(address _registry, bytes32) public notInitialized {

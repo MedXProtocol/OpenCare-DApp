@@ -7,20 +7,21 @@ contract Delegate {
   bytes32 private constant delegateKeyPosition = keccak256("org.medcredits.delegate.key");
 
   constructor (address _registry, bytes32 _key) public {
-    require(_registry != address(0), 'registry address cannot be blank');
-    require(_key != bytes32(0), '_key cannot be blank');
+    require(_registry != address(0), "registry address cannot be blank");
+    require(_key != bytes32(0), "_key cannot be blank");
     _setDelegateRegistry(_registry);
     _setDelegateKey(_key);
     address _impl = implementation();
-    require(_impl != address(0), '_impl must be defined');
-    require(
-      _impl.delegatecall(bytes4(keccak256('initializeTarget(address,bytes32)')), _registry, _key),
-      'constructor failed'
+    require(_impl != address(0), "_impl must be defined");
+    require( /* solium-disable-next-line security/no-low-level-calls */
+      _impl.delegatecall(bytes4(keccak256("initializeTarget(address,bytes32)")), _registry, _key),
+      "constructor failed"
     );
   }
 
   function getDelegateRegistry() public view returns (address impl) {
     bytes32 position = delegateRegistryPosition;
+    /* solium-disable-next-line security/no-inline-assembly */
     assembly {
       impl := sload(position)
     }
@@ -28,6 +29,7 @@ contract Delegate {
 
   function getDelegateKey() public view returns (bytes32 key) {
     bytes32 position = delegateKeyPosition;
+    /* solium-disable-next-line security/no-inline-assembly */
     assembly {
       key := sload(position)
     }
@@ -35,6 +37,7 @@ contract Delegate {
 
   function _setDelegateRegistry(address registry) internal {
     bytes32 position = delegateRegistryPosition;
+    /* solium-disable-next-line security/no-inline-assembly */
     assembly {
       sstore(position, registry)
     }
@@ -42,6 +45,7 @@ contract Delegate {
 
   function _setDelegateKey(bytes32 key) internal {
     bytes32 position = delegateKeyPosition;
+    /* solium-disable-next-line security/no-inline-assembly */
     assembly {
       sstore(position, key)
     }
@@ -60,10 +64,10 @@ contract Delegate {
   * @dev Fallback function allowing to perform a delegatecall to the given implementation.
   * This function will return whatever the implementation call returns
   */
-  function () payable public {
+  function () public payable {
     address _impl = implementation();
-    require(_impl != address(0), '_impl cannot be blank');
-
+    require(_impl != address(0), "_impl cannot be blank");
+    /* solium-disable-next-line security/no-inline-assembly */
     assembly {
       let ptr := mload(0x40)
       calldatacopy(ptr, 0, calldatasize)

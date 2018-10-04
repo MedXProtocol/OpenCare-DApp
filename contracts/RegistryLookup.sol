@@ -1,20 +1,20 @@
 pragma solidity ^0.4.23;
 
-import './AccountManager.sol';
-import './AdminSettings.sol';
-import './Case.sol';
-import './CaseDiagnosingDoctor.sol';
-import './CaseManager.sol';
-import './CaseLifecycleManager.sol';
-import './CaseFirstPhaseManager.sol';
-import './CaseSecondPhaseManager.sol';
-import './CaseScheduleManager.sol';
-import './CaseStatusManager.sol';
-import './CasePaymentManager.sol';
-import './DoctorManager.sol';
+import "./AccountManager.sol";
+import "./AdminSettings.sol";
+import "./Case.sol";
+import "./CaseDiagnosingDoctor.sol";
+import "./CaseManager.sol";
+import "./CaseLifecycleManager.sol";
+import "./CaseFirstPhaseManager.sol";
+import "./CaseSecondPhaseManager.sol";
+import "./CaseScheduleManager.sol";
+import "./CaseStatusManager.sol";
+import "./CasePaymentManager.sol";
+import "./DoctorManager.sol";
 import "./IEtherPriceFeed.sol";
-import './Registry.sol';
-import './WETH9.sol';
+import "./Registry.sol";
+import "./WETH9.sol";
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 library RegistryLookup {
@@ -68,10 +68,10 @@ library RegistryLookup {
   }
 
   function etherPriceFeed(Registry self) internal view returns (IEtherPriceFeed) {
-    return IEtherPriceFeed(self.lookup(keccak256('EtherPriceFeed')));
+    return IEtherPriceFeed(self.lookup(keccak256("EtherPriceFeed")));
   }
 
   function adminSettings(Registry self) internal view returns (AdminSettings) {
-    return AdminSettings(self.lookup(keccak256('AdminSettings')));
+    return AdminSettings(self.lookup(keccak256("AdminSettings")));
   }
 }
