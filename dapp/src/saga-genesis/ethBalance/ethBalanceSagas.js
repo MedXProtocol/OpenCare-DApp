@@ -2,9 +2,11 @@ import { put, select, call, fork } from 'redux-saga/effects'
 import { delay } from 'redux-saga'
 import { bugsnagClient } from '~/bugsnagClient'
 import { customProviderWeb3 } from '~/utils/customProviderWeb3'
+import { web3NetworkId } from '~/saga-genesis/web3/web3-sagas'
 
 function* getEthBalance() {
-  const web3 = yield customProviderWeb3()
+  const networkId = yield web3NetworkId()
+  const web3 = customProviderWeb3(networkId)
   const address = yield select((state) => state.sagaGenesis.accounts[0])
   if (web3 === undefined || address === undefined) {
     return
