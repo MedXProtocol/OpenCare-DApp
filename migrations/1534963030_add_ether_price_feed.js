@@ -8,7 +8,7 @@ module.exports = function(deployer) {
   // Use deployer to state migration tasks.
   deployer.then(async () => {
     const registryInstance = await Registry.deployed()
-    const networkId = await promisify(cb => web3.version.getNetwork(cb))
+    const networkId = await web3.eth.net.getId()
     const key = 'EtherPriceFeed'
     const registryKey = toRegistryKey(key)
     switch(networkId) {
@@ -18,7 +18,7 @@ module.exports = function(deployer) {
         return registryInstance.register(registryKey, '0xa944bd4b25c9f186a846fd5668941aa3d3b8425f')
       default: // localhost
         return deployAndRegister(deployer, EtherPriceFeed, Registry, key).then(async (etherPriceFeed) => {
-          await etherPriceFeed.set(web3.toWei('300', 'ether'))
+          await etherPriceFeed.set(web3.utils.toWei('300', 'ether'))
         })
     }
   })
