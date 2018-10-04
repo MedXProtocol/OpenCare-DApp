@@ -26,6 +26,7 @@
     "eth-gas-reporter": "^0.1.10",
     "ganache-cli": "^6.1.8",
     "netlify-lambda": "^0.4.0",
+    "solium": "^1.1.8",
     "swarm-js": "^0.1.37",
     "truffle": "^5.0.0-beta.1",
     "truffle-deploy-registry": "^0.2.2",

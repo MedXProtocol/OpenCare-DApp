@@ -2,10 +2,10 @@ pragma solidity ^0.4.23;
 
 import "./Initializable.sol";
 import "./MedXToken.sol";
-import './Registry.sol';
-import './RegistryLookup.sol';
+import "./Registry.sol";
+import "./RegistryLookup.sol";
 import "./WETH9.sol";
-import './DelegateTarget.sol';
+import "./DelegateTarget.sol";
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -62,12 +62,12 @@ contract Case is Ownable, Initializable {
             or the second (challenge/second opinion) CasePhaseManager
    */
   modifier onlyCasePhaseManagers() {
-    require(isCasePhaseManager(), 'must be one of the Case Phase Manager contracts');
+    require(isCasePhaseManager(), "must be one of the Case Phase Manager contracts");
     _;
   }
 
   modifier onlyCasePaymentManager() {
-    require(msg.sender == address(registry.casePaymentManager()));
+    require(msg.sender == address(registry.casePaymentManager()), "only the case manager");
     _;
   }
 
@@ -85,21 +85,21 @@ contract Case is Ownable, Initializable {
   modifier onlyCaseFirstPhaseManager() {
     require(
       msg.sender == address(registry.caseFirstPhaseManager()),
-      'Must be an instance of the Case First Phase Manager contract'
+      "Must be an instance of the Case First Phase Manager contract"
     );
     _;
   }
 
   modifier onlyCaseSecondPhaseManager() {
     require(
-      (msg.sender == address(registry.caseSecondPhaseManager())),
-      'Must be an instance of the Case Second Phase Manager contract'
+      msg.sender == address(registry.caseSecondPhaseManager()),
+      "Must be an instance of the Case Second Phase Manager contract"
     );
     _;
   }
 
   modifier patientMustBeZero() {
-    require(patient == address(0));
+    require(patient == address(0), "patient is not set");
     _;
   }
 
@@ -107,7 +107,7 @@ contract Case is Ownable, Initializable {
    * @dev - Contract should not accept any ether
    */
   function () public payable {
-    revert();
+    revert("is not payable");
   }
 
   function initializeTarget(address _registry, bytes32) public notInitialized {
@@ -122,16 +122,16 @@ contract Case is Ownable, Initializable {
    * @param _caseFee - fee for this particular case
    */
   function initialize (
-      address _patient,
-      bytes _encryptedCaseKey,
-      bytes _caseKeySalt,
-      bytes _caseHash,
-      uint256 _caseFee
+    address _patient,
+    bytes _encryptedCaseKey,
+    bytes _caseKeySalt,
+    bytes _caseHash,
+    uint256 _caseFee
   ) external patientMustBeZero {
-    require(_patient != address(0), 'patient must be defined');
-    require(_encryptedCaseKey.length != 0, 'encryptedCaseKey required');
-    require(_caseKeySalt.length != 0, 'caseKeySalt required');
-    require(_caseHash.length != 0, 'caseHash required');
+    require(_patient != address(0), "patient must be defined");
+    require(_encryptedCaseKey.length != 0, "encryptedCaseKey required");
+    require(_caseKeySalt.length != 0, "caseKeySalt required");
+    require(_caseHash.length != 0, "caseHash required");
     status = CaseStatus.Open;
     patient = _patient;
     caseFee = _caseFee;

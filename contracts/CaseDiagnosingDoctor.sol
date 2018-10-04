@@ -2,11 +2,11 @@
 
 pragma solidity ^0.4.23;
 
-import './Case.sol';
+import "./Case.sol";
 import "./Initializable.sol";
-import './Registry.sol';
-import './RegistryLookup.sol';
-import './DelegateTarget.sol';
+import "./Registry.sol";
+import "./RegistryLookup.sol";
+import "./DelegateTarget.sol";
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import 'zeppelin-solidity/contracts/math/SafeMath.sol';
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 library Queue {
   using SafeMath for uint256;
@@ -21,7 +21,7 @@ library Queue {
   }
 
   function dequeue(UInt256 storage self) internal returns (uint256) {
-    require(self.last >= self.first, 'the last entry must be greater than or equal to the first');
+    require(self.last >= self.first, "the last entry must be greater than or equal to the first");
     uint256 value = self.queue[self.first];
     delete self.queue[self.first];
     self.first = self.first.add(1);
@@ -29,7 +29,7 @@ library Queue {
   }
 
   function peek(UInt256 storage self) internal view returns (uint256) {
-    require(self.last >= self.first, 'the last entry must be greater than or equal to the first');
+    require(self.last >= self.first, "the last entry must be greater than or equal to the first");
     return self.queue[self.first];
   }
 
