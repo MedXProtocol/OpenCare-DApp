@@ -7,7 +7,7 @@ const Dai = artifacts.require('./Dai.sol')
 module.exports = function(deployer) {
   deployer.then(async () => {
     const registryInstance = await Registry.deployed()
-    const networkId = await promisify(cb => web3.version.getNetwork(cb))
+    const networkId = await web3.eth.net.getId()
     const key = 'Dai'
     const registryKey = toRegistryKey(key)
     switch(networkId) {

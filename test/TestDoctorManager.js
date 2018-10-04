@@ -1,5 +1,6 @@
 const expectThrow = require('./helpers/expectThrow')
 const DoctorManager = artifacts.require("./DoctorManager.sol")
+const Registry = artifacts.require('./Registry.sol')
 
 contract('DoctorManager', function (accounts) {
   let doctor = accounts[1]
@@ -8,10 +9,12 @@ contract('DoctorManager', function (accounts) {
   let doctor4 = accounts[4]
 
   let doctorManager
+  let registry
 
   beforeEach(async () => {
+    registry = await Registry.new()
     doctorManager = await DoctorManager.new()
-    await doctorManager.initializeTarget(0, 0)
+    await doctorManager.initializeTarget(registry.address, '0x')
   })
 
   describe('initialize()', () => {

@@ -15,7 +15,7 @@ module.exports = async function(env, patientAddress, doctorAddress) {
     caseKeySalt,
     ipfsHash,
     doctorAddress,
-    'doctor encrypted case key',
+    '0xaef9087aefa98dfa7e9fa8',
     {
       from: patientAddress,
       value: requiredDepositTokenWei
