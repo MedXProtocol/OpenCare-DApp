@@ -71,3 +71,4 @@ Addresses for mainnet and test nets are stored in networks/ and merged using the
 To deploy/migrate the contracts:
 
 `$ truffle migrate`
+
