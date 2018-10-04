@@ -1,7 +1,6 @@
 const deployTargetAndDelegate = require('./support/deployTargetAndDelegate')
 const FromBlockNumber = artifacts.require("./FromBlockNumber.sol")
 
-module.exports = function(deployer) {
-  return deployTargetAndDelegate(artifacts, deployer, FromBlockNumber).then((fromBlockNumber) => {
-  })
+module.exports = function(deployer, networkName) {
+  return deployTargetAndDelegate(artifacts, deployer, FromBlockNumber, networkName)
 }

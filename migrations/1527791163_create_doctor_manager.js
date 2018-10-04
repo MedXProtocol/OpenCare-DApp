@@ -1,6 +1,6 @@
 const deployTargetAndDelegate = require('./support/deployTargetAndDelegate')
 const DoctorManager = artifacts.require("./DoctorManager.sol")
 
-module.exports = function(deployer) {
-  return deployTargetAndDelegate(artifacts, deployer, DoctorManager)
+module.exports = function(deployer, networkName) {
+  return deployTargetAndDelegate(artifacts, deployer, DoctorManager, networkName)
 };

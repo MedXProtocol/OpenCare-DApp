@@ -5,13 +5,12 @@ const BetaFaucet = artifacts.require("./BetaFaucet.sol");
 const Registry = artifacts.require("./Registry.sol");
 const MedXToken = artifacts.require("./MedXToken.sol");
 
-module.exports = function(deployer) {
+module.exports = function(deployer, networkName) {
   deployer.then(async () => {
     const medXTokenInstance = await MedXToken.deployed()
-    const networkId = await promisify(cb => web3.version.getNetwork(cb))
 
-    if (networkId !== '1') { // if not mainnet
-      return deployTargetAndDelegate(artifacts, deployer, BetaFaucet).then(betaFaucetDelegateInstance => {
+    if (deployer.network_id !== '1') { // if not mainnet
+      return deployTargetAndDelegate(artifacts, deployer, BetaFaucet, networkName).then(betaFaucetDelegateInstance => {
         return betaFaucetDelegateInstance.updateMedXTokenAddress(medXTokenInstance.address)
       })
     }
