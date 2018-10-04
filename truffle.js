@@ -36,6 +36,12 @@ module.exports = {
       network_id: 1,
       gas: 4700000,
       gasPrice: 10 * 1000000000
+    },
+    custom: {
+      provider: () => new HDWalletProvider(process.env.HDWALLET_MNEMONIC_MAINNET, process.env.REACT_APP_CUSTOM_PROVIDER_URL),
+      network_id: 1,
+      gas: 4700000,
+      gasPrice: 10 * 1000000000
     }
   },
   // mocha: {
