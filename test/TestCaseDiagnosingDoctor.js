@@ -16,6 +16,7 @@ contract('CaseDiagnosingDoctor', function (accounts) {
   let doctor3 = accounts[3]
   let caseFeeWei
   let secondsInADay
+  let diagnosisHash = '0xafe709a8d7fa89ef7a9d87fae98f'
 
   before(async () => {
     env = await createEnvironment(artifacts)
@@ -53,7 +54,7 @@ contract('CaseDiagnosingDoctor', function (accounts) {
       const caseInstance1 = await Case.at(await createCase(env, patient, doctor))
       await env.caseLifecycleManager.diagnoseCase(
         caseInstance1.address,
-        'diagnosis hash',
+        diagnosisHash,
         { from: doctor }
       )
 
@@ -61,13 +62,13 @@ contract('CaseDiagnosingDoctor', function (accounts) {
       const caseInstance2 = await Case.at(await createCase(env, patient, doctor))
       await env.caseLifecycleManager.diagnoseCase(
         caseInstance2.address,
-        'diagnosis hash',
+        diagnosisHash,
         { from: doctor }
       )
       await env.caseLifecycleManager.challengeWithDoctor(
         caseInstance2.address,
         doctor2,
-        'doctor 2 encrypted case key',
+        '0xa9e8f7a9d8f79ef8a7',
         { from: patient }
       )
 

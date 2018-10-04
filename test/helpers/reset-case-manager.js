@@ -20,7 +20,7 @@ module.exports = async function (artifacts, env) {
   let casePaymentManagerDelegate = await Delegate.new(env.registry.address, toRegistryKey('CasePaymentManagerTarget'))
   await env.registry.register(toRegistryKey('CasePaymentManager'), casePaymentManagerDelegate.address)
   let casePaymentManager = await CasePaymentManager.at(casePaymentManagerDelegate.address)
-  await casePaymentManager.setBaseCaseFeeUsdWei(web3.toWei('10', 'ether'))
+  await casePaymentManager.setBaseCaseFeeUsdWei(web3.utils.toWei('10', 'ether'))
 
   let caseStatusManagerDelegate = await Delegate.new(env.registry.address, toRegistryKey('CaseStatusManagerTarget'))
   await env.registry.register(toRegistryKey('CaseStatusManager'), caseStatusManagerDelegate.address)
