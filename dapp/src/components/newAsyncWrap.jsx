@@ -36,7 +36,7 @@ export const newAsyncWrap = function ({ createImport, name }) {
           <FlipMove
             enterAnimation="fade"
             leaveAnimation="fade"
-            duration={1200}
+            duration={100}
             maintainContainerHeight={true}
           >
             {this.state.Component ?
