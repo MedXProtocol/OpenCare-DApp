@@ -1,6 +1,10 @@
 const MedXToken = artifacts.require("./MedXToken.sol");
-const appendInstance = require('truffle-deploy-registry').appendInstance
+const tdr = require('truffle-deploy-registry')
 
-module.exports = function(deployer) {
-  deployer.deploy(MedXToken).then(appendInstance)
+module.exports = function(deployer, networkName) {
+  deployer.deploy(MedXToken).then(instance => {
+    if (!tdr.isDryRunNetworkName(networkName)) {
+      return tdr.appendInstance(instance)
+    })
+  })
 };

@@ -1,6 +1,9 @@
 const Migrations = artifacts.require("./Migrations.sol");
-const appendInstance = require('truffle-deploy-registry').appendInstance
+const tdr = require('truffle-deploy-registry')
 
-module.exports = function(deployer) {
-  deployer.deploy(Migrations).then(appendInstance)
+module.exports = function(deployer, networkName) {
+  deployer.deploy(Migrations).then((instance) => {
+    if (!tdr.isDryRunNetworkName(networkName)) {
+      return tdr.appendInstance(instance)
+    })
 };
