@@ -12,7 +12,7 @@ import cacheCallSagas from './call-cache/call-cache-sagas'
 import networkSagas from './network/network-sagas'
 import ethBalanceSagas from './ethBalance/ethBalanceSagas'
 import transactionSagas, { web3Send } from './transaction/transaction-sagas'
-import web3Initialize from './web3/web3-sagas'
+import { web3Initialize, web3NetworkId } from './web3/web3-sagas'
 import { logSaga } from './logs/logSaga'
 import { takeOnceAndRun } from './utils/takeOnceAndRun'
 import { takeSequentially } from './utils/takeSequentially'
@@ -38,6 +38,7 @@ export function* start({ web3 }) {
 export {
   web3Send,
   addContract,
+  web3NetworkId,
   takeOnceAndRun,
   takeSequentially
 }

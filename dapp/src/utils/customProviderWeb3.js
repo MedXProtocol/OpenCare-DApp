@@ -1,12 +1,9 @@
 import Web3 from 'web3'
 
-let customWeb3, customNetworkId
+let customWeb3
 
-export const customProviderWeb3 = async function() {
-  const stockWeb3 = new Web3(window.web3.currentProvider)
-  const networkId = await stockWeb3.eth.net.getId()
-
-  if (customWeb3 && customNetworkId === networkId) {
+export const customProviderWeb3 = function(networkId) {
+  if (customWeb3) {
     return customWeb3
   }
 
@@ -30,7 +27,6 @@ export const customProviderWeb3 = async function() {
   }
 
   customWeb3 = new Web3(new Web3.providers.HttpProvider(customProvider))
-  customNetworkId = networkId
 
   return customWeb3
 }
