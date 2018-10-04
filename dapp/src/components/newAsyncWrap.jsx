@@ -1,6 +1,8 @@
 import React, {
   PureComponent
 } from 'react'
+import { ChunkLoading } from '~/components/ChunkLoading'
+import FlipMove from 'react-flip-move'
 
 export const newAsyncWrap = function ({ createImport, name }) {
   return class _AsyncWrap extends PureComponent {
@@ -29,11 +31,25 @@ export const newAsyncWrap = function ({ createImport, name }) {
     }
 
     render () {
-      var result = null
-      if (this.state.Component) {
-        result = React.createElement(this.state.Component, this.props)
-      }
-      return result
+      return (
+        <div>
+          <FlipMove
+            enterAnimation="fade"
+            leaveAnimation="fade"
+            duration={100}
+            maintainContainerHeight={true}
+          >
+            {this.state.Component ?
+                <div key={`key-async-wrap-visible`}>
+                  {React.createElement(this.state.Component, this.props)}
+                </div>
+              : <div key={`key-async-wrap-hidden`}>
+                  <ChunkLoading />
+                </div>
+            }
+          </FlipMove>
+        </div>
+      )
     }
   }
 }
