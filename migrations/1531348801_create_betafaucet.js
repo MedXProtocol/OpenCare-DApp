@@ -8,7 +8,7 @@ const MedXToken = artifacts.require("./MedXToken.sol");
 module.exports = function(deployer) {
   deployer.then(async () => {
     const medXTokenInstance = await MedXToken.deployed()
-    const networkId = await promisify(cb => web3.version.getNetwork(cb))
+    const networkId = await web3.eth.net.getId()
 
     if (networkId !== '1') { // if not mainnet
       return deployTargetAndDelegate(artifacts, deployer, BetaFaucet).then(betaFaucetDelegateInstance => {

@@ -21,7 +21,7 @@ contract('CasePaymentManager', function (accounts) {
     describe('with dai', () => {
       it('should work', async () => {
         // Make sure the patient has DAI
-        await env.dai.mint(patient, web3.toWei('1000', 'ether'))
+        await env.dai.mint(patient, web3.utils.toWei('1000', 'ether'))
         // approve of the spend by the CasePaymentManager
         const requiredDepositWei = await env.casePaymentManager.requiredDepositTokenWei(env.dai.address)
         await env.dai.approve(env.casePaymentManager.address, requiredDepositWei, { from: patient })
@@ -56,7 +56,7 @@ contract('CasePaymentManager', function (accounts) {
     it('should return the Dai cost', async () => {
       assert.equal(
         (await env.casePaymentManager.caseFeeTokenWei(env.dai.address)).toString(),
-        web3.toWei('10', 'ether')
+        web3.utils.toWei('10', 'ether')
       )
     })
 
@@ -72,7 +72,7 @@ contract('CasePaymentManager', function (accounts) {
     it('should return the Dai cost', async () => {
       assert.equal(
         (await env.casePaymentManager.requiredDepositTokenWei(env.dai.address)).toString(),
-        web3.toWei('15', 'ether')
+        web3.utils.toWei('15', 'ether')
       )
     })
 
@@ -98,7 +98,7 @@ contract('CasePaymentManager', function (accounts) {
 
   describe('setBaseCaseFeeUsdWei(uint256)', () => {
     it('should update the base case fee', async () => {
-      await env.casePaymentManager.setBaseCaseFeeUsdWei(web3.toWei('20', 'ether'))
+      await env.casePaymentManager.setBaseCaseFeeUsdWei(web3.utils.toWei('20', 'ether'))
       assert.equal((await env.casePaymentManager.caseFeeEtherWei()).toString(), '66666666666666666')
     })
   })

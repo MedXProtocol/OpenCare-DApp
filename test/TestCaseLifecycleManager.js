@@ -6,6 +6,7 @@ const createCase = require('./helpers/create-case')
 const caseStatus = require('./helpers/case-status')
 const resetCaseManager = require('./helpers/reset-case-manager')
 const increaseTime = require('./helpers/increaseTime')
+const BN = require('bn.js')
 
 contract('CaseLifecycleManager', function (accounts) {
   let caseInstance
@@ -17,6 +18,10 @@ contract('CaseLifecycleManager', function (accounts) {
   let doctor3 = accounts[3]
   let caseFeeWei
   let secondsInADay
+  let diagnosisHash = '0x9ae8fa9e8fa2'
+
+  let doctorEncryptedCaseKey = '0xaf9a8f3928a2'
+  let patientEncryptedCaseKey = '0x178888787878'
 
   before(async () => {
     env = await createEnvironment(artifacts)
@@ -30,7 +35,7 @@ contract('CaseLifecycleManager', function (accounts) {
     await resetCaseManager(artifacts, env)
     secondsInADay = (await env.caseScheduleManager.secondsInADay()).toNumber()
 
-    caseFeeWei = await env.casePaymentManager.caseFeeTokenWei(env.weth9.address)
+    caseFeeWei = new BN(await env.casePaymentManager.caseFeeTokenWei(env.weth9.address))
 
     caseInstance = await Case.at(await createCase(env, patient, doctor))
   })
@@ -59,7 +64,7 @@ contract('CaseLifecycleManager', function (accounts) {
       await env.caseLifecycleManager.patientRequestNewInitialDoctor(
         caseInstance.address,
         doctor2,
-        'a diff doc encrypted case key'
+        doctorEncryptedCaseKey
       )
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
       assert.equal(await caseInstance.diagnosingDoctor.call(), doctor2)
@@ -73,14 +78,14 @@ contract('CaseLifecycleManager', function (accounts) {
     it('should allow the diagnosing doctor to submit the diagnosis', async () => {
       assert.equal(await env.caseStatusManager.openCaseCount.call(doctor), 1)
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluating'))
-      await env.caseLifecycleManager.diagnoseCase(caseInstance.address, 'diagnosis hash', { from: doctor })
+      await env.caseLifecycleManager.diagnoseCase(caseInstance.address, diagnosisHash, { from: doctor })
       assert.equal(await caseInstance.status.call(), caseStatus('Evaluated'))
     })
   })
 
   context('is diagnosed', () => {
     beforeEach(async () => {
-      await env.caseLifecycleManager.diagnoseCase(caseInstance.address, 'diagnosis hash', { from: doctor })
+      await env.caseLifecycleManager.diagnoseCase(caseInstance.address, diagnosisHash, { from: doctor })
     })
 
     describe('acceptDiagnosis()', () => {
@@ -96,18 +101,18 @@ contract('CaseLifecycleManager', function (accounts) {
         assert.equal(doctorBalance.toString(), caseFeeWei.toString())
 
         // Deposit afterwards to clean up this test
-        await env.weth9.withdraw(caseFeeWei, { from: doctor })
+        await env.weth9.withdraw(caseFeeWei.toString(), { from: doctor })
       })
 
       it('should allow the patient to accept diagnosis 24 hours after choosing a challenge doc', async () => {
-        let patientBalance = await env.weth9.balanceOf(patient)
-        assert.equal(patientBalance, 0)
+        let patientBalance = new BN(await env.weth9.balanceOf(patient))
+        assert.equal(patientBalance.toString(), '0')
 
         assert.equal(await caseInstance.status.call(), caseStatus('Evaluated'))
         await env.caseLifecycleManager.challengeWithDoctor(
           caseInstance.address,
           doctor2,
-          'doctor 2 encrypted case key',
+          doctorEncryptedCaseKey,
           { from: patient }
         )
         assert.equal(await caseInstance.status.call(), caseStatus('Challenging'))
@@ -120,9 +125,6 @@ contract('CaseLifecycleManager', function (accounts) {
         assert.equal(await env.caseStatusManager.openCaseCount.call(doctor2), 0)
         assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor2), 0)
         assert.equal(await caseInstance.status.call(), caseStatus('Closed'))
-
-        // patientBalance = await env.weth9.balanceOf(patient)
-        // assert.equal(patientBalance, caseFee / 3)
 
         let doctorBalance = await env.weth9.balanceOf(doctor)
         assert.equal(doctorBalance.toString(), caseFeeWei.toString())
@@ -149,7 +151,7 @@ contract('CaseLifecycleManager', function (accounts) {
           await env.caseLifecycleManager.challengeWithDoctor(
             caseInstance.address,
             patient,
-            'patient encrypted case key'
+            patientEncryptedCaseKey
           )
         })
       })
@@ -159,7 +161,7 @@ contract('CaseLifecycleManager', function (accounts) {
           await env.caseLifecycleManager.challengeWithDoctor(
             caseInstance.address,
             doctor2,
-            'doctor 2 encrypted case key',
+            doctorEncryptedCaseKey,
             { from: patient }
           )
 
@@ -177,7 +179,7 @@ contract('CaseLifecycleManager', function (accounts) {
             await env.caseLifecycleManager.challengeWithDoctor(
               caseInstance.address,
               doctor2,
-              'doctor 2 encrypted case key',
+              doctorEncryptedCaseKey,
               { from: patient }
             )
           })
@@ -190,7 +192,7 @@ contract('CaseLifecycleManager', function (accounts) {
             await env.caseLifecycleManager.patientRequestNewChallengeDoctor(
               caseInstance.address,
               doctor3,
-              'yet another doc encrypted case key'
+              doctorEncryptedCaseKey
             )
             assert.equal(await env.caseStatusManager.openCaseCount.call(doctor2), 0)
             assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor2), 0)
@@ -220,11 +222,11 @@ contract('CaseLifecycleManager', function (accounts) {
 
         describe('diagnoseChallengedCase()', () => {
           it('on approval should award both doctors', async () => {
-            let doctorBalance = await env.weth9.balanceOf(doctor)
-            let doctorBalance2 = await env.weth9.balanceOf(doctor2)
+            let doctorBalance = new BN(await env.weth9.balanceOf(doctor))
+            let doctorBalance2 = new BN(await env.weth9.balanceOf(doctor2))
             let result = await env.caseLifecycleManager.diagnoseChallengedCase(
               caseInstance.address,
-              'diagnosis hash',
+              diagnosisHash,
               true,
               { from: doctor2 }
             )
@@ -233,8 +235,8 @@ contract('CaseLifecycleManager', function (accounts) {
             assert.equal(await env.caseStatusManager.openCaseCount.call(doctor2), 0)
             assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor2), 1)
 
-            assert.equal((await env.weth9.balanceOf(doctor)).toString(), doctorBalance.plus(caseFeeWei).toString())
-            assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.plus(caseFeeWei).div(2).floor().toString())
+            assert.equal((await env.weth9.balanceOf(doctor)).toString(), doctorBalance.add(caseFeeWei).toString())
+            assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.add(caseFeeWei).div(new BN(2)).toString())
 
             // console.log(result.logs)
             // assert.equal(result.logs[result.logs.length-1].event, 'CaseDiagnosisConfirmed')
@@ -243,12 +245,12 @@ contract('CaseLifecycleManager', function (accounts) {
           })
 
           it('on rejecting original diagnosis should award the challenge doc', async () => {
-            let patientBalance = await env.weth9.balanceOf(patient)
-            let doctorBalance2 = await env.weth9.balanceOf(doctor2)
+            let patientBalance = new BN(await env.weth9.balanceOf(patient))
+            let doctorBalance2 = new BN(await env.weth9.balanceOf(doctor2))
 
             let result = await env.caseLifecycleManager.diagnoseChallengedCase(
               caseInstance.address,
-              'diagnosis hash',
+              diagnosisHash,
               false,
               { from: doctor2 }
             )
@@ -257,8 +259,8 @@ contract('CaseLifecycleManager', function (accounts) {
             assert.equal(await env.caseStatusManager.openCaseCount.call(doctor2), 0)
             assert.equal(await env.caseStatusManager.closedCaseCount.call(doctor2), 1)
 
-            assert.equal((await env.weth9.balanceOf(patient)).toString(), patientBalance.plus(caseFeeWei).toString())
-            assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.plus(caseFeeWei).div(2).floor().toString())
+            assert.equal((await env.weth9.balanceOf(patient)).toString(), patientBalance.add(caseFeeWei).toString())
+            assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.add(caseFeeWei).div(new BN(2)).toString())
             // assert.equal(result.receipt.logs[result.receipt.logs.length-1].event, 'CaseDiagnosesDiffer')
           })
         })

@@ -39,10 +39,10 @@ contract('Case', function (accounts) {
       await expectThrow(async () => {
         await caseInstance.initialize(
           accounts[0],
-          'alaksefj',
-          'caseKeySalt',
-          'caseHash',
-          web3.toWei('10', 'ether')
+          '0xae09',
+          '0x8f9e',
+          '0x0a9f',
+          web3.utils.toWei('10', 'ether')
         )
       })
     })

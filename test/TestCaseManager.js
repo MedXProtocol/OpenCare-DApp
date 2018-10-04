@@ -13,11 +13,12 @@ contract('CaseManager', function (accounts) {
 
   let env
 
-  let caseCharge = web3.toWei(15, 'ether')
+  let caseCharge = web3.utils.toWei('15', 'ether')
 
   const ipfsHash = '0x516d61485a4a774243486a54726d3848793244356d50706a64636d5a4d396e5971554e475a6855435368526e5a4a' // generateBytes(50)
   const encryptedCaseKey = '0x265995a0a13dad6fbc6769d0c9a99f07dcb1acb7bc8c5f8c5a85ab6739512b9bcad881a302630a17dcbdbe908683d13d3f2363a2e006af9df53068c0860f2f73'
   const caseKeySalt = '0x365995a0a13dad6fbc6769d0c9a99f07dcb1acb7bc8c5f8c5a85ab6739512b9bcad881a302630a17dcbdbe908683d13d3f2363a2e006af9df53068c0860f2f74'
+  const doctorEncryptedCaseKey = '0xafe987a9ef8a'
 
   before(async () => {
     env = await createEnvironment(artifacts)
@@ -46,7 +47,7 @@ contract('CaseManager', function (accounts) {
             caseKeySalt,
             ipfsHash,
             doctor2,
-            'doctor encrypted case key',
+            doctorEncryptedCaseKey,
             { from: patient, value: caseCharge }
           )
         })
@@ -62,7 +63,7 @@ contract('CaseManager', function (accounts) {
             caseKeySalt,
             ipfsHash,
             doctor,
-            'doctor encrypted case key',
+            doctorEncryptedCaseKey,
             { from: patient, value: caseCharge }
           )
         })
@@ -78,7 +79,7 @@ contract('CaseManager', function (accounts) {
             caseKeySalt,
             ipfsHash,
             doctor,
-            'doctor encrypted case key',
+            doctorEncryptedCaseKey,
             { from: patient, value: caseCharge }
           )
         })
@@ -91,7 +92,7 @@ contract('CaseManager', function (accounts) {
           caseKeySalt,
           ipfsHash,
           doctor,
-          'doctor encrypted case key',
+          doctorEncryptedCaseKey,
           { from: doctor2, value: caseCharge }
         )
         assert.equal((await env.caseManager.getAllCaseListCount()).toString(), 1)
@@ -106,7 +107,7 @@ contract('CaseManager', function (accounts) {
           caseKeySalt,
           ipfsHash,
           doctor,
-          'doctor encrypted case key',
+          doctorEncryptedCaseKey,
           { from: patient, value: caseCharge }
         )
 
@@ -124,7 +125,7 @@ contract('CaseManager', function (accounts) {
 
     describe('with dai', () => {
       it('should work', async () => {
-        await env.dai.mint(patient, web3.toWei('1000', 'ether'))
+        await env.dai.mint(patient, web3.utils.toWei('1000', 'ether'))
         const depositTokenWei = await env.casePaymentManager.requiredDepositTokenWei(env.dai.address)
         await env.dai.approve(env.casePaymentManager.address, depositTokenWei, { from: patient })
 
@@ -135,7 +136,7 @@ contract('CaseManager', function (accounts) {
           caseKeySalt,
           ipfsHash,
           doctor,
-          'doctor encrypted case key',
+          doctorEncryptedCaseKey,
           { from: patient, value: caseCharge }
         )
 
@@ -155,7 +156,7 @@ contract('CaseManager', function (accounts) {
         caseKeySalt,
         ipfsHash,
         doctor,
-        'doctor encrypted case key',
+        doctorEncryptedCaseKey,
         '0xea1234',
         { from: patient2, value: caseCharge }
       )
