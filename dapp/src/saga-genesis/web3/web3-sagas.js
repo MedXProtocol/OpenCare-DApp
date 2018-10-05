@@ -3,10 +3,11 @@ import {
   getContext
 } from 'redux-saga/effects'
 import Web3 from 'web3'
+import getWeb3OrNull from '~/getWeb3OrNull'
 
 export function* web3Initialize() {
-  if (window.web3) {
-    const web3 = new Web3(window.web3.currentProvider)
+  const web3 = getWeb3OrNull()
+  if (web3) {
     yield put({type: 'WEB3_INITIALIZED', web3})
   } else {
     console.error("window.web3 doesn't exist!")
