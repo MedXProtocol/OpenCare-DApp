@@ -1,13 +1,17 @@
 import Web3 from 'web3'
 
 let customWeb3
+const debug = require('debug')('custom-provider-web3')
 
 export const customProviderWeb3 = function(networkId) {
   if (customWeb3) {
+    debug("using memoized")
+
     return customWeb3
   }
 
   let customProvider
+  debug("networkId" + networkId)
 
   if (networkId === 1) {
     customProvider = process.env.REACT_APP_MAINNET_PROVIDER_URL
