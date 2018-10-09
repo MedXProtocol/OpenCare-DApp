@@ -34,7 +34,8 @@ i18next
             sendDai: 'Sending 1000 DAI',
             withdraw: 'Withdrawing W-ETH',
             setBaseCaseFeeUsdWei: 'Updating case fee',
-            approve: 'Approving DAI Spend'
+            approve: 'Approving DAI Spend',
+            updateAdminSettings: 'Updating Admin Settings'
           },
           transactionErrors: {
             userRevert: 'You rejected the transaction.',
@@ -66,8 +67,7 @@ i18next
             fourOhFour: '404 | OpenCare - Powered by MedX Protocol',
             adminSettings: 'Settings | OpenCare - Powered by MedX Protocol',
             adminFees: 'Fees | OpenCare - Powered by MedX Protocol',
-            adminCases: 'Cases | OpenCare - Powered by MedX Protocol',
-            updateAdminSettings: 'Updating Admin Settings'
+            adminCases: 'Cases | OpenCare - Powered by MedX Protocol'
           }
         }
       }
