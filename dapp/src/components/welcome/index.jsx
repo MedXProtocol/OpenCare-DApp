@@ -72,7 +72,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                     {
                       this.ropsten() ? (
                         <li>
-                          Earn <strong>0.5 MEDX</strong> for every case submitted or diagnosed during our trial period (<a target='_blank' rel="noopener noreferrer"  href="https://medium.com/medcredits/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
+                          Earn <strong>0.5 MEDX</strong> for every case submitted or diagnosed during our trial period (<a target='_blank' rel="noopener noreferrer"  href="https://medium.com/medxprotocol/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
                         </li>
                       ) : null
                     }

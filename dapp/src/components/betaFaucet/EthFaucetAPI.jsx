@@ -71,10 +71,10 @@ export const EthFaucetAPI = ReactTimeout(class _EthFaucetAPI extends Component {
       var englishErrorMessage = (
         <small>
           <br />
-          There was an error while sending you Ether, you may have already received it or it's on the way. If the problem persists please contact MedCredits on Telegram and we can send you Ropsten Testnet Ether:
+          There was an error while sending you Ether, you may have already received it or it's on the way. If the problem persists please contact MedX Protocol on Telegram and we can send you Ropsten Testnet Ether:
           &nbsp; <a
             target="_blank"
-            href="https://t.me/MedCredits"
+            href="https://t.me/MedXProtocol"
             rel="noopener noreferrer">Contact Support</a>
         </small>
       )
