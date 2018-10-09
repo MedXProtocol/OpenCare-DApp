@@ -107,7 +107,7 @@ function* updateCurrentBlockNumber() {
       })
     }
   } catch (exception) {
-    console.warn(exception)
+    console.warn('Warn in updateCurrentBlockNumber: ' + exception)
     bugsnagClient.notify(exception)
   }
 }

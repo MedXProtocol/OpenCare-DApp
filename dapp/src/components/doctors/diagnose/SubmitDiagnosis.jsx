@@ -172,7 +172,7 @@ export const SubmitDiagnosisContainer = withRouter(ReactTimeout(connect(mapState
         })
     } catch (error) {
       toastr.error('There was an error while downloading your case details from IPFS.')
-      console.warn(error)
+      console.warn('warn in submitDiagnosis.' + error)
       this.setState({
         loading: false
       })

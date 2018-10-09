@@ -187,7 +187,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
         })
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')
-      console.warn(error)
+      console.warn('Warn in Diagnosis from IPFS.' + error)
     }
   }
 

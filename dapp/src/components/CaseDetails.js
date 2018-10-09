@@ -138,7 +138,7 @@ export const CaseDetails = connect(mapStateToProps, mapDispatchToProps)(
         })
     } catch (error) {
       toastr.error('There was an error while downloading your case details from IPFS.')
-      console.warn(error)
+      console.warn('Warn in CaseDetails from IPFS.' + error)
       this.setState({
         loading: false
       })

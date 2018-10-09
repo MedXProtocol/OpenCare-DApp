@@ -117,7 +117,7 @@ const ChallengedDiagnosis = connect(mapStateToProps)(
         })
     } catch (error) {
       toastr.error('There was an error while downloading the diagnosis from IPFS.')
-      console.warn(error)
+      console.warn('Warn in ChallengedDiagnosis from IPFS.' + error)
     }
   }
 

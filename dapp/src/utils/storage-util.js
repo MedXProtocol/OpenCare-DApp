@@ -22,7 +22,7 @@ const ipfsMethodWithRetry = async (func, ...args) => {
       result = await func(...args)
     } catch (error) {
       if (++retries === maxRetries) {
-        console.warn(error)
+        console.warn('Warn in ipfsMethodWithRetry' + error)
         return null
       }
     }
