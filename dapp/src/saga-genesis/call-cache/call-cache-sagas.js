@@ -139,7 +139,7 @@ function* web3CallExecute({call}) {
     const callMethod = yield findCallMethod(call)
     yield spawn(function* () {
       try {
-        let response = yield reduxSagaCall(callMethod, options, 'pending')
+        let response = yield reduxSagaCall(callMethod, options)
         yield put({ type: 'WEB3_CALL_RETURN', call, response })
       } catch (error) {
         debug(`web3CallExecute rpc ERROR: ${error}`)
