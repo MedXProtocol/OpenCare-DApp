@@ -219,7 +219,7 @@ const Diagnosis = connect(mapStateToProps, mapDispatchToProps)(
           })
         })
         .onTxHash(() => {
-          toastr.success('You have accepted the case diagnosis. Thank you for using MedCredits!')
+          toastr.success('You have accepted the case diagnosis. Thank you for using OpenCare!')
           mixpanel.track('Accept Diagnosis Submitted')
           this.props.history.push(routes.PATIENTS_CASES)
         })

@@ -31,7 +31,7 @@ export function* checkExternalTransactionReceipts(web3) {
           yield put({ type: 'TRANSACTION_CONFIRMED', transactionId, receipt, call })
         } else {
           yield put({ type: 'EXTERNAL_TRANSACTION_ERROR', transactionId, txType })
-          yield put({ type: 'TRANSACTION_ERROR', transactionId, call, error: `Possibly sent '${txType}' previously, please contact MedCredits support` })
+          yield put({ type: 'TRANSACTION_ERROR', transactionId, call, error: `Possibly sent '${txType}' previously, please contact MedX Protocol support` })
         }
       } else {
         // console.log('ignoring as not yet mined')

@@ -61,7 +61,7 @@ export const Loading = ReactTimeout(class _Loading extends Component {
       >
         <div className="loading--overlay">
           <div className="loading">
-            <img width="100" height="100" src={medCreditsLoadingImg} alt="MedCredits Loading Indicator" />
+            <img width="100" height="100" src={medCreditsLoadingImg} alt="MedX Protocol Loading Indicator" />
             <p>
               Working on your request ...
               <br />
