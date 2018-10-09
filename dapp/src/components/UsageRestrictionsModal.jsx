@@ -48,7 +48,7 @@ export const UsageRestrictionsModal = connect(mapStateToProps, mapDispatchToProp
         <p>
           OpenCare is not taking any new consultations for the time being. If you would like to join the OpenCare network please <a
             target="_blank"
-            href="https://t.me/MedCredits"
+            href="https://t.me/MedXProtocol"
             rel="noopener noreferrer"
           >
             <span>
@@ -61,7 +61,7 @@ export const UsageRestrictionsModal = connect(mapStateToProps, mapDispatchToProp
         <p>
           OpenCare is currently supporting physician-to-physician consultations only. If you would like to join the OpenCare network please <a
             target="_blank"
-            href="https://t.me/MedCredits"
+            href="https://t.me/MedXProtocol"
             rel="noopener noreferrer"
           >
             <span>

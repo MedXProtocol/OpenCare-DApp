@@ -101,9 +101,9 @@ export const SecretKey = class _SecretKey extends Component {
           <Modal.Body>
             <p>
               OpenCare is a decentralized application serving as an open bulletin
-              board connecting users to dermatologists. The MedCredits team does not control or view
-              user-physician encounters. Physician credentials are verified by nodes in the MedCredits’
-              Token Curated Registry. The MedCredits team does not guarantee physician credentials nor
+              board connecting users to dermatologists. The MedX Protocol team does not control or view
+              user-physician encounters. Physician credentials are verified by nodes in the MedX Protocol
+              Token Curated Registry. The MedX Protocol team does not guarantee physician credentials nor
               control which physicians are able to participate in this decentralized application.
               Client side HIPAA-compliant encryption is used in an effort to maintain user confidentiality.
               However, we strongly advise users to avoid using any identifiers or images that

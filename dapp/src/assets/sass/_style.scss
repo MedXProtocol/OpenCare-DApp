@@ -4,6 +4,10 @@ body {
   font-feature-settings: "liga1" on;
   overflow-y: scroll;
   overflow-x: hidden;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
 }
 
 .content {
@@ -147,14 +151,34 @@ h6 .small-inverse {
   color: #4aa8f7;
 }
 
+h1,
+.h1 {
+  font-size: 2.6rem;
+}
+
+h2,
+.h2 {
+  font-size: 2.4rem;
+}
+
+h3,
+.h3 {
+  font-size: 2.2rem;
+}
+
+h4,
+.h4 {
+  font-size: 1.8rem;
+}
+
 h5,
 .h5 {
-  font-size: 16px;
+  font-size: 1.4rem;
 }
 
 h6,
 .h6 {
-  font-size: 14px;
+  font-size: 1.2rem;
 }
 
 .header--no-top-margin {
@@ -172,12 +196,8 @@ ol {
   color: white;
 }
 
-not(.nav) li {
-  margin-bottom: 0.5em;
-}
-
 .text-gray {
-  color: $medcredits-text-gray;
+  color: $medx-text-gray;
 }
 
 .text-blue {
@@ -185,15 +205,24 @@ not(.nav) li {
 }
 
 .text-gold {
-  color: $medcredits-text-gold;
+  color: $medx-text-gold;
 }
 
-.text-green {
+.text-green,
+.text-success {
   color: $brand-success;
 }
 
+.text-red {
+  color: $brand-danger;
+}
+
 .text-footer {
-  color: $medcredits-text-gray;
+  color: $medx-text-gray;
+}
+
+not(.nav) li {
+  margin-bottom: 0.5em;
 }
 
 .body-inverse .text-footer {

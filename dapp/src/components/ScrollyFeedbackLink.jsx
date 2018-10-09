@@ -74,7 +74,7 @@ export const ScrollyFeedbackLink = class _ScrollyFeedbackLink extends Component 
       <div className="scroll-in-nav" ref="scrollnav">
         <a
           target="_blank"
-          href="https://t.me/MedCredits"
+          href="https://t.me/MedXProtocol"
           className="floating-feedback-link text-center"
           rel="noopener noreferrer"
           style={renderStyle}

@@ -198,7 +198,7 @@ export const CaseDetails = connect(mapStateToProps, mapDispatchToProps)(
                 Unable to download case data from IPFS
               </h4>
               <p>
-                There is probably an issue with the IPFS server. Please contact MedCredits support.
+                There is probably an issue with the IPFS server. Please contact MedX Protocol support.
               </p>
 
               <br />
