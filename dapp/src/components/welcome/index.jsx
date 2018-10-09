@@ -20,6 +20,9 @@ function mapStateToProps (state) {
 }
 
 export const Welcome = connect(mapStateToProps)(class _Welcome extends Component {
+  ropsten = () => {
+    return (this.props.networkId && this.props.networkId === 3)
+  }
 
   render () {
     let launchLink
@@ -66,13 +69,14 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                     <li>
                       Sign up and submit your skin ailment
                     </li>
-                    <li>
-                      Earn <strong>0.5 MEDX</strong> for every case submitted or diagnosed during our trial period (<a target='_blank' rel="noopener noreferrer"  href="https://medium.com/medcredits/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
-                    </li>
+                    {
+                      this.ropsten() ? (
+                        <li>
+                          Earn <strong>0.5 MEDX</strong> for every case submitted or diagnosed during our trial period (<a target='_blank' rel="noopener noreferrer"  href="https://medium.com/medcredits/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
+                        </li>
+                      ) : null
+                    }
                   </ol>
-                  <p>
-                    As beta development progresses, your cases may be reset from time to time. If you see all of your cases vanish, don't worry. Your case count will be based on your complete history.
-                  </p>
                   <hr />
                   <p className="text-red small">
                     NOTE: This is v1.0 of OpenCare. It is currently open for physician-to-physician consultations on the Ethereum mainnet.
