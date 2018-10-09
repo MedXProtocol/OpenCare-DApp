@@ -9,21 +9,21 @@ import {
   withSaga,
   contractByName
 } from '~/saga-genesis'
-import { weiToUsd } from '~/utils/weiToUsd'
+import { etherWeiToUsdWei } from '~/utils/etherWeiToUsdWei'
 import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
 import { Ether } from './Ether'
 
 function mapStateToProps(state) {
   const CasePaymentManager = contractByName(state, 'CasePaymentManager')
   return {
-    usdPerWei: cacheCallValue(state, CasePaymentManager, 'usdPerEther'),
+    usdWeiPerEther: cacheCallValue(state, CasePaymentManager, 'usdWeiPerEther'),
     CasePaymentManager
   }
 }
 
 function* etherFlipSaga({ CasePaymentManager }) {
   if (!CasePaymentManager) { return }
-  yield cacheCall(CasePaymentManager, 'usdPerEther')
+  yield cacheCall(CasePaymentManager, 'usdWeiPerEther')
 }
 
 export const EtherFlip = connect(mapStateToProps)(
@@ -36,7 +36,7 @@ export const EtherFlip = connect(mapStateToProps)(
 
       static defaultProps = {
         wei: '0',
-        usdPerWei: '1',
+        usdWeiPerEther: '1',
         noToggle: false
       }
 
@@ -54,7 +54,7 @@ export const EtherFlip = connect(mapStateToProps)(
       render () {
         const wei = this.props.wei || 0
 
-        const usd = <span className='currency'>${displayWeiToUsd(weiToUsd(wei, this.props.usdPerWei))} USD</span>
+        const usd = <span className='currency'>${displayWeiToUsd(etherWeiToUsdWei(wei, this.props.usdWeiPerEther))} USD</span>
         const ether = <Ether wei={wei} />
 
         let firstValue = ether

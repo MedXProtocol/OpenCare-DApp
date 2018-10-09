@@ -86,7 +86,6 @@ contract('CaseDiagnosingDoctor', function (accounts) {
       result = await env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor })
 
       doctorBalance = await env.weth9.balanceOf(doctor)
-      // console.log(doctorBalance.toString(), caseFeeWei.toString())
       assert.equal(doctorBalance.toString(), caseFeeWei.toString())
 
       assert.equal((await caseInstance1.status.call()).toString(), caseStatus('Closed'))
@@ -98,7 +97,6 @@ contract('CaseDiagnosingDoctor', function (accounts) {
       await env.caseDiagnosingDoctor.acceptAllAsDoctor({ from: doctor })
 
       doctorBalance = await env.weth9.balanceOf(doctor)
-      // console.log(doctorBalance, (caseFeeWei * 2))
       assert.equal(doctorBalance.toString(), (caseFeeWei * 2))
 
       assert.equal((await caseInstance1.status.call()).toString(), caseStatus('Closed'))

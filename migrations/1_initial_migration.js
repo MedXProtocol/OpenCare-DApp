@@ -5,5 +5,6 @@ module.exports = function(deployer, networkName) {
   deployer.deploy(Migrations).then((instance) => {
     if (!tdr.isDryRunNetworkName(networkName)) {
       return tdr.appendInstance(instance)
-    })
+    }
+  })
 };

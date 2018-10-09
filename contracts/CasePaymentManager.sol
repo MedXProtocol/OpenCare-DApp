@@ -38,7 +38,7 @@ contract CasePaymentManager is Ownable, Initializable, DelegateTarget {
     if (_tokenContract == address(registry.dai())) {
       return baseCaseFeeUsdWei;
     } else if (_tokenContract == address(registry.weth9())){
-      return caseFeeEtherWei();
+      return weiPerCase();
     } else {
       revert('Unknown token contract');
     }
@@ -84,12 +84,15 @@ contract CasePaymentManager is Ownable, Initializable, DelegateTarget {
     baseCaseFeeUsdWei = _baseCaseFeeUsdWei;
   }
 
-  function caseFeeEtherWei() public view returns (uint256) {
-    return baseCaseFeeUsdWei.div(usdPerEther());
+  function weiPerCase() public view returns (uint256) {
+    uint256 usdPerKwei = usdWeiPerEther().div(1000000000000000);
+    uint256 kweiPerCase = baseCaseFeeUsdWei.div(usdPerKwei);
+
+    return kweiPerCase.mul(1000);
   }
 
-  function usdPerEther() public view returns (uint256) {
-    uint256 usdPerEth = uint256(registry.etherPriceFeed().read());
-    return usdPerEth.div(1000000000000000000);
+  function usdWeiPerEther() public view returns (uint256) {
+    return uint256(registry.etherPriceFeed().read());
   }
+
 }
