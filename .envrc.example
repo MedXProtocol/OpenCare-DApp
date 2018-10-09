@@ -2,10 +2,6 @@
 # or just `source .envrc`
 
 export HDWALLET_MNEMONIC="track endorse coyote area casino budget item income vote pull cushion soon"
-export HDWALLET_MNEMONIC_MAINNET="track endorse coyote area casino budget item income vote pull cushion soon"
-export REACT_APP_ROPSTEN_PROVIDER_URL=https://ropsten.infura.io/To0546l6M9AapR2JxoHN
-export REACT_APP_RINKEBY_PROVIDER_URL=https://rinkeby.infura.io/To0546l6M9AapR2JxoHN
-export REACT_APP_MAINNET_PROVIDER_URL=https://mainnet.infura.io/To0546l6M9AapR2JxoHN
 export REACT_APP_LOCALHOST_PROVIDER_URL=http://localhost:8545
 
 export GENERATE_SOURCEMAP=true
