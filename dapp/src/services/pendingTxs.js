@@ -5,11 +5,10 @@ import { caseStatus } from '~/utils/caseStatus'
 // Contains info about pending tx's
 export const addPendingTx = function(transaction, objIndex) {
   let caseRowObject
-  const { confirmed, error } = transaction
+  const { confirmationNumber, error } = transaction
 
-  // TODO: Find a way to only fade this out after a few seconds
   // A tx we care about
-  if (!confirmed || defined(error)) {
+  if (!confirmationNumber || confirmationNumber < 1 || defined(error)) {
     caseRowObject = {
       ...transaction,
       objIndex
