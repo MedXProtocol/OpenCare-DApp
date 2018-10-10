@@ -34,7 +34,7 @@ module.exports = async function createEnvironment(artifacts) {
 
   const etherPriceFeed = await EtherPriceFeed.new()
   await registry.register(toRegistryKey('EtherPriceFeed'), etherPriceFeed.address)
-  await etherPriceFeed.set(web3.toWei('300', 'ether'))
+  await etherPriceFeed.set(web3.toWei('300.52', 'ether'))
 
   const caseInstance = await Case.new()
   await registry.register(toRegistryKey('Case'), caseInstance.address)

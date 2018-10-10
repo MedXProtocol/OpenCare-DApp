@@ -3,9 +3,9 @@ const migrationLog = require('./migrationLog')
 const tdr = require('truffle-deploy-registry')
 
 /**
-  * @title updateDeployedTargetContract
-  * @dev Updates a pre-existing Target (behavioural) Contract and registers
-  * it with the Registry. Use this to update a pre-existing contract
+  * @title resetDelegate
+  * @dev Replaces a pre-existing delegate (memory) Contract and registers
+  * it with the Registry. Use this to blow away the delegate
   */
 module.exports = function (deployer, artifacts, contractName, networkName) {
   const targetKey = contractName + 'Target'

@@ -235,11 +235,6 @@ contract('CaseLifecycleManager', function (accounts) {
 
             assert.equal((await env.weth9.balanceOf(doctor)).toString(), doctorBalance.plus(caseFeeWei).toString())
             assert.equal((await env.weth9.balanceOf(doctor2)).toString(), doctorBalance2.plus(caseFeeWei).div(2).floor().toString())
-
-            // console.log(result.logs)
-            // assert.equal(result.logs[result.logs.length-1].event, 'CaseDiagnosisConfirmed')
-            // console.log(result.receipt.logs)
-            // assert.equal(result.receipt.logs[result.receipt.logs.length-1].event, 'CaseDiagnosisConfirmed')
           })
 
           it('on rejecting original diagnosis should award the challenge doc', async () => {
