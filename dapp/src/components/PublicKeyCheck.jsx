@@ -4,6 +4,7 @@ import { all } from 'redux-saga/effects'
 import { Button } from 'react-bootstrap'
 import ReactTooltip from 'react-tooltip'
 import { currentAccount } from '~/services/sign-in'
+import get from 'lodash.get'
 import {
   cacheCallValue,
   withSend,
@@ -21,18 +22,21 @@ function mapStateToProps (state) {
   const account = currentAccount()
   if (account === null)
     return {}
+
+  const address = get(state, 'sagaGenesis.accounts[0]')
   const AccountManager = contractByName(state, 'AccountManager')
   const DoctorManager = contractByName(state, 'DoctorManager')
   const transactions = state.sagaGenesis.transactions
-  const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', account.address())
-  const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', account.address())
-  const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', account.address())
+  const isDoctor = cacheCallValue(state, DoctorManager, 'isDoctor', address)
+  const isDermatologist = cacheCallValue(state, DoctorManager, 'isDermatologist', address)
+  const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
   const publicKeyIsDefined = publicKey !== undefined
   const publicKeyMatches = publicKey === '0x' + account.hexPublicKey()
   const isVisible = publicKeyIsDefined && !publicKeyMatches && isDoctor && isDermatologist
 
   return {
     account,
+    address,
     AccountManager,
     DoctorManager,
     isVisible,
@@ -40,12 +44,12 @@ function mapStateToProps (state) {
   }
 }
 
-function* saga({ account, AccountManager, DoctorManager }) {
-  if (!account || !AccountManager || !DoctorManager) { return }
+function* saga({ address, AccountManager, DoctorManager }) {
+  if (!address || !AccountManager || !DoctorManager) { return }
   yield all([
-    cacheCall(AccountManager, 'publicKeys', account.address()),
-    cacheCall(DoctorManager, 'isDoctor', account.address()),
-    cacheCall(DoctorManager, 'isDermatologist', account.address())
+    cacheCall(AccountManager, 'publicKeys', address),
+    cacheCall(DoctorManager, 'isDoctor', address),
+    cacheCall(DoctorManager, 'isDermatologist', address)
   ])
 }
 

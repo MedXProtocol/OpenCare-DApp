@@ -60,9 +60,9 @@ function mapStateToProps (state) {
   const WrappedEther = contractByName(state, 'WrappedEther')
   const daiBalance = cacheCallValue(state, Dai, 'balanceOf', address)
 
-  const caseFeeEtherWei = cacheCallValue(state, CasePaymentManager, 'caseFeeEtherWei')
+  const weiPerCase = cacheCallValue(state, CasePaymentManager, 'weiPerCase')
   const caseFeeUsdWei = cacheCallValue(state, CasePaymentManager, 'baseCaseFeeUsdWei')
-  const usdPerWei = cacheCallValue(state, CasePaymentManager, 'usdPerEther')
+  const usdWeiPerEther = cacheCallValue(state, CasePaymentManager, 'usdWeiPerEther')
   const AccountManager = contractByName(state, 'AccountManager')
   const publicKey = cacheCallValue(state, AccountManager, 'publicKeys', address)
   const doctor = get(state, 'nextAvailableDoctor.doctor')
@@ -79,9 +79,9 @@ function mapStateToProps (state) {
     daiBalance,
     daiIsInFlight,
     etherIsInflight,
-    caseFeeEtherWei,
+    weiPerCase,
     caseFeeUsdWei,
-    usdPerWei,
+    usdWeiPerEther,
     transactions: state.sagaGenesis.transactions,
     CaseManager,
     CasePaymentManager,
@@ -108,8 +108,8 @@ function mapDispatchToProps(dispatch) {
 function* saga({ address, Dai, AccountManager, CaseManager, CasePaymentManager }) {
   if (!address || !Dai || !AccountManager || !CaseManager || !CasePaymentManager) { return }
   yield cacheCall(AccountManager, 'publicKeys', address)
-  yield cacheCall(CasePaymentManager, 'caseFeeEtherWei')
-  yield cacheCall(CasePaymentManager, 'usdPerEther')
+  yield cacheCall(CasePaymentManager, 'weiPerCase')
+  yield cacheCall(CasePaymentManager, 'usdWeiPerEther')
   yield cacheCall(CasePaymentManager, 'baseCaseFeeUsdWei')
   yield cacheCall(Dai, 'balanceOf', address)
 }
@@ -513,14 +513,14 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
 
         handleSubmit = async (event) => {
           const { address,
-            caseFeeEtherWei,
+            weiPerCase,
             noDoctorsAvailable
           } = this.props
           event.preventDefault()
 
           await this.runValidation()
 
-          if (!caseFeeEtherWei) {
+          if (!weiPerCase) {
             toastr.warning('The case fee has not been set.')
           } else if (this.props.doctor && this.props.doctor.address === address) {
             toastr.warning('You cannot be your own Doctor.')
@@ -632,7 +632,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
           const tokenContract = paymentMethodOptions[this.state.paymentMethod]
           let value = 0
           if (this.state.paymentMethod === 'ETH') {
-            value = computeTotalFee(this.props.caseFeeEtherWei)
+            value = computeTotalFee(this.props.weiPerCase)
           }
 
           let result = null
@@ -738,9 +738,9 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
           }
 
           if (this.state.paymentMethod === 'ETH') {
-            var caseFeeItem = <EtherFlip wei={computeTotalFee(this.props.caseFeeEtherWei) - computeChallengeFee(this.props.caseFeeEtherWei)} />
-            var depositItem = <EtherFlip wei={computeChallengeFee(this.props.caseFeeEtherWei)} />
-            var totalItem = <EtherFlip wei={computeTotalFee(this.props.caseFeeEtherWei)} />
+            var caseFeeItem = <EtherFlip wei={computeTotalFee(this.props.weiPerCase) - computeChallengeFee(this.props.weiPerCase)} />
+            var depositItem = <EtherFlip wei={computeChallengeFee(this.props.weiPerCase)} />
+            var totalItem = <EtherFlip wei={computeTotalFee(this.props.weiPerCase)} />
           } else {
             const totalFeeUsdWei = computeTotalFee(this.props.caseFeeUsdWei)
             const daiBalance = toBN(this.props.daiBalance)

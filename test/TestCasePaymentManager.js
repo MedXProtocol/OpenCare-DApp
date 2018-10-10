@@ -63,7 +63,7 @@ contract('CasePaymentManager', function (accounts) {
     it('should return the W-ETH cost', async () => {
       assert.equal(
         (await env.casePaymentManager.caseFeeTokenWei(env.weth9.address)).toString(),
-        '33333333333333333'
+        '33275655530413000'
       )
     })
   })
@@ -79,27 +79,27 @@ contract('CasePaymentManager', function (accounts) {
     it('should return the W-ETH cost', async () => {
       assert.equal(
         (await env.casePaymentManager.requiredDepositTokenWei(env.weth9.address)).toString(),
-        '49999999999999999'
+        '49913483295619500'
       )
     })
   })
 
-  describe('usdPerEther()', () => {
+  describe('usdWeiPerEther()', () => {
     it('should pull in the ether price feed', async () => {
-      assert.equal((await env.casePaymentManager.usdPerEther()).toString(), '300')
+      assert.equal((await env.casePaymentManager.usdWeiPerEther()).toString(), web3.toWei('300.52', 'ether'))
     })
   })
 
-  describe('caseFeeEtherWei()', () => {
+  describe('weiPerCase()', () => {
     it('should dynamically calculate the case fee', async () => {
-      assert.equal((await env.casePaymentManager.caseFeeEtherWei()).toString(), '33333333333333333')
+      assert.equal((await env.casePaymentManager.weiPerCase()).toString(), '33275655530413000')
     })
   })
 
   describe('setBaseCaseFeeUsdWei(uint256)', () => {
     it('should update the base case fee', async () => {
       await env.casePaymentManager.setBaseCaseFeeUsdWei(web3.toWei('20', 'ether'))
-      assert.equal((await env.casePaymentManager.caseFeeEtherWei()).toString(), '66666666666666666')
+      assert.equal((await env.casePaymentManager.weiPerCase()).toString(), '66551311060827000')
     })
   })
 })
