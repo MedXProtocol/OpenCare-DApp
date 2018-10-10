@@ -546,5 +546,100 @@
   {
     "contractName": "CaseScheduleManager",
     "address": "0xcd4c1fac469eb0c512b3db2070d49941c90869c6"
+  },
+  {
+    "contractName": "Migrations",
+    "address": "0xea15031216d5cd39e7322bd55c71639d2fbdd70a",
+    "transactionHash": "0x1cab8cbd5866133333cbb6127dc527cf3cf50bbcb43c30bf5bfd929ee75eb905"
+  },
+  {
+    "contractName": "Migrations",
+    "address": "0xa9074d84a14c32935694e6512ca2059247e67d74",
+    "transactionHash": "0x0325e84e641d10caf5d949f162757092e2475570af43a81ddee582bb81dc57d7"
+  },
+  {
+    "contractName": "Registry",
+    "address": "0x7b775c8e03171fa2c7d2286793aa1d17a5299537",
+    "transactionHash": "0x7acfeaa83690cd7c39737d5d39479fddf4a7b9777a21c415dc5bb2786cf3d01c"
+  },
+  {
+    "contractName": "MedXToken",
+    "address": "0xd1fd763e6be14baeb0ed3f83db1b86473b6dd780",
+    "transactionHash": "0xd4a7c9c8a6a5a322c3c7f936e8d991fd0d9dd9211a55684534cff4c71f18ffda"
+  },
+  {
+    "contractName": "AccountManager",
+    "address": "0xf664f53c837aa0f447c52b44d807fb46294d2c19",
+    "transactionHash": "0x723c071f90ae7ae1e251aea21b97e8a123eba062423aa8d925cccc0a92a56a9b"
+  },
+  {
+    "contractName": "CaseManager",
+    "address": "0x8818dbb3c4994e24e392a36926ce9b037630963f",
+    "transactionHash": "0x56bf28f9663c20895aaede55c3d3356f66838baec2affbfab1191dfcec855385"
+  },
+  {
+    "contractName": "DoctorManager",
+    "address": "0x55dc167c535c79ae4a4875209a34798bb89d1f60",
+    "transactionHash": "0xaa04ea8ac22d916ce9aad2444e0fe7ed8cf7dd4d0004f9fc23f4663b8728d675"
+  },
+  {
+    "contractName": "Case",
+    "address": "0x9e96a4c885933929dfcda18fa28389080de325ec",
+    "transactionHash": "0x85ce90df3d4051fcaf607ed4df2b36d14d159b42ab3595194fd5865fac6b0a2d"
+  },
+  {
+    "contractName": "BetaFaucet",
+    "address": "0xf85ec75b2b6c1a96ab10a458fcd2fccd91d5f7de",
+    "transactionHash": "0xfcb3ed7e0f0a9f89a6300e23eab777a694cd60768431279f2abcbfdaa6073796"
+  },
+  {
+    "contractName": "CaseStatusManager",
+    "address": "0x431d65340c9369099781687d78c02fb8dda909c2",
+    "transactionHash": "0x92941a841429db3075d9247f1c86c4850e8ec9def8a8b77c8640baab0cc47e4e"
+  },
+  {
+    "contractName": "CaseScheduleManager",
+    "address": "0x5ac49e68f6505c72d586ab571beeacf53e444576",
+    "transactionHash": "0xc43de31cf32c89467131cf63a65d138dba6c86a41fadadb750a8c4dc0010360e"
+  },
+  {
+    "contractName": "CaseFirstPhaseManager",
+    "address": "0x322d4037b581c1176683fa18040d5d9e666138a7",
+    "transactionHash": "0x0a11c2680a64e94b703aa01c0a824e05bb25c14839efbc422b840eaa2b8523d7"
+  },
+  {
+    "contractName": "CaseSecondPhaseManager",
+    "address": "0x321182c99cd499d2914758064a5357ba16f856a0",
+    "transactionHash": "0x3212e3a7a49769abfbab2724c7f277b667635115c961867645973976f99a99db"
+  },
+  {
+    "contractName": "CaseLifecycleManager",
+    "address": "0xa36d120905e75a1402707abcbd3f64a814b492e3",
+    "transactionHash": "0x231ffd758b313cfef5cd3962a9ac35d9b7d68b4d3def2356b26cc2f60ece462d"
+  },
+  {
+    "contractName": "FromBlockNumber",
+    "address": "0xb9e7f63f37a731d629dd3d39cea2bcc44ac6c06d",
+    "transactionHash": "0xab2d1c96c0803b222197aa5fc632035a90bcec44d650defb5dc0d59f34eb58f2"
+  },
+  {
+    "contractName": "FromBlockNumber",
+    "address": "0xc29d75150189201d270cf363e97e01b43dcc4a7f",
+    "transactionHash": "0x80b3cb0a4eb448e74fd6ea60994f5168b68b7643baea0e303e0069c49412bf6c"
+  },
+  {
+    "contractName": "CaseDiagnosingDoctor",
+    "address": "0xefde90699738f710ff4054da1647db176542fee5",
+    "transactionHash": "0x2140e76ef0947f2cdfba00ff310029404dae60f61386bd0eb09df7e62ab9d1fb"
+  },
+  {
+    "contractName": "CasePaymentManager",
+    "address": "0x02dab6a290e759be5d8efe05c3a63387a9ef3f5a",
+    "transactionHash": "0xd58c096b936a942372dd6e28b84d312fc2f05751df1c0341f1bb7e9ac0cdf75d"
+  },
+  {
+    "contractName": "AdminSettings",
+    "address": "0x728bc314a4192366e5dca88421be30e1fefea2f0",
+    "transactionHash": "0xccaeb739ff6580f7e9c3825a3c9dd08be8680d0e11706262cb2c1b917c6e012f"
   }
 ]
