@@ -7,9 +7,9 @@ import registryConfig from '#/Registry.json'
 
 function* addTruffleArtifactAddresses(config, name) {
   var networkIds = Object.keys(config.networks)
+
   yield all(networkIds.map(function* (networkId) {
     var networkConfig = config.networks[networkId]
-    // console.log('called by add-top-level-contracts-saga.js')
     yield addContract({
       address: networkConfig.address,
       name,

@@ -24,9 +24,9 @@ export default function* () {
     yield setContext({ web3 })
     yield put({ type: 'SET_READ_WEB3', readWeb3: customProviderWeb3(networkId) })
     yield addTopLevelContracts()
-    yield caughtErrorsSaga()
     yield addRegistryContracts({ web3 })
     yield fork(all, [
+      caughtErrorsSaga(),
       signInSaga(),
       signOutSaga(),
       signUpSaga(),

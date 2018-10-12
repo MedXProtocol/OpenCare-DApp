@@ -143,16 +143,38 @@ module.exports = {
           },
           // Process JS with Babel.
           {
-            test: /\.(js|jsx|mjs)$/,
-            include: paths.appSrc,
+            test: /\.(js|jsx)$/,
+            include: [paths.appSrc, /node_modules\/saga-genesis/, /saga-genesis/],
             loader: require.resolve('babel-loader'),
             options: {
-
               // This is a feature of `babel-loader` for webpack (not Babel itself).
               // It enables caching results in ./node_modules/.cache/babel-loader/
               // directory for faster rebuilds.
               cacheDirectory: true,
-              plugins: ['react-hot-loader/babel']
+              plugins: [
+                [
+                  require('react-hot-loader/babel')
+                ],
+                [
+                  require("babel-plugin-root-import").default,
+                  {
+                    "rootPathSuffix": "src",
+                    "rootPathPrefix": "~"
+                  }
+                ],
+                [
+                  require("babel-plugin-root-import").default,
+                  {
+                    "rootPathSuffix": "../build/contracts",
+                    "rootPathPrefix": "#"
+                  },
+                  "contract-root-import"
+                ]
+              ],
+              presets: [
+                require("babel-preset-env"),
+                require("babel-preset-react-app")
+              ]
             },
           },
           // "postcss" loader applies autoprefixer to our CSS.
