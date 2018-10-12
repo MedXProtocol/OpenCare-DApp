@@ -8,7 +8,7 @@ import {
   cacheCallValue,
   cacheCallValueInt,
   contractByName
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { usageRestrictionsToString } from '~/utils/usageRestrictions'
 import get from 'lodash.get'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';

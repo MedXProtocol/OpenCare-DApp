@@ -14,7 +14,7 @@ import {
   LogListener,
   addContract,
   contractByName
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import {
   caseFinders,
   caseManagerFinders

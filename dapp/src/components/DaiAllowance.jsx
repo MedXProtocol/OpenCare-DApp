@@ -12,7 +12,7 @@ import {
   cacheCall,
   cacheCallValueBigNumber,
   contractByName
-} from '~/saga-genesis'
+} from 'saga-genesis'
 
 function mapStateToProps(state, { address }) {
   const Dai = contractByName(state, 'Dai')

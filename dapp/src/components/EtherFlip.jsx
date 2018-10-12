@@ -8,7 +8,7 @@ import {
   cacheCallValue,
   withSaga,
   contractByName
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { etherWeiToUsdWei } from '~/utils/etherWeiToUsdWei'
 import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
 import { Ether } from './Ether'

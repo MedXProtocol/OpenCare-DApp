@@ -8,7 +8,7 @@ import { HippoToggleButtonGroup } from '~/components/forms/HippoToggleButtonGrou
 import sortBy from 'lodash.sortby'
 import { isBlank } from '~/utils/isBlank'
 import { withDoctors } from '~/components/withDoctors'
-import { withSend } from '~/saga-genesis'
+import { withSend } from 'saga-genesis'
 import classnames from 'classnames'
 import Select from 'react-select'
 import * as Animated from 'react-select/lib/animated';

@@ -3,7 +3,7 @@ import { all } from 'redux-saga/effects'
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
 import PropTypes from 'prop-types'
-import { withSaga, cacheCallValue, cacheCall, contractByName } from '~/saga-genesis'
+import { withSaga, cacheCallValue, cacheCall, contractByName } from 'saga-genesis'
 import get from 'lodash.get'
 import range from 'lodash.range'
 

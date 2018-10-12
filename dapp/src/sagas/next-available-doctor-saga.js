@@ -1,7 +1,7 @@
 import {
   contractByName,
   web3Call
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { isBlank } from '~/utils/isBlank'
 import {
   select,

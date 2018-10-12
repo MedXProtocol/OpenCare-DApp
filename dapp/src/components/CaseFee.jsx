@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {
   withSaga,
   contractByName
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { Dai } from '~/components/Dai'
 import { Ether } from '~/components/Ether'
 import { EtherFlip } from '~/components/EtherFlip'

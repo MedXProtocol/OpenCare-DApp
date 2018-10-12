@@ -7,7 +7,7 @@ import {
   contractByName,
   cacheCall,
   withSaga
-} from '~/saga-genesis'
+} from 'saga-genesis'
 
 function mapStateToProps(state) {
   const address = get(state, 'sagaGenesis.accounts[0]')

@@ -1,6 +1,6 @@
 import {
   cacheCall
-} from '~/saga-genesis'
+} from 'saga-genesis'
 
 export function* caseSaga({ caseAddress, CasePaymentManager }) {
   if (!caseAddress || !CasePaymentManager) { return }

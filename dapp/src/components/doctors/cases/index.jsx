@@ -13,7 +13,7 @@ import {
   contractByName,
   withSaga,
   cacheCall
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { isBlank } from '~/utils/isBlank'
 import range from 'lodash.range'
 import get from 'lodash.get'

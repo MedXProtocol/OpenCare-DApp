@@ -2,7 +2,7 @@ import caseContractConfig from '#/Case.json'
 import {
   ABIHelper,
   logReducerFactory
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { fixAddress } from '~/utils/fixAddress'
 
 const caseAbi = new ABIHelper(caseContractConfig.abi)

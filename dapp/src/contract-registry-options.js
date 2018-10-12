@@ -17,7 +17,7 @@ import fromBlockNumberConfig from '#/FromBlockNumber.json'
 import daiConfig from '#/Dai.json'
 import registryConfig from '#/Registry.json'
 
-import { abiFactory } from '~/saga-genesis/utils'
+import { abiFactory } from 'saga-genesis'
 
 export default {
   contractFactories: {

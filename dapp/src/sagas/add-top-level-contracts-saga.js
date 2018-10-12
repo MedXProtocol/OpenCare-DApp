@@ -1,6 +1,6 @@
 import {
   addContract
- } from '~/saga-genesis/sagas'
+ } from 'saga-genesis'
 import { all } from 'redux-saga/effects'
 import medXTokenContractConfig from '#/MedXToken.json'
 import registryConfig from '#/Registry.json'

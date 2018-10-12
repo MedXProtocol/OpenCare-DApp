@@ -10,7 +10,7 @@ import {
   withSend,
   contractByName,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import {
   all
 } from 'redux-saga/effects'

@@ -14,7 +14,7 @@ import {
   cacheCallValue,
   contractByName,
   withSaga
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { ScrollToTop } from '~/components/ScrollToTop'
 import { BodyClass } from '~/components/BodyClass'
 import { Loading } from '~/components/Loading'

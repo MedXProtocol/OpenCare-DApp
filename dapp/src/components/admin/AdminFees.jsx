@@ -8,7 +8,7 @@ import {
   withSend,
   contractByName,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { displayWeiToUsd } from '~/utils/displayWeiToUsd'
 import { etherToWei } from '~/utils/etherToWei'
 import { toastr } from '~/toastr'

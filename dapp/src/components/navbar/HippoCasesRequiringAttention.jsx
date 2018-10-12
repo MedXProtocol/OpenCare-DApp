@@ -10,7 +10,7 @@ import {
   cacheCallValue,
   cacheCallValueInt,
   contractByName
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
 import { doesNotRequireAttention } from '~/utils/doesNotRequireAttention'
 

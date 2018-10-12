@@ -12,7 +12,7 @@ import {
   cacheCall,
   contractByName,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { mixpanel } from '~/mixpanel'
 import { CSSTransition } from 'react-transition-group'
 import { toastr } from '~/toastr'

@@ -36,7 +36,7 @@ import {
   contractByName,
   LogListener,
   withSaga
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { getRequestedPathname } from '~/services/getRequestedPathname'
 import { setRequestedPathname } from '~/services/setRequestedPathname'
 import { toastr } from '~/toastr'

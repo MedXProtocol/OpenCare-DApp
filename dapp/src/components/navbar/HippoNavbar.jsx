@@ -33,7 +33,7 @@ import {
   withSaga,
   cacheCallValue,
   contractByName
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { HippoCasesRequiringAttention } from './HippoCasesRequiringAttention'
 import { CurrentTransactionsList } from '~/components/CurrentTransactionsList'
 import * as routes from '~/config/routes'

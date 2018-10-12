@@ -12,7 +12,7 @@ import {
   withSaga,
   withSend,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { caseStale } from '~/services/caseStale'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'

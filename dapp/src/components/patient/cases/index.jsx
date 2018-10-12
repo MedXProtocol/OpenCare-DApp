@@ -11,7 +11,7 @@ import {
   withSaga,
   cacheCallValue,
   cacheCallValueInt
-} from "~/saga-genesis";
+} from "saga-genesis";
 import { CaseRow } from "~/components/CaseRow";
 import { LoadingLines } from "~/components/LoadingLines";
 import { ScrollToTop } from "~/components/ScrollToTop";

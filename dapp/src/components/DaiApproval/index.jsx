@@ -14,7 +14,7 @@ import {
   cacheCallValueBigNumber,
   contractByName,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import get from 'lodash.get'
 
 function mapStateToProps(state, { address }) {

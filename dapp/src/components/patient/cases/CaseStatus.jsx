@@ -7,7 +7,7 @@ import {
   contractByName,
   cacheCall,
   addContract
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { connect } from 'react-redux'
 import { isBlank } from '~/utils/isBlank'
 import { computeTotalFee } from '~/utils/computeTotalFee'

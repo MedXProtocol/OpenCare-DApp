@@ -4,7 +4,7 @@ import secretKeyInvalid from '~/services/secret-key-invalid'
 import masterPasswordInvalid from '~/services/master-password-invalid'
 import { mixpanel } from '~/mixpanel'
 import { Account } from '~/accounts/Account'
-import { contractByName, web3Call } from '~/saga-genesis'
+import { contractByName, web3Call } from 'saga-genesis'
 
 // Here the sign in should perform the check
 export function* signInSaga({ networkId, secretKey, masterPassword, account, address, overrideAccount }) {

@@ -16,7 +16,7 @@ import {
   contractByName,
   withSend,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import oasisDirectButtonImg from '~/assets/img/oasis-direct-button.png'
 import oasisDirectButtonImg2x from '~/assets/img/oasis-direct-button@2x.png'
 

@@ -35,7 +35,7 @@ import {
   withSaga,
   withSend,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { reencryptCaseKeyAsync } from '~/services/reencryptCaseKey'
 import { getExifOrientation } from '~/services/getExifOrientation'
 import { mixpanel } from '~/mixpanel'

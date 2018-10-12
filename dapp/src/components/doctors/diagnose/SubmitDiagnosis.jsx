@@ -17,7 +17,7 @@ import {
   contractByName,
   TransactionStateHandler,
   withSend
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { customStyles } from '~/config/react-select-custom-styles'
 import { groupedDiagnosisOptions } from './diagnosisOptions'
 import { sideEffectValues, counselingValues } from '~/sideEffectsAndCounselingValues'

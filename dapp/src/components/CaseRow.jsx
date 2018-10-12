@@ -13,7 +13,7 @@ import {
   contractByName,
   addContract,
   cacheCall
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faChevronCircleRight from '@fortawesome/fontawesome-free-solid/faChevronCircleRight'
 import { AbandonedCaseActionsContainer } from '~/components/doctors/cases/AbandonedCaseActions'

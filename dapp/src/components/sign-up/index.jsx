@@ -9,7 +9,7 @@ import { mixpanel } from '~/mixpanel'
 import { OverrideDisallowedModal } from '~/components/OverrideDisallowedModal'
 import { MasterPasswordForm } from './masterPasswordForm'
 import { SecretKeyContainer } from './secret-key'
-import { contractByName, cacheCall, cacheCallValue, withSaga } from '~/saga-genesis'
+import { contractByName, cacheCall, cacheCallValue, withSaga } from 'saga-genesis'
 import { PageTitle } from '~/components/PageTitle'
 import get from 'lodash.get'
 

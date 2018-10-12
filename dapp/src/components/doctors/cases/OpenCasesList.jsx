@@ -16,7 +16,7 @@ import {
   cacheCall,
   cacheCallValue,
   contractByName
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { mapOpenCasePage, openCasePageSaga } from '~/services/openCasesService'
 
 const PAGE_SIZE = 5

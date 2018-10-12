@@ -17,7 +17,7 @@ import {
   LogListener,
   addContract,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { connect } from 'react-redux'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { computeTotalFee } from '~/utils/computeTotalFee'

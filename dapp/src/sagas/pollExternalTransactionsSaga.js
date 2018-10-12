@@ -8,7 +8,7 @@ import {
   delay
 } from 'redux-saga'
 import { bugsnagClient } from '~/bugsnagClient'
-import { web3NetworkId } from '~/saga-genesis/web3/web3-sagas'
+import { web3NetworkId } from 'saga-genesis'
 import { customProviderWeb3 } from '~/utils/customProviderWeb3'
 
 export function* checkExternalTransactionReceipts(web3) {

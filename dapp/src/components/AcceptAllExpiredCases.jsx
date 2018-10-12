@@ -11,7 +11,7 @@ import {
   withSaga,
   withSend,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { caseStale } from '~/services/caseStale'
 import { mapOpenCaseAddresses, openCaseAddressesSaga } from '~/services/openCasesService'
 import { CSSTransition } from 'react-transition-group'

@@ -6,7 +6,7 @@ import {
   cacheCallValue,
   withSaga,
   contractByName
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { toastr } from '~/toastr'
 import get from 'lodash.get'
 

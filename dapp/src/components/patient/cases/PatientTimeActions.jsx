@@ -18,7 +18,7 @@ import {
   LogListener,
   withSend,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { NextAvailableDoctor } from '~/components/NextAvailableDoctor'
 import { Loading } from '~/components/Loading'
 import { caseStale } from '~/services/caseStale'

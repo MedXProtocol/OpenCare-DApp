@@ -7,7 +7,7 @@ import {
   cacheCall,
   addContract,
   LogListener
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { currentAccount } from '~/services/sign-in'
 import { cancelablePromise } from '~/utils/cancelablePromise'
 import { isEmptyObject } from '~/utils/isEmptyObject'

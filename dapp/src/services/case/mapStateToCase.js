@@ -1,7 +1,7 @@
 import {
   contractByName,
   cacheCallValue
-} from '~/saga-genesis'
+} from 'saga-genesis'
 
 export function mapStateToCase(state, { caseAddress }) {
   const CasePaymentManager = contractByName(state, 'CasePaymentManager')

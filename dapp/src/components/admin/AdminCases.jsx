@@ -8,7 +8,7 @@ import {
   withSend,
   contractByName,
   TransactionStateHandler
-} from '~/saga-genesis'
+} from 'saga-genesis'
 import { toastr } from '~/toastr'
 import { mixpanel } from '~/mixpanel'
 

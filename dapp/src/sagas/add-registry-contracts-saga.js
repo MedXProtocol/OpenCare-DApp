@@ -6,7 +6,7 @@ import {
   contractByName,
   addContract,
   web3Call
-} from '~/saga-genesis'
+} from 'saga-genesis'
 const debug = require('debug')('addRegistryContractsSaga.js')
 
 function* lookupAndAddContract(web3, name) {

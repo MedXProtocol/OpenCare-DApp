@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import getWeb3 from '~/get-web3'
 import get from 'lodash.get'
 import { connect } from 'react-redux'
-import { contractByName, withSend } from '~/saga-genesis'
+import { contractByName, withSend } from 'saga-genesis'
 import {
   FormGroup,
   ControlLabel,
