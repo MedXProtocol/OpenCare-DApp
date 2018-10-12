@@ -87,7 +87,7 @@
     "react-transition-group": "^2.3.1",
     "redux": "^4.0.0",
     "redux-saga": "^0.16.0",
-    "saga-genesis": "file:../saga-genesis/dist/bundle.js",
+    "saga-genesis": "file:../saga-genesis/dist/sagaGenesis.js",
     "sass-loader": "^7.0.1",
     "style-loader": "0.19.0",
     "sw-precache-webpack-plugin": "0.11.4",
