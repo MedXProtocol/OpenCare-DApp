@@ -47,7 +47,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
               <div className="form-wrapper form-wrapper--inverse">
                 <div className="form-wrapper--body">
                   <h3 className="text-center">
-                    Welcome to OpenCare!
+                    Welcome to OpenCare (also known as Hippocrates)!
                     <br /><small>The first dApp in the MedX Health System connecting patients and physicians worldwide.</small>
                     <br /><small className="text-gray">Supported medical specialties: Dermatology for skin ailments.</small>
                     <br /><small className="text-gray"><strong>Coming soon:</strong> Ophthalmology, general medicine and radiology</small>
