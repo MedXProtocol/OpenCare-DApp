@@ -31,6 +31,7 @@ function* addSubscription({ address, fromBlock }) {
 
       if (pastLogs) {
         yield put({ type: 'PAST_LOGS', address, logs: pastLogs })
+        return
       } else if (i > MAX_RETRIES) {
         // attempts failed after 50 x 2secs
         throw new Error('Unable to get pastLogs from network');
