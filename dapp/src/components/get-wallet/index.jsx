@@ -3,10 +3,18 @@ import { BodyClass } from '~/components/BodyClass'
 import DownloadMetamaskButtonImg from '~/assets/img/button--download-metamask.png'
 import AppStoreButtonImg from '~/assets/img/button--app-store.png'
 import PlayStoreButtonImg from '~/assets/img/button--play-store.png'
+import GetCoinbaseWalletImg from '~/assets/img/getCoinbaseWallet.svg'
+import { getMobileOperatingSystem } from '~/utils/getMobileOperatingSystem'
+
 import { PageTitle } from '~/components/PageTitle'
 
 export const TryMetamask = class _TryMetamask extends Component {
   render () {
+    const itunesLink = 'https://itunes.apple.com/us/app/coinbase-wallet/id1278383455?mt=8'
+    const androidLink = 'https://play.google.com/store/apps/details?id=org.toshi&hl=en_CA'
+
+    const link = getMobileOperatingSystem() === 'iOS' ? itunesLink : androidLink
+
     return (
       <BodyClass isDark={true}>
         <PageTitle renderTitle={(t) => t('pageTitles.tryMetaMask')} />
@@ -19,20 +27,26 @@ export const TryMetamask = class _TryMetamask extends Component {
 
               <div className="form-wrapper form-wrapper--inverse form-wrapper--account">
                 <div className="form-wrapper--body form-wrapper--body__extra-padding text-center">
-                  <h4>
-                    <a href='https://metamask.io/' title='MetaMask' target="_blank" rel="noopener noreferrer">MetaMask</a> is a wallet extension for Chrome, Firefox and Brave browsers:
-                  </h4>
+                  <h3>
+                    Use a DApp browser
+                  </h3>
+                  <p>
+                    Any mobile DApp browser like Coinbase Wallet is supported.
+                    If you're new to cryptocurrency we recommend Coinbase Wallet
+                    so you can easily purchase Ether:
+                  </p>
                   <br />
-                  <a href="https://metamask.io" title="Download Metamask" target="_blank" rel="noopener noreferrer"><img src={DownloadMetamaskButtonImg} alt="Metamask Download Button" width="200" /></a>
-                  <br />
-                  <br />
-                  <hr />
-                  <br />
-                  <h4>
-                    On mobile? Try the Coinbase Wallet browser:
-                  </h4>
                   <a
-                    href="https://itunes.apple.com/us/app/coinbase-wallet/id1278383455?mt=8"
+                    href={itunesLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Get Coinbase Wallet">
+                    <img src={GetCoinbaseWalletImg} alt="Get Coinbase Wallet Button" width="200" />
+                  </a>
+                  <br />
+                  <br />
+                  <a
+                    href={itunesLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Download Coinbase Wallet from Apple App Store">
@@ -40,12 +54,22 @@ export const TryMetamask = class _TryMetamask extends Component {
                   </a>
                   &nbsp; &nbsp; &nbsp;
                   <a
-                    href="https://play.google.com/store/apps/details?id=org.toshi&hl=en_CA"
+                    href={androidLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Download Coinbase Wallet from Google Play Store">
                     <img src={PlayStoreButtonImg} alt="Google Play Store Button" width="100" />
                   </a>
+                  <br />
+                  <br />
+                  <hr />
+                  <br />
+
+                  <p>
+                    On desktop, we recommend <a href='https://metamask.io/' title='MetaMask' target="_blank" rel="noopener noreferrer">MetaMask</a> &mdash; a wallet extension for Chrome, Firefox and Brave browsers:
+                  </p>
+                  <br />
+                  <a href="https://metamask.io" title="Download Metamask" target="_blank" rel="noopener noreferrer"><img src={DownloadMetamaskButtonImg} alt="Metamask Download Button" width="200" /></a>
                 </div>
               </div>
             </div>
