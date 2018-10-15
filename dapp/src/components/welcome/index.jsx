@@ -48,13 +48,13 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                 <div className="form-wrapper--body">
                   <h3 className="text-center">
                     Welcome to OpenCare (also known as Hippocrates)!
-                    <br /><small>The first dApp in the MedX Health System connecting patients and physicians worldwide.</small>
+                    <br /><small>The first dApp in the MedX (MedCredits) Health System connecting patients and physicians worldwide.</small>
                     <br /><small className="text-gray">Supported medical specialties: Dermatology for skin ailments.</small>
                     <br /><small className="text-gray"><strong>Coming soon:</strong> Ophthalmology, general medicine and radiology</small>
                   </h3>
                   <hr />
                   <p>
-                    Diagnose or submit a case in minutes.
+                    Submit a case in minutes.
                   </p>
                   <ol>
                     <li>
@@ -79,10 +79,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                   </ol>
                   <hr />
                   <p className="text-red small">
-                    NOTE: This is v1.0 of OpenCare. It is currently open for physician-to-physician consultations on the Ethereum mainnet.
-                  </p>
-                  <p className="text-blue small">
-                    BETA: OpenCare is available to both patients and physicians for <strong><em>testing purposes</em></strong> only on the Ropsten network.
+                    NOTE: This is v1.0 of OpenCare (Hippocrates) on Ethereum mainnet for real consultations. If interested in checking the functionality of the dApp for testing purposes only, please switch your MetaMask account to "Ropsten".
                   </p>
                 </div>
 
