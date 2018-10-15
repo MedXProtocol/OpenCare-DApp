@@ -169,12 +169,20 @@
 
 .case-list--item button {
   height: 28px;
-  margin: -20px auto;
+  margin: -37px auto;
   padding-top: 5px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 .case-list--item button.btn-danger {
-  margin-top: 0;
+  margin-top: -13px;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 }
 
 .case-list--item .btn__remove-transaction {

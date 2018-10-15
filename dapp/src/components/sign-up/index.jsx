@@ -18,8 +18,6 @@ function mapStateToProps(state) {
   if (!networkId) { return {} }
 
   const address = get(state, 'sagaGenesis.accounts[0]')
-  console.log('address in saga genesis: ' + address)
-  console.log(address)
   const account = Account.get(networkId, address)
   const signedIn = state.account.signedIn
   const missingCredentialsError = state.account.missingCredentialsError

@@ -8,7 +8,7 @@ import { newAsyncWrap } from '~/components/newAsyncWrap'
 import { EmergencyKit } from '~/components/account/emergency-kit'
 import { ChangePasswordContainer } from '~/components/account/change-password'
 import { Welcome } from '~/components/welcome'
-import { TryMetamask } from '~/components/try-metamask'
+import { TryMetamask } from '~/components/get-wallet'
 import { LoginToMetaMask } from '~/components/login-to-metamask'
 import { FourOhFour } from '~/components/four-oh-four'
 import { DebugLink } from '~/components/DebugLink'
@@ -350,7 +350,7 @@ const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
 
             <Route path={routes.WELCOME} render={ () => WelcomeWrapped } />
             <Route path={routes.LOGIN_METAMASK} component={LoginToMetaMask} />
-            <Route path={routes.TRY_METAMASK} component={TryMetamask} />
+            <Route path={routes.GET_WALLET} component={TryMetamask} />
 
             <SignedInRoute path={routes.ACCOUNT_EMERGENCY_KIT} component={EmergencyKit} />
             <SignedInRoute path={routes.ACCOUNT_CHANGE_PASSWORD} component={ChangePasswordContainer} />

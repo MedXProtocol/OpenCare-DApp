@@ -3,18 +3,7 @@ import { Modal } from 'react-bootstrap'
 import getWeb3 from '~/get-web3'
 import AppStoreButtonImg from '~/assets/img/button--app-store.png'
 import PlayStoreButtonImg from '~/assets/img/button--play-store.png'
-
-function getMobileOperatingSystem() {
-  const userAgent = navigator.userAgent || navigator.vendor || window.opera
-
-  if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-    return "iOS"
-  } else if (/android/i.test(userAgent)) {
-    return "Android"
-  }
-
-  return "unknown"
-}
+import { getMobileOperatingSystem } from '~/utils/getMobileOperatingSystem'
 
 function unsupportedBrowser() {
   const _web3 = getWeb3()
