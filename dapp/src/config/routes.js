@@ -1,7 +1,7 @@
 // Signed-Out Routes
 export const WELCOME = '/welcome'
 export const LOGIN_METAMASK = '/login-metamask'
-export const TRY_METAMASK = '/try-metamask'
+export const GET_WALLET = '/get-wallet'
 export const SIGN_IN = '/sign-in'
 export const SIGN_UP = '/sign-up'
 export const HOME = '/'
@@ -26,5 +26,5 @@ export const PATIENTS_CASES_PAGE_NUMBER = '/patients/cases/:currentPage'
 export const PATIENTS_CASE = '/patients/cases/:currentPage/:caseAddress'
 
 export const signedOutRoutes = [
-  WELCOME, LOGIN_METAMASK, TRY_METAMASK, SIGN_UP, SIGN_IN, HOME
+  WELCOME, LOGIN_METAMASK, GET_WALLET, SIGN_UP, SIGN_IN, HOME
 ]

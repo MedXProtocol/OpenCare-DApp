@@ -24,7 +24,7 @@ export const Web3Route = connect(mapStateToProps)(class _Web3Route extends Compo
 
   redirect () {
     if (!this.props.web3Initialized) {
-      var redirect = routes.TRY_METAMASK
+      var redirect = routes.GET_WALLET
     } else if (!this.props.address) {
       redirect = routes.LOGIN_METAMASK
     }
