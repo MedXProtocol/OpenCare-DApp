@@ -935,7 +935,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
                                 &nbsp;<InfoQuestionMark
                                   name="deposit-info"
                                   place="bottom"
-                                  tooltipText="If you do not require a second opinion <br />this deposit will be refunded."
+                                  tooltipText="This deposit will be automatically refunded unless <br />you request a second opinion."
                                 />
                               </th>
                               <td>
