@@ -392,7 +392,7 @@ const App = ReactTimeout(connect(mapStateToProps, mapDispatchToProps)(
             <div className="row">
               <div className="col-sm-12 text-center">
                 <p className="text-footer">
-                  &copy; 2018 MedX Protocol - All Rights Reserved
+                  &copy; Copyright 2018 Medical Exchange Protocols. All Rights Reserved.
                 </p>
                 {debugLink}
               </div>

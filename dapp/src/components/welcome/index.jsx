@@ -6,6 +6,9 @@ import get from 'lodash.get'
 import { Account } from '~/accounts/Account'
 import * as routes from '~/config/routes'
 import { PageTitle } from '~/components/PageTitle'
+import ScreenshotStep1 from '~/assets/img/screenshot-step1.png'
+import ScreenshotStep2 from '~/assets/img/screenshot-step2.png'
+import ScreenshotStep3 from '~/assets/img/screenshot-step3.png'
 
 function mapStateToProps (state) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
@@ -41,62 +44,144 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
     return (
       <BodyClass isDark={true}>
         <PageTitle renderTitle={(t) => t('pageTitles.welcome')} />
-        <div className='container'>
-          <div className='row'>
-            <div className='col-xs-12 col-md-10 col-md-offset-1'>
-              <div className="form-wrapper form-wrapper--inverse">
-                <div className="form-wrapper--body">
-                  <h3 className="text-center">
-                    Welcome to OpenCare (also known as Hippocrates)!
-                    <br /><small>The first dApp in the MedX (MedCredits) Health System connecting patients and physicians worldwide.</small>
-                    <br /><small className="text-gray">Supported medical specialties: Dermatology for skin ailments.</small>
-                    <br /><small className="text-gray"><strong>Coming soon:</strong> Ophthalmology, general medicine and radiology</small>
-                  </h3>
-                  <hr />
-                  <p>
-                    Submit a case in minutes.
-                  </p>
-                  <ol>
-                    <li>
-                      Download the MetaMask Extension (
-                        <a target='_blank' rel="noopener noreferrer" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">Chrome</a>
-                        &nbsp;/&nbsp;
-                        <a target='_blank' rel="noopener noreferrer" href="https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/">Firefox</a>)
-                        or the Coinbase Wallet mobile browser (<a target='_blank' rel="noopener noreferrer" href="https://itunes.apple.com/us/app/coinbase-wallet/id1278383455?mt=8">iOS</a>
-                        &nbsp;/&nbsp;
-                        <a target='_blank' rel="noopener noreferrer" href="https://play.google.com/store/apps/details?id=org.toshi&hl=en_CA">Android</a>)
-                    </li>
-                    <li>
-                      Sign up and submit your skin ailment
-                    </li>
-                    {
-                      this.ropsten() ? (
-                        <li>
-                          Earn <strong>0.5 MEDX</strong> for every case submitted or diagnosed during our trial period (<a target='_blank' rel="noopener noreferrer"  href="https://medium.com/medxprotocol/start-earning-medx-on-hippocrates-107662a751d9">see our blog post for additional information</a>)
-                        </li>
-                      ) : null
-                    }
-                  </ol>
-                  <hr />
-                  <p className="text-red small">
-                    NOTE: This is v1.0 of OpenCare (Hippocrates) on Ethereum mainnet for real consultations. If interested in checking the functionality of the dApp for testing purposes only, please switch your MetaMask account to "Ropsten".
-                  </p>
-                </div>
 
-                <div className="form-wrapper--footer">
-                  <div className='text-right'>
-                    <Link
-                      className="btn btn-lg btn-success"
-                      to={launchLink}>
-                        Launch OpenCare
-                    </Link>
-                  </div>
-                </div>
+        <section className="section--bg-image">
+          <div className="container">
+            <div className="row">
+              <div className="col-xs-12 text-center pad-mobile">
+                <h1>
+                  A board certified dermatology consult for $10
+                </h1>
+              </div>
+            </div>
 
+            <div className="row">
+              <div className="col-xs-12 col-sm-offset-8 col-sm-3 pad-mobile">
+                <ul className="section--bg-image--list">
+                  <li>
+                    No registration
+                  </li>
+                  <li>
+                    Submit case instantly
+                  </li>
+                  <li>
+                    Diagnosis in hours
+                  </li>
+                  <li>
+                    Notify patient with follow-up &amp; Rx
+                  </li>
+                </ul>
+
+                <Link
+                  className="btn btn-sm btn-info"
+                  to={launchLink}>
+                    Watch Video
+                </Link>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <section className="bg-white section--access">
+          <div className='container'>
+            <div className='row'>
+              <div className='col-xs-12 col-sm-6 col-sm-offset-1 pad-mobile'>
+                <h4>
+                  Access dermatologists worldwide. Anywhere. Anytime.
+                </h4>
+              </div>
+              <div className="col-xs-12 col-sm-offset-1 col-sm-3 pad-mobile">
+                <Link
+                  className="btn btn-lg btn-success"
+                  to={launchLink}
+                >
+                    Submit Case
+                </Link>
               </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        <section className="section--screenshots">
+          <div className='container'>
+            <div className='row'>
+              <div className='col-xs-12 col-sm-offset-1 col-sm-10 pad-mobile text-center'>
+                <h1>
+                  How it Works
+                </h1>
+
+                <p>
+                  (Inquire at <a href="mailto:contact@medxprotocol.com">contact@medxprotocol.com</a> for instant free trial consultations)
+                </p>
+                <br />
+              </div>
+            </div>
+
+            <div className='row'>
+              <div className='col-xs-12 col-md-offset-1 col-md-3 col-custom-md-3 pad-mobile text-center'>
+                <img
+                  src={ScreenshotStep1}
+                  className="img-responsive"
+                  alt="screenshot 1"
+                />
+                <h3>
+                  Snap a photo
+                </h3>
+              </div>
+
+              <div className='col-xs-12 col-md-3 col-custom-md-3 pad-mobile text-center'>
+                <img
+                  src={ScreenshotStep2}
+                  className="img-responsive"
+                  alt="screenshot 2"
+                />
+                <h3>
+                  Enter details, payment &amp; submit
+                </h3>
+              </div>
+
+              <div className='col-xs-12 col-md-3 col-custom-md-3 pad-mobile text-center'>
+                <img
+                  src={ScreenshotStep3}
+                  className="img-responsive"
+                  alt="screenshot 3"
+                />
+                <h3>
+                  Receive diagnosis &amp; recommendation in hours
+                </h3>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+
+        <section className="bg-white section--learn-more">
+          <div className='container'>
+            <div className='row'>
+              <div className='col-xs-12 col-md-10 col-md-offset-1 pad-mobile'>
+                <h3>
+                  Learn More
+                </h3>
+                <p>
+                  For more information, refer to our blog post to learn how we provide the most affordable consultations.
+                </p>
+
+                <br />
+
+                <h3>
+                  About MedX Protocol
+                </h3>
+
+                <p>
+                  MedX (formerly MedCredits) is a protocol for launching medical dApps that connect patients and physicians worldwide for medical care. Applications on the MedX protocol can be used to eliminate intermediaries and international barriers to affordable care. OpenCare (formerly Hippocrates) is the first app on MedX that reduces global disparities in medical care. For more information, please visit us at <a href="https://medxprotocol.com" title="MedX Protocl Site">https://medxprotocol.com</a>.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </section>
       </BodyClass>
     )
   }

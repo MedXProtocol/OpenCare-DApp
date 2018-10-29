@@ -8,6 +8,10 @@
 
 .form-wrapper--body {
   padding: 4rem;
+
+  @media (max-width: 768px) {
+    padding: 4rem 2rem;
+  }
 }
 
 .form-wrapper--body__extra-padding {
