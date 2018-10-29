@@ -9,6 +9,8 @@ import { PageTitle } from '~/components/PageTitle'
 import ScreenshotStep1 from '~/assets/img/screenshot-step1.png'
 import ScreenshotStep2 from '~/assets/img/screenshot-step2.png'
 import ScreenshotStep3 from '~/assets/img/screenshot-step3.png'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import faPlayCircle from '@fortawesome/fontawesome-free-regular/faPlayCircle';
 
 function mapStateToProps (state) {
   const networkId = get(state, 'sagaGenesis.network.networkId')
@@ -56,26 +58,16 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
             </div>
 
             <div className="row">
-              <div className="col-xs-12 col-sm-offset-8 col-sm-3 pad-mobile">
-                <ul className="section--bg-image--list">
-                  <li>
-                    No registration
-                  </li>
-                  <li>
-                    Submit case instantly
-                  </li>
-                  <li>
-                    Diagnosis in hours
-                  </li>
-                  <li>
-                    Notify patient with follow-up &amp; Rx
-                  </li>
-                </ul>
+              <div className="col-xs-12 col-sm-offset-0 col-sm-12 pad-mobile text-center">
+                <p className="section--bg-image--list">
+                  No registration. Submit case instantly. Diagnosis in hours.
+                </p>
 
                 <Link
-                  className="btn btn-sm btn-info"
-                  to={launchLink}>
-                    Watch Video
+                  className="btn btn-link"
+                  to={launchLink}
+                >
+                  <FontAwesomeIcon icon={faPlayCircle} /> Watch Video
                 </Link>
               </div>
             </div>
