@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { BodyClass } from '~/components/BodyClass'
 import DownloadMetamaskButtonImg from '~/assets/img/button--download-metamask.png'
-import AppStoreButtonImg from '~/assets/img/button--app-store.png'
-import PlayStoreButtonImg from '~/assets/img/button--play-store.png'
 import GetCoinbaseWalletImg from '~/assets/img/getCoinbaseWallet.svg'
 import { getMobileOperatingSystem } from '~/utils/getMobileOperatingSystem'
 
@@ -37,30 +35,12 @@ export const TryMetamask = class _TryMetamask extends Component {
                   </p>
                   <br />
                   <a
-                    href={itunesLink}
+                    href={link}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Get Coinbase Wallet">
                     <img src={GetCoinbaseWalletImg} alt="Get Coinbase Wallet Button" width="200" />
                   </a>
-                  <br />
-                  <br />
-                  <a
-                    href={itunesLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="Download Coinbase Wallet from Apple App Store">
-                    <img src={AppStoreButtonImg} alt="Apple App Store Button" width="100" />
-                  </a>
-                  &nbsp; &nbsp; &nbsp;
-                  <a
-                    href={androidLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="Download Coinbase Wallet from Google Play Store">
-                    <img src={PlayStoreButtonImg} alt="Google Play Store Button" width="100" />
-                  </a>
-                  <br />
                   <br />
                   <hr />
                   <br />
