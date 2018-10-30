@@ -59,9 +59,9 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
 
             <div className="row">
               <div className="col-xs-12 col-sm-offset-0 col-sm-12 pad-mobile text-center">
-                <p className="section--bg-image--list">
+                <h2>
                   No registration. Submit case instantly. Diagnosis in hours.
-                </p>
+                </h2>
 
                 <Link
                   className="btn btn-link"
