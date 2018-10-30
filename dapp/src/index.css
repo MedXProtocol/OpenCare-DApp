@@ -1,6 +1,8 @@
 @import "./assets/sass/bootstrap-overrides";
 @import "./assets/sass/bootstrap-custom";
 
+@import 'react-modal-video/scss/modal-video.scss';
+
 @import 'react-redux-toastr/src/styles/index.scss';
 @import './assets/sass/toastr-animations';
 @import './assets/sass/toastr-overrides';
@@ -26,6 +28,7 @@
 @import "./assets/sass/style";
 @import "./assets/sass/table";
 @import "./assets/sass/well";
+
 
 @import url(https://fonts.googleapis.com/css?family=Nunito+Sans:400,700);
 @import url(https://fonts.googleapis.com/css?family=Space+Mono:400);

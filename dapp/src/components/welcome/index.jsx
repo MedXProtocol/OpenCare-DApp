@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ModalVideo from 'react-modal-video'
 import { Link } from 'react-router-dom'
 import { BodyClass } from '~/components/BodyClass'
 import { connect } from 'react-redux'
@@ -25,6 +26,23 @@ function mapStateToProps (state) {
 }
 
 export const Welcome = connect(mapStateToProps)(class _Welcome extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      isOpen: false
+    }
+    // this.openModal = this.openModal.bind(this)
+  }
+
+  toggleModal = (e) => {
+    if (e) {
+      e.preventDefault()
+    }
+
+    this.setState({ isOpen: !this.state.isOpen })
+  }
+
   ropsten = () => {
     return (this.props.networkId && this.props.networkId === 3)
   }
@@ -63,12 +81,18 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                   No registration. Submit case instantly. Diagnosis in hours.
                 </h2>
 
-                <Link
+                <ModalVideo
+                  channel='youtube'
+                  isOpen={this.state.isOpen}
+                  videoId='sMhp94_iPZQ'
+                  onClose={this.toggleModal}
+                />
+                <button
                   className="btn btn-link"
-                  to={launchLink}
+                  onClick={this.toggleModal}
                 >
                   <FontAwesomeIcon icon={faPlayCircle} /> Watch Video
-                </Link>
+                </button>
               </div>
             </div>
 
