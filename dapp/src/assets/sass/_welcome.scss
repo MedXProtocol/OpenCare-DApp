@@ -191,8 +191,7 @@
 }
 
 .bottom-svg {
-  bottom: 0;
-  margin-bottom: -1px;
+  bottom: -1px;
 }
 
 .bottom-svg,
@@ -200,6 +199,7 @@
   position: absolute;
   left: 0;
   height: 8em;
+  top: -1px;
   width: 100%;
 }
 
