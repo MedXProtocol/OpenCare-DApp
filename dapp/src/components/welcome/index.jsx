@@ -171,9 +171,10 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
           </div>
         </section>
 
-
-
         <section className="bg-white section--learn-more">
+          <svg class="top-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <polygon points="100,0 0,100 0,0"></polygon>
+          </svg>
           <div className='container'>
             <div className='row'>
               <div className='col-xs-12 col-md-10 col-md-offset-1 pad-mobile'>
@@ -181,7 +182,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                   Learn More
                 </h3>
                 <p>
-                  For more information, refer to our blog post to learn how we provide the most affordable consultations.
+                  For more information, refer to our <a href="https://medium.com/medxprotocol/opencare-powered-by-medx-is-now-live-on-ethereum-mainnet-998b05c23a75">blog post</a> to learn how we provide the most affordable consultations.
                 </p>
 
                 <br />
@@ -196,6 +197,9 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
               </div>
             </div>
 
+            <svg class="bottom-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <polygon points="0,100 100,0 100,100"></polygon>
+            </svg>
           </div>
         </section>
       </BodyClass>
