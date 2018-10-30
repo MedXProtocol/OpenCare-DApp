@@ -84,7 +84,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                 <ModalVideo
                   channel='youtube'
                   isOpen={this.state.isOpen}
-                  videoId='sMhp94_iPZQ'
+                  videoId='GZe1jtOnB7w'
                   onClose={this.toggleModal}
                 />
                 <button
@@ -102,12 +102,12 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
         <section className="bg-white section--access">
           <div className='container'>
             <div className='row'>
-              <div className='col-xs-12 col-sm-6 col-sm-offset-1 pad-mobile'>
+              <div className='col-xs-12 col-sm-6 col-md-7 col-md-offset-1 pad-mobile'>
                 <h4>
                   Access dermatologists worldwide. Anywhere. Anytime.
                 </h4>
               </div>
-              <div className="col-xs-12 col-sm-offset-1 col-sm-3 pad-mobile">
+              <div className="col-xs-12 col-sm-offset-1 col-sm-5 col-md-offset-0 col-md-3 pad-mobile mobile--text-center text-right">
                 <Link
                   className="btn btn-lg btn-success"
                   to={launchLink}
@@ -128,14 +128,14 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                 </h1>
 
                 <p>
-                  (Inquire at <a href="mailto:contact@medxprotocol.com">contact@medxprotocol.com</a> for instant free trial consultations)
+                  Inquire at <a href="mailto:contact@medxprotocol.com">contact@medxprotocol.com</a> for free trial consultations
                 </p>
                 <br />
               </div>
             </div>
 
             <div className='row'>
-              <div className='col-xs-12 col-md-offset-1 col-md-3 col-custom-md-3 pad-mobile text-center'>
+              <div className='col-xs-12 col-md-4 col-screenshot pad-mobile text-center'>
                 <img
                   src={ScreenshotStep1}
                   className="img-responsive"
@@ -146,25 +146,25 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                 </h3>
               </div>
 
-              <div className='col-xs-12 col-md-3 col-custom-md-3 pad-mobile text-center'>
+              <div className='col-xs-12 col-md-4 col-screenshot pad-mobile text-center'>
                 <img
                   src={ScreenshotStep2}
                   className="img-responsive"
                   alt="screenshot 2"
                 />
                 <h3>
-                  Enter details, payment &amp; submit
+                  Enter case details
                 </h3>
               </div>
 
-              <div className='col-xs-12 col-md-3 col-custom-md-3 pad-mobile text-center'>
+              <div className='col-xs-12 col-md-4 col-screenshot pad-mobile text-center'>
                 <img
                   src={ScreenshotStep3}
                   className="img-responsive"
                   alt="screenshot 3"
                 />
                 <h3>
-                  Receive diagnosis &amp; recommendation in hours
+                  Submit &amp; receive an expert recommendation in hours
                 </h3>
               </div>
             </div>
@@ -196,10 +196,6 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                 </p>
               </div>
             </div>
-
-            <svg class="bottom-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <polygon points="0,100 100,0 100,100"></polygon>
-            </svg>
           </div>
         </section>
       </BodyClass>

@@ -27,8 +27,8 @@
 @import "./assets/sass/star";
 @import "./assets/sass/style";
 @import "./assets/sass/table";
+@import "./assets/sass/welcome";
 @import "./assets/sass/well";
-
 
 @import url(https://fonts.googleapis.com/css?family=Nunito+Sans:400,700);
 @import url(https://fonts.googleapis.com/css?family=Space+Mono:400);
