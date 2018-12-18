@@ -45,6 +45,10 @@
   text-decoration: line-through;
 }
 
+.table--invoice {
+  margin: 10px 0 30px;
+}
+
 .table--invoice .flip-link span {
   color: lighten($brand-dark-blue, 50%);
 }

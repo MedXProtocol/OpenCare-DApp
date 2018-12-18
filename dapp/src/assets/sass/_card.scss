@@ -163,11 +163,11 @@ $card-columns-margin:               $card-spacer-y;
   }
 }
 
-.card-footer .btn {
-  @media (min-width: $screen-sm) {
-    margin-left: 10px;
-  }
-}
+// .card-footer .btn {
+//   @media (min-width: $screen-sm) {
+//     margin-left: 10px;
+//   }
+// }
 
 //
 // Header navs
@@ -371,5 +371,7 @@ $card-columns-margin:               $card-spacer-y;
 }
 
 .card-footer--invoice {
-  background: #f1f1f1;
+  background: #e8effa;
+  padding-bottom: 40px;
+  padding-top: 40px;
 }

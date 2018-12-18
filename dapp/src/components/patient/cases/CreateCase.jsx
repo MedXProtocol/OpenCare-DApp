@@ -3,6 +3,10 @@ import { toBN } from '~/utils/toBN'
 import { connect } from 'react-redux'
 import { cold } from 'react-hot-loader'
 import {
+  ControlLabel,
+  ToggleButtonGroup,
+  ToggleButton,
+  ButtonToolbar,
   Button,
   Modal
 } from 'react-bootstrap'
@@ -26,7 +30,7 @@ import { Dai } from '~/components/Dai'
 import { DaiApproval } from '~/components/DaiApproval'
 import { DaiAllowance } from '~/components/DaiAllowance'
 import { InfoQuestionMark } from '~/components/InfoQuestionMark'
-import { ControlLabel, ToggleButtonGroup, ToggleButton, ButtonToolbar } from 'react-bootstrap'
+import { WyreModal } from '~/components/WyreModal'
 import { externalTransactionFinders } from '~/finders/externalTransactionFinders'
 import {
   contractByName,
@@ -174,7 +178,7 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
             showTermsModal: false,
             spotRashOrAcne: null,
             whatAllergies: null,
-            worseWithPeriod: null,
+            worseWithPeriod: null
           }
 
           this.setCountryRef = element => { this.countryInput = element }
@@ -955,6 +959,8 @@ export const CreateCase = connect(mapStateToProps, mapDispatchToProps)(
                             {approvalButtonRow}
                           </tbody>
                         </table>
+
+                        <WyreModal />
                       </div>
 
                       <div className="card-footer text-right">
