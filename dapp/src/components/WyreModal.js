@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import ReactTimeout from 'react-timeout'
-import { Modal } from 'react-bootstrap'
 
 export const WyreModal = ReactTimeout(class _WyreModal extends Component {
 
