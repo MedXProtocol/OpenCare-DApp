@@ -5,8 +5,8 @@ export const WyreModal = ReactTimeout(class _WyreModal extends Component {
 
   componentDidMount() {
     this.handler = new window.Wyre({
-      apiKey: "AK-P6B4DP8N-J2MDNWW9-YUX8LMMP-7QJZHPAT",
-      env: "test",
+      apiKey: process.env.REACT_APP_WYRE_API_KEY,
+      env: process.env.REACT_APP_WYRE_ENV,
       onExit: function (error) {
         if (error != null)
           console.error(error)
