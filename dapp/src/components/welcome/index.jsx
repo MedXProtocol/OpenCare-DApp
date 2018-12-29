@@ -84,7 +84,7 @@ export const Welcome = connect(mapStateToProps)(class _Welcome extends Component
                 <ModalVideo
                   channel='youtube'
                   isOpen={this.state.isOpen}
-                  videoId='GZe1jtOnB7w'
+                  videoId='4-QPtYzMh90'
                   onClose={this.toggleModal}
                 />
                 <button
