@@ -32,7 +32,7 @@ export const WyreModal = ReactTimeout(class _WyreModal extends Component {
           className="btn btn-primary"
           onClick={this.handleOpenWyre}
         >
-          Purchase with USD
+          Pay with USD
         </button>
         <script src="/popper.min.js"></script>
         <script src="/bootstrap.min.js"></script>
